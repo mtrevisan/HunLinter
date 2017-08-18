@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="false">
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %logger{0}:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="unit731.hunspeller" level="trace" />
+	<logger name="sun.misc" level="off" />
+	<logger name="java.util" level="off" />
+
+
+	<root level="info">
+		<appender-ref ref="console" />
+	</root>
+</configuration>

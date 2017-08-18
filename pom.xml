@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>unit731</groupId>
+	<artifactId>Hunspeller</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<!-- Maven Source Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Maven JavaDoc Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Maven Deploy Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+			</plugin>
+			<!-- Maven Shade Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<!-- Run shade goal on package phase -->
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<minimizeJar>true</minimizeJar>
+					<shadedArtifactAttached>true</shadedArtifactAttached>
+					<shadedClassifierName>shaded</shadedClassifierName>
+					<filters>
+						<!-- FIXME: strenghten the inclusions -->
+						<filter>
+							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+						<filter>
+							<artifact>org.apache.commons:commons-vfs2</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter> 
+						<filter>
+							<artifact>commons-logging:commons-logging</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>AUTHORS</exclude>
+								<exclude>LICENSE</exclude>
+								<exclude>changelog.txt</exclude>
+								<exclude>latestchanges.html</exclude>
+								<exclude>changelog.txt</exclude>
+								<exclude>META-INF/LICENSE</exclude>
+								<exclude>META-INF/LICENSE.txt</exclude>
+								<exclude>META-INF/NOTICE</exclude>
+								<exclude>META-INF/NOTICE.txt</exclude>
+							</excludes>
+						</filter>
+					</filters>
+					<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>unit731.hunspeller.HunspellerFrame</mainClass>
+						</transformer>
+					</transformers>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<!-- Apache -->
+		<org.apache.commons.lang3.version>3.6</org.apache.commons.lang3.version>
+		<org.apache.commons.vfs2.version>2.1</org.apache.commons.vfs2.version>
+		<org.apache.commons.io.version>2.5</org.apache.commons.io.version>
+
+		<!-- Murmur3 Hash -->
+		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
+
+		<!-- Lombok -->
+		<org.projectlombok.version>1.16.18</org.projectlombok.version>
+
+		<!-- Jackson -->
+		<com.fasterxml.jackson.version>2.9.0</com.fasterxml.jackson.version>
+
+		<!-- Logging -->
+		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
+
+		<!-- JUnit -->
+		<junit.version>4.12</junit.version>
+	</properties>
+
+	<dependencies>
+		<!-- Apache -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${org.apache.commons.lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-vfs2</artifactId>
+			<version>${org.apache.commons.vfs2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${org.apache.commons.io.version}</version>
+		</dependency>
+
+		<!-- Bloom filter: For computing Murmur hashes -->
+		<dependency>
+			<groupId>com.sangupta</groupId>
+			<artifactId>murmur</artifactId>
+			<version>${com.sangupta.murmur.version}</version>
+		</dependency>
+
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${org.projectlombok.version}</version>
+		</dependency>
+
+		<!-- Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${com.fasterxml.jackson.version}</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${ch.qos.logback.version}</version>
+		</dependency>
+
+		<!-- JUnit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
