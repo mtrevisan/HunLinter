@@ -37,6 +37,9 @@ public class AffixParser{
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
 	private static final String BOM_MARKER = "\uFEFF";
 
+	private static final String DEFAULT_CHARACTER_SET = "ISO8859-1";
+
+
 	//General options
 	/**
 	 * Set character encoding of words and morphemes in affix and dictionary files. Possible values: UTF-8, ISO8859−1 through ISO8859−10,
@@ -217,6 +220,10 @@ public class AffixParser{
 				}
 			}
 		}
+
+		//apply default charset
+		if(!containsData(TAG_CHARACTER_SET))
+			addData(TAG_CHARACTER_SET, DEFAULT_CHARACTER_SET);
 	}
 
 	private Charset extractCharset(File file) throws IOException{

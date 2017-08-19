@@ -14,7 +14,11 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseRuleFlags(String textFlags){
-		return (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(StringUtils.EMPTY)): new String[0]);
+		String[] flags = (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(StringUtils.EMPTY)): new String[0]);
+		for(String flag : flags)
+			if(StringUtils.isBlank(flag))
+				throw new IllegalArgumentException("Flag must be a valid UTF-8 character");
+		return flags;
 	}
 
 	@Override

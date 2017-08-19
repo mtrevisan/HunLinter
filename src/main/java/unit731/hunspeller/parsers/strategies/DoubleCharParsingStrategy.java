@@ -15,6 +15,9 @@ public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseRuleFlags(String textFlags){
+		if(textFlags != null && textFlags.length() % 2 != 0)
+			throw new IllegalArgumentException("Flag must be of length two or a multiple");
+
 		return (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(SPLITTER)): new String[0]);
 	}
 

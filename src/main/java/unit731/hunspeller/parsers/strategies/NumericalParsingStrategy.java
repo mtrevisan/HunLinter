@@ -9,13 +9,26 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class NumericalParsingStrategy implements FlagParsingStrategy{
 
+	private static final int MAX_NUMERICAL_FLAG = 65510;
+
 	private static final String COMMA = ",";
 	private static final String SLASH = "/";
 
 
 	@Override
 	public String[] parseRuleFlags(String textFlags){
-		return (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(COMMA)): new String[0]);
+		String[] flags = (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(COMMA)): new String[0]);
+		for(String flag : flags){
+			try{
+				int numericalFlag = Integer.parseInt(flag);
+				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]");
+			}
+			catch(NumberFormatException e){
+				throw new IllegalArgumentException("Flag must be an integer number");
+			}
+		}
+		return flags;
 	}
 
 	@Override
