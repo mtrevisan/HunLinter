@@ -21,7 +21,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,15 +37,13 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.resources.DictionaryEntry;
 import unit731.hunspeller.resources.Duplicate;
 import unit731.hunspeller.resources.RuleProductionEntry;
+import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.WordGenerator;
 import unit731.hunspeller.services.sorters.ExternalSorter;
 import unit731.hunspeller.services.sorters.ExternalSorterOptions;
 
 
 public class DictionaryParser{
-
-	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
-	private static final String BOM_MARKER = "\uFEFF";
 
 	private static final Matcher COMMENT = Pattern.compile("^\\s*[#\\/].*$").matcher(StringUtils.EMPTY);
 
@@ -96,7 +93,7 @@ public class DictionaryParser{
 				try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
 					String line = br.readLine();
 					//ignore any BOM marker on first line
-					if(line.startsWith(BOM_MARKER))
+					if(line.startsWith(FileService.BOM_MARKER))
 						line = line.substring(1);
 					if(!NumberUtils.isCreatable(line))
 						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");

@@ -52,7 +52,7 @@ public class RecentItems{
 	}
 
 	public String get(int index){
-		return (String)items.get(index);
+		return items.get(index);
 	}
 
 	public int indexOf(String item){
@@ -91,7 +91,7 @@ public class RecentItems{
 		int size = items.size();
 		for(int i = 0; i < maxItems; i ++){
 			if(i < size)
-				preferenceNode.put(RECENT_ITEM_PREFIX + i, (String)items.get(i));
+				preferenceNode.put(RECENT_ITEM_PREFIX + i, items.get(i));
 			else
 				preferenceNode.remove(RECENT_ITEM_PREFIX + i);
 		}

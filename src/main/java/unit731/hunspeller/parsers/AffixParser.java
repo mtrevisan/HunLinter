@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +24,7 @@ import unit731.hunspeller.collections.regexptrie.RegExpTrie;
 import unit731.hunspeller.resources.AffixEntry;
 import unit731.hunspeller.resources.ParsingContext;
 import unit731.hunspeller.resources.RuleEntry;
+import unit731.hunspeller.services.FileService;
 
 
 @Slf4j
@@ -33,11 +33,6 @@ public class AffixParser{
 	public static final String FLAG_TYPE_UTF_8 = "UTF-8";
 	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
 	public static final String FLAG_TYPE_NUMERIC = "num";
-
-	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
-	private static final String BOM_MARKER = "\uFEFF";
-
-	private static final String DEFAULT_CHARACTER_SET = "ISO8859-1";
 
 
 	//General options
@@ -98,16 +93,16 @@ public class AffixParser{
 
 				AffixEntry entry = new AffixEntry(line, strategy);
 				if(entry.getType() != ruleType)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at index " + i + ": mismatched rule type (expected "
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ ruleType + ")");
 				if(!ruleFlag.equals(entry.getRuleFlag()))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at index " + i + ": mismatched rule flag (expected "
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule flag (expected "
 						+ ruleFlag + ")");
 				if(!containsUnique(entry.getContinuationClasses()))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at index " + i + ": multiple rule flags");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": multiple rule flags");
 
 				if(entries.contains(entry))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at index " + i + ": duplicated line");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 
 				entries.add(entry);
 //				String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", "").replaceFirst("\\$$", ""): ".");
@@ -196,12 +191,12 @@ public class AffixParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
-		charset = extractCharset(affFile);
+		charset = FileService.determineCharset(affFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
 			String line;
 			while((line = br.readLine()) != null){
 				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1 && line.startsWith(BOM_MARKER))
+				if(br.getLineNumber() == 1 && line.startsWith(FileService.BOM_MARKER))
 					line = line.substring(1);
 
 				line = removeComment(line);
@@ -223,39 +218,10 @@ public class AffixParser{
 
 		//apply default charset
 		if(!containsData(TAG_CHARACTER_SET))
-			addData(TAG_CHARACTER_SET, DEFAULT_CHARACTER_SET);
-	}
-
-	private Charset extractCharset(File file) throws IOException{
-		String charsetCode = StandardCharsets.UTF_8.name();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8))){
-			String line;
-			while((line = br.readLine()) != null){
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1 && line.startsWith(BOM_MARKER))
-					line = line.substring(1);
-
-				line = removeComment(line);
-				if(line.isEmpty())
-					continue;
-
-				ParsingContext context = new ParsingContext(line, br);
-				if(!TAG_CHARACTER_SET.equals(context.getRuleType()))
-					continue;
-
-				Consumer<ParsingContext> fun = RULE_FUNCTION.get(TAG_CHARACTER_SET);
-				if(fun != null){
-					try{
-						fun.accept(context);
-					}
-					catch(RuntimeException e){
-						throw new IllegalArgumentException(e.getMessage());
-					}
-				}
-				break;
-			}
-		}
-		return Charset.forName(charsetCode);
+			addData(TAG_CHARACTER_SET, charset);
+		if(!containsData(TAG_LANGUAGE))
+			//try to infer language from filename
+			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
 	}
 
 	public void clear(){

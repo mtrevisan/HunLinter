@@ -179,6 +179,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		sorterDialog.setSize(600, 400);
 		sorterDialog.setLocationRelativeTo(null);
 
+		enableMenuItemFromWorker.put(ThesaurusParser.ParserWorker.class, () -> theMenu.setEnabled(true));
 		enableMenuItemFromWorker.put(DictionaryParser.CorrectnessWorker.class, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
 		enableMenuItemFromWorker.put(DictionaryParser.DuplicatesWorker.class, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableMenuItemFromWorker.put(DictionaryParser.SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
@@ -1191,7 +1192,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 			//enable menu
 			dicMenu.setEnabled(true);
-			theMenu.setEnabled(true);
 			fileCreatePackageMenuItem.setEnabled(true);
 
 			flm.addFile(affFile);

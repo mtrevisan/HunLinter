@@ -26,6 +26,7 @@ import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.resources.DuplicationResult;
 import unit731.hunspeller.resources.MeaningEntry;
 import unit731.hunspeller.resources.ThesaurusEntry;
+import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.memento.Caretaker;
 
 
@@ -52,9 +53,6 @@ public class ThesaurusParser{
 	@AllArgsConstructor
 	public static class ParserWorker extends SwingWorker<List<ThesaurusEntry>, String>{
 
-		//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
-		private static final String BOM_MARKER = "\uFEFF";
-
 		private final File theFile;
 		private final ThesaurusParser theParser;
 		private final Runnable postExecution;
@@ -70,7 +68,7 @@ public class ThesaurusParser{
 				long readSoFar = 0l;
 				long totalSize = theFile.length();
 
-				Charset charset = extractCharset(theFile);
+				Charset charset = FileService.determineCharset(theFile.toPath());
 				try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
 					String line = br.readLine();
 					if(Charset.forName(line) != charset)
@@ -94,17 +92,6 @@ public class ThesaurusParser{
 				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return theParser.synonyms;
-		}
-
-		private Charset extractCharset(File file) throws IOException{
-			String charsetCode = StandardCharsets.UTF_8.name();
-			try(BufferedReader br = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)){
-				String line = br.readLine();
-				//ignore any BOM marker on first line
-				if(line.startsWith(BOM_MARKER))
-					charsetCode = line.substring(1);
-			}
-			return Charset.forName(charsetCode);
 		}
 
 		@Override
