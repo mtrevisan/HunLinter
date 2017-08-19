@@ -49,7 +49,7 @@ public class AffixParser{
 	 * from 1 to 65000, and in flag fields are separated by comma
 	 */
 	private static final String TAG_FLAG = "FLAG";
-	/** Set twofold prefix stripping (but single suffix stripping) for agglutinative languages with right-toleft writing system */
+	/** Set twofold prefix stripping (but single suffix stripping) for agglutinative languages with right-to-left writing system */
 	private static final String TAG_COMPLEX_PREFIXES = "COMPLEXPREFIXES";
 	private static final String TAG_LANGUAGE = "LANG";
 
@@ -81,6 +81,8 @@ public class AffixParser{
 			String ruleFlag = context.getFirstParameter();
 			String combineable = context.getSecondParameter();
 			int numEntries = Integer.parseInt(context.getThirdParameter());
+			if(numEntries == 0)
+				throw new IllegalArgumentException("Error reading line \"" + context.toString() + ": Bad number of entries (0)");
 
 			String flag = getFlag();
 			strategy = createFlagParsingStrategy(flag);
@@ -171,6 +173,7 @@ public class AffixParser{
 //		RULE_FUNCTION.put("REP", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("MAP", FUN_DO_NOTHING);
 		//Options for compounding
+		//default break table contains: "-", "^-", and "-$"
 //		RULE_FUNCTION.put("BREAK", FUN_DO_NOTHING);
 		//Options for affix creation
 		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);

@@ -12,6 +12,7 @@ public class ParsingContext{
 	private static final String SEPARATOR = "[\\s\\t]+";
 
 
+	private final String line;
 	private final String[] definitionParts;
 	@Getter private final BufferedReader reader;
 
@@ -20,6 +21,7 @@ public class ParsingContext{
 		Objects.nonNull(line);
 		Objects.nonNull(br);
 
+		this.line = line;
 		definitionParts = line.split(SEPARATOR);
 		reader = br;
 	}
@@ -51,6 +53,11 @@ public class ParsingContext{
 	public int getRuleLength(){
 		String part = getFirstParameter();
 		return (StringUtils.isNumeric(part)? Integer.parseInt(part): 0);
+	}
+
+	@Override
+	public String toString(){
+		return line;
 	}
 
 }

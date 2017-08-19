@@ -46,10 +46,13 @@ public class AffixEntry{
 
 
 	@Getter private final TYPE type;
+	//ID used to represent the affix
 	@Getter private final String ruleFlag;
 	@Getter private final String[] continuationClasses;
 	@Getter private final Matcher match;
+	//string to strip
 	private final Matcher remove;
+	//string to append
 	private final String add;
 	@Getter private final String[] dataFields;
 

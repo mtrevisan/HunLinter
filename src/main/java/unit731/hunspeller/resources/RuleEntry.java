@@ -13,6 +13,7 @@ public class RuleEntry{
 
 
 	private final boolean isSuffix;
+	//cross product flag
 	private final boolean combineable;
 	private final List<AffixEntry> entries;
 //	private final RegExpTrie<AffixEntry> prefixEntries;
