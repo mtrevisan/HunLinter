@@ -80,7 +80,7 @@ public class AffixParser{
 			String combineable = context.getSecondParameter();
 			int numEntries = Integer.parseInt(context.getThirdParameter());
 			if(numEntries == 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString() + ": Bad number of entries (0)");
+				throw new IllegalArgumentException("Error reading line \"" + context.toString() + ": Bad number of entries, it must be a positive integer");
 
 			String flag = getFlag();
 			strategy = createFlagParsingStrategy(flag);
