@@ -889,16 +889,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryDuplicates(affParser);
-
-		dicExtractDuplicatesMenuItem.setEnabled(false);
 	}//GEN-LAST:event_dicExtractDuplicatesMenuItemMousePressed
 
 	private void dicExtractWordlistMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_dicExtractWordlistMenuItemMousePressed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist();
-
-		dicExtractWordlistMenuItem.setEnabled(false);
 	}//GEN-LAST:event_dicExtractWordlistMenuItemMousePressed
 
 	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_dicInputTextFieldKeyReleased
@@ -1092,7 +1088,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					dicCorrectnessWorker.cancel(true);
 					dicCorrectnessWorker = null;
 
-					mainProgressBar.setValue(0);
 					dicCheckCorrectnessMenuItem.setEnabled(true);
 					printResultLine("Dictionary correctness check aborted");
 				}
@@ -1107,7 +1102,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					dicDuplicatesWorker.cancel(true);
 					dicDuplicatesWorker = null;
 
-					mainProgressBar.setValue(0);
 					dicExtractDuplicatesMenuItem.setEnabled(true);
 					printResultLine("Dictionary duplicate extraction aborted");
 				}
@@ -1122,7 +1116,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					dicWordlistWorker.cancel(true);
 					dicWordlistWorker = null;
 
-					mainProgressBar.setValue(0);
 					dicExtractWordlistMenuItem.setEnabled(true);
 					printResultLine("Dictionary wordlist extraction aborted");
 				}
@@ -1260,9 +1253,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 	private void extractDictionaryDuplicates(AffixParser affParser){
 		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
+			dicExtractDuplicatesMenuItem.setEnabled(false);
+
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
-				dicExtractDuplicatesMenuItem.setEnabled(false);
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
@@ -1270,14 +1264,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
+			else
+				dicExtractDuplicatesMenuItem.setEnabled(true);
 		}
 	}
 
 	private void extractDictionaryWordlist(){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
+			dicExtractWordlistMenuItem.setEnabled(false);
+
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
-				dicExtractWordlistMenuItem.setEnabled(false);
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
@@ -1285,6 +1282,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
+			else
+				dicExtractWordlistMenuItem.setEnabled(true);
 		}
 	}
 

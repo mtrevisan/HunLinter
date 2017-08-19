@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Word{
 
-	private static final String ALPHABET = ".0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ";
+	private static final String ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ";
 
 	private static final Matcher LAST_STRESSED_VOWEL = Pattern.compile("[aeiouàèéíòóú][^aeiouàèéíòóú]*$").matcher(StringUtils.EMPTY);
 

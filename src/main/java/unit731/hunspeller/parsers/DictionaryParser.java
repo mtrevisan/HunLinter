@@ -18,10 +18,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -291,9 +294,14 @@ public class DictionaryParser{
 
 			long writtenSoFar = 0l;
 			long totalSize = duplicates.size();
+			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
-				for(Duplicate duplicate : duplicates){
-					writer.write(duplicate.getLineIndex() + ": " + duplicate.getProduction().getWord() + " from " + duplicate.getDictionaryWord().getWord());
+				for(List<Duplicate> entries : mergedDuplicates){
+					writer.write(entries.get(0).getProduction().getWord());
+					writer.write(": ");
+					writer.write(entries.stream()
+						.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + ")")
+						.collect(Collectors.joining(", ")));
 					writer.newLine();
 
 					writtenSoFar ++;
@@ -303,6 +311,26 @@ public class DictionaryParser{
 
 				publish("File written: " + outputFile.getAbsolutePath());
 			}
+		}
+
+		private List<List<Duplicate>> mergeDuplicates(List<Duplicate> duplicates){
+			Map<String, List<Duplicate>> dupls = duplicates.stream()
+				.collect(Collectors.toMap(duplicate -> duplicate.getProduction().getWord(),
+					duplicate -> {
+						List<Duplicate> list = new ArrayList<>();
+						list.add(duplicate);
+						return list;
+					},
+					(oldValue, newValue) -> {
+						oldValue.addAll(newValue);
+						return oldValue;
+					}));
+
+			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
+			List<List<Duplicate>> result = new ArrayList<>(dupls.values());
+			result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
+				.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
+			return result;
 		}
 
 		@Override
