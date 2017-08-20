@@ -71,8 +71,6 @@ public class ThesaurusParser{
 				Charset charset = FileService.determineCharset(theFile.toPath());
 				try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
 					String line = br.readLine();
-					if(Charset.forName(line) != charset)
-						throw new IllegalArgumentException("Thesaurus data file malformed, the first line is not '" + charset.name() + "'");
 
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
