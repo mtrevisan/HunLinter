@@ -71,7 +71,7 @@ public class WordGenerator{
 			String[] ruleFlags = dicEntry.getRuleFlags();
 			Set<String> otherRuleFlags = extractLeftOverContinuationClasses(ruleFlags, true);
 
-			return new RuleProductionEntry(dicEntry, otherRuleFlags, true, flag);
+			return new RuleProductionEntry(dicEntry, otherRuleFlags, true);
 		}
 		catch(IllegalArgumentException e){
 			throw new IllegalArgumentException(word + " does not have a rule for flag " + e.getMessage());
@@ -178,7 +178,7 @@ public class WordGenerator{
 		String[] newDataFields = combineDataFields(dataFields, affixEntry.getDataFields());
 
 		RuleProductionEntry production = new RuleProductionEntry(newWord, otherRuleFlags, affixEntry.getContinuationClasses(), newDataFields,
-			isCombineable, affParser.getFlag());
+			isCombineable);
 		production.getRules().add(affixEntry);
 		return production;
 	}

@@ -321,16 +321,19 @@ public class AffixParser{
 
 	public boolean definesFlag(String ruleFlag){
 		if(rawFlags == null){
-			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
-			String rawRules = compoundRules.stream()
-				.map(rule -> rule.replaceAll("[*?()]", StringUtils.EMPTY))
-				.collect(Collectors.joining(StringUtils.EMPTY));
-			String[] parsedRules = strategy.parseRuleFlags(rawRules);
-			rawFlags = new HashSet<>(Arrays.asList(parsedRules));
-
+			rawFlags = new HashSet<>();
 			rawFlags.add(getData(TAG_KEEP_CASE));
 			rawFlags.add(getData(TAG_NO_SUGGEST));
 			rawFlags.add(getData(TAG_ONLY_IN_COMPOUND));
+
+			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
+			if(compoundRules != null){
+				String rawRules = compoundRules.stream()
+					.map(rule -> rule.replaceAll("[*?()]", StringUtils.EMPTY))
+					.collect(Collectors.joining(StringUtils.EMPTY));
+				String[] parsedRules = strategy.parseRuleFlags(rawRules);
+				rawFlags.addAll(Arrays.asList(parsedRules));
+			}
 
 			rawFlags.remove(null);
 		}

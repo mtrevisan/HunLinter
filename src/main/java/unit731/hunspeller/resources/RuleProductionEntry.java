@@ -26,19 +26,16 @@ public class RuleProductionEntry implements Productable{
 	@Setter private List<AffixEntry> rules;
 	private final boolean combineable;
 
-	private final String flag;
 
-
-	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> ruleFlags, boolean combineable, String flag){
-		this(dicEntry.getWord(), ruleFlags, null, dicEntry.getDataFields(), combineable, flag);
+	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> ruleFlags, boolean combineable){
+		this(dicEntry.getWord(), ruleFlags, null, dicEntry.getDataFields(), combineable);
 	}
 
-	public RuleProductionEntry(String word, Set<String> otherRuleFlags, String[] currentContinuationClasses, String[] dataFields, boolean combineable, String flag){
+	public RuleProductionEntry(String word, Set<String> otherRuleFlags, String[] currentContinuationClasses, String[] dataFields, boolean combineable){
 		Objects.nonNull(word);
 		Objects.nonNull(otherRuleFlags);
 		Objects.nonNull(currentContinuationClasses);
 		Objects.nonNull(dataFields);
-		Objects.nonNull(flag);
 
 		String[] newContinuationClasses = mergeContinuationClasses(otherRuleFlags, currentContinuationClasses);
 
@@ -47,8 +44,6 @@ public class RuleProductionEntry implements Productable{
 		this.dataFields = dataFields;
 		rules = new ArrayList<>();
 		this.combineable = combineable;
-
-		this.flag = flag;
 	}
 
 	/** Merge previous unproductive continuation classes with the continuation classes of the current rule */
