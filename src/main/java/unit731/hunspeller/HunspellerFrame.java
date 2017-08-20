@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import javax.swing.JComponent;
@@ -89,8 +88,6 @@ import unit731.hunspeller.services.ZipManager;
 public class HunspellerFrame extends JFrame implements ActionListener, FileListener, PropertyChangeListener, Resultable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
-
-	private static final String PATH_SEPARATOR = Pattern.quote("/") + Pattern.quote("\\");
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
@@ -851,7 +848,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		dicSortDictionaryMenuItem.setEnabled(false);
 
 		try{
-			File dicFile = getDICFile();
+			File dicFile = getDictionaryFile();
 			String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
 				.map(line -> StringUtils.replace(line, "\t", "   "))
 				.toArray(String[]::new);
@@ -1301,7 +1298,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	private String getCurrentWorkingDirectory(){
 		String codePath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
 		return codePath
-			.replaceFirst("(classes[" + PATH_SEPARATOR + "])?[^" + PATH_SEPARATOR + "]*$", StringUtils.EMPTY)
+			.replaceFirst("(classes/)?[^/]*$", StringUtils.EMPTY)
 			.replaceAll("%20", StringUtils.SPACE);
 	}
 
@@ -1453,7 +1450,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
 
-	private File getDICFile(){
+	private File getDictionaryFile(){
 		return getFile(affParser.getLanguage() + ".dic");
 	}
 
