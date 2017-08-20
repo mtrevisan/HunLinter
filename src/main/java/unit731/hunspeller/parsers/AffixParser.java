@@ -37,8 +37,8 @@ public class AffixParser{
 
 	//General options
 	/**
-	 * Set character encoding of words and morphemes in affix and dictionary files. Possible values: UTF-8, ISO8859−1 through ISO8859−10,
-	 * ISO8859−13 through ISO8859−15, KOI8-R, KOI8-U, microsoftcp1251, ISCII-DEVANAGARI
+	 * Set character encoding of words and morphemes in affix and dictionary files. Possible values are UTF-8, ISO8859-1 through ISO8859-10,
+	 * ISO8859-13 through ISO8859-15, KOI8-R, KOI8-U, MICROSOFT-CP1251, ISCII-DEVANAGARI
 	 */
 	private static final String TAG_CHARACTER_SET = "SET";
 	/**
@@ -49,17 +49,17 @@ public class AffixParser{
 	private static final String TAG_FLAG = "FLAG";
 	/** Set twofold prefix stripping (but single suffix stripping) for agglutinative languages with right-to-left writing system */
 	private static final String TAG_COMPLEX_PREFIXES = "COMPLEXPREFIXES";
+	/** Language code */
 	private static final String TAG_LANGUAGE = "LANG";
-
-	//Options for suggestions
-	private static final String TAG_ALPHABET = "TRY";
 
 	//Options for affix creation
 	private static final String TAG_PREFIX = AffixEntry.TYPE.PREFIX.getFlag();
 	private static final String TAG_SUFFIX = AffixEntry.TYPE.SUFFIX.getFlag();
 
 	//Other options
+	/** With this flag the affix rules can strip full words, not only one less characters */
 	private static final String TAG_FULLSTRIP = "FULLSTRIP";
+	/** Forbid uppercased and capitalized forms of words signed with this flag */
 	private static final String TAG_KEEPCASE = "KEEPCASE";
 
 
@@ -80,7 +80,8 @@ public class AffixParser{
 			String combineable = context.getSecondParameter();
 			int numEntries = Integer.parseInt(context.getThirdParameter());
 			if(numEntries == 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString() + ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ ": Bad number of entries, it must be a positive integer");
 
 			String flag = getFlag();
 			strategy = createFlagParsingStrategy(flag);
@@ -167,7 +168,7 @@ public class AffixParser{
 		RULE_FUNCTION.put(TAG_LANGUAGE, FUN_COPY_OVER);
 		//Options for suggestions
 //		RULE_FUNCTION.put("KEY", FUN_DO_NOTHING);
-//		RULE_FUNCTION.put(TAG_ALPHABET, FUN_DO_NOTHING);
+//		RULE_FUNCTION.put("TRY", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("REP", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("MAP", FUN_DO_NOTHING);
 		//Options for compounding
@@ -265,10 +266,6 @@ public class AffixParser{
 
 	public Charset getCharset(){
 		return Charset.forName(getData(TAG_CHARACTER_SET));
-	}
-
-	public String getAlphabet(){
-		return getData(TAG_ALPHABET);
 	}
 
 	public String getKeepcase(){
