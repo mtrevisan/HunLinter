@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import org.apache.commons.lang3.StringUtils;
 
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files */

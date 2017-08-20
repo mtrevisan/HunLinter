@@ -101,13 +101,11 @@ public class WordGenerator{
 		List<RuleProductionEntry> productions = new ArrayList<>();
 
 		if(ruleFlags != null){
-			String keepcaseTag = affParser.getKeepcase();
-
 			Set<String> otherRuleFlags = extractLeftOverContinuationClasses(ruleFlags, isSuffix);
 
 			//for each flag...
 			for(String ruleFlag : ruleFlags){
-				if(ruleFlag.equals(keepcaseTag))
+				if(affParser.definesFlag(ruleFlag))
 					continue;
 
 				//... that is a suffix or prefix...
@@ -156,11 +154,9 @@ public class WordGenerator{
 
 	/** Collect other type's flags (if the current production is for suffixes then collects prefixes, and vice-versa) */
 	private Set<String> extractLeftOverContinuationClasses(String[] ruleFlags, boolean isSuffix) throws IllegalArgumentException{
-		String keepcaseTag = affParser.getKeepcase();
-
 		Set<String> otherRuleFlags = new HashSet<>();
 		for(String ruleFlag : ruleFlags){
-			if(ruleFlag.equals(keepcaseTag)){
+			if(affParser.definesFlag(ruleFlag)){
 				otherRuleFlags.add(ruleFlag);
 				continue;
 			}

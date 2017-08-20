@@ -82,7 +82,7 @@ public class AffixEntry{
 		add = (ZERO.equals(addition)? StringUtils.EMPTY: addition);
 
 		if(isSuffix() && StringUtils.isNotBlank(regexToRemove) && addition.length() > 1 && regexToRemove.charAt(0) == addition.charAt(0))
-			log.warn("This line has characters in common between removed and added part " + line);
+			log.warn("This line has characters in common between removed and added part: " + line);
 
 		entry = line.replaceFirst("\t.*$", "");
 	}

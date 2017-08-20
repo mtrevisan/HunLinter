@@ -85,7 +85,7 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening DIC file: " + affParser.getLanguage() + ".dic");
+				publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
 				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -159,7 +159,7 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening DIC file: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
 			setProgress(0);
 
 			//collect duplicates
@@ -519,7 +519,7 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening DIC file: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
 			setProgress(0);
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();

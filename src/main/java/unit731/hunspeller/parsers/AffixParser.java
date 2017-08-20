@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.regexptrie.RegExpTrie;
@@ -34,6 +35,7 @@ public class AffixParser{
 	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
 	public static final String FLAG_TYPE_NUMERIC = "num";
 
+	private static final String COMPOUND_RULE_SEPARATOR = "[\\s\\t]+";
 
 	//General options
 	/**
@@ -52,6 +54,14 @@ public class AffixParser{
 	/** Language code */
 	private static final String TAG_LANGUAGE = "LANG";
 
+	//Options for suggestions
+	private static final String TAG_NO_SUGGEST = "NOSUGGEST";
+
+	//Options for compounding
+	private static final String TAG_COMPOUND_RULE = "COMPOUNDRULE";
+	private static final String TAG_COMPOUND_MIN = "COMPOUNDMIN";
+	private static final String TAG_ONLY_IN_COMPOUND = "ONLYINCOMPOUND";
+
 	//Options for affix creation
 	private static final String TAG_PREFIX = AffixEntry.TYPE.PREFIX.getFlag();
 	private static final String TAG_SUFFIX = AffixEntry.TYPE.SUFFIX.getFlag();
@@ -60,16 +70,53 @@ public class AffixParser{
 	/** With this flag the affix rules can strip full words, not only one less characters */
 	private static final String TAG_FULLSTRIP = "FULLSTRIP";
 	/** Forbid uppercased and capitalized forms of words signed with this flag */
-	private static final String TAG_KEEPCASE = "KEEPCASE";
+	private static final String TAG_KEEP_CASE = "KEEPCASE";
 
 
 	private final Map<String, Object> data = new HashMap<>();
+	private Set<String> rawFlags;
 	private Charset charset;
 	private FlagParsingStrategy strategy;
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
 		addData(context.getRuleType(), context.getAllButFirstParameter());
+	};
+	private final Consumer<ParsingContext> FUN_COMPOUND_RULE = context -> {
+		try{
+			BufferedReader br = context.getReader();
+			int numEntries = Integer.parseInt(context.getFirstParameter());
+			if(numEntries == 0)
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ ": Bad number of entries, it must be a positive integer");
+
+			String flag = getFlag();
+			strategy = createFlagParsingStrategy(flag);
+
+			Set<String> compoundRules = new HashSet<>();
+			for(int i = 0; i < numEntries; i ++){
+				String line = br.readLine();
+
+				String[] lineParts = line.split(COMPOUND_RULE_SEPARATOR);
+				String tag = lineParts[0];
+				if(!TAG_COMPOUND_RULE.equals(tag))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
+						+ TAG_COMPOUND_RULE + ")");
+				String rule = lineParts[1];
+				if(StringUtils.isBlank(rule))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": rule type cannot be empty");
+
+				if(compoundRules.contains(rule))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+
+				compoundRules.add(rule);
+			}
+
+			addData(TAG_COMPOUND_RULE, compoundRules);
+		}
+		catch(IOException e){
+			throw new RuntimeException(e);
+		}
 	};
 	private final Consumer<ParsingContext> FUN_AFFIX = context -> {
 		try{
@@ -169,17 +216,21 @@ public class AffixParser{
 		//Options for suggestions
 //		RULE_FUNCTION.put("KEY", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("TRY", FUN_DO_NOTHING);
+		RULE_FUNCTION.put(TAG_NO_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("REP", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("MAP", FUN_DO_NOTHING);
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
 //		RULE_FUNCTION.put("BREAK", FUN_DO_NOTHING);
+		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
+		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
 		//Options for affix creation
 		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);
 		RULE_FUNCTION.put(TAG_SUFFIX, FUN_AFFIX);
 		//Other options
 		RULE_FUNCTION.put(TAG_FULLSTRIP, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_KEEPCASE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_KEEP_CASE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("ICONV", FUN_DO_NOTHING);
 //		RULE_FUNCTION.put("WORDCHARS", FUN_DO_NOTHING);
 	}
@@ -268,8 +319,22 @@ public class AffixParser{
 		return Charset.forName(getData(TAG_CHARACTER_SET));
 	}
 
-	public String getKeepcase(){
-		return getData(TAG_KEEPCASE);
+	public boolean definesFlag(String ruleFlag){
+		if(rawFlags == null){
+			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
+			String rawRules = compoundRules.stream()
+				.map(rule -> rule.replaceAll("[*?()]", StringUtils.EMPTY))
+				.collect(Collectors.joining(StringUtils.EMPTY));
+			String[] parsedRules = strategy.parseRuleFlags(rawRules);
+			rawFlags = new HashSet<>(Arrays.asList(parsedRules));
+
+			rawFlags.add(getData(TAG_KEEP_CASE));
+			rawFlags.add(getData(TAG_NO_SUGGEST));
+			rawFlags.add(getData(TAG_ONLY_IN_COMPOUND));
+
+			rawFlags.remove(null);
+		}
+		return rawFlags.contains(ruleFlag);
 	}
 
 	public boolean isFullstrip(){
