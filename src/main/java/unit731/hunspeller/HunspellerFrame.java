@@ -1286,9 +1286,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				}
 
 				printResultLine("Finished reading Aid file");
-
-				flm.addFile(aidFile);
 			}
+
+			flm.addFile(aidFile);
 		}
 		catch(IOException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1361,9 +1361,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				hypParserWorker.addPropertyChangeListener(this);
 
 				hypParserWorker.execute();
-
-				flm.addFile(hypFile);
 			}
+
+			flm.addFile(hypFile);
 		}
 	}
 

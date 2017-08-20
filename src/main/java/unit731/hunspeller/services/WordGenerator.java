@@ -194,7 +194,7 @@ public class WordGenerator{
 		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes removed by splitting rules
 		if(dataFields != null)
 			for(String dataField : dataFields)
-				if(!dataField.startsWith(TAG_INFLECTIONAL_SUFFIX)
+				if(!dataField.startsWith(TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(TAG_INFLECTIONAL_PREFIX)
 						&& (!dataField.startsWith(TAG_PART_OF_SPEECH) || affixEntryDataFields == null
 							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(TAG_PART_OF_SPEECH)))
 						&& (!dataField.startsWith(TAG_TERMINAL_SUFFIX) || affixEntryDataFields == null
