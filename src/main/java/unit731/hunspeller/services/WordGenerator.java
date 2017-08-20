@@ -27,7 +27,7 @@ public class WordGenerator{
 	//default morphological fields:
 	public static final String TAG_STEM = "st:";
 	public static final String TAG_ALLOMORPH = "al:";
-	private static final String TAG_PART_OF_SPEECH = "po:";
+	public static final String TAG_PART_OF_SPEECH = "po:";
 	private static final String TAG_DERIVATIONAL_PREFIX = "dp:";
 	private static final String TAG_INFLECTIONAL_PREFIX = "ip:";
 	private static final String TAG_TERMINAL_PREFIX = "tp:";

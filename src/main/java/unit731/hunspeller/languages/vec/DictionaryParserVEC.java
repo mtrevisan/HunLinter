@@ -2,6 +2,8 @@ package unit731.hunspeller.languages.vec;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -28,9 +30,57 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher ENDS_IN_MAN = Pattern.compile("man\\/").matcher(StringUtils.EMPTY);
 
 	private static final String TAB = "\t";
-	private static final String VERB = "po:verb";
-	private static final String ARTICLE = "po:article";
-	private static final String ADVERB = "po:adverb";
+
+	private static final String POS_NOUN = "noun";
+	private static final String POS_PROPER_NOUN = "proper_noun";
+	private static final String POS_VERB = "verb";
+	private static final String POS_ADJECTIVE = "adjective";
+	private static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
+	private static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
+	private static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
+	private static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
+	private static final String POS_QUANTIFIER = "quantifier";
+	private static final String POS_NUMERAL_LATIN = "numeral_latin";
+	private static final String POS_NUMERAL_CARDENAL = "numeral_cardenal";
+	private static final String POS_NUMERAL_ORDENAL = "numeral_ordenal";
+	private static final String POS_NUMERAL_COLLECTIVE = "numeral_collective";
+	private static final String POS_NUMERAL_FRACTIONAL = "numeral_fractional";
+	private static final String POS_NUMERAL_MULTIPLICATIVE = "numeral_multiplicative";
+	private static final String POS_ARTICLE = "article";
+	private static final String POS_PRONOUN = "pronoun";
+	private static final String POS_PREPOSITION = "preposition";
+	private static final String POS_ADVERB = "adverb";
+	private static final String POS_CONJUNCTION = "conjunction";
+	private static final String POS_PREFIX = "prefix";
+	private static final String POS_INTERJECTION = "interjection";
+	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
+	
+	private static final Set<String> PART_OF_SPEECH = new HashSet<>();
+	static{
+		PART_OF_SPEECH.add(POS_NOUN);
+		PART_OF_SPEECH.add(POS_PROPER_NOUN);
+		PART_OF_SPEECH.add(POS_VERB);
+		PART_OF_SPEECH.add(POS_ADJECTIVE);
+		PART_OF_SPEECH.add(POS_ADJECTIVE_POSSESSIVE);
+		PART_OF_SPEECH.add(POS_ADJECTIVE_DEMONSTRATIVE);
+		PART_OF_SPEECH.add(POS_ADJECTIVE_IDENTIFICATIVE);
+		PART_OF_SPEECH.add(POS_ADJECTIVE_INTERROGATIVE);
+		PART_OF_SPEECH.add(POS_QUANTIFIER);
+		PART_OF_SPEECH.add(POS_NUMERAL_LATIN);
+		PART_OF_SPEECH.add(POS_NUMERAL_CARDENAL);
+		PART_OF_SPEECH.add(POS_NUMERAL_ORDENAL);
+		PART_OF_SPEECH.add(POS_NUMERAL_COLLECTIVE);
+		PART_OF_SPEECH.add(POS_NUMERAL_FRACTIONAL);
+		PART_OF_SPEECH.add(POS_NUMERAL_MULTIPLICATIVE);
+		PART_OF_SPEECH.add(POS_ARTICLE);
+		PART_OF_SPEECH.add(POS_PRONOUN);
+		PART_OF_SPEECH.add(POS_PREPOSITION);
+		PART_OF_SPEECH.add(POS_ADVERB);
+		PART_OF_SPEECH.add(POS_CONJUNCTION);
+		PART_OF_SPEECH.add(POS_PREFIX);
+		PART_OF_SPEECH.add(POS_INTERJECTION);
+		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
+	}
 
 
 	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, Charset charset){
@@ -45,7 +95,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Cannot use &0 rule with vanishing el, use &1");
 		if(NON_VANISHING_L_AND_VANISHING_DIMINUTIVE.reset(line).find())
 			throw new IllegalArgumentException("Cannot use &1 rule with non-vanishing el, use &0");
-		if(!line.contains(VERB) && !line.contains(ARTICLE) && !line.contains(ADVERB) && !ENDS_IN_MAN.reset(line).find() && MISSING_PLURAL_AFTER_N_OR_L.reset(line).find())
+		if(!line.contains(POS_VERB) && !line.contains(POS_ARTICLE) && !line.contains(POS_ADVERB) && !line.contains(POS_PRONOUN)
+				&& !ENDS_IN_MAN.reset(line).find() && MISSING_PLURAL_AFTER_N_OR_L.reset(line).find())
 			throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
 	}
 
@@ -54,6 +105,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String derivedWord = production.getWord();
 		if(MISMATCHED_VARIANTS.reset(derivedWord).find())
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
+
+		String[] dataFields = dicEntry.getDataFields();
+		for(String dataField : dataFields)
+			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
+				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
 
 		String[] splittedWords = derivedWord.split("-");
 		for(String subword : splittedWords){
