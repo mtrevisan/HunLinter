@@ -61,19 +61,25 @@
 					<shadedArtifactAttached>true</shadedArtifactAttached>
 					<shadedClassifierName>shaded</shadedClassifierName>
 					<filters>
-						<!-- FIXME: strenghten the inclusions -->
 						<filter>
-							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
+							<artifact>commons-io:commons-io</artifact>
 							<includes>
-								<include>**</include>
+								<include>org.apache.commons.io.IOUtils</include>
 							</includes>
 						</filter>
+						<!-- FIXME: strenghten the inclusions -->
 						<filter>
 							<artifact>org.apache.commons:commons-vfs2</artifact>
 							<includes>
 								<include>**</include>
 							</includes>
 						</filter> 
+						<filter>
+							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
 						<filter>
 							<artifact>commons-logging:commons-logging</artifact>
 							<includes>
