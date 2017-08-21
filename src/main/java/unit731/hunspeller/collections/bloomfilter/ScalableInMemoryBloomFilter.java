@@ -16,7 +16,6 @@ import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
  */
 public class ScalableInMemoryBloomFilter<T> extends InMemoryBloomFilter<T>{
 
-	/** Growth ratio when full */
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
 
