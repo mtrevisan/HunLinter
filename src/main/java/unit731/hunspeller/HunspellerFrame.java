@@ -1149,8 +1149,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			openAffixFile();
 		else if(hasAIDExtension(fn))
 			openAidFile();
-		else if(isHyphenationFile(fn))
+		else if(isHyphenationFile(fn)){
 			openHyphenationFile();
+
+			//clear hyphenation
+			formerHyphenationText = null;
+			clearHyphenation();
+		}
 	}
 
 	private boolean hasAFFExtension(FileName fn){
@@ -1369,6 +1374,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 	private void clearHyphenationFile(){
 		hypParser.clear();
+		
+		clearHyphenation();
 
 		mainTabbedPane.setEnabledAt(2, false);
 	}
@@ -1443,6 +1450,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 		frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
+	}
+
+	private void clearHyphenation(){
+		hypWordTextField.setText(null);
+		hypSyllabationOutputLabel.setText(null);
+		hypSyllabesCountOutputLabel.setText(null);
+		hypAddRuleTextField.setText(null);
+		hypAddRuleButton.setEnabled(false);
+		hypAddRuleSyllabationOutputLabel.setText(null);
+		hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
 
