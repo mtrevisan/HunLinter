@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.swing.SwingWorker;
@@ -56,18 +58,19 @@ public class HyphenationParser{
 
 	private static final String WORD_BOUNDARY = ".";
 
+	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
+
 	private static final String NEW_LINE = "\n";
 
 
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private final Trie<String> trie = new Trie<>();
+	private final Trie<String> patterns = new Trie<>();
 	@Getter private int leftMin = -1;
 	@Getter private int rightMin = -1;
 	@Getter private int leftCompoundMin = -1;
 	@Getter private int rightCompoundMin = -1;
-
 
 
 	public HyphenationParser(AffixParser affParser){
@@ -117,13 +120,15 @@ public class HyphenationParser{
 							else if(line.startsWith(MIN_COMPOUND_RIGHT_HYPHENATION))
 								hypParser.rightCompoundMin = Integer.parseInt(StringUtils.strip(line.replace(MIN_COMPOUND_RIGHT_HYPHENATION, "")));
 							else{
-								String key = line.replaceAll("\\d", StringUtils.EMPTY);
-								TrieNode<String> foundRule = hypParser.trie.contains(key);
-								if(foundRule != null)
+								validateRule(line);
+
+								String key = getKeyFromData(line);
+								TrieNode<String> foundRule = hypParser.patterns.contains(key);
+								if(foundRule != null && line.equals(foundRule.getData()))
 									publish("Duplication found: " + foundRule.getData() + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
-									hypParser.trie.add(key, line);
+									hypParser.patterns.add(key, line);
 							}
 						}
 
@@ -153,7 +158,7 @@ public class HyphenationParser{
 	};
 
 	public void clear(){
-		trie.clear();
+		patterns.clear();
 		leftMin = -1;
 		rightMin = -1;
 		leftCompoundMin = -1;
@@ -166,11 +171,24 @@ public class HyphenationParser{
 	 */
 	public TrieNode<String> addRule(String rule){
 		rule = orthography.correctOrthography(rule.toLowerCase(Locale.ROOT));
-		String key = rule.replaceAll("\\d", StringUtils.EMPTY);
-		TrieNode<String> foundRule = trie.contains(key);
+
+		validateRule(rule);
+
+		String key = getKeyFromData(rule);
+		TrieNode<String> foundRule = patterns.contains(key);
 		if(foundRule == null || !foundRule.getData().equals(rule))
-			trie.add(key, rule);
+			patterns.add(key, rule);
 		return foundRule;
+	}
+
+	/**
+	 * Line must contains exactly one hyphenation point
+	 * 
+	 * @param rule	Rule to be validated
+	 */
+	public static void validateRule(String rule){
+		if(!VALID_RULE.reset(rule).find())
+			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 	}
 
 	public void save(File hypFile) throws IOException{
@@ -206,7 +224,7 @@ public class HyphenationParser{
 			}
 			//extract data from the trie
 			Map<Integer, List<String>> content = new HashMap<>();
-			trie.forEachLeaf(node -> {
+			patterns.forEachLeaf(node -> {
 				String data = node.getData();
 				content.computeIfAbsent(data.length(), ArrayList::new)
 					.add(data);
@@ -231,7 +249,7 @@ public class HyphenationParser{
 	 * @return the list of hyphenation objects
 	 */
 	public List<Hyphenation> hyphenate(String word){
-		return hyphenate(word, trie);
+		return hyphenate(word, patterns);
 	}
 
 	/**
@@ -242,29 +260,33 @@ public class HyphenationParser{
 	 * @return the list of hyphenation objects
 	 */
 	public List<Hyphenation> hyphenate(String word, String addedRule){
-		Trie<String> augmentedTrie = new Trie<>(trie);
+		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
 		addedRule = orthography.correctOrthography(addedRule.toLowerCase(Locale.ROOT));
-		String key = addedRule.replaceAll("\\d", StringUtils.EMPTY);
-		augmentedTrie.add(key, addedRule);
+		String key = getKeyFromData(addedRule);
+		patternsWithAddedRule.add(key, addedRule);
 
-		return hyphenate(word, augmentedTrie);
+		return hyphenate(word, patternsWithAddedRule);
 	}
 
 	public boolean hasRule(String rule){
 		rule = orthography.correctOrthography(rule.toLowerCase(Locale.ROOT));
-		String key = rule.replaceAll("\\d", StringUtils.EMPTY);
-		TrieNode<String> foundRule = trie.contains(key);
+		String key = getKeyFromData(rule);
+		TrieNode<String> foundRule = patterns.contains(key);
 		return (foundRule != null && foundRule.getData().equals(rule));
+	}
+
+	private static String getKeyFromData(String rule){
+		return rule.replaceAll("\\d", StringUtils.EMPTY);
 	}
 
 	/**
 	 * Performs hyphenation
 	 *
 	 * @param word	String to hyphenate
-	 * @param trie	The trie containing the subdivision rules
+	 * @param patterns	The trie containing the subdivision rules
 	 * @return the list of hyphenation objects
 	 */
-	private List<Hyphenation> hyphenate(String word, Trie<String> trie){
+	private List<Hyphenation> hyphenate(String word, Trie<String> patterns){
 		word = orthography.correctOrthography(word.toLowerCase(Locale.ROOT));
 
 		List<Hyphenation> result = new ArrayList<>();
@@ -281,8 +303,8 @@ public class HyphenationParser{
 				result.addAll(hyphenate(subword));
 		}
 		else{
-			int[] pattern = getHyphenationPattern(word, trie);
-			List<String> hyphenatedWord = createHyphenatedWord(word, pattern);
+			int[] indices = getHyphenationIndices(word, patterns);
+			List<String> hyphenatedWord = createHyphenatedWord(word, indices);
 			boolean[] errors = orthography.getSyllabationErrors(hyphenatedWord);
 			result.add(new Hyphenation(hyphenatedWord, errors));
 		}
@@ -290,40 +312,40 @@ public class HyphenationParser{
 		return result;
 	}
 
-	private int[] getHyphenationPattern(String word, Trie<String> trie){
+	private int[] getHyphenationIndices(String word, Trie<String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
-		int[] hyp = new int[word.length()];
+		int[] indices = new int[word.length()];
 		for(int i = 0; i < size; i ++){
-			List<Prefix<String>> prefixes = trie.findPrefix(w.substring(i));
+			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
 				int j = -1;
 				String data = prefix.getNode().getData();
-				int size2 = data.length();
-				for(int k = 0; k < size2; k ++){
+				int ruleSize = data.length();
+				for(int k = 0; k < ruleSize; k ++){
 					char chr = data.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
 					else{
 						int dd = Character.digit(data.charAt(k), 10);
-						if(hyp[i + j] == 0 || dd > hyp[i + j])
-							hyp[i + j] = dd;
+						if(indices[i + j] == 0 || dd > indices[i + j])
+							indices[i + j] = dd;
 					}
 				}
 			}
 		}
-		return hyp;
+		return indices;
 	}
 
-	private List<String> createHyphenatedWord(String word, int[] pattern){
+	private List<String> createHyphenatedWord(String word, int[] indices){
 		List<String> result = new ArrayList<>();
 		int startIndex = 0;
 		int endIndex = 0;
 		int maxLength = word.length() - rightMin;
 		int size = word.length();
 		for(int i = 0; i < size; i ++){
-			if(i >= leftMin && i <= maxLength && pattern[i] % 2 != 0){
+			if(i >= leftMin && i <= maxLength && indices[i] % 2 != 0){
 				result.add(word.substring(startIndex, endIndex));
 				startIndex = endIndex;
 			}
