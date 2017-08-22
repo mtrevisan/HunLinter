@@ -47,6 +47,10 @@ public class HyphenationParser{
 	private static final String MIN_COMPOUND_LEFT_HYPHENATION = "COMPOUNDLEFTHYPHENMIN";
 	/** minimal hyphation distance from the right compound word boundary */
 	private static final String MIN_COMPOUND_RIGHT_HYPHENATION = "COMPOUNDRIGHTHYPHENMIN";
+	/** comma separated list of characters or character sequences with forbidden hyphenation */
+	private static final String NO_HYPHEN = "NOHYPHEN";
+	private static final String NEXT_LEVEL = "NEXTLEVEL";
+	private static final String COMMA = ",";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
 	private static final String HYPHEN = "\u2010";
@@ -59,9 +63,7 @@ public class HyphenationParser{
 	private static final String WORD_BOUNDARY = ".";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/.*(-_|=).*$").matcher(StringUtils.EMPTY);
-
-	private static final String NEW_LINE = "\n";
+	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/.*(=|-_).*$").matcher(StringUtils.EMPTY);
 
 
 	private final Comparator<String> comparator;
@@ -72,6 +74,7 @@ public class HyphenationParser{
 	@Getter private int rightMin = -1;
 	@Getter private int leftCompoundMin = -1;
 	@Getter private int rightCompoundMin = -1;
+	@Getter private String[] noHyphen;
 
 
 	public HyphenationParser(AffixParser affParser){
@@ -110,16 +113,22 @@ public class HyphenationParser{
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
+						line = removeComment(line);
+						if(line.isEmpty())
+							continue;
+
 						line = StringUtils.strip(line);
 						if(!line.isEmpty()){
 							if(line.startsWith(MIN_LEFT_HYPHENATION))
-								hypParser.leftMin = Integer.parseInt(StringUtils.strip(line.replace(MIN_LEFT_HYPHENATION, "")));
+								hypParser.leftMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_LEFT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_RIGHT_HYPHENATION))
-								hypParser.rightMin = Integer.parseInt(StringUtils.strip(line.replace(MIN_RIGHT_HYPHENATION, "")));
+								hypParser.rightMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_RIGHT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_COMPOUND_LEFT_HYPHENATION))
-								hypParser.leftCompoundMin = Integer.parseInt(StringUtils.strip(line.replace(MIN_COMPOUND_LEFT_HYPHENATION, "")));
+								hypParser.leftCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_LEFT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_COMPOUND_RIGHT_HYPHENATION))
-								hypParser.rightCompoundMin = Integer.parseInt(StringUtils.strip(line.replace(MIN_COMPOUND_RIGHT_HYPHENATION, "")));
+								hypParser.rightCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_RIGHT_HYPHENATION.length())));
+							else if(line.startsWith(NO_HYPHEN))
+								hypParser.noHyphen = line.substring(NO_HYPHEN.length()).split(COMMA);
 							else{
 								validateRule(line);
 
@@ -144,6 +153,20 @@ public class HyphenationParser{
 				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
+		}
+
+		/**
+		 * Removes comment lines and then cleans up blank lines and trailing whitespace.
+		 *
+		 * @param {String} data	The data from an affix file.
+		 * @return {String}		The cleaned-up data.
+		 */
+		private String removeComment(String line){
+			//remove comments
+			line = StringUtils.replaceAll(line, "^$|\\s*%.*$", StringUtils.EMPTY);
+			//trim the entire string
+			line = StringUtils.replaceAll(line, "^[^\\S\\r\\n]+|[^\\S\\r\\n]+$|^\\r?\\n$", StringUtils.EMPTY);
+			return line;
 		}
 
 		@Override
@@ -203,31 +226,37 @@ public class HyphenationParser{
 		try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
 			//save charset
 			writer.write(charset.name());
-			writer.write(NEW_LINE);
+			writer.write(StringUtils.LF);
 			//save options
 			if(leftMin >= 0){
 				writer.write(MIN_LEFT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
 				writer.write(Integer.toString(leftMin));
-				writer.write(NEW_LINE);
+				writer.write(StringUtils.LF);
 			}
 			if(rightMin >= 0){
 				writer.write(MIN_RIGHT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
 				writer.write(Integer.toString(rightMin));
-				writer.write(NEW_LINE);
+				writer.write(StringUtils.LF);
 			}
 			if(leftCompoundMin >= 0){
 				writer.write(MIN_COMPOUND_LEFT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
 				writer.write(Integer.toString(leftCompoundMin));
-				writer.write(NEW_LINE);
+				writer.write(StringUtils.LF);
 			}
 			if(leftCompoundMin >= 0){
 				writer.write(MIN_COMPOUND_RIGHT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
 				writer.write(Integer.toString(leftCompoundMin));
-				writer.write(NEW_LINE);
+				writer.write(StringUtils.LF);
+			}
+			if(noHyphen != null){
+				writer.write(NO_HYPHEN);
+				writer.write(StringUtils.SPACE);
+				writer.write(StringUtils.join(noHyphen, COMMA));
+				writer.write(StringUtils.LF);
 			}
 			//extract data from the trie
 			Map<Integer, List<String>> content = new HashMap<>();
@@ -244,7 +273,7 @@ public class HyphenationParser{
 				.collect(Collectors.toList());
 			for(String rule : rules){
 				writer.write(rule);
-				writer.write(NEW_LINE);
+				writer.write(StringUtils.LF);
 			}
 		}
 	}

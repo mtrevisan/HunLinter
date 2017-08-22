@@ -36,7 +36,6 @@ public class ThesaurusParser{
 
 	private static final String PIPE = "|";
 	private static final String ESCAPED_PIPE = Pattern.quote(PIPE);
-	private static final String NEW_LINE = "\n";
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 	private boolean modified = false;
@@ -203,7 +202,7 @@ public class ThesaurusParser{
 			undoCaretaker.pushMemento(synonyms);
 
 			if(StringUtils.isNotBlank(text)){
-				String[] lines = text.split("\n");
+				String[] lines = text.split(StringUtils.LF);
 				meanings.clear();
 				for(String line : lines)
 					meanings.add(new MeaningEntry(line));
@@ -262,13 +261,13 @@ public class ThesaurusParser{
 				){
 			//save charset
 			indexWriter.write(charset.name());
-			indexWriter.write(NEW_LINE);
+			indexWriter.write(StringUtils.LF);
 			//save counter
 			indexWriter.write(Integer.toString(synonyms.size()));
-			indexWriter.write(NEW_LINE);
+			indexWriter.write(StringUtils.LF);
 			//save charset
 			dataWriter.write(charset.name());
-			dataWriter.write(NEW_LINE);
+			dataWriter.write(StringUtils.LF);
 			//save data
 			int idx = charset.name().length() + 1;
 			for(ThesaurusEntry synonym : synonyms){
@@ -276,18 +275,18 @@ public class ThesaurusParser{
 				indexWriter.write(syn);
 				indexWriter.write(PIPE);
 				indexWriter.write(Integer.toString(idx));
-				indexWriter.write(NEW_LINE);
+				indexWriter.write(StringUtils.LF);
 
 				int meaningsCount = synonym.getMeanings().size();
 				dataWriter.write(syn);
 				dataWriter.write(PIPE);
 				dataWriter.write(Integer.toString(meaningsCount));
-				dataWriter.write(NEW_LINE);
+				dataWriter.write(StringUtils.LF);
 				List<MeaningEntry> meanings = synonym.getMeanings();
 				int meaningsLength = 1;
 				for(MeaningEntry meaning : meanings){
 					dataWriter.write(meaning.toString());
-					dataWriter.write(NEW_LINE);
+					dataWriter.write(StringUtils.LF);
 
 					meaningsLength += meaning.toString().getBytes(charset).length + 1;
 				}

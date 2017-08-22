@@ -15,6 +15,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.resources.MeaningEntry;
 
 
@@ -36,7 +37,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		addCancelByEscapeKey();
 
-		String content = String.join("\n", duplicates);
+		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);
 
 		setLocationRelativeTo(parent);

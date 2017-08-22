@@ -1470,7 +1470,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	@Override
 	public void printResultLine(String text){
 		String timeOfDay = LocalTime.now().format(TIME_FORMATTER);
-		parseTextArea.append(timeOfDay + " " + text + "\n");
+		parseTextArea.append(timeOfDay + StringUtils.SPACE + text + StringUtils.LF);
 	}
 
 	@Override

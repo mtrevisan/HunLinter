@@ -52,7 +52,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
 		meanings = synonym.getMeanings();
-		String content = StringUtils.join(meanings, "\n");
+		String content = StringUtils.join(meanings, StringUtils.LF);
 		meaningsTextArea.setText(content);
 
 		this.resultable = resultable;
