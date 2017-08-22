@@ -53,7 +53,7 @@ public class HyphenationParser{
 	private static final String SOFT_HYPHEN = "\u00AD";
 //	private static final String NON_BREAKING_HYPHEN = "\u2011";
 //	private static final String ZERO_WIDTH_SPACE = "\u200B";
-	private static final Matcher HYPHENS = Pattern.compile("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + SOFT_HYPHEN) + "]").matcher(StringUtils.EMPTY);
+	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN + SOFT_HYPHEN) + "]";
 
 	private static final String WORD_BOUNDARY = ".";
 
@@ -286,7 +286,8 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Trie<String> patterns){
-		word = orthography.correctOrthography(word.toLowerCase(Locale.ROOT));
+		word = orthography.correctOrthography(word.toLowerCase(Locale.ROOT))
+			.replaceAll(HYPHENS, SOFT_HYPHEN);
 
 		List<String> hyphenatedWord;
 		boolean[] errors;
@@ -335,14 +336,12 @@ public class HyphenationParser{
 		int maxLength = word.length() - rightMin;
 		int size = word.length();
 		for(int i = 0; i < size; i ++){
-			int idx = maxLength;
 			//manage hyphenation characters already present in the word
-			Matcher m = HYPHENS.reset(word.substring(endIndex));
-			if(m.find())
-				idx = m.start() + endIndex - rightMin - 1;
+			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
+			idx = (idx >= 0? idx + endIndex - rightMin - 1: maxLength);
 
 			if(i >= leftMin && i <= idx && indices[i] % 2 != 0){
-				result.add(word.substring(startIndex, endIndex).replaceFirst(HYPHENS.pattern().pattern(), StringUtils.EMPTY));
+				result.add(word.substring(startIndex, endIndex).replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY));
 				startIndex = endIndex;
 			}
 			endIndex ++;
