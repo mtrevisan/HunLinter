@@ -48,12 +48,12 @@ public class HyphenationParser{
 	private static final String MIN_COMPOUND_RIGHT_HYPHENATION = "COMPOUNDRIGHTHYPHENMIN";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
-	public static final String HYPHEN = "\u2010";
+	private static final String HYPHEN = "\u2010";
 	private static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
 //	private static final String NON_BREAKING_HYPHEN = "\u2011";
 //	private static final String ZERO_WIDTH_SPACE = "\u200B";
-	public static final String WORD_HYPHEN = HYPHEN_MINUS;
+	private static final Matcher HYPHENS = Pattern.compile("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + SOFT_HYPHEN) + "]").matcher(StringUtils.EMPTY);
 
 	private static final String WORD_BOUNDARY = ".";
 
@@ -335,8 +335,14 @@ public class HyphenationParser{
 		int maxLength = word.length() - rightMin;
 		int size = word.length();
 		for(int i = 0; i < size; i ++){
-			if(i >= leftMin && i <= maxLength && indices[i] % 2 != 0){
-				result.add(word.substring(startIndex, endIndex));
+			int idx = maxLength;
+			//manage hyphenation characters already present in the word
+			Matcher m = HYPHENS.reset(word.substring(endIndex));
+			if(m.find())
+				idx = m.start() + endIndex - rightMin - 1;
+
+			if(i >= leftMin && i <= idx && indices[i] % 2 != 0){
+				result.add(word.substring(startIndex, endIndex).replaceFirst(HYPHENS.pattern().pattern(), StringUtils.EMPTY));
 				startIndex = endIndex;
 			}
 			endIndex ++;
@@ -346,7 +352,7 @@ public class HyphenationParser{
 	}
 
 	public String formatHyphenation(Hyphenation hyphenation){
-		StringJoiner sj = new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
+		StringJoiner sj = new StringJoiner(HYPHEN, "<html>", "</html>");
 		List<String> syllabes = hyphenation.getSyllabes();
 		boolean[] erros = hyphenation.getErrors();
 		int size = syllabes.size();
