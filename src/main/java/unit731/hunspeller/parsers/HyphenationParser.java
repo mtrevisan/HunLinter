@@ -63,7 +63,7 @@ public class HyphenationParser{
 	private static final String WORD_BOUNDARY = ".";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/.*(=|-_).*(,\\d+)*$").matcher(StringUtils.EMPTY);
+	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*)(=|-_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
 
 
@@ -230,9 +230,11 @@ public class HyphenationParser{
 				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
 				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]) - 1: -1);
 				if(startIndex < 0 || startIndex >= index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the first index not less than the hyphenation point");
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the first number not less than the hyphenation point");
 				if(length < 0 || startIndex + length <= index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the second index not less than the hyphenation point");
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the second number not less than the hyphenation point");
+				if(startIndex + length >= parts[0].length())
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the second number not less than the length of the rule");
 			}
 		}
 	}
@@ -371,9 +373,10 @@ public class HyphenationParser{
 			for(Prefix<String> prefix : prefixes){
 				int j = -1;
 				String data = prefix.getNode().getData();
-				int ruleSize = data.length();
+				String reducedData = data.replaceFirst("/.+$", StringUtils.EMPTY);
+				int ruleSize = reducedData.length();
 				for(int k = 0; k < ruleSize; k ++){
-					char chr = data.charAt(k);
+					char chr = reducedData.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
 					else{
@@ -408,6 +411,15 @@ public class HyphenationParser{
 				if(augmentedPatternData != null){
 					//remove last characters from subword
 					//append first characters to next subword
+					Matcher m = AUGMENTED_RULE.reset(augmentedPatternData);
+					m.find();
+					String rule = m.group("rule");
+					String addBefore = m.group("addBefore");
+					String addAfter = m.group("addAfter");
+					String indexBefore = m.group("indexBefore");
+					String indexAfter = m.group("indexAfter");
+
+System.out.println("");
 				}
 
 				result.add(subword);
