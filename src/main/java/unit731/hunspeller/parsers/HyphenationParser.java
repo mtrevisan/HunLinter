@@ -63,7 +63,9 @@ public class HyphenationParser{
 	private static final String WORD_BOUNDARY = ".";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/.*(=|-_).*$").matcher(StringUtils.EMPTY);
+	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/.*(=|-_).*(,\\d+)*$").matcher(StringUtils.EMPTY);
+	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
+
 
 
 	private final Comparator<String> comparator;
@@ -213,8 +215,26 @@ public class HyphenationParser{
 	public static void validateRule(String rule){
 		if(!VALID_RULE.reset(rule).find())
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
-		if(isAugmentedRule(rule) && rule.replaceFirst("[^13579]|/.+$", StringUtils.EMPTY).length() != 1)
-			throw new IllegalArgumentException("Rule " + rule + " has not exactly one hyphenation point");
+		if(isAugmentedRule(rule)){
+			int augmentedIndex = rule.indexOf('/');
+			if((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule).replaceAll("[^13579]|/.+$", StringUtils.EMPTY).length() != 1)
+				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
+
+			//having the rule ../m=m,1,2 assure that the indexes are before and after the hyphen respectively
+			String[] parts = rule.split(COMMA);
+			if(parts.length > 1){
+				Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
+				m.find();
+				int index = m.start();
+
+				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
+				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]) - 1: -1);
+				if(startIndex < 0 || startIndex >= index)
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the first index not less than the hyphenation point");
+				if(length < 0 || startIndex + length <= index)
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the second index not less than the hyphenation point");
+			}
+		}
 	}
 
 	private static boolean isAugmentedRule(String rule){
@@ -332,7 +352,7 @@ public class HyphenationParser{
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
-			HyphenationPattern hyphPattern = getHyphenationIndices(word, patterns);
+			HyphenationPattern hyphPattern = getHyphenationIndexes(word, patterns);
 			hyphenatedWord = createHyphenatedWord(word, hyphPattern);
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
@@ -340,11 +360,11 @@ public class HyphenationParser{
 		return new Hyphenation(hyphenatedWord, errors);
 	}
 
-	private HyphenationPattern getHyphenationIndices(String word, Trie<String> patterns){
+	private HyphenationPattern getHyphenationIndexes(String word, Trie<String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
-		int[] indices = new int[word.length()];
+		int[] indexes = new int[word.length()];
 		String[] augmentedPatternData = new String[word.length()];
 		for(int i = 0; i < size; i ++){
 			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
@@ -358,15 +378,15 @@ public class HyphenationParser{
 						j ++;
 					else{
 						int dd = Character.digit(chr, 10);
-						if(dd > indices[i + j]){
-							indices[i + j] = dd;
+						if(dd > indexes[i + j]){
+							indexes[i + j] = dd;
 							augmentedPatternData[i + j] = (isAugmentedRule(data)? data: null);
 						}
 					}
 				}
 			}
 		}
-		return new HyphenationPattern(indices, augmentedPatternData);
+		return new HyphenationPattern(indexes, augmentedPatternData);
 	}
 
 	private List<String> createHyphenatedWord(String word, HyphenationPattern hyphPattern){
@@ -380,8 +400,17 @@ public class HyphenationParser{
 			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
 			idx = (idx >= 0? idx + endIndex - rightMin - 1: maxLength);
 
-			if(i >= leftMin && i <= idx && hyphPattern.getIndices()[i] % 2 != 0){
-				result.add(word.substring(startIndex, endIndex).replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY));
+			if(i >= leftMin && i <= idx && hyphPattern.getIndexes()[i] % 2 != 0){
+				String subword = word.substring(startIndex, endIndex)
+					.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY);
+
+				String augmentedPatternData = hyphPattern.getAugmentedPatternData()[i];
+				if(augmentedPatternData != null){
+					//remove last characters from subword
+					//append first characters to next subword
+				}
+
+				result.add(subword);
 				startIndex = endIndex;
 			}
 			endIndex ++;

@@ -170,8 +170,8 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 		return bitsChanged;
 	}
 
-	private List<Integer> indices(byte[] bytes){
-		List<Integer> indices = new ArrayList<>();
+	private List<Integer> indexes(byte[] bytes){
+		List<Integer> indexes = new ArrayList<>();
 		long hash64 = getLongHash64(bytes);
 		int hash1 = (int)hash64;
 		int hash2 = (int)(hash64 >>> 32);
@@ -180,9 +180,9 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 			int index = nextHash % bitArray.bitSize();
-			indices.add(index);
+			indexes.add(index);
 		}
-		return indices;
+		return indexes;
 	}
 
 	private boolean contains(byte[] bytes){
@@ -245,8 +245,8 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 	}
 
 	@Override
-	public List<Integer> indices(T value){
-		return (value != null? indices(decomposeValue(value)): Collections.<Integer>emptyList());
+	public List<Integer> indexes(T value){
+		return (value != null? indexes(decomposeValue(value)): Collections.<Integer>emptyList());
 	}
 
 	@Override

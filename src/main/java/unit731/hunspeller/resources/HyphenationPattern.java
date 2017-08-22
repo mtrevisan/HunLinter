@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class HyphenationPattern{
 
-	private final int[] indices;
+	private final int[] indexes;
 	private final String[] augmentedPatternData;
 
 }

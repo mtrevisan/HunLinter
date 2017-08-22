@@ -50,13 +50,13 @@ public interface BloomFilter<T>{
 	boolean add(T value);
 
 	/**
-	 * Returns the indices modified by inserting the given value object to the bloom filter by decomposing it using
+	 * Returns the indexes modified by inserting the given value object to the bloom filter by decomposing it using
 	 * the given/default {@link Decomposer}
 	 *
 	 * @param value	The object to be added to the bloom filter
 	 * @return <code>true</code> if the value was added to the bloom filter, <code>false</code> otherwise
 	 */
-	List<Integer> indices(T value);
+	List<Integer> indexes(T value);
 
 	/**
 	 * Check if the value object is present in the bloom filter or not by decomposing it using the given/default decomposer
