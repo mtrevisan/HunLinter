@@ -1381,10 +1381,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 		String count = null;
 		if(StringUtils.isNotBlank(text)){
-			List<Hyphenation> hyphenations = frame.hypParser.hyphenate(text);
+			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
-			text = frame.hypParser.formatHyphenation(hyphenations);
-			count = Long.toString(frame.hypParser.countSyllabes(hyphenations));
+			text = frame.hypParser.formatHyphenation(hyphenation);
+			count = Long.toString(frame.hypParser.countSyllabes(hyphenation));
 
 			frame.hypAddRuleTextField.setEnabled(true);
 		}
@@ -1416,15 +1416,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				ruleMatchesText = addedRuleText.contains(addedRule.replaceAll("[.\\d]", StringUtils.EMPTY));
 
 				if(ruleMatchesText){
-					List<Hyphenation> hyphenations = frame.hypParser.hyphenate(addedRuleText);
-					List<Hyphenation> addedRuleHyphenations = frame.hypParser.hyphenate(addedRuleText, addedRule);
+					Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
+					Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
 
-					String text = frame.hypParser.formatHyphenation(hyphenations);
-					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenations);
-					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenations));
+					String text = frame.hypParser.formatHyphenation(hyphenation);
+					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation);
+					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
 					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = frame.hypParser.hasErrors(addedRuleHyphenations);
+					correctHyphenation = frame.hypParser.hasErrors(addedRuleHyphenation);
 				}
 			}
 

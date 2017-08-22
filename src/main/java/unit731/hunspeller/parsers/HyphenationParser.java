@@ -21,7 +21,6 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -246,9 +245,9 @@ public class HyphenationParser{
 	 * Performs hyphenation
 	 *
 	 * @param word	String to hyphenate
-	 * @return the list of hyphenation objects
+	 * @return the hyphenation object
 	 */
-	public List<Hyphenation> hyphenate(String word){
+	public Hyphenation hyphenate(String word){
 		return hyphenate(word, patterns);
 	}
 
@@ -257,9 +256,9 @@ public class HyphenationParser{
 	 *
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
-	 * @return the list of hyphenation objects
+	 * @return the hyphenation object
 	 */
-	public List<Hyphenation> hyphenate(String word, String addedRule){
+	public Hyphenation hyphenate(String word, String addedRule){
 		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
 		addedRule = orthography.correctOrthography(addedRule.toLowerCase(Locale.ROOT));
 		String key = getKeyFromData(addedRule);
@@ -284,32 +283,23 @@ public class HyphenationParser{
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The trie containing the subdivision rules
-	 * @return the list of hyphenation objects
+	 * @return the hyphenation object
 	 */
-	private List<Hyphenation> hyphenate(String word, Trie<String> patterns){
+	private Hyphenation hyphenate(String word, Trie<String> patterns){
 		word = orthography.correctOrthography(word.toLowerCase(Locale.ROOT));
 
-		List<Hyphenation> result = new ArrayList<>();
-		//ignore short words (early out)
-		if(word.length() < leftMin + rightMin){
-			List<String> hyphenatedWord = Arrays.asList(word);
-			boolean[] errors = orthography.getSyllabationErrors(hyphenatedWord);
-			result.add(new Hyphenation(hyphenatedWord, errors));
-		}
-		else if(word.contains(HYPHEN) || word.contains(HYPHEN_MINUS) || word.contains(SOFT_HYPHEN)){
-			//if word contains an hyphen then hyphenate each single part
-			String[] subwords = word.split(HYPHEN + "|" + HYPHEN_MINUS + "|" + SOFT_HYPHEN);
-			for(String subword : subwords)
-				result.addAll(hyphenate(subword));
-		}
+		List<String> hyphenatedWord;
+		boolean[] errors;
+		if(word.length() < leftMin + rightMin)
+			//ignore short words (early out)
+			hyphenatedWord = Arrays.asList(word);
 		else{
 			int[] indices = getHyphenationIndices(word, patterns);
-			List<String> hyphenatedWord = createHyphenatedWord(word, indices);
-			boolean[] errors = orthography.getSyllabationErrors(hyphenatedWord);
-			result.add(new Hyphenation(hyphenatedWord, errors));
+			hyphenatedWord = createHyphenatedWord(word, indices);
 		}
+		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
-		return result;
+		return new Hyphenation(hyphenatedWord, errors);
 	}
 
 	private int[] getHyphenationIndices(String word, Trie<String> patterns){
@@ -320,16 +310,16 @@ public class HyphenationParser{
 		for(int i = 0; i < size; i ++){
 			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
-				int j = -1;
 				String data = prefix.getNode().getData();
+				int j = -1;
 				int ruleSize = data.length();
 				for(int k = 0; k < ruleSize; k ++){
 					char chr = data.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
 					else{
-						int dd = Character.digit(data.charAt(k), 10);
-						if(indices[i + j] == 0 || dd > indices[i + j])
+						int dd = Character.digit(chr, 10);
+						if(dd > indices[i + j])
 							indices[i + j] = dd;
 					}
 				}
@@ -355,31 +345,29 @@ public class HyphenationParser{
 		return result;
 	}
 
-	public String formatHyphenation(List<Hyphenation> hyphenations){
-		StringJoiner sj = new StringJoiner(HyphenationParser.WORD_HYPHEN);
-		for(Hyphenation hyphenation : hyphenations){
-			StringJoiner subword = new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
-			List<String> syllabes = hyphenation.getSyllabes();
-			boolean[] erros = hyphenation.getErrors();
-			int size = syllabes.size();
-			for(int i = 0; i < size; i ++)
-				subword.add(erros[i]? "<b style=\"color:red\">" + syllabes.get(i) + "</b>": syllabes.get(i));
-			sj.add(subword.toString());
-		}
+	public String formatHyphenation(Hyphenation hyphenation){
+		StringJoiner sj = new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
+		List<String> syllabes = hyphenation.getSyllabes();
+		boolean[] erros = hyphenation.getErrors();
+		int size = syllabes.size();
+		for(int i = 0; i < size; i ++)
+			sj.add(erros[i]? "<b style=\"color:red\">" + syllabes.get(i) + "</b>": syllabes.get(i));
 		return sj.toString();
 	}
 
-	public long countSyllabes(List<Hyphenation> hyphenations){
-		return hyphenations.stream()
-			.map(Hyphenation::getSyllabes)
-			.flatMap(List::stream)
-			.count();
+	public long countSyllabes(Hyphenation hyphenation){
+		return hyphenation.getSyllabes().size();
 	}
 
-	public boolean hasErrors(List<Hyphenation> hyphenations){
-		return !hyphenations.stream()
-			.map(Hyphenation::getErrors)
-			.anyMatch(errors -> IntStream.range(0, errors.length).anyMatch(i -> errors[i]));
+	public boolean hasErrors(Hyphenation hyphenation){
+		boolean response = false;
+		boolean[] errors = hyphenation.getErrors();
+		for(boolean error : errors)
+			if(error){
+				response = true;
+				break;
+			}
+		return response;
 	}
 
 }
