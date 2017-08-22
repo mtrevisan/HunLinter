@@ -408,11 +408,11 @@ public class HyphenationParser{
 			//manage hyphenation characters already present in the word
 			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
 			idx = (idx >= 0? idx + endIndex - rightMin - 1: maxLength);
-			if(i >= leftMin && i <= idx && hyphPattern.getIndexes()[i] % 2 != 0){
+			if(/*i >= leftMin && i <= idx &&*/ hyphPattern.getIndexes()[i] % 2 != 0){
 				String subword = word.substring(startIndex, endIndex)
-					.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY);
+					/*.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY)*/;
 
-				if(addAfter != null){
+				if(StringUtils.isNotBlank(addAfter)){
 					subword = addAfter + subword.substring(Math.min(after, subword.length()));
 					addAfter = null;
 				}
@@ -435,7 +435,7 @@ public class HyphenationParser{
 					subword = subword.substring(0, i - before) + addBefore;
 
 					//append first characters to next subword
-					after = i - before + (indexAfter != null? Integer.parseInt(indexAfter) - 1: 0);
+					after = index - before + (indexAfter != null? Integer.parseInt(indexAfter): 0);
 				}
 
 				result.add(subword);
@@ -444,7 +444,7 @@ public class HyphenationParser{
 			endIndex ++;
 		}
 		String subword = word.substring(startIndex);
-		if(addAfter != null)
+		if(StringUtils.isNotBlank(addAfter))
 			subword = addAfter + subword.substring(Math.min(after, subword.length()));
 		result.add(subword);
 		return result;
