@@ -497,7 +497,7 @@ public class HyphenationParser{
 		}
 		String subword = word.substring(startIndex);
 		if(StringUtils.isNotBlank(addAfter))
-			subword = addAfter + subword.substring(Math.min(after, subword.length()));
+			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
 		result.add(subword);
 		return result;
 	}

@@ -131,6 +131,22 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("ab-", "-cd"), hyphenation.getSyllabes());
 	}
 
+	@Test
+	public void augmentedAfterBreak2(){
+		Trie<String> patterns = new Trie<>();
+		addRule(patterns, "1k");
+		addRule(patterns, "-1/-=-");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("kuko-fu");
+
+		Assert.assertEquals(Arrays.asList("ku", "ko-", "-fu"), hyphenation.getSyllabes());
+	}
+
 //	@Test
 	public void augmentedNonWordInitial(){
 		Trie<String> patterns = new Trie<>();
