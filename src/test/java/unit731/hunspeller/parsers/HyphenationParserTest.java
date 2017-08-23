@@ -28,8 +28,7 @@ public class HyphenationParserTest{
 	@Test
 	public void base(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "a1bc";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -43,8 +42,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedWithRemovalBeforeHyphen(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "aa1tje/=,2,1";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "aa1tje/=,2,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -58,8 +56,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedWithIndexes(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "1-/-=,1,1";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "1-/-=,1,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -73,8 +70,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedWithoutIndexes(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "1-/-=";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "1-/-=");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -88,8 +84,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedNonWordInitial(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "eigh1teen/ht=t,4,2";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "eigh1teen/ht=t,4,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -103,8 +98,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedWordInitial(){
 		Trie<String> patterns = new Trie<>();
-		String rule = ".schif1fahrt/ff=f,5,2";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, ".schif1fahrt/ff=f,5,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -118,8 +112,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedBase(){
 		Trie<String> patterns = new Trie<>();
-		String rule = "c1k/k=k";
-		patterns.add(getKeyFromData(rule), rule);
+		addRule(patterns, "c1k/k=k");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -128,6 +121,26 @@ public class HyphenationParserTest{
 		Hyphenation hyphenation = parser.hyphenate("Zucker");
 
 		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
+	}
+
+	@Test
+	public void competingRules(){
+		Trie<String> patterns = new Trie<>();
+		addRule(patterns, "ab1c");
+		addRule(patterns, "2c");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+	}
+
+
+	private void addRule(Trie<String> patterns, String rule){
+		patterns.add(getKeyFromData(rule), rule);
 	}
 
 	private String getKeyFromData(String rule){

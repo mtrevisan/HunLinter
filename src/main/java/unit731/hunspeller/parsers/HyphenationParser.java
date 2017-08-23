@@ -152,7 +152,20 @@ public class HyphenationParser{
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
-					
+
+					//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
+//					if(noHyphen == null)
+//						//en dash and right single quotation mark
+//						noHyphen = new String[]{"\\u2013", "\\u2019"};
+//					line = "1-1/=,1,1";
+//					hypParser.patterns.add(getKeyFromData(line), line);
+//					line = "1'1";
+//					hypParser.patterns.add(getKeyFromData(line), line);
+//					leftMin = leftMin;	//from previous level
+//					rightMin = rightMin;	//from previous level
+//					leftCompoundMin = (leftCompoundMin > 0? leftCompoundMin: (leftMin > 0? leftMin: 3));	//from previous level
+//					rightCompoundMin = (rightCompoundMin > 0? rightCompoundMin: (rightMin > 0? rightMin: 3));	//from previous level
+
 					hypParser.options = HyphenationOptions.builder()
 						.leftMin(leftMin)
 						.rightMin(rightMin)
