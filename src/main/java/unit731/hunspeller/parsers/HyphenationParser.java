@@ -76,6 +76,7 @@ public class HyphenationParser{
 
 	private Trie<String> patterns = new Trie<>();
 	private HyphenationOptions options;
+	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
 
 	public HyphenationParser(String language){
@@ -155,6 +156,13 @@ public class HyphenationParser{
 
 								if(level > 1)
 									throw new IllegalArgumentException("Cannot have more than two levels");
+							}
+							else if(!VALID_RULE.reset(line).find() && line.contains(HYPHEN_MINUS)){
+								String key = line.replaceAll(HYPHEN_MINUS, StringUtils.EMPTY);
+								if(hypParser.nonStandardHyphenation.containsKey(key))
+									throw new IllegalArgumentException("Non-standard hyphenation " + line + " is already present");
+
+								hypParser.nonStandardHyphenation.put(key, line);
 							}
 							else{
 								validateRule(line);
@@ -397,7 +405,12 @@ public class HyphenationParser{
 
 		List<String> hyphenatedWord;
 		boolean[] errors;
-		if(word.length() < options.getLeftMin() + options.getRightMin())
+
+		String nonStandard = nonStandardHyphenation.get(word);
+		if(nonStandard != null)
+			//hyphenation is non-standard
+			hyphenatedWord = Arrays.asList(nonStandard.split(HYPHEN_MINUS));
+		else if(word.length() < options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
@@ -447,19 +460,15 @@ public class HyphenationParser{
 		List<String> result = new ArrayList<>();
 		int startIndex = 0;
 		int endIndex = 0;
-//		int maxLength = word.length() - options.getRightMin();
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
 		for(int i = 0; i < size; i ++){
-			//manage hyphenation characters already present in the word
-//			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
-//			idx = (idx >= 0? idx + endIndex - options.getRightMin() - 1: maxLength);
-			if(/*i >= leftMin && i <= idx &&*/ hyphBreak.getIndexes()[i] % 2 != 0){
-				String subword = word.substring(startIndex, endIndex)
-					/*.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY)*/;
+			if(hyphBreak.getIndexes()[i] % 2 != 0){
+				String subword = word.substring(startIndex, endIndex);
 
 				if(StringUtils.isNotBlank(addAfter)){
+					//append first characters to next subword
 					subword = addAfter + subword.substring(Math.min(after, subword.length()));
 					addAfter = null;
 				}
@@ -483,11 +492,12 @@ public class HyphenationParser{
 					}
 
 					//remove last characters from subword
+					//  ll3a/a=b,2,2
+					//syll
+					//syla-b
 					int end = subword.length() - index + Integer.parseInt(indexBefore) - 1;
-					subword = subword.substring(0, end) + addBefore;
-
-					//append first characters to next subword
 					after = end + Integer.parseInt(indexAfter) - endIndex;
+					subword = subword.substring(0, end) + addBefore;
 				}
 
 				result.add(subword);
@@ -499,6 +509,7 @@ public class HyphenationParser{
 		if(StringUtils.isNotBlank(addAfter))
 			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
 		result.add(subword);
+
 		return result;
 	}
 
