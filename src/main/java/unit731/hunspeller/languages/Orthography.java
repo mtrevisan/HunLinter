@@ -20,8 +20,6 @@ public class Orthography{
 	}
 
 	public String correctOrthography(String word){
-		word = word.toLowerCase(Locale.ROOT);
-
 		//apply stress
 		word = StringUtils.replaceAll(word, "a\\\\", "à");
 		word = StringUtils.replaceAll(word, "e\\\\", "è");

@@ -209,7 +209,7 @@ public class HyphenationParser{
 	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public TrieNode<String> addRule(String rule){
-		rule = orthography.correctOrthography(rule.toLowerCase(Locale.ROOT));
+		rule = orthography.correctOrthography(rule);
 
 		validateRule(rule);
 
@@ -332,7 +332,7 @@ public class HyphenationParser{
 	 */
 	public Hyphenation hyphenate(String word, String addedRule){
 		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
-		addedRule = orthography.correctOrthography(addedRule.toLowerCase(Locale.ROOT));
+		addedRule = orthography.correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);
 		patternsWithAddedRule.add(key, addedRule);
 
@@ -340,7 +340,7 @@ public class HyphenationParser{
 	}
 
 	public boolean hasRule(String rule){
-		rule = orthography.correctOrthography(rule.toLowerCase(Locale.ROOT));
+		rule = orthography.correctOrthography(rule);
 		String key = getKeyFromData(rule);
 		TrieNode<String> foundRule = patterns.contains(key);
 		return (foundRule != null && foundRule.getData().equals(rule));
@@ -358,7 +358,7 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Trie<String> patterns){
-		word = orthography.correctOrthography(word.toLowerCase(Locale.ROOT))
+		word = orthography.correctOrthography(word)
 			.replaceAll(HYPHENS, SOFT_HYPHEN);
 
 		List<String> hyphenatedWord;

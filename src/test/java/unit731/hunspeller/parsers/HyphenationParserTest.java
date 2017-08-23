@@ -115,6 +115,21 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
 	}
 
+	@Test
+	public void augmentedBase(){
+		Trie<String> patterns = new Trie<>();
+		String rule = "c1k/k=k";
+		patterns.add(getKeyFromData(rule), rule);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("de", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("Zucker");
+
+		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
+	}
+
 	private String getKeyFromData(String rule){
 		return rule.replaceAll("\\d|/.+$", StringUtils.EMPTY);
 	}
