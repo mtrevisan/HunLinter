@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +36,10 @@ import unit731.hunspeller.resources.HyphenationPattern;
 import unit731.hunspeller.services.FileService;
 
 
+/**
+ * @link <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">Paper</a>
+ * @link <a href="https://searchcode.com/codesearch/view/884580/">Source code</a>
+ */
 public class HyphenationParser{
 
 	/** minimal hyphenation distance from the left word end */
