@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -75,15 +76,23 @@ public class HyphenationParser{
 
 
 	public HyphenationParser(String language){
+		Objects.nonNull(language);
+
 		language = Optional.ofNullable(language)
 			.orElse(StringUtils.EMPTY);
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
+
+		Objects.nonNull(comparator);
+		Objects.nonNull(orthography);
 	}
 
 	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
 		this(language);
+
+		Objects.nonNull(patterns);
+		Objects.nonNull(options);
 
 		this.patterns = patterns;
 		this.options = options;
@@ -118,6 +127,7 @@ public class HyphenationParser{
 					int leftCompoundMin = 0;
 					int rightCompoundMin = 0;
 					String[] noHyphen = null;
+					int level = 0;
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
@@ -137,6 +147,12 @@ public class HyphenationParser{
 								rightCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_RIGHT_HYPHENATION.length())));
 							else if(line.startsWith(NO_HYPHEN))
 								noHyphen = line.substring(NO_HYPHEN.length()).split(COMMA);
+							else if(line.startsWith(NEXT_LEVEL)){
+								level ++;
+
+								if(level > 1)
+									throw new IllegalArgumentException("Cannot have more than two levels");
+							}
 							else{
 								validateRule(line);
 
@@ -153,18 +169,20 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
-//					if(noHyphen == null)
-//						//en dash and right single quotation mark
-//						noHyphen = new String[]{"\\u2013", "\\u2019"};
-//					line = "1-1/=,1,1";
-//					hypParser.patterns.add(getKeyFromData(line), line);
-//					line = "1'1";
-//					hypParser.patterns.add(getKeyFromData(line), line);
-//					leftMin = leftMin;	//from previous level
-//					rightMin = rightMin;	//from previous level
-//					leftCompoundMin = (leftCompoundMin > 0? leftCompoundMin: (leftMin > 0? leftMin: 3));	//from previous level
-//					rightCompoundMin = (rightCompoundMin > 0? rightCompoundMin: (rightMin > 0? rightMin: 3));	//from previous level
+					if(level == 1){
+						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
+//						if(noHyphen[1] == null)
+//							//en dash and right single quotation mark
+//							noHyphen[1] = new String[]{"\\u2013", "\\u2019"};
+//						line = "1-1/=,1,1";
+//						hypParser.patterns[1].add(getKeyFromData(line), line);
+//						line = "1'1";
+//						hypParser.patterns[1].add(getKeyFromData(line), line);
+//						leftMin[1] = leftMin[0];
+//						rightMin[1] = rightMin[0];
+//						leftCompoundMin[1] = (leftCompoundMin[0] > 0? leftCompoundMin[0]: (leftMin[0] > 0? leftMin[0]: 3));
+//						rightCompoundMin[1] = (rightCompoundMin[0] > 0? rightCompoundMin[0]: (rightMin[0] > 0? rightMin[0]: 3));
+					}
 
 					hypParser.options = HyphenationOptions.builder()
 						.leftMin(leftMin)
@@ -213,8 +231,7 @@ public class HyphenationParser{
 
 	public void clear(){
 		patterns.clear();
-		if(options != null)
-			options.clear();
+		options.clear();
 	}
 
 	/**
