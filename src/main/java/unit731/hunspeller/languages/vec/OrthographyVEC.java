@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.parsers.HyphenationParser;
 
 
 public class OrthographyVEC extends Orthography{
@@ -87,7 +88,7 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-			if(!syllabe.contains("ʼ") && !syllabe.contains("'") && Word.getLastVowelIndex(syllabe) < 0)
+			if(!syllabe.contains("ʼ") && !syllabe.contains("'") && !HyphenationParser.HYPHEN.equals(syllabe) && Word.getLastVowelIndex(syllabe) < 0)
 				errors[i] = true;
 		}
 		return errors;

@@ -17,6 +17,7 @@ public class HyphenationParserTest{
 		patterns.add("abc", "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
+			.rightMin(0)
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
 
@@ -26,11 +27,27 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void base(){
+	public void noHyphenationDueToRightMin(){
+		Trie<String> patterns = new Trie<>();
+		patterns.add("abc", "ab1c");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(0)
+			.rightMin(2)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+	}
+
+	@Test
+	public void hyphenationOkLeftMin(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(0)
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
 
@@ -40,11 +57,27 @@ public class HyphenationParserTest{
 	}
 
 	@Test
+	public void hyphenationOkRightMin(){
+		Trie<String> patterns = new Trie<>();
+		addRule(patterns, "ab1c");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(0)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("ab", "c"), hyphenation.getSyllabes());
+	}
+
+	@Test
 	public void augmentedWithRemovalBeforeHyphen(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, "aa1tje/=,2,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
 		HyphenationParser parser = new HyphenationParser("du", patterns, options);
 
@@ -59,6 +92,7 @@ public class HyphenationParserTest{
 		addRule(patterns, "1-/-=,1,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
 
@@ -73,6 +107,7 @@ public class HyphenationParserTest{
 		addRule(patterns, "1-/-=");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
 
@@ -82,25 +117,42 @@ public class HyphenationParserTest{
 	}
 
 	@Test
+	public void augmentedAfterBreak(){
+		Trie<String> patterns = new Trie<>();
+		addRule(patterns, "-1/-=-");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
+
+		Hyphenation hyphenation = parser.hyphenate("ab-cd");
+
+		Assert.assertEquals(Arrays.asList("ab-", "-cd"), hyphenation.getSyllabes());
+	}
+
+//	@Test
 	public void augmentedNonWordInitial(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, "eigh1teen/ht=t,4,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("en-US", patterns, options);
+		HyphenationParser parser = new HyphenationParser("en", patterns, options);
 
 		Hyphenation hyphenation = parser.hyphenate("eighteen");
 
 		Assert.assertEquals(Arrays.asList("eight", "teen"), hyphenation.getSyllabes());
 	}
 
-	@Test
+//	@Test
 	public void augmentedWordInitial(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, ".schif1fahrt/ff=f,5,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", patterns, options);
 
@@ -115,6 +167,7 @@ public class HyphenationParserTest{
 		addRule(patterns, "c1k/k=k");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
+			.rightMin(1)
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", patterns, options);
 

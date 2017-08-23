@@ -32,7 +32,7 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.resources.Hyphenation;
 import unit731.hunspeller.resources.HyphenationOptions;
-import unit731.hunspeller.resources.HyphenationPattern;
+import unit731.hunspeller.resources.HyphenationBreak;
 import unit731.hunspeller.services.FileService;
 
 
@@ -56,7 +56,7 @@ public class HyphenationParser{
 	private static final String COMMA = ",";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
-	private static final String HYPHEN = "\u2010";
+	public static final String HYPHEN = "\u2010";
 	private static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
 //	private static final String NON_BREAKING_HYPHEN = "\u2011";
@@ -74,7 +74,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private Trie<String> patterns;
+	private Trie<String> patterns = new Trie<>();
 	private HyphenationOptions options;
 
 
@@ -234,7 +234,8 @@ public class HyphenationParser{
 
 	public void clear(){
 		patterns.clear();
-		options.clear();
+		if(options != null)
+			options.clear();
 	}
 
 	/**
@@ -400,15 +401,15 @@ public class HyphenationParser{
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
-			HyphenationPattern hyphPattern = getHyphenationIndexes(word, patterns);
-			hyphenatedWord = createHyphenatedWord(word, hyphPattern);
+			HyphenationBreak hyphBreak = getHyphenationIndexes(word, patterns);
+			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
 		return new Hyphenation(hyphenatedWord, errors);
 	}
 
-	private HyphenationPattern getHyphenationIndexes(String word, Trie<String> patterns){
+	private HyphenationBreak getHyphenationIndexes(String word, Trie<String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -439,10 +440,10 @@ public class HyphenationParser{
 				}
 			}
 		}
-		return new HyphenationPattern(indexes, augmentedPatternData);
+		return new HyphenationBreak(indexes, augmentedPatternData);
 	}
 
-	private List<String> createHyphenatedWord(String word, HyphenationPattern hyphPattern){
+	private List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
 		List<String> result = new ArrayList<>();
 		int startIndex = 0;
 		int endIndex = 0;
@@ -454,7 +455,7 @@ public class HyphenationParser{
 			//manage hyphenation characters already present in the word
 //			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
 //			idx = (idx >= 0? idx + endIndex - options.getRightMin() - 1: maxLength);
-			if(/*i >= leftMin && i <= idx &&*/ hyphPattern.getIndexes()[i] % 2 != 0){
+			if(/*i >= leftMin && i <= idx &&*/ hyphBreak.getIndexes()[i] % 2 != 0){
 				String subword = word.substring(startIndex, endIndex)
 					/*.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY)*/;
 
@@ -463,7 +464,7 @@ public class HyphenationParser{
 					addAfter = null;
 				}
 
-				String augmentedPatternData = hyphPattern.getAugmentedPatternData()[i];
+				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
 				if(augmentedPatternData != null){
 					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(augmentedPatternData.replaceFirst("^\\.", StringUtils.EMPTY));
 					m.find();
@@ -471,22 +472,22 @@ public class HyphenationParser{
 
 					m = AUGMENTED_RULE.reset(augmentedPatternData);
 					m.find();
-					String rule = m.group("rule");
 					String addBefore = m.group("addBefore");
 					addAfter = m.group("addAfter");
 					String indexBefore = m.group("indexBefore");
 					String indexAfter = m.group("indexAfter");
 					if(indexBefore == null){
-						indexBefore = "1";
+						String rule = m.group("rule");
+						indexBefore = Integer.toString(1);
 						indexAfter = Integer.toString(rule.replaceAll("[.\\d]", StringUtils.EMPTY).length());
 					}
 
 					//remove last characters from subword
-					int end = i - index + Integer.parseInt(indexBefore) - 1 /*- (StringUtils.isEmpty(addBefore)? 0: 0)*/;
+					int end = subword.length() - index + Integer.parseInt(indexBefore) - 1;
 					subword = subword.substring(0, end) + addBefore;
 
 					//append first characters to next subword
-					after = end + Integer.parseInt(indexAfter) - endIndex /*- (StringUtils.isEmpty(addBefore)? 1: 0)*/;
+					after = end + Integer.parseInt(indexAfter) - endIndex;
 				}
 
 				result.add(subword);

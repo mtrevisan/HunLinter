@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class HyphenationPattern{
+public class HyphenationBreak{
 
 	private final int[] indexes;
 	private final String[] augmentedPatternData;
