@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.trie.Prefix;
 import unit731.hunspeller.collections.trie.Trie;
@@ -32,6 +31,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.resources.Hyphenation;
+import unit731.hunspeller.resources.HyphenationOptions;
 import unit731.hunspeller.resources.HyphenationPattern;
 import unit731.hunspeller.services.FileService;
 
@@ -62,7 +62,7 @@ public class HyphenationParser{
 	private static final String WORD_BOUNDARY = ".";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^.+/(?<addBefore>.*)(=|-_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
+	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*)(=|-_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
 
 
@@ -70,12 +70,8 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private final Trie<String> patterns = new Trie<>();
-	@Getter private int leftMin = 2;
-	@Getter private int rightMin = 2;
-	@Getter private int leftCompoundMin = 0;
-	@Getter private int rightCompoundMin = 0;
-	@Getter private String[] noHyphen;
+	private Trie<String> patterns;
+	private HyphenationOptions options;
 
 
 	public HyphenationParser(String language){
@@ -84,6 +80,13 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
+	}
+
+	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
+		this(language);
+
+		this.patterns = patterns;
+		this.options = options;
 	}
 
 	@AllArgsConstructor
@@ -110,6 +113,11 @@ public class HyphenationParser{
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
+					int leftMin = 2;
+					int rightMin = 2;
+					int leftCompoundMin = 0;
+					int rightCompoundMin = 0;
+					String[] noHyphen = null;
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
@@ -120,15 +128,15 @@ public class HyphenationParser{
 						line = StringUtils.strip(line);
 						if(!line.isEmpty()){
 							if(line.startsWith(MIN_LEFT_HYPHENATION))
-								hypParser.leftMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_LEFT_HYPHENATION.length())));
+								leftMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_LEFT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_RIGHT_HYPHENATION))
-								hypParser.rightMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_RIGHT_HYPHENATION.length())));
+								rightMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_RIGHT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_COMPOUND_LEFT_HYPHENATION))
-								hypParser.leftCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_LEFT_HYPHENATION.length())));
+								leftCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_LEFT_HYPHENATION.length())));
 							else if(line.startsWith(MIN_COMPOUND_RIGHT_HYPHENATION))
-								hypParser.rightCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_RIGHT_HYPHENATION.length())));
+								rightCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_RIGHT_HYPHENATION.length())));
 							else if(line.startsWith(NO_HYPHEN))
-								hypParser.noHyphen = line.substring(NO_HYPHEN.length()).split(COMMA);
+								noHyphen = line.substring(NO_HYPHEN.length()).split(COMMA);
 							else{
 								validateRule(line);
 
@@ -144,6 +152,15 @@ public class HyphenationParser{
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
+					
+					hypParser.options = HyphenationOptions.builder()
+						.leftMin(leftMin)
+						.rightMin(rightMin)
+						.leftCompoundMin(leftCompoundMin)
+						.rightCompoundMin(rightCompoundMin)
+						.noHyphen(noHyphen)
+						.build();
+
 					setProgress(100);
 				}
 
@@ -183,11 +200,8 @@ public class HyphenationParser{
 
 	public void clear(){
 		patterns.clear();
-		leftMin = 0;
-		rightMin = 0;
-		leftCompoundMin = 0;
-		rightCompoundMin = 0;
-		noHyphen = null;
+		if(options != null)
+			options.clear();
 	}
 
 	/**
@@ -249,34 +263,34 @@ public class HyphenationParser{
 			writer.write(charset.name());
 			writer.write(StringUtils.LF);
 			//save options
-			if(leftMin > 0){
+			if(options.getLeftMin() > 0){
 				writer.write(MIN_LEFT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(leftMin));
+				writer.write(Integer.toString(options.getLeftMin()));
 				writer.write(StringUtils.LF);
 			}
-			if(rightMin > 0){
+			if(options.getRightMin() > 0){
 				writer.write(MIN_RIGHT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(rightMin));
+				writer.write(Integer.toString(options.getRightMin()));
 				writer.write(StringUtils.LF);
 			}
-			if(leftCompoundMin > 0){
+			if(options.getLeftCompoundMin() > 0){
 				writer.write(MIN_COMPOUND_LEFT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(leftCompoundMin));
+				writer.write(Integer.toString(options.getLeftCompoundMin()));
 				writer.write(StringUtils.LF);
 			}
-			if(leftCompoundMin > 0){
+			if(options.getRightCompoundMin() > 0){
 				writer.write(MIN_COMPOUND_RIGHT_HYPHENATION);
 				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(leftCompoundMin));
+				writer.write(Integer.toString(options.getRightCompoundMin()));
 				writer.write(StringUtils.LF);
 			}
-			if(noHyphen != null){
+			if(options.getNoHyphen() != null){
 				writer.write(NO_HYPHEN);
 				writer.write(StringUtils.SPACE);
-				writer.write(StringUtils.join(noHyphen, COMMA));
+				writer.write(StringUtils.join(options.getNoHyphen(), COMMA));
 				writer.write(StringUtils.LF);
 			}
 			//extract data from the trie
@@ -349,7 +363,7 @@ public class HyphenationParser{
 
 		List<String> hyphenatedWord;
 		boolean[] errors;
-		if(word.length() < leftMin + rightMin)
+		if(word.length() < options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
@@ -365,8 +379,9 @@ public class HyphenationParser{
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
-		int[] indexes = new int[word.length()];
-		String[] augmentedPatternData = new String[word.length()];
+		int wordSize = word.length();
+		int[] indexes = new int[wordSize];
+		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
 			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
@@ -380,7 +395,7 @@ public class HyphenationParser{
 						j ++;
 					else{
 						int idx = i + j;
-						if(leftMin <= idx && idx <= word.length() - rightMin){
+						if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
 							int dd = Character.digit(chr, 10);
 							if(dd > indexes[idx]){
 								indexes[idx] = dd;
@@ -398,14 +413,14 @@ public class HyphenationParser{
 		List<String> result = new ArrayList<>();
 		int startIndex = 0;
 		int endIndex = 0;
-		int maxLength = word.length() - rightMin;
+//		int maxLength = word.length() - options.getRightMin();
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
 		for(int i = 0; i < size; i ++){
 			//manage hyphenation characters already present in the word
-			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
-			idx = (idx >= 0? idx + endIndex - rightMin - 1: maxLength);
+//			int idx = word.substring(endIndex).indexOf(HYPHEN_MINUS);
+//			idx = (idx >= 0? idx + endIndex - options.getRightMin() - 1: maxLength);
 			if(/*i >= leftMin && i <= idx &&*/ hyphPattern.getIndexes()[i] % 2 != 0){
 				String subword = word.substring(startIndex, endIndex)
 					/*.replaceFirst(HYPHEN_MINUS, StringUtils.EMPTY)*/;
@@ -417,23 +432,28 @@ public class HyphenationParser{
 
 				String augmentedPatternData = hyphPattern.getAugmentedPatternData()[i];
 				if(augmentedPatternData != null){
-					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(augmentedPatternData);
+					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(augmentedPatternData.replaceFirst("^\\.", StringUtils.EMPTY));
 					m.find();
 					int index = m.start();
 
 					m = AUGMENTED_RULE.reset(augmentedPatternData);
 					m.find();
+					String rule = m.group("rule");
 					String addBefore = m.group("addBefore");
 					addAfter = m.group("addAfter");
 					String indexBefore = m.group("indexBefore");
 					String indexAfter = m.group("indexAfter");
+					if(indexBefore == null){
+						indexBefore = "1";
+						indexAfter = Integer.toString(rule.replaceAll("[.\\d]", StringUtils.EMPTY).length());
+					}
 
 					//remove last characters from subword
-					int before = index - (indexBefore != null? Integer.parseInt(indexBefore) - 1: 0);
-					subword = subword.substring(0, i - before) + addBefore;
+					int end = i - index + Integer.parseInt(indexBefore) - 1 /*- (StringUtils.isEmpty(addBefore)? 0: 0)*/;
+					subword = subword.substring(0, end) + addBefore;
 
 					//append first characters to next subword
-					after = index - before + (indexAfter != null? Integer.parseInt(indexAfter): 0);
+					after = end + Integer.parseInt(indexAfter) - endIndex /*- (StringUtils.isEmpty(addBefore)? 1: 0)*/;
 				}
 
 				result.add(subword);
