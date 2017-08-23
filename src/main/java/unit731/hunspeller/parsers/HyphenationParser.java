@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -79,11 +78,10 @@ public class HyphenationParser{
 	@Getter private String[] noHyphen;
 
 
-	public HyphenationParser(AffixParser affParser){
-		Objects.nonNull(affParser);
-
-		String language = Optional.ofNullable(affParser.getLanguage())
+	public HyphenationParser(String language){
+		language = Optional.ofNullable(language)
 			.orElse(StringUtils.EMPTY);
+
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
 	}
