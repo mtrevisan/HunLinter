@@ -49,9 +49,7 @@ public class HyphenationParser{
 	public static final String HYPHEN = "\u2010";
 	private static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
-	private static final String NON_BREAKING_HYPHEN = "\u2011";
-//	private static final String ZERO_WIDTH_SPACE = "\u200B";
-	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN + NON_BREAKING_HYPHEN) + "]";
+	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN) + "]";
 
 	private static final String WORD_BOUNDARY = ".";
 
