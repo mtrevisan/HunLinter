@@ -244,6 +244,7 @@ public class HyphenationParser{
 		patterns.clear();
 		if(options != null)
 			options.clear();
+		nonStandardHyphenation.clear();
 	}
 
 	/**
