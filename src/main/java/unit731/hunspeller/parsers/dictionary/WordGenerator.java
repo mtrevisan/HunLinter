@@ -1,4 +1,4 @@
-package unit731.hunspeller.services;
+package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,11 +14,7 @@ import unit731.hunspeller.collections.regexptrie.RegExpPrefix;
 import unit731.hunspeller.collections.regexptrie.RegExpTrieNode;
 
 import unit731.hunspeller.interfaces.Productable;
-import unit731.hunspeller.parsers.AffixParser;
-import unit731.hunspeller.resources.AffixEntry;
-import unit731.hunspeller.resources.DictionaryEntry;
-import unit731.hunspeller.resources.RuleEntry;
-import unit731.hunspeller.resources.RuleProductionEntry;
+import unit731.hunspeller.parsers.affix.AffixParser;
 
 
 @AllArgsConstructor

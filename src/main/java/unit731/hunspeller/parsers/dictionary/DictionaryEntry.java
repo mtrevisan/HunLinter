@@ -1,4 +1,4 @@
-package unit731.hunspeller.resources;
+package unit731.hunspeller.parsers.dictionary;
 
 import java.util.Arrays;
 import java.util.List;

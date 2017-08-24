@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.affix;
 
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.strategies.NumericalParsingStrategy;
@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.regexptrie.RegExpTrie;
-import unit731.hunspeller.resources.AffixEntry;
-import unit731.hunspeller.resources.ParsingContext;
-import unit731.hunspeller.resources.RuleEntry;
+import unit731.hunspeller.parsers.dictionary.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.RuleEntry;
 import unit731.hunspeller.services.FileService;
 
 

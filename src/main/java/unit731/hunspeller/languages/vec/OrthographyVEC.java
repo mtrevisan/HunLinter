@@ -90,8 +90,8 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-			if(!syllabe.contains("ʼ") && !syllabe.contains("'") && !HyphenationParser.HYPHEN.equals(syllabe) && Word.getLastVowelIndex(syllabe) < 0)
-				errors[i] = true;
+			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains("'") && !HyphenationParser.HYPHEN.equals(syllabe)
+				&& Word.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;
 	}

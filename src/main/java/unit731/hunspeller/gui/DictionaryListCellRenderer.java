@@ -8,9 +8,9 @@ import javax.swing.ListCellRenderer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import unit731.hunspeller.parsers.AffixParser;
-import unit731.hunspeller.parsers.DictionaryParser;
-import unit731.hunspeller.resources.Watercolors;
+import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.Watercolors;
 
 
 @AllArgsConstructor

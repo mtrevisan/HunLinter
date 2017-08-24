@@ -16,7 +16,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.resources.MeaningEntry;
+import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 
 
 @Slf4j

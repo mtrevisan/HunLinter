@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.aid;
 
 import java.io.File;
 import java.io.IOException;

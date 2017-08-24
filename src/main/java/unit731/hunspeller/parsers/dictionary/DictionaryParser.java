@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.dictionary;
 
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import java.io.BufferedReader;
@@ -34,11 +34,8 @@ import unit731.hunspeller.collections.intervalmap.Interval;
 import unit731.hunspeller.collections.intervalmap.IntervalMap;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.resources.DictionaryEntry;
-import unit731.hunspeller.resources.Duplicate;
-import unit731.hunspeller.resources.RuleProductionEntry;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.WordGenerator;
 import unit731.hunspeller.services.sorters.ExternalSorter;
 import unit731.hunspeller.services.sorters.ExternalSorterOptions;
 

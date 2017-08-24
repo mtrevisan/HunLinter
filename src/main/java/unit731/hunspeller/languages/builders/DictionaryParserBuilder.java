@@ -3,8 +3,8 @@ package unit731.hunspeller.languages.builders;
 import java.io.File;
 import java.nio.charset.Charset;
 import unit731.hunspeller.languages.vec.DictionaryParserVEC;
-import unit731.hunspeller.parsers.DictionaryParser;
-import unit731.hunspeller.services.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 
 
 public class DictionaryParserBuilder{

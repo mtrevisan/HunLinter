@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import unit731.hunspeller.resources.MeaningEntry;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
+	protected static final String APOSTROPHE = "ʼ";
+
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
 	}
@@ -42,9 +44,9 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		word = StringUtils.replace(word, "'", "ʼ");
-		word = StringUtils.replace(word, "‘", "ʼ");
-		word = StringUtils.replace(word, "’", "ʼ");
+		word = StringUtils.replace(word, "'", APOSTROPHE);
+		word = StringUtils.replace(word, "‘", APOSTROPHE);
+		word = StringUtils.replace(word, "’", APOSTROPHE);
 		return word;
 	}
 

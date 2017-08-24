@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.DictionaryParser;
-import unit731.hunspeller.resources.AffixEntry;
-import unit731.hunspeller.resources.DictionaryEntry;
-import unit731.hunspeller.resources.RuleProductionEntry;
-import unit731.hunspeller.services.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 
 
 public class DictionaryParserVEC extends DictionaryParser{

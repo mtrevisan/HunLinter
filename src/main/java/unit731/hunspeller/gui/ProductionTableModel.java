@@ -3,8 +3,8 @@ package unit731.hunspeller.gui;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.resources.AffixEntry;
-import unit731.hunspeller.resources.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 
 
 public class ProductionTableModel extends AbstractTableModel{
