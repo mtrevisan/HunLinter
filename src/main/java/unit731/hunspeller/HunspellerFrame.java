@@ -1390,7 +1390,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		if(StringUtils.isNotBlank(text)){
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
-			text = frame.hypParser.formatHyphenation(hyphenation);
+			text = frame.hypParser.formatHyphenation(hyphenation, HyphenationParser.HYPHEN);
 			count = Long.toString(frame.hypParser.countSyllabes(hyphenation));
 
 			frame.hypAddRuleTextField.setEnabled(true);
@@ -1426,8 +1426,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
 					Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
 
-					String text = frame.hypParser.formatHyphenation(hyphenation);
-					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation);
+					String text = frame.hypParser.formatHyphenation(hyphenation, HyphenationParser.HYPHEN);
+					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, HyphenationParser.HYPHEN);
 					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
 					hyphenationChanged = !text.equals(addedRuleText);

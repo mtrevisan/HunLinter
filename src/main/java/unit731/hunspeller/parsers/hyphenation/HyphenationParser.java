@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -34,33 +35,27 @@ import unit731.hunspeller.services.FileService;
 
 
 /**
- * @link <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">Paper</a>
- * @link <a href="https://searchcode.com/codesearch/view/884580/">Source code</a>
+ * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non-standard hyphenation extension.
+ * 
+ * @link <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
+ * @link <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
+ * @link <a href="https://github.com/hunspell/hyphen">C source code</a>
  */
 public class HyphenationParser{
 
-	/** minimal hyphenation distance from the left word end */
-	private static final String MIN_LEFT_HYPHENATION = "LEFTHYPHENMIN";
-	/** minimal hyphation distance from the right word end */
-	private static final String MIN_RIGHT_HYPHENATION = "RIGHTHYPHENMIN";
-	/** minimal hyphation distance from the left compound word boundary */
-	private static final String MIN_COMPOUND_LEFT_HYPHENATION = "COMPOUNDLEFTHYPHENMIN";
-	/** minimal hyphation distance from the right compound word boundary */
-	private static final String MIN_COMPOUND_RIGHT_HYPHENATION = "COMPOUNDRIGHTHYPHENMIN";
-	/** comma separated list of characters or character sequences with forbidden hyphenation */
-	private static final String NO_HYPHEN = "NOHYPHEN";
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
-	private static final String COMMA = ",";
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
 	public static final String HYPHEN = "\u2010";
 	private static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
-//	private static final String NON_BREAKING_HYPHEN = "\u2011";
+	private static final String NON_BREAKING_HYPHEN = "\u2011";
 //	private static final String ZERO_WIDTH_SPACE = "\u200B";
-	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN + SOFT_HYPHEN) + "]";
+	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN + NON_BREAKING_HYPHEN) + "]";
 
 	private static final String WORD_BOUNDARY = ".";
+
+	private static final String COMMA = ",";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
@@ -123,12 +118,8 @@ public class HyphenationParser{
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-					int leftMin = 2;
-					int rightMin = 2;
-					int leftCompoundMin = 0;
-					int rightCompoundMin = 0;
-					String[] noHyphen = null;
 					int level = 0;
+					hypParser.options = new HyphenationOptions();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
@@ -136,18 +127,8 @@ public class HyphenationParser{
 						if(line.isEmpty())
 							continue;
 
-						line = StringUtils.strip(line);
 						if(!line.isEmpty()){
-							if(line.startsWith(MIN_LEFT_HYPHENATION))
-								leftMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_LEFT_HYPHENATION.length())));
-							else if(line.startsWith(MIN_RIGHT_HYPHENATION))
-								rightMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_RIGHT_HYPHENATION.length())));
-							else if(line.startsWith(MIN_COMPOUND_LEFT_HYPHENATION))
-								leftCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_LEFT_HYPHENATION.length())));
-							else if(line.startsWith(MIN_COMPOUND_RIGHT_HYPHENATION))
-								rightCompoundMin = Integer.parseInt(StringUtils.strip(line.substring(MIN_COMPOUND_RIGHT_HYPHENATION.length())));
-							else if(line.startsWith(NO_HYPHEN))
-								noHyphen = line.substring(NO_HYPHEN.length()).split(COMMA);
+							if(hypParser.options.parseLine(line)){}
 							else if(line.startsWith(NEXT_LEVEL)){
 								level ++;
 
@@ -179,26 +160,18 @@ public class HyphenationParser{
 
 					if(level == 1){
 						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
-//						if(noHyphen[1] == null)
+//						if(hypParser.options[1].getNoHyphen() == null)
 //							//en dash and right single quotation mark
-//							noHyphen[1] = new String[]{"\\u2013", "\\u2019"};
+//							hypParser.options[1].setNoHyphen(new String[]{"\\u2013", "\\u2019"});
 //						line = "1-1/=,1,1";
 //						hypParser.patterns[1].add(getKeyFromData(line), line);
 //						line = "1'1";
 //						hypParser.patterns[1].add(getKeyFromData(line), line);
-//						leftMin[1] = leftMin[0];
-//						rightMin[1] = rightMin[0];
-//						leftCompoundMin[1] = (leftCompoundMin[0] > 0? leftCompoundMin[0]: (leftMin[0] > 0? leftMin[0]: 3));
-//						rightCompoundMin[1] = (rightCompoundMin[0] > 0? rightCompoundMin[0]: (rightMin[0] > 0? rightMin[0]: 3));
+//						hypParser.options[1].setLeftMin(hypParser.options[0].getLeftMin());
+//						hypParser.options[1].setRightMin(hypParser.options[0].getRightMin());
+//						hypParser.options[1].setLeftCompoundMin(hypParser.options[0].getLeftCompoundMin() > 0? hypParser.options[0].getLeftCompoundMin(): (hypParser.options[0].getLeftMin() > 0? hypParser.options[0].getLeftMin(): 3));
+//						hypParser.options[1].setRightCompoundMin(hypParser.options[0].getRightCompoundMin() > 0? hypParser.options[0].getRightCompoundMin(): (hypParser.options[0].getRightMin() > 0? hypParser.options[0].getRightMin(): 3));
 					}
-
-					hypParser.options = HyphenationOptions.builder()
-						.leftMin(leftMin)
-						.rightMin(rightMin)
-						.leftCompoundMin(leftCompoundMin)
-						.rightCompoundMin(rightCompoundMin)
-						.noHyphen(noHyphen)
-						.build();
 
 					setProgress(100);
 				}
@@ -221,8 +194,7 @@ public class HyphenationParser{
 			//remove comments
 			line = StringUtils.replaceAll(line, "^$|\\s*%.*$", StringUtils.EMPTY);
 			//trim the entire string
-			line = StringUtils.replaceAll(line, "^[^\\S\\r\\n]+|[^\\S\\r\\n]+$|^\\r?\\n$", StringUtils.EMPTY);
-			return line;
+			return StringUtils.strip(line);
 		}
 
 		@Override
@@ -303,36 +275,7 @@ public class HyphenationParser{
 			writer.write(charset.name());
 			writer.write(StringUtils.LF);
 			//save options
-			if(options.getLeftMin() > 0){
-				writer.write(MIN_LEFT_HYPHENATION);
-				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(options.getLeftMin()));
-				writer.write(StringUtils.LF);
-			}
-			if(options.getRightMin() > 0){
-				writer.write(MIN_RIGHT_HYPHENATION);
-				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(options.getRightMin()));
-				writer.write(StringUtils.LF);
-			}
-			if(options.getLeftCompoundMin() > 0){
-				writer.write(MIN_COMPOUND_LEFT_HYPHENATION);
-				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(options.getLeftCompoundMin()));
-				writer.write(StringUtils.LF);
-			}
-			if(options.getRightCompoundMin() > 0){
-				writer.write(MIN_COMPOUND_RIGHT_HYPHENATION);
-				writer.write(StringUtils.SPACE);
-				writer.write(Integer.toString(options.getRightCompoundMin()));
-				writer.write(StringUtils.LF);
-			}
-			if(options.getNoHyphen() != null){
-				writer.write(NO_HYPHEN);
-				writer.write(StringUtils.SPACE);
-				writer.write(StringUtils.join(options.getNoHyphen(), COMMA));
-				writer.write(StringUtils.LF);
-			}
+			options.write(writer);
 			//extract data from the trie
 			Map<Integer, List<String>> content = new HashMap<>();
 			patterns.forEachLeaf(node -> {
@@ -348,6 +291,12 @@ public class HyphenationParser{
 				.collect(Collectors.toList());
 			for(String rule : rules){
 				writer.write(rule);
+				writer.write(StringUtils.LF);
+			}
+			//non-standard hyphenations
+			Collection<String> nonStandards = nonStandardHyphenation.values();
+			for(String hyphenation : nonStandards){
+				writer.write(hyphenation);
 				writer.write(StringUtils.LF);
 			}
 		}
@@ -490,9 +439,9 @@ public class HyphenationParser{
 					}
 
 					//remove last characters from subword
-					//  ll3a/a=b,2,2
+					//  ll3a/aa=b,2,2
 					//syll
-					//syla-b
+					//sylaa-b
 					int end = subword.length() - index + Integer.parseInt(indexBefore) - 1;
 					after = end + Integer.parseInt(indexAfter) - endIndex;
 					subword = subword.substring(0, end) + addBefore;
@@ -511,8 +460,8 @@ public class HyphenationParser{
 		return result;
 	}
 
-	public String formatHyphenation(Hyphenation hyphenation){
-		StringJoiner sj = new StringJoiner(HYPHEN, "<html>", "</html>");
+	public String formatHyphenation(Hyphenation hyphenation, String hyphen){
+		StringJoiner sj = new StringJoiner(hyphen, "<html>", "</html>");
 		List<String> syllabes = hyphenation.getSyllabes();
 		boolean[] erros = hyphenation.getErrors();
 		int size = syllabes.size();

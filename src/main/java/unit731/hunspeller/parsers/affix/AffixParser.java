@@ -289,8 +289,7 @@ public class AffixParser{
 		//remove comments
 		line = StringUtils.replaceAll(line, "^$|\\s*#.*$", StringUtils.EMPTY);
 		//trim the entire string
-		line = StringUtils.replaceAll(line, "^[^\\S\\r\\n]+|[^\\S\\r\\n]+$|^\\r?\\n$", StringUtils.EMPTY);
-		return line;
+		return StringUtils.strip(line);
 	}
 
 	private boolean containsData(String key){
