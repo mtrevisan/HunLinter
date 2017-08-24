@@ -1,13 +1,10 @@
 package unit731.hunspeller.parsers.hyphenation;
 
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.parsers.hyphenation.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.HyphenationOptions;
 
 
 public class HyphenationParserTest{
@@ -148,7 +145,7 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("ku", "ko-", "-fu"), hyphenation.getSyllabes());
 	}
 
-//	@Test
+	@Test
 	public void augmentedNonWordInitial(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, "eigh1teen/ht=t,4,2");
@@ -163,7 +160,7 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("eight", "teen"), hyphenation.getSyllabes());
 	}
 
-//	@Test
+	@Test
 	public void augmentedWordInitial(){
 		Trie<String> patterns = new Trie<>();
 		addRule(patterns, ".schif1fahrt/ff=f,5,2");

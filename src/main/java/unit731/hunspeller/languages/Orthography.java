@@ -9,13 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	protected static Orthography INSTANCE;
+	private static class SingletonHelper{
+		private static final Orthography INSTANCE = new Orthography();
+	}
 
 
 	public static Orthography getInstance(){
-		if(INSTANCE == null)
-			INSTANCE = new Orthography();
-		return INSTANCE;
+		return SingletonHelper.INSTANCE;
 	}
 
 	public String correctOrthography(String word){

@@ -8,10 +8,13 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 public class OrthographyVEC extends Orthography{
 
-	public static Orthography getInstance(){
-		if(INSTANCE == null)
-			INSTANCE = new OrthographyVEC();
-		return INSTANCE;
+	private static class SingletonHelper{
+		private static final OrthographyVEC INSTANCE = new OrthographyVEC();
+	}
+
+
+	public static synchronized Orthography getInstance(){
+		return SingletonHelper.INSTANCE;
 	}
 
 	@Override
