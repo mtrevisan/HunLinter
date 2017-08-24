@@ -1,7 +1,6 @@
 package unit731.hunspeller.languages.vec;
 
 import java.util.List;
-import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.HyphenationParser;

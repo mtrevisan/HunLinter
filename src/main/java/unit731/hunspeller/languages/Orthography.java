@@ -1,7 +1,6 @@
 package unit731.hunspeller.languages;
 
 import java.util.List;
-import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
