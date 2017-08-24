@@ -37,9 +37,9 @@ import unit731.hunspeller.services.FileService;
 /**
  * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non-standard hyphenation extension.
  * 
- * @link <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
- * @link <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
- * @link <a href="https://github.com/hunspell/hyphen">C source code</a>
+ * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
+ * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
+ * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  */
 public class HyphenationParser{
 
