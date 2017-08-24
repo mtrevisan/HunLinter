@@ -3,7 +3,7 @@ package unit731.hunspeller.languages.vec;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.parsers.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 public class OrthographyVEC extends Orthography{

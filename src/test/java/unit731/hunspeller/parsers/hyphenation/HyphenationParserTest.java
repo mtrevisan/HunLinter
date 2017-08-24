@@ -1,12 +1,13 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.hyphenation;
 
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.resources.Hyphenation;
-import unit731.hunspeller.resources.HyphenationOptions;
+import unit731.hunspeller.parsers.hyphenation.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.HyphenationOptions;
 
 
 public class HyphenationParserTest{

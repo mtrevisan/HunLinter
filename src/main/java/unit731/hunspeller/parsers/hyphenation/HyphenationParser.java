@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.hyphenation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,9 +30,6 @@ import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
-import unit731.hunspeller.resources.Hyphenation;
-import unit731.hunspeller.resources.HyphenationOptions;
-import unit731.hunspeller.resources.HyphenationBreak;
 import unit731.hunspeller.services.FileService;
 
 

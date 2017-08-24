@@ -1,4 +1,4 @@
-package unit731.hunspeller.resources;
+package unit731.hunspeller.parsers.hyphenation;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

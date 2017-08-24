@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers;
+package unit731.hunspeller.parsers.thesaurus;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,9 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.resources.DuplicationResult;
 import unit731.hunspeller.resources.MeaningEntry;
-import unit731.hunspeller.resources.ThesaurusEntry;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.memento.Caretaker;
 

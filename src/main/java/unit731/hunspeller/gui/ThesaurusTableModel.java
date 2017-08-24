@@ -4,7 +4,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.resources.MeaningEntry;
-import unit731.hunspeller.resources.ThesaurusEntry;
+import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 
 
 public class ThesaurusTableModel extends AbstractTableModel{
