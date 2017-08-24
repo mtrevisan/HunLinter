@@ -40,6 +40,7 @@ import unit731.hunspeller.services.FileService;
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
+ * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
 public class HyphenationParser{
 
@@ -281,6 +282,16 @@ public class HyphenationParser{
 				content.computeIfAbsent(data.length(), ArrayList::new)
 					.add(data);
 			});
+			if(!nonStandardHyphenation.isEmpty()){
+				//non-standard hyphenations
+				Collection<String> nonStandards = nonStandardHyphenation.values();
+				for(String hyphenation : nonStandards){
+					writer.write(hyphenation);
+					writer.write(StringUtils.LF);
+				}
+				writer.write(NEXT_LEVEL);
+				writer.write(StringUtils.LF);
+			}
 			//sort values
 			content.values()
 				.forEach(v -> Collections.sort(v, comparator::compare));
@@ -289,12 +300,6 @@ public class HyphenationParser{
 				.collect(Collectors.toList());
 			for(String rule : rules){
 				writer.write(rule);
-				writer.write(StringUtils.LF);
-			}
-			//non-standard hyphenations
-			Collection<String> nonStandards = nonStandardHyphenation.values();
-			for(String hyphenation : nonStandards){
-				writer.write(hyphenation);
 				writer.write(StringUtils.LF);
 			}
 		}
