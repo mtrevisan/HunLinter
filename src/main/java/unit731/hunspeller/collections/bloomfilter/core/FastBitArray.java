@@ -10,7 +10,7 @@ import lombok.Getter;
 /**
  * A fast bit-set implementation that allows direct access to data property so that it can be easily serialized.
  */
-public class FastBitArray{
+public class FastBitArray implements BitArray{
 
 	/** The data-set */
 	private final long[] data;
@@ -28,7 +28,6 @@ public class FastBitArray{
 		this(new long[checkedCast(divide(bits, 64, RoundingMode.CEILING))]);
 	}
 
-	//Used by serialization
 	public FastBitArray(long[] data){
 		if(data == null || data.length == 0)
 			throw new IllegalArgumentException("Data must be valued");
@@ -39,18 +38,35 @@ public class FastBitArray{
 			bitCount += Long.bitCount(value);
 	}
 
+	@Override
+	public boolean get(int index){
+		return ((data[index >> 6] & (1l << index)) != 0l);
+	}
+
 	/** Returns true if the bit changed value. */
-	boolean set(int index){
+	@Override
+	public boolean set(int index){
 		if(!get(index)){
-			data[index >> 6] |= (1L << index);
+			data[index >> 6] |= (1l << index);
 			bitCount ++;
 			return true;
 		}
 		return false;
 	}
 
-	boolean get(int index){
-		return ((data[index >> 6] & (1L << index)) != 0);
+	@Override
+	public void clear(int index){
+		if(get(index)){
+			data[index >> 6] &= ~(1l << index);
+			bitCount --;
+		}
+	}
+
+	@Override
+	public void clearAll(){
+		int size = data.length;
+		while(size > 0)
+			data[-- size] = 0l;
 	}
 
 	/**
@@ -58,29 +74,9 @@ public class FastBitArray{
 	 *
 	 * @return total number of bits allocated
 	 */
+	@Override
 	public int bitSize(){
 		return data.length * Long.SIZE;
-	}
-
-	/**
-	 * Copy the bitset.
-	 *
-	 * @return a new {@link FastBitArray} that is exactly in the same state as this
-	 */
-	public FastBitArray copy(){
-		return new FastBitArray(data.clone());
-	}
-
-	void putAll(FastBitArray array){
-		Objects.requireNonNull(array, "Array to be combined with cannot be null");
-		if(data.length != array.data.length)
-			throw new IllegalArgumentException("Array to be combined with must be of equal length");
-
-		bitCount = 0;
-		for(int i = 0; i < data.length; i ++){
-			data[i] |= array.data[i];
-			bitCount += Long.bitCount(data[i]);
-		}
 	}
 
 	/**

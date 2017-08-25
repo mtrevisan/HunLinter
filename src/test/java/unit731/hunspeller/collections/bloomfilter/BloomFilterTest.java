@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class BloomFilterTest{
 
-	private static final int MAX = 1000 * 1000;
+	private static final int MAX = 100 * 100;
 
 	private static final double FPP = 0.01;
 

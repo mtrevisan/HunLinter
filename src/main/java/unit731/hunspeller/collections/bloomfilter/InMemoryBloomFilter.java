@@ -1,7 +1,7 @@
 package unit731.hunspeller.collections.bloomfilter;
 
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
-import unit731.hunspeller.collections.bloomfilter.core.JavaBitSetArray;
+import unit731.hunspeller.collections.bloomfilter.core.JavaBitArray;
 
 
 /**
@@ -16,10 +16,10 @@ public class InMemoryBloomFilter<T> extends AbstractBloomFilter<T>{
 		super(expectedNumberOfElements, falsePositiveProbability);
 	}
 
-	/** NOTE: A normal {@link JavaBitSetArray} is used. */
+	/** *  NOTE: A normal {@link JavaBitArray} is used. */
 	@Override
 	protected BitArray createBitArray(int numBits){
-		return new JavaBitSetArray(numBits);
+		return new JavaBitArray(numBits);
 	}
 
 }

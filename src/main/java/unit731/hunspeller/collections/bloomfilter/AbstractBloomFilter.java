@@ -164,7 +164,7 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 			int index = nextHash % bitArray.bitSize();
-			bitsChanged |= bitArray.setBit(index);
+			bitsChanged |= bitArray.set(index);
 		}
 		addedElements ++;
 		return bitsChanged;
@@ -200,7 +200,7 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 			int index = nextHash % bitArray.bitSize();
-			if(!bitArray.getBit(index))
+			if(!bitArray.get(index))
 				return false;
 		}
 		return true;
@@ -285,7 +285,7 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 	/** Sets all bits to false in the Bloom filter. */
 	@Override
 	public void clear(){
-		bitArray.clear();
+		bitArray.clearAll();
 		addedElements = 0;
 	}
 

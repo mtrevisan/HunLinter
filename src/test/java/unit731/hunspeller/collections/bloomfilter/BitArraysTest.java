@@ -3,27 +3,27 @@ package unit731.hunspeller.collections.bloomfilter;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
-import unit731.hunspeller.collections.bloomfilter.core.JavaBitSetArray;
+import unit731.hunspeller.collections.bloomfilter.core.JavaBitArray;
 
 
 public class BitArraysTest{
 
-	private static final int MILLION_ELEMENTS = 1 * 1000 * 1000;
+	private static final int MAX = 100 * 100;
 
 
 	@Test
 	public void javaBitArray(){
-		BitArray bitArray = new JavaBitSetArray(MILLION_ELEMENTS);
-		testArray(bitArray, MILLION_ELEMENTS);
+		BitArray bitArray = new JavaBitArray(MAX);
+		testArray(bitArray, MAX);
 	}
 
 	private void testArray(BitArray bitArray, int maxElements){
 		for(int index = 0; index < maxElements; index ++){
-			Assert.assertFalse(bitArray.getBit(index));
-			bitArray.setBit(index);
-			Assert.assertTrue(bitArray.getBit(index));
-			bitArray.clearBit(index);
-			Assert.assertFalse(bitArray.getBit(index));
+			Assert.assertFalse(bitArray.get(index));
+			bitArray.set(index);
+			Assert.assertTrue(bitArray.get(index));
+			bitArray.clear(index);
+			Assert.assertFalse(bitArray.get(index));
 		}
 	}
 
