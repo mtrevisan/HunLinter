@@ -244,7 +244,6 @@ public class HyphenationParser{
 			if((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule).replaceAll("[^13579]|/.+$", StringUtils.EMPTY).length() != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
-			//having the rule ../m=m,1,2 assure that the indexes are before and after the hyphen respectively
 			String[] parts = rule.split(COMMA);
 			if(parts.length > 1){
 				Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
@@ -253,7 +252,7 @@ public class HyphenationParser{
 
 				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
 				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
-				if(startIndex < 0 || startIndex >= index)
+				if(startIndex <= 0 || startIndex >= index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
 				if(length < 0 || startIndex + length < index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
@@ -271,8 +270,7 @@ public class HyphenationParser{
 		Charset charset = StandardCharsets.UTF_8;
 		try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
 			//save charset
-			writer.write(charset.name());
-			writer.write(StringUtils.LF);
+			writeln(writer, charset.name());
 			//save options
 			options.write(writer);
 			//extract data from the trie
@@ -285,12 +283,9 @@ public class HyphenationParser{
 			if(!nonStandardHyphenation.isEmpty()){
 				//non-standard hyphenations
 				Collection<String> nonStandards = nonStandardHyphenation.values();
-				for(String hyphenation : nonStandards){
-					writer.write(hyphenation);
-					writer.write(StringUtils.LF);
-				}
-				writer.write(NEXT_LEVEL);
-				writer.write(StringUtils.LF);
+				for(String hyphenation : nonStandards)
+					writeln(writer, hyphenation);
+				writeln(writer, NEXT_LEVEL);
 			}
 			//sort values
 			content.values()
@@ -298,11 +293,14 @@ public class HyphenationParser{
 			List<String> rules = content.values().stream()
 				.flatMap(List::stream)
 				.collect(Collectors.toList());
-			for(String rule : rules){
-				writer.write(rule);
-				writer.write(StringUtils.LF);
-			}
+			for(String rule : rules)
+				writeln(writer, rule);
 		}
+	}
+
+	private void writeln(BufferedWriter writer, String line) throws IOException{
+		writer.write(line);
+		writer.write(StringUtils.LF);
 	}
 
 	/**
