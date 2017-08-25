@@ -254,11 +254,11 @@ public class HyphenationParser{
 				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
 				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
 				if(startIndex < 0 || startIndex >= index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the first number not less than the hyphenation point");
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
 				if(length < 0 || startIndex + length < index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the second number not less than the hyphenation point");
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
 				if(startIndex + length >= parts[0].length())
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the second number not less than the length of the rule");
+					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 			}
 		}
 	}
