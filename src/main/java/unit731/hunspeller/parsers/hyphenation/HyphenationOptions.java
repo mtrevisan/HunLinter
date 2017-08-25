@@ -71,7 +71,7 @@ public class HyphenationOptions{
 	}
 
 	private String extractValue(String line){
-		String[] components = line.split("\\s++");
+		String[] components = line.split("\\s+");
 		return StringUtils.strip(components[1]);
 	}
 
