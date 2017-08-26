@@ -239,6 +239,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
+      hlpMenu = new javax.swing.JMenu();
+      hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       jMenu1.setText("jMenu1");
 
@@ -582,9 +584,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileOpenAFFMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, 0));
       fileOpenAFFMenuItem.setMnemonic('A');
       fileOpenAFFMenuItem.setText("Open AFF file...");
-      fileOpenAFFMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            fileOpenAFFMenuItemMousePressed(evt);
+      fileOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            fileOpenAFFMenuItemActionPerformed(evt);
          }
       });
       fileMenu.add(fileOpenAFFMenuItem);
@@ -593,9 +595,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileCreatePackageMenuItem.setMnemonic('p');
       fileCreatePackageMenuItem.setText("Create package");
       fileCreatePackageMenuItem.setEnabled(false);
-      fileCreatePackageMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            fileCreatePackageMenuItemMousePressed(evt);
+      fileCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            fileCreatePackageMenuItemActionPerformed(evt);
          }
       });
       fileMenu.add(fileCreatePackageMenuItem);
@@ -606,9 +608,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
       fileExitMenuItem.setMnemonic('x');
       fileExitMenuItem.setText("Exit");
-      fileExitMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            fileExitMenuItemMousePressed(evt);
+      fileExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            fileExitMenuItemActionPerformed(evt);
          }
       });
       fileMenu.add(fileExitMenuItem);
@@ -629,9 +631,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicCheckCorrectnessMenuItem.setMnemonic('c');
       dicCheckCorrectnessMenuItem.setText("Check correctness");
       dicCheckCorrectnessMenuItem.setToolTipText("");
-      dicCheckCorrectnessMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            dicCheckCorrectnessMenuItemMousePressed(evt);
+      dicCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicCheckCorrectnessMenuItemActionPerformed(evt);
          }
       });
       dicMenu.add(dicCheckCorrectnessMenuItem);
@@ -641,9 +643,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary...");
       dicSortDictionaryMenuItem.setToolTipText("");
-      dicSortDictionaryMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            dicSortDictionaryMenuItemMousePressed(evt);
+      dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicSortDictionaryMenuItemActionPerformed(evt);
          }
       });
       dicMenu.add(dicSortDictionaryMenuItem);
@@ -652,9 +654,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
       dicExtractDuplicatesMenuItem.setToolTipText("");
-      dicExtractDuplicatesMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            dicExtractDuplicatesMenuItemMousePressed(evt);
+      dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicExtractDuplicatesMenuItemActionPerformed(evt);
          }
       });
       dicMenu.add(dicExtractDuplicatesMenuItem);
@@ -663,9 +665,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_extractWordlist.png"))); // NOI18N
       dicExtractWordlistMenuItem.setMnemonic('w');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
-      dicExtractWordlistMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            dicExtractWordlistMenuItemMousePressed(evt);
+      dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicExtractWordlistMenuItemActionPerformed(evt);
          }
       });
       dicMenu.add(dicExtractWordlistMenuItem);
@@ -678,14 +680,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       theMenu.setEnabled(false);
 
       theFindDuplicatesMenuItem.setText("Find duplicates");
-      theFindDuplicatesMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mousePressed(java.awt.event.MouseEvent evt) {
-            theFindDuplicatesMenuItemMousePressed(evt);
+      theFindDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            theFindDuplicatesMenuItemActionPerformed(evt);
          }
       });
       theMenu.add(theFindDuplicatesMenuItem);
 
       mainMenuBar.add(theMenu);
+
+      hlpMenu.setText("Help");
+
+      hlpAboutMenuItem.setText("About");
+      hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hlpAboutMenuItemActionPerformed(evt);
+         }
+      });
+      hlpMenu.add(hlpAboutMenuItem);
+
+      mainMenuBar.add(hlpMenu);
 
       setJMenuBar(mainMenuBar);
 
@@ -729,7 +743,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    }// </editor-fold>//GEN-END:initComponents
 
 
-	private void fileOpenAFFMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_fileOpenAFFMenuItemMousePressed
+   private void fileOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileOpenAFFMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
@@ -750,9 +764,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 			openHyphenationFile();
 		}
-	}//GEN-LAST:event_fileOpenAFFMenuItemMousePressed
+   }//GEN-LAST:event_fileOpenAFFMenuItemActionPerformed
 
-	private void fileCreatePackageMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_fileCreatePackageMenuItemMousePressed
+   private void fileCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		//go up directories until description.xml or install.rdf is found
@@ -788,13 +802,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				printResultLine("Compression error: " + e.getMessage());
 			}
 		}
-	}//GEN-LAST:event_fileCreatePackageMenuItemMousePressed
+   }//GEN-LAST:event_fileCreatePackageMenuItemActionPerformed
 
-	private void fileExitMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_fileExitMenuItemMousePressed
+   private void fileExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileExitMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		exit();
-	}//GEN-LAST:event_fileExitMenuItemMousePressed
+   }//GEN-LAST:event_fileExitMenuItemActionPerformed
 
 	private void exit(){
 		if(theParser.isModified()){
@@ -810,6 +824,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		else
 			dispose();
 	}
+
+   private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
 	private static void calculateProductions(HunspellerFrame frame){
@@ -837,15 +855,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	}
 
 
-	private void dicCheckCorrectnessMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_dicCheckCorrectnessMenuItemMousePressed
+   private void dicCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkDictionaryCorrectness(affParser);
 
 		dicCheckCorrectnessMenuItem.setEnabled(false);
-	}//GEN-LAST:event_dicCheckCorrectnessMenuItemMousePressed
+   }//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
 
-	private void dicSortDictionaryMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_dicSortDictionaryMenuItemMousePressed
+   private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 		dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -862,24 +880,31 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		}
 
 		dicSortDictionaryMenuItem.setEnabled(true);
-	}//GEN-LAST:event_dicSortDictionaryMenuItemMousePressed
+   }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
-	private void dicExtractDuplicatesMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_dicExtractDuplicatesMenuItemMousePressed
+   private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryDuplicates(affParser);
-	}//GEN-LAST:event_dicExtractDuplicatesMenuItemMousePressed
+   }//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
 
-	private void dicExtractWordlistMenuItemMousePressed(java.awt.event.MouseEvent evt){//GEN-FIRST:event_dicExtractWordlistMenuItemMousePressed
+   private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist();
-	}//GEN-LAST:event_dicExtractWordlistMenuItemMousePressed
+   }//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
 
 	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_dicInputTextFieldKeyReleased
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
+
+   private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
+        MenuSelectionManager.defaultManager().clearSelectedPath();
+
+        ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(this, theParser.extractDuplicates());
+        dialog.setVisible(true);
+   }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theAddButtonActionPerformed
 		try{
@@ -966,13 +991,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			printResultLine("Deletion error: " + e.getMessage());
 		}
 	}
-
-   private void theFindDuplicatesMenuItemMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemMousePressed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(this, theParser.extractDuplicates());
-		dialog.setVisible(true);
-   }//GEN-LAST:event_theFindDuplicatesMenuItemMousePressed
 
    private void theUndoButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theUndoButtonActionPerformed
 		try{
@@ -1557,6 +1575,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JMenuItem fileExitMenuItem;
    private javax.swing.JMenu fileMenu;
    private javax.swing.JMenuItem fileOpenAFFMenuItem;
+   private javax.swing.JMenuItem hlpAboutMenuItem;
+   private javax.swing.JMenu hlpMenu;
    private javax.swing.JButton hypAddRuleButton;
    private javax.swing.JLabel hypAddRuleLabel;
    private javax.swing.JLabel hypAddRuleSyllabationLabel;

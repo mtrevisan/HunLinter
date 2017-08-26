@@ -111,6 +111,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
 
+		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
+			throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
+
 		String[] dataFields = dicEntry.getDataFields();
 		for(String dataField : dataFields)
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
