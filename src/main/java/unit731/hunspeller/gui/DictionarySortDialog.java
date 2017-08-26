@@ -1,7 +1,9 @@
 package unit731.hunspeller.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.Objects;
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -10,17 +12,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionListener;
 import lombok.Getter;
 
 
-public class DictionaryDialog{
+public class DictionarySortDialog{
 
 	private final JList<String> list;
 	@Getter private final JDialog dialog;
 
 
-	public DictionaryDialog(String title, String message){
+	public DictionarySortDialog(String title, String message){
 		Objects.nonNull(title);
 		Objects.nonNull(message);
 
@@ -31,6 +34,8 @@ public class DictionaryDialog{
 		JLabel label = new JLabel(message);
 		panel.add(label, BorderLayout.NORTH);
 		JScrollPane scrollPane = new JScrollPane(list);
+		scrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
+		scrollPane.setBackground(Color.WHITE);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
 		JOptionPane optionPane = new JOptionPane(panel);

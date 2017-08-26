@@ -57,7 +57,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
-import unit731.hunspeller.gui.DictionaryDialog;
+import unit731.hunspeller.gui.DictionarySortDialog;
 import unit731.hunspeller.gui.DictionaryListCellRenderer;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
@@ -108,7 +108,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	private static String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
-	private final DictionaryDialog dicDialog;
+	private final DictionarySortDialog dicDialog;
 
 	private final AffixParser affParser;
 	private final AidParser aidParser;
@@ -157,7 +157,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		dicDialog = new DictionaryDialog("Select option", "Please select a section from the list:");
+		dicDialog = new DictionarySortDialog("Select option", "Please select a section from the list:");
 		dicDialog.addListSelectionListener(e -> {
 			if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 				int selectedRow = dicDialog.getSelectedIndex();
@@ -898,10 +898,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 				dm.fireTableDataChanged();
 
-				if(!duplicationResult.isForcedInsertion()){
-					theMeaningsTextField.setText(null);
-					formerFilterThesaurusText = null;
-				}
+				formerFilterThesaurusText = null;
+				theMeaningsTextField.setText(null);
 				theMeaningsTextField.requestFocusInWindow();
 				@SuppressWarnings("unchecked")
 				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
