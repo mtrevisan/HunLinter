@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Simple implementation of {@link FlagParsingStrategy} that treats the chars in each String as a individual flags.
  */
-public class UTF8ParsingStrategy implements FlagParsingStrategy{
+public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
 	private static final String SLASH = "/";
 
@@ -17,13 +17,13 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		if(textFlags == null)
 			return new String[0];
 
-		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
+		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
+			throw new IllegalArgumentException("Each flag must be in ASCII encoding");
 
 		String[] flags = (!textFlags.isEmpty()? removeDuplicates(textFlags.split(StringUtils.EMPTY)): new String[0]);
 		for(String flag : flags)
 			if(StringUtils.isBlank(flag))
-				throw new IllegalArgumentException("Flag must be a valid UTF-8 character");
+				throw new IllegalArgumentException("Flag must be a valid ASCII character");
 		return flags;
 	}
 
@@ -34,8 +34,8 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!StandardCharsets.UTF_8.newEncoder().canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
+			if(!StandardCharsets.US_ASCII.newEncoder().canEncode(flag))
+				throw new IllegalArgumentException("Each flag must be in ASCII encoding");
 		}
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);

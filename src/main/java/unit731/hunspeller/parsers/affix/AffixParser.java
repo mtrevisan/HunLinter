@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.regexptrie.RegExpTrie;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
+import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
 
 
@@ -170,7 +171,7 @@ public class AffixParser{
 	private static FlagParsingStrategy createFlagParsingStrategy(String flag){
 		FlagParsingStrategy stategy = null;
 		if(flag == null)
-			stategy = new UTF8ParsingStrategy();
+			stategy = new ASCIIParsingStrategy();
 		else
 			switch(flag){
 				case FLAG_TYPE_UTF_8:

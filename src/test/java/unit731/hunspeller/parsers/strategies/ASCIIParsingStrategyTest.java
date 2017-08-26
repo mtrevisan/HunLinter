@@ -5,16 +5,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class UTF8ParsingStrategyTest{
+public class ASCIIParsingStrategyTest{
 
-	private final FlagParsingStrategy strategy = new UTF8ParsingStrategy();
+	private final FlagParsingStrategy strategy = new ASCIIParsingStrategy();
 
 
 	@Test
 	public void ok(){
-		String[] flags = strategy.parseRuleFlags("èŧ");
+		String[] flags = strategy.parseRuleFlags("ba");
 
-		Assert.assertEquals(Arrays.asList("ŧ", "è"), Arrays.asList(flags));
+		Assert.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
 	}
 
 	@Test
@@ -33,33 +33,33 @@ public class UTF8ParsingStrategyTest{
 
 	@Test
 	public void joinFlags(){
-		String[] flags = new String[]{"è", "ŧ"};
+		String[] flags = new String[]{"a", "b"};
 		String ruleFlags = strategy.joinRuleFlags(flags);
 
-		Assert.assertEquals("/èŧ", ruleFlags);
+		Assert.assertEquals("/ab", ruleFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithError(){
-		String[] flags = new String[]{"è", "aŧ"};
+		String[] flags = new String[]{"a", "ab"};
 		strategy.joinRuleFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void joinFlagsWithNoUTF8(){
-		String[] flags = new String[]{"\\x{FFFD}"};
+	public void joinFlagsWithNoASCII(){
+		String[] flags = new String[]{"ŧ"};
 		strategy.joinRuleFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithEmpty(){
-		String[] flags = new String[]{"è", ""};
+		String[] flags = new String[]{"a", ""};
 		strategy.joinRuleFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithNull(){
-		String[] flags = new String[]{"ŧ", null};
+		String[] flags = new String[]{"a", null};
 		strategy.joinRuleFlags(flags);
 	}
 
