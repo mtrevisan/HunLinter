@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -1390,7 +1392,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		if(StringUtils.isNotBlank(text)){
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
-			text = frame.hypParser.formatHyphenation(hyphenation, HyphenationParser.HYPHEN);
+			text = frame.hypParser.formatHyphenation(hyphenation, new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>"),
+				syllabe -> "<b style=\"color:red\">" + syllabe + "</b>");
 			count = Long.toString(frame.hypParser.countSyllabes(hyphenation));
 
 			frame.hypAddRuleTextField.setEnabled(true);
@@ -1426,8 +1429,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
 					Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
 
-					String text = frame.hypParser.formatHyphenation(hyphenation, HyphenationParser.HYPHEN);
-					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, HyphenationParser.HYPHEN);
+					Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
+					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+					String text = frame.hypParser.formatHyphenation(hyphenation, baseStringJoiner.get(), errorFormatter);
+					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, baseStringJoiner.get(), errorFormatter);
 					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
 					hyphenationChanged = !text.equals(addedRuleText);

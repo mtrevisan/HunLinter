@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -465,13 +466,14 @@ public class HyphenationParser{
 		return result;
 	}
 
-	public String formatHyphenation(Hyphenation hyphenation, String hyphen){
-		StringJoiner sj = new StringJoiner(hyphen, "<html>", "</html>");
+	public String formatHyphenation(Hyphenation hyphenation, StringJoiner sj, Function<String, String> errorFormatter){
 		List<String> syllabes = hyphenation.getSyllabes();
 		boolean[] erros = hyphenation.getErrors();
 		int size = syllabes.size();
-		for(int i = 0; i < size; i ++)
-			sj.add(erros[i]? "<b style=\"color:red\">" + syllabes.get(i) + "</b>": syllabes.get(i));
+		for(int i = 0; i < size; i ++){
+			Function<String, String> fun = (erros[i]? errorFormatter: Function.identity());
+			sj.add(fun.apply(syllabes.get(i)));
+		}
 		return sj.toString();
 	}
 
