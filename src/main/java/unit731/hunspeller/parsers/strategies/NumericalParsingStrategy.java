@@ -35,6 +35,16 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 	public String joinRuleFlags(String[] textFlags){
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
+		for(String flag : textFlags){
+			try{
+				int numericalFlag = Integer.parseInt(flag);
+				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]");
+			}
+			catch(NumberFormatException e){
+				throw new IllegalArgumentException("Each flag must be an integer number");
+			}
+		}
 
 		return SLASH + String.join(COMMA, textFlags);
 	}

@@ -60,7 +60,8 @@ public class ZipManager{
 		zipStream(new FileInputStream(file), file.getName(), compressionLevel, zipFilename);
 	}
 
-	public static void zipStream(InputStream entry, String entryName, int compressionLevel, String zipFilename) throws FileNotFoundException, IOException{
+	public static void zipStream(InputStream entry, String entryName, int compressionLevel, String zipFilename) throws FileNotFoundException,
+			IOException{
 		//create ZipOutputStream to write to the zip file
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
 			zos.setLevel(compressionLevel);

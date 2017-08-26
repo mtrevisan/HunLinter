@@ -1,5 +1,7 @@
-package unit731.hunspeller.services.sorters;
+package unit731.hunspeller.services.externalsorter;
 
+import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
+import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

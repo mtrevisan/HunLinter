@@ -25,6 +25,9 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 	public String joinRuleFlags(String[] textFlags){
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
+		for(String flag : textFlags)
+			if(flag == null || flag.length() != 1)
+				throw new IllegalArgumentException("Each flag must be of length two");
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);
 	}

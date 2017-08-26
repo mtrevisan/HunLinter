@@ -1,4 +1,4 @@
-package unit731.hunspeller.services.sorters;
+package unit731.hunspeller.services.externalsorter;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
