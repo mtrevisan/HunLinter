@@ -4,12 +4,12 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.AbstractAction;
-import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.KeyStroke;
@@ -26,8 +26,6 @@ import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 public class ThesaurusMeaningsDialog extends JDialog{
 
 	private static final long serialVersionUID = 667526009330291911L;
-
-	private static final String CANCEL_ACTION_KEY = "CANCEL_ACTION_KEY";
 
 
 	private final ThesaurusEntry synonym;
@@ -159,18 +157,16 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		InputMap inputMap = getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-		inputMap.put(escapeKey, CANCEL_ACTION_KEY);
 		AbstractAction cancelAction = new AbstractAction(){
-			private static final long serialVersionUID = 3435241037784957190L;
+			private static final long serialVersionUID = -5644390861803492172L;
 
 			@Override
 			public void actionPerformed(ActionEvent e){
-				cancelButtonActionPerformed(e);
+				dispose();
 			}
 		};
-		getRootPane().getActionMap().put(CANCEL_ACTION_KEY, cancelAction);
+		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
 	public static void main(String args[]){
@@ -184,12 +180,12 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		}
 		//</editor-fold>
 
-		/* Create and display the dialog */
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				List<MeaningEntry> meanings = new ArrayList<>();
-				meanings.add(new MeaningEntry("(noun)|bla|bli|blo"));
-				meanings.add(new MeaningEntry("(art)|el|la"));
+				List<MeaningEntry> meanings = Collections.unmodifiableList(Arrays.asList(
+					new MeaningEntry("(noun)|bla|bli|blo"),
+					new MeaningEntry("(art)|el|la")
+				));
 				ThesaurusEntry synonym = new ThesaurusEntry("synonym", meanings);
 				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(new javax.swing.JFrame(), synonym, (means, text) -> {}, null);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){

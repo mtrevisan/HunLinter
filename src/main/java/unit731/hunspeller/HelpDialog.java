@@ -3,8 +3,6 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -13,27 +11,22 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 
 @Slf4j
-public class ThesaurusDuplicatesDialog extends JDialog{
+public class HelpDialog extends JDialog{
 
-	private static final long serialVersionUID = 5718588727397261977L;
+	private static final long serialVersionUID = -9151942201399886892L;
 
 
-	public ThesaurusDuplicatesDialog(Frame parent, List<String> duplicates){
-		super(parent, "Duplicates", true);
+	public HelpDialog(Frame parent){
+		super(parent, "About", true);
 
 		Objects.nonNull(parent);
-		Objects.nonNull(duplicates);
 
 		initComponents();
 
 		addCancelByEscapeKey();
-
-		String content = String.join(StringUtils.LF, duplicates);
-		duplicatesTextArea.setText(content);
 
 		setLocationRelativeTo(parent);
 	}
@@ -41,17 +34,11 @@ public class ThesaurusDuplicatesDialog extends JDialog{
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      mainScrollPane = new javax.swing.JScrollPane();
-      duplicatesTextArea = new javax.swing.JTextArea();
+      jLabel1 = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      duplicatesTextArea.setEditable(false);
-      duplicatesTextArea.setColumns(20);
-      duplicatesTextArea.setLineWrap(true);
-      duplicatesTextArea.setRows(5);
-      duplicatesTextArea.setWrapStyleWord(true);
-      mainScrollPane.setViewportView(duplicatesTextArea);
+      jLabel1.setText("jLabel1");
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -59,15 +46,15 @@ public class ThesaurusDuplicatesDialog extends JDialog{
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-            .addContainerGap())
+            .addComponent(jLabel1)
+            .addContainerGap(356, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(mainScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())
+         .addGroup(layout.createSequentialGroup()
+            .addContainerGap()
+            .addComponent(jLabel1)
+            .addContainerGap(156, Short.MAX_VALUE))
       );
 
       pack();
@@ -100,7 +87,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(new javax.swing.JFrame(), Arrays.asList("a", "b", "c"));
+				HelpDialog dialog = new HelpDialog(new javax.swing.JFrame());
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override
 					public void windowClosing(java.awt.event.WindowEvent e){
@@ -116,7 +103,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JTextArea duplicatesTextArea;
-   private javax.swing.JScrollPane mainScrollPane;
+   private javax.swing.JLabel jLabel1;
    // End of variables declaration//GEN-END:variables
 }

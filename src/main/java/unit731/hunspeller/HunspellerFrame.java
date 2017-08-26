@@ -157,7 +157,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		dicDialog = new DictionarySortDialog("Select option", "Please select a section from the list:");
+		dicDialog = new DictionarySortDialog("Sorter", "Please select a section from the list:");
 		dicDialog.addListSelectionListener(e -> {
 			if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 				int selectedRow = dicDialog.getSelectedIndex();
@@ -826,7 +826,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	}
 
    private void hlpAboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlpAboutMenuItemActionPerformed
-      // TODO add your handling code here:
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		HelpDialog dialog = new HelpDialog(this);
+		dialog.setVisible(true);
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
