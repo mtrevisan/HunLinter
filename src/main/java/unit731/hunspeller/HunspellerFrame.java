@@ -1411,8 +1411,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		String addedRuleText = frame.hypWordTextField.getText();
-		String addedRule = frame.hypAddRuleTextField.getText();
+		String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
+		String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText());
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
 			boolean alreadyHasRule = frame.hypParser.hasRule(addedRule);
@@ -1431,7 +1431,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
 					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = frame.hypParser.hasErrors(addedRuleHyphenation);
+					correctHyphenation = !frame.hypParser.hasErrors(addedRuleHyphenation);
 				}
 			}
 

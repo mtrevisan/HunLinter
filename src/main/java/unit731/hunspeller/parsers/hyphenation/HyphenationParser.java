@@ -215,12 +215,16 @@ public class HyphenationParser{
 		nonStandardHyphenation.clear();
 	}
 
+	public String correctOrthography(String text){
+		return orthography.correctOrthography(text);
+	}
+
 	/**
 	 * @param rule	The rule to add
 	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public TrieNode<String> addRule(String rule){
-		rule = orthography.correctOrthography(rule);
+		rule = correctOrthography(rule);
 
 		validateRule(rule);
 
@@ -322,7 +326,7 @@ public class HyphenationParser{
 	 */
 	public Hyphenation hyphenate(String word, String addedRule){
 		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
-		addedRule = orthography.correctOrthography(addedRule);
+		addedRule = correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);
 		patternsWithAddedRule.add(key, addedRule);
 
@@ -330,7 +334,7 @@ public class HyphenationParser{
 	}
 
 	public boolean hasRule(String rule){
-		rule = orthography.correctOrthography(rule);
+		rule = correctOrthography(rule);
 		String key = getKeyFromData(rule);
 		TrieNode<String> foundRule = patterns.contains(key);
 		return (foundRule != null && foundRule.getData().equals(rule));
@@ -348,7 +352,7 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Trie<String> patterns){
-		word = orthography.correctOrthography(word)
+		word = correctOrthography(word)
 			.replaceAll(HYPHENS, SOFT_HYPHEN);
 
 		List<String> hyphenatedWord;
