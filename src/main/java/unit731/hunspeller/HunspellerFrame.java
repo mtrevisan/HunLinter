@@ -689,8 +689,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
       mainMenuBar.add(theMenu);
 
+      hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
+      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
+      hlpAboutMenuItem.setMnemonic('A');
       hlpAboutMenuItem.setText("About");
       hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
