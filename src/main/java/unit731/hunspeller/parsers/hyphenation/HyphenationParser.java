@@ -49,7 +49,7 @@ public class HyphenationParser{
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
 	public static final String HYPHEN = "\u2010";
-	private static final String HYPHEN_MINUS = "\u002D";
+	public static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
 	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN) + "]";
 

@@ -12,9 +12,12 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 public class DictionaryParserVEC extends DictionaryParser{
+
+	private static final String VANISHING_EL = "ƚ";
 
 	private static final Matcher MISMATCHED_VARIANTS = Pattern.compile("ƚ.*[ŧđ]|[ŧđ].*ƚ").matcher(StringUtils.EMPTY);
 	private static final Matcher MULTIPLE_ACCENTS = Pattern.compile("([^àèéíòóú]*[àèéíòóú]){2,}").matcher(StringUtils.EMPTY);
@@ -105,13 +108,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String derivedWord = production.getWord();
 		if(MISMATCHED_VARIANTS.reset(derivedWord).find())
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
+		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
+			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
 
 		String[] dataFields = dicEntry.getDataFields();
 		for(String dataField : dataFields)
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
 
-		String[] splittedWords = derivedWord.split("-");
+		String[] splittedWords = derivedWord.split(HyphenationParser.HYPHEN_MINUS);
 		for(String subword : splittedWords){
 			if(MULTIPLE_ACCENTS.reset(subword).find())
 				throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
@@ -123,7 +128,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 				if(!elBetweenVowelsRemoval)
 					throw new IllegalArgumentException("Word cannot have an accent here: " + derivedWord);
 			}
-			if(!dicEntry.containsDataField("po:numeral_latin") && NHIV.reset(subword).find() && !CIUI.reset(subword).find()){
+			if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && NHIV.reset(subword).find()
+					&& !CIUI.reset(subword).find()){
 				boolean dBetweenVowelsRemoval = production.getRules().stream()
 					.map(AffixEntry::toString)
 					.map(D_BETWEEN_VOWELS::reset)

@@ -45,6 +45,16 @@ public class RuleProductionEntry implements Productable{
 		this.combineable = combineable;
 	}
 
+	public boolean containsRuleFlag(String ruleFlag){
+		return Arrays.stream(ruleFlags)
+			.anyMatch(flag -> flag.equals(ruleFlag));
+	}
+
+	public boolean containsDataField(String dataField){
+		return Arrays.stream(dataFields)
+			.anyMatch(field -> field.equals(dataField));
+	}
+
 	/** Merge previous unproductive continuation classes with the continuation classes of the current rule */
 	private String[] mergeContinuationClasses(Set<String> otherRuleFlags, String[] currentContinuationClasses){
 		HashSet<String> newContinuationClasses = new HashSet<>(otherRuleFlags);
