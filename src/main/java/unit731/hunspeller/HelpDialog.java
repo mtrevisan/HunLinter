@@ -11,6 +11,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import unit731.hunspeller.services.POMData;
 
 
 @Slf4j
@@ -29,6 +30,9 @@ public class HelpDialog extends JDialog{
 		addCancelByEscapeKey();
 
 		setLocationRelativeTo(parent);
+
+		String version = POMData.getVersion();
+System.out.println(version);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
