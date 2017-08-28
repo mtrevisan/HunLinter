@@ -11,6 +11,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.POMData;
 
 
@@ -31,18 +32,31 @@ public class HelpDialog extends JDialog{
 
 		setLocationRelativeTo(parent);
 
+		String artifactID = POMData.getArtifactID();
 		String version = POMData.getVersion();
-System.out.println(version);
+		String buildTimestamp = POMData.getBuildTimestamp();
+		lblProductVersionOut.setText(artifactID + StringUtils.SPACE + version);
+		lblAuthorOut.setText("Mauro Trevisan");
+		lblReleaseDateOut.setText(buildTimestamp);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      jLabel1 = new javax.swing.JLabel();
+      lblProductVersion = new javax.swing.JLabel();
+      lblProductVersionOut = new javax.swing.JLabel();
+      lblReleaseDate = new javax.swing.JLabel();
+      lblReleaseDateOut = new javax.swing.JLabel();
+      lblAuthor = new javax.swing.JLabel();
+      lblAuthorOut = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      jLabel1.setText("jLabel1");
+      lblProductVersion.setText("Product Version:");
+
+      lblReleaseDate.setText("Release Date:");
+
+      lblAuthor.setText("Author:");
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -50,15 +64,37 @@ System.out.println(version);
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(jLabel1)
-            .addContainerGap(356, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(lblProductVersion)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(lblProductVersionOut, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(lblAuthor)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(lblAuthorOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(lblReleaseDate)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(lblReleaseDateOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addContainerGap())
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(jLabel1)
-            .addContainerGap(156, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(lblProductVersion)
+               .addComponent(lblProductVersionOut))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(lblReleaseDate)
+               .addComponent(lblReleaseDateOut))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(lblAuthor)
+               .addComponent(lblAuthorOut))
+            .addContainerGap(116, Short.MAX_VALUE))
       );
 
       pack();
@@ -107,6 +143,11 @@ System.out.println(version);
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JLabel jLabel1;
+   private javax.swing.JLabel lblAuthor;
+   private javax.swing.JLabel lblAuthorOut;
+   private javax.swing.JLabel lblProductVersion;
+   private javax.swing.JLabel lblProductVersionOut;
+   private javax.swing.JLabel lblReleaseDate;
+   private javax.swing.JLabel lblReleaseDateOut;
    // End of variables declaration//GEN-END:variables
 }

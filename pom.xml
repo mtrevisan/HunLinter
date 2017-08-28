@@ -122,14 +122,6 @@
 					</transformers>
 				</configuration>
 			</plugin>
-		 <plugin>
-		  <groupId>org.apache.maven.plugins</groupId>
-		  <artifactId>maven-compiler-plugin</artifactId>
-		  <version>3.6.2</version>
-		  <configuration>
-		   <debug>true</debug>
-		  </configuration>
-		 </plugin>
 		</plugins>
 	</build>
 
@@ -137,6 +129,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<build.timestamp>${maven.build.timestamp}</build.timestamp>
+		<maven.build.timestamp.format>dd MMM yyyy</maven.build.timestamp.format>
 
 		<!-- Apache -->
 		<org.apache.commons.lang3.version>3.6</org.apache.commons.lang3.version>
