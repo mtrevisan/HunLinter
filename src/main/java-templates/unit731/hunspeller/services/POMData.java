@@ -1,5 +1,7 @@
 package unit731.hunspeller.services;
 
+import java.time.LocalDate;
+
 
 /**
  * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version Informations Into Your Apps With Maven</a>
@@ -24,8 +26,8 @@ public final class POMData{
 		return VERSION;
 	}
 
-	public static String getBuildTimestamp(){
-		return BUILD_TIMESTAMP;
+	public static LocalDate getBuildTimestamp(){
+		return LocalDate.parse(BUILD_TIMESTAMP);
 	}
 
 }

@@ -3,6 +3,9 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -34,10 +37,10 @@ public class HelpDialog extends JDialog{
 
 		String artifactID = POMData.getArtifactID();
 		String version = POMData.getVersion();
-		String buildTimestamp = POMData.getBuildTimestamp();
+		LocalDate buildTimestamp = POMData.getBuildTimestamp();
 		lblProductVersionOut.setText(artifactID + StringUtils.SPACE + version);
 		lblAuthorOut.setText("Mauro Trevisan");
-		lblReleaseDateOut.setText(buildTimestamp);
+		lblReleaseDateOut.setText(buildTimestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US)));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
