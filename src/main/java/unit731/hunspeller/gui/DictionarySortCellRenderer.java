@@ -15,7 +15,7 @@ import unit731.hunspeller.parsers.dictionary.Watercolors;
 
 @AllArgsConstructor
 @Slf4j
-public class DictionaryListCellRenderer extends JLabel implements ListCellRenderer<String>{
+public class DictionarySortCellRenderer extends JLabel implements ListCellRenderer<String>{
 
 	private static final long serialVersionUID = -6904206237491328151L;
 

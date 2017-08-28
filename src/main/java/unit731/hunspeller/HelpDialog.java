@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +19,6 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.POMData;
 
 
@@ -59,7 +57,7 @@ public class HelpDialog extends JDialog{
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);
 		lblReleaseDateOut.setText(buildTimestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US)));
-		lblCopyrightOut.setText("Copyright (c) 2017 Mauro Trevisan");
+		lblCopyrightOut.setText("Copyright © 2017 Mauro Trevisan");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

@@ -33,7 +33,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -57,8 +56,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
-import unit731.hunspeller.gui.DictionarySortDialog;
-import unit731.hunspeller.gui.DictionaryListCellRenderer;
+import unit731.hunspeller.gui.DictionarySortCellRenderer;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
@@ -157,12 +155,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		dicDialog = new DictionarySortDialog("Sorter", "Please select a section from the list:");
+		dicDialog = new DictionarySortDialog(this, "Sorter", "Please select a section from the list:");
 		dicDialog.addListSelectionListener(e -> {
 			if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 				int selectedRow = dicDialog.getSelectedIndex();
 				if(dicParser.isInBoundary(selectedRow)){
-					dicDialog.hide();
+					dicDialog.setVisible(false);
 
 					dicSortDictionaryMenuItem.setEnabled(false);
 					mainProgressBar.setValue(0);
@@ -174,9 +172,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				}
 			}
 		});
-		JDialog sorterDialog = dicDialog.getDialog();
-		sorterDialog.setSize(600, 400);
-		sorterDialog.setLocationRelativeTo(null);
 
 		enableMenuItemFromWorker.put(ThesaurusParser.ParserWorker.class, () -> theMenu.setEnabled(true));
 		enableMenuItemFromWorker.put(DictionaryParser.CorrectnessWorker.class, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
@@ -224,7 +219,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
-      lblCopyright = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
       fileMenu = new javax.swing.JMenu();
       fileOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -309,7 +303,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
                .addComponent(dicRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(dicRuleTagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -445,7 +439,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
                .addComponent(theUndoButton)
                .addComponent(theRedoButton))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+            .addComponent(theScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(theLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(theSynonymsRecordedLabel)
@@ -582,12 +576,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addContainerGap(101, Short.MAX_VALUE))
+            .addContainerGap(87, Short.MAX_VALUE))
       );
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
-
-      lblCopyright.setText("© 2017 Mauro Trevisan");
 
       addWindowListener(new WindowAdapter(){
          @Override
@@ -734,10 +726,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(parseScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-               .addComponent(mainTabbedPane)
-               .addGroup(layout.createSequentialGroup()
-                  .addComponent(lblCopyright)
-                  .addGap(0, 0, Short.MAX_VALUE)))
+               .addComponent(mainTabbedPane))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -748,9 +737,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
-            .addComponent(mainTabbedPane)
-            .addGap(18, 18, 18)
-            .addComponent(lblCopyright)
+            .addComponent(mainTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -898,7 +885,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				.map(line -> StringUtils.replace(line, "\t", "   "))
 				.toArray(String[]::new);
 			dicDialog.setListData(lines);
-			dicDialog.show();
+			dicDialog.setVisible(true);
 		}
 		catch(IOException e){
 			log.error("Something very bad happend while sorting the dictionary", e);
@@ -1227,7 +1214,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			File dicFile = getFile(language + ".dic");
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
 
-			ListCellRenderer<String> dicCellRenderer = new DictionaryListCellRenderer(affParser, dicParser);
+			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(affParser, dicParser);
 			dicDialog.setCellRenderer(dicCellRenderer);
 
 			mainTabbedPane.setSelectedIndex(0);
@@ -1616,7 +1603,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JLabel hypWordLabel;
    private javax.swing.JTextField hypWordTextField;
    private javax.swing.JMenu jMenu1;
-   private javax.swing.JLabel lblCopyright;
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
