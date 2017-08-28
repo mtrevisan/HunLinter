@@ -28,9 +28,6 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="fileOpenAFFMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="A"/>
-                </Property>
                 <Property name="mnemonic" type="int" value="65"/>
                 <Property name="text" type="java.lang.String" value="Open AFF file..."/>
               </Properties>
@@ -40,9 +37,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="fileCreatePackageMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="P"/>
-                </Property>
                 <Property name="mnemonic" type="int" value="112"/>
                 <Property name="text" type="java.lang.String" value="Create package"/>
                 <Property name="enabled" type="boolean" value="false"/>
@@ -57,9 +51,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="fileExitMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="X"/>
-                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/file_exit.png"/>
                 </Property>
@@ -82,9 +73,6 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="dicCheckCorrectnessMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="C"/>
-                </Property>
                 <Property name="mnemonic" type="int" value="99"/>
                 <Property name="text" type="java.lang.String" value="Check correctness"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -95,9 +83,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicSortDictionaryMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="S"/>
-                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_sort.png"/>
                 </Property>
@@ -111,9 +96,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractDuplicatesMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="D"/>
-                </Property>
                 <Property name="mnemonic" type="int" value="100"/>
                 <Property name="text" type="java.lang.String" value="Extract duplicates..."/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -124,9 +106,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="W"/>
-                </Property>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_extractWordlist.png"/>
                 </Property>

@@ -592,7 +592,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileMenu.setText("File");
       fileMenu.setToolTipText("");
 
-      fileOpenAFFMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, 0));
       fileOpenAFFMenuItem.setMnemonic('A');
       fileOpenAFFMenuItem.setText("Open AFF file...");
       fileOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -602,7 +601,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       });
       fileMenu.add(fileOpenAFFMenuItem);
 
-      fileCreatePackageMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, 0));
       fileCreatePackageMenuItem.setMnemonic('p');
       fileCreatePackageMenuItem.setText("Create package");
       fileCreatePackageMenuItem.setEnabled(false);
@@ -615,7 +613,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileMenu.add(recentFilesSeparator);
       fileMenu.add(exitSeparator);
 
-      fileExitMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, 0));
       fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
       fileExitMenuItem.setMnemonic('x');
       fileExitMenuItem.setText("Exit");
@@ -638,7 +635,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       dicMenu.setToolTipText("");
       dicMenu.setEnabled(false);
 
-      dicCheckCorrectnessMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, 0));
       dicCheckCorrectnessMenuItem.setMnemonic('c');
       dicCheckCorrectnessMenuItem.setText("Check correctness");
       dicCheckCorrectnessMenuItem.setToolTipText("");
@@ -649,7 +645,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       });
       dicMenu.add(dicCheckCorrectnessMenuItem);
 
-      dicSortDictionaryMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, 0));
       dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary...");
@@ -661,7 +656,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       });
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicExtractDuplicatesMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, 0));
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
       dicExtractDuplicatesMenuItem.setToolTipText("");
@@ -672,7 +666,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       });
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
-      dicExtractWordlistMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_W, 0));
       dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_extractWordlist.png"))); // NOI18N
       dicExtractWordlistMenuItem.setMnemonic('w');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
