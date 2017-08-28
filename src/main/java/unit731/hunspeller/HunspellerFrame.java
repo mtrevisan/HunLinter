@@ -224,7 +224,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
-      copyrightLabel = new javax.swing.JLabel();
+      lblCopyright = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
       fileMenu = new javax.swing.JMenu();
       fileOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -246,7 +246,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
       setTitle("Hunspeller");
-      setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.png")));
+      setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
 
       parseTextArea.setEditable(false);
       parseTextArea.setColumns(20);
@@ -255,6 +255,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parseScrollPane.setViewportView(parseTextArea);
 
+      dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
       dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -263,6 +264,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
          }
       });
 
+      dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
       dicRuleTagsAidLabel.setText("Rule tags aid:");
 
       dicTable.setModel(new ProductionTableModel());
@@ -313,6 +315,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
 
+      theMeaningsLabel.setLabelFor(theMeaningsTextField);
       theMeaningsLabel.setText("New synonym:");
 
       theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -374,6 +377,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       theTable.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
       theScrollPane.setViewportView(theTable);
 
+      theSynonymsRecordedLabel.setLabelFor(theSynonymsRecordedOutputLabel);
       theSynonymsRecordedLabel.setText("Synonyms recorded:");
 
       theSynonymsRecordedOutputLabel.setText("...");
@@ -451,18 +455,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
 
+      hypWordLabel.setLabelFor(hypWordTextField);
       hypWordLabel.setText("Word:");
 
+      hypWordTextField.setNextFocusableComponent(hypAddRuleTextField);
       hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             hypWordTextFieldKeyReleased(evt);
          }
       });
 
+      hypSyllabationLabel.setLabelFor(hypSyllabationOutputLabel);
       hypSyllabationLabel.setText("Syllabation:");
 
+      hypSyllabationOutputLabel.setText("...");
+
+      hypSyllabesCountLabel.setLabelFor(hypSyllabesCountOutputLabel);
       hypSyllabesCountLabel.setText("Syllabes:");
 
+      hypSyllabesCountOutputLabel.setText("...");
+
+      hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
 
       hypAddRuleTextField.setEnabled(false);
@@ -481,9 +494,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
          }
       });
 
+      hypAddRuleSyllabationLabel.setLabelFor(hypAddRuleSyllabationOutputLabel);
       hypAddRuleSyllabationLabel.setText("New syllabation:");
 
+      hypAddRuleSyllabationOutputLabel.setText("...");
+
+      hypAddRuleSyllabesCountLabel.setLabelFor(hypAddRuleSyllabesCountOutputLabel);
       hypAddRuleSyllabesCountLabel.setText("New syllabes:");
+
+      hypAddRuleSyllabesCountOutputLabel.setText("...");
 
       hypLayeredPane.setLayer(hypWordLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypWordTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -568,7 +587,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
 
-      copyrightLabel.setText("© 2017 Mauro Trevisan");
+      lblCopyright.setText("© 2017 Mauro Trevisan");
 
       addWindowListener(new WindowAdapter(){
          @Override
@@ -717,7 +736,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                .addComponent(mainTabbedPane)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(copyrightLabel)
+                  .addComponent(lblCopyright)
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -731,7 +750,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
             .addGap(18, 18, 18)
             .addComponent(mainTabbedPane)
             .addGap(18, 18, 18)
-            .addComponent(copyrightLabel)
+            .addComponent(lblCopyright)
             .addContainerGap())
       );
 
@@ -1563,7 +1582,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JLabel copyrightLabel;
    private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
@@ -1598,6 +1616,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JLabel hypWordLabel;
    private javax.swing.JTextField hypWordTextField;
    private javax.swing.JMenu jMenu1;
+   private javax.swing.JLabel lblCopyright;
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
