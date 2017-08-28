@@ -226,7 +226,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="mainProgressBar" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="mainTabbedPane" pref="277" max="32767" attributes="0"/>
+              <Component id="mainTabbedPane" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
