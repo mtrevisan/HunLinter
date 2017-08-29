@@ -1,7 +1,6 @@
 package unit731.hunspeller.languages.vec;
 
 import java.util.Comparator;
-import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +40,7 @@ public class Word{
 
 
 	public static int getLastVowelIndex(String word){
-		Matcher m = LAST_STRESSED_VOWEL.reset(word.toLowerCase(Locale.ROOT));
+		Matcher m = LAST_STRESSED_VOWEL.reset(word);
 		return (m.find()? m.start(): -1);
 	}
 
@@ -53,17 +52,17 @@ public class Word{
 	}*/
 
 	private static int getLastUnstressedVowelIndex(String word, int idx){
-		Matcher m = LAST_UNSTRESSED_VOWEL.reset((idx < 0? word: word.substring(0, idx)).toLowerCase(Locale.ROOT));
+		Matcher m = LAST_UNSTRESSED_VOWEL.reset(idx < 0? word: word.substring(0, idx));
 		return (m.find()? m.start(): -1);
 	}
 
 
 	public static boolean isStressed(String word){
-		return STRESSED.reset(word.toLowerCase(Locale.ROOT)).find();
+		return STRESSED.reset(word).find();
 	}
 
 	private static int getIndexOfStress(String word){
-		Matcher m = STRESSED.reset(word.toLowerCase(Locale.ROOT));
+		Matcher m = STRESSED.reset(word);
 		return (m.find()? m.start(): -1);
 	}
 

@@ -1,6 +1,8 @@
 package unit731.hunspeller.languages;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
+
+	private static final Matcher REGEX_APOSTROPHE = Pattern.compile("['‘’]").matcher(StringUtils.EMPTY);
 
 	protected static final String APOSTROPHE = "ʼ";
 
@@ -22,32 +26,11 @@ public class Orthography{
 
 	public String correctOrthography(String word){
 		//apply stress
-		word = StringUtils.replaceAll(word, "a\\\\", "à");
-		word = StringUtils.replaceAll(word, "e\\\\", "è");
-		word = StringUtils.replaceAll(word, "i\\\\", "ì");
-		word = StringUtils.replaceAll(word, "o\\\\", "ò");
-		word = StringUtils.replaceAll(word, "u\\\\", "ù");
-		word = StringUtils.replaceAll(word, "a/", "á");
-		word = StringUtils.replaceAll(word, "e/", "é");
-		word = StringUtils.replaceAll(word, "i/", "í");
-		word = StringUtils.replaceAll(word, "o/", "ó");
-		word = StringUtils.replaceAll(word, "u/", "ú");
-		word = StringUtils.replaceAll(word, "a:", "ä");
-		word = StringUtils.replaceAll(word, "e:", "ë");
-		word = StringUtils.replaceAll(word, "i:", "ï");
-		word = StringUtils.replaceAll(word, "o:", "ö");
-		word = StringUtils.replaceAll(word, "u:", "ü");
-
-		word = correctApostrophes(word);
-
-		return word;
+		return correctApostrophes(word);
 	}
 
 	protected String correctApostrophes(String word){
-		word = StringUtils.replace(word, "'", APOSTROPHE);
-		word = StringUtils.replace(word, "‘", APOSTROPHE);
-		word = StringUtils.replace(word, "’", APOSTROPHE);
-		return word;
+		return REGEX_APOSTROPHE.reset(word).replaceAll(APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

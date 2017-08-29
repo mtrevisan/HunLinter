@@ -1,12 +1,22 @@
 package unit731.hunspeller.languages.vec;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 public class OrthographyVEC extends Orthography{
+
+	private static final Matcher REGEX_A_STRESSED_GRAVE = Pattern.compile("a\\\\").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_E_STRESSED_GRAVE = Pattern.compile("e\\\\").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_O_STRESSED_GRAVE = Pattern.compile("o\\\\").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_E_STRESSED_ACUTE = Pattern.compile("e/").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_I_STRESSED_ACUTE = Pattern.compile("(i/|ì)").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_O_STRESSED_ACUTE = Pattern.compile("o/").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_U_STRESSED_ACUTE = Pattern.compile("(u/|ù)").matcher(StringUtils.EMPTY);
 
 	private static class SingletonHelper{
 		private static final OrthographyVEC INSTANCE = new OrthographyVEC();
@@ -19,16 +29,14 @@ public class OrthographyVEC extends Orthography{
 
 	@Override
 	public String correctOrthography(String word){
-		//apply (and correct) stress
-		word = StringUtils.replaceAll(word, "a\\\\", "à");
-		word = StringUtils.replaceAll(word, "e\\\\", "è");
-		word = StringUtils.replaceAll(word, "o\\\\", "ò");
-		word = StringUtils.replaceAll(word, "e/", "é");
-		word = StringUtils.replaceAll(word, "ì", "í");
-		word = StringUtils.replaceAll(word, "i/", "í");
-		word = StringUtils.replaceAll(word, "o/", "ó");
-		word = StringUtils.replaceAll(word, "ù", "ú");
-		word = StringUtils.replaceAll(word, "u/", "ú");
+		//apply stress
+		word = REGEX_A_STRESSED_GRAVE.reset(word).replaceAll("à");
+		word = REGEX_E_STRESSED_GRAVE.reset(word).replaceAll("è");
+		word = REGEX_O_STRESSED_GRAVE.reset(word).replaceAll("ò");
+		word = REGEX_E_STRESSED_ACUTE.reset(word).replaceAll("é");
+		word = REGEX_I_STRESSED_ACUTE.reset(word).replaceAll("í");
+		word = REGEX_O_STRESSED_ACUTE.reset(word).replaceAll("ó");
+		word = REGEX_U_STRESSED_ACUTE.reset(word).replaceAll("ú");
 
 		//correct h occurrences not after d, f, k, j, l, n, p, s, t, x
 		word = word.replaceAll("(^|[^dfkjlnpstx])h", "$1");
