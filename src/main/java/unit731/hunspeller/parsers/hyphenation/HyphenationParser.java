@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -353,7 +354,9 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Trie<String> patterns){
-		word = correctOrthography(word)
+		boolean[] uppercases = extractUppercases(word);
+
+		word = correctOrthography(word.toLowerCase(Locale.ROOT))
 			.replaceAll(HYPHENS, SOFT_HYPHEN);
 
 		List<String> hyphenatedWord;
@@ -372,7 +375,37 @@ public class HyphenationParser{
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
+		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 		return new Hyphenation(hyphenatedWord, errors);
+	}
+
+	private boolean[] extractUppercases(String word){
+		int size = word.length();
+		boolean[] uppercases = new boolean[size];
+		for(int i = 0; i < size; i ++)
+			if(Character.isUpperCase(word.charAt(i)))
+				uppercases[i] = true;
+		return uppercases;
+	}
+
+	private List<String> restoreUppercases(List<String> hyphenatedWord, boolean[] uppercase){
+		int size = uppercase.length;
+		for(int i = 0; i < size; i ++)
+			if(uppercase[i]){
+				int j = i;
+				int indexSoFar = 0;
+				String syll = hyphenatedWord.get(indexSoFar);
+				while(j > syll.length()){
+					j -= syll.length();
+					indexSoFar ++;
+					syll = hyphenatedWord.get(indexSoFar);
+				}
+				StringBuilder syllabe = new StringBuilder(syll);
+				String chr = Character.valueOf(syllabe.charAt(j)).toString();
+				syllabe.setCharAt(j, chr.toUpperCase(Locale.ROOT).charAt(0));
+				hyphenatedWord.set(indexSoFar, syllabe.toString());
+			}
+		return hyphenatedWord;
 	}
 
 	private HyphenationBreak getHyphenationIndexes(String word, Trie<String> patterns){
