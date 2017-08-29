@@ -1345,6 +1345,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
 				Runnable postExecution = () -> {
+					dicParser.setHyphenationParser(hypParser);
+
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 					dm.setSynonyms(theParser.getSynonyms());
 
@@ -1457,7 +1459,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
 					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = !frame.hypParser.hasErrors(addedRuleHyphenation);
+					correctHyphenation = !addedRuleHyphenation.hasErrors();
 				}
 			}
 

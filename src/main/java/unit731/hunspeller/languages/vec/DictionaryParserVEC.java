@@ -12,6 +12,7 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
@@ -140,6 +141,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 				if(!dBetweenVowelsRemoval)
 					throw new IllegalArgumentException("Word cannot have [cijɉñ]iV: " + derivedWord);
 			}
+		}
+
+		//check syllabation
+		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)){
+			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
+			if(hyphenation.hasErrors())
+				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
+					+ "): " + derivedWord);
 		}
 	}
 

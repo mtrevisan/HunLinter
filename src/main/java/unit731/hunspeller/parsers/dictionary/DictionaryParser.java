@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -35,6 +36,7 @@ import unit731.hunspeller.collections.intervalmap.IntervalMap;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
@@ -53,12 +55,14 @@ public class DictionaryParser{
 	private final File dicFile;
 	private IntervalMap<Integer, Integer> boundaries;
 	private final WordGenerator wordGenerator;
+	@Setter protected HyphenationParser hyphenationParser;
 	private final ExternalSorter sorter = new ExternalSorter();
 
 
 	public DictionaryParser(File dicFile, WordGenerator wordGenerator, Charset charset){
 		Objects.nonNull(dicFile);
 		Objects.nonNull(wordGenerator);
+		Objects.nonNull(charset);
 
 		this.dicFile = dicFile;
 		this.wordGenerator = wordGenerator;

@@ -16,7 +16,12 @@ public class InMemoryBloomFilter<T> extends AbstractBloomFilter<T>{
 		super(expectedNumberOfElements, falsePositiveProbability);
 	}
 
-	/** *  NOTE: A normal {@link JavaBitArray} is used. */
+	/**
+	 * NOTE: A normal {@link JavaBitArray} is used.
+	 *
+	 * @param numBits	The number of required bits in the underlying array
+	 * @return the {@link BitArray} implementation to be used
+	 */
 	@Override
 	protected BitArray createBitArray(int numBits){
 		return new JavaBitArray(numBits);

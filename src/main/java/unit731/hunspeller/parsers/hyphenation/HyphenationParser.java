@@ -481,15 +481,4 @@ public class HyphenationParser{
 		return hyphenation.getSyllabes().size();
 	}
 
-	public boolean hasErrors(Hyphenation hyphenation){
-		boolean response = false;
-		boolean[] errors = hyphenation.getErrors();
-		for(boolean error : errors)
-			if(error){
-				response = true;
-				break;
-			}
-		return response;
-	}
-
 }

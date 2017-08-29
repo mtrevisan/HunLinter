@@ -54,4 +54,14 @@ public class Hyphenation{
 		return (idx + syllabes.size()) % syllabes.size();
 	}
 
+	public boolean hasErrors(){
+		boolean response = false;
+		for(boolean error : errors)
+			if(error){
+				response = true;
+				break;
+			}
+		return response;
+	}
+
 }
