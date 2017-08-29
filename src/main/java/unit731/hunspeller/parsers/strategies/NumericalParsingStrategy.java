@@ -12,7 +12,6 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 	private static final int MAX_NUMERICAL_FLAG = 65000;
 
 	private static final String COMMA = ",";
-	private static final String SLASH = "/";
 
 
 	@Override

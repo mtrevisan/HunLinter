@@ -7,6 +7,9 @@ import java.util.HashSet;
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
 
+	static final String SLASH = "/";
+
+
 	/**
 	 * Parses the given String into multiple flags
 	 *

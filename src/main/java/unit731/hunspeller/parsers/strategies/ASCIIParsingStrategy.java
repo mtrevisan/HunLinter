@@ -9,9 +9,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
-	private static final String SLASH = "/";
-
-
 	@Override
 	public String[] parseRuleFlags(String textFlags){
 		if(textFlags == null)

@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -21,10 +22,12 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 @Getter
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
-	private static final String PIPE = "|";
-	private static final String ESCAPED_PIPE = Pattern.quote(PIPE);
+	public static final String PIPE = "|";
+	public static final String ESCAPED_PIPE = Pattern.quote(PIPE);
 
+	@NonNull
 	private String synonym;
+	@NonNull
 	@Setter private List<MeaningEntry> meanings;
 
 

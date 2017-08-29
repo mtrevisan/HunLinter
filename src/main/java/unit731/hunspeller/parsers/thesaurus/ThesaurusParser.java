@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
@@ -30,9 +29,6 @@ import unit731.hunspeller.services.memento.Caretaker;
 @Slf4j
 @Getter
 public class ThesaurusParser{
-
-	private static final String PIPE = "|";
-	private static final String ESCAPED_PIPE = Pattern.quote(PIPE);
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 	private boolean modified = false;
@@ -110,12 +106,12 @@ public class ThesaurusParser{
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		String[] partOfSpeechAndMeanings = synonymAndMeanings.split(ESCAPED_PIPE, 2);
+		String[] partOfSpeechAndMeanings = synonymAndMeanings.split(ThesaurusEntry.ESCAPED_PIPE, 2);
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 			throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-		String[] meanings = partOfSpeechAndMeanings[1].split(ESCAPED_PIPE);
+		String[] meanings = partOfSpeechAndMeanings[1].split(ThesaurusEntry.ESCAPED_PIPE);
 		List<String> means = Arrays.stream(meanings)
 			.map(String::trim)
 			.filter(StringUtils::isNotBlank)
@@ -139,7 +135,7 @@ public class ThesaurusParser{
 
 			for(String meaning : means){
 				//insert the new synonym
-				StringJoiner sj = new StringJoiner(PIPE);
+				StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 				sj.add(partOfSpeech);
 				means.stream()
 					.filter(m -> !m.equals(meaning))
@@ -270,13 +266,13 @@ public class ThesaurusParser{
 			for(ThesaurusEntry synonym : synonyms){
 				String syn = synonym.getSynonym();
 				indexWriter.write(syn);
-				indexWriter.write(PIPE);
+				indexWriter.write(ThesaurusEntry.PIPE);
 				indexWriter.write(Integer.toString(idx));
 				indexWriter.write(StringUtils.LF);
 
 				int meaningsCount = synonym.getMeanings().size();
 				dataWriter.write(syn);
-				dataWriter.write(PIPE);
+				dataWriter.write(ThesaurusEntry.PIPE);
 				dataWriter.write(Integer.toString(meaningsCount));
 				dataWriter.write(StringUtils.LF);
 				List<MeaningEntry> meanings = synonym.getMeanings();

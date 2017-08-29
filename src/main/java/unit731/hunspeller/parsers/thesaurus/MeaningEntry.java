@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
@@ -16,11 +17,9 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 @Getter
 public class MeaningEntry implements Comparable<MeaningEntry>{
 
-	private static final String PIPE = "|";
-	private static final String ESCAPED_PIPE = Pattern.quote(PIPE);
-
-
+	@NonNull
 	private final String partOfSpeech;
+	@NonNull
 	private final List<String> meanings;
 
 
@@ -28,13 +27,13 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		Objects.nonNull(synonymAndMeanings);
 
 		try{
-			String[] partOfSpeechAndMeanings = synonymAndMeanings.split(ESCAPED_PIPE, 2);
+			String[] partOfSpeechAndMeanings = synonymAndMeanings.split(ThesaurusEntry.ESCAPED_PIPE, 2);
 
 			partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-			this.meanings = Arrays.stream(partOfSpeechAndMeanings[1].split(ESCAPED_PIPE))
+			this.meanings = Arrays.stream(partOfSpeechAndMeanings[1].split(ThesaurusEntry.ESCAPED_PIPE))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
 				.distinct()
@@ -49,9 +48,9 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 	@Override
 	public String toString(){
-		return (new StringJoiner(PIPE))
+		return (new StringJoiner(ThesaurusEntry.PIPE))
 			.add(partOfSpeech)
-			.add(StringUtils.join(meanings, PIPE))
+			.add(StringUtils.join(meanings, ThesaurusEntry.PIPE))
 			.toString();
 	}
 

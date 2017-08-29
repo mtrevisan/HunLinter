@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 
 	private static final String SPLITTER = "(?<=\\G.{2})";
-	private static final String SLASH = "/";
 
 
 	@Override
