@@ -38,13 +38,14 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 public class DictionaryParser{
 
-	private static final Matcher COMMENT = Pattern.compile("^\\s*[#\\/].*$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_COMMENT = Pattern.compile("^\\s*[#\\/].*$").matcher(StringUtils.EMPTY);
 
 	private static final NumberFormat COUNTER_FORMATTER = NumberFormat.getInstance(Locale.US);
 	private static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));
@@ -581,13 +582,13 @@ public class DictionaryParser{
 	}
 
 	private boolean isComment(String line){
-		return COMMENT.reset(line).find();
+		return PatternService.find(line, REGEX_COMMENT);
 	}
 
 	/** Removes comment lines and then cleans up blank lines and trailing whitespace. */
 	private String cleanLine(String line){
 		//remove comments
-		line = COMMENT.reset(line).replaceAll(StringUtils.EMPTY);
+		line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;

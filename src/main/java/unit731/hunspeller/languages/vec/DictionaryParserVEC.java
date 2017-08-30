@@ -15,6 +15,7 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.services.PatternService;
 
 
 public class DictionaryParserVEC extends DictionaryParser{
@@ -87,6 +88,16 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
+	private static final Matcher REGEX_I_ACUTE = Pattern.compile("(i/|ì)").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_O_ACUTE = Pattern.compile("o/").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_U_ACUTE = Pattern.compile("(u/|ù)").matcher(StringUtils.EMPTY);
+
+	private static final Matcher REGEX_DH = Pattern.compile("dh").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_JH = Pattern.compile("jh").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_LH = Pattern.compile("lh").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_NH = Pattern.compile("nh").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_TH = Pattern.compile("th").matcher(StringUtils.EMPTY);
+
 
 	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, Charset charset){
 		super(dicFile, wordGenerator, charset);
@@ -96,19 +107,19 @@ public class DictionaryParserVEC extends DictionaryParser{
 	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
-		if(VANISHING_L_AND_NON_VANISHING_DIMINUTIVE.reset(line).find())
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_DIMINUTIVE))
 			throw new IllegalArgumentException("Cannot use &0 rule with vanishing el, use &1");
-		if(NON_VANISHING_L_AND_VANISHING_DIMINUTIVE.reset(line).find())
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_DIMINUTIVE))
 			throw new IllegalArgumentException("Cannot use &1 rule with non-vanishing el, use &0");
 		if(!line.contains(POS_VERB) && !line.contains(POS_ARTICLE) && !line.contains(POS_ADVERB) && !line.contains(POS_PRONOUN)
-				&& !ENDS_IN_MAN.reset(line).find() && MISSING_PLURAL_AFTER_N_OR_L.reset(line).find())
+				&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 			throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
 	}
 
 	@Override
 	protected void checkProductionLanguageSpecific(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
-		if(MISMATCHED_VARIANTS.reset(derivedWord).find())
+		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
@@ -123,7 +134,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 		String[] splittedWords = derivedWord.split(HyphenationParser.HYPHEN_MINUS);
 		for(String subword : splittedWords){
-			if(MULTIPLE_ACCENTS.reset(subword).find())
+			if(PatternService.find(subword, MULTIPLE_ACCENTS))
 				throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
 			if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
 				boolean elBetweenVowelsRemoval = production.getRules().stream()
@@ -133,8 +144,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 				if(!elBetweenVowelsRemoval)
 					throw new IllegalArgumentException("Word cannot have an accent here: " + derivedWord);
 			}
-			if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && NHIV.reset(subword).find()
-					&& !CIUI.reset(subword).find()){
+			if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
+					&& !PatternService.find(subword, CIUI)){
 				boolean dBetweenVowelsRemoval = production.getRules().stream()
 					.map(AffixEntry::toString)
 					.map(D_BETWEEN_VOWELS::reset)
@@ -160,16 +171,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 	public String prepareTextForFilter(String text){
 		text = super.prepareTextForFilter(text);
 
-		text = StringUtils.replaceAll(text, "ì", "í");
-		text = StringUtils.replaceAll(text, "i/", "í");
-		text = StringUtils.replaceAll(text, "o/", "ó");
-		text = StringUtils.replaceAll(text, "ù", "ú");
-		text = StringUtils.replaceAll(text, "u/", "ú");
-		text = StringUtils.replaceAll(text, "dh", "(dh|đ)");
-		text = StringUtils.replaceAll(text, "jh", "(jh|ɉ)");
-		text = StringUtils.replaceAll(text, "lh", "(lh|ƚ)");
-		text = StringUtils.replaceAll(text, "nh", "(nh|ñ)");
-		text = StringUtils.replaceAll(text, "th", "(th|ŧ)");
+		text = PatternService.replaceAll(text, REGEX_I_ACUTE, "í");
+		text = PatternService.replaceAll(text, REGEX_O_ACUTE, "ó");
+		text = PatternService.replaceAll(text, REGEX_U_ACUTE, "ú");
+		text = PatternService.replaceAll(text, REGEX_DH, "(dh|đ)");
+		text = PatternService.replaceAll(text, REGEX_JH, "(jh|ɉ)");
+		text = PatternService.replaceAll(text, REGEX_LH, "(lh|ƚ)");
+		text = PatternService.replaceAll(text, REGEX_NH, "(nh|ñ)");
+		text = PatternService.replaceAll(text, REGEX_TH, "(th|ŧ)");
 
 		return text;
 	}

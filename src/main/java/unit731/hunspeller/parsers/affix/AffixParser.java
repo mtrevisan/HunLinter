@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
 import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 
 
 @Slf4j
@@ -71,6 +74,8 @@ public class AffixParser{
 	private static final String TAG_FULLSTRIP = "FULLSTRIP";
 	/** Forbid uppercased and capitalized forms of words signed with this flag */
 	private static final String TAG_KEEP_CASE = "KEEPCASE";
+
+	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|\\s*#.*$").matcher(StringUtils.EMPTY);
 
 
 	private final Map<String, Object> data = new HashMap<>();
@@ -288,7 +293,7 @@ public class AffixParser{
 	 */
 	private String removeComment(String line){
 		//remove comments
-		line = StringUtils.replaceAll(line, "^$|\\s*#.*$", StringUtils.EMPTY);
+		line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}

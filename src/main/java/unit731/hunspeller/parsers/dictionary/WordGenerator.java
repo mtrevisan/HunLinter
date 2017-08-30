@@ -15,6 +15,7 @@ import unit731.hunspeller.collections.regexptrie.RegExpTrieNode;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.services.PatternService;
 
 
 @AllArgsConstructor
@@ -115,7 +116,7 @@ public class WordGenerator{
 				for(AffixEntry entry : entries){
 					Matcher match = entry.getMatch();
 					//... only if it matches the given word
-					if(match == null || match.reset(word).find())
+					if(match == null || PatternService.find(word, match))
 						applicableAffixes.add(entry);
 				}
 

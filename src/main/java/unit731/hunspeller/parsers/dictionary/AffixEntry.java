@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
+import unit731.hunspeller.services.PatternService;
 
 
 @Slf4j
@@ -93,7 +94,7 @@ public class AffixEntry{
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
 		if(remove != null){
-			word = remove.reset(word).replaceFirst(StringUtils.EMPTY);
+			word = PatternService.replaceFirst(word, remove, StringUtils.EMPTY);
 			if(word.isEmpty() && !isFullstrip)
 				throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
 		}

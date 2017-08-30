@@ -3,6 +3,7 @@ package unit731.hunspeller.languages.vec;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 public class Grapheme{
@@ -19,19 +20,19 @@ public class Grapheme{
 
 
 	public static boolean endsInVowel(String word){
-		return ENDS_IN_VOWEL.reset(word).find();
+		return PatternService.find(word, ENDS_IN_VOWEL);
 	}
 
 	public static boolean isDiphtong(String group){
-		return DIPHTONG.reset(group).find();
+		return PatternService.find(group, DIPHTONG);
 	}
 
 	public static boolean isHyatus(String group){
-		return HYATUS.reset(group).find();
+		return PatternService.find(group, HYATUS);
 	}
 
 	public static boolean isEterophonicSequence(String group){
-		return ETEROPHONIC_SEQUENCE.reset(group).find();
+		return PatternService.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
 
@@ -54,13 +55,13 @@ public class Grapheme{
 	 */
 	private static String phonizeJAffineGrapheme(String word){
 		//this step is mandatory before eterophonic sequence VjV
-		return StringUtils.replaceAll(word, "j", "ʝ");
+		return StringUtils.replace(word, "j", "ʝ");
 	}
 
 	private static String phonizeEterophonicSequence(String word){
-		word = ETEROPHONIC_SEQUENCE_J.reset(word).replaceAll("$1j$2");
-		word = ETEROPHONIC_SEQUENCE_W1.reset(word).replaceAll("$1w$3");
-		word = ETEROPHONIC_SEQUENCE_W2.reset(word).replaceAll("$1w$3");
+		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
+		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W1, "$1w$3");
+		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W2, "$1w$3");
 		return word;
 	}
 

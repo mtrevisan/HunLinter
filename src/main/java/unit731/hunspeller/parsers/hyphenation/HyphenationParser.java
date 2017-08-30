@@ -34,6 +34,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 
 
 /**
@@ -61,6 +62,8 @@ public class HyphenationParser{
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
+
+	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|\\s*%.*$").matcher(StringUtils.EMPTY);
 
 
 
@@ -136,7 +139,7 @@ public class HyphenationParser{
 								if(level > 1)
 									throw new IllegalArgumentException("Cannot have more than two levels");
 							}
-							else if(!VALID_RULE.reset(line).find() && line.contains(HYPHEN_MINUS)){
+							else if(!PatternService.find(line, VALID_RULE) && line.contains(HYPHEN_MINUS)){
 								String key = line.replaceAll(HYPHEN_MINUS, StringUtils.EMPTY);
 								if(hypParser.nonStandardHyphenation.containsKey(key))
 									throw new IllegalArgumentException("Non-standard hyphenation " + line + " is already present");
@@ -193,7 +196,7 @@ public class HyphenationParser{
 		 */
 		private String removeComment(String line){
 			//remove comments
-			line = StringUtils.replaceAll(line, "^$|\\s*%.*$", StringUtils.EMPTY);
+			line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
 			//trim the entire string
 			return StringUtils.strip(line);
 		}
@@ -243,7 +246,7 @@ public class HyphenationParser{
 	 * @param rule	Rule to be validated
 	 */
 	public static void validateRule(String rule){
-		if(!VALID_RULE.reset(rule).find())
+		if(!PatternService.find(rule, VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 		if(isAugmentedRule(rule)){
 			int augmentedIndex = rule.indexOf('/');
@@ -269,7 +272,7 @@ public class HyphenationParser{
 	}
 
 	private static boolean isAugmentedRule(String rule){
-		return AUGMENTED_RULE.reset(rule).find();
+		return PatternService.find(rule, AUGMENTED_RULE);
 	}
 
 	public void save(File hypFile) throws IOException{

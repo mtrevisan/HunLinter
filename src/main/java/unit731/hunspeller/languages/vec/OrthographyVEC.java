@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.services.PatternService;
 
 
 public class OrthographyVEC extends Orthography{
@@ -26,7 +27,7 @@ public class OrthographyVEC extends Orthography{
 	private static final Matcher REGEX_TH = Pattern.compile("th").matcher(StringUtils.EMPTY);
 
 	private static final Matcher REGEX_MB_MP = Pattern.compile("m([bp])").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_J_INTO_I = Pattern.compile("j(?=[^aeiouàèéíòóúh])").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_J_INTO_I = Pattern.compile("^j(?=[^aeiouàèéíòóúh])").matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_I_INITIAL_INTO_J = Pattern.compile("^i(?=[aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_I_INSIDE_INTO_J = Pattern.compile("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = Pattern.compile("^ƚ(?=[^ʼ'aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
@@ -49,41 +50,41 @@ public class OrthographyVEC extends Orthography{
 	@Override
 	public String correctOrthography(String word){
 		//apply stress
-		word = REGEX_A_GRAVE.reset(word).replaceAll("à");
-		word = REGEX_E_GRAVE.reset(word).replaceAll("è");
-		word = REGEX_O_GRAVE.reset(word).replaceAll("ò");
-		word = REGEX_E_ACUTE.reset(word).replaceAll("é");
-		word = REGEX_I_ACUTE.reset(word).replaceAll("í");
-		word = REGEX_O_ACUTE.reset(word).replaceAll("ó");
-		word = REGEX_U_ACUTE.reset(word).replaceAll("ú");
+		word = PatternService.replaceAll(word, REGEX_A_GRAVE, "à");
+		word = PatternService.replaceAll(word, REGEX_E_GRAVE, "è");
+		word = PatternService.replaceAll(word, REGEX_O_GRAVE, "ò");
+		word = PatternService.replaceAll(word, REGEX_E_ACUTE, "é");
+		word = PatternService.replaceAll(word, REGEX_I_ACUTE, "í");
+		word = PatternService.replaceAll(word, REGEX_O_ACUTE, "ó");
+		word = PatternService.replaceAll(word, REGEX_U_ACUTE, "ú");
 
 		//correct h occurrences not after d, f, k, j, l, n, p, s, t, x
-		word = REGEX_H.reset(word).replaceAll("$1");
+		word = PatternService.replaceAll(word, REGEX_H, "$1");
 		//rewrite characters
-		word = REGEX_DH.reset(word).replaceAll("đ");
-		word = REGEX_JH.reset(word).replaceAll("ɉ");
-		word = REGEX_LH.reset(word).replaceAll("ƚ");
-		word = REGEX_NH.reset(word).replaceAll("ñ");
-		word = REGEX_TH.reset(word).replaceAll("ŧ");
+		word = PatternService.replaceAll(word, REGEX_DH, "đ");
+		word = PatternService.replaceAll(word, REGEX_JH, "ɉ");
+		word = PatternService.replaceAll(word, REGEX_LH, "ƚ");
+		word = PatternService.replaceAll(word, REGEX_NH, "ñ");
+		word = PatternService.replaceAll(word, REGEX_TH, "ŧ");
 
 		//correct mb/mp occurrences into nb/np
-		word = REGEX_MB_MP.reset(word).replaceAll("n$1");
+		word = PatternService.replaceAll(word, REGEX_MB_MP, "n$1");
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
-		word = REGEX_J_INTO_I.reset(word).replaceAll("i");
-		word = REGEX_I_INITIAL_INTO_J.reset(word).replaceAll("j");
-		word = REGEX_I_INSIDE_INTO_J.reset(word).replaceAll("$1j");
+		word = PatternService.replaceFirst(word, REGEX_J_INTO_I, "i");
+		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, "j");
+		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1j");
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = REGEX_LH_INITIAL_INTO_L.reset(word).replaceAll("l");
-		word = REGEX_LH_INSIDE_INTO_L.reset(word).replaceAll("$1l");
+		word = PatternService.replaceFirst(word, REGEX_LH_INITIAL_INTO_L, "l");
+		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
 		//correct fh occurrences into f not before vowel
-		word = REGEX_FH_INTO_F.reset(word).replaceAll("f");
+		word = PatternService.replaceAll(word, REGEX_FH_INTO_F, "f");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
-		word = REGEX_X_INTO_S.reset(word).replaceAll("s");
-		word = REGEX_S_INTO_X.reset(word).replaceAll("x");
+		word = PatternService.replaceAll(word, REGEX_X_INTO_S, "s");
+		word = PatternService.replaceAll(word, REGEX_S_INTO_X, "x");
 
 		//correct morphologic error
-		word = REGEX_MORPHOLOGICAL.reset(word).replaceAll("$1$2");
+		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
 
 		word = eliminateConsonantGeminates(word);
 

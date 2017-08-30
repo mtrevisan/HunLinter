@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,11 +31,11 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return REGEX_APOSTROPHE.reset(word).replaceAll(APOSTROPHE);
+		return PatternService.replaceAll(word, REGEX_APOSTROPHE, APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){
 		return new boolean[syllabes.size()];
-}
+	}
 
 }

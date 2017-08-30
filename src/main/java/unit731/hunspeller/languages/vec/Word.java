@@ -5,6 +5,7 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 public class Word{
@@ -58,7 +59,7 @@ public class Word{
 
 
 	public static boolean isStressed(String word){
-		return STRESSED.reset(word).find();
+		return PatternService.find(word, STRESSED);
 	}
 
 	private static int getIndexOfStress(String word){
@@ -119,7 +120,7 @@ public class Word{
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
 			if(Grapheme.endsInVowel(phones))
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
-			if(idx >= 0 && DEFAULT_STRESS_GROUP.reset(phones.substring(0, idx + 1)).find())
+			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
 				idx --;
 			if(idx < 0)
 				idx = lastChar;
@@ -140,9 +141,10 @@ public class Word{
 			return null;
 
 		int idx = getIndexOfStress(word);
-		if(idx >= 0 && !STRESSED_LAST.reset(word).find()){
+		if(idx >= 0 && !PatternService.find(word, STRESSED_LAST)){
 			String subword = word.substring(idx, idx + 2);
-			String tmp = (!Grapheme.isDiphtong(subword) && !Grapheme.isHyatus(subword) && !NO_STRESS.reset(word).find()? suppressDefaultStress(word): word);
+			String tmp = (!Grapheme.isDiphtong(subword) && !Grapheme.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
+				suppressDefaultStress(word): word);
 			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 				word = tmp;
 		}
