@@ -29,9 +29,26 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher D_BETWEEN_VOWELS = Pattern.compile("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$").matcher(StringUtils.EMPTY);
 	private static final Matcher NHIV = Pattern.compile("[cijɉñ]i[aàeèéiíoòóuú]").matcher(StringUtils.EMPTY);
 	private static final Matcher CIUI = Pattern.compile("ciuí$").matcher(StringUtils.EMPTY);
-	
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE = Pattern.compile("ƚ[^/]+[^a]/[^\\t\\n]*&0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE = Pattern.compile("^[^ƚ/]+[^a]/[^\\t\\n]*&1").matcher(StringUtils.EMPTY);
+
+	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*E1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*E2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*G1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*G2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = Pattern.compile("ƚ[^/]+/[^\\t\\n]*F1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*F2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_INTERROGATIVE = Pattern.compile("ƚ[^/]+/[^\\t\\n]*P1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_INTERROGATIVE = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*P2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_CONDITIONAL = Pattern.compile("ƚ[^/]+/[^\\t\\n]*Q1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_CONDITIONAL = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*Q2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*r0").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*r1").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*s1").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL2 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*s2").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_ADVERB = Pattern.compile("ƚ[^/]+/[^\\t\\n]*W0").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_ADVERB = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*W1").matcher(StringUtils.EMPTY);
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*&0").matcher(StringUtils.EMPTY);
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE = Pattern.compile(NON_VANISHING_L + "[^a]/[^\\t\\n]*&1").matcher(StringUtils.EMPTY);
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = Pattern.compile("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t").matcher(StringUtils.EMPTY);
 	private static final Matcher ENDS_IN_MAN = Pattern.compile("man\\/").matcher(StringUtils.EMPTY);
 
@@ -107,13 +124,47 @@ public class DictionaryParserVEC extends DictionaryParser{
 	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
+		if(!line.contains(POS_VERB) && !line.contains(POS_ARTICLE) && !line.contains(POS_ADVERB) && !line.contains(POS_PRONOUN)
+				&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
+			throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1))
+			throw new IllegalArgumentException("Cannot use E1 rule with vanishing el, use E2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1))
+			throw new IllegalArgumentException("Cannot use E2 rule with non-vanishing el, use E1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2))
+			throw new IllegalArgumentException("Cannot use G1 rule with vanishing el, use G2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB2))
+			throw new IllegalArgumentException("Cannot use G2 rule with non-vanishing el, use G1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE))
+			throw new IllegalArgumentException("Cannot use F1 rule with vanishing el, use F2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE))
+			throw new IllegalArgumentException("Cannot use F2 rule with non-vanishing el, use F1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_INTERROGATIVE))
+			throw new IllegalArgumentException("Cannot use P1 rule with vanishing el, use P2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_INTERROGATIVE))
+			throw new IllegalArgumentException("Cannot use P2 rule with non-vanishing el, use P1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_CONDITIONAL))
+			throw new IllegalArgumentException("Cannot use Q1 rule with vanishing el, use Q2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_CONDITIONAL))
+			throw new IllegalArgumentException("Cannot use Q2 rule with non-vanishing el, use Q1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1))
+			throw new IllegalArgumentException("Cannot use r0 rule with vanishing el, use r1");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL1))
+			throw new IllegalArgumentException("Cannot use r1 rule with non-vanishing el, use r0");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1))
+			throw new IllegalArgumentException("Cannot use r0 rule with vanishing el, use r1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2))
+			throw new IllegalArgumentException("Cannot use s1 rule with vanishing el, use s0s2");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL2))
+			throw new IllegalArgumentException("Cannot use s2 rule with non-vanishing el, use s0s1");
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_ADVERB))
+			throw new IllegalArgumentException("Cannot use W0 rule with vanishing el, use W1");
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_ADVERB))
+			throw new IllegalArgumentException("Cannot use W1 rule with non-vanishing el, use W0");
 		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_DIMINUTIVE))
 			throw new IllegalArgumentException("Cannot use &0 rule with vanishing el, use &1");
 		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_DIMINUTIVE))
 			throw new IllegalArgumentException("Cannot use &1 rule with non-vanishing el, use &0");
-		if(!line.contains(POS_VERB) && !line.contains(POS_ARTICLE) && !line.contains(POS_ADVERB) && !line.contains(POS_PRONOUN)
-				&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-			throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
 	}
 
 	@Override
