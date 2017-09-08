@@ -1198,7 +1198,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		try{
 			clearAffixFile();
 
-			printResultLine("Opening AFF file: " + affFile.getName());
+			printResultLine("Opening Affix file: " + affFile.getName());
 			affParser.parse(affFile);
 
 			printResultLine("Finished reading Affix file");
