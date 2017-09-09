@@ -31,6 +31,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher CIUI = Pattern.compile("ciuí$").matcher(StringUtils.EMPTY);
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
+	private static final Matcher METAPHONESIS = Pattern.compile("[^i][eo]([kƚñstxv]o|nt[eo]|[lnr])/((?!mf).)*\\t").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*E1").matcher(StringUtils.EMPTY);
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*E2").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*G1").matcher(StringUtils.EMPTY);
@@ -132,9 +133,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
-		if(!line.contains(POS_VERB) && !line.contains(POS_ARTICLE) && !line.contains(POS_ADVERB) && !line.contains(POS_PRONOUN)
-				&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-			throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && PatternService.find(line, METAPHONESIS))
+				throw new IllegalArgumentException("Metaphonesis missing, add mf");
+			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+					&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
+				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+		}
 		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1))
 			throw new IllegalArgumentException("Cannot use E1 rule with vanishing el, use E2");
 		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1))

@@ -319,6 +319,10 @@ public class AffixParser{
 		return getData(TAG_LANGUAGE);
 	}
 
+	public String getNoSugggestFlag(){
+		return getData(TAG_NO_SUGGEST);
+	}
+
 	public Charset getCharset(){
 		return Charset.forName(getData(TAG_CHARACTER_SET));
 	}

@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,6 +115,12 @@ public class DictionaryParser{
 								dicParser.checkLineLanguageSpecific(line);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								String noSugggestFlag = affParser.getNoSugggestFlag();
+								List<String> ruleFlags = Arrays.stream(dictionaryWord.getRuleFlags())
+									.filter(ruleFlag -> !ruleFlag.equals(noSugggestFlag))
+									.collect(Collectors.toList());
+								if(!ruleFlags.isEmpty() && subProductions.size() == 1)
+									throw new IllegalArgumentException("Word has no productions");
 
 								subProductions.forEach(production -> dicParser.checkProductionLanguageSpecific(dictionaryWord, production));
 							}
