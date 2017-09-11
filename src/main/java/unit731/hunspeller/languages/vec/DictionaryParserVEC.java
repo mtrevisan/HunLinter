@@ -31,9 +31,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher CIUI = Pattern.compile("ciuí$").matcher(StringUtils.EMPTY);
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
-	private static final Matcher CAN_HAVE_METAPHONESIS = Pattern.compile("[^i][eo]([kƚñstxv]o|nt[eo]|[lnr])/").matcher(StringUtils.EMPTY);
+	private static final Matcher CAN_HAVE_METAPHONESIS = Pattern.compile("[eo]([kƚñstxv]o|nt[eo]|[lnr])/").matcher(StringUtils.EMPTY);
 	private static final Matcher HAS_METAPHONESIS = Pattern.compile("/[^\\t\\n]*mf").matcher(StringUtils.EMPTY);
-	private static final Matcher HAS_PLURAL = Pattern.compile("/[^\\t\\n]*[TBC]0").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*E1").matcher(StringUtils.EMPTY);
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*E2").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*G1").matcher(StringUtils.EMPTY);
@@ -136,12 +135,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
 		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && PatternService.find(line, CAN_HAVE_METAPHONESIS)){
+			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)){
+				boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
 				boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
-				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-				if(!hasMetaphonesisFlag && hasPluralFlag)
+				if(canHaveMetaphonesis && !hasMetaphonesisFlag)
 					throw new IllegalArgumentException("Metaphonesis missing, add mf");
-				else if(hasMetaphonesisFlag && !hasPluralFlag)
+				else if(!canHaveMetaphonesis && hasMetaphonesisFlag)
 					throw new IllegalArgumentException("Metaphonesis not needed, remove mf");
 			}
 			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
