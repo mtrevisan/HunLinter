@@ -136,7 +136,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
 		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)){
+			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
 				boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
 				boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
 				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
