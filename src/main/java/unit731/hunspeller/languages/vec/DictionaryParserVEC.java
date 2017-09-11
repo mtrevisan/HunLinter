@@ -32,8 +32,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
 	private static final Matcher CAN_HAVE_METAPHONESIS = Pattern.compile("[^i][eo]([kƚñstxv]o|nt[eo]|[lnr])/").matcher(StringUtils.EMPTY);
-	private static final Matcher HAS_METAPHONESIS = Pattern.compile("/(mf.?)+\\t").matcher(StringUtils.EMPTY);
-	private static final Matcher HAS_PLURAL = Pattern.compile("/((T0|B0).?)+\\t").matcher(StringUtils.EMPTY);
+	private static final Matcher HAS_METAPHONESIS = Pattern.compile("/[^\\t\\n]*mf").matcher(StringUtils.EMPTY);
+	private static final Matcher HAS_PLURAL = Pattern.compile("/[^\\t\\n]*[TBC]0").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*E1").matcher(StringUtils.EMPTY);
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*E2").matcher(StringUtils.EMPTY);
 	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*G1").matcher(StringUtils.EMPTY);

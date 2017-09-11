@@ -319,8 +319,8 @@ public class AffixParser{
 		return getData(TAG_LANGUAGE);
 	}
 
-	public String getNoSugggestFlag(){
-		return getData(TAG_NO_SUGGEST);
+	public String getKeepCaseFlag(){
+		return getData(TAG_KEEP_CASE);
 	}
 
 	public Charset getCharset(){
