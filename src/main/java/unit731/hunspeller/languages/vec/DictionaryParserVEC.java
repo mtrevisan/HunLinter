@@ -136,7 +136,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
-		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
+				&& !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
 			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
 				boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
 				boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
@@ -223,21 +224,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 		if(production.getRuleFlags().length > 0 && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
 				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			String derivedWordWithoutDataFields = production.toStringWithoutDataFields(strategy);
+			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
 			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
 				boolean canHaveMetaphonesis = PatternService.find(derivedWordWithoutDataFields, CAN_HAVE_METAPHONESIS);
 				boolean hasMetaphonesisFlag = production.containsRuleFlag("mf");
 				boolean hasPluralFlag = PatternService.find(derivedWordWithoutDataFields, HAS_PLURAL);
 				if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing, add mf");
+					throw new IllegalArgumentException("Metaphonesis missing for word " + derivedWord + ", add mf");
 				else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed, remove mf");
+					throw new IllegalArgumentException("Metaphonesis not needed for word " + derivedWord + ", remove mf");
 			}
 			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
-					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN) && PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
+					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN)
+					&& PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
 				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
 		}
 
