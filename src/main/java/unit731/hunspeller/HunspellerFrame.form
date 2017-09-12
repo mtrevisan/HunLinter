@@ -2,15 +2,6 @@
 
 <Form version="1.9" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Container class="javax.swing.JMenu" name="jMenu1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jMenu1"/>
-      </Properties>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
-        <Property name="useNullLayout" type="boolean" value="true"/>
-      </Layout>
-    </Container>
     <Menu class="javax.swing.JMenuBar" name="mainMenuBar">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowClosing(WindowEvent e){&#xa;&#x9;&#x9;exit();&#xa;&#x9;}&#xa;});&#xa;"/>
@@ -45,9 +36,9 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fileCreatePackageMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="recentFilesSeparator">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="recentFilesFileSeparator">
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="exitSeparator">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="fileSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="fileExitMenuItem">
               <Properties>
@@ -103,6 +94,8 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractDuplicatesMenuItemActionPerformed"/>
               </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistMenuItem">
               <Properties>

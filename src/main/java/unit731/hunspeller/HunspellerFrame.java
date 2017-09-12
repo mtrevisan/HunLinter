@@ -183,7 +183,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      jMenu1 = new javax.swing.JMenu();
       parseScrollPane = new javax.swing.JScrollPane();
       parseTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
@@ -223,20 +222,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       fileMenu = new javax.swing.JMenu();
       fileOpenAFFMenuItem = new javax.swing.JMenuItem();
       fileCreatePackageMenuItem = new javax.swing.JMenuItem();
-      recentFilesSeparator = new javax.swing.JPopupMenu.Separator();
-      exitSeparator = new javax.swing.JPopupMenu.Separator();
+      recentFilesFileSeparator = new javax.swing.JPopupMenu.Separator();
+      fileSeparator = new javax.swing.JPopupMenu.Separator();
       fileExitMenuItem = new javax.swing.JMenuItem();
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
+      dicSeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
-
-      jMenu1.setText("jMenu1");
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
       setTitle("Hunspeller");
@@ -610,8 +608,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
          }
       });
       fileMenu.add(fileCreatePackageMenuItem);
-      fileMenu.add(recentFilesSeparator);
-      fileMenu.add(exitSeparator);
+      fileMenu.add(recentFilesFileSeparator);
+      fileMenu.add(fileSeparator);
 
       fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
       fileExitMenuItem.setMnemonic('x');
@@ -665,6 +663,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
          }
       });
       dicMenu.add(dicExtractDuplicatesMenuItem);
+      dicMenu.add(dicSeparator);
 
       dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_extractWordlist.png"))); // NOI18N
       dicExtractWordlistMenuItem.setMnemonic('w');
@@ -1574,13 +1573,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
    private javax.swing.JScrollPane dicScrollPane;
+   private javax.swing.JPopupMenu.Separator dicSeparator;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JTable dicTable;
-   private javax.swing.JPopupMenu.Separator exitSeparator;
    private javax.swing.JMenuItem fileCreatePackageMenuItem;
    private javax.swing.JMenuItem fileExitMenuItem;
    private javax.swing.JMenu fileMenu;
    private javax.swing.JMenuItem fileOpenAFFMenuItem;
+   private javax.swing.JPopupMenu.Separator fileSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JButton hypAddRuleButton;
@@ -1597,13 +1597,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JLabel hypSyllabesCountOutputLabel;
    private javax.swing.JLabel hypWordLabel;
    private javax.swing.JTextField hypWordTextField;
-   private javax.swing.JMenu jMenu1;
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parseScrollPane;
    private javax.swing.JTextArea parseTextArea;
-   private javax.swing.JPopupMenu.Separator recentFilesSeparator;
+   private javax.swing.JPopupMenu.Separator recentFilesFileSeparator;
    private javax.swing.JButton theAddButton;
    private javax.swing.JMenuItem theFindDuplicatesMenuItem;
    private javax.swing.JLayeredPane theLayeredPane;
