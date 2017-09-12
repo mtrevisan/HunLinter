@@ -15,6 +15,7 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -212,7 +213,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
-
 		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
 			throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
 
@@ -220,6 +220,26 @@ public class DictionaryParserVEC extends DictionaryParser{
 		for(String dataField : dataFields)
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
+
+		if(production.getRuleFlags().length > 0 && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			String derivedWordWithoutDataFields = production.toStringWithoutDataFields(strategy);
+			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
+					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
+				boolean canHaveMetaphonesis = PatternService.find(derivedWordWithoutDataFields, CAN_HAVE_METAPHONESIS);
+				boolean hasMetaphonesisFlag = production.containsRuleFlag("mf");
+				boolean hasPluralFlag = PatternService.find(derivedWordWithoutDataFields, HAS_PLURAL);
+				if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis missing, add mf");
+				else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis not needed, remove mf");
+			}
+			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
+					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN) && PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
+				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+		}
 
 		String[] splittedWords = derivedWord.split(HyphenationParser.HYPHEN_MINUS);
 		for(String subword : splittedWords){
