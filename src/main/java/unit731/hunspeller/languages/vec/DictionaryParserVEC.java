@@ -231,15 +231,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 				boolean hasMetaphonesisFlag = production.containsRuleFlag("mf");
 				boolean hasPluralFlag = PatternService.find(derivedWordWithoutDataFields, HAS_PLURAL);
 				if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + derivedWord + ", add mf");
+					throw new IllegalArgumentException("Metaphonesis missing for word " + derivedWordWithoutDataFields + ", add mf");
 				else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed for word " + derivedWord + ", remove mf");
+					throw new IllegalArgumentException("Metaphonesis not needed for word " + derivedWordWithoutDataFields + ", remove mf");
 			}
 			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
 					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN)
 					&& PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
-				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+				throw new IllegalArgumentException("Plural missing after n or l for word " + derivedWordWithoutDataFields + ", add u0 or U0");
 		}
 
 		String[] splittedWords = derivedWord.split(HyphenationParser.HYPHEN_MINUS);
