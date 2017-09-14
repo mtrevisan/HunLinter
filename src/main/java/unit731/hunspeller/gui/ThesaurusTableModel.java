@@ -20,7 +20,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String END_TAG = "</html>";
 	public static final String NEW_LINE_TAG = "<br>";
 
-	private static final Matcher REGEX_REPLACE = Pattern.compile("^" + START_TAG + "|" + END_TAG + "$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_REPLACE = PatternService.matcher("^" + START_TAG + "|" + END_TAG + "$");
 
 	private static final Pattern REGEX_PATTERN_NEW_LINE = Pattern.compile(NEW_LINE_TAG);
 

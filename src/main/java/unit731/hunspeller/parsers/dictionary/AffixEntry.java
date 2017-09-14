@@ -15,7 +15,7 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
-	private static final Matcher REGEX_ENTRY = Pattern.compile("\t.*$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_ENTRY = PatternService.matcher("\t.*$");
 
 	private static final Pattern REGEX_PATTERN_SEPARATOR = Pattern.compile("[\\s\\t]+");
 	private static final Pattern REGEX_PATTERN_SLASH = Pattern.compile("/");
@@ -80,9 +80,9 @@ public class AffixEntry{
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
 		continuationClasses = (classes.length > 0? classes: null);
 		match = (!POINT.equals(regexToMatch)?
-			Pattern.compile(isSuffix()? regexToMatch + REGEX_END_OF_LINE: REGEX_START_OF_LINE + regexToMatch).matcher(StringUtils.EMPTY): null);
+			PatternService.matcher(isSuffix()? regexToMatch + REGEX_END_OF_LINE: REGEX_START_OF_LINE + regexToMatch): null);
 		remove = (!ZERO.equals(regexToRemove)?
-			Pattern.compile(isSuffix()? regexToRemove + REGEX_END_OF_LINE: REGEX_START_OF_LINE + regexToRemove).matcher(StringUtils.EMPTY): null);
+			PatternService.matcher(isSuffix()? regexToRemove + REGEX_END_OF_LINE: REGEX_START_OF_LINE + regexToRemove): null);
 		add = (ZERO.equals(addition)? StringUtils.EMPTY: addition);
 
 		if(isSuffix() && StringUtils.isNotBlank(regexToRemove) && addition.length() > 1 && regexToRemove.charAt(0) == addition.charAt(0))

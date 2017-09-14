@@ -2,9 +2,14 @@ package unit731.hunspeller.services;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class PatternService{
+
+	public static Matcher matcher(String text){
+		return Pattern.compile(text).matcher(StringUtils.EMPTY);
+	}
 
 	public static String[] split(String text, Pattern pattern){
 		return split(text, pattern, 0);

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
@@ -46,10 +45,10 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 public class DictionaryParser{
 
-	private static final Matcher REGEX_COMMENT = Pattern.compile("^\\s*[#\\/].*$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
 
-	private static final Matcher REGEX_FILTER_EMPTY = Pattern.compile("^\\(.+?\\)\\|?|^\\||\\|$").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_FILTER_OR = Pattern.compile("\\|{2,}").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
 	private static final NumberFormat COUNTER_FORMATTER = NumberFormat.getInstance(Locale.US);
 	private static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));

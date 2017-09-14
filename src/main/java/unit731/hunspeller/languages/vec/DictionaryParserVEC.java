@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
@@ -22,48 +21,48 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
 
-	private static final Matcher MISMATCHED_VARIANTS = Pattern.compile("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ").matcher(StringUtils.EMPTY);
-	private static final Matcher MULTIPLE_ACCENTS = Pattern.compile("([^àèéíòóú]*[àèéíòóú]){2,}").matcher(StringUtils.EMPTY);
+	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
+	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
 
-	private static final Matcher L_BETWEEN_VOWELS = Pattern.compile("l i l$").matcher(StringUtils.EMPTY);
-	private static final Matcher D_BETWEEN_VOWELS = Pattern.compile("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$").matcher(StringUtils.EMPTY);
-	private static final Matcher NHIV = Pattern.compile("[cijɉñ]i[aàeèéiíoòóuú]").matcher(StringUtils.EMPTY);
-	private static final Matcher CIUI = Pattern.compile("ciuí$").matcher(StringUtils.EMPTY);
+	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
+	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
+	private static final Matcher NHIV = PatternService.matcher("[cijɉñ]i[aàeèéiíoòóuú]");
+	private static final Matcher CIUI = PatternService.matcher("ciuí$");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = Pattern.compile(HyphenationParser.HYPHEN_MINUS);
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
-	private static final Matcher CAN_HAVE_METAPHONESIS = Pattern.compile("[eo]([kƚñstxv]o|nt[eo]|[lnr])/").matcher(StringUtils.EMPTY);
-	private static final Matcher HAS_METAPHONESIS = Pattern.compile("/[^\\t\\n]*mf").matcher(StringUtils.EMPTY);
-	private static final Matcher HAS_PLURAL = Pattern.compile("[^i]/[^\\t\\n]*T0|[^aie]/[^\\t\\n]*B0|[^ieo]/[^\\t\\n]*C0|[^aio]/[^\\t\\n]*D0").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*E1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*E2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*G1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB2 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*G2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = Pattern.compile("ƚ[^/]+/[^\\t\\n]*F1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*F2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_INTERROGATIVE = Pattern.compile("ƚ[^/]+/[^\\t\\n]*P1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_INTERROGATIVE = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*P2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CONDITIONAL = Pattern.compile("ƚ[^/]+/[^\\t\\n]*Q1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_CONDITIONAL = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*Q2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*r0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL1 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*r1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2 = Pattern.compile("ƚ[^/]+/[^\\t\\n]*s1").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL2 = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*s2").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_ADVERB = Pattern.compile("ƚ[^/]+/[^\\t\\n]*W0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_ADVERB = Pattern.compile(NON_VANISHING_L + "/[^\\t\\n]*W1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE1 = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*&0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE1 = Pattern.compile(NON_VANISHING_L + "[^a]/[^\\t\\n]*&1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE2 = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*\\[0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE2 = Pattern.compile(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\[1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE1 = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*\\(0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE1 = Pattern.compile(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\(1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE2 = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*\\)0").matcher(StringUtils.EMPTY);
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE2 = Pattern.compile(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\)1").matcher(StringUtils.EMPTY);
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PEJORATIVE = Pattern.compile("ƚ[^/]*[^a]/[^\\t\\n]*<0").matcher(StringUtils.EMPTY);
-	private static final Matcher NORTHERN_THDH_AND_VANISHING_PEJORATIVE = Pattern.compile("[đŧ][^/]*[^a]/[^\\t\\n]*<1").matcher(StringUtils.EMPTY);
-	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = Pattern.compile("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t").matcher(StringUtils.EMPTY);
-	private static final Matcher ENDS_IN_MAN = Pattern.compile("man\\/").matcher(StringUtils.EMPTY);
+	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");
+	private static final Matcher HAS_METAPHONESIS = PatternService.matcher("/[^\\t\\n]*mf");
+	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]/[^\\t\\n]*T0|[^aie]/[^\\t\\n]*B0|[^ieo]/[^\\t\\n]*C0|[^aio]/[^\\t\\n]*D0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*E1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*E2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*G1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB2 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*G2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*F1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*F2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_INTERROGATIVE = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*P1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_INTERROGATIVE = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*P2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_CONDITIONAL = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*Q1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_CONDITIONAL = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*Q2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*r0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL1 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*r1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*s1");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL2 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*s2");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_ADVERB = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*W0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_ADVERB = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*W1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE1 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*&0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE1 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*&1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE2 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\[0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE2 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\[1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE1 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\(0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE1 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\(1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE2 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\)0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE2 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\)1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PEJORATIVE = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*<0");
+	private static final Matcher NORTHERN_THDH_AND_VANISHING_PEJORATIVE = PatternService.matcher("[đŧ][^/]*[^a]/[^\\t\\n]*<1");
+	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
+	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
 	private static final String TAB = "\t";
 
@@ -118,15 +117,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
-	private static final Matcher REGEX_I_ACUTE = Pattern.compile("(i/|ì)").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_O_ACUTE = Pattern.compile("o/").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_U_ACUTE = Pattern.compile("(u/|ù)").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(i/|ì)");
+	private static final Matcher REGEX_O_ACUTE = PatternService.matcher("o/");
+	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(u/|ù)");
 
-	private static final Matcher REGEX_DH = Pattern.compile("dh").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_JH = Pattern.compile("jh").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_LH = Pattern.compile("lh").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_NH = Pattern.compile("nh").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_TH = Pattern.compile("th").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_DH = PatternService.matcher("dh");
+	private static final Matcher REGEX_JH = PatternService.matcher("jh");
+	private static final Matcher REGEX_LH = PatternService.matcher("lh");
+	private static final Matcher REGEX_NH = PatternService.matcher("nh");
+	private static final Matcher REGEX_TH = PatternService.matcher("th");
 
 
 	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, Charset charset){

@@ -3,7 +3,6 @@ package unit731.hunspeller.languages.vec;
 import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
@@ -12,14 +11,14 @@ public class Word{
 
 	private static final String ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
 
-	private static final Matcher LAST_STRESSED_VOWEL = Pattern.compile("[aeiouàèéíòóú][^aeiouàèéíòóú]*$").matcher(StringUtils.EMPTY);
+	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
-	private static final Matcher STRESSED = Pattern.compile("[àèéíòóú]").matcher(StringUtils.EMPTY);
-	private static final Matcher STRESSED_LAST = Pattern.compile("[àèéíòóú]$").matcher(StringUtils.EMPTY);
+	private static final Matcher STRESSED = PatternService.matcher("[àèéíòóú]");
+	private static final Matcher STRESSED_LAST = PatternService.matcher("[àèéíòóú]$");
 
-	private static final Matcher DEFAULT_STRESS_GROUP = Pattern.compile("(fr|[ln]|st)au$").matcher(StringUtils.EMPTY);
-//	private static final Matcher LAST_UNSTRESSED_VOWEL = Pattern.compile("[aeiou][^aeiou]*$").matcher(StringUtils.EMPTY);
-	private static final Matcher LAST_UNSTRESSED_VOWEL = Pattern.compile("[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$").matcher(StringUtils.EMPTY);
+	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
+//	private static final Matcher LAST_UNSTRESSED_VOWEL = PatternService.matcher("[aeiou][^aeiou]*$");
+	private static final Matcher LAST_UNSTRESSED_VOWEL = PatternService.matcher("[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[ei])?((s[ae]r)?[àé]|[sx]é)([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -36,7 +35,7 @@ public class Word{
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER);
-		NO_STRESS = Pattern.compile(sj.toString()).matcher(StringUtils.EMPTY);
+		NO_STRESS = PatternService.matcher(sj.toString());
 	}
 
 

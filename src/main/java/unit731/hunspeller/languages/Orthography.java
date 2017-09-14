@@ -2,17 +2,15 @@ package unit731.hunspeller.languages;
 
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	private static final Matcher REGEX_APOSTROPHE = Pattern.compile("['‘’]").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_APOSTROPHE = PatternService.matcher("['‘’]");
 
 	protected static final String APOSTROPHE = "ʼ";
 

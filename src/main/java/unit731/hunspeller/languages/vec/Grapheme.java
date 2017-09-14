@@ -1,22 +1,21 @@
 package unit731.hunspeller.languages.vec;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
 public class Grapheme{
 
-	private static final Matcher DIPHTONG = Pattern.compile("([iu][íú]|[àèéòó][iu])").matcher(StringUtils.EMPTY);
-	private static final Matcher HYATUS = Pattern.compile("([aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú])").matcher(StringUtils.EMPTY);
-//	private static final Matcher HYATUS = Pattern.compile("([íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo])").matcher(StringUtils.EMPTY);
-	private static final Matcher ENDS_IN_VOWEL = Pattern.compile("[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$").matcher(StringUtils.EMPTY);
+	private static final Matcher DIPHTONG = PatternService.matcher("([iu][íú]|[àèéòó][iu])");
+	private static final Matcher HYATUS = PatternService.matcher("([aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú])");
+//	private static final Matcher HYATUS = PatternService.matcher("([íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo])");
+	private static final Matcher ENDS_IN_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$");
 
-	private static final Matcher ETEROPHONIC_SEQUENCE = Pattern.compile("(^|[^aeiouàèéíòóú])[iju][àèéíòóú]").matcher(StringUtils.EMPTY);
-	private static final Matcher ETEROPHONIC_SEQUENCE_J = Pattern.compile("([^aeiouàèéíòóú])i([aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
-	private static final Matcher ETEROPHONIC_SEQUENCE_W1 = Pattern.compile("((^|[^s])t)u([aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
-	private static final Matcher ETEROPHONIC_SEQUENCE_W2 = Pattern.compile("((^|[^t])[kgrs])u([aeiouàèéíòóú])").matcher(StringUtils.EMPTY);
+	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
+	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóú])i([aeiouàèéíòóú])");
+	private static final Matcher ETEROPHONIC_SEQUENCE_W1 = PatternService.matcher("((^|[^s])t)u([aeiouàèéíòóú])");
+	private static final Matcher ETEROPHONIC_SEQUENCE_W2 = PatternService.matcher("((^|[^t])[kgrs])u([aeiouàèéíòóú])");
 
 
 	public static boolean endsInVowel(String word){

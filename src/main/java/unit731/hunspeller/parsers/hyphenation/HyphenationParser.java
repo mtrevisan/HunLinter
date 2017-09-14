@@ -59,20 +59,20 @@ public class HyphenationParser{
 
 	private static final Pattern REGEX_PATTERN_COMMA = Pattern.compile(",");
 
-	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*?)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
+	private static final Matcher VALID_RULE = PatternService.matcher("[\\d]");
+	private static final Matcher AUGMENTED_RULE = PatternService.matcher("^(?<rule>.+)/(?<addBefore>.*?)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$");
+	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = Pattern.compile(HYPHEN_MINUS);
-	private static final Matcher REGEX_HYPHEN_MINUS = REGEX_PATTERN_HYPHEN_MINUS.matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_HYPHENS = Pattern.compile(HYPHENS).matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_POINTS_AND_NUMBERS = Pattern.compile("[.\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_KEY = Pattern.compile("\\d|/.+$").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_HYPHENATION_POINT = Pattern.compile("[^13579]|/.+$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_HYPHEN_MINUS = PatternService.matcher(HYPHEN_MINUS);
+	private static final Matcher REGEX_HYPHENS = PatternService.matcher(HYPHENS);
+	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
+	private static final Matcher REGEX_KEY = PatternService.matcher("\\d|/.+$");
+	private static final Matcher REGEX_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
 
-	private static final Matcher REGEX_REDUCE = Pattern.compile("/.+$").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|\\s*%.*$").matcher(StringUtils.EMPTY);
-	private static final Matcher REGEX_WORD_INITIAL = Pattern.compile("^\\.").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_REDUCE = PatternService.matcher("/.+$");
+	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|\\s*%.*$");
+	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^\\.");
 
 
 

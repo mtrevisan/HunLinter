@@ -31,7 +31,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import javax.swing.JComponent;
@@ -92,7 +91,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
-	private static final Matcher REGEX_POINTS_AND_NUMBERS = Pattern.compile("[.\\d]").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
