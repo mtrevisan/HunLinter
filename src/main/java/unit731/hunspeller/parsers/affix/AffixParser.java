@@ -75,7 +75,7 @@ public class AffixParser{
 	/** Forbid uppercased and capitalized forms of words signed with this flag */
 	private static final String TAG_KEEP_CASE = "KEEPCASE";
 
-	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|\\s*#.*$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|^\\s*#.*$").matcher(StringUtils.EMPTY);
 
 
 	private final Map<String, Object> data = new HashMap<>();

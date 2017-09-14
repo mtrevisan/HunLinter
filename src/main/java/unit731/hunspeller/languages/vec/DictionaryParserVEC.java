@@ -22,7 +22,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
 
-	private static final Matcher MISMATCHED_VARIANTS = Pattern.compile("ƚ.*[ŧđ]|[ŧđ].*ƚ").matcher(StringUtils.EMPTY);
+	private static final Matcher MISMATCHED_VARIANTS = Pattern.compile("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ").matcher(StringUtils.EMPTY);
 	private static final Matcher MULTIPLE_ACCENTS = Pattern.compile("([^àèéíòóú]*[àèéíòóú]){2,}").matcher(StringUtils.EMPTY);
 
 	private static final Matcher L_BETWEEN_VOWELS = Pattern.compile("l i l$").matcher(StringUtils.EMPTY);

@@ -60,7 +60,7 @@ public class HyphenationParser{
 	private static final String COMMA = ",";
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
-	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
+	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*?)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
 
 	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|\\s*%.*$").matcher(StringUtils.EMPTY);
@@ -272,7 +272,7 @@ public class HyphenationParser{
 	}
 
 	private static boolean isAugmentedRule(String rule){
-		return PatternService.find(rule, AUGMENTED_RULE);
+		return rule.contains("/");
 	}
 
 	public void save(File hypFile) throws IOException{
