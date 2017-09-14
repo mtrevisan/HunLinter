@@ -127,7 +127,7 @@ public class WordGenerator{
 //				en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
 //				en1.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
 //				if(!ListUtils.isEqualList(en0, en1)){
-//					System.out.println("");
+//					System.out.println(StringUtils.EMPTY);
 //				}
 				//List<RegExpPrefix<AffixEntry>> rePrefixes = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word));
 				//List<AffixEntry> applicableAffixes = rePrefixes.stream()

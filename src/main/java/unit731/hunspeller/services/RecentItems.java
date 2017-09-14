@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -79,7 +80,7 @@ public class RecentItems{
 
 	private void loadFromPreferences(){
 		for(int i = 0; i < maxItems; i ++){
-			String val = preferenceNode.get(RECENT_ITEM_PREFIX + i, "");
+			String val = preferenceNode.get(RECENT_ITEM_PREFIX + i, StringUtils.EMPTY);
 			if(val.isEmpty())
 				break;
 

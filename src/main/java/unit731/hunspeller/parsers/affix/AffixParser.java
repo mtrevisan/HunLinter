@@ -159,7 +159,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 
 				entries.add(entry);
-//				String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", "").replaceFirst("\\$$", ""): ".");
+//				String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //				if(entry.isSuffix())
 //					suffixEntries.add(new StringBuilder(regexToMatch).reverse().toString(), entry);
 //				else

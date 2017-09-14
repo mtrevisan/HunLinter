@@ -85,7 +85,7 @@ public class Word{
 	//NOTE: duplicated in Grapheme
 	var suppressStress = function(word){
 		word = Normalizer.normalize(word, Normalizer.Form.NFD);
-		return word.replaceAll("\\p{M}", "");
+		return word.replaceAll("\\p{M}", StringUtils.EMPTY);
 	};*/
 
 	private static String suppressDefaultStress(String word){
