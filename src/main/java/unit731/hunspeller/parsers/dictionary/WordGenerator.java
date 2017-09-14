@@ -61,8 +61,6 @@ public class WordGenerator{
 	}
 
 	private RuleProductionEntry getBaseProduction(DictionaryEntry dicEntry) throws IllegalArgumentException{
-		String flag = affParser.getFlag();
-
 		String word = dicEntry.getWord();
 		try{
 			String[] ruleFlags = dicEntry.getRuleFlags();

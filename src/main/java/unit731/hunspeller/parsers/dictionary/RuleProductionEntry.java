@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 
 @Getter
