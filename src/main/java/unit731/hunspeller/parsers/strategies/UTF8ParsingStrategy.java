@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.strategies;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -12,7 +11,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_EMPTY = Pattern.compile(StringUtils.EMPTY);
+	private static final Pattern REGEX_PATTERN_EMPTY = PatternService.pattern(StringUtils.EMPTY);
 
 
 	@Override

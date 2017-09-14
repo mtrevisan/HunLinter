@@ -12,7 +12,7 @@ import unit731.hunspeller.services.PatternService;
 
 public class ParsingContext{
 
-	private static final Pattern REGEX_ENTRY = Pattern.compile("[\\s\\t]+");
+	private static final Pattern REGEX_ENTRY = PatternService.pattern("[\\s\\t]+");
 
 
 	private final String line;

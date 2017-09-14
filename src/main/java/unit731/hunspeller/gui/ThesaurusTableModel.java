@@ -22,7 +22,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final Matcher REGEX_REPLACE = PatternService.matcher("^" + START_TAG + "|" + END_TAG + "$");
 
-	private static final Pattern REGEX_PATTERN_NEW_LINE = Pattern.compile(NEW_LINE_TAG);
+	private static final Pattern REGEX_PATTERN_NEW_LINE = PatternService.pattern(NEW_LINE_TAG);
 
 
 	private List<ThesaurusEntry> synonyms;

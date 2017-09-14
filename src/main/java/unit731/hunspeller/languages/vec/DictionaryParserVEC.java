@@ -29,7 +29,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher NHIV = PatternService.matcher("[cijɉñ]i[aàeèéiíoòóuú]");
 	private static final Matcher CIUI = PatternService.matcher("ciuí$");
 
-	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = Pattern.compile(HyphenationParser.HYPHEN_MINUS);
+	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");

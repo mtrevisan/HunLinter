@@ -11,7 +11,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_DOUBLE = Pattern.compile("(?<=\\G.{2})");
+	private static final Pattern REGEX_PATTERN_DOUBLE = PatternService.pattern("(?<=\\G.{2})");
 
 
 	@Override

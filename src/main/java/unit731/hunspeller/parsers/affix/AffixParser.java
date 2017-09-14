@@ -38,7 +38,7 @@ public class AffixParser{
 	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
 	public static final String FLAG_TYPE_NUMERIC = "num";
 
-	private static final Pattern REGEX_PATTERN_COMPOUND_RULE = Pattern.compile("[\\s\\t]+");
+	private static final Pattern REGEX_PATTERN_COMPOUND_RULE = PatternService.pattern("[\\s\\t]+");
 
 	//General options
 	/**

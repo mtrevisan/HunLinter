@@ -7,8 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class PatternService{
 
+	public static Pattern pattern(String text){
+		return Pattern.compile(text);
+	}
+
 	public static Matcher matcher(String text){
-		return Pattern.compile(text).matcher(StringUtils.EMPTY);
+		return pattern(text).matcher(StringUtils.EMPTY);
 	}
 
 	public static String[] split(String text, Pattern pattern){

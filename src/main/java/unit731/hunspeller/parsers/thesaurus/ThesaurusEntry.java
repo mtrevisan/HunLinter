@@ -25,7 +25,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
 
-	public static final Pattern REGEX_PATTERN_ESCAPED_PIPE = Pattern.compile(Pattern.quote(PIPE));
+	public static final Pattern REGEX_PATTERN_ESCAPED_PIPE = PatternService.pattern(Pattern.quote(PIPE));
 
 
 	@NonNull

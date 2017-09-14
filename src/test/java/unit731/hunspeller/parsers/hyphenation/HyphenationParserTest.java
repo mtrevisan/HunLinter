@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +11,7 @@ import unit731.hunspeller.services.PatternService;
 
 public class HyphenationParserTest{
 
-	private static final Matcher REGEX_CLEANER = Pattern.compile("\\d|/.+$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
 
 
 	@Test

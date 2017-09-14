@@ -11,7 +11,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_EMPTY = Pattern.compile(StringUtils.EMPTY);
+	private static final Pattern REGEX_PATTERN_EMPTY = PatternService.pattern(StringUtils.EMPTY);
 
 
 	@Override

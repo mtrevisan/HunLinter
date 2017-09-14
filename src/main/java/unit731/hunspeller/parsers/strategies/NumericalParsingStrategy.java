@@ -15,7 +15,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Pattern REGEX_PATTERN_COMMA = Pattern.compile(COMMA);
+	private static final Pattern REGEX_PATTERN_COMMA = PatternService.pattern(COMMA);
 
 
 	@Override

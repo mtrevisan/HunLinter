@@ -17,8 +17,8 @@ public class AffixEntry{
 
 	private static final Matcher REGEX_ENTRY = PatternService.matcher("\t.*$");
 
-	private static final Pattern REGEX_PATTERN_SEPARATOR = Pattern.compile("[\\s\\t]+");
-	private static final Pattern REGEX_PATTERN_SLASH = Pattern.compile("/");
+	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
+	private static final Pattern REGEX_PATTERN_SLASH = PatternService.pattern("/");
 
 	private static final String POINT = ".";
 	private static final String ZERO = "0";

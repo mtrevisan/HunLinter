@@ -32,7 +32,7 @@ import unit731.hunspeller.services.memento.Caretaker;
 @Getter
 public class ThesaurusParser{
 
-	private static final Pattern REGEX_PATTERN_LF = Pattern.compile(StringUtils.LF);
+	private static final Pattern REGEX_PATTERN_LF = PatternService.pattern(StringUtils.LF);
 
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();

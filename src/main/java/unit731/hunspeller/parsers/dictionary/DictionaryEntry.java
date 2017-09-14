@@ -19,7 +19,7 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryEntry implements Productable{
 
 	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?([\\t\\s]+(?<dataFields>.+))?$");
-	private static final Pattern REGEX_PATTERN_ENTRY = Pattern.compile("[\\s\\t]+");
+	private static final Pattern REGEX_PATTERN_ENTRY = PatternService.pattern("[\\s\\t]+");
 
 	private static final String TAB = "\t";
 
