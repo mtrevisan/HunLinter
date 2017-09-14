@@ -10,12 +10,18 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class ZipManager{
+
+	private static final Matcher REGEX_PATH_SEPARATOR = Pattern.compile("\\\\").matcher(StringUtils.EMPTY);
+
 
 	private final List<String> filesListInDir = new ArrayList<>();
 
@@ -50,7 +56,7 @@ public class ZipManager{
 		File[] files = dir.listFiles();
 		for(File file : files){
 			if(file.isFile())
-				filesListInDir.add(file.getAbsolutePath().replaceAll("\\\\", "/"));
+				filesListInDir.add(PatternService.replaceAll(file.getAbsolutePath(), REGEX_PATH_SEPARATOR, "/"));
 			else
 				populateFilesList(file);
 		}

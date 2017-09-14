@@ -38,6 +38,8 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Matcher REGEX_MORPHOLOGICAL = Pattern.compile("([cjñ])i([aeiou])").matcher(StringUtils.EMPTY);
 
+	private static final Matcher REGEX_CONSONANT_GEMINATES = Pattern.compile("([^aeiou]){1}\\1+").matcher(StringUtils.EMPTY);
+
 	private static class SingletonHelper{
 		private static final OrthographyVEC INSTANCE = new OrthographyVEC();
 	}
@@ -103,7 +105,7 @@ public class OrthographyVEC extends Orthography{
 			prefixRemoved = true;
 		}
 
-		word = word.replaceAll("([^aeiou]){1}\\1+", "$1");
+		word = PatternService.replaceAll(word, REGEX_CONSONANT_GEMINATES, "$1");
 		
 		if(prefixRemoved)
 			word = prefix + word;

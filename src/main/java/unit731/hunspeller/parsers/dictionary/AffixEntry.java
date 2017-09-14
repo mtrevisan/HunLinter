@@ -15,6 +15,8 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
+	private static final Matcher REGEX_ENTRY = Pattern.compile("\t.*$").matcher(StringUtils.EMPTY);
+
 	private static final String SEPARATOR = "[\\s\\t]+";
 	private static final String POINT = ".";
 	private static final String SLASH = "/";
@@ -85,7 +87,7 @@ public class AffixEntry{
 		if(isSuffix() && StringUtils.isNotBlank(regexToRemove) && addition.length() > 1 && regexToRemove.charAt(0) == addition.charAt(0))
 			log.warn("This line has characters in common between removed and added part: " + line);
 
-		entry = line.replaceFirst("\t.*$", "");
+		entry = PatternService.replaceFirst(line, REGEX_ENTRY, StringUtils.EMPTY);
 	}
 
 	public final boolean isSuffix(){

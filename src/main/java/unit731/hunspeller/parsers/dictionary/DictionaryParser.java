@@ -48,6 +48,9 @@ public class DictionaryParser{
 
 	private static final Matcher REGEX_COMMENT = Pattern.compile("^\\s*[#\\/].*$").matcher(StringUtils.EMPTY);
 
+	private static final Matcher REGEX_FILTER_EMPTY = Pattern.compile("^\\(.+?\\)\\|?|^\\||\\|$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_FILTER_OR = Pattern.compile("\\|{2,}").matcher(StringUtils.EMPTY);
+
 	private static final NumberFormat COUNTER_FORMATTER = NumberFormat.getInstance(Locale.US);
 	private static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));
 
@@ -582,10 +585,10 @@ public class DictionaryParser{
 
 
 	public String prepareTextForFilter(String text){
-		return "(?iu)("
-			+ text.replaceAll(" ?\\(.+?\\)\\|?|^\\||\\|$", StringUtils.EMPTY)
-				.replaceAll("\\|{2,}", "|")
-			+ ")";
+		text = StringUtils.trim(text);
+		text = PatternService.replaceAll(text, REGEX_FILTER_EMPTY, StringUtils.EMPTY);
+		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
+		return "(?iu)(" + text + ")";
 	}
 
 	private boolean isComment(String line){

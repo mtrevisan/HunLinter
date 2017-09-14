@@ -30,6 +30,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import javax.swing.JComponent;
@@ -76,6 +78,7 @@ import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.FileListenerManager;
+import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
 import unit731.hunspeller.services.ZipManager;
 
@@ -88,6 +91,8 @@ import unit731.hunspeller.services.ZipManager;
 public class HunspellerFrame extends JFrame implements ActionListener, FileListener, PropertyChangeListener, Resultable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
+
+	private static final Matcher REGEX_POINTS_AND_NUMBERS = Pattern.compile("[.\\d]").matcher(StringUtils.EMPTY);
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
@@ -1445,7 +1450,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
 			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(addedRule.replaceAll("[.\\d]", StringUtils.EMPTY));
+				ruleMatchesText = addedRuleText.contains(PatternService.replaceAll(addedRule, REGEX_POINTS_AND_NUMBERS, StringUtils.EMPTY));
 
 				if(ruleMatchesText){
 					Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);

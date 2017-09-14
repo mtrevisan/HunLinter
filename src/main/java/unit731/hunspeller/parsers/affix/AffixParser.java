@@ -76,6 +76,7 @@ public class AffixParser{
 	private static final String TAG_KEEP_CASE = "KEEPCASE";
 
 	private static final Matcher REGEX_COMMENT = Pattern.compile("^$|^\\s*#.*$").matcher(StringUtils.EMPTY);
+	private static final Matcher REGEX_COMPOUND_RULES_OPERATORS= Pattern.compile("[*?()]").matcher(StringUtils.EMPTY);
 
 
 	private final Map<String, Object> data = new HashMap<>();
@@ -337,7 +338,7 @@ public class AffixParser{
 			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
 			if(compoundRules != null){
 				String rawRules = compoundRules.stream()
-					.map(rule -> rule.replaceAll("[*?()]", StringUtils.EMPTY))
+					.map(rule -> PatternService.replaceAll(rule, REGEX_COMPOUND_RULES_OPERATORS, StringUtils.EMPTY))
 					.collect(Collectors.joining(StringUtils.EMPTY));
 				String[] parsedRules = strategy.parseRuleFlags(rawRules);
 				rawFlags.addAll(Arrays.asList(parsedRules));
