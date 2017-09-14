@@ -12,15 +12,16 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
+import unit731.hunspeller.services.PatternService;
 
 
 @Getter
 public class DictionaryEntry implements Productable{
 
 	private static final Matcher ENTRY_PATTERN = Pattern.compile("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?([\\t\\s]+(?<dataFields>.+))?$").matcher(StringUtils.EMPTY);
+	private static final Pattern REGEX_PATTERN_ENTRY = Pattern.compile("[\\s\\t]+");
 
 	private static final String TAB = "\t";
-	private static final String SEPARATOR = "[\\s\\t]+";
 
 
 	private final String word;
@@ -59,7 +60,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group("flags");
 		ruleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
-		dataFields = (dicDataFields != null? dicDataFields.split(SEPARATOR): new String[0]);
+		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_ENTRY): new String[0]);
 
 		this.strategy = strategy;
 	}

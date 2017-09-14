@@ -30,6 +30,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher NHIV = Pattern.compile("[cijɉñ]i[aàeèéiíoòóuú]").matcher(StringUtils.EMPTY);
 	private static final Matcher CIUI = Pattern.compile("ciuí$").matcher(StringUtils.EMPTY);
 
+	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = Pattern.compile(HyphenationParser.HYPHEN_MINUS);
+
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
 	private static final Matcher CAN_HAVE_METAPHONESIS = Pattern.compile("[eo]([kƚñstxv]o|nt[eo]|[lnr])/").matcher(StringUtils.EMPTY);
 	private static final Matcher HAS_METAPHONESIS = Pattern.compile("/[^\\t\\n]*mf").matcher(StringUtils.EMPTY);
@@ -241,7 +243,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException("Plural missing after n or l for word " + derivedWordWithoutDataFields + ", add u0 or U0");
 		}
 
-		String[] splittedWords = derivedWord.split(HyphenationParser.HYPHEN_MINUS);
+		String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 		for(String subword : splittedWords){
 			if(PatternService.find(subword, MULTIPLE_ACCENTS))
 				throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);

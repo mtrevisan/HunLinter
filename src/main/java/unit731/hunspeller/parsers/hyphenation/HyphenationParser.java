@@ -57,13 +57,14 @@ public class HyphenationParser{
 
 	private static final String WORD_BOUNDARY = ".";
 
-	private static final String COMMA = ",";
+	private static final Pattern REGEX_PATTERN_COMMA = Pattern.compile(",");
 
 	private static final Matcher VALID_RULE = Pattern.compile("[\\d]").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE = Pattern.compile("^(?<rule>.+)/(?<addBefore>.*?)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$").matcher(StringUtils.EMPTY);
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = Pattern.compile("[13579]").matcher(StringUtils.EMPTY);
 
-	private static final Matcher REGEX_HYPHEN_MINUS = Pattern.compile(HYPHEN_MINUS).matcher(StringUtils.EMPTY);
+	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = Pattern.compile(HYPHEN_MINUS);
+	private static final Matcher REGEX_HYPHEN_MINUS = REGEX_PATTERN_HYPHEN_MINUS.matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_HYPHENS = Pattern.compile(HYPHENS).matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_POINTS_AND_NUMBERS = Pattern.compile("[.\\d]").matcher(StringUtils.EMPTY);
 	private static final Matcher REGEX_KEY = Pattern.compile("\\d|/.+$").matcher(StringUtils.EMPTY);
@@ -262,7 +263,7 @@ public class HyphenationParser{
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
-			String[] parts = rule.split(COMMA);
+			String[] parts = PatternService.split(rule, REGEX_PATTERN_COMMA);
 			if(parts.length > 1){
 				Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
 				m.find();
@@ -377,7 +378,7 @@ public class HyphenationParser{
 		String nonStandard = nonStandardHyphenation.get(word);
 		if(nonStandard != null)
 			//hyphenation is non-standard
-			hyphenatedWord = Arrays.asList(nonStandard.split(HYPHEN_MINUS));
+			hyphenatedWord = Arrays.asList(PatternService.split(nonStandard, REGEX_PATTERN_HYPHEN_MINUS));
 		else if(word.length() < options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);

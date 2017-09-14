@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
@@ -23,12 +24,16 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.memento.Caretaker;
 
 
 @Slf4j
 @Getter
 public class ThesaurusParser{
+
+	private static final Pattern REGEX_PATTERN_LF = Pattern.compile(StringUtils.LF);
+
 
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 	private boolean modified = false;
@@ -106,12 +111,12 @@ public class ThesaurusParser{
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		String[] partOfSpeechAndMeanings = synonymAndMeanings.split(ThesaurusEntry.ESCAPED_PIPE, 2);
+		String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE, 2);
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 			throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-		String[] meanings = partOfSpeechAndMeanings[1].split(ThesaurusEntry.ESCAPED_PIPE);
+		String[] meanings = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
 		List<String> means = Arrays.stream(meanings)
 			.map(String::trim)
 			.filter(StringUtils::isNotBlank)
@@ -195,7 +200,7 @@ public class ThesaurusParser{
 			undoCaretaker.pushMemento(synonyms);
 
 			if(StringUtils.isNotBlank(text)){
-				String[] lines = text.split(StringUtils.LF);
+				String[] lines = PatternService.split(text, REGEX_PATTERN_LF);
 				meanings.clear();
 				for(String line : lines)
 					meanings.add(new MeaningEntry(line));

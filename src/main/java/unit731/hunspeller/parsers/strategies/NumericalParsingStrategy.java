@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.strategies;
 
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 /**
@@ -13,10 +15,13 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
+	private static final Pattern REGEX_PATTERN_COMMA = Pattern.compile(COMMA);
+
 
 	@Override
 	public String[] parseRuleFlags(String textFlags){
-		String[] flags = (textFlags != null && !textFlags.isEmpty()? removeDuplicates(textFlags.split(COMMA)): new String[0]);
+		String[] flags = (textFlags != null && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_COMMA)):
+			new String[0]);
 		for(String flag : flags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);

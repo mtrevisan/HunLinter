@@ -38,7 +38,7 @@ public class AffixParser{
 	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
 	public static final String FLAG_TYPE_NUMERIC = "num";
 
-	private static final String COMPOUND_RULE_SEPARATOR = "[\\s\\t]+";
+	private static final Pattern REGEX_PATTERN_COMPOUND_RULE = Pattern.compile("[\\s\\t]+");
 
 	//General options
 	/**
@@ -103,7 +103,7 @@ public class AffixParser{
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
-				String[] lineParts = line.split(COMPOUND_RULE_SEPARATOR);
+				String[] lineParts = PatternService.split(line, REGEX_PATTERN_COMPOUND_RULE);
 				String tag = lineParts[0];
 				if(!TAG_COMPOUND_RULE.equals(tag))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "

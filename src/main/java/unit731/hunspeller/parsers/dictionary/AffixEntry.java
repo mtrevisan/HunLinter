@@ -17,9 +17,10 @@ public class AffixEntry{
 
 	private static final Matcher REGEX_ENTRY = Pattern.compile("\t.*$").matcher(StringUtils.EMPTY);
 
-	private static final String SEPARATOR = "[\\s\\t]+";
+	private static final Pattern REGEX_PATTERN_SEPARATOR = Pattern.compile("[\\s\\t]+");
+	private static final Pattern REGEX_PATTERN_SLASH = Pattern.compile("/");
+
 	private static final String POINT = ".";
-	private static final String SLASH = "/";
 	private static final String ZERO = "0";
 
 	private static final String REGEX_START_OF_LINE = "^";
@@ -66,14 +67,14 @@ public class AffixEntry{
 		Objects.nonNull(line);
 		Objects.nonNull(strategy);
 
-		String[] lineParts = line.split(SEPARATOR, 6);
+		String[] lineParts = PatternService.split(line, REGEX_PATTERN_SEPARATOR, 6);
 		String ruleType = lineParts[0];
 		this.ruleFlag = lineParts[1];
 		String regexToRemove = lineParts[2];
-		String[] additionParts = lineParts[3].split(SLASH);
+		String[] additionParts = PatternService.split(lineParts[3], REGEX_PATTERN_SLASH);
 		String addition = additionParts[0];
 		String regexToMatch = lineParts[4];
-		dataFields = (lineParts.length > 5? lineParts[5].split(SEPARATOR): new String[0]);
+		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], REGEX_PATTERN_SEPARATOR): new String[0]);
 
 		type = TYPE.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));

@@ -15,6 +15,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,7 +24,9 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
-	public static final String ESCAPED_PIPE = Pattern.quote(PIPE);
+
+	public static final Pattern REGEX_PATTERN_ESCAPED_PIPE = Pattern.compile(Pattern.quote(PIPE));
+
 
 	@NonNull
 	private String synonym;
@@ -35,7 +38,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.nonNull(line);
 		Objects.nonNull(br);
 
-		String[] data = line.split(ESCAPED_PIPE);
+		String[] data = PatternService.split(line, REGEX_PATTERN_ESCAPED_PIPE);
 
 		synonym = data[0];
 		int numEntries = Integer.parseInt(data[1]);

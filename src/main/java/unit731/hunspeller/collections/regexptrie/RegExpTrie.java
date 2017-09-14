@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 public class RegExpTrie<T>{
+
+	private static final Pattern REGEX_PATTERN_EMPTY = Pattern.compile(StringUtils.EMPTY);
+
 
 	/** the root of the RegExpTrie */
 	private final RegExpTrieNode<T> root = new RegExpTrieNode<>();
@@ -130,7 +136,7 @@ public class RegExpTrie<T>{
 	}
 
 	private String[] characters(String word){
-		String[] characters = word.split("");
+		String[] characters = PatternService.split(word, REGEX_PATTERN_EMPTY);
 		List<String> list = new ArrayList<>();
 		String group = null;
 		boolean inGroup = false;

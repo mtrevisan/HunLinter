@@ -2,12 +2,15 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import static unit731.hunspeller.parsers.thesaurus.ThesaurusEntry.PIPE;
+import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor
@@ -28,6 +31,9 @@ public class HyphenationOptions{
 	private static final String NO_HYPHEN = "NOHYPHEN";
 
 	private static final String NO_HYPHEN_SEPARATOR = ",";
+
+	private static final Pattern REGEX_PATTERN_SPACE = Pattern.compile("\\s+");
+	private static final Pattern REGEX_PATTERN_NO_HYPHEN_SEPARATOR = Pattern.compile(NO_HYPHEN_SEPARATOR);
 
 
 	@Builder.Default private int leftMin = 2;
@@ -64,14 +70,14 @@ public class HyphenationOptions{
 			managed = true;
 		}
 		else if(line.startsWith(NO_HYPHEN)){
-			noHyphen = extractValue(line).split(NO_HYPHEN_SEPARATOR);
+			noHyphen = PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR);
 			managed = true;
 		}
 		return managed;
 	}
 
 	private String extractValue(String line){
-		String[] components = line.split("\\s+");
+		String[] components = PatternService.split(line, REGEX_PATTERN_SPACE);
 		return StringUtils.strip(components[1]);
 	}
 
