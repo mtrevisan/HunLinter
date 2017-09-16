@@ -45,8 +45,8 @@ public class ProductionTableModel extends AbstractTableModel{
 				return production.getWord();
 
 			case 1:
-				return (production.getDataFields() != null && production.getDataFields().length > 0?
-					String.join(StringUtils.SPACE, production.getDataFields()): StringUtils.EMPTY);
+		final String[] dataFields = production.getDataFields();
+				return (dataFields != null? String.join(StringUtils.SPACE, dataFields): StringUtils.EMPTY);
 
 			case 2:
 				return (rules.size() > 0? rules.get(0): null);
