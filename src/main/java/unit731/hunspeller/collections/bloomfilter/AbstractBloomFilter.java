@@ -28,7 +28,7 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
  *
  * @param <T> the type of objects to be stored in the filter
  *
- * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter</a>
+ * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
  */
 public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 
