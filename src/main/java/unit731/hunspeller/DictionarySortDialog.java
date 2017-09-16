@@ -110,7 +110,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
                .addComponent(btnPreviousUnsortedArea)
                .addComponent(lblMessage))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -121,8 +121,11 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 		try{
 			int lineIndex = list.getFirstVisibleIndex();
 			int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
-			if(boundaryIndex >= 0)
+			if(boundaryIndex >= 0){
+				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
+				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 				list.ensureIndexIsVisible(boundaryIndex);
+			}
 		}
 		catch(IOException e){
 			log.error(null, e);
@@ -130,7 +133,15 @@ public class DictionarySortDialog extends javax.swing.JDialog{
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
-      // TODO add your handling code here:
+		try{
+			int lineIndex = list.getFirstVisibleIndex();
+			int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
+			if(boundaryIndex >= 0)
+				list.ensureIndexIsVisible(boundaryIndex);
+		}
+		catch(IOException e){
+			log.error(null, e);
+		}
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
 	/** Force the escape key to call the same action as pressing the Cancel button. */

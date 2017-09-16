@@ -56,7 +56,7 @@ public class DictionaryParser{
 
 
 	private final File dicFile;
-	private NavigableMap<Integer, Range> boundaries;
+	private final NavigableMap<Integer, Range> boundaries = new TreeMap<>();
 	private final WordGenerator wordGenerator;
 	@Setter protected HyphenationParser hyphenationParser;
 	private final ExternalSorter sorter = new ExternalSorter();
@@ -64,7 +64,7 @@ public class DictionaryParser{
 	@AllArgsConstructor
 	private static class Range{
 		private final int upper;
-		private final int value;
+		private final int index;
 	}
 	private static class Interval{
 		private final int lower;
@@ -425,7 +425,7 @@ public class DictionaryParser{
 
 		private Interval getBoundary(int lineIndex){
 			return Optional.ofNullable(dicParser.boundaries.floorEntry(lineIndex))
-				.filter(v -> v.getKey() <= lineIndex && lineIndex <= v.getValue().upper)
+				.filter(e -> lineIndex <= e.getValue().upper)
 				.map(Interval::new)
 				.orElse(null);
 		}
@@ -489,17 +489,23 @@ public class DictionaryParser{
 	};
 
 	public int getBoundaryIndex(int lineIndex) throws IOException{
+		calculateDictionaryBoundaries();
+
 		return searchBoundary(lineIndex)
-			.map(e -> e.getValue().value)
+			.map(e -> e.getValue().index)
 			.orElse(-1);
 	}
 
 	public int getNextBoundaryIndex(int lineIndex) throws IOException{
-		calculateDictionaryBoundaries();
+		return Optional.ofNullable(boundaries.higherEntry(lineIndex))
+			.map(Map.Entry::getKey)
+			.orElse(-1);
+	}
 
-//		Collection<Integer> values = boundaries.getNextInterval(lineIndex).values();
-//		return (values.size() == 1? (new ArrayList<>(values)).get(0): -1);
-return -1;
+	public int getPreviousBoundaryIndex(int lineIndex) throws IOException{
+		return Optional.ofNullable(boundaries.lowerEntry(lineIndex))
+			.map(Map.Entry::getKey)
+			.orElse(-1);
 	}
 
 	public boolean isInBoundary(int lineIndex) throws IOException{
@@ -508,16 +514,12 @@ return -1;
 	}
 
 	private Optional<Map.Entry<Integer, Range>> searchBoundary(int lineIndex) throws IOException{
-		calculateDictionaryBoundaries();
-
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
-			.filter(v -> v.getKey() <= lineIndex && lineIndex <= v.getValue().upper);
+			.filter(e -> lineIndex <= e.getValue().upper);
 	}
 
 	private void calculateDictionaryBoundaries() throws IOException{
-		if(boundaries == null || boundaries.isEmpty()){
-			boundaries = new TreeMap<>();
-
+		if(boundaries.isEmpty()){
 			int lineIndex = 0;
 			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), CHARSET)){
 				String prevLine = null;
