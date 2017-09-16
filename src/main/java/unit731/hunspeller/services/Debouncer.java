@@ -18,7 +18,7 @@ public class Debouncer<T>{
 
 
 	public Debouncer(Consumer<T> callback, int interval){
-		Objects.nonNull(callback);
+		Objects.requireNonNull(callback);
 
 		this.callback = callback;
 		this.interval = interval;

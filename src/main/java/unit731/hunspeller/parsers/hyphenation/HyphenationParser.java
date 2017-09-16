@@ -85,7 +85,7 @@ public class HyphenationParser{
 
 
 	public HyphenationParser(String language){
-		Objects.nonNull(language);
+		Objects.requireNonNull(language);
 
 		language = Optional.ofNullable(language)
 			.orElse(StringUtils.EMPTY);
@@ -93,15 +93,15 @@ public class HyphenationParser{
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
 
-		Objects.nonNull(comparator);
-		Objects.nonNull(orthography);
+		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(orthography);
 	}
 
 	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
 		this(language);
 
-		Objects.nonNull(patterns);
-		Objects.nonNull(options);
+		Objects.requireNonNull(patterns);
+		Objects.requireNonNull(options);
 
 		this.patterns = patterns;
 		this.options = options;

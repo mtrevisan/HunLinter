@@ -14,14 +14,15 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
@@ -31,8 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
-import unit731.hunspeller.collections.intervalmap.Interval;
-import unit731.hunspeller.collections.intervalmap.IntervalMap;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -57,16 +56,31 @@ public class DictionaryParser{
 
 
 	private final File dicFile;
-	private IntervalMap<Integer, Integer> boundaries;
+	private NavigableMap<Integer, Range> boundaries;
 	private final WordGenerator wordGenerator;
 	@Setter protected HyphenationParser hyphenationParser;
 	private final ExternalSorter sorter = new ExternalSorter();
 
+	@AllArgsConstructor
+	private static class Range{
+		private final int upper;
+		private final int value;
+	}
+	private static class Interval{
+		private final int lower;
+		private final int upper;
+
+		Interval(Map.Entry<Integer, Range> entry){
+			lower = entry.getKey();
+			upper = entry.getValue().upper;
+		}
+	}
+
 
 	public DictionaryParser(File dicFile, WordGenerator wordGenerator, Charset charset){
-		Objects.nonNull(dicFile);
-		Objects.nonNull(wordGenerator);
-		Objects.nonNull(charset);
+		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
 		this.wordGenerator = wordGenerator;
@@ -76,6 +90,11 @@ public class DictionaryParser{
 	public void clear(){
 		if(boundaries != null)
 			boundaries.clear();
+	}
+
+	private String getLanguage(){
+		String filename = dicFile.getName();
+		return filename.substring(0, filename.indexOf(".dic"));
 	}
 
 
@@ -115,7 +134,7 @@ public class DictionaryParser{
 							try{
 								DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
-								dicParser.checkLineLanguageSpecific(line);
+								dicParser.checkLine(line);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 								List<String> ruleFlags = Arrays.stream(dictionaryWord.getRuleFlags())
@@ -124,7 +143,7 @@ public class DictionaryParser{
 								if(!ruleFlags.isEmpty() && subProductions.size() == 1)
 									throw new IllegalArgumentException("Word has no productions");
 
-								subProductions.forEach(production -> dicParser.checkProductionLanguageSpecific(dictionaryWord, production));
+								subProductions.forEach(production -> dicParser.checkProduction(dictionaryWord, production));
 							}
 							catch(IllegalArgumentException e){
 								int tabIndex = line.indexOf('\t');
@@ -154,9 +173,9 @@ public class DictionaryParser{
 		}
 	};
 
-	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{}
+	protected void checkLine(String line) throws IllegalArgumentException{}
 
-	protected void checkProductionLanguageSpecific(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{}
+	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{}
 
 
 	@AllArgsConstructor
@@ -351,7 +370,6 @@ public class DictionaryParser{
 	@AllArgsConstructor
 	public static class SorterWorker extends SwingWorker<Void, String>{
 
-		private final AffixParser affParser;
 		private final DictionaryParser dicParser;
 		private final int lineIndex;
 		private final Resultable resultable;
@@ -363,11 +381,11 @@ public class DictionaryParser{
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
-			dicParser.calculateDictionaryBoundaries(affParser);
+			dicParser.calculateDictionaryBoundaries();
 
 			setProgress(20);
 
-			Interval<Integer> boundary = getBoundary(lineIndex);
+			Interval boundary = getBoundary(lineIndex);
 			if(boundary != null){
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
@@ -378,7 +396,7 @@ public class DictionaryParser{
 				File sortSection = chunks.get(1);
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(CHARSET)
-					.comparator(ComparatorBuilder.getComparator(affParser.getLanguage()))
+					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
 					.useZip(true)
 					.removeDuplicates(true)
 					.build();
@@ -405,12 +423,14 @@ public class DictionaryParser{
 			return null;
 		}
 
-		private Interval<Integer> getBoundary(int lineIndex){
-			Set<Interval<Integer>> intervals = dicParser.boundaries.getContaining(lineIndex).keySet();
-			return (intervals.size() == 1? (new ArrayList<>(intervals)).get(0): null);
+		private Interval getBoundary(int lineIndex){
+			return Optional.ofNullable(dicParser.boundaries.floorEntry(lineIndex))
+				.filter(v -> v.getKey() <= lineIndex && lineIndex <= v.getValue().upper)
+				.map(Interval::new)
+				.orElse(null);
 		}
 
-		private List<File> splitDictionary(Interval<Integer> boundary) throws IOException{
+		private List<File> splitDictionary(Interval boundary) throws IOException{
 			int index = 0;
 			List<File> files = new ArrayList<>();
 			File file = File.createTempFile("split", ".out");
@@ -418,7 +438,7 @@ public class DictionaryParser{
 				BufferedWriter writer = Files.newBufferedWriter(file.toPath(), CHARSET);
 				String line;
 				while((line = br.readLine()) != null){
-					if(index == boundary.getLowerBound() || index == boundary.getUpperBound() + 1){
+					if(index == boundary.lower || index == boundary.upper + 1){
 						writer.close();
 
 						files.add(file);
@@ -468,9 +488,35 @@ public class DictionaryParser{
 		}
 	};
 
-	public void calculateDictionaryBoundaries(AffixParser affParser) throws IOException{
+	public int getBoundaryIndex(int lineIndex) throws IOException{
+		return searchBoundary(lineIndex)
+			.map(e -> e.getValue().value)
+			.orElse(-1);
+	}
+
+	public int getNextBoundaryIndex(int lineIndex) throws IOException{
+		calculateDictionaryBoundaries();
+
+//		Collection<Integer> values = boundaries.getNextInterval(lineIndex).values();
+//		return (values.size() == 1? (new ArrayList<>(values)).get(0): -1);
+return -1;
+	}
+
+	public boolean isInBoundary(int lineIndex) throws IOException{
+		return searchBoundary(lineIndex)
+			.isPresent();
+	}
+
+	private Optional<Map.Entry<Integer, Range>> searchBoundary(int lineIndex) throws IOException{
+		calculateDictionaryBoundaries();
+
+		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
+			.filter(v -> v.getKey() <= lineIndex && lineIndex <= v.getValue().upper);
+	}
+
+	private void calculateDictionaryBoundaries() throws IOException{
 		if(boundaries == null || boundaries.isEmpty()){
-			boundaries = new IntervalMap<>();
+			boundaries = new TreeMap<>();
 
 			int lineIndex = 0;
 			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), CHARSET)){
@@ -478,13 +524,13 @@ public class DictionaryParser{
 				String line;
 				int startSection = -1;
 				boolean needSorting = false;
-				Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
+				Comparator<String> comparator = ComparatorBuilder.getComparator(getLanguage());
 				while((line = br.readLine()) != null){
 					if(isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){
 							//filter out single word that doesn't need to be sorted
 							if(lineIndex - startSection > 2 && needSorting)
-								boundaries.put(new Interval<>(startSection, lineIndex - 1), boundaries.size());
+								boundaries.put(startSection, new Range(lineIndex - 1, boundaries.size()));
 							prevLine = null;
 							startSection = -1;
 							needSorting = false;
@@ -503,19 +549,9 @@ public class DictionaryParser{
 				}
 				//filter out single word that doesn't need to be sorted
 				if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
-					boundaries.put(new Interval<>(startSection, lineIndex - 1), boundaries.size());
+					boundaries.put(startSection, new Range(lineIndex - 1, boundaries.size()));
 			}
 		}
-	}
-
-	public int getBoundaryIndex(int lineIndex){
-		Collection<Integer> values = boundaries.getContaining(lineIndex).values();
-		return (values.size() == 1? (new ArrayList<>(values)).get(0): -1);
-	}
-
-	public boolean isInBoundary(int lineIndex){
-		Set<Interval<Integer>> intervals = boundaries.getContaining(lineIndex).keySet();
-		return (intervals.size() == 1);
 	}
 
 

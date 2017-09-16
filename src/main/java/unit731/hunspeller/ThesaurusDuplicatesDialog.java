@@ -25,8 +25,8 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 	public ThesaurusDuplicatesDialog(Frame parent, List<String> duplicates){
 		super(parent, "Duplicates", true);
 
-		Objects.nonNull(parent);
-		Objects.nonNull(duplicates);
+		Objects.requireNonNull(parent);
+		Objects.requireNonNull(duplicates);
 
 		initComponents();
 

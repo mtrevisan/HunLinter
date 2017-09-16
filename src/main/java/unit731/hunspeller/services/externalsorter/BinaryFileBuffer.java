@@ -15,7 +15,7 @@ public class BinaryFileBuffer{
 
 
 	public BinaryFileBuffer(BufferedReader r) throws IOException{
-		Objects.nonNull(r);
+		Objects.requireNonNull(r);
 
 		br = r;
 

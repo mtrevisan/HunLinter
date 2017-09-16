@@ -64,8 +64,8 @@ public class AffixEntry{
 
 
 	public AffixEntry(String line, FlagParsingStrategy strategy){
-		Objects.nonNull(line);
-		Objects.nonNull(strategy);
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(strategy);
 
 		String[] lineParts = PatternService.split(line, REGEX_PATTERN_SEPARATOR, 6);
 		String ruleType = lineParts[0];

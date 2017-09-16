@@ -34,7 +34,7 @@ public class Caretaker<T>{
 
 
 	public Caretaker(Class<T> cl){
-		Objects.nonNull(cl);
+		Objects.requireNonNull(cl);
 
 		collectionType = JSON_MAPPER.getTypeFactory().constructCollectionType(List.class, cl);
 	}

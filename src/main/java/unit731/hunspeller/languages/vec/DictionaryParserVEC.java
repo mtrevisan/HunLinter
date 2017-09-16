@@ -133,7 +133,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkLineLanguageSpecific(String line) throws IllegalArgumentException{
+	protected void checkLine(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
 		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
@@ -208,7 +208,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProductionLanguageSpecific(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
+	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);

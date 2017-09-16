@@ -22,8 +22,8 @@ public class RuleEntry{
 
 
 	public RuleEntry(boolean isSuffix, String combineable, List<AffixEntry> entries){
-		Objects.nonNull(combineable);
-		Objects.nonNull(entries);
+		Objects.requireNonNull(combineable);
+		Objects.requireNonNull(entries);
 
 		this.isSuffix = isSuffix;
 		this.combineable = YES.equals(combineable);
@@ -31,9 +31,9 @@ public class RuleEntry{
 	}
 
 //	public RuleEntry(boolean isSuffix, String combineable, RegExpTrie<AffixEntry> prefixEntries, RegExpTrie<AffixEntry> suffixEntries){
-//		Objects.nonNull(combineable);
-//		Objects.nonNull(prefixEntries);
-//		Objects.nonNull(suffixEntries);
+//		Objects.requireNonNull(combineable);
+//		Objects.requireNonNull(prefixEntries);
+//		Objects.requireNonNull(suffixEntries);
 //
 //		this.isSuffix = isSuffix;
 //		this.combineable = YES.equals(combineable);

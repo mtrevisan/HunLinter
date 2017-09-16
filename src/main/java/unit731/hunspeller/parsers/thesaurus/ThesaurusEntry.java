@@ -35,8 +35,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 
 	public ThesaurusEntry(String line, BufferedReader br) throws IOException{
-		Objects.nonNull(line);
-		Objects.nonNull(br);
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(br);
 
 		String[] data = PatternService.split(line, REGEX_PATTERN_ESCAPED_PIPE);
 

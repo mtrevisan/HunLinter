@@ -24,7 +24,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 
 	public MeaningEntry(String synonymAndMeanings){
-		Objects.nonNull(synonymAndMeanings);
+		Objects.requireNonNull(synonymAndMeanings);
 
 		try{
 			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE, 2);

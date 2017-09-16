@@ -29,7 +29,10 @@
                   <Component id="mainScrollPane" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="518" max="32767" attributes="0"/>
+                      <EmptySpace pref="422" max="32767" attributes="0"/>
+                      <Component id="btnNextUnsortedArea" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="btnPreviousUnsortedArea" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -40,9 +43,13 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblMessage" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnNextUnsortedArea" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnPreviousUnsortedArea" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblMessage" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="mainScrollPane" pref="328" max="32767" attributes="0"/>
+              <Component id="mainScrollPane" pref="319" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -69,5 +76,23 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
     </Container>
+    <Component class="javax.swing.JButton" name="btnNextUnsortedArea">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#x25bc;"/>
+        <Property name="toolTipText" type="java.lang.String" value="Next unsorted area"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNextUnsortedAreaActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnPreviousUnsortedArea">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#x25b2;"/>
+        <Property name="toolTipText" type="java.lang.String" value="Previous unsorted area"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPreviousUnsortedAreaActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

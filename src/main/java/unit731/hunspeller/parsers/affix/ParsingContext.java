@@ -21,8 +21,8 @@ public class ParsingContext{
 
 
 	public ParsingContext(String line, BufferedReader br){
-		Objects.nonNull(line);
-		Objects.nonNull(br);
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(br);
 
 		this.line = line;
 		definitionParts = PatternService.split(line, REGEX_ENTRY);

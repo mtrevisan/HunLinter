@@ -27,7 +27,7 @@ public class RecentItems{
 
 
 	public RecentItems(int maxItems, Preferences preferenceNode){
-		Objects.nonNull(preferenceNode);
+		Objects.requireNonNull(preferenceNode);
 
 		this.maxItems = maxItems;
 		this.preferenceNode = preferenceNode;

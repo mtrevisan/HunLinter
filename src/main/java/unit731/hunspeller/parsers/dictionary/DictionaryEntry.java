@@ -36,10 +36,10 @@ public class DictionaryEntry implements Productable{
 	}
 
 	public DictionaryEntry(String word, String[] dicFlags, String[] dataFields, FlagParsingStrategy strategy){
-		Objects.nonNull(word);
-		Objects.nonNull(dicFlags);
-		Objects.nonNull(dataFields);
-		Objects.nonNull(strategy);
+		Objects.requireNonNull(word);
+		Objects.requireNonNull(dicFlags);
+		Objects.requireNonNull(dataFields);
+		Objects.requireNonNull(strategy);
 
 		this.word = word;
 		ruleFlags = (dicFlags != null? dicFlags: new String[0]);
@@ -49,8 +49,8 @@ public class DictionaryEntry implements Productable{
 	}
 
 	public DictionaryEntry(String line, FlagParsingStrategy strategy){
-		Objects.nonNull(line);
-		Objects.nonNull(strategy);
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(strategy);
 
 		Matcher m = ENTRY_PATTERN.reset(line);
 		if(!m.find())

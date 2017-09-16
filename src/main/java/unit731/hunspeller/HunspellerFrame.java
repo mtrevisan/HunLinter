@@ -110,7 +110,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	private static String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
-	private final DictionarySortDialog dicDialog;
+	private DictionarySortDialog dicDialog;
 
 	private final AffixParser affParser;
 	private final AidParser aidParser;
@@ -158,24 +158,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		saveTextFileFileChooser = new JFileChooser();
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
-
-		dicDialog = new DictionarySortDialog(this, "Sorter", "Please select a section from the list:");
-		dicDialog.addListSelectionListener(e -> {
-			if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-				int selectedRow = dicDialog.getSelectedIndex();
-				if(dicParser.isInBoundary(selectedRow)){
-					dicDialog.setVisible(false);
-
-					dicSortDictionaryMenuItem.setEnabled(false);
-					mainProgressBar.setValue(0);
-
-
-					dicSorterWorker = new DictionaryParser.SorterWorker(affParser, dicParser, selectedRow, this);
-					dicSorterWorker.addPropertyChangeListener(this);
-					dicSorterWorker.execute();
-				}
-			}
-		});
 
 		enableMenuItemFromWorker.put(ThesaurusParser.ParserWorker.class, () -> theMenu.setEnabled(true));
 		enableMenuItemFromWorker.put(DictionaryParser.CorrectnessWorker.class, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
@@ -1210,8 +1192,30 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			File dicFile = getFile(language + ".dic");
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
 
-			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(affParser, dicParser);
+			dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
+			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
 			dicDialog.setCellRenderer(dicCellRenderer);
+			dicDialog.addListSelectionListener(e -> {
+				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
+					int selectedRow = dicDialog.getSelectedIndex();
+					try{
+						if(dicParser.isInBoundary(selectedRow)){
+							dicDialog.setVisible(false);
+
+							dicSortDictionaryMenuItem.setEnabled(false);
+							mainProgressBar.setValue(0);
+
+
+							dicSorterWorker = new DictionaryParser.SorterWorker(dicParser, selectedRow, this);
+							dicSorterWorker.addPropertyChangeListener(this);
+							dicSorterWorker.execute();
+						}
+					}
+					catch(IOException exc){
+						log.error(null, exc);
+					}
+				}
+			});
 
 			mainTabbedPane.setSelectedIndex(0);
 			mainTabbedPane.setEnabledAt(0, true);

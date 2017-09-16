@@ -27,7 +27,7 @@ public class FileListenerManager{
 
 
 	public FileListenerManager(FileListener fl){
-		Objects.nonNull(fl);
+		Objects.requireNonNull(fl);
 
 		try{
 			fsManager = (StandardFileSystemManager)VFS.getManager();

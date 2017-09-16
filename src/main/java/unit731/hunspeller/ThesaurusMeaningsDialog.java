@@ -38,10 +38,10 @@ public class ThesaurusMeaningsDialog extends JDialog{
 	public ThesaurusMeaningsDialog(Frame parent, ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Resultable resultable){
 		super(parent, "Change meanings for \"" + synonym.getSynonym() + "\"", true);
 
-		Objects.nonNull(parent);
-		Objects.nonNull(synonym);
-		Objects.nonNull(okButtonAction);
-		Objects.nonNull(resultable);
+		Objects.requireNonNull(parent);
+		Objects.requireNonNull(synonym);
+		Objects.requireNonNull(okButtonAction);
+		Objects.requireNonNull(resultable);
 
 		initComponents();
 

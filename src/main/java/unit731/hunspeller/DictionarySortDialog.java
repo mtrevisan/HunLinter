@@ -3,6 +3,7 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -14,21 +15,31 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionListener;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 @Slf4j
 public class DictionarySortDialog extends javax.swing.JDialog{
 
+	private static final long serialVersionUID = -4815599935456195094L;
+
+
+	@NonNull
+	private final DictionaryParser dicParser;
+
 	private final JList<String> list;
 
 
-	public DictionarySortDialog(Frame parent, String title, String message){
+	public DictionarySortDialog(DictionaryParser dicParser, Frame parent, String title, String message){
 		super(parent, true);
 
-		Objects.nonNull(title);
-		Objects.nonNull(message);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(title);
+		Objects.requireNonNull(message);
 
+		this.dicParser = dicParser;
 		list = new JList<>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -48,6 +59,8 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
       lblMessage = new javax.swing.JLabel();
       mainScrollPane = new javax.swing.JScrollPane(list);
+      btnNextUnsortedArea = new javax.swing.JButton();
+      btnPreviousUnsortedArea = new javax.swing.JButton();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -55,6 +68,22 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
       mainScrollPane.setBackground(java.awt.Color.white);
       mainScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
+
+      btnNextUnsortedArea.setText("▼");
+      btnNextUnsortedArea.setToolTipText("Next unsorted area");
+      btnNextUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            btnNextUnsortedAreaActionPerformed(evt);
+         }
+      });
+
+      btnPreviousUnsortedArea.setText("▲");
+      btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
+      btnPreviousUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            btnPreviousUnsortedAreaActionPerformed(evt);
+         }
+      });
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -66,21 +95,43 @@ public class DictionarySortDialog extends javax.swing.JDialog{
                .addComponent(mainScrollPane)
                .addGroup(layout.createSequentialGroup()
                   .addComponent(lblMessage)
-                  .addGap(0, 518, Short.MAX_VALUE)))
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 422, Short.MAX_VALUE)
+                  .addComponent(btnNextUnsortedArea)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(btnPreviousUnsortedArea)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(lblMessage)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(btnNextUnsortedArea)
+               .addComponent(btnPreviousUnsortedArea)
+               .addComponent(lblMessage))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
+            .addComponent(mainScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
             .addContainerGap())
       );
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+   private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
+		try{
+			int lineIndex = list.getFirstVisibleIndex();
+			int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
+			if(boundaryIndex >= 0)
+				list.ensureIndexIsVisible(boundaryIndex);
+		}
+		catch(IOException e){
+			log.error(null, e);
+		}
+   }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
+
+   private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
+      // TODO add your handling code here:
+   }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
@@ -126,7 +177,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		/* Create and display the dialog */
 		java.awt.EventQueue.invokeLater(() -> {
-			DictionarySortDialog dialog = new DictionarySortDialog(new javax.swing.JFrame(), "title", "message");
+			DictionarySortDialog dialog = new DictionarySortDialog(null, new javax.swing.JFrame(), "title", "message");
 			dialog.setListData(new String[]{"a", "b", "c"});
 			dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 				@Override
@@ -139,6 +190,8 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JButton btnNextUnsortedArea;
+   private javax.swing.JButton btnPreviousUnsortedArea;
    private javax.swing.JLabel lblMessage;
    private javax.swing.JScrollPane mainScrollPane;
    // End of variables declaration//GEN-END:variables
