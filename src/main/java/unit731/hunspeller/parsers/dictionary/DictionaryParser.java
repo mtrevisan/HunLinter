@@ -56,25 +56,10 @@ public class DictionaryParser{
 
 
 	private final File dicFile;
-	private final NavigableMap<Integer, Range> boundaries = new TreeMap<>();
+	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 	private final WordGenerator wordGenerator;
 	@Setter protected HyphenationParser hyphenationParser;
 	private final ExternalSorter sorter = new ExternalSorter();
-
-	@AllArgsConstructor
-	private static class Range{
-		private final int upper;
-		private final int index;
-	}
-	private static class Interval{
-		private final int lower;
-		private final int upper;
-
-		Interval(Map.Entry<Integer, Range> entry){
-			lower = entry.getKey();
-			upper = entry.getValue().upper;
-		}
-	}
 
 
 	public DictionaryParser(File dicFile, WordGenerator wordGenerator, Charset charset){
@@ -385,7 +370,7 @@ public class DictionaryParser{
 
 			setProgress(20);
 
-			Interval boundary = getBoundary(lineIndex);
+			Map.Entry<Integer, Integer> boundary = getBoundary(lineIndex);
 			if(boundary != null){
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
@@ -423,14 +408,13 @@ public class DictionaryParser{
 			return null;
 		}
 
-		private Interval getBoundary(int lineIndex){
+		private Map.Entry<Integer, Integer> getBoundary(int lineIndex){
 			return Optional.ofNullable(dicParser.boundaries.floorEntry(lineIndex))
-				.filter(e -> lineIndex <= e.getValue().upper)
-				.map(Interval::new)
+				.filter(e -> lineIndex <= e.getValue())
 				.orElse(null);
 		}
 
-		private List<File> splitDictionary(Interval boundary) throws IOException{
+		private List<File> splitDictionary(Map.Entry<Integer, Integer> boundary) throws IOException{
 			int index = 0;
 			List<File> files = new ArrayList<>();
 			File file = File.createTempFile("split", ".out");
@@ -438,7 +422,7 @@ public class DictionaryParser{
 				BufferedWriter writer = Files.newBufferedWriter(file.toPath(), CHARSET);
 				String line;
 				while((line = br.readLine()) != null){
-					if(index == boundary.lower || index == boundary.upper + 1){
+					if(index == boundary.getKey() || index == boundary.getValue() + 1){
 						writer.close();
 
 						files.add(file);
@@ -492,7 +476,7 @@ public class DictionaryParser{
 		calculateDictionaryBoundaries();
 
 		return searchBoundary(lineIndex)
-			.map(e -> e.getValue().index)
+			.map(e -> boundaries.headMap(lineIndex, true).size() - 1)
 			.orElse(-1);
 	}
 
@@ -513,9 +497,9 @@ public class DictionaryParser{
 			.isPresent();
 	}
 
-	private Optional<Map.Entry<Integer, Range>> searchBoundary(int lineIndex) throws IOException{
+	private Optional<Map.Entry<Integer, Integer>> searchBoundary(int lineIndex) throws IOException{
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
-			.filter(e -> lineIndex <= e.getValue().upper);
+			.filter(e -> lineIndex <= e.getValue());
 	}
 
 	private void calculateDictionaryBoundaries() throws IOException{
@@ -532,7 +516,7 @@ public class DictionaryParser{
 						if(startSection >= 0){
 							//filter out single word that doesn't need to be sorted
 							if(lineIndex - startSection > 2 && needSorting)
-								boundaries.put(startSection, new Range(lineIndex - 1, boundaries.size()));
+								boundaries.put(startSection, lineIndex - 1);
 							prevLine = null;
 							startSection = -1;
 							needSorting = false;
@@ -551,7 +535,7 @@ public class DictionaryParser{
 				}
 				//filter out single word that doesn't need to be sorted
 				if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
-					boundaries.put(startSection, new Range(lineIndex - 1, boundaries.size()));
+					boundaries.put(startSection, lineIndex - 1);
 			}
 		}
 	}
