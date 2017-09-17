@@ -124,8 +124,10 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 			if(boundaryIndex >= 0){
 				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
-				list.ensureIndexIsVisible(boundaryIndex);
 			}
+			else
+				boundaryIndex = 0;
+			list.ensureIndexIsVisible(boundaryIndex);
 		}
 		catch(IOException e){
 			log.error(null, e);
@@ -136,8 +138,12 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 		try{
 			int lineIndex = list.getFirstVisibleIndex();
 			int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
-			if(boundaryIndex >= 0)
-				list.ensureIndexIsVisible(boundaryIndex);
+			if(boundaryIndex < 0){
+				boundaryIndex = dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
+				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
+				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
+			}
+			list.ensureIndexIsVisible(boundaryIndex);
 		}
 		catch(IOException e){
 			log.error(null, e);
