@@ -33,7 +33,6 @@ public class RuleProductionEntry implements Productable{
 	public RuleProductionEntry(String word, Set<String> otherRuleFlags, String[] currentContinuationClasses, String[] dataFields, boolean combineable){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(otherRuleFlags);
-		Objects.requireNonNull(currentContinuationClasses);
 		Objects.requireNonNull(dataFields);
 
 		String[] newContinuationClasses = mergeContinuationClasses(otherRuleFlags, currentContinuationClasses);
