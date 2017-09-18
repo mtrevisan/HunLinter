@@ -179,6 +179,12 @@
 			<version>${com.sangupta.murmur.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.takawitter</groupId>
+			<artifactId>trie4j</artifactId>
+			<version>0.9.6</version>
+		</dependency>
+
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

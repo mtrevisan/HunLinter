@@ -26,9 +26,13 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.trie.Prefix;
-import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.collections.trie.TrieNode;
+import org.trie4j.MapTrie;
+import org.trie4j.Trie;
+import org.trie4j.patricia.MapPatriciaTrie;
+import org.trie4j.patricia.MapPatriciaTrieNode;
+//import unit731.hunspeller.collections.trie.Prefix;
+//import unit731.hunspeller.collections.trie.Trie;
+//import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -79,7 +83,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private Trie<String> patterns = new Trie<>();
+	private MapTrie<String> patterns = new MapPatriciaTrie<>();
 	private HyphenationOptions options;
 	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
@@ -97,7 +101,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, MapTrie<String> patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -159,12 +163,12 @@ public class HyphenationParser{
 								validateRule(line);
 
 								String key = getKeyFromData(line);
-								TrieNode<String> foundRule = hypParser.patterns.containsKey(key);
+								MapPatriciaTrieNode<String> foundRule = ((MapPatriciaTrie<String>)hypParser.patterns).getNode(key);
 								if(foundRule != null && foundRule.getValue().equals(line))
 									publish("Duplication found: " + foundRule.getValue() + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
-									hypParser.patterns.put(key, line);
+									((MapPatriciaTrie<String>)hypParser.patterns).put(key, line);
 							}
 						}
 
@@ -223,7 +227,7 @@ public class HyphenationParser{
 	};
 
 	public void clear(){
-		patterns.clear();
+		patterns ;
 		if(options != null)
 			options.clear();
 		nonStandardHyphenation.clear();
