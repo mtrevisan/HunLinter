@@ -5,11 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-@NoArgsConstructor
 public class TrieNode<T>{
 
 	@Getter @Setter private T data;
