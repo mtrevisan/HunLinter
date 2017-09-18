@@ -15,7 +15,7 @@ public class Trie<T>{
 	private TrieNode<T> root = new TrieNode<>();
 
 
-	public Trie(Trie<T> trie){
+	public Trie(Trie<T> trie) throws CloneNotSupportedException{
 		root = trie.root.clone();
 	}
 

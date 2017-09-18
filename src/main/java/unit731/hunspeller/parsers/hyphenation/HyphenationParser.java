@@ -338,8 +338,9 @@ public class HyphenationParser{
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
 	 * @return the hyphenation object
+	 * @throws CloneNotSupportedException	If the Trie does not support the {@code Cloneable} interface
 	 */
-	public Hyphenation hyphenate(String word, String addedRule){
+	public Hyphenation hyphenate(String word, String addedRule) throws CloneNotSupportedException{
 		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
 		addedRule = correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);

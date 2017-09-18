@@ -17,15 +17,6 @@ public class RegExpTrieNode<T>{
 	private final Map<String, RegExpTrieNode<T>> children = new HashMap<>();
 
 
-	@Override
-	public RegExpTrieNode<T> clone(){
-		RegExpTrieNode<T> clone = new RegExpTrieNode<>();
-		clone.data.addAll(data);
-		clone.leaf = leaf;
-		children.forEach((key, value) -> clone.children.put(key, value.clone()));
-		return clone;
-	}
-
 	public void clear(){
 		data.clear();
 		leaf = false;

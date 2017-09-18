@@ -1444,47 +1444,52 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
-		String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText());
-		String addedRuleCount = null;
-		if(StringUtils.isNotBlank(addedRule)){
-			boolean alreadyHasRule = frame.hypParser.hasRule(addedRule);
-			boolean ruleMatchesText = false;
-			boolean hyphenationChanged = false;
-			boolean correctHyphenation = false;
-			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(PatternService.replaceAll(addedRule, REGEX_POINTS_AND_NUMBERS, StringUtils.EMPTY));
+		try{
+			String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
+			String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText());
+			String addedRuleCount = null;
+			if(StringUtils.isNotBlank(addedRule)){
+				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule);
+				boolean ruleMatchesText = false;
+				boolean hyphenationChanged = false;
+				boolean correctHyphenation = false;
+				if(!alreadyHasRule){
+					ruleMatchesText = addedRuleText.contains(PatternService.replaceAll(addedRule, REGEX_POINTS_AND_NUMBERS, StringUtils.EMPTY));
 
-				if(ruleMatchesText){
-					Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
-					Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
+					if(ruleMatchesText){
+						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
+						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
 
-					Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
-					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-					String text = frame.hypParser.formatHyphenation(hyphenation, baseStringJoiner.get(), errorFormatter);
-					addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, baseStringJoiner.get(), errorFormatter);
-					addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
+						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
+						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+						String text = frame.hypParser.formatHyphenation(hyphenation, baseStringJoiner.get(), errorFormatter);
+						addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, baseStringJoiner.get(), errorFormatter);
+						addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
 
-					hyphenationChanged = !text.equals(addedRuleText);
-					correctHyphenation = !addedRuleHyphenation.hasErrors();
+						hyphenationChanged = !text.equals(addedRuleText);
+						correctHyphenation = !addedRuleHyphenation.hasErrors();
+					}
 				}
+
+				if(alreadyHasRule || !ruleMatchesText)
+					addedRuleText = null;
+				frame.hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
+			}
+			else{
+				addedRuleText = null;
+
+				frame.hypAddRuleTextField.setText(null);
+				frame.hypAddRuleButton.setEnabled(false);
+				frame.hypAddRuleSyllabationOutputLabel.setText(null);
+				frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
 			}
 
-			if(alreadyHasRule || !ruleMatchesText)
-				addedRuleText = null;
-			frame.hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
+			frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
+			frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
 		}
-		else{
-			addedRuleText = null;
-
-			frame.hypAddRuleTextField.setText(null);
-			frame.hypAddRuleButton.setEnabled(false);
-			frame.hypAddRuleSyllabationOutputLabel.setText(null);
-			frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
+		catch(CloneNotSupportedException e){
+			log.error("Unexpected exception", e);
 		}
-
-		frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
-		frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
 	}
 
 	private void clearHyphenation(){

@@ -2,6 +2,7 @@ package unit731.hunspeller.collections.trie;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,15 @@ public class TrieNode<T>{
 
 
 	@Override
-	public TrieNode<T> clone(){
+	public TrieNode<T> clone() throws CloneNotSupportedException{
+		super.clone();
+
 		TrieNode<T> clone = new TrieNode<>();
 		clone.data = data;
 		clone.leaf = leaf;
-		children.forEach((key, value) -> clone.children.put(key, value.clone()));
+		Set<Map.Entry<Character, TrieNode<T>>> entries = children.entrySet();
+		for(Map.Entry<Character, TrieNode<T>> entry : entries)
+			clone.children.put(entry.getKey(), entry.getValue().clone());
 		return clone;
 	}
 

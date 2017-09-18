@@ -1,7 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
-import java.io.Closeable;
-
 
 /**
  * A contract for all implementations of bit-arrays. This provides specific methods that will be needed for working with bloom filters.
