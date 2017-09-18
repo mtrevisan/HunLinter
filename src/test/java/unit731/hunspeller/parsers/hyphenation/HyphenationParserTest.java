@@ -17,7 +17,7 @@ public class HyphenationParserTest{
 	@Test
 	public void noHyphenationDueToLeftMin(){
 		Trie<String> patterns = new Trie<>();
-		patterns.add("abc", "a1bc");
+		patterns.put("abc", "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
 			.rightMin(0)
@@ -32,7 +32,7 @@ public class HyphenationParserTest{
 	@Test
 	public void noHyphenationDueToRightMin(){
 		Trie<String> patterns = new Trie<>();
-		patterns.add("abc", "ab1c");
+		patterns.put("abc", "ab1c");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
 			.rightMin(2)
@@ -212,7 +212,7 @@ public class HyphenationParserTest{
 
 
 	private void addRule(Trie<String> patterns, String rule){
-		patterns.add(getKeyFromData(rule), rule);
+		patterns.put(getKeyFromData(rule), rule);
 	}
 
 	private String getKeyFromData(String rule){

@@ -159,12 +159,12 @@ public class HyphenationParser{
 								validateRule(line);
 
 								String key = getKeyFromData(line);
-								TrieNode<String> foundRule = hypParser.patterns.contains(key);
-								if(foundRule != null && foundRule.getData().equals(line))
-									publish("Duplication found: " + foundRule.getData() + " <-> " + line);
+								TrieNode<String> foundRule = hypParser.patterns.containsKey(key);
+								if(foundRule != null && foundRule.getValue().equals(line))
+									publish("Duplication found: " + foundRule.getValue() + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
-									hypParser.patterns.add(key, line);
+									hypParser.patterns.put(key, line);
 							}
 						}
 
@@ -243,9 +243,9 @@ public class HyphenationParser{
 		validateRule(rule);
 
 		String key = getKeyFromData(rule);
-		TrieNode<String> foundRule = patterns.contains(key);
-		if(foundRule == null || !foundRule.getData().equals(rule))
-			patterns.add(key, rule);
+		TrieNode<String> foundRule = patterns.containsKey(key);
+		if(foundRule == null || !foundRule.getValue().equals(rule))
+			patterns.put(key, rule);
 		return foundRule;
 	}
 
@@ -295,9 +295,9 @@ public class HyphenationParser{
 			//extract data from the trie
 			Map<Integer, List<String>> content = new HashMap<>();
 			patterns.forEachLeaf(node -> {
-				String data = node.getData();
-				content.computeIfAbsent(data.length(), ArrayList::new)
-					.add(data);
+				String rule = node.getValue();
+				content.computeIfAbsent(rule.length(), ArrayList::new)
+					.add(rule);
 			});
 			if(!nonStandardHyphenation.isEmpty()){
 				//non-standard hyphenations
@@ -344,7 +344,7 @@ public class HyphenationParser{
 		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
 		addedRule = correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);
-		patternsWithAddedRule.add(key, addedRule);
+		patternsWithAddedRule.put(key, addedRule);
 
 		return hyphenate(word, patternsWithAddedRule);
 	}
@@ -352,8 +352,8 @@ public class HyphenationParser{
 	public boolean hasRule(String rule){
 		rule = correctOrthography(rule);
 		String key = getKeyFromData(rule);
-		TrieNode<String> foundRule = patterns.contains(key);
-		return (foundRule != null && foundRule.getData().equals(rule));
+		TrieNode<String> foundRule = patterns.containsKey(key);
+		return (foundRule != null && foundRule.getValue().equals(rule));
 	}
 
 	private static String getKeyFromData(String rule){
@@ -433,8 +433,8 @@ public class HyphenationParser{
 			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
 				int j = -1;
-				String data = prefix.getNode().getData();
-				String reducedData = PatternService.replaceFirst(data, REGEX_REDUCE, StringUtils.EMPTY);
+				String rule = prefix.getNode().getValue();
+				String reducedData = PatternService.replaceFirst(rule, REGEX_REDUCE, StringUtils.EMPTY);
 				int ruleSize = reducedData.length();
 				for(int k = 0; k < ruleSize; k ++){
 					char chr = reducedData.charAt(k);
@@ -446,7 +446,7 @@ public class HyphenationParser{
 							int dd = Character.digit(chr, 10);
 							if(dd > indexes[idx]){
 								indexes[idx] = dd;
-								augmentedPatternData[idx] = (isAugmentedRule(data)? data: null);
+								augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
 							}
 						}
 					}

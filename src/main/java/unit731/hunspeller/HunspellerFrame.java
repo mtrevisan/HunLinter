@@ -1055,7 +1055,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			printResultLine("Duplicated rule found (" + foundRule.getData() + "), cannot insert " + newRule);
+			printResultLine("Duplicated rule found (" + foundRule.getValue() + "), cannot insert " + newRule);
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 

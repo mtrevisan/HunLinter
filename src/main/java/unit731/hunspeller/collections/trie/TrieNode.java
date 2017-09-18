@@ -10,7 +10,7 @@ import lombok.Setter;
 
 public class TrieNode<T>{
 
-	@Getter @Setter private T data;
+	@Getter @Setter private T value;
 	@Getter private boolean leaf;
 	private final Map<Character, TrieNode<T>> children = new HashMap<>();
 
@@ -20,7 +20,7 @@ public class TrieNode<T>{
 		super.clone();
 
 		TrieNode<T> clone = new TrieNode<>();
-		clone.data = data;
+		clone.value = value;
 		clone.leaf = leaf;
 		Set<Map.Entry<Character, TrieNode<T>>> entries = children.entrySet();
 		for(Map.Entry<Character, TrieNode<T>> entry : entries)
@@ -29,7 +29,7 @@ public class TrieNode<T>{
 	}
 
 	public void clear(){
-		data = null;
+		value = null;
 		leaf = false;
 		children.clear();
 	}
@@ -51,7 +51,11 @@ public class TrieNode<T>{
 	}
 
 	public void forEachChild(Consumer<TrieNode<T>> callback){
-		children.forEach((key, value) -> callback.accept(value));
+		children.forEach((k, v) -> callback.accept(v));
+	}
+
+	public boolean isEmpty(){
+		return (!leaf && children.isEmpty());
 	}
 
 }
