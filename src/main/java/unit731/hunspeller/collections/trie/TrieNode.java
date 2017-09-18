@@ -51,7 +51,8 @@ public class TrieNode<T>{
 	}
 
 	public void forEachChild(Consumer<TrieNode<T>> callback){
-		children.forEach((k, v) -> callback.accept(v));
+		children.values()
+			.forEach(callback::accept);
 	}
 
 	public boolean isEmpty(){
