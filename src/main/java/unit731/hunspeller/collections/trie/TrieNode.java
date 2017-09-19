@@ -56,7 +56,7 @@ public class TrieNode<T>{
 	}
 
 	public boolean isEmpty(){
-		return (!leaf && children.isEmpty());
+		return (value == null && !leaf && children.isEmpty());
 	}
 
 }
