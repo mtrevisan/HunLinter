@@ -34,7 +34,7 @@ public class TrieTest{
 		trie.put("cd", 4);
 		trie.put("abc", 5);
 
-		Collection<Prefix<Integer>> prefixes = trie.findPrefix("abcd");
+		Collection<Prefix<Integer>> prefixes = trie.collectPrefixes("abcd");
 		Integer[] datas = prefixes.stream()
 			.map(Prefix::getNode)
 			.map(TrieNode::getValue)

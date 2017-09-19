@@ -3,7 +3,6 @@ package unit731.hunspeller.collections.trie;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -63,9 +62,26 @@ public class Trie<T>{
 		return oldValue;
 	}
 
-	public void putAll(Map<String, ? extends T> map){
-		map.entrySet()
-			.forEach(e -> put(e.getKey(), e.getValue()));
+	public T get(String word){
+		Objects.requireNonNull(word);
+
+		T foundValue = null;
+		TrieNode<T> node = root;
+		int size = word.length();
+		for(int i = 0; i < size; i ++){
+			Character stem = getAtIndex(word, i);
+			TrieNode<T> nextNode = node.getChild(stem);
+			if(nextNode == null)
+				break;
+
+			if(nextNode.isLeaf() && i + 1 == size){
+				foundValue = nextNode.getValue();
+				break;
+			}
+
+			node = nextNode;
+		}
+		return foundValue;
 	}
 
 	/**
@@ -75,32 +91,30 @@ public class Trie<T>{
 	 * @return	The data of the removed word, or null if no word was removed.
 	 */
 	public T remove(String word){
-		T result = null;
-		Collection<Prefix<T>> prefixes = findPrefix(word);
-		if(prefixes.size() == 1)
-			result = removeSingle(word, prefixes.iterator().next());
-		return result;
-	}
+		Objects.requireNonNull(word);
 
-	public boolean removeAll(String word){
-		Collection<Prefix<T>> prefixes = findPrefix(word);
-		return prefixes.stream()
-			.map(prefix -> removeSingle(word, prefix))
-			.map(Objects::nonNull)
-			.reduce(true, (a, b) -> a && b);
-	}
+		T foundValue = null;
+		TrieNode<T> node = root;
+		int size = word.length();
+		for(int i = 0; i < size; i ++){
+			Character stem = getAtIndex(word, i);
+			TrieNode<T> nextNode = node.getChild(stem);
+			if(nextNode == null)
+				break;
 
-	private T removeSingle(String word, Prefix<T> pref){
-		T value = null;
-		if(pref.isLeaf()){
-			Character stem = getAtIndex(word, word.length() - 1);
-			TrieNode<T> node = pref.getParent().removeChild(stem);
-			value = (node != null? node.getValue(): null);
+			TrieNode<T> parent = node;
+			node = nextNode;
+
+			if(node.isLeaf() && i + 1 == size){
+				parent.removeChild(stem);
+				foundValue = node.getValue();
+				break;
+			}
 		}
-		return value;
+		return foundValue;
 	}
 
-	public Collection<Prefix<T>> findPrefix(String word){
+	public Collection<Prefix<T>> collectPrefixes(String word){
 		Objects.requireNonNull(word);
 
 		TrieNode<T> node = root;
