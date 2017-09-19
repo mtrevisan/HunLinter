@@ -26,13 +26,9 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.trie4j.MapTrie;
-import org.trie4j.Trie;
-import org.trie4j.patricia.MapPatriciaTrie;
-import org.trie4j.patricia.MapPatriciaTrieNode;
-//import unit731.hunspeller.collections.trie.Prefix;
-//import unit731.hunspeller.collections.trie.Trie;
-//import unit731.hunspeller.collections.trie.TrieNode;
+import unit731.hunspeller.collections.trie.Prefix;
+import unit731.hunspeller.collections.trie.Trie;
+import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -83,7 +79,8 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private MapTrie<String> patterns = new MapPatriciaTrie<>();
+	
+	private Trie<String> patterns = new Trie<>();
 	private HyphenationOptions options;
 	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
@@ -101,7 +98,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, MapTrie<String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -163,12 +160,11 @@ public class HyphenationParser{
 								validateRule(line);
 
 								String key = getKeyFromData(line);
-								MapPatriciaTrieNode<String> foundRule = ((MapPatriciaTrie<String>)hypParser.patterns).getNode(key);
-								if(foundRule != null && foundRule.getValue().equals(line))
-									publish("Duplication found: " + foundRule.getValue() + " <-> " + line);
+								if(hypParser.patterns.containsKey(key))
+									publish("Duplication found: " + key + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
-									((MapPatriciaTrie<String>)hypParser.patterns).put(key, line);
+									hypParser.patterns.put(key, line);
 							}
 						}
 
@@ -227,7 +223,7 @@ public class HyphenationParser{
 	};
 
 	public void clear(){
-		patterns ;
+		patterns.clear();
 		if(options != null)
 			options.clear();
 		nonStandardHyphenation.clear();
@@ -241,16 +237,18 @@ public class HyphenationParser{
 	 * @param rule	The rule to add
 	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
 	 */
-	public TrieNode<String> addRule(String rule){
+	public String addRule(String rule){
 		rule = correctOrthography(rule);
 
 		validateRule(rule);
 
+		String newRule = null;
 		String key = getKeyFromData(rule);
-		TrieNode<String> foundRule = patterns.containsKey(key);
-		if(foundRule == null || !foundRule.getValue().equals(rule))
+		if(!patterns.containsKey(key)){
 			patterns.put(key, rule);
-		return foundRule;
+			newRule = rule;
+		}
+		return newRule;
 	}
 
 	/**
@@ -356,8 +354,7 @@ public class HyphenationParser{
 	public boolean hasRule(String rule){
 		rule = correctOrthography(rule);
 		String key = getKeyFromData(rule);
-		TrieNode<String> foundRule = patterns.containsKey(key);
-		return (foundRule != null && foundRule.getValue().equals(rule));
+		return patterns.containsKey(key);
 	}
 
 	private static String getKeyFromData(String rule){
@@ -434,7 +431,7 @@ public class HyphenationParser{
 		int[] indexes = new int[wordSize];
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
-			List<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
+			Collection<Prefix<String>> prefixes = patterns.findPrefix(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getNode().getValue();

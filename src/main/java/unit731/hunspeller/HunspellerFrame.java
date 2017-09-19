@@ -53,7 +53,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileChangeEvent;
 import org.apache.commons.vfs2.FileListener;
 import org.apache.commons.vfs2.FileName;
-import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
@@ -1032,7 +1031,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		String newRule = hypAddRuleTextField.getText();
-		TrieNode<String> foundRule = hypParser.addRule(newRule);
+		String foundRule = hypParser.addRule(newRule);
 		if(foundRule == null){
 			try{
 				File hypFile = getHyphenationFile();
@@ -1055,7 +1054,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			printResultLine("Duplicated rule found (" + foundRule.getValue() + "), cannot insert " + newRule);
+			printResultLine("Duplicated rule found (" + foundRule + "), cannot insert " + newRule);
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 

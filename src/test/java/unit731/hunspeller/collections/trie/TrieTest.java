@@ -1,6 +1,6 @@
 package unit731.hunspeller.collections.trie;
 
-import java.util.List;
+import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,9 +19,9 @@ public class TrieTest{
 		trie.put("ac", 3);
 		trie.put("a", 4);
 
-		Assert.assertNotNull(trie.containsKey("a"));
-		Assert.assertNull(trie.containsKey("ab"));
-		Assert.assertNull(trie.containsKey("c"));
+		Assert.assertTrue(trie.containsKey("a"));
+		Assert.assertFalse(trie.containsKey("ab"));
+		Assert.assertFalse(trie.containsKey("c"));
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class TrieTest{
 		trie.put("cd", 4);
 		trie.put("abc", 5);
 
-		List<Prefix<Integer>> prefixes = trie.findPrefix("abcd");
+		Collection<Prefix<Integer>> prefixes = trie.findPrefix("abcd");
 		Integer[] datas = prefixes.stream()
 			.map(Prefix::getNode)
 			.map(TrieNode::getValue)

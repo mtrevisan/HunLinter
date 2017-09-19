@@ -1,6 +1,7 @@
 package unit731.hunspeller.collections.trie;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -75,14 +76,14 @@ public class Trie<T>{
 	 */
 	public T remove(String word){
 		T result = null;
-		List<Prefix<T>> prefixes = findPrefix(word);
+		Collection<Prefix<T>> prefixes = findPrefix(word);
 		if(prefixes.size() == 1)
-			result = removeSingle(word, prefixes.get(0));
+			result = removeSingle(word, prefixes.iterator().next());
 		return result;
 	}
 
 	public boolean removeAll(String word){
-		List<Prefix<T>> prefixes = findPrefix(word);
+		Collection<Prefix<T>> prefixes = findPrefix(word);
 		return prefixes.stream()
 			.map(prefix -> removeSingle(word, prefix))
 			.map(Objects::nonNull)
@@ -99,7 +100,7 @@ public class Trie<T>{
 		return value;
 	}
 
-	public List<Prefix<T>> findPrefix(String word){
+	public Collection<Prefix<T>> findPrefix(String word){
 		Objects.requireNonNull(word);
 
 		TrieNode<T> node = root;
@@ -124,9 +125,9 @@ public class Trie<T>{
 	 * Search the given string and return an object if it lands on a word, essentially testing if the word exists in the trie.
 	 *
 	 * @param word	The word to search for
-	 * @return The node found if the word is contained into this trie
+	 * @return Whether the word is fully contained into this trie
 	 */
-	public TrieNode<T> containsKey(String word){
+	public boolean containsKey(String word){
 		Objects.requireNonNull(word);
 
 		TrieNode<T> node = root;
@@ -140,7 +141,7 @@ public class Trie<T>{
 
 			node = nextNode;
 		}
-		return (i == size && node != null && node.isLeaf()? node: null);
+		return (i == size && node != null && node.isLeaf());
 	}
 
 	private Character getAtIndex(String word, int index){
