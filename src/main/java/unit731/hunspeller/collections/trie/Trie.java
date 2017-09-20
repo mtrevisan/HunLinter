@@ -76,7 +76,7 @@ public class Trie<T>{
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
 	public T remove(String sequence){
-		return findAndApply(sequence, (node, stem) -> node.removeChild(stem));
+		return findAndApply(sequence, (parent, stem) -> parent.removeChild(stem));
 	}
 
 	private T findAndApply(String sequence, BiConsumer<TrieNode<T>, Integer> callback){
