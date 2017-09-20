@@ -57,7 +57,10 @@ public class Trie<T>{
 			if(nextNode == null){
 				nextNode = new TrieNode<>();
 				node.addChild(stem, nextNode);
+				node = nextNode;
+				break;
 			}
+
 			node = nextNode;
 		}
 		T oldValue = node.getValue();
@@ -142,7 +145,7 @@ public class Trie<T>{
 	public void forEachLeaf(Consumer<TrieNode<T>> callback){
 		Objects.requireNonNull(callback);
 
-		find(node -> {
+		forEach(node -> {
 			if(node.isLeaf())
 				callback.accept(node);
 			return false;
@@ -155,7 +158,7 @@ public class Trie<T>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	private boolean find(Function<TrieNode<T>, Boolean> callback){
+	public boolean forEach(Function<TrieNode<T>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;
