@@ -431,7 +431,7 @@ public class HyphenationParser{
 		int[] indexes = new int[wordSize];
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
-			Collection<Prefix<String>> prefixes = patterns.collectPrefixes(w.substring(i));
+			Iterable<Prefix<String>> prefixes = patterns.collectPrefixes(w.substring(i));
 			for(Prefix<String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getNode().getValue();

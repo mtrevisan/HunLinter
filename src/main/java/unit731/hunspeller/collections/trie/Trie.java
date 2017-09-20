@@ -4,7 +4,6 @@ import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.Consumer;
@@ -117,11 +116,11 @@ public class Trie<T>{
 		return foundValue;
 	}
 
-	public Collection<Prefix<T>> collectPrefixes(String sequence){
+	public Iterable<Prefix<T>> collectPrefixes(String sequence){
 		Objects.requireNonNull(sequence);
 
 		TrieNode<T> node = root;
-		List<Prefix<T>> result = new ArrayList<>();
+		Collection<Prefix<T>> result = new ArrayList<>();
 		int size = sequence.length();
 		for(int i = 0; i < size; i ++){
 			int stem = sequencer.hashOf(sequence, i);
@@ -129,11 +128,10 @@ public class Trie<T>{
 			if(nextNode == null)
 				break;
 
-			TrieNode<T> parent = node;
-			node = nextNode;
+			if(nextNode.isLeaf())
+				result.add(new Prefix<>(nextNode, i, node));
 
-			if(node.isLeaf())
-				result.add(new Prefix<>(node, i, parent));
+			node = nextNode;
 		}
 		return result;
 	}
@@ -145,20 +143,7 @@ public class Trie<T>{
 	 * @return Whether the sequence is fully contained into this trie
 	 */
 	public boolean containsKey(String sequence){
-		Objects.requireNonNull(sequence);
-
-		TrieNode<T> node = root;
-		int i;
-		int size = sequence.length();
-		for(i = 0; i < size; i ++){
-			int stem = sequencer.hashOf(sequence, i);
-			TrieNode<T> nextNode = node.getChild(stem);
-			if(nextNode == null)
-				break;
-
-			node = nextNode;
-		}
-		return (i == size && node != null && node.isLeaf());
+		return (get(sequence) != null);
 	}
 
 	/**
