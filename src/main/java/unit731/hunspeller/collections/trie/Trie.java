@@ -1,5 +1,7 @@
 package unit731.hunspeller.collections.trie;
 
+import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,13 +17,14 @@ import java.util.function.Function;
 public class Trie<T>{
 
 	private final TrieNode<T> root;
+	private final TrieSequencer<String> sequencer = new StringTrieSequencer();
 
 
 	public Trie(){
 		root = new TrieNode<>();
 	}
 
-	public Trie(Trie<T> trie) throws CloneNotSupportedException{
+	public Trie(Trie<T> trie){
 		root = trie.root.clone();
 	}
 
@@ -34,21 +37,22 @@ public class Trie<T>{
 	}
 
 	/**
-	 * Adds a word into the Trie
+	 * Adds a sequence into the Trie
 	 *
-	 * @param word		Word with which the specified value is to be associated
+	 * @param sequence		Sequence with which the specified value is to be associated
 	 * @param value	Value to be associated with the specified key
-	 * @return	The previous value associated with <tt>word</tt>, or <tt>null</tt> if there was no mapping for <tt>word</tt>.
-	 *		(A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with <tt>word</tt>)
-	 * @throws NullPointerException if the specified <tt>word</tt> is <tt>null</tt>
+	 * @return	The previous value associated with <tt>sequence</tt>, or <tt>null</tt> if there was no mapping for <tt>sequence</tt>.
+	 *		(A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with <tt>sequence</tt>)
+	 * @throws NullPointerException if the specified <tt>sequence</tt> is <tt>null</tt>
 	 */
-	public T put(String word, T value){
-		Objects.requireNonNull(word);
+	public T put(String sequence, T value){
+		Objects.requireNonNull(sequence);
+		Objects.requireNonNull(value);
 
 		TrieNode<T> node = root;
-		int size = word.length();
+		int size = sequence.length();
 		for(int i = 0; i < size; i ++){
-			Character stem = getAtIndex(word, i);
+			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null){
 				nextNode = new TrieNode<>();
@@ -58,18 +62,17 @@ public class Trie<T>{
 		}
 		T oldValue = node.getValue();
 		node.setValue(value);
-		node.setLeaf();
 		return oldValue;
 	}
 
-	public T get(String word){
-		Objects.requireNonNull(word);
+	public T get(String sequence){
+		Objects.requireNonNull(sequence);
 
 		T foundValue = null;
 		TrieNode<T> node = root;
-		int size = word.length();
+		int size = sequence.length();
 		for(int i = 0; i < size; i ++){
-			Character stem = getAtIndex(word, i);
+			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null)
 				break;
@@ -85,19 +88,19 @@ public class Trie<T>{
 	}
 
 	/**
-	 * Removes the word from the Trie and returns it's value. The sequence must be an exact match, otherwise nothing will be removed.
+	 * Removes the sequence from the Trie and returns it's value. The sequence must be an exact match, otherwise nothing will be removed.
 	 *
-	 * @param word	The word to remove.
-	 * @return	The data of the removed word, or null if no word was removed.
+	 * @param sequence	The sequence to remove.
+	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
-	public T remove(String word){
-		Objects.requireNonNull(word);
+	public T remove(String sequence){
+		Objects.requireNonNull(sequence);
 
 		T foundValue = null;
 		TrieNode<T> node = root;
-		int size = word.length();
+		int size = sequence.length();
 		for(int i = 0; i < size; i ++){
-			Character stem = getAtIndex(word, i);
+			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null)
 				break;
@@ -114,14 +117,14 @@ public class Trie<T>{
 		return foundValue;
 	}
 
-	public Collection<Prefix<T>> collectPrefixes(String word){
-		Objects.requireNonNull(word);
+	public Collection<Prefix<T>> collectPrefixes(String sequence){
+		Objects.requireNonNull(sequence);
 
 		TrieNode<T> node = root;
 		List<Prefix<T>> result = new ArrayList<>();
-		int size = word.length();
+		int size = sequence.length();
 		for(int i = 0; i < size; i ++){
-			Character stem = getAtIndex(word, i);
+			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null)
 				break;
@@ -136,19 +139,19 @@ public class Trie<T>{
 	}
 
 	/**
-	 * Search the given string and return an object if it lands on a word, essentially testing if the word exists in the trie.
+	 * Search the given string and return an object if it lands on a sequence, essentially testing if the sequence exists in the trie.
 	 *
-	 * @param word	The word to search for
-	 * @return Whether the word is fully contained into this trie
+	 * @param sequence	The sequence to search for
+	 * @return Whether the sequence is fully contained into this trie
 	 */
-	public boolean containsKey(String word){
-		Objects.requireNonNull(word);
+	public boolean containsKey(String sequence){
+		Objects.requireNonNull(sequence);
 
 		TrieNode<T> node = root;
 		int i;
-		int size = word.length();
+		int size = sequence.length();
 		for(i = 0; i < size; i ++){
-			Character stem = getAtIndex(word, i);
+			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null)
 				break;
@@ -156,10 +159,6 @@ public class Trie<T>{
 			node = nextNode;
 		}
 		return (i == size && node != null && node.isLeaf());
-	}
-
-	private Character getAtIndex(String word, int index){
-		return word.charAt(index);
 	}
 
 	/**
@@ -183,7 +182,7 @@ public class Trie<T>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	public boolean find(Function<TrieNode<T>, Boolean> callback){
+	private boolean find(Function<TrieNode<T>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;

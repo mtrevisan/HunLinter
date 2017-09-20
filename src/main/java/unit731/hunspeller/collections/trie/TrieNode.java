@@ -2,61 +2,66 @@ package unit731.hunspeller.collections.trie;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
 
-public class TrieNode<T>{
+public class TrieNode<T> implements Cloneable{
 
 	@Getter @Setter private T value;
-	@Getter private boolean leaf;
-	private final Map<Character, TrieNode<T>> children = new HashMap<>();
+	private Map<Integer, TrieNode<T>> children;
 
 
 	@Override
-	public TrieNode<T> clone() throws CloneNotSupportedException{
-		super.clone();
-
+	public TrieNode<T> clone(){
 		TrieNode<T> clone = new TrieNode<>();
 		clone.value = value;
-		clone.leaf = leaf;
-		Set<Map.Entry<Character, TrieNode<T>>> entries = children.entrySet();
-		for(Map.Entry<Character, TrieNode<T>> entry : entries)
-			clone.children.put(entry.getKey(), entry.getValue().clone());
+		if(children != null){
+			clone.children = children.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
+		}
 		return clone;
 	}
 
 	public void clear(){
 		value = null;
-		leaf = false;
-		children.clear();
+		if(children != null)
+			children.clear();
 	}
 
-	public void setLeaf(){
-		leaf = true;
+	public boolean isLeaf(){
+		return (value != null);
 	}
 
-	public TrieNode<T> getChild(Character stem){
-		return children.get(stem);
+	public boolean hasChildren(){
+		return (children != null && !children.isEmpty());
 	}
 
-	public void addChild(Character stem, TrieNode<T> nextNode){
-		children.put(stem, nextNode);
+	public TrieNode<T> getChild(int stem){
+		return (children != null? children.get(stem): null);
 	}
 
-	public TrieNode<T> removeChild(Character stem){
-		return children.remove(stem);
+	public void addChild(int stem, TrieNode<T> node){
+		if(children == null)
+			children = new HashMap<>();
+
+		children.put(stem, node);
+	}
+
+	public TrieNode<T> removeChild(int stem){
+		return (children != null? children.remove(stem): null);
 	}
 
 	public void forEachChild(Consumer<TrieNode<T>> callback){
-		children.values()
-			.forEach(callback::accept);
+		if(children != null)
+			children.values()
+				.forEach(callback::accept);
 	}
 
 	public boolean isEmpty(){
-		return (value == null && !leaf && children.isEmpty());
+		return (value == null && (children == null || children.isEmpty()));
 	}
 
 }
