@@ -57,8 +57,6 @@ public class Trie<T>{
 			if(nextNode == null){
 				nextNode = new TrieNode<>();
 				node.addChild(stem, nextNode);
-				node = nextNode;
-				break;
 			}
 
 			node = nextNode;

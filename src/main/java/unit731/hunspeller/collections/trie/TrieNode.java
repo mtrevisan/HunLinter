@@ -10,7 +10,8 @@ import lombok.Setter;
 
 public class TrieNode<T> implements Cloneable{
 
-	@Getter @Setter private T value;
+	@Getter private T value;
+	@Getter private boolean leaf;
 	private Map<Integer, TrieNode<T>> children;
 
 
@@ -18,6 +19,7 @@ public class TrieNode<T> implements Cloneable{
 	public TrieNode<T> clone(){
 		TrieNode<T> clone = new TrieNode<>();
 		clone.value = value;
+		clone.leaf = leaf;
 		if(children != null){
 			clone.children = children.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
@@ -27,12 +29,18 @@ public class TrieNode<T> implements Cloneable{
 
 	public void clear(){
 		value = null;
+		leaf = false;
 		if(children != null)
 			children.clear();
 	}
 
-	public boolean isLeaf(){
-		return (value != null);
+	public void setValue(T value){
+		this.value = value;
+		setLeaf();
+	}
+
+	public void setLeaf(){
+		leaf = true;
 	}
 
 	public boolean hasChildren(){
@@ -51,7 +59,14 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public TrieNode<T> removeChild(int stem){
-		return (children != null? children.remove(stem): null);
+		TrieNode<T> removedNode = null;
+		if(children != null){
+			TrieNode<T> node = children.get(stem);
+			//when there are no children, remove this node from it's parent
+			if(node.children == null || node.children.isEmpty())
+				removedNode = children.remove(stem);
+		}
+		return removedNode;
 	}
 
 	public void forEachChild(Consumer<TrieNode<T>> callback){
@@ -61,7 +76,7 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public boolean isEmpty(){
-		return (value == null && (children == null || children.isEmpty()));
+		return (value == null && !leaf && (children == null || children.isEmpty()));
 	}
 
 }
