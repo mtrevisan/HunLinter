@@ -104,14 +104,13 @@ public class Trie<T>{
 			if(nextNode == null)
 				break;
 
-			TrieNode<T> parent = node;
-			node = nextNode;
-
-			if(node.isLeaf() && i + 1 == size){
-				parent.removeChild(stem);
-				foundValue = node.getValue();
+			if(nextNode.isLeaf() && i + 1 == size){
+				node.removeChild(stem);
+				foundValue = nextNode.getValue();
 				break;
 			}
+
+			node = nextNode;
 		}
 		return foundValue;
 	}
