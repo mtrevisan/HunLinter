@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -65,25 +66,7 @@ public class Trie<T>{
 	}
 
 	public T get(String sequence){
-		Objects.requireNonNull(sequence);
-
-		T foundValue = null;
-		TrieNode<T> node = root;
-		int size = sequence.length();
-		for(int i = 0; i < size; i ++){
-			int stem = sequencer.hashOf(sequence, i);
-			TrieNode<T> nextNode = node.getChild(stem);
-			if(nextNode == null)
-				break;
-
-			if(nextNode.isLeaf() && i + 1 == size){
-				foundValue = nextNode.getValue();
-				break;
-			}
-
-			node = nextNode;
-		}
-		return foundValue;
+		return findAndApply(sequence, null);
 	}
 
 	/**
@@ -93,6 +76,10 @@ public class Trie<T>{
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
 	public T remove(String sequence){
+		return findAndApply(sequence, (node, stem) -> node.removeChild(stem));
+	}
+
+	private T findAndApply(String sequence, BiConsumer<TrieNode<T>, Integer> callback){
 		Objects.requireNonNull(sequence);
 
 		T foundValue = null;
@@ -105,7 +92,9 @@ public class Trie<T>{
 				break;
 
 			if(nextNode.isLeaf() && i + 1 == size){
-				node.removeChild(stem);
+				if(callback != null)
+					callback.accept(node, stem);
+
 				foundValue = nextNode.getValue();
 				break;
 			}
