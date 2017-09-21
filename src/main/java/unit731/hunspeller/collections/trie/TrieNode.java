@@ -5,14 +5,28 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 
+//@NoArgsConstructor
 public class TrieNode<T> implements Cloneable{
+
+//	private String sequence;
+//	private int startIndex;
+//	@Getter private int endIndex;
 
 	@Getter private T value;
 	@Getter private boolean leaf;
 	private Map<Integer, TrieNode<T>> children;
 
+
+//	public TrieNode(String sequence, int startIndex, int endIndex, T value){
+//		this.sequence = sequence;
+//		this.startIndex = startIndex;
+//		this.endIndex = endIndex;
+//		this.value = value;
+//	}
 
 	@Override
 	public TrieNode<T> clone(){
@@ -76,5 +90,31 @@ public class TrieNode<T> implements Cloneable{
 	public boolean hasChildren(){
 		return (children != null && !children.isEmpty());
 	}
+
+	/**
+	 * Splits this node at the given relative index and returns the TrieNode with
+	 * the sequence starting at index. The returned TrieNode has this node's
+	 * sequence, value, and children. The returned TrieNode is also the only
+	 * child of this node when this method returns.
+	 *
+	 * @param index	The relative index (starting at 0 and going to end - start - 1) in the sequence.
+	 * @param value	The new value of this node.
+	 * @param sequencer	The sequencer to use to determine the place of the node in the children's list
+	 * @return	The reference to the child node created that's sequence starts at index.
+	 */
+//	public TrieNode<T> split(int index, T value, TrieSequencer<String> sequencer){
+//		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
+//		if(children != null){
+//			children.forEach((stem, node) -> lowerNode.addChild(stem, node));
+//			children.clear();
+//		}
+//
+//		endIndex = startIndex + index;
+//
+//		int stem = sequencer.hashOf(sequence, endIndex);
+//		addChild(stem, lowerNode);
+//
+//		return lowerNode;
+//	}
 
 }

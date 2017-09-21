@@ -8,12 +8,9 @@ import org.junit.Test;
 
 public class TrieTest{
 
-	private final Trie<Integer> trie = new Trie<>();
-
-
 	@Test
 	public void contains(){
-		trie.clear();
+		Trie<Integer> trie = new Trie<>();
 
 		trie.put("abc", 1);
 		trie.put("abb", 2);
@@ -27,7 +24,7 @@ public class TrieTest{
 
 	@Test
 	public void collectPrefixes(){
-		trie.clear();
+		Trie<Integer> trie = new Trie<>();
 
 		trie.put("a", 1);
 		trie.put("ab", 2);
@@ -45,168 +42,168 @@ public class TrieTest{
 
 	@Test
 	public void emptyConstructor(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Integer> trie = new Trie<>();
 
-		Assert.assertTrue(t.isEmpty());
-		Assert.assertFalse(t.containsKey("word"));
-		Assert.assertFalse(t.containsKey(StringUtils.EMPTY));
+		Assert.assertTrue(trie.isEmpty());
+		Assert.assertFalse(trie.containsKey("word"));
+		Assert.assertFalse(trie.containsKey(StringUtils.EMPTY));
 	}
 
 	@Test
 	public void defaultValueConstructor(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		Assert.assertEquals(null, t.get("meow"));
+		Assert.assertEquals(null, trie.get("meow"));
 
-		t.put("meow", Boolean.TRUE);
+		trie.put("meow", Boolean.TRUE);
 
-		Assert.assertEquals(Boolean.TRUE, t.get("meow"));
-		Assert.assertEquals(null, t.get("world"));
+		Assert.assertEquals(Boolean.TRUE, trie.get("meow"));
+		Assert.assertEquals(null, trie.get("world"));
 	}
 
 	@Test
 	public void simplePut(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		Assert.assertTrue(t.isEmpty());
+		Assert.assertTrue(trie.isEmpty());
 
-		t.put("java.lang.", Boolean.TRUE);
-		t.put("java.io.", Boolean.TRUE);
-		t.put("java.util.concurrent.", Boolean.TRUE);
-		t.put("java.util.", Boolean.FALSE);
-		t.put("java.lang.Boolean", Boolean.FALSE);
+		trie.put("java.lang.", Boolean.TRUE);
+		trie.put("java.io.", Boolean.TRUE);
+		trie.put("java.util.concurrent.", Boolean.TRUE);
+		trie.put("java.util.", Boolean.FALSE);
+		trie.put("java.lang.Boolean", Boolean.FALSE);
 
-		Assert.assertFalse(t.isEmpty());
-		Assert.assertTrue(t.collectPrefixes("java.lang.Integer").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("java.lang.Long").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("java.lang.Boolean").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("java.io.InputStream").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("java.util.ArrayList").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("java.util.concurrent.ConcurrentHashMap").iterator().hasNext());
+		Assert.assertFalse(trie.isEmpty());
+		Assert.assertTrue(trie.collectPrefixes("java.lang.Integer").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("java.lang.Long").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("java.lang.Boolean").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("java.io.InputStream").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("java.util.ArrayList").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("java.util.concurrent.ConcurrentHashMap").iterator().hasNext());
 	}
 
 	@Test
 	public void hasPartialMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertFalse(t.collectPrefixes("wow").iterator().hasNext());
-		Assert.assertFalse(t.collectPrefixes("book").iterator().hasNext());
+		Assert.assertFalse(trie.collectPrefixes("wow").iterator().hasNext());
+		Assert.assertFalse(trie.collectPrefixes("book").iterator().hasNext());
 	}
 
 	@Test
 	public void hasStartsWithMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertTrue(t.collectPrefixes("wowzacowza").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("wowzacowza").iterator().hasNext());
 	}
 
 	@Test
 	public void hasExactMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertTrue(t.collectPrefixes("wowza").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("wowza").iterator().hasNext());
 	}
 
 	@Test
 	public void getPartialMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertFalse(t.collectPrefixes("wow").iterator().hasNext());
-		Assert.assertFalse(t.collectPrefixes("book").iterator().hasNext());
+		Assert.assertFalse(trie.collectPrefixes("wow").iterator().hasNext());
+		Assert.assertFalse(trie.collectPrefixes("book").iterator().hasNext());
 	}
 
 	@Test
 	public void getStartsWithMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertTrue(t.collectPrefixes("wowzacowza").iterator().hasNext());
-		Assert.assertTrue(t.collectPrefixes("bookshelfmania").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("wowzacowza").iterator().hasNext());
+		Assert.assertTrue(trie.collectPrefixes("bookshelfmania").iterator().hasNext());
 	}
 
 	@Test
 	public void getExactMatch(){
-		Trie<Boolean> t = new Trie<>();
+		Trie<Boolean> trie = new Trie<>();
 
-		t.put("bookshelf", Boolean.TRUE);
-		t.put("wowza", Boolean.FALSE);
+		trie.put("bookshelf", Boolean.TRUE);
+		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(Boolean.FALSE, t.get("wowza"));
-		Assert.assertEquals(Boolean.TRUE, t.get("bookshelf"));
+		Assert.assertEquals(Boolean.FALSE, trie.get("wowza"));
+		Assert.assertEquals(Boolean.TRUE, trie.get("bookshelf"));
 	}
 
 	@Test
 	public void removeBack(){
-		Trie<Integer> t = new Trie<>();
+		Trie<Integer> trie = new Trie<>();
 
-		t.put("hello", 0);
-		t.put("hello world", 1);
+		trie.put("hello", 0);
+		trie.put("hello world", 1);
 
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertEquals(1, t.get("hello world").intValue());
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertEquals(1, trie.get("hello world").intValue());
 
-		Integer r1 = t.remove("hello world");
+		Integer r1 = trie.remove("hello world");
 
 		Assert.assertNotNull(r1);
 		Assert.assertEquals(1, r1.intValue());
 
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertNull(t.get("hello world"));
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertNull(trie.get("hello world"));
 	}
 
 	@Test
 	public void removeFront(){
-		Trie<Integer> t = new Trie<>();
+		Trie<Integer> trie = new Trie<>();
 
-		t.put("hello", 0);
-		t.put("hello world", 1);
+		trie.put("hello", 0);
+		trie.put("hello world", 1);
 
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertEquals(1, t.get("hello world").intValue());
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertEquals(1, trie.get("hello world").intValue());
 
-		Integer r0 = t.remove("hello world");
+		Integer r0 = trie.remove("hello world");
 
 		Assert.assertNotNull(r0);
 		Assert.assertEquals(1, r0.intValue());
 
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertNull(t.get("hello world"));
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertNull(trie.get("hello world"));
 	}
 
 	@Test
 	public void removeFrontManyChildren(){
-		Trie<Integer> t = new Trie<>();
+		Trie<Integer> trie = new Trie<>();
 
-		t.put("hello", 0);
-		t.put("hello world", 1);
-		t.put("hello, clarice", 2);
+		trie.put("hello", 0);
+		trie.put("hello world", 1);
+		trie.put("hello, clarice", 2);
 
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertEquals(1, t.get("hello world").intValue());
-		Assert.assertEquals(2, t.get("hello, clarice").intValue());
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertEquals(1, trie.get("hello world").intValue());
+		Assert.assertEquals(2, trie.get("hello, clarice").intValue());
 
-		Integer r0 = t.remove("hello world");
+		Integer r0 = trie.remove("hello world");
 
 		Assert.assertNotNull(r0);
 		Assert.assertEquals(1, r0.intValue());
 
-		Assert.assertNull(t.get("hello world"));
-		Assert.assertEquals(0, t.get("hello").intValue());
-		Assert.assertEquals(2, t.get("hello, clarice").intValue());
+		Assert.assertNull(trie.get("hello world"));
+		Assert.assertEquals(0, trie.get("hello").intValue());
+		Assert.assertEquals(2, trie.get("hello, clarice").intValue());
 	}
 
 }
