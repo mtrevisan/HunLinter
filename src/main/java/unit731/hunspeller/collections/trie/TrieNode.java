@@ -72,7 +72,7 @@ public class TrieNode<T> implements Cloneable{
 		if(children != null){
 			TrieNode<T> node = children.get(stem);
 			//when there are no children, remove this node from it's parent
-			if(node.children == null){
+			if(node != null && node.children == null){
 				removedNode = children.remove(stem);
 
 				if(children.isEmpty())
