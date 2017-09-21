@@ -19,10 +19,9 @@ public class TrieNode<T> implements Cloneable{
 		TrieNode<T> clone = new TrieNode<>();
 		clone.value = value;
 		clone.leaf = leaf;
-		if(children != null){
+		if(children != null)
 			clone.children = children.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
-		}
 		return clone;
 	}
 
@@ -40,10 +39,6 @@ public class TrieNode<T> implements Cloneable{
 
 	public void setLeaf(){
 		leaf = true;
-	}
-
-	public boolean hasChildren(){
-		return (children != null && !children.isEmpty());
 	}
 
 	public TrieNode<T> getChild(int stem){
@@ -76,6 +71,10 @@ public class TrieNode<T> implements Cloneable{
 
 	public boolean isEmpty(){
 		return (value == null && !leaf && (children == null || children.isEmpty()));
+	}
+
+	public boolean hasChildren(){
+		return (children != null && !children.isEmpty());
 	}
 
 }
