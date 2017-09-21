@@ -2,6 +2,7 @@ package unit731.hunspeller.collections.trie;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ public class TrieNode<T> implements Cloneable{
 		this.sequence = sequence;
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
+
 		this.value = value;
 	}
 
@@ -48,8 +50,8 @@ public class TrieNode<T> implements Cloneable{
 		endIndex = 0;
 
 		value = null;
-		if(children != null)
-			children.clear();
+		Optional.ofNullable(children)
+			.ifPresent(Map::clear);
 	}
 
 	public boolean isLeaf(){
@@ -57,13 +59,14 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public TrieNode<T> getChild(int stem){
-		return (children != null? children.get(stem): null);
+		return Optional.ofNullable(children)
+			.map(c -> c.get(stem))
+			.orElse(null);
 	}
 
 	public void addChild(int stem, TrieNode<T> node){
-		if(children == null)
-			children = new HashMap<>();
-
+		children = Optional.ofNullable(children)
+			.orElseGet(HashMap::new);
 		children.put(stem, node);
 	}
 
@@ -90,7 +93,7 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public boolean isEmpty(){
-		return (value == null && (children == null || children.isEmpty()));
+		return (value == null && !hasChildren());
 	}
 
 	public boolean hasChildren(){
@@ -112,7 +115,7 @@ public class TrieNode<T> implements Cloneable{
 		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		if(children != null){
 			children.forEach((stem, node) -> lowerNode.addChild(stem, node));
-			children.clear();
+			children = null;
 		}
 
 		endIndex = startIndex + index;
