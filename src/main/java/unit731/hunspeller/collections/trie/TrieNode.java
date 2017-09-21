@@ -14,8 +14,8 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TrieNode<T> implements Cloneable{
 
-	private String sequence;
-	private int startIndex;
+	@Getter private String sequence;
+	@Getter private int startIndex;
 	@Getter private int endIndex;
 
 	@Getter @Setter private T value;
@@ -35,8 +35,7 @@ public class TrieNode<T> implements Cloneable{
 
 	@Override
 	public TrieNode<T> clone(){
-		TrieNode<T> clone = new TrieNode<>();
-		clone.value = value;
+		TrieNode<T> clone = new TrieNode<>(sequence, startIndex, endIndex, value);
 		if(children != null)
 			clone.children = children.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
@@ -44,6 +43,10 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public void clear(){
+		sequence = null;
+		startIndex = 0;
+		endIndex = 0;
+
 		value = null;
 		if(children != null)
 			children.clear();
