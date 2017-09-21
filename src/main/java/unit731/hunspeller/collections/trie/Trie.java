@@ -21,7 +21,7 @@ public class Trie<T>{
 
 
 	public Trie(){
-		root = new TrieNode<>();
+		root = TrieNode.makeRoot();
 	}
 
 	public Trie(Trie<T> trie){
@@ -55,7 +55,8 @@ public class Trie<T>{
 			int stem = sequencer.hashOf(sequence, i);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null){
-				nextNode = new TrieNode<>();
+				//FIXME
+				nextNode = TrieNode.makeRoot();
 				node.addChild(stem, nextNode);
 			}
 

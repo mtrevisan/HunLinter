@@ -19,7 +19,7 @@ public class TrieNodeTest{
 		node0.addChild('d', node2);
 
 		//split on ab-c
-		TrieNode<String> newNode = node0.split(1, null, sequencer);
+		node0.split(1, null, sequencer);
 
 		//verify ab-c-c and ab-c-d
 		Assert.assertEquals(1, node0.getEndIndex());

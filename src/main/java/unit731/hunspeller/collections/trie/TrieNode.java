@@ -4,35 +4,39 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 
-//@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TrieNode<T> implements Cloneable{
 
-//	private String sequence;
-//	private int startIndex;
-//	@Getter private int endIndex;
+	private String sequence;
+	private int startIndex;
+	@Getter private int endIndex;
 
-	@Getter private T value;
-	@Getter private boolean leaf;
+	@Getter @Setter private T value;
 	private Map<Integer, TrieNode<T>> children;
 
 
-//	public TrieNode(String sequence, int startIndex, int endIndex, T value){
-//		this.sequence = sequence;
-//		this.startIndex = startIndex;
-//		this.endIndex = endIndex;
-//		this.value = value;
-//	}
+	public TrieNode(String sequence, int startIndex, int endIndex, T value){
+		this.sequence = sequence;
+		this.startIndex = startIndex;
+		this.endIndex = endIndex;
+		this.value = value;
+	}
+
+	public static <T> TrieNode<T> makeRoot(){
+		return new TrieNode<>();
+	}
 
 	@Override
 	public TrieNode<T> clone(){
 		TrieNode<T> clone = new TrieNode<>();
 		clone.value = value;
-		clone.leaf = leaf;
 		if(children != null)
 			clone.children = children.entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
@@ -41,18 +45,12 @@ public class TrieNode<T> implements Cloneable{
 
 	public void clear(){
 		value = null;
-		leaf = false;
 		if(children != null)
 			children.clear();
 	}
 
-	public void setValue(T value){
-		this.value = value;
-		setLeaf();
-	}
-
-	public void setLeaf(){
-		leaf = true;
+	public boolean isLeaf(){
+		return (value != null);
 	}
 
 	public TrieNode<T> getChild(int stem){
@@ -84,7 +82,7 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public boolean isEmpty(){
-		return (value == null && !leaf && (children == null || children.isEmpty()));
+		return (value == null && (children == null || children.isEmpty()));
 	}
 
 	public boolean hasChildren(){
@@ -102,19 +100,19 @@ public class TrieNode<T> implements Cloneable{
 	 * @param sequencer	The sequencer to use to determine the place of the node in the children's list
 	 * @return	The reference to the child node created that's sequence starts at index.
 	 */
-//	public TrieNode<T> split(int index, T value, TrieSequencer<String> sequencer){
-//		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
-//		if(children != null){
-//			children.forEach((stem, node) -> lowerNode.addChild(stem, node));
-//			children.clear();
-//		}
-//
-//		endIndex = startIndex + index;
-//
-//		int stem = sequencer.hashOf(sequence, endIndex);
-//		addChild(stem, lowerNode);
-//
-//		return lowerNode;
-//	}
+	public TrieNode<T> split(int index, T value, TrieSequencer<String> sequencer){
+		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
+		if(children != null){
+			children.forEach((stem, node) -> lowerNode.addChild(stem, node));
+			children.clear();
+		}
+
+		endIndex = startIndex + index;
+
+		int stem = sequencer.hashOf(sequence, endIndex);
+		addChild(stem, lowerNode);
+
+		return lowerNode;
+	}
 
 }
