@@ -144,7 +144,7 @@ public class Trie<T>{
 	public void forEachLeaf(Consumer<TrieNode<T>> callback){
 		Objects.requireNonNull(callback);
 
-		forEach(node -> {
+		find(node -> {
 			if(node.isLeaf())
 				callback.accept(node);
 			return false;
@@ -157,7 +157,7 @@ public class Trie<T>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	public boolean forEach(Function<TrieNode<T>, Boolean> callback){
+	public boolean find(Function<TrieNode<T>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;
