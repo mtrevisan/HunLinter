@@ -37,13 +37,13 @@ public class Trie<T>{
 	}
 
 	/**
-	 * Adds a sequence into the Trie
+	 * Puts the value in the Trie with the given sequence.
 	 *
-	 * @param sequence		Sequence with which the specified value is to be associated
-	 * @param value	Value to be associated with the specified key
+	 * @param sequence	Sequence with which the specified value is to be associated
+	 * @param value		The value to place in the Trie
 	 * @return	The previous value associated with <tt>sequence</tt>, or <tt>null</tt> if there was no mapping for <tt>sequence</tt>.
 	 *		(A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with <tt>sequence</tt>)
-	 * @throws NullPointerException if the specified <tt>sequence</tt> is <tt>null</tt>
+	 * @throws NullPointerException if the specified <tt>sequence</tt> or <tt>value</tt> is <tt>null</tt>
 	 */
 	public T put(String sequence, T value){
 		Objects.requireNonNull(sequence);
