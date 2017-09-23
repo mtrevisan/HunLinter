@@ -200,6 +200,13 @@
 			<version>${ch.qos.logback.version}</version>
 		</dependency>
 
+        <!-- Memory usage -->
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>java-sizeof</artifactId>
+            <version>0.0.5</version>
+        </dependency>
+
 		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>
