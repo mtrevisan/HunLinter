@@ -280,6 +280,9 @@ public class AffixParser{
 		if(!containsData(TAG_LANGUAGE))
 			//try to infer language from filename
 			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
+
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
+//7 490 848 B
 	}
 
 	public void clear(){

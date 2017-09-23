@@ -98,6 +98,9 @@ public class ThesaurusParser{
 		protected void done(){
 			if(postExecution != null)
 				postExecution.run();
+
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
+//6 035 792 B
 		}
 	};
 
