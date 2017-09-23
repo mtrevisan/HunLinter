@@ -14,6 +14,8 @@ import java.util.function.Function;
 /**
  * An implementation of a compact Trie. <br/>
  * 
+ * @see <a href="https://github.com/ClickerMonkey/TrieHard">TrieHard</a>
+ * 
  * @param <T>	The data type.
  */
 public class Trie<T>{
