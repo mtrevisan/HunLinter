@@ -165,7 +165,7 @@ public class Trie<T>{
 
 	public Collection<TrieNode<T>> collectPrefixes(String sequence){
 		Collection<TrieNode<T>> prefixes = new ArrayList<>();
-		searchAndApply(sequence, TrieMatch.PARTIAL, (parent, stem) -> {
+		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> {
 			TrieNode<T> node = parent.getChild(stem);
 			if(!prefixes.contains(node))
 				prefixes.add(node);

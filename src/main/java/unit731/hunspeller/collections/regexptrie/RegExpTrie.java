@@ -24,15 +24,15 @@ public class RegExpTrie<T>{
 	}
 
 	/**
-	 * Adds a word into the RegExpTrie
+	 * Adds a sequence into the RegExpTrie
 	 *
-	 * @param word	The word to be added
-	 * @param data	The payload for the inserted word
+	 * @param sequence	The sequence to be added
+	 * @param data	The payload for the inserted sequence
 	 * @return The node just inserted
 	 */
-	public RegExpTrieNode<T> add(String word, T data){
+	public RegExpTrieNode<T> add(String sequence, T data){
 		RegExpTrieNode<T> node = root;
-		String[] chars = characters(word);
+		String[] chars = characters(sequence);
 		for(String stem : chars){
 			RegExpTrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null){
@@ -46,46 +46,46 @@ public class RegExpTrie<T>{
 		return node;
 	}
 
-	public boolean remove(String word){
+	public boolean remove(String sequence){
 		boolean result = false;
-		List<RegExpPrefix<T>> prefixes = findPrefix(word);
+		List<RegExpPrefix<T>> prefixes = findPrefix(sequence);
 		if(prefixes.size() == 1)
-			result = removeSingle(word, prefixes.get(0));
+			result = removeSingle(sequence, prefixes.get(0));
 		return result;
 	}
 
-	public boolean removeAll(String word){
-		List<RegExpPrefix<T>> prefixes = findPrefix(word);
+	public boolean removeAll(String sequence){
+		List<RegExpPrefix<T>> prefixes = findPrefix(sequence);
 		return prefixes.stream()
-			.map(prefix -> removeSingle(word, prefix))
+			.map(prefix -> removeSingle(sequence, prefix))
 			.reduce(true, (a, b) -> a && b);
 	}
 
-	private boolean removeSingle(String word, RegExpPrefix<T> pref){
+	private boolean removeSingle(String sequence, RegExpPrefix<T> pref){
 		boolean result = false;
 		if(pref.isLeaf()){
-			String[] chars = characters(word);
-			String pattern = chars[word.length() - 1];
+			String[] chars = characters(sequence);
+			String pattern = chars[sequence.length() - 1];
 			result = (pref.getParent().removeChild(pattern) != null);
 		}
 		return result;
 	}
 
-	public List<RegExpPrefix<T>> findSuffix(String word){
-		word = new StringBuilder(word).reverse().toString();
-		return findPrefix(word);
+	public List<RegExpPrefix<T>> findSuffix(String sequence){
+		sequence = new StringBuilder(sequence).reverse().toString();
+		return findPrefix(sequence);
 	}
 
-	public List<RegExpPrefix<T>> findPrefix(String word){
+	public List<RegExpPrefix<T>> findPrefix(String sequence){
 		List<RegExpPrefix<T>> result = new ArrayList<>();
 		Stack<RegExpTrieNode<T>> stack = new Stack<>();
 		stack.push(root);
 		List<RegExpTrieNode<T>> tmpStack = new ArrayList<>();
-		int size = word.length();
+		int size = sequence.length();
 		int i = 0;
 		while(!stack.isEmpty()){
 			RegExpTrieNode<T> parent = stack.pop();
-			List<RegExpTrieNode<T>> tmp = parent.getChildrenMatching(word.charAt(i));
+			List<RegExpTrieNode<T>> tmp = parent.getChildrenMatching(sequence.charAt(i));
 
 			int index = i;
 			tmp.stream()
@@ -107,20 +107,20 @@ public class RegExpTrie<T>{
 	}
 
 	/**
-	 * Search the given string and return an object if it lands on a word, essentially testing if the word exists in the trie.
+	 * Search the given string and return an object if it lands on a sequence, essentially testing if the sequence exists in the trie.
 	 *
-	 * @param word	The word to search for
-	 * @return The list of nodes found if the word is contained into this trie
+	 * @param sequence	The sequence to search for
+	 * @return The list of nodes found if the sequence is contained into this trie
 	 */
-	public List<RegExpTrieNode<T>> contains(String word){
+	public List<RegExpTrieNode<T>> containsKey(String sequence){
 		Stack<RegExpTrieNode<T>> stack = new Stack<>();
 		stack.push(root);
 		List<RegExpTrieNode<T>> tmpStack = new ArrayList<>();
-		int size = word.length();
+		int size = sequence.length();
 		int i = 0;
 		while(!stack.isEmpty()){
 			RegExpTrieNode<T> parent = stack.pop();
-			List<RegExpTrieNode<T>> tmp = parent.getChildrenMatching(word.charAt(i));
+			List<RegExpTrieNode<T>> tmp = parent.getChildrenMatching(sequence.charAt(i));
 
 			tmpStack.addAll(tmp);
 			if(stack.isEmpty()){
@@ -135,25 +135,30 @@ public class RegExpTrie<T>{
 		return (i == size? tmpStack.stream().filter(RegExpTrieNode::isLeaf).collect(Collectors.toList()): Collections.<RegExpTrieNode<T>>emptyList());
 	}
 
-	private String[] characters(String word){
-		String[] characters = PatternService.split(word, REGEX_PATTERN_EMPTY);
+	private String[] characters(String sequence){
+		String[] characters = PatternService.split(sequence, REGEX_PATTERN_EMPTY);
 		List<String> list = new ArrayList<>();
 		String group = null;
 		boolean inGroup = false;
 		for(String chr : characters){
-			if(!inGroup && ("[".equals(chr) || "]".equals(chr))){
-				inGroup = true;
-				group = "[";
+			if(("[".equals(chr) || "]".equals(chr))){
+				if(!inGroup){
+					inGroup = true;
+					group = "[";
+				}
+				else if(inGroup){
+					inGroup = false;
+					group += "]";
+					list.add(group);
+					group = StringUtils.EMPTY;
+				}
 			}
-			else if(inGroup && "^".equals(chr))
-				group = "[^" + group.substring(1);
-			else if(inGroup && ("[".equals(chr) || "]".equals(chr))){
-				inGroup = false;
-				group += "]";
-				list.add(group);
+			else if(inGroup){
+				if("^".equals(chr))
+					group = "[^" + group.substring(1);
+				else
+					group += chr;
 			}
-			else if(inGroup)
-				group += chr;
 			else
 				list.add(chr);
 		}

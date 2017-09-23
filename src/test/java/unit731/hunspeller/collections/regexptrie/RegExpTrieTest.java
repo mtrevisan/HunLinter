@@ -19,9 +19,9 @@ public class RegExpTrieTest{
 		trie.add("ac", 3);
 		trie.add("a", 4);
 
-		Assert.assertEquals(1, trie.contains("a").size());
-		Assert.assertEquals(0, trie.contains("ab").size());
-		Assert.assertEquals(0, trie.contains("c").size());
+		Assert.assertEquals(1, trie.containsKey("a").size());
+		Assert.assertEquals(0, trie.containsKey("ab").size());
+		Assert.assertEquals(0, trie.containsKey("c").size());
 	}
 
 	@Test
