@@ -193,6 +193,13 @@
 			<version>${com.fasterxml.jackson.version}</version>
 		</dependency>
 
+		<!-- Memory usage -->
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>java-sizeof</artifactId>
+			<version>0.0.5</version>
+		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
