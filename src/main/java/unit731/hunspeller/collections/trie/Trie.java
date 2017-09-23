@@ -20,7 +20,6 @@ public class Trie<T>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
 	public enum TrieMatch{
-
 		/**
 		 * A partial match only requires the input sequence to be a subset of the sequences stored in the Trie. If the sequence "meow" is
 		 * stored in the Trie, then it can partially match on "m", "me", "meo", "meow", "meowa", etc.
@@ -35,8 +34,7 @@ public class Trie<T>{
 		 * A start-with match requires the input sequence to be a superset of the sequences stored in the Trie. If the sequence "meow" is
 		 * stored in the Trie, then it can match on "meow", "meowa", "meowab", etc.
 		 */
-		STARTS_WITH;
-
+		STARTS_WITH
 	}
 
 
@@ -171,22 +169,6 @@ public class Trie<T>{
 				prefixes.add(node);
 		});
 		return prefixes;
-
-//		TrieNode<T> node = root;
-//		Collection<TrieNode<T>> result = new ArrayList<>();
-//		int size = sequence.length();
-//		for(int i = 0; i < size; i ++){
-//			int stem = sequencer.hashOf(sequence, i);
-//			TrieNode<T> nextNode = node.getChild(stem);
-//			if(nextNode == null)
-//				break;
-//
-//			if(sequence.startsWith(nextNode.getSequence()) && nextNode.isLeaf())
-//				result.add(nextNode);
-//
-//			node = nextNode;
-//		}
-//		return result;
 	}
 
 	/**
