@@ -1,9 +1,12 @@
 package unit731.hunspeller.collections.trie;
 
-import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
-import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 import java.util.ArrayList;
 import java.util.Collection;
+import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.BiConsumer;
@@ -15,6 +18,28 @@ import java.util.function.Function;
  * @param <T>	The data type.
  */
 public class Trie<T>{
+
+	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
+	public enum TrieMatch{
+
+		/**
+		 * A partial match only requires the input sequence to be a subset of the sequences stored in the Trie. If the sequence "meow" is
+		 * stored in the Trie, then it can partially match on "m", "me", "meo", "meow", "meowa", etc.
+		 */
+		PARTIAL,
+		/**
+		 * An exact match requires the input sequence to be an exact match to the sequences stored in the Trie. If the sequence "meow" is
+		 * stored in the Trie, then it can only match on "meow".
+		 */
+		EXACT,
+		/**
+		 * A start-with match requires the input sequence to be a superset of the sequences stored in the Trie. If the sequence "meow" is
+		 * stored in the Trie, then it can match on "meow", "meowa", "meowab", etc.
+		 */
+		STARTS_WITH;
+
+	}
+
 
 	private final TrieNode<T> root;
 	private final TrieSequencer<String> sequencer = new StringTrieSequencer();
@@ -49,26 +74,83 @@ public class Trie<T>{
 		Objects.requireNonNull(sequence);
 		Objects.requireNonNull(value);
 
-		TrieNode<T> node = root;
+		int sequenceOffset = 0;
 		int size = sequence.length();
-		for(int i = 0; i < size; i ++){
-			int stem = sequencer.hashOf(sequence, i);
-			TrieNode<T> nextNode = node.getChild(stem);
-			if(nextNode == null){
-				//FIXME
-				nextNode = TrieNode.makeRoot();
-				node.addChild(stem, nextNode);
+		int stem = sequencer.hashOf(sequence, sequenceOffset);
+		TrieNode<T> node = root.getChild(stem);
+		if(node == null){
+			node = new TrieNode<>(sequence, sequenceOffset, size, value);
+			root.addChild(stem, node);
+
+			return null;
+		}
+
+		while(node != null){
+			int nodeLength = node.getEndIndex() - node.getStartIndex();
+			int max = Math.min(nodeLength, size - sequenceOffset);
+			int matches = sequencer.matches(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
+
+			sequenceOffset += matches;
+
+			//mismatch in current node
+			if(matches != max){
+				node.split(matches, node.getValue(), sequencer);
+
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				stem = sequencer.hashOf(sequence, sequenceOffset);
+				node.addChild(stem, newNode);
+
+				return null;
 			}
 
-			node = nextNode;
+			//partial match to the current node
+			if(max < nodeLength){
+				node.split(max, value, sequencer);
+				node.setSequence(sequence);
+
+				return null;
+			}
+
+			//full match to sequence, replace value and sequence
+			if(sequenceOffset == size){
+				node.setSequence(sequence);
+
+				return node.setValue(value);
+			}
+
+			//full match, end of the query, or node
+			if(!node.hasChildren()){
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				stem = sequencer.hashOf(sequence, sequenceOffset);
+				node.addChild(stem, newNode);
+
+				return null;
+			}
+
+			//full match, end of node
+			stem = sequencer.hashOf(sequence, sequenceOffset);
+			TrieNode<T> nextNode = node.getChild(stem);
+			if(nextNode == null){
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				node.addChild(stem, newNode);
+			}
+
+			//full match, query or node remaining
+         node = nextNode;
 		}
-		T oldValue = node.getValue();
-		node.setValue(value);
-		return oldValue;
+		return null;
 	}
 
+	/**
+	 * Gets the value that matches the given sequence.
+	 *
+	 * @param sequence	The sequence to match.
+	 * @return	The value for the given sequence, or the default value of the Trie if no match was found. The default value of a Trie is by default
+	 *		null.
+	 */
 	public T get(String sequence){
-		return findAndApply(sequence, null);
+		TrieNode<T> node = searchAndApply(sequence, TrieMatch.EXACT, null);
+		return (node != null? node.getValue(): null);
 	}
 
 	/**
@@ -78,52 +160,108 @@ public class Trie<T>{
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
 	public T remove(String sequence){
-		return findAndApply(sequence, (parent, stem) -> parent.removeChild(stem));
+		TrieNode<T> node = searchAndApply(sequence, TrieMatch.EXACT, (parent, stem) -> parent.removeChild(stem));
+		return (node != null? node.getValue(): null);
 	}
 
-	private T findAndApply(String sequence, BiConsumer<TrieNode<T>, Integer> callback){
+	public Collection<TrieNode<T>> collectPrefixes(String sequence){
+		Collection<TrieNode<T>> prefixes = new ArrayList<>();
+		searchAndApply(sequence, TrieMatch.PARTIAL, (parent, stem) -> {
+			TrieNode<T> node = parent.getChild(stem);
+			if(!prefixes.contains(node))
+				prefixes.add(node);
+		});
+		return prefixes;
+
+//		TrieNode<T> node = root;
+//		Collection<TrieNode<T>> result = new ArrayList<>();
+//		int size = sequence.length();
+//		for(int i = 0; i < size; i ++){
+//			int stem = sequencer.hashOf(sequence, i);
+//			TrieNode<T> nextNode = node.getChild(stem);
+//			if(nextNode == null)
+//				break;
+//
+//			if(sequence.startsWith(nextNode.getSequence()) && nextNode.isLeaf())
+//				result.add(nextNode);
+//
+//			node = nextNode;
+//		}
+//		return result;
+	}
+
+	/**
+	 * Searches in the Trie based on the sequence query.
+	 *
+	 * @param sequence	The query sequence.
+	 * @param match		The matching logic.
+	 * @param callback	The callback to be executed on match found.
+	 * @return	The node that best matched the query based on the logic.
+	 */
+	private TrieNode<T> searchAndApply(String sequence, TrieMatch matchType, BiConsumer<TrieNode<T>, Integer> callback){
 		Objects.requireNonNull(sequence);
 
-		T foundValue = null;
-		TrieNode<T> node = root;
-		int size = sequence.length();
-		for(int i = 0; i < size; i ++){
-			int stem = sequencer.hashOf(sequence, i);
-			TrieNode<T> nextNode = node.getChild(stem);
-			if(nextNode == null)
-				break;
+		int sequenceLength = sequence.length();
+		int sequenceOffset = root.getEndIndex();
+		//if the sequence is empty, return null
+		if(sequenceLength == 0 || sequenceLength < sequenceOffset)
+			return null;
 
-			if(nextNode.isLeaf() && i + 1 == size){
-				if(callback != null)
-					callback.accept(node, stem);
+		int stem = sequencer.hashOf(sequence, sequenceOffset);
+		TrieNode<T> parent = root;
+		TrieNode<T> node = root.getChild(stem);
+		while(node != null){
+			int nodeLength = node.getEndIndex() - node.getStartIndex();
+			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
+			int matches = sequencer.matches(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
-				foundValue = nextNode.getValue();
+			sequenceOffset += matches;
+
+			//not found
+			if(matches != max)
+				node = null;
+			//potentially PARTIAL match
+			else if(max != nodeLength && matches == max){
+				if(matchType != TrieMatch.PARTIAL)
+					node = null;
+				else
+					break;
+			}
+			//either EXACT or STARTS_WITH match
+			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
+				if(callback != null && node.isLeaf())
+					callback.accept(parent, stem);
+
 				break;
 			}
+			else{
+				if(callback != null && node.isLeaf())
+					callback.accept(parent, stem);
 
-			node = nextNode;
+				stem = sequencer.hashOf(sequence, sequenceOffset);
+				TrieNode<T> next = node.getChild(stem);
+
+				//if there is no next, node could be a STARTS_WITH match
+				if(next == null)
+					break;
+
+				parent = node;
+				node = next;
+			}
 		}
-		return foundValue;
-	}
 
-	public Iterable<Prefix<T>> collectPrefixes(String sequence){
-		Objects.requireNonNull(sequence);
-
-		TrieNode<T> node = root;
-		Collection<Prefix<T>> result = new ArrayList<>();
-		int size = sequence.length();
-		for(int i = 0; i < size; i ++){
-			int stem = sequencer.hashOf(sequence, i);
-			TrieNode<T> nextNode = node.getChild(stem);
-			if(nextNode == null)
-				break;
-
-			if(nextNode.isLeaf())
-				result.add(new Prefix<>(nextNode, i, node));
-
-			node = nextNode;
+		//EXACT matches
+		if(node != null && matchType == TrieMatch.EXACT){
+			//check length of last node against query
+			int endIndex = node.getEndIndex();
+			if(!node.isLeaf() || endIndex != sequenceLength)
+				return null;
+			//check actual sequence values
+			if(node.getSequence().length() != sequenceLength || sequencer.matches(node.getSequence(), 0, sequence, 0, endIndex) != sequenceLength)
+				return null;
 		}
-		return result;
+
+		return node;
 	}
 
 	/**
@@ -144,7 +282,7 @@ public class Trie<T>{
 	public void forEachLeaf(Consumer<TrieNode<T>> callback){
 		Objects.requireNonNull(callback);
 
-		find(node -> {
+		find(root, node -> {
 			if(node.isLeaf())
 				callback.accept(node);
 			return false;
@@ -154,10 +292,11 @@ public class Trie<T>{
 	/**
 	 * Apply a function to each node, traversing the tree in level order, until the callback responds <code>true</code>.
 	 * 
+	 * @param root			Node to start with
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	public boolean find(Function<TrieNode<T>, Boolean> callback){
+	public boolean find(TrieNode<T> root, Function<TrieNode<T>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;

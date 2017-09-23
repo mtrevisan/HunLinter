@@ -3,19 +3,21 @@ package unit731.hunspeller.collections.trie.sequencers;
 
 public class StringTrieSequencer implements TrieSequencer<String>{
 
-	/**
-	 * Calculates the hash of the element at the given index in the given sequence. The hash is used as a key to quickly retrieve entries.
-	 * Typical implementations based on characters return the ASCII value of the character, since it yields dense numerical values.
-	 * The more dense the hashes returned (the smaller the difference between the minimum and maximum returnable hash means it's more dense),
-	 * the less space that is wasted.
-	 *
-	 * @param sequence	The sequence.
-	 * @param index		The index of the element to calculate the hash of.
-	 * @return	The hash of the element in the sequence at the index.
-	 */
 	@Override
 	public int hashOf(String sequence, int index){
 		return sequence.charAt(index);
+	}
+
+	/* Find the Longest Common Prefix length */
+	@Override
+	public int matches(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
+		int count = maxCount;
+		for(int i = 0; i < maxCount; i ++)
+			if(sequenceA.charAt(indexA + i) != sequenceB.charAt(indexB + i)){
+				count = i;
+				break;
+			}
+		return count;
 	}
 
 }

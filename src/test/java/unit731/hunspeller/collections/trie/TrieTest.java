@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.trie;
 
+import java.util.Collection;
 import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -32,9 +33,8 @@ public class TrieTest{
 		trie.put("cd", 4);
 		trie.put("abc", 5);
 
-		Iterable<Prefix<Integer>> prefixes = trie.collectPrefixes("abcd");
-		Integer[] datas = StreamSupport.stream(prefixes.spliterator(), false)
-			.map(Prefix::getNode)
+		Collection<TrieNode<Integer>> prefixes = trie.collectPrefixes("abcd");
+		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
@@ -68,6 +68,7 @@ public class TrieTest{
 		Assert.assertTrue(trie.isEmpty());
 
 		trie.put("java.lang.", Boolean.TRUE);
+		trie.put("java.i", Boolean.TRUE);
 		trie.put("java.io.", Boolean.TRUE);
 		trie.put("java.util.concurrent.", Boolean.TRUE);
 		trie.put("java.util.", Boolean.FALSE);
@@ -80,17 +81,6 @@ public class TrieTest{
 		Assert.assertTrue(trie.collectPrefixes("java.io.InputStream").iterator().hasNext());
 		Assert.assertTrue(trie.collectPrefixes("java.util.ArrayList").iterator().hasNext());
 		Assert.assertTrue(trie.collectPrefixes("java.util.concurrent.ConcurrentHashMap").iterator().hasNext());
-	}
-
-	@Test
-	public void hasPartialMatch(){
-		Trie<Boolean> trie = new Trie<>();
-
-		trie.put("bookshelf", Boolean.TRUE);
-		trie.put("wowza", Boolean.FALSE);
-
-		Assert.assertFalse(trie.collectPrefixes("wow").iterator().hasNext());
-		Assert.assertFalse(trie.collectPrefixes("book").iterator().hasNext());
 	}
 
 	@Test
@@ -110,18 +100,7 @@ public class TrieTest{
 		trie.put("bookshelf", Boolean.TRUE);
 		trie.put("wowza", Boolean.FALSE);
 
-		Assert.assertTrue(trie.collectPrefixes("wowza").iterator().hasNext());
-	}
-
-	@Test
-	public void getPartialMatch(){
-		Trie<Boolean> trie = new Trie<>();
-
-		trie.put("bookshelf", Boolean.TRUE);
-		trie.put("wowza", Boolean.FALSE);
-
-		Assert.assertFalse(trie.collectPrefixes("wow").iterator().hasNext());
-		Assert.assertFalse(trie.collectPrefixes("book").iterator().hasNext());
+		Assert.assertTrue(trie.containsKey("wowza"));
 	}
 
 	@Test
@@ -144,6 +123,7 @@ public class TrieTest{
 
 		Assert.assertEquals(Boolean.FALSE, trie.get("wowza"));
 		Assert.assertEquals(Boolean.TRUE, trie.get("bookshelf"));
+		Assert.assertNull(trie.get("bookshelf2"));
 	}
 
 	@Test

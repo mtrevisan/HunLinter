@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,13 +14,14 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(of = {"sequence", "startIndex", "endIndex"})
 public class TrieNode<T> implements Cloneable{
 
-	@Getter private String sequence;
+	@Getter @Setter private String sequence;
 	@Getter private int startIndex;
 	@Getter private int endIndex;
 
-	@Getter @Setter private T value;
+	@Getter private T value;
 	private Map<Integer, TrieNode<T>> children;
 
 
@@ -52,6 +54,12 @@ public class TrieNode<T> implements Cloneable{
 		value = null;
 		Optional.ofNullable(children)
 			.ifPresent(Map::clear);
+	}
+
+	public T setValue(T value){
+		T previousValue = this.value;
+		this.value = value;
+		return previousValue;
 	}
 
 	public boolean isLeaf(){
@@ -97,7 +105,7 @@ public class TrieNode<T> implements Cloneable{
 	}
 
 	public boolean hasChildren(){
-		return (children != null && !children.isEmpty());
+		return (children != null);
 	}
 
 	/**

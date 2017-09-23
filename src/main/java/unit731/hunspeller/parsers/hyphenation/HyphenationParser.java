@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.trie.Prefix;
 import unit731.hunspeller.collections.trie.Trie;
 import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.interfaces.Resultable;
@@ -431,10 +430,10 @@ public class HyphenationParser{
 		int[] indexes = new int[wordSize];
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
-			Iterable<Prefix<String>> prefixes = patterns.collectPrefixes(w.substring(i));
-			for(Prefix<String> prefix : prefixes){
+			Iterable<TrieNode<String>> prefixes = patterns.collectPrefixes(w.substring(i));
+			for(TrieNode<String> prefix : prefixes){
 				int j = -1;
-				String rule = prefix.getNode().getValue();
+				String rule = prefix.getValue();
 				String reducedData = PatternService.replaceFirst(rule, REGEX_REDUCE, StringUtils.EMPTY);
 				int ruleSize = reducedData.length();
 				for(int k = 0; k < ruleSize; k ++){
