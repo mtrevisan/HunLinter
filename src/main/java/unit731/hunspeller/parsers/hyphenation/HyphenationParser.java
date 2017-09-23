@@ -187,9 +187,9 @@ public class HyphenationParser{
 
 					setProgress(100);
 				}
-long noBytes = com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns);
-System.out.println(noBytes);
-//103304
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103304 patricia trie
+//106800 basic trie
 
 				publish("Finished reading Hyphenation file");
 			}

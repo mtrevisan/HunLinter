@@ -121,11 +121,8 @@ public class TrieNode<T> implements Cloneable{
 	 */
 	public TrieNode<T> split(int index, T value, TrieSequencer<String> sequencer){
 		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
-		if(children != null){
-			children.forEach((stem, node) -> lowerNode.addChild(stem, node));
-			children = null;
-		}
-
+		lowerNode.children = children;
+		children = null;
 		endIndex = startIndex + index;
 
 		int stem = sequencer.hashOf(sequence, endIndex);

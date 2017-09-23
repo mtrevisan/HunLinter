@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.BiConsumer;
@@ -15,6 +12,8 @@ import java.util.function.Function;
 
 
 /**
+ * An implementation of a compact Trie. <br/>
+ * 
  * @param <T>	The data type.
  */
 public class Trie<T>{
