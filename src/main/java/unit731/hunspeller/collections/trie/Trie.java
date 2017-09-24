@@ -7,6 +7,7 @@ import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
@@ -18,6 +19,7 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
  * 
  * @param <T>	The data type.
  */
+@NoArgsConstructor
 public class Trie<T>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
@@ -36,8 +38,12 @@ public class Trie<T>{
 
 
 	private final TrieNode<T> root = TrieNode.makeRoot();
-	private final TrieSequencer<String> sequencer = new StringTrieSequencer();
+	private TrieSequencer<String> sequencer = new StringTrieSequencer();
 
+
+	public Trie(TrieSequencer<String> sequencer){
+		this.sequencer = sequencer;
+	}
 
 	public void clear(){
 		root.clear();
@@ -61,11 +67,11 @@ public class Trie<T>{
 		Objects.requireNonNull(value);
 
 		int sequenceOffset = 0;
-		int size = sequence.length();
+		int sequenceLength = sequence.length();
 		int stem = sequencer.hashOf(sequence, sequenceOffset);
 		TrieNode<T> node = root.getChild(stem);
 		if(node == null){
-			node = new TrieNode<>(sequence, sequenceOffset, size, value);
+			node = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
 			root.addChild(stem, node);
 
 			return null;
@@ -73,7 +79,7 @@ public class Trie<T>{
 
 		while(node != null){
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
-			int max = Math.min(nodeLength, size - sequenceOffset);
+			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matches(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
 			sequenceOffset += matches;
@@ -82,7 +88,7 @@ public class Trie<T>{
 			if(matches != max){
 				node.split(matches, node.getValue(), sequencer);
 
-				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
 				stem = sequencer.hashOf(sequence, sequenceOffset);
 				node.addChild(stem, newNode);
 
@@ -98,7 +104,7 @@ public class Trie<T>{
 			}
 
 			//full match to sequence, replace value and sequence
-			if(sequenceOffset == size){
+			if(sequenceOffset == sequenceLength){
 				node.setSequence(sequence);
 
 				return node.setValue(value);
@@ -106,7 +112,7 @@ public class Trie<T>{
 
 			//full match, end of the query, or node
 			if(!node.hasChildren()){
-				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
 				stem = sequencer.hashOf(sequence, sequenceOffset);
 				node.addChild(stem, newNode);
 
@@ -117,7 +123,7 @@ public class Trie<T>{
 			stem = sequencer.hashOf(sequence, sequenceOffset);
 			TrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null){
-				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, size, value);
+				TrieNode<T> newNode = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
 				node.addChild(stem, newNode);
 			}
 
