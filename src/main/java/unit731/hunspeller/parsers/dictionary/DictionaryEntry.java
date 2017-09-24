@@ -19,7 +19,7 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryEntry implements Productable{
 
 	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?([\\t\\s]+(?<dataFields>.+))?$");
-	private static final Pattern REGEX_PATTERN_ENTRY = PatternService.pattern("[\\s\\t]+");
+	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
 	private static final String TAB = "\t";
 
@@ -60,7 +60,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group("flags");
 		ruleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
-		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_ENTRY): new String[0]);
+		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
 
 		this.strategy = strategy;
 	}

@@ -12,7 +12,7 @@ import unit731.hunspeller.services.PatternService;
 
 public class RegExpTrie<T>{
 
-	private static final Pattern REGEX_PATTERN_EMPTY = PatternService.pattern(StringUtils.EMPTY);
+	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?!\\])");
 
 
 	/** the root of the RegExpTrie */
@@ -32,7 +32,7 @@ public class RegExpTrie<T>{
 	 */
 	public RegExpTrieNode<T> add(String sequence, T data){
 		RegExpTrieNode<T> node = root;
-		String[] chars = characters(sequence);
+		String[] chars = PatternService.split(sequence, REGEX_PATTERN);
 		for(String stem : chars){
 			RegExpTrieNode<T> nextNode = node.getChild(stem);
 			if(nextNode == null){
@@ -64,7 +64,7 @@ public class RegExpTrie<T>{
 	private boolean removeSingle(String sequence, RegExpPrefix<T> pref){
 		boolean result = false;
 		if(pref.isLeaf()){
-			String[] chars = characters(sequence);
+			String[] chars = PatternService.split(sequence, REGEX_PATTERN);
 			String pattern = chars[sequence.length() - 1];
 			result = (pref.getParent().removeChild(pattern) != null);
 		}
@@ -133,36 +133,6 @@ public class RegExpTrie<T>{
 			}
 		}
 		return (i == size? tmpStack.stream().filter(RegExpTrieNode::isLeaf).collect(Collectors.toList()): Collections.<RegExpTrieNode<T>>emptyList());
-	}
-
-	private String[] characters(String sequence){
-		String[] characters = PatternService.split(sequence, REGEX_PATTERN_EMPTY);
-		List<String> list = new ArrayList<>();
-		String group = null;
-		boolean inGroup = false;
-		for(String chr : characters){
-			if(("[".equals(chr) || "]".equals(chr))){
-				if(!inGroup){
-					inGroup = true;
-					group = "[";
-				}
-				else if(inGroup){
-					inGroup = false;
-					group += "]";
-					list.add(group);
-					group = StringUtils.EMPTY;
-				}
-			}
-			else if(inGroup){
-				if("^".equals(chr))
-					group = "[^" + group.substring(1);
-				else
-					group += chr;
-			}
-			else
-				list.add(chr);
-		}
-		return list.toArray(new String[0]);
 	}
 
 }
