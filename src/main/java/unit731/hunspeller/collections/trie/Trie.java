@@ -2,17 +2,17 @@ package unit731.hunspeller.collections.trie;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
-import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 
 /**
- * An implementation of a compact Trie. <br/>
+ * An implementation of a compact Trie.
  * 
  * @see <a href="https://github.com/ClickerMonkey/TrieHard">TrieHard</a>
  * 
@@ -40,17 +40,9 @@ public class Trie<T>{
 	}
 
 
-	private final TrieNode<T> root;
+	private final TrieNode<T> root = TrieNode.makeRoot();
 	private final TrieSequencer<String> sequencer = new StringTrieSequencer();
 
-
-	public Trie(){
-		root = TrieNode.makeRoot();
-	}
-
-	public Trie(Trie<T> trie){
-		root = trie.root.clone();
-	}
 
 	public void clear(){
 		root.clear();
@@ -240,7 +232,8 @@ public class Trie<T>{
 			if(!node.isLeaf() || endIndex != sequenceLength)
 				return null;
 			//check actual sequence values
-			if(node.getSequence().length() != sequenceLength || sequencer.matches(node.getSequence(), 0, sequence, 0, endIndex) != sequenceLength)
+			String seq = node.getSequence();
+			if(seq.length() != sequenceLength || sequencer.matches(seq, 0, sequence, 0, endIndex) != sequenceLength)
 				return null;
 		}
 

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = {"sequence", "startIndex", "endIndex"})
-public class TrieNode<T> implements Cloneable{
+public class TrieNode<T>{
 
 	@Getter @Setter private String sequence;
 	@Getter private int startIndex;
@@ -35,15 +34,6 @@ public class TrieNode<T> implements Cloneable{
 
 	public static <T> TrieNode<T> makeRoot(){
 		return new TrieNode<>();
-	}
-
-	@Override
-	public TrieNode<T> clone(){
-		TrieNode<T> clone = new TrieNode<>(sequence, startIndex, endIndex, value);
-		if(children != null)
-			clone.children = children.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue()));
-		return clone;
 	}
 
 	public void clear(){

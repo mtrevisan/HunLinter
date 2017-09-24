@@ -345,12 +345,17 @@ public class HyphenationParser{
 	 * @throws CloneNotSupportedException	If the Trie does not support the {@code Cloneable} interface
 	 */
 	public Hyphenation hyphenate(String word, String addedRule) throws CloneNotSupportedException{
-		Trie<String> patternsWithAddedRule = new Trie<>(patterns);
 		addedRule = correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);
-		patternsWithAddedRule.put(key, addedRule);
+		Hyphenation hyph = null;
+		if(!patterns.containsKey(key)){
+			patterns.put(key, addedRule);
 
-		return hyphenate(word, patternsWithAddedRule);
+			hyph = hyphenate(word, patterns);
+
+			patterns.remove(key);
+		}
+		return hyph;
 	}
 
 	public boolean hasRule(String rule){
