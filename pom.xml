@@ -60,7 +60,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<executions>
 					<!-- Run shade goal on package phase -->
 					<execution>
@@ -145,7 +145,10 @@
 		<org.projectlombok.version>1.16.18</org.projectlombok.version>
 
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.9.0</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.9.1</com.fasterxml.jackson.version>
+
+		<!-- CarrotSearch sizeof -->
+		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>
 
 		<!-- Logging -->
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
@@ -197,7 +200,7 @@
 		<dependency>
 			<groupId>com.carrotsearch</groupId>
 			<artifactId>java-sizeof</artifactId>
-			<version>0.0.5</version>
+			<version>${com.carrotsearch.sizeof.version}</version>
 		</dependency>
 
 		<!-- Logging -->
