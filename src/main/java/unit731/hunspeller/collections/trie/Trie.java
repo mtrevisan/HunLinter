@@ -187,12 +187,11 @@ public class Trie<T>{
 
 			sequenceOffset += matches;
 
-			//not found
 			if(matches != max || matches == max && max != nodeLength)
+				//not found
 				node = null;
-			//either EXACT or STARTS_WITH match
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
-				if(callback != null && node.isLeaf())
+				if(callback != null && node.isLeaf() && sequence.startsWith(node.getSequence()))
 					callback.accept(parent, stem);
 
 				break;
