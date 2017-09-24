@@ -8,7 +8,6 @@ public class StringTrieSequencer implements TrieSequencer<String>{
 		return sequence.charAt(index);
 	}
 
-	/* Find the Longest Common Prefix length */
 	@Override
 	public int matches(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
 		int count = maxCount;

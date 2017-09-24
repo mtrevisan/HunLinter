@@ -272,7 +272,7 @@ public class Trie<T>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	public boolean find(TrieNode<T> root, Function<TrieNode<T>, Boolean> callback){
+	private boolean find(TrieNode<T> root, Function<TrieNode<T>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;
