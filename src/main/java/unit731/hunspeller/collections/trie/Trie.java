@@ -23,11 +23,6 @@ public class Trie<T>{
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
 	public enum TrieMatch{
 		/**
-		 * A partial match only requires the input sequence to be a subset of the sequences stored in the Trie. If the sequence "meow" is
-		 * stored in the Trie, then it can partially match on "m", "me", "meo", "meow", "meowa", etc.
-		 */
-		PARTIAL,
-		/**
 		 * An exact match requires the input sequence to be an exact match to the sequences stored in the Trie. If the sequence "meow" is
 		 * stored in the Trie, then it can only match on "meow".
 		 */
@@ -193,15 +188,8 @@ public class Trie<T>{
 			sequenceOffset += matches;
 
 			//not found
-			if(matches != max)
+			if(matches != max || matches == max && max != nodeLength)
 				node = null;
-			//potentially PARTIAL match
-			else if(max != nodeLength && matches == max){
-				if(matchType != TrieMatch.PARTIAL)
-					node = null;
-				else
-					break;
-			}
 			//either EXACT or STARTS_WITH match
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
 				if(callback != null && node.isLeaf())
@@ -210,7 +198,8 @@ public class Trie<T>{
 				break;
 			}
 			else{
-				if(callback != null && node.isLeaf())
+				//call callback for each leaf node found so far
+				if(callback != null && node.isLeaf() && sequence.startsWith(node.getSequence()))
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
@@ -231,6 +220,7 @@ public class Trie<T>{
 			int endIndex = node.getEndIndex();
 			if(!node.isLeaf() || endIndex != sequenceLength)
 				return null;
+
 			//check actual sequence values
 			String seq = node.getSequence();
 			if(seq.length() != sequenceLength || sequencer.matches(seq, 0, sequence, 0, endIndex) != sequenceLength)

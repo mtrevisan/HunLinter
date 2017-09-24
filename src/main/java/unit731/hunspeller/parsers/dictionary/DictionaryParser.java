@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,6 +35,7 @@ import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
@@ -175,22 +175,17 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
-			setProgress(0);
 
 			//collect duplicates
 			BloomFilter<String> duplicatesBloomFilter = collectDuplicates();
-			setProgress(25);
 
 			//extract duplicates
 			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
-			setProgress(50);
 
 			//write duplicates to file
 			writeDuplicates(duplicates, outputFile);
-			setProgress(75);
 
 			publish("Duplicates extracted successfully");
-			setProgress(100);
 			return null;
 		}
 
@@ -200,6 +195,7 @@ public class DictionaryParser{
 			BloomFilter<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(500_000, 0.000_000_2, 2.);
 			duplicatesBloomFilter.setCharset(CHARSET);
 
+			setProgress(0);
 			try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
 				String line = br.readLine();
 				if(!NumberUtils.isCreatable(line))
@@ -257,6 +253,7 @@ public class DictionaryParser{
 
 			publish("Start extracting duplicates");
 
+			setProgress(0);
 			try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
 				String line = br.readLine();
 
@@ -306,7 +303,9 @@ public class DictionaryParser{
 
 			long writtenSoFar = 0l;
 			long totalSize = duplicates.size();
+			setProgress(0);
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
+				setProgress((int)(100. / (totalSize + 1)));
 			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
@@ -317,7 +316,7 @@ public class DictionaryParser{
 					writer.newLine();
 
 					writtenSoFar ++;
-					setProgress((int)((writtenSoFar * 100.) / totalSize));
+					setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
 				}
 				setProgress(100);
 
