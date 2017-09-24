@@ -1241,7 +1241,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 		//disable menu
 		dicMenu.setEnabled(false);
-		theMenu.setEnabled(false);
 		fileCreatePackageMenuItem.setEnabled(false);
 
 		affParser.clear();
@@ -1373,6 +1372,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		dm.setSynonyms(null);
 
 		theParser.clear();
+
+		theMenu.setEnabled(false);
 
 		mainTabbedPane.setEnabledAt(1, false);
 	}
