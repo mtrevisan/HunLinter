@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.regexptrie.RegExpPrefix;
-import unit731.hunspeller.collections.regexptrie.RegExpTrieNode;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;

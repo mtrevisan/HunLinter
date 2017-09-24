@@ -46,6 +46,10 @@ public class TrieNode<T>{
 			.ifPresent(Map::clear);
 	}
 
+	public String getSubSequence(){
+		return sequence.substring(startIndex, endIndex);
+	}
+
 	public T setValue(T value){
 		T previousValue = this.value;
 		this.value = value;

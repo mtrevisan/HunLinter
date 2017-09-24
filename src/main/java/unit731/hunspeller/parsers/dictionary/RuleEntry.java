@@ -1,10 +1,8 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
-import unit731.hunspeller.collections.regexptrie.RegExpTrie;
 
 
 @Getter
