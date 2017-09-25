@@ -129,6 +129,7 @@ public class Trie<T>{
 
 	private void createAndAttachNode(String sequence, int startIndex, int endIndex, T value, TrieNode<T> parent){
 		TrieNode<T> newNode = new TrieNode<>(sequence, startIndex, endIndex, value);
+
 		int stem = sequencer.hashOf(sequence, startIndex);
 		parent.addChild(stem, newNode);
 	}
