@@ -12,9 +12,9 @@ public class TrieNodeTest{
 	public void removeChildWithoutChildren(){
 		TrieSequencer<String> sequencer = new StringTrieSequencer();
 		String sequence = "abcd";
-		TrieNode<String> node = new TrieNode<>(sequence, 0, 3, null);
+		TrieNode<String, String> node = new TrieNode<>(sequence, 0, 3, null);
 
-		TrieNode<String> removedNode = node.removeChild(sequencer.hashOf(sequence, 0));
+		TrieNode<String, String> removedNode = node.removeChild(sequencer.hashOf(sequence, 0));
 
 		Assert.assertNull(removedNode);
 		Assert.assertFalse(node.hasChildren());
@@ -23,11 +23,11 @@ public class TrieNodeTest{
 	@Test
 	public void removeChildWithOneChild(){
 		String sequence = "abc";
-		TrieNode<String> node = new TrieNode<>(sequence, 0, 3, null);
-		TrieNode<String> node1 = new TrieNode<>("abcd", 3, 3, null);
+		TrieNode<String, String> node = new TrieNode<>(sequence, 0, 3, null);
+		TrieNode<String, String> node1 = new TrieNode<>("abcd", 3, 3, null);
 		node.addChild('d', node1);
 
-		TrieNode<String> removedNode = node.removeChild('a');
+		TrieNode<String, String> removedNode = node.removeChild('a');
 
 		Assert.assertNull(removedNode);
 		Assert.assertNotNull(node.getChild('d'));
@@ -37,9 +37,9 @@ public class TrieNodeTest{
 	public void nodeSplit(){
 		//create: abc, abc-d, and abc-e
 		TrieSequencer<String> sequencer = new StringTrieSequencer();
-		TrieNode<String> node0 = new TrieNode<>("abc", 0, 3, null);
-		TrieNode<String> node1 = new TrieNode<>("abcd", 3, 3, null);
-		TrieNode<String> node2 = new TrieNode<>("abce", 3, 3, null);
+		TrieNode<String, String> node0 = new TrieNode<>("abc", 0, 3, null);
+		TrieNode<String, String> node1 = new TrieNode<>("abcd", 3, 3, null);
+		TrieNode<String, String> node2 = new TrieNode<>("abce", 3, 3, null);
 		node0.addChild('d', node1);
 		node0.addChild('e', node2);
 
@@ -48,11 +48,11 @@ public class TrieNodeTest{
 
 		//verify ab-c-d, and ab-c-e
 		Assert.assertEquals(2, node0.getEndIndex());
-		TrieNode<String> child1 = node0.getChild('c');
+		TrieNode<String, String> child1 = node0.getChild('c');
 		Assert.assertNotNull(child1);
-		TrieNode<String> child2 = child1.getChild('d');
+		TrieNode<String, String> child2 = child1.getChild('d');
 		Assert.assertNotNull(child2);
-		TrieNode<String> child3 = child1.getChild('e');
+		TrieNode<String, String> child3 = child1.getChild('e');
 		Assert.assertNotNull(child3);
 	}
 
