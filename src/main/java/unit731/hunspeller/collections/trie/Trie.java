@@ -15,6 +15,8 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 /**
  * An implementation of a compact Trie.
  * 
+ * @see <a href="http://en.wikipedia.org/wiki/Radix_tree">Radix Tree</a>
+ * @see <a href="http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Tree/PATRICIA">PATRICIA Trie</a>
  * @see <a href="https://github.com/ClickerMonkey/TrieHard">TrieHard</a>
  * 
  * @param <T>	The data type.
