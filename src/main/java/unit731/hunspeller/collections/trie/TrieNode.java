@@ -36,7 +36,7 @@ public class TrieNode<S, V>{
 		this.value = value;
 	}
 
-	public static <S, T> TrieNode<S, T> makeRoot(){
+	public static <S, V> TrieNode<S, V> makeRoot(){
 		return new TrieNode<>();
 	}
 

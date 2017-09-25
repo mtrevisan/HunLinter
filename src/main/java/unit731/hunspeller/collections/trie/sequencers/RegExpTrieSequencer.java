@@ -9,7 +9,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?!\\])");
 
 
-	public String[] extractCharacters(String sequence){
+	public static String[] extractCharacters(String sequence){
 		return PatternService.split(sequence, REGEX_PATTERN);
 	}
 
