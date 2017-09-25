@@ -57,13 +57,16 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	}
 
 	@Override
-	public int matchesGet(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
+	public int matchesGet(String[] nodeSequence, int nodeIndex, String[] searchSequence, int searchIndex, int maxCount){
 		int count = maxCount;
-		for(int i = 0; i < maxCount; i ++)
-			if(!PatternService.find(sequenceB[indexB + i], PatternService.matcher(sequenceA[indexA + i]))){
+		for(int i = 0; i < maxCount; i ++){
+			String ns = nodeSequence[nodeIndex + i];
+			String ss = searchSequence[searchIndex + i];
+			if(ns.startsWith("[^") ^ !ns.contains(ss)){
 				count = i;
 				break;
 			}
+		}
 		return count;
 	}
 
