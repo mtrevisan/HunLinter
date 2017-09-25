@@ -1,7 +1,7 @@
 package unit731.hunspeller.collections.trie.sequencers;
 
 
-public interface TrieSequencer<T>{
+public interface TrieSequencer<S>{
 
 	/**
 	 * Calculates the length of the sequence.
@@ -9,7 +9,7 @@ public interface TrieSequencer<T>{
 	 * @param sequence	The sequence.
 	 * @return	The sequence length.
 	 */
-	int lengthOf(T sequence);
+	int lengthOf(S sequence);
 
 	/**
 	 * Calculates the length of the sequence.
@@ -18,7 +18,7 @@ public interface TrieSequencer<T>{
 	 * @param prefix		The prefix the sequence should be compared to.
 	 * @return	Whether the sequence starts with the given text.
 	 */
-	boolean startsWith(T sequence, T prefix);
+	boolean startsWith(S sequence, S prefix);
 
 	/**
 	 * Calculates the true sequence.
@@ -28,7 +28,7 @@ public interface TrieSequencer<T>{
 	 * @param endIndex	The ending index.
 	 * @return	The true sequence.
 	 */
-	T getTrueSequence(T sequence, int startIndex, int endIndex);
+	S getTrueSequence(S sequence, int startIndex, int endIndex);
 
 	/**
 	 * Calculates the hash of the element at the given index in the given sequence. The hash is used as a key to quickly retrieve entries.
@@ -40,7 +40,7 @@ public interface TrieSequencer<T>{
 	 * @param index		The index of the element to calculate the hash of.
 	 * @return	The hash of the element in the sequence at the index.
 	 */
-	Object hashOf(T sequence, int index);
+	Object hashOf(S sequence, int index);
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to
@@ -54,6 +54,6 @@ public interface TrieSequencer<T>{
 	 * @return	A number between <tt>0</tt> (inclusive) and <tt>maxCount</tt> (inclusive) that is the number of matches between the two sequence
 	 *		sections.
 	 */
-	int matches(T sequenceA, int indexA, T sequenceB, int indexB, int maxCount);
+	int matches(S sequenceA, int indexA, S sequenceB, int indexB, int maxCount);
 
 }

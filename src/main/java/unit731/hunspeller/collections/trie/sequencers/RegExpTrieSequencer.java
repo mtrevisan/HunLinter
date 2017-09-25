@@ -23,12 +23,10 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 		int i = 0;
 		int size = sequence.length;
 		for(String p : prefix){
-			if(!Pattern.matches(sequence[i], p))
+			if(i == size || !sequence[i].equals(p))
 				return false;
-			i ++;
 
-			if(i >= size)
-				return false;
+			i ++;
 		}
 		return true;
 	}

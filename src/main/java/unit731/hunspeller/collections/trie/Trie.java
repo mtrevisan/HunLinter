@@ -20,10 +20,10 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
  * @see <a href="https://github.com/ClickerMonkey/TrieHard">TrieHard</a>
  * 
  * @param <S>	The sequence type.
- * @param <T>	The data type.
+ * @param <V>	The value type.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Trie<S, T>{
+public class Trie<S, V>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
 	public enum TrieMatch{
@@ -40,7 +40,7 @@ public class Trie<S, T>{
 	}
 
 
-	private final TrieNode<S, T> root = TrieNode.makeRoot();
+	private final TrieNode<S, V> root = TrieNode.makeRoot();
 	private TrieSequencer<S> sequencer;
 
 
@@ -65,15 +65,15 @@ public class Trie<S, T>{
 	 *		(A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with <tt>sequence</tt>)
 	 * @throws NullPointerException if the specified <tt>sequence</tt> or <tt>value</tt> is <tt>null</tt>
 	 */
-	public T put(S sequence, T value){
+	public V put(S sequence, V value){
 		Objects.requireNonNull(sequence);
 		Objects.requireNonNull(value);
 
-		T previousValue = null;
+		V previousValue = null;
 		int sequenceOffset = 0;
 		int sequenceLength = sequencer.lengthOf(sequence);
 		Object stem = sequencer.hashOf(sequence, sequenceOffset);
-		TrieNode<S, T> node = root.getChild(stem);
+		TrieNode<S, V> node = root.getChild(stem);
 		if(node == null){
 			node = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
 			root.addChild(stem, node);
@@ -120,7 +120,7 @@ public class Trie<S, T>{
 
 				//full match, end of node
 				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TrieNode<S, T> nextNode = node.getChild(stem);
+				TrieNode<S, V> nextNode = node.getChild(stem);
 				if(nextNode == null)
 					createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
 
@@ -130,8 +130,8 @@ public class Trie<S, T>{
 		return previousValue;
 	}
 
-	private void createAndAttachNode(S sequence, int startIndex, int endIndex, T value, TrieNode<S, T> parent){
-		TrieNode<S, T> newNode = new TrieNode<>(sequence, startIndex, endIndex, value);
+	private void createAndAttachNode(S sequence, int startIndex, int endIndex, V value, TrieNode<S, V> parent){
+		TrieNode<S, V> newNode = new TrieNode<>(sequence, startIndex, endIndex, value);
 
 		Object stem = sequencer.hashOf(sequence, startIndex);
 		parent.addChild(stem, newNode);
@@ -144,8 +144,8 @@ public class Trie<S, T>{
 	 * @return	The value for the given sequence, or the default value of the Trie if no match was found. The default value of a Trie is by default
 	 *		null.
 	 */
-	public T get(S sequence){
-		TrieNode<S, T> node = searchAndApply(sequence, TrieMatch.EXACT, null);
+	public V get(S sequence){
+		TrieNode<S, V> node = searchAndApply(sequence, TrieMatch.EXACT, null);
 		return (node != null? node.getValue(): null);
 	}
 
@@ -155,15 +155,15 @@ public class Trie<S, T>{
 	 * @param sequence	The sequence to remove.
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
-	public T remove(S sequence){
-		TrieNode<S, T> node = searchAndApply(sequence, TrieMatch.EXACT, (parent, stem) -> parent.removeChild(stem));
+	public V remove(S sequence){
+		TrieNode<S, V> node = searchAndApply(sequence, TrieMatch.EXACT, (parent, stem) -> parent.removeChild(stem));
 		return (node != null? node.getValue(): null);
 	}
 
-	public Collection<TrieNode<S, T>> collectPrefixes(S sequence){
-		Collection<TrieNode<S, T>> prefixes = new ArrayList<>();
+	public Collection<TrieNode<S, V>> collectPrefixes(S sequence){
+		Collection<TrieNode<S, V>> prefixes = new ArrayList<>();
 		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> {
-			TrieNode<S, T> node = parent.getChild(stem);
+			TrieNode<S, V> node = parent.getChild(stem);
 			if(!prefixes.contains(node))
 				prefixes.add(node);
 		});
@@ -178,7 +178,7 @@ public class Trie<S, T>{
 	 * @param callback	The callback to be executed on match found.
 	 * @return	The node that best matched the query based on the logic.
 	 */
-	private TrieNode<S, T> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, T>, Object> callback){
+	private TrieNode<S, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, V>, Object> callback){
 		Objects.requireNonNull(sequence);
 
 		int sequenceLength = sequencer.lengthOf(sequence);
@@ -188,8 +188,8 @@ public class Trie<S, T>{
 			return null;
 
 		Object stem = sequencer.hashOf(sequence, sequenceOffset);
-		TrieNode<S, T> parent = root;
-		TrieNode<S, T> node = root.getChild(stem);
+		TrieNode<S, V> parent = root;
+		TrieNode<S, V> node = root.getChild(stem);
 		while(node != null){
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
@@ -212,7 +212,7 @@ public class Trie<S, T>{
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TrieNode<S, T> next = node.getChild(stem);
+				TrieNode<S, V> next = node.getChild(stem);
 
 				//if there is no next, node could be a STARTS_WITH match
 				if(next == null)
@@ -254,7 +254,7 @@ public class Trie<S, T>{
 	 * 
 	 * @param callback	Function that will be executed for each leaf of the trie
 	 */
-	public void forEachLeaf(Consumer<TrieNode<S, T>> callback){
+	public void forEachLeaf(Consumer<TrieNode<S, V>> callback){
 		Objects.requireNonNull(callback);
 
 		find(root, node -> {
@@ -271,14 +271,14 @@ public class Trie<S, T>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	private boolean find(TrieNode<S, T> root, Function<TrieNode<S, T>, Boolean> callback){
+	private boolean find(TrieNode<S, V> root, Function<TrieNode<S, V>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;
-		Stack<TrieNode<S, T>> level = new Stack<>();
+		Stack<TrieNode<S, V>> level = new Stack<>();
 		level.push(root);
 		while(!level.empty()){
-			TrieNode<S, T> node = level.pop();
+			TrieNode<S, V> node = level.pop();
 
 			node.forEachChild(level::push);
 
