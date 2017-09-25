@@ -46,10 +46,21 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	}
 
 	@Override
-	public int matches(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
+	public int matchesPut(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
 		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
 			if(!sequenceA[indexA + i].equals(sequenceB[indexB + i])){
+				count = i;
+				break;
+			}
+		return count;
+	}
+
+	@Override
+	public int matchesGet(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
+		int count = maxCount;
+		for(int i = 0; i < maxCount; i ++)
+			if(!PatternService.find(sequenceB[indexB + i], PatternService.matcher(sequenceA[indexA + i]))){
 				count = i;
 				break;
 			}

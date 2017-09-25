@@ -24,7 +24,16 @@ public class StringTrieSequencer implements TrieSequencer<String>{
 	}
 
 	@Override
-	public int matches(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
+	public int matchesPut(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
+		return matches(sequenceA, indexA, sequenceB, indexB, maxCount);
+	}
+
+	@Override
+	public int matchesGet(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
+		return matches(sequenceA, indexA, sequenceB, indexB, maxCount);
+	}
+
+	private int matches(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
 		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
 			if(sequenceA.charAt(indexA + i) != sequenceB.charAt(indexB + i)){

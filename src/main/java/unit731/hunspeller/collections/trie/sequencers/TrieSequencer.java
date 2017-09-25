@@ -44,7 +44,7 @@ public interface TrieSequencer<S>{
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to
-	 * the given count.
+	 * the given count for inserting a new sequence.
 	 *
 	 * @param sequenceA	The first sequence to count matches on.
 	 * @param indexA		The offset into the first sequence.
@@ -54,6 +54,20 @@ public interface TrieSequencer<S>{
 	 * @return	A number between <tt>0</tt> (inclusive) and <tt>maxCount</tt> (inclusive) that is the number of matches between the two sequence
 	 *		sections.
 	 */
-	int matches(S sequenceA, int indexA, S sequenceB, int indexB, int maxCount);
+	int matchesPut(S sequenceA, int indexA, S sequenceB, int indexB, int maxCount);
+
+	/**
+	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to
+	 * the given count for retrieving a sequence.
+	 *
+	 * @param sequenceA	The first sequence to count matches on.
+	 * @param indexA		The offset into the first sequence.
+	 * @param sequenceB	The second sequence to count matches on.
+	 * @param indexB		The offset into the second sequence.
+	 * @param maxCount	The maximum number of matches to search for.
+	 * @return	A number between <tt>0</tt> (inclusive) and <tt>maxCount</tt> (inclusive) that is the number of matches between the two sequence
+	 *		sections.
+	 */
+	int matchesGet(S sequenceA, int indexA, S sequenceB, int indexB, int maxCount);
 
 }

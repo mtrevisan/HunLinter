@@ -13,8 +13,8 @@ public class RegExpTrieTest{
 	public void contains(){
 		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
-		trie.put(RegExpTrieSequencer.extractCharacters("abc"), 1);
-		trie.put(RegExpTrieSequencer.extractCharacters("abb"), 2);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[b]c"), 1);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[b]b"), 2);
 		trie.put(RegExpTrieSequencer.extractCharacters("ac"), 3);
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 4);
 

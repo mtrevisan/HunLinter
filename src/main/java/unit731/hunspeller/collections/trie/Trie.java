@@ -82,7 +82,7 @@ public class Trie<S, V>{
 			while(node != null){
 				int nodeLength = node.getEndIndex() - node.getStartIndex();
 				int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
-				int matches = sequencer.matches(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
+				int matches = sequencer.matchesPut(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
 				sequenceOffset += matches;
 
@@ -193,7 +193,7 @@ public class Trie<S, V>{
 		while(node != null){
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
-			int matches = sequencer.matches(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
+			int matches = sequencer.matchesGet(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
 			sequenceOffset += matches;
 
@@ -232,7 +232,7 @@ public class Trie<S, V>{
 
 			//check actual sequence values
 			S seq = node.getSequence();
-			if(sequencer.lengthOf(seq) != sequenceLength || sequencer.matches(seq, 0, sequence, 0, endIndex) != sequenceLength)
+			if(sequencer.lengthOf(seq) != sequenceLength || sequencer.matchesGet(seq, 0, sequence, 0, endIndex) != sequenceLength)
 				return null;
 		}
 
