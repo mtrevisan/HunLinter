@@ -42,12 +42,11 @@ public class TrieNode<T>{
 		endIndex = 0;
 
 		value = null;
-		Optional.ofNullable(children)
-			.ifPresent(Map::clear);
+		children = null;
 	}
 
-	public String getSubSequence(){
-		return sequence.substring(startIndex, endIndex);
+	public String getNodeSequence(){
+		return (sequence != null? sequence.substring(startIndex, endIndex): null);
 	}
 
 	public T setValue(T value){
