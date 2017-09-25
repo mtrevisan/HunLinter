@@ -58,7 +58,7 @@ public class HyphenationParser{
 	private static final Pattern REGEX_PATTERN_COMMA = PatternService.pattern(",");
 
 	private static final Matcher VALID_RULE = PatternService.matcher("[\\d]");
-	private static final Matcher AUGMENTED_RULE = PatternService.matcher("^(?<rule>.+)/(?<addBefore>.*?)(=|(?<hyphen>.)_)(?<addAfter>[^,]*)(,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$");
+	private static final Matcher AUGMENTED_RULE = PatternService.matcher("^(?<rule>.+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$");
 	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);

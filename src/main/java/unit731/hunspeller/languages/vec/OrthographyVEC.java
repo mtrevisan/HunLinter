@@ -13,9 +13,9 @@ public class OrthographyVEC extends Orthography{
 	private static final Matcher REGEX_E_GRAVE = PatternService.matcher("e\\\\");
 	private static final Matcher REGEX_O_GRAVE = PatternService.matcher("o\\\\");
 	private static final Matcher REGEX_E_ACUTE = PatternService.matcher("e/");
-	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(i/|ì)");
+	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(?:i/|ì)");
 	private static final Matcher REGEX_O_ACUTE = PatternService.matcher("o/");
-	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(u/|ù)");
+	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(?:u/|ù)");
 
 	private static final Matcher REGEX_H = PatternService.matcher("(^|[^dfkjlnpstx])h");
 	private static final Matcher REGEX_DH = PatternService.matcher("dh");

@@ -117,9 +117,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
-	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(i/|ì)");
+	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(?:i/|ì)");
 	private static final Matcher REGEX_O_ACUTE = PatternService.matcher("o/");
-	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(u/|ù)");
+	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(?:u/|ù)");
 
 	private static final Matcher REGEX_DH = PatternService.matcher("dh");
 	private static final Matcher REGEX_JH = PatternService.matcher("jh");
