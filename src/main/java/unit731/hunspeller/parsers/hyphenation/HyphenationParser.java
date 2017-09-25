@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.trie.Trie;
 import unit731.hunspeller.collections.trie.TrieNode;
+import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -78,7 +79,7 @@ public class HyphenationParser{
 	private final Orthography orthography;
 
 	
-	private Trie<String> patterns = new Trie<>();
+	private Trie<String, String> patterns = new Trie<>(new StringTrieSequencer());
 	private HyphenationOptions options;
 	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
@@ -96,7 +97,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, Trie<String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, Trie<String, String> patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -374,7 +375,7 @@ public class HyphenationParser{
 	 * @param patterns	The trie containing the subdivision rules
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Trie<String> patterns){
+	private Hyphenation hyphenate(String word, Trie<String, String> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		word = correctOrthography(word.toLowerCase(Locale.ROOT));
@@ -429,7 +430,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak getHyphenationIndexes(String word, Trie<String> patterns){
+	private HyphenationBreak getHyphenationIndexes(String word, Trie<String, String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -437,8 +438,8 @@ public class HyphenationParser{
 		int[] indexes = new int[wordSize];
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
-			Iterable<TrieNode<String>> prefixes = patterns.collectPrefixes(w.substring(i));
-			for(TrieNode<String> prefix : prefixes){
+			Iterable<TrieNode<String, String>> prefixes = patterns.collectPrefixes(w.substring(i));
+			for(TrieNode<String, String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getValue();
 				String reducedData = PatternService.replaceFirst(rule, REGEX_REDUCE, StringUtils.EMPTY);

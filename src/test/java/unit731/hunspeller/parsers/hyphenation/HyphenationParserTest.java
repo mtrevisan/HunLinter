@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.trie.Trie;
+import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -16,7 +17,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToLeftMin(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		patterns.put("abc", "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
@@ -31,7 +32,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToRightMin(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		patterns.put("abc", "ab1c");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
@@ -46,7 +47,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkLeftMin(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "a1bc");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -61,7 +62,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkRightMin(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "ab1c");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
@@ -76,7 +77,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithRemovalBeforeHyphen(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "aa1tje/=,2,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -91,7 +92,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithIndexes(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "1-/-=,1,1");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -106,7 +107,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithoutIndexes(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "1-/-=");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -121,7 +122,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "-1/-=-");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -136,7 +137,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak2(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "1k");
 		addRule(patterns, "-1/-=-");
 		HyphenationOptions options = HyphenationOptions.builder()
@@ -152,7 +153,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedNonWordInitial(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "eigh1teen/ht=t,4,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -167,7 +168,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWordInitial(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, ".schif1fahrt/ff=f,5,2");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -182,7 +183,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedBase(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "c1k/k=k");
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
@@ -197,7 +198,7 @@ public class HyphenationParserTest{
 
 	@Test
 	public void competingRules(){
-		Trie<String> patterns = new Trie<>();
+		Trie<String> patterns = new Trie<>(new StringTrieSequencer());
 		addRule(patterns, "ab1c");
 		addRule(patterns, "2c");
 		HyphenationOptions options = HyphenationOptions.builder()

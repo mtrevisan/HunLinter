@@ -4,7 +4,22 @@ package unit731.hunspeller.collections.trie.sequencers;
 public class StringTrieSequencer implements TrieSequencer<String>{
 
 	@Override
-	public int hashOf(String sequence, int index){
+	public int lengthOf(String sequence){
+		return sequence.length();
+	}
+
+	@Override
+	public boolean startsWith(String sequence, String prefix){
+		return sequence.startsWith(prefix);
+	}
+
+	@Override
+	public String getTrueSequence(String sequence, int startIndex, int endIndex){
+		return sequence.substring(startIndex, endIndex);
+	}
+
+	@Override
+	public Object hashOf(String sequence, int index){
 		return sequence.charAt(index);
 	}
 

@@ -12,19 +12,23 @@ import lombok.Setter;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
 
 
+/**
+ * @param <S>	The sequence type.
+ * @param <T>	The data type.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = {"sequence", "startIndex", "endIndex"})
-public class TrieNode<T>{
+public class TrieNode<S, T>{
 
-	@Getter @Setter private String sequence;
+	@Getter @Setter private S sequence;
 	@Getter private int startIndex;
 	@Getter private int endIndex;
 
 	@Getter private T value;
-	private Map<Integer, TrieNode<T>> children;
+	private Map<Object, TrieNode<S, T>> children;
 
 
-	public TrieNode(String sequence, int startIndex, int endIndex, T value){
+	public TrieNode(S sequence, int startIndex, int endIndex, T value){
 		this.sequence = sequence;
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
@@ -32,7 +36,7 @@ public class TrieNode<T>{
 		this.value = value;
 	}
 
-	public static <T> TrieNode<T> makeRoot(){
+	public static <S, T> TrieNode<S, T> makeRoot(){
 		return new TrieNode<>();
 	}
 
@@ -45,10 +49,6 @@ public class TrieNode<T>{
 		children = null;
 	}
 
-	public String getNodeSequence(){
-		return (sequence != null? sequence.substring(startIndex, endIndex): null);
-	}
-
 	public T setValue(T value){
 		T previousValue = this.value;
 		this.value = value;
@@ -59,22 +59,22 @@ public class TrieNode<T>{
 		return (value != null);
 	}
 
-	public TrieNode<T> getChild(int stem){
+	public TrieNode<S, T> getChild(Object stem){
 		return Optional.ofNullable(children)
 			.map(c -> c.get(stem))
 			.orElse(null);
 	}
 
-	public void addChild(int stem, TrieNode<T> node){
+	public void addChild(Object stem, TrieNode<S, T> node){
 		children = Optional.ofNullable(children)
 			.orElseGet(HashMap::new);
 		children.put(stem, node);
 	}
 
-	public TrieNode<T> removeChild(int stem){
-		TrieNode<T> removedNode = null;
+	public TrieNode<S, T> removeChild(Object stem){
+		TrieNode<S, T> removedNode = null;
 		if(children != null){
-			TrieNode<T> node = children.get(stem);
+			TrieNode<S, T> node = children.get(stem);
 			//when there are no children, remove this node from it's parent
 			if(node != null && node.children == null){
 				removedNode = children.remove(stem);
@@ -87,7 +87,7 @@ public class TrieNode<T>{
 		return removedNode;
 	}
 
-	public void forEachChild(Consumer<TrieNode<T>> callback){
+	public void forEachChild(Consumer<TrieNode<S, T>> callback){
 		if(children != null)
 			children.values()
 				.forEach(callback::accept);
@@ -112,13 +112,13 @@ public class TrieNode<T>{
 	 * @param sequencer	The sequencer to use to determine the place of the node in the children's list
 	 * @return	The reference to the child node created that's sequence starts at index.
 	 */
-	public TrieNode<T> split(int index, T value, TrieSequencer<String> sequencer){
-		TrieNode<T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
+	public TrieNode<S, T> split(int index, T value, TrieSequencer<S> sequencer){
+		TrieNode<S, T> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		lowerNode.children = children;
 		children = null;
 		endIndex = startIndex + index;
 
-		int stem = sequencer.hashOf(sequence, endIndex);
+		Object stem = sequencer.hashOf(sequence, endIndex);
 		addChild(stem, lowerNode);
 
 		return lowerNode;
