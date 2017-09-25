@@ -1,6 +1,9 @@
 package unit731.hunspeller.collections.trie.sequencers;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
+import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -23,7 +26,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 		int i = 0;
 		int size = sequence.length;
 		for(String p : prefix){
-			if(i == size || !sequence[i].equals(p))
+			if(i == size || sequence[i].startsWith("[^") ^ !sequence[i].contains(p))
 				return false;
 
 			i ++;
@@ -43,6 +46,15 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	@Override
 	public Object hashOf(String[] sequence, int index){
 		return sequence[index];
+	}
+
+	@Override
+	public <V> TrieNode<String[], V> getChild(Map<Object, TrieNode<String[], V>> children, Object stem){
+		Set<Object> keys = children.keySet();
+		for(Object key : keys)
+			if(((String)key).startsWith("[^") ^ ((String)key).contains((String)stem))
+				return children.get(key);
+		return null;
 	}
 
 	@Override

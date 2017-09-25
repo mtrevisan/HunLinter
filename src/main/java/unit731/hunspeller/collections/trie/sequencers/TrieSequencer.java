@@ -1,5 +1,9 @@
 package unit731.hunspeller.collections.trie.sequencers;
 
+import java.util.Map;
+import unit731.hunspeller.collections.trie.TrieNode;
+
+
 
 public interface TrieSequencer<S>{
 
@@ -41,6 +45,8 @@ public interface TrieSequencer<S>{
 	 * @return	The hash of the element in the sequence at the index.
 	 */
 	Object hashOf(S sequence, int index);
+
+	<V> TrieNode<S, V> getChild(Map<Object, TrieNode<S, V>> children, Object stem);
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to

@@ -59,10 +59,11 @@ public class TrieNode<S, V>{
 		return (value != null);
 	}
 
-	public TrieNode<S, V> getChild(Object stem){
-		return Optional.ofNullable(children)
-			.map(c -> c.get(stem))
-			.orElse(null);
+	public TrieNode<S, V> getChild(Object stem, TrieSequencer<S> sequencer){
+		TrieNode<S, V> child = null;
+		if(children != null)
+			child = sequencer.getChild(children, stem);
+		return child;
 	}
 
 	public void addChild(Object stem, TrieNode<S, V> node){
@@ -71,10 +72,10 @@ public class TrieNode<S, V>{
 		children.put(stem, node);
 	}
 
-	public TrieNode<S, V> removeChild(Object stem){
+	public TrieNode<S, V> removeChild(Object stem, TrieSequencer<S> sequencer){
 		TrieNode<S, V> removedNode = null;
 		if(children != null){
-			TrieNode<S, V> node = children.get(stem);
+			TrieNode<S, V> node = sequencer.getChild(children, stem);
 			//when there are no children, remove this node from it's parent
 			if(node != null && node.children == null){
 				removedNode = children.remove(stem);

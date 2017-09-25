@@ -1,5 +1,9 @@
 package unit731.hunspeller.collections.trie.sequencers;
 
+import java.util.Map;
+import unit731.hunspeller.collections.trie.TrieNode;
+
+
 
 public class StringTrieSequencer implements TrieSequencer<String>{
 
@@ -21,6 +25,11 @@ public class StringTrieSequencer implements TrieSequencer<String>{
 	@Override
 	public Object hashOf(String sequence, int index){
 		return sequence.charAt(index);
+	}
+
+	@Override
+	public <V> TrieNode<String, V> getChild(Map<Object, TrieNode<String, V>> children, Object stem){
+		return children.get(stem);
 	}
 
 	@Override
