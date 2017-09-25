@@ -52,7 +52,6 @@ public class HyphenationParser{
 	public static final String HYPHEN = "\u2010";
 	public static final String HYPHEN_MINUS = "\u002D";
 	private static final String SOFT_HYPHEN = "\u00AD";
-	private static final String HYPHENS = "[" + Pattern.quote(HYPHEN) + "]";
 
 	private static final String WORD_BOUNDARY = ".";
 
@@ -64,7 +63,7 @@ public class HyphenationParser{
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher REGEX_HYPHEN_MINUS = PatternService.matcher(HYPHEN_MINUS);
-	private static final Matcher REGEX_HYPHENS = PatternService.matcher(HYPHENS);
+	private static final Matcher REGEX_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN) + "]");
 	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher REGEX_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher REGEX_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
