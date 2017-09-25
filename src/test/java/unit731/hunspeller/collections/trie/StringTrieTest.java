@@ -7,7 +7,7 @@ import org.junit.Test;
 import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 
 
-public class TrieTest{
+public class StringTrieTest{
 
 	@Test
 	public void contains(){

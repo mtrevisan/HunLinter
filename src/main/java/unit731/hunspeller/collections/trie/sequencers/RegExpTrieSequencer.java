@@ -49,7 +49,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	public int matches(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
 		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
-			if(sequenceA[indexA + i].equals(sequenceB[indexB + i])){
+			if(!sequenceA[indexA + i].equals(sequenceB[indexB + i])){
 				count = i;
 				break;
 			}
