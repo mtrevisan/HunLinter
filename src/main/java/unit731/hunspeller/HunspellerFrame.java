@@ -1227,7 +1227,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 			flm.addFile(affFile);
 		}
-		catch(IOException | IllegalArgumentException e){
+		catch(IOException | IllegalArgumentException | NullPointerException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}
@@ -1323,7 +1323,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 			flm.addFile(aidFile);
 		}
-		catch(IOException e){
+		catch(IOException | NullPointerException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}

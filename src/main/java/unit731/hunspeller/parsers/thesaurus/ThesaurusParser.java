@@ -83,7 +83,7 @@ public class ThesaurusParser{
 
 				publish("Finished reading Thesaurus file");
 			}
-			catch(IOException | IllegalArgumentException e){
+			catch(IOException | IllegalArgumentException | NullPointerException e){
 				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return theParser.synonyms;

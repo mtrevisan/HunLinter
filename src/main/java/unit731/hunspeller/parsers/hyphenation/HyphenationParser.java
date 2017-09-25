@@ -193,7 +193,7 @@ public class HyphenationParser{
 
 				publish("Finished reading Hyphenation file");
 			}
-			catch(IOException | IllegalArgumentException e){
+			catch(IOException | IllegalArgumentException | NullPointerException e){
 				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;

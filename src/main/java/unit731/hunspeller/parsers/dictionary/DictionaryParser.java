@@ -146,7 +146,7 @@ public class DictionaryParser{
 
 				publish("Finished reading Dictionary file");
 			}
-			catch(IOException | IllegalArgumentException e){
+			catch(IOException | IllegalArgumentException | NullPointerException e){
 				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
