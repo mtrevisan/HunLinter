@@ -47,14 +47,14 @@ public class RegExpTrieTest{
 
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]c"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]b"), 2);
-		trie.put(RegExpTrieSequencer.extractCharacters("ac"), 3);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[^bcd]"), 3);
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 4);
 
 		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("a")));
 		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("abc")));
 		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("adc")));
 		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("aec")));
-		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("ab")));
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("ae")));
 		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("c")));
 	}
 
