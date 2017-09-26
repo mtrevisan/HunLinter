@@ -11,6 +11,8 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 
 	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
+	private static final String NEGATED_CLASS_START = "[^";
+
 
 	public static String[] extractCharacters(String sequence){
 		return PatternService.split(sequence, REGEX_PATTERN);
@@ -26,7 +28,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 		int i = 0;
 		int size = sequence.length;
 		for(String p : prefix){
-			if(i == size || p.startsWith("[^") ^ !p.contains(sequence[i]))
+			if(i == size || p.startsWith(NEGATED_CLASS_START) ^ !p.contains(sequence[i]))
 				return false;
 
 			i ++;
@@ -45,15 +47,17 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 
 	@Override
 	public Object hashOf(String[] sequence, int index){
-		return sequence[index];
+		return (String)sequence[index];
 	}
 
 	@Override
 	public <V> TrieNode<String[], V> getChild(Map<Object, TrieNode<String[], V>> children, Object stem){
 		Set<Object> keys = children.keySet();
-		for(Object key : keys)
-			if(((String)key).startsWith("[^") ^ ((String)key).contains((String)stem))
+		for(Object key : keys){
+			String k = (String)key;
+			if(k.startsWith(NEGATED_CLASS_START) ^ k.contains((String)stem))
 				return children.get(key);
+		}
 		return null;
 	}
 
@@ -74,7 +78,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 		for(int i = 0; i < maxCount; i ++){
 			String ns = nodeSequence[nodeIndex + i];
 			String ss = searchSequence[searchIndex + i];
-			if(ns.startsWith("[^") ^ !ns.contains(ss)){
+			if(ns.startsWith(NEGATED_CLASS_START) ^ !ns.contains(ss)){
 				count = i;
 				break;
 			}

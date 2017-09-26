@@ -110,12 +110,12 @@ public class RegExpTrieTest{
 	public void defaultValueConstructor(){
 		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
-		Assert.assertEquals(null, trie.get(RegExpTrieSequencer.extractCharacters("meow")));
+		Assert.assertNull(trie.get(RegExpTrieSequencer.extractCharacters("meow")));
 
 		trie.put(RegExpTrieSequencer.extractCharacters("meow"), Boolean.TRUE);
 
 		Assert.assertEquals(Boolean.TRUE, trie.get(RegExpTrieSequencer.extractCharacters("meow")));
-		Assert.assertEquals(null, trie.get(RegExpTrieSequencer.extractCharacters("world")));
+		Assert.assertNull(trie.get(RegExpTrieSequencer.extractCharacters("world")));
 	}
 
 	@Test

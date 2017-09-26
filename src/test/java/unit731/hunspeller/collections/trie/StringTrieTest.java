@@ -53,12 +53,12 @@ public class StringTrieTest{
 	public void defaultValueConstructor(){
 		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
-		Assert.assertEquals(null, trie.get("meow"));
+		Assert.assertNull(trie.get("meow"));
 
 		trie.put("meow", Boolean.TRUE);
 
 		Assert.assertEquals(Boolean.TRUE, trie.get("meow"));
-		Assert.assertEquals(null, trie.get("world"));
+		Assert.assertNull(trie.get("world"));
 	}
 
 	@Test
