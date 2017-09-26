@@ -81,7 +81,7 @@ public class RegExpTrieTest{
 
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bcd]"), 2);
-		trie.put(RegExpTrieSequencer.extractCharacters("bc"), 3);
+		trie.put(RegExpTrieSequencer.extractCharacters("[^ac]c"), 3);
 		trie.put(RegExpTrieSequencer.extractCharacters("cd"), 4);
 		trie.put(RegExpTrieSequencer.extractCharacters("aec"), 5);
 
@@ -90,6 +90,11 @@ public class RegExpTrieTest{
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
+		prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("ec"));
+		datas = prefixes.stream()
+			.map(TrieNode::getValue)
+			.toArray(Integer[]::new);
+		Assert.assertArrayEquals(new Integer[]{3}, datas);
 	}
 
 	@Test
