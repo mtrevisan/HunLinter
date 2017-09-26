@@ -29,7 +29,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void contains(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("abc"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("abb"), 2);
@@ -43,7 +43,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void containsRegExp(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]c"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]b"), 2);
@@ -60,7 +60,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void collectPrefixes(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("ab"), 2);
@@ -68,7 +68,7 @@ public class RegExpTrieTest{
 		trie.put(RegExpTrieSequencer.extractCharacters("cd"), 4);
 		trie.put(RegExpTrieSequencer.extractCharacters("abc"), 5);
 
-		Collection<TrieNode<String[], Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
+		Collection<TrieNode<String[], String, Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
@@ -77,7 +77,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void collectPrefixesRegExp(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 1);
 		trie.put(RegExpTrieSequencer.extractCharacters("a[bcd]"), 2);
@@ -85,7 +85,7 @@ public class RegExpTrieTest{
 		trie.put(RegExpTrieSequencer.extractCharacters("cd"), 4);
 		trie.put(RegExpTrieSequencer.extractCharacters("aec"), 5);
 
-		Collection<TrieNode<String[], Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
+		Collection<TrieNode<String[], String, Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
@@ -99,7 +99,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void emptyConstructor(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		Assert.assertTrue(trie.isEmpty());
 		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("word")));
@@ -108,7 +108,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void defaultValueConstructor(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		Assert.assertNull(trie.get(RegExpTrieSequencer.extractCharacters("meow")));
 
@@ -120,7 +120,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void simplePut(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		Assert.assertTrue(trie.isEmpty());
 
@@ -142,7 +142,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void hasStartsWithMatch(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("bookshelf"), Boolean.TRUE);
 		trie.put(RegExpTrieSequencer.extractCharacters("wowza"), Boolean.FALSE);
@@ -152,7 +152,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void hasExactMatch(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("bookshelf"), Boolean.TRUE);
 		trie.put(RegExpTrieSequencer.extractCharacters("wowza"), Boolean.FALSE);
@@ -162,7 +162,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void getStartsWithMatch(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("bookshelf"), Boolean.TRUE);
 		trie.put(RegExpTrieSequencer.extractCharacters("wowza"), Boolean.FALSE);
@@ -173,7 +173,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void getExactMatch(){
-		Trie<String[], Boolean> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Boolean> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("bookshelf"), Boolean.TRUE);
 		trie.put(RegExpTrieSequencer.extractCharacters("wowza"), Boolean.FALSE);
@@ -185,7 +185,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void removeBack(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("hello"), 0);
 		trie.put(RegExpTrieSequencer.extractCharacters("hello world"), 1);
@@ -204,7 +204,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void removeFront(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("hello"), 0);
 		trie.put(RegExpTrieSequencer.extractCharacters("hello world"), 1);
@@ -223,7 +223,7 @@ public class RegExpTrieTest{
 
 	@Test
 	public void removeFrontManyChildren(){
-		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
 		trie.put(RegExpTrieSequencer.extractCharacters("hello"), 0);
 		trie.put(RegExpTrieSequencer.extractCharacters("hello world"), 1);

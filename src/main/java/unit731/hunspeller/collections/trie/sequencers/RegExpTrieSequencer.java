@@ -7,7 +7,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.services.PatternService;
 
 
-public class RegExpTrieSequencer implements TrieSequencer<String[]>{
+public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 
 	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
@@ -46,16 +46,15 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 	}
 
 	@Override
-	public Object hashOf(String[] sequence, int index){
-		return (String)sequence[index];
+	public String hashOf(String[] sequence, int index){
+		return sequence[index];
 	}
 
 	@Override
-	public <V> TrieNode<String[], V> getChild(Map<Object, TrieNode<String[], V>> children, Object stem){
-		Set<Object> keys = children.keySet();
-		for(Object key : keys){
-			String k = (String)key;
-			if(k.startsWith(NEGATED_CLASS_START) ^ k.contains((String)stem))
+	public <V> TrieNode<String[], String, V> getChild(Map<String, TrieNode<String[], String, V>> children, String stem){
+		Set<String> keys = children.keySet();
+		for(String key : keys){
+			if(key.startsWith(NEGATED_CLASS_START) ^ key.contains(stem))
 				return children.get(key);
 		}
 		return null;

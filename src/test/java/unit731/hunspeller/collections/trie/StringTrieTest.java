@@ -11,7 +11,7 @@ public class StringTrieTest{
 
 	@Test
 	public void contains(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("abc", 1);
 		trie.put("abb", 2);
@@ -25,7 +25,7 @@ public class StringTrieTest{
 
 	@Test
 	public void collectPrefixes(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("a", 1);
 		trie.put("ab", 2);
@@ -33,7 +33,7 @@ public class StringTrieTest{
 		trie.put("cd", 4);
 		trie.put("abc", 5);
 
-		Collection<TrieNode<String, Integer>> prefixes = trie.collectPrefixes("abcd");
+		Collection<TrieNode<String, Integer, Integer>> prefixes = trie.collectPrefixes("abcd");
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
@@ -42,7 +42,7 @@ public class StringTrieTest{
 
 	@Test
 	public void emptyConstructor(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		Assert.assertTrue(trie.isEmpty());
 		Assert.assertFalse(trie.containsKey("word"));
@@ -51,7 +51,7 @@ public class StringTrieTest{
 
 	@Test
 	public void defaultValueConstructor(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		Assert.assertNull(trie.get("meow"));
 
@@ -63,7 +63,7 @@ public class StringTrieTest{
 
 	@Test
 	public void simplePut(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		Assert.assertTrue(trie.isEmpty());
 
@@ -85,7 +85,7 @@ public class StringTrieTest{
 
 	@Test
 	public void hasStartsWithMatch(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("bookshelf", Boolean.TRUE);
 		trie.put("wowza", Boolean.FALSE);
@@ -95,7 +95,7 @@ public class StringTrieTest{
 
 	@Test
 	public void hasExactMatch(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("bookshelf", Boolean.TRUE);
 		trie.put("wowza", Boolean.FALSE);
@@ -105,7 +105,7 @@ public class StringTrieTest{
 
 	@Test
 	public void getStartsWithMatch(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("bookshelf", Boolean.TRUE);
 		trie.put("wowza", Boolean.FALSE);
@@ -116,7 +116,7 @@ public class StringTrieTest{
 
 	@Test
 	public void getExactMatch(){
-		Trie<String, Boolean> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Boolean> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("bookshelf", Boolean.TRUE);
 		trie.put("wowza", Boolean.FALSE);
@@ -128,7 +128,7 @@ public class StringTrieTest{
 
 	@Test
 	public void removeBack(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("hello", 0);
 		trie.put("hello world", 1);
@@ -147,7 +147,7 @@ public class StringTrieTest{
 
 	@Test
 	public void removeFront(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("hello", 0);
 		trie.put("hello world", 1);
@@ -166,7 +166,7 @@ public class StringTrieTest{
 
 	@Test
 	public void removeFrontManyChildren(){
-		Trie<String, Integer> trie = new Trie<>(new StringTrieSequencer());
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 
 		trie.put("hello", 0);
 		trie.put("hello world", 1);

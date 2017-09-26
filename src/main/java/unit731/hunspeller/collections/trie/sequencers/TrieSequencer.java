@@ -5,7 +5,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 
 
 
-public interface TrieSequencer<S>{
+public interface TrieSequencer<S, H>{
 
 	/**
 	 * Calculates the length of the sequence.
@@ -44,9 +44,9 @@ public interface TrieSequencer<S>{
 	 * @param index		The index of the element to calculate the hash of.
 	 * @return	The hash of the element in the sequence at the index.
 	 */
-	Object hashOf(S sequence, int index);
+	H hashOf(S sequence, int index);
 
-	<V> TrieNode<S, V> getChild(Map<Object, TrieNode<S, V>> children, Object stem);
+	<V> TrieNode<S, H, V> getChild(Map<H, TrieNode<S, H, V>> children, H stem);
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to

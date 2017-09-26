@@ -79,7 +79,7 @@ public class HyphenationParser{
 	private final Orthography orthography;
 
 	
-	private Trie<String, String> patterns = new Trie<>(new StringTrieSequencer());
+	private Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
 	private HyphenationOptions options;
 	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
@@ -97,7 +97,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, Trie<String, String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, Trie<String, Integer, String> patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -375,7 +375,7 @@ public class HyphenationParser{
 	 * @param patterns	The trie containing the subdivision rules
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Trie<String, String> patterns){
+	private Hyphenation hyphenate(String word, Trie<String, Integer, String> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		word = correctOrthography(word.toLowerCase(Locale.ROOT));
@@ -430,7 +430,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak getHyphenationIndexes(String word, Trie<String, String> patterns){
+	private HyphenationBreak getHyphenationIndexes(String word, Trie<String, Integer, String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -438,8 +438,8 @@ public class HyphenationParser{
 		int[] indexes = new int[wordSize];
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
-			Iterable<TrieNode<String, String>> prefixes = patterns.collectPrefixes(w.substring(i));
-			for(TrieNode<String, String> prefix : prefixes){
+			Iterable<TrieNode<String, Integer, String>> prefixes = patterns.collectPrefixes(w.substring(i));
+			for(TrieNode<String, Integer, String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getValue();
 				String reducedData = PatternService.replaceFirst(rule, REGEX_REDUCE, StringUtils.EMPTY);

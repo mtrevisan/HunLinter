@@ -5,7 +5,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 
 
 
-public class StringTrieSequencer implements TrieSequencer<String>{
+public class StringTrieSequencer implements TrieSequencer<String, Integer>{
 
 	@Override
 	public int lengthOf(String sequence){
@@ -23,12 +23,12 @@ public class StringTrieSequencer implements TrieSequencer<String>{
 	}
 
 	@Override
-	public Object hashOf(String sequence, int index){
+	public Integer hashOf(String sequence, int index){
 		return (int)sequence.charAt(index);
 	}
 
 	@Override
-	public <V> TrieNode<String, V> getChild(Map<Object, TrieNode<String, V>> children, Object stem){
+	public <V> TrieNode<String, Integer, V> getChild(Map<Integer, TrieNode<String, Integer, V>> children, Integer stem){
 		return children.get(stem);
 	}
 
