@@ -10,6 +10,24 @@ import unit731.hunspeller.collections.trie.sequencers.RegExpTrieSequencer;
 public class RegExpTrieTest{
 
 	@Test
+	public void splitting(){
+		String[] parts = RegExpTrieSequencer.extractCharacters("abd");
+		Assert.assertArrayEquals(new String[]{"a", "b", "d"}, parts);
+
+		parts = RegExpTrieSequencer.extractCharacters("a[b]d");
+		Assert.assertArrayEquals(new String[]{"a", "[b]", "d"}, parts);
+
+		parts = RegExpTrieSequencer.extractCharacters("a[bc]d");
+		Assert.assertArrayEquals(new String[]{"a", "[bc]", "d"}, parts);
+
+		parts = RegExpTrieSequencer.extractCharacters("a[^b]d");
+		Assert.assertArrayEquals(new String[]{"a", "[^b]", "d"}, parts);
+
+		parts = RegExpTrieSequencer.extractCharacters("a[^bc]d");
+		Assert.assertArrayEquals(new String[]{"a", "[^bc]", "d"}, parts);
+	}
+
+	@Test
 	public void contains(){
 		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
@@ -19,6 +37,23 @@ public class RegExpTrieTest{
 		trie.put(RegExpTrieSequencer.extractCharacters("a"), 4);
 
 		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("a")));
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("ab")));
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("c")));
+	}
+
+	@Test
+	public void containsRegExp(){
+		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+
+		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]c"), 1);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[bd]b"), 2);
+		trie.put(RegExpTrieSequencer.extractCharacters("ac"), 3);
+		trie.put(RegExpTrieSequencer.extractCharacters("a"), 4);
+
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("a")));
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("abc")));
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("adc")));
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("aec")));
 		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("ab")));
 		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("c")));
 	}
@@ -38,6 +73,23 @@ public class RegExpTrieTest{
 			.map(TrieNode::getValue)
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
+	}
+
+	@Test
+	public void collectPrefixesRegExp(){
+		Trie<String[], Integer> trie = new Trie<>(new RegExpTrieSequencer());
+
+		trie.put(RegExpTrieSequencer.extractCharacters("a"), 1);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[bcd]"), 2);
+		trie.put(RegExpTrieSequencer.extractCharacters("bc"), 3);
+		trie.put(RegExpTrieSequencer.extractCharacters("cd"), 4);
+		trie.put(RegExpTrieSequencer.extractCharacters("aec"), 5);
+
+		Collection<TrieNode<String[], Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
+		Integer[] datas = prefixes.stream()
+			.map(TrieNode::getValue)
+			.toArray(Integer[]::new);
+		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
 	}
 
 	@Test

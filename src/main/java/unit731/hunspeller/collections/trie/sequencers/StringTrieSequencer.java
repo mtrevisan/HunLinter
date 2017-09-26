@@ -24,7 +24,7 @@ public class StringTrieSequencer implements TrieSequencer<String>{
 
 	@Override
 	public Object hashOf(String sequence, int index){
-		return sequence.charAt(index);
+		return (int)sequence.charAt(index);
 	}
 
 	@Override

@@ -9,7 +9,7 @@ import unit731.hunspeller.services.PatternService;
 
 public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 
-	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?!\\])");
+	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 
 	public static String[] extractCharacters(String sequence){
@@ -26,7 +26,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[]>{
 		int i = 0;
 		int size = sequence.length;
 		for(String p : prefix){
-			if(i == size || sequence[i].startsWith("[^") ^ !sequence[i].contains(p))
+			if(i == size || sequence[i].startsWith("[^") ^ !p.contains(sequence[i]))
 				return false;
 
 			i ++;

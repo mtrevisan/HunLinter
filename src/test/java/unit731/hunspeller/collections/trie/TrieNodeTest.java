@@ -41,19 +41,19 @@ public class TrieNodeTest{
 		TrieNode<String, String> node0 = new TrieNode<>("abc", 0, 3, null);
 		TrieNode<String, String> node1 = new TrieNode<>("abcd", 3, 3, null);
 		TrieNode<String, String> node2 = new TrieNode<>("abce", 3, 3, null);
-		node0.addChild('d', node1);
-		node0.addChild('e', node2);
+		node0.addChild((int)'d', node1);
+		node0.addChild((int)'e', node2);
 
 		//split on ab-c
 		node0.split(2, null, sequencer);
 
 		//verify ab-c-d, and ab-c-e
 		Assert.assertEquals(2, node0.getEndIndex());
-		TrieNode<String, String> child1 = node0.getChild('c', sequencer);
+		TrieNode<String, String> child1 = node0.getChild((int)'c', sequencer);
 		Assert.assertNotNull(child1);
-		TrieNode<String, String> child2 = child1.getChild('d', sequencer);
+		TrieNode<String, String> child2 = child1.getChild((int)'d', sequencer);
 		Assert.assertNotNull(child2);
-		TrieNode<String, String> child3 = child1.getChild('e', sequencer);
+		TrieNode<String, String> child3 = child1.getChild((int)'e', sequencer);
 		Assert.assertNotNull(child3);
 	}
 
