@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FileService{
 
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)

@@ -2,9 +2,12 @@ package unit731.hunspeller.services;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PatternService{
 
 	public static Pattern pattern(String pattern){

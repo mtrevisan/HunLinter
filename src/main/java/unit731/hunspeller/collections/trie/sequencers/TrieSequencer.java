@@ -4,7 +4,6 @@ import java.util.Map;
 import unit731.hunspeller.collections.trie.TrieNode;
 
 
-
 public interface TrieSequencer<S, H>{
 
 	/**
