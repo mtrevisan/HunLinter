@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.trie;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
