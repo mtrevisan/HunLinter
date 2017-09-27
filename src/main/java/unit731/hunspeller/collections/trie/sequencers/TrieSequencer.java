@@ -45,6 +45,14 @@ public interface TrieSequencer<S, H>{
 	 */
 	H hashOf(S sequence, int index);
 
+	/**
+	 * Returns the child that corresponds with the given stem.
+	 * 
+	 * @param <V>	The value type.
+	 * @param children	The map of children.
+	 * @param stem			The stem used to search the child in the given map.
+	 * @return	The child searched, or <tt>null</tt> if not found.
+	 */
 	<V> TrieNode<S, H, V> getChild(Map<H, TrieNode<S, H, V>> children, H stem);
 
 	/**

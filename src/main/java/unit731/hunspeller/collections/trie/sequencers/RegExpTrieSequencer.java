@@ -28,7 +28,7 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 		int i = 0;
 		int size = sequence.length;
 		for(String p : prefix){
-			if(i == size || p.startsWith(NEGATED_CLASS_START) ^ !p.contains(sequence[i]))
+			if(i == size || matches(sequence[i], p))
 				return false;
 
 			i ++;
@@ -53,10 +53,9 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 	@Override
 	public <V> TrieNode<String[], String, V> getChild(Map<String, TrieNode<String[], String, V>> children, String stem){
 		Set<String> keys = children.keySet();
-		for(String key : keys){
-			if(key.startsWith(NEGATED_CLASS_START) ^ key.contains(stem))
+		for(String key : keys)
+			if(!matches(stem, key))
 				return children.get(key);
-		}
 		return null;
 	}
 
@@ -74,15 +73,16 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 	@Override
 	public int matchesGet(String[] nodeSequence, int nodeIndex, String[] searchSequence, int searchIndex, int maxCount){
 		int count = maxCount;
-		for(int i = 0; i < maxCount; i ++){
-			String ns = nodeSequence[nodeIndex + i];
-			String ss = searchSequence[searchIndex + i];
-			if(ns.startsWith(NEGATED_CLASS_START) ^ !ns.contains(ss)){
+		for(int i = 0; i < maxCount; i ++)
+			if(matches(searchSequence[searchIndex + i], nodeSequence[nodeIndex + i])){
 				count = i;
 				break;
 			}
-		}
 		return count;
+	}
+
+	private boolean matches(String text, String sequence){
+		return (sequence.startsWith(NEGATED_CLASS_START) ^ !sequence.contains(text));
 	}
 
 }
