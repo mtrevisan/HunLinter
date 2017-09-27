@@ -4,7 +4,6 @@ import java.util.Map;
 import unit731.hunspeller.collections.trie.TrieNode;
 
 
-
 public class StringTrieSequencer implements TrieSequencer<String, Integer>{
 
 	@Override
