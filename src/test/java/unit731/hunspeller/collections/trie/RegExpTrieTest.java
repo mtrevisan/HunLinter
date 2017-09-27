@@ -71,6 +71,7 @@ public class RegExpTrieTest{
 		Collection<TrieNode<String[], String, Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
+			.sorted()
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
 	}
@@ -88,6 +89,7 @@ public class RegExpTrieTest{
 		Collection<TrieNode<String[], String, Integer>> prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("abcd"));
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
+			.sorted()
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
 		prefixes = trie.collectPrefixes(RegExpTrieSequencer.extractCharacters("ec"));
