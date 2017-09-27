@@ -42,13 +42,10 @@ public class StringTrieSequencer implements TrieSequencer<String, Integer>{
 	}
 
 	private int matches(String sequenceA, int indexA, String sequenceB, int indexB, int maxCount){
-		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
-			if(sequenceA.charAt(indexA + i) != sequenceB.charAt(indexB + i)){
-				count = i;
-				break;
-			}
-		return count;
+			if(sequenceA.charAt(indexA + i) != sequenceB.charAt(indexB + i))
+				return i;
+		return maxCount;
 	}
 
 }

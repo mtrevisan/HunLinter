@@ -35,7 +35,8 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 
 	@Override
 	public String[] getTrueSequence(String[] sequence, int startIndex, int endIndex){
-		return Arrays.asList(sequence).subList(startIndex, endIndex)
+		return Arrays.asList(sequence)
+			.subList(startIndex, endIndex)
 			.toArray(new String[0]);
 	}
 
@@ -55,24 +56,18 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 
 	@Override
 	public int matchesPut(String[] sequenceA, int indexA, String[] sequenceB, int indexB, int maxCount){
-		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
-			if(!sequenceA[indexA + i].equals(sequenceB[indexB + i])){
-				count = i;
-				break;
-			}
-		return count;
+			if(!sequenceA[indexA + i].equals(sequenceB[indexB + i]))
+				return i;
+		return maxCount;
 	}
 
 	@Override
 	public int matchesGet(String[] nodeSequence, int nodeIndex, String[] searchSequence, int searchIndex, int maxCount){
-		int count = maxCount;
 		for(int i = 0; i < maxCount; i ++)
-			if(matches(searchSequence[searchIndex + i], nodeSequence[nodeIndex + i])){
-				count = i;
-				break;
-			}
-		return count;
+			if(matches(searchSequence[searchIndex + i], nodeSequence[nodeIndex + i]))
+				return i;
+		return maxCount;
 	}
 
 	private boolean matches(String text, String sequence){
