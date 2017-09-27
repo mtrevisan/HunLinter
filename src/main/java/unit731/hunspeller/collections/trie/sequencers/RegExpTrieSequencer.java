@@ -26,14 +26,10 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 
 	@Override
 	public boolean startsWith(String[] sequence, String[] prefix){
-		int i = 0;
-		int size = sequence.length;
-		for(String p : prefix){
-			if(i == size || matches(sequence[i], p))
+		int size = Math.min(sequence.length, prefix.length);
+		for(int i = 0; i < size; i ++)
+			if(matches(sequence[i], prefix[i]))
 				return false;
-
-			i ++;
-		}
 		return true;
 	}
 
