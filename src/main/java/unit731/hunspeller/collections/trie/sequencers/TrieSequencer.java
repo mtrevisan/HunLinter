@@ -51,7 +51,7 @@ public interface TrieSequencer<S, H>{
 	 * @param <V>	The value type.
 	 * @param children	The map of children.
 	 * @param stem			The stem used to search the child in the given map.
-	 * @return	The child searched, or <tt>null</tt> if not found.
+	 * @return	The child searched, or <code>null</code> if not found.
 	 */
 	<V> TrieNode<S, H, V> getChild(Map<H, TrieNode<S, H, V>> children, H stem);
 
@@ -64,7 +64,7 @@ public interface TrieSequencer<S, H>{
 	 * @param sequenceB	The second sequence to count matches on.
 	 * @param indexB		The offset into the second sequence.
 	 * @param maxCount	The maximum number of matches to search for.
-	 * @return	A number between <tt>0</tt> (inclusive) and <tt>maxCount</tt> (inclusive) that is the number of matches between the two sequence
+	 * @return	A number between <code>0</code> (inclusive) and <code>maxCount</code> (inclusive) that is the number of matches between the two sequence
 	 *		sections.
 	 */
 	int matchesPut(S sequenceA, int indexA, S sequenceB, int indexB, int maxCount);
@@ -78,7 +78,7 @@ public interface TrieSequencer<S, H>{
 	 * @param searchSequence	The second sequence to count matches on.
 	 * @param searchIndex		The offset into the second sequence.
 	 * @param maxCount	The maximum number of matches to search for.
-	 * @return	A number between <tt>0</tt> (inclusive) and <tt>maxCount</tt> (inclusive) that is the number of matches between the two sequence
+	 * @return	A number between <code>0</code> (inclusive) and <code>maxCount</code> (inclusive) that is the number of matches between the two sequence
 	 *		sections.
 	 */
 	int matchesGet(S nodeSequence, int nodeIndex, S searchSequence, int searchIndex, int maxCount);

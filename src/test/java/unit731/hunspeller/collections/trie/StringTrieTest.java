@@ -36,6 +36,7 @@ public class StringTrieTest{
 		Collection<TrieNode<String, Integer, Integer>> prefixes = trie.collectPrefixes("abcd");
 		Integer[] datas = prefixes.stream()
 			.map(TrieNode::getValue)
+			.sorted()
 			.toArray(Integer[]::new);
 		Assert.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
 	}

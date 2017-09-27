@@ -2,7 +2,9 @@ package unit731.hunspeller.collections.trie;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -62,9 +64,9 @@ public class Trie<S, H, V>{
 	 *
 	 * @param sequence	Sequence with which the specified value is to be associated
 	 * @param value		The value to place in the Trie
-	 * @return	The previous value associated with <tt>sequence</tt>, or <tt>null</tt> if there was no mapping for <tt>sequence</tt>.
-	 *		(A <tt>null</tt> return can also indicate that the map previously associated <tt>null</tt> with <tt>sequence</tt>)
-	 * @throws NullPointerException if the specified <tt>sequence</tt> or <tt>value</tt> is <tt>null</tt>
+	 * @return	The previous value associated with <code>sequence</code>, or <code>null</code> if there was no mapping for <code>sequence</code>.
+	 *		(A <code>null</code> return can also indicate that the map previously associated <code>null</code> with <code>sequence</code>)
+	 * @throws NullPointerException if the specified <code>sequence</code> or <code>value</code> is <code>null</code>
 	 */
 	public V put(S sequence, V value){
 		Objects.requireNonNull(sequence);
@@ -162,12 +164,8 @@ public class Trie<S, H, V>{
 	}
 
 	public Collection<TrieNode<S, H, V>> collectPrefixes(S sequence){
-		Collection<TrieNode<S, H, V>> prefixes = new ArrayList<>();
-		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> {
-			TrieNode<S, H, V> node = parent.getChild(stem, sequencer);
-			if(!prefixes.contains(node))
-				prefixes.add(node);
-		});
+		Set<TrieNode<S, H, V>> prefixes = new HashSet<>();
+		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> prefixes.add(parent.getChild(stem, sequencer)));
 		return prefixes;
 	}
 
@@ -272,7 +270,7 @@ public class Trie<S, H, V>{
 	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
-	private boolean find(TrieNode<S, H, V> root, Function<TrieNode<S, H, V>, Boolean> callback){
+	public boolean find(TrieNode<S, H, V> root, Function<TrieNode<S, H, V>, Boolean> callback){
 		Objects.requireNonNull(callback);
 
 		boolean found = false;
