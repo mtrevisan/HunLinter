@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.trie.sequencers;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -38,11 +39,8 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 
 	@Override
 	public String[] getTrueSequence(String[] sequence, int startIndex, int endIndex){
-		int size = endIndex - startIndex;
-		String[] response = new String[size];
-		for(int i = 0; i < size; i ++)
-			response[i] = sequence[startIndex + i];
-		return response;
+		return Arrays.asList(sequence).subList(startIndex, endIndex)
+			.toArray(new String[0]);
 	}
 
 	@Override
