@@ -2,11 +2,14 @@ package unit731.hunspeller.languages.vec;
 
 import java.util.List;
 import java.util.regex.Matcher;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrthographyVEC extends Orthography{
 
 	private static final Matcher REGEX_A_GRAVE = PatternService.matcher("a\\\\");
@@ -39,7 +42,7 @@ public class OrthographyVEC extends Orthography{
 	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternService.matcher("([^aeiou]){1}\\1+");
 
 	private static class SingletonHelper{
-		private static final OrthographyVEC INSTANCE = new OrthographyVEC();
+		private static final Orthography INSTANCE = new OrthographyVEC();
 	}
 
 

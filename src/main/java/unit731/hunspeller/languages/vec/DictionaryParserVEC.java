@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
@@ -127,15 +130,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
-	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(?:i/|ì)");
-	private static final Matcher REGEX_O_ACUTE = PatternService.matcher("o/");
-	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(?:u/|ù)");
 
-	private static final Matcher REGEX_DH = PatternService.matcher("dh");
-	private static final Matcher REGEX_JH = PatternService.matcher("jh");
-	private static final Matcher REGEX_LH = PatternService.matcher("lh");
-	private static final Matcher REGEX_NH = PatternService.matcher("nh");
-	private static final Matcher REGEX_TH = PatternService.matcher("th");
+	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
 	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, Charset charset){
@@ -243,16 +239,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	public String prepareTextForFilter(String text){
 		text = super.prepareTextForFilter(text);
 
-		text = PatternService.replaceAll(text, REGEX_I_ACUTE, "í");
-		text = PatternService.replaceAll(text, REGEX_O_ACUTE, "ó");
-		text = PatternService.replaceAll(text, REGEX_U_ACUTE, "ú");
-		text = PatternService.replaceAll(text, REGEX_DH, "(dh|đ)");
-		text = PatternService.replaceAll(text, REGEX_JH, "(jh|ɉ)");
-		text = PatternService.replaceAll(text, REGEX_LH, "(lh|ƚ)");
-		text = PatternService.replaceAll(text, REGEX_NH, "(nh|ñ)");
-		text = PatternService.replaceAll(text, REGEX_TH, "(th|ŧ)");
-
-		return text;
+		return orthography.correctOrthography(text);
 	}
 
 }
