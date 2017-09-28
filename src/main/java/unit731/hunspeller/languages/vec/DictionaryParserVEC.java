@@ -146,6 +146,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	protected void checkLine(String line) throws IllegalArgumentException{
 		if(!line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
+
 		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
 				&& !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
 			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
@@ -161,6 +162,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
 		}
+
 		Set<Matcher> keys = ERROR_CHECKS.keySet();
 		for(Matcher key : keys)
 			if(PatternService.find(line, key))
