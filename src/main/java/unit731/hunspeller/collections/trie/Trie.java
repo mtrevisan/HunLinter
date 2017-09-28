@@ -63,15 +63,12 @@ public class Trie<S, H, V>{
 	 *
 	 * @param sequence	Sequence with which the specified value is to be associated
 	 * @param value		The value to place in the Trie
-	 * @return	The previous value associated with <code>sequence</code>, or <code>null</code> if there was no mapping for <code>sequence</code>.
-	 *		(A <code>null</code> return can also indicate that the map previously associated <code>null</code> with <code>sequence</code>)
 	 * @throws NullPointerException if the specified <code>sequence</code> or <code>value</code> is <code>null</code>
 	 */
-	public V put(S sequence, V value){
+	public void put(S sequence, V value){
 		Objects.requireNonNull(sequence);
 		Objects.requireNonNull(value);
 
-		V previousValue = null;
 		int sequenceOffset = 0;
 		int sequenceLength = sequencer.lengthOf(sequence);
 		TrieNode<S, H, V> node = root;
@@ -103,14 +100,12 @@ public class Trie<S, H, V>{
 			if(sequenceOffset == sequenceLength){
 				node.setSequence(sequence);
 
-				if(node.isValueAList()){
+				if(node.isValueAList())
 					//add the current value along with the old one if the value type is a collection
-					//FIXME return the old value?
 					node.addValue(value);
-					previousValue = null;
-				}
 				else
-					previousValue = node.setValue(value);
+					node.setValue(value);
+
 				break;
 			}
 
@@ -130,8 +125,6 @@ public class Trie<S, H, V>{
 			//full match, query or node remaining
 			node = nextNode;
 		}
-
-		return previousValue;
 	}
 
 	private void createAndAttachNode(S sequence, int startIndex, int endIndex, V value, TrieNode<S, H, V> parent){

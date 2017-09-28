@@ -26,7 +26,7 @@ public class TrieNode<S, H, V>{
 	@Getter private int startIndex;
 	@Getter private int endIndex;
 
-	@Getter private V value;
+	@Getter @Setter private V value;
 	private Map<H, TrieNode<S, H, V>> children;
 
 
@@ -53,12 +53,6 @@ public class TrieNode<S, H, V>{
 
 	boolean isValueAList(){
 		return (this.value instanceof List);
-	}
-
-	public V setValue(V value){
-		V previousValue = this.value;
-		this.value = value;
-		return previousValue;
 	}
 
 	public void addValue(V value){
