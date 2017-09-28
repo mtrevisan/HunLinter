@@ -119,6 +119,9 @@ public class Trie<S, H, V>{
 			TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
 			if(nextNode == null)
 				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
+			else{
+				//TODO manage adding (or not) the current value along with the old one
+			}
 
 			//full match, query or node remaining
 			node = nextNode;

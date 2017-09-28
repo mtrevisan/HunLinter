@@ -24,6 +24,20 @@ public class StringTrieTest{
 	}
 
 	@Test
+	public void duplicatedEntry(){
+		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
+
+		trie.put("abc", 1);
+		trie.put("abc", 2);
+
+		Assert.assertFalse(trie.containsKey("a"));
+		Assert.assertFalse(trie.containsKey("ab"));
+		Assert.assertTrue(trie.containsKey("abc"));
+		Assert.assertEquals(2, trie.get("abc").intValue());
+		Assert.assertFalse(trie.containsKey("c"));
+	}
+
+	@Test
 	public void collectPrefixes(){
 		Trie<String, Integer, Integer> trie = new Trie<>(new StringTrieSequencer());
 

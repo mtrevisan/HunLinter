@@ -59,6 +59,34 @@ public class RegExpTrieTest{
 	}
 
 	@Test
+	public void duplicatedEntry(){
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
+
+		trie.put(RegExpTrieSequencer.extractCharacters("abc"), 1);
+		trie.put(RegExpTrieSequencer.extractCharacters("abc"), 2);
+
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("a")));
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("ab")));
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("abc")));
+		Assert.assertEquals(2, trie.get(RegExpTrieSequencer.extractCharacters("abc")).intValue());
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("c")));
+	}
+
+	@Test
+	public void duplicatedEntryRegExp(){
+		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
+
+		trie.put(RegExpTrieSequencer.extractCharacters("a[bc]c"), 1);
+		trie.put(RegExpTrieSequencer.extractCharacters("a[bc]c"), 2);
+
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("a")));
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("ab")));
+		Assert.assertTrue(trie.containsKey(RegExpTrieSequencer.extractCharacters("abc")));
+		Assert.assertEquals(2, trie.get(RegExpTrieSequencer.extractCharacters("acc")).intValue());
+		Assert.assertFalse(trie.containsKey(RegExpTrieSequencer.extractCharacters("c")));
+	}
+
+	@Test
 	public void collectPrefixes(){
 		Trie<String[], String, Integer> trie = new Trie<>(new RegExpTrieSequencer());
 
