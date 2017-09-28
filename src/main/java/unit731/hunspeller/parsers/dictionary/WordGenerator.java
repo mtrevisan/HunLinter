@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +10,10 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.trie.TrieNode;
+import unit731.hunspeller.collections.trie.sequencers.RegExpTrieSequencer;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -116,16 +120,19 @@ public class WordGenerator{
 						applicableAffixes.add(entry);
 				}
 
-//				List<AffixEntry> en0 = applicableAffixes;
-//				List<AffixEntry> en1 = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word)).stream()
-//					.map(RegExpPrefix::getNode)
-//					.map(RegExpTrieNode::getData)
-//					.flatMap(List::stream)
-//					.collect(Collectors.toList());
-//				en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//				en1.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//				if(!ListUtils.isEqualList(en0, en1))
-//					System.out.println(StringUtils.EMPTY);
+//List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
+//Collection<TrieNode<String[], String, AffixEntry>> en1;
+//String[] arr = RegExpTrieSequencer.extractCharacters(word);
+//if(isSuffix){
+//	ArrayUtils.reverse(arr);
+//	en1 = rule.getSuffixEntries().collectPrefixes(arr);
+//}
+//else
+//	en1 = rule.getPrefixEntries().collectPrefixes(arr);
+//en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
+//en1.stream().map(TrieNode::getValue).sorted((a1, a2) -> a1.toString().compareTo(a2.toString()));
+//if(!org.apache.commons.collections4.ListUtils.isEqualList(en0, en1))
+//	System.out.println("diff");
 				//List<RegExpPrefix<AffixEntry>> rePrefixes = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word));
 				//List<AffixEntry> applicableAffixes = rePrefixes.stream()
 				//	.map(RegExpPrefix::getNode)

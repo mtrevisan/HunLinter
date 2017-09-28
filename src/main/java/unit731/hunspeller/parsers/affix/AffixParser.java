@@ -22,7 +22,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.trie.Trie;
+import unit731.hunspeller.collections.trie.sequencers.RegExpTrieSequencer;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
 import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
@@ -138,8 +141,9 @@ public class AffixParser{
 			String flag = getFlag();
 			strategy = createFlagParsingStrategy(flag);
 
-//			RegExpTrie<AffixEntry> prefixEntries = new RegExpTrie<>();
-//			RegExpTrie<AffixEntry> suffixEntries = new RegExpTrie<>();
+//RegExpTrieSequencer sequencer = new RegExpTrieSequencer();
+//Trie<String[], String, AffixEntry> prefixEntries = new Trie<>(sequencer);
+//Trie<String[], String, AffixEntry> suffixEntries = new Trie<>(sequencer);
 			List<AffixEntry> entries = new ArrayList<>();
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
@@ -158,15 +162,18 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 
 				entries.add(entry);
-//				String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
-//				if(entry.isSuffix())
-//					suffixEntries.add(new StringBuilder(regexToMatch).reverse().toString(), entry);
-//				else
-//					prefixEntries.add(regexToMatch, entry);
+//String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
+//String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
+//if(entry.isSuffix()){
+//	ArrayUtils.reverse(arr);
+//	suffixEntries.put(arr, entry);
+//}
+//else
+//	prefixEntries.put(arr, entry);
 			}
 
 			addData(ruleFlag, new RuleEntry(isSuffix, combineable, entries));
-//			addData(ruleFlag, new RuleEntry(isSuffix, combineable, prefixEntries, suffixEntries));
+//addData(ruleFlag, new RuleEntry(isSuffix, combineable, entries, prefixEntries, suffixEntries));
 		}
 		catch(IOException e){
 			throw new RuntimeException(e);
