@@ -74,61 +74,56 @@ public class Trie<S, H, V>{
 		V previousValue = null;
 		int sequenceOffset = 0;
 		int sequenceLength = sequencer.lengthOf(sequence);
-		H stem = sequencer.hashOf(sequence, sequenceOffset);
-		TrieNode<S, H, V> node = root.getChild(stem, sequencer);
-		if(node == null){
-			node = new TrieNode<>(sequence, sequenceOffset, sequenceLength, value);
-			root.addChild(stem, node);
-		}
-		else
-			while(node != null){
-				int nodeLength = node.getEndIndex() - node.getStartIndex();
-				int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
-				int matches = sequencer.matchesPut(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
+		TrieNode<S, H, V> node = root;
+		while(node != null){
+			int nodeLength = node.getEndIndex() - node.getStartIndex();
+			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
+			int matches = sequencer.matchesPut(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
-				sequenceOffset += matches;
+			sequenceOffset += matches;
 
-				//mismatch in current node
-				if(matches != max){
-					node.split(matches, node.getValue(), sequencer);
+			//mismatch in current node
+			if(matches != max){
+				node.split(matches, node.getValue(), sequencer);
 
-					createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
+				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
 
-					break;
-				}
-
-				//partial match to the current node
-				if(max < nodeLength){
-					node.split(max, value, sequencer);
-					node.setSequence(sequence);
-
-					break;
-				}
-
-				//full match to sequence, replace value and sequence
-				if(sequenceOffset == sequenceLength){
-					node.setSequence(sequence);
-
-					previousValue = node.setValue(value);
-					break;
-				}
-
-				//full match, end of the query, or node
-				if(!node.hasChildren()){
-					createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
-
-					break;
-				}
-
-				//full match, end of node
-				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
-				if(nextNode == null)
-					createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
-
-				//full match, query or node remaining
-				node = nextNode;
+				break;
 			}
+
+			//partial match to the current node
+			if(max < nodeLength){
+				node.split(max, value, sequencer);
+				node.setSequence(sequence);
+
+				break;
+			}
+
+			//full match to sequence, replace value and sequence
+			if(sequenceOffset == sequenceLength){
+				node.setSequence(sequence);
+
+				previousValue = node.setValue(value);
+				break;
+			}
+
+			//full match, end of the query, or node
+			if(!node.hasChildren()){
+				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
+
+				break;
+			}
+
+			//full match, end of node
+			H stem = sequencer.hashOf(sequence, sequenceOffset);
+			TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
+			if(nextNode == null)
+				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
+
+			//full match, query or node remaining
+			node = nextNode;
+		}
+
 		return previousValue;
 	}
 
