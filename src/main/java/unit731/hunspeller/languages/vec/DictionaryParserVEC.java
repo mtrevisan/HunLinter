@@ -178,7 +178,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
 
-		if(production.getRuleFlags().length > 0 && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
+		if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
 				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
 			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
 			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)

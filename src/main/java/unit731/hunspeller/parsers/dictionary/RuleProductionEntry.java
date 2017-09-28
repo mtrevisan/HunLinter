@@ -44,9 +44,17 @@ public class RuleProductionEntry implements Productable{
 		this.combineable = combineable;
 	}
 
+	public boolean hasRuleFlags(){
+		return (ruleFlags.length > 0);
+	}
+
 	public boolean containsRuleFlag(String ruleFlag){
 		return Arrays.stream(ruleFlags)
 			.anyMatch(ruleFlag::equals);
+	}
+
+	public boolean hasDataFields(){
+		return (dataFields.length > 0);
 	}
 
 	public boolean containsDataField(String dataField){
@@ -63,11 +71,11 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public String[] getSignificantDataFields(){
-		return (dataFields != null? Arrays.stream(dataFields)
+		return Arrays.stream(dataFields)
 			.sorted()
 			.filter(df -> !df.startsWith(WordGenerator.TAG_PHONETIC) && !df.startsWith(WordGenerator.TAG_STEM) && !df.startsWith(WordGenerator.TAG_ALLOMORPH))
 			.collect(Collectors.toList())
-			.toArray(new String[0]): null);
+			.toArray(new String[0]);
 	}
 
 //	@Override
