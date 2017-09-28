@@ -32,34 +32,36 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*";
+	private static final String VANISHING_L = "ƚ[^/]+/[^\\t\\n]*";
+	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]/[^\\t\\n]*";
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");
 	private static final Matcher HAS_METAPHONESIS = PatternService.matcher("/[^\\t\\n]*mf");
 	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]/[^\\t\\n]*T0|[^aie]/[^\\t\\n]*B0|[^ieo]/[^\\t\\n]*C0|[^aio]/[^\\t\\n]*D0");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*E1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB1 = PatternService.matcher(VANISHING_L + "E1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB1 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*E2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*G1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB2 = PatternService.matcher(VANISHING_L + "G1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB2 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*G2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*F1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = PatternService.matcher(VANISHING_L + "F1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_PROCOMPLEMENTAR_VERB_IMPERATIVE = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*F2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_INTERROGATIVE = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*P1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_INTERROGATIVE = PatternService.matcher(VANISHING_L + "P1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_INTERROGATIVE = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*P2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CONDITIONAL = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*Q1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_CONDITIONAL = PatternService.matcher(VANISHING_L + "Q1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_CONDITIONAL = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*Q2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*r0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL1 = PatternService.matcher(VANISHING_L + "r0");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL1 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*r1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2 = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*s1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_NOMINAL_DEVERBAL2 = PatternService.matcher(VANISHING_L + "s1");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_NOMINAL_DEVERBAL2 = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*s2");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_ADVERB = PatternService.matcher("ƚ[^/]+/[^\\t\\n]*W0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_ADVERB = PatternService.matcher(VANISHING_L + "W0");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_ADVERB = PatternService.matcher(NON_VANISHING_L + "/[^\\t\\n]*W1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE1 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*&0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE1 = PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "&0");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE1 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*&1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE2 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\[0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_DIMINUTIVE2 = PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0");
 	private static final Matcher NON_VANISHING_L_AND_VANISHING_DIMINUTIVE2 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\[1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE1 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\(0");
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE1 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\(1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_CRESCITIVE2 = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*\\)0");
-	private static final Matcher NON_VANISHING_L_AND_VANISHING_CRESCITIVE2 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\)1");
-	private static final Matcher VANISHING_L_AND_NON_VANISHING_PEJORATIVE = PatternService.matcher("ƚ[^/]*[^a]/[^\\t\\n]*<0");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_AUGMENTATIVE1 = PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_AUGMENTATIVE1 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\(1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_AUGMENTATIVE2 = PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0");
+	private static final Matcher NON_VANISHING_L_AND_VANISHING_AUGMENTATIVE2 = PatternService.matcher(NON_VANISHING_L + "[^a]/[^\\t\\n]*\\)1");
+	private static final Matcher VANISHING_L_AND_NON_VANISHING_PEJORATIVE = PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0");
 	private static final Matcher NORTHERN_THDH_AND_VANISHING_PEJORATIVE = PatternService.matcher("[đŧ][^/]*[^a]/[^\\t\\n]*<1");
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
@@ -193,13 +195,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Cannot use [0 rule with vanishing el, use [1");
 		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_DIMINUTIVE2))
 			throw new IllegalArgumentException("Cannot use [1 rule with non-vanishing el, use [0");
-		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_CRESCITIVE1))
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_AUGMENTATIVE1))
 			throw new IllegalArgumentException("Cannot use (0 rule with vanishing el, use (1");
-		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_CRESCITIVE1))
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_AUGMENTATIVE1))
 			throw new IllegalArgumentException("Cannot use (1 rule with non-vanishing el, use (0");
-		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_CRESCITIVE2))
+		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_AUGMENTATIVE2))
 			throw new IllegalArgumentException("Cannot use )0 rule with vanishing el, use )1");
-		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_CRESCITIVE2))
+		if(PatternService.find(line, NON_VANISHING_L_AND_VANISHING_AUGMENTATIVE2))
 			throw new IllegalArgumentException("Cannot use )1 rule with non-vanishing el, use )0");
 		if(PatternService.find(line, VANISHING_L_AND_NON_VANISHING_PEJORATIVE))
 			throw new IllegalArgumentException("Cannot use <0 rule with vanishing el, use <1");
