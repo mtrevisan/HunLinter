@@ -26,7 +26,7 @@ public class TrieNode<S, H, V>{
 	@Getter private int startIndex;
 	@Getter private int endIndex;
 
-	@Getter @Setter private V value;
+	@Getter private V value;
 	private Map<H, TrieNode<S, H, V>> children;
 
 
@@ -51,12 +51,17 @@ public class TrieNode<S, H, V>{
 		children = null;
 	}
 
-	boolean isValueAList(){
-		return (this.value instanceof List);
-	}
-
+	/**
+	 * Add the current value (along with the old one if the value type is a {@link List})
+	 * 
+	 * @param value	The value to add
+	 */
+	@SuppressWarnings("unchecked")
 	public void addValue(V value){
-		((List)this.value).addAll((List)value);
+		if(this.value instanceof List)
+			((List)this.value).addAll((List)value);
+		else
+			this.value = value;
 	}
 
 	public boolean isLeaf(){

@@ -99,12 +99,7 @@ public class Trie<S, H, V>{
 			//full match to sequence, replace/add value and sequence
 			if(sequenceOffset == sequenceLength){
 				node.setSequence(sequence);
-
-				if(node.isValueAList())
-					//add the current value along with the old one if the value type is a collection
-					node.addValue(value);
-				else
-					node.setValue(value);
+				node.addValue(value);
 
 				break;
 			}
