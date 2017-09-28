@@ -17,9 +17,9 @@ public class ListOfStringTrieTest{
 	public void contains(){
 		Trie<String, Integer, List<Integer>> trie = new Trie<>(new StringTrieSequencer());
 
-		List<Integer> abcValues = new ArrayList<>();
-		abcValues.add(1);
-		trie.put("abc", abcValues);
+		List<Integer> oneValue = new ArrayList<>();
+		oneValue.add(1);
+		trie.put("abc", oneValue);
 		trie.put("abc", Arrays.asList(2));
 		trie.put("abb", Arrays.asList(2));
 		trie.put("ac", Arrays.asList(3));
@@ -28,6 +28,7 @@ public class ListOfStringTrieTest{
 		Assert.assertTrue(trie.containsKey("a"));
 		Assert.assertFalse(trie.containsKey("ab"));
 		Assert.assertFalse(trie.containsKey("c"));
+		Assert.assertEquals(2, trie.get("abc").size());
 		Assert.assertEquals(Arrays.asList(1, 2), trie.get("abc").stream().map(Integer::intValue).sorted().collect(Collectors.toList()));
 	}
 
@@ -35,14 +36,16 @@ public class ListOfStringTrieTest{
 	public void duplicatedEntry(){
 		Trie<String, Integer, List<Integer>> trie = new Trie<>(new StringTrieSequencer());
 
-		trie.put("abc", Arrays.asList(1));
+		List<Integer> oneValue = new ArrayList<>();
+		oneValue.add(1);
+		trie.put("abc", oneValue);
 		trie.put("abc", Arrays.asList(2));
 
 		Assert.assertFalse(trie.containsKey("a"));
 		Assert.assertFalse(trie.containsKey("ab"));
 		Assert.assertTrue(trie.containsKey("abc"));
-		Assert.assertEquals(1, trie.get("abc").size());
-		Assert.assertEquals(2, trie.get("abc").get(0).intValue());
+		Assert.assertEquals(2, trie.get("abc").size());
+		Assert.assertEquals(Arrays.asList(1, 2), trie.get("abc").stream().map(Integer::intValue).sorted().collect(Collectors.toList()));
 		Assert.assertFalse(trie.containsKey("c"));
 	}
 

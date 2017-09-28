@@ -74,7 +74,6 @@ public class HyphenationParser{
 	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^\\.");
 
 
-
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 

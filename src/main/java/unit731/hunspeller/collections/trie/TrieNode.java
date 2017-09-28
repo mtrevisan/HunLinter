@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.trie;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,8 +126,10 @@ public class TrieNode<S, H, V>{
 	public TrieNode<S, H, V> split(int index, V value, TrieSequencer<S, H> sequencer){
 		TrieNode<S, H, V> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		lowerNode.children = children;
+		if(lowerNode.startIndex == endIndex - 1)
+			this.value = null;
 		children = null;
-		endIndex = startIndex + index;
+		endIndex = lowerNode.startIndex;
 
 		H stem = sequencer.hashOf(sequence, endIndex);
 		addChild(stem, lowerNode);

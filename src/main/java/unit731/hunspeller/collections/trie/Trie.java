@@ -99,7 +99,7 @@ public class Trie<S, H, V>{
 				break;
 			}
 
-			//full match to sequence, replace value and sequence
+			//full match to sequence, replace/add value and sequence
 			if(sequenceOffset == sequenceLength){
 				node.setSequence(sequence);
 
@@ -126,11 +126,6 @@ public class Trie<S, H, V>{
 			TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
 			if(nextNode == null)
 				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
-			else if(nextNode.isValueAList()){
-				//add the current value along with the old one if the value type is a collection
-				//FIXME return the old value?
-				nextNode.addValue(value);
-			}
 
 			//full match, query or node remaining
 			node = nextNode;
