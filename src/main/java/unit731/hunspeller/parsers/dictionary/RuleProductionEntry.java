@@ -46,12 +46,12 @@ public class RuleProductionEntry implements Productable{
 
 	public boolean containsRuleFlag(String ruleFlag){
 		return Arrays.stream(ruleFlags)
-			.anyMatch(flag -> flag.equals(ruleFlag));
+			.anyMatch(ruleFlag::equals);
 	}
 
 	public boolean containsDataField(String dataField){
 		return Arrays.stream(dataFields)
-			.anyMatch(field -> field.equals(dataField));
+			.anyMatch(dataField::equals);
 	}
 
 	/** Merge previous unproductive continuation classes with the continuation classes of the current rule */
