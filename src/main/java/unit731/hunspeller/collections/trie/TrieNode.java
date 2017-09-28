@@ -1,6 +1,8 @@
 package unit731.hunspeller.collections.trie;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -50,10 +52,18 @@ public class TrieNode<S, H, V>{
 		children = null;
 	}
 
+	boolean isValueAList(){
+		return (this.value instanceof List);
+	}
+
 	public V setValue(V value){
 		V previousValue = this.value;
 		this.value = value;
 		return previousValue;
+	}
+
+	public void addValue(V value){
+		((List)this.value).addAll((List)value);
 	}
 
 	public boolean isLeaf(){

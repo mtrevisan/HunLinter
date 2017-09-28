@@ -103,7 +103,14 @@ public class Trie<S, H, V>{
 			if(sequenceOffset == sequenceLength){
 				node.setSequence(sequence);
 
-				previousValue = node.setValue(value);
+				if(node.isValueAList()){
+					//add the current value along with the old one if the value type is a collection
+					//FIXME return the old value?
+					node.addValue(value);
+					previousValue = null;
+				}
+				else
+					previousValue = node.setValue(value);
 				break;
 			}
 
@@ -119,8 +126,10 @@ public class Trie<S, H, V>{
 			TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
 			if(nextNode == null)
 				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
-			else{
-				//TODO manage adding (or not) the current value along with the old one
+			else if(nextNode.isValueAList()){
+				//add the current value along with the old one if the value type is a collection
+				//FIXME return the old value?
+				nextNode.addValue(value);
 			}
 
 			//full match, query or node remaining
