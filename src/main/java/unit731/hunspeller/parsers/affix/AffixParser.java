@@ -374,7 +374,7 @@ public class AffixParser{
 	public Boolean isSuffix(String affixCode){
 		Boolean isSuffix = null;
 		Object affix = getData(affixCode);
-		if(affix instanceof RuleEntry)
+		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
 			isSuffix = ((RuleEntry)affix).isSuffix();
 		return isSuffix;
 	}

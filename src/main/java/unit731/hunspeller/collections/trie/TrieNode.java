@@ -58,8 +58,8 @@ public class TrieNode<S, H, V>{
 	 */
 	@SuppressWarnings("unchecked")
 	public void addValue(V value){
-		if(this.value instanceof List)
-			((List)this.value).addAll((List)value);
+		if(this.value != null && List.class.isAssignableFrom(value.getClass()))
+			((List)this.value).addAll((List<?>)value);
 		else
 			this.value = value;
 	}

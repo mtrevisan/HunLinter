@@ -18,7 +18,7 @@ public class DefaultDecomposer implements Decomposer<Object>{
 	public void decompose(Object object, ByteSink sink, Charset charset){
 		if(object != null){
 			byte[] bytes;
-			if(object instanceof String)
+			if(String.class.isAssignableFrom(object.getClass()))
 				bytes = ((String)object).getBytes(charset);
 			else
 				bytes = object.toString().getBytes(charset);

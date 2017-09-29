@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
