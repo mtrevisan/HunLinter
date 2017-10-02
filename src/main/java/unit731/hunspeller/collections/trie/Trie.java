@@ -69,8 +69,8 @@ public class Trie<S, H, V>{
 		Objects.requireNonNull(sequence);
 		Objects.requireNonNull(value);
 
-		int sequenceOffset = 0;
 		int sequenceLength = sequencer.lengthOf(sequence);
+		int sequenceOffset = 0;
 		TrieNode<S, H, V> node = root;
 		while(node != null){
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
