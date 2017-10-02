@@ -68,11 +68,12 @@ public class TrieNode<S, H, V>{
 		return (value != null);
 	}
 
-	public TrieNode<S, H, V> getChild(H stem, TrieSequencer<S, H> sequencer){
-		TrieNode<S, H, V> child = null;
-		if(children != null)
-			child = sequencer.getChild(children, stem);
-		return child;
+	public TrieNode<S, H, V> getChildForInsert(H stem){
+		return (children != null? children.get(stem): null);
+	}
+
+	public TrieNode<S, H, V> getChildForRetrieve(H stem, TrieSequencer<S, H> sequencer){
+		return (children != null? sequencer.getChild(children, stem): null);
 	}
 
 	public void addChild(H stem, TrieNode<S, H, V> node){

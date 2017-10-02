@@ -31,7 +31,7 @@ public class TrieNodeTest{
 		TrieNode<String, Integer, String> removedNode = node.removeChild((int)'a', sequencer);
 
 		Assert.assertNull(removedNode);
-		Assert.assertNotNull(node.getChild((int)'d', sequencer));
+		Assert.assertNotNull(node.getChildForRetrieve((int)'d', sequencer));
 	}
 
 	@Test
@@ -49,11 +49,11 @@ public class TrieNodeTest{
 
 		//verify ab-c-d, and ab-c-e
 		Assert.assertEquals(2, node0.getEndIndex());
-		TrieNode<String, Integer, String> child1 = node0.getChild((int)'c', sequencer);
+		TrieNode<String, Integer, String> child1 = node0.getChildForRetrieve((int)'c', sequencer);
 		Assert.assertNotNull(child1);
-		TrieNode<String, Integer, String> child2 = child1.getChild((int)'d', sequencer);
+		TrieNode<String, Integer, String> child2 = child1.getChildForRetrieve((int)'d', sequencer);
 		Assert.assertNotNull(child2);
-		TrieNode<String, Integer, String> child3 = child1.getChild((int)'e', sequencer);
+		TrieNode<String, Integer, String> child3 = child1.getChildForRetrieve((int)'e', sequencer);
 		Assert.assertNotNull(child3);
 	}
 

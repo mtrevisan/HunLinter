@@ -113,7 +113,7 @@ public class Trie<S, H, V>{
 
 			//full match, end of node
 			H stem = sequencer.hashOf(sequence, sequenceOffset);
-			TrieNode<S, H, V> nextNode = node.getChild(stem, sequencer);
+			TrieNode<S, H, V> nextNode = node.getChildForInsert(stem);
 			if(nextNode == null)
 				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
 
@@ -154,7 +154,7 @@ public class Trie<S, H, V>{
 
 	public Collection<TrieNode<S, H, V>> collectPrefixes(S sequence){
 		Set<TrieNode<S, H, V>> prefixes = new HashSet<>();
-		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> prefixes.add(parent.getChild(stem, sequencer)));
+		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> prefixes.add(parent.getChildForRetrieve(stem, sequencer)));
 		return prefixes;
 	}
 
@@ -177,7 +177,7 @@ public class Trie<S, H, V>{
 
 		H stem = sequencer.hashOf(sequence, sequenceOffset);
 		TrieNode<S, H, V> parent = root;
-		TrieNode<S, H, V> node = root.getChild(stem, sequencer);
+		TrieNode<S, H, V> node = root.getChildForRetrieve(stem, sequencer);
 		while(node != null){
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
@@ -200,7 +200,7 @@ public class Trie<S, H, V>{
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TrieNode<S, H, V> next = node.getChild(stem, sequencer);
+				TrieNode<S, H, V> next = node.getChildForRetrieve(stem, sequencer);
 
 				//if there is no next, node could be a STARTS_WITH match
 				if(next == null)
