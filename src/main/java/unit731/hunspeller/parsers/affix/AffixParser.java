@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +85,7 @@ public class AffixParser{
 	private final Map<String, Object> data = new HashMap<>();
 	private Set<String> rawFlags;
 	private Charset charset;
-	private FlagParsingStrategy strategy;
+	@Getter private FlagParsingStrategy strategy;
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
