@@ -25,6 +25,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_EL = "ƚ";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuú-]ƚ|ƚ[^aàeèéiíoòóuú]");
 	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
@@ -168,6 +169,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String derivedWord = production.getWord();
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
+		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
+			throw new IllegalArgumentException("Word with a vanishing el near a consonant: " + derivedWord);
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
 		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
