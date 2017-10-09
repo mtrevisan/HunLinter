@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -110,7 +109,6 @@ public class DictionaryParser{
 					int lineIndex = 1;
 					long readSoFar = 0l;
 					long totalSize = dicParser.dicFile.length();
-					String keepCaseFlag = affParser.getKeepCaseFlag();
 					while((line = br.readLine()) != null){
 						lineIndex ++;
 						readSoFar += line.length();
@@ -122,11 +120,6 @@ public class DictionaryParser{
 								dicParser.checkLine(line);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
-								List<String> ruleFlags = Arrays.stream(dictionaryWord.getRuleFlags())
-									.filter(ruleFlag -> !ruleFlag.equals(keepCaseFlag))
-									.collect(Collectors.toList());
-								if(!ruleFlags.isEmpty() && subProductions.size() == 1)
-									throw new IllegalArgumentException("Word has no productions");
 
 								subProductions.forEach(production -> dicParser.checkProduction(dictionaryWord, production));
 							}

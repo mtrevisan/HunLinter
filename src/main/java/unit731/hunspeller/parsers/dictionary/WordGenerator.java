@@ -119,6 +119,10 @@ public class WordGenerator{
 					if(match == null || PatternService.find(word, match))
 						applicableAffixes.add(entry);
 				}
+				if(applicableAffixes.isEmpty())
+					throw new IllegalArgumentException("Word has no applicable rules for " + ruleFlag + " from " + productable.getWord()
+						+ affParser.getStrategy().joinRuleFlags(productable.getRuleFlags()));
+
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
