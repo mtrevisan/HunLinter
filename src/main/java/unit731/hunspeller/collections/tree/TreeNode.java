@@ -89,13 +89,14 @@ public class TreeNode<S, H, V>{
 		if(children != null){
 			Set<TreeNode<S, H, V>> nodes = sequencer.getChildren(children, stem);
 			//when there are no children, remove this node from it's parent
-			if(!nodes.isEmpty() && node.children == null){
-				removedNode = children.remove(stem);
+			for(TreeNode<S, H, V> node : nodes)
+				if(node.children == null){
+					removedNode = children.remove(stem);
 
-				if(children.isEmpty())
-					//claim memory
-					children = null;
-			}
+					if(children.isEmpty())
+						//claim memory
+						children = null;
+				}
 		}
 		return removedNode;
 	}
