@@ -1,9 +1,12 @@
 package unit731.hunspeller.collections.trie;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -74,6 +77,10 @@ public class TrieNode<S, H, V>{
 
 	public TrieNode<S, H, V> getChildForRetrieve(H stem, TrieSequencer<S, H> sequencer){
 		return (children != null? sequencer.getChild(children, stem): null);
+	}
+
+	public Set<TrieNode<S, H, V>> getChildrenForRetrieve(H stem, TrieSequencer<S, H> sequencer){
+		return new HashSet<>(Arrays.asList(getChildForRetrieve(stem, sequencer)));
 	}
 
 	public void addChild(H stem, TrieNode<S, H, V> node){

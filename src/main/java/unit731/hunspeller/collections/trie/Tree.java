@@ -1,6 +1,8 @@
 package unit731.hunspeller.collections.trie;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.Stack;
 import java.util.function.BiConsumer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -44,8 +46,12 @@ public class Tree<S, H, V> extends Trie<S, H, V>{
 
 		H stem = sequencer.hashOf(sequence, sequenceOffset);
 		TrieNode<S, H, V> parent = root;
-		TrieNode<S, H, V> node = root.getChildForRetrieve(stem, sequencer);
-		while(node != null){
+		Set<TrieNode<S, H, V>> nodes = root.getChildrenForRetrieve(stem, sequencer);
+		Stack<TrieNode<S, H, V>> stack = new Stack<>();
+		stack.addAll(nodes);
+		while(!stack.isEmpty()){
+			TrieNode<S, H, V> node = stack.pop();
+
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesGet(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
@@ -67,19 +73,19 @@ public class Tree<S, H, V> extends Trie<S, H, V>{
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TrieNode<S, H, V> next = node.getChildForRetrieve(stem, sequencer);
+				Set<TrieNode<S, H, V>> next = node.getChildrenForRetrieve(stem, sequencer);
 
 				//if there is no next, node could be a STARTS_WITH match
 				if(next == null)
 					break;
 
 				parent = node;
-				node = next;
+				stack.addAll(next);
 			}
 		}
 
 		//EXACT matches
-		if(node != null && matchType == TrieMatch.EXACT){
+		if(!stack.isEmpty() && matchType == TrieMatch.EXACT){
 			//check length of last node against query
 			int endIndex = node.getEndIndex();
 			if(!node.isLeaf() || endIndex != sequenceLength)
