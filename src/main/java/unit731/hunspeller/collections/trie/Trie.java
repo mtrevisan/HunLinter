@@ -24,11 +24,11 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
  * @param <H>	The hash type (used to find a particular child).
  * @param <V>	The value type.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Trie<S, H, V>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
-	public enum TrieMatch{
+	public static enum TrieMatch{
 		/**
 		 * An exact match requires the input sequence to be an exact match to the sequences stored in the Trie. If the sequence "meow" is
 		 * stored in the Trie, then it can only match on "meow".
@@ -43,7 +43,7 @@ public class Trie<S, H, V>{
 
 
 	private final TrieNode<S, H, V> root = TrieNode.makeRoot();
-	private TrieSequencer<S, H> sequencer;
+	protected TrieSequencer<S, H> sequencer;
 
 
 	public Trie(TrieSequencer<S, H> sequencer){
@@ -162,11 +162,11 @@ public class Trie<S, H, V>{
 	 * Searches in the Trie based on the sequence query.
 	 *
 	 * @param sequence	The query sequence.
-	 * @param match		The matching logic.
+	 * @param matchType	The matching logic.
 	 * @param callback	The callback to be executed on match found.
 	 * @return	The node that best matched the query based on the logic.
 	 */
-	private TrieNode<S, H, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, H, V>, H> callback){
+	protected TrieNode<S, H, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, H, V>, H> callback){
 		Objects.requireNonNull(sequence);
 
 		int sequenceLength = sequencer.lengthOf(sequence);
