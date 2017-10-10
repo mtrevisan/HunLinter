@@ -1,9 +1,11 @@
 package unit731.hunspeller.collections.tree;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -72,8 +74,8 @@ public class TreeNode<S, H, V>{
 		return (children != null? children.get(stem): null);
 	}
 
-	public TreeNode<S, H, V> getChildForRetrieve(H stem, TreeSequencer<S, H> sequencer){
-		return (children != null? sequencer.getChild(children, stem): null);
+	public Set<TreeNode<S, H, V>> getChildrenForRetrieve(H stem, TreeSequencer<S, H> sequencer){
+		return (children != null? sequencer.getChildren(children, stem): Collections.<TreeNode<S, H, V>>emptySet());
 	}
 
 	public void addChild(H stem, TreeNode<S, H, V> node){
@@ -85,9 +87,9 @@ public class TreeNode<S, H, V>{
 	public TreeNode<S, H, V> removeChild(H stem, TreeSequencer<S, H> sequencer){
 		TreeNode<S, H, V> removedNode = null;
 		if(children != null){
-			TreeNode<S, H, V> node = sequencer.getChild(children, stem);
+			Set<TreeNode<S, H, V>> nodes = sequencer.getChildren(children, stem);
 			//when there are no children, remove this node from it's parent
-			if(node != null && node.children == null){
+			if(!nodes.isEmpty() && node.children == null){
 				removedNode = children.remove(stem);
 
 				if(children.isEmpty())

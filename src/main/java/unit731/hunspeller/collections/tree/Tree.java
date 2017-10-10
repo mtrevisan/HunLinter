@@ -2,12 +2,14 @@ package unit731.hunspeller.collections.tree;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.tree.sequencers.TreeSequencer;
@@ -132,9 +134,9 @@ public class Tree<S, H, V>{
 	 * @return	The value for the given sequence, or the default value of the Tree if no match was found. The default value of a Tree is by default
 	 *		null.
 	 */
-	public V get(S sequence){
-		TreeNode<S, H, V> node = searchAndApply(sequence, TreeMatch.EXACT, null);
-		return (node != null? node.getValue(): null);
+	public Set<V> get(S sequence){
+		Set<TreeNode<S, H, V>> nodes = searchAndApply(sequence, TreeMatch.EXACT, null);
+		return (nodes != null? nodes.stream().map(TreeNode::getValue).collect(Collectors.toSet()): null);
 	}
 
 	/**
@@ -143,14 +145,14 @@ public class Tree<S, H, V>{
 	 * @param sequence	The sequence to remove.
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
-	public V remove(S sequence){
-		TreeNode<S, H, V> node = searchAndApply(sequence, TreeMatch.EXACT, (parent, stem) -> parent.removeChild(stem, sequencer));
-		return (node != null? node.getValue(): null);
+	public Set<V> remove(S sequence){
+		Set<TreeNode<S, H, V>> nodes = searchAndApply(sequence, TreeMatch.EXACT, (parent, stem) -> parent.removeChild(stem, sequencer));
+		return (nodes != null? nodes.stream().map(TreeNode::getValue).collect(Collectors.toSet()): null);
 	}
 
 	public Collection<TreeNode<S, H, V>> collectPrefixes(S sequence){
 		Set<TreeNode<S, H, V>> prefixes = new HashSet<>();
-		searchAndApply(sequence, TreeMatch.STARTS_WITH, (parent, stem) -> prefixes.add(parent.getChildForRetrieve(stem, sequencer)));
+		searchAndApply(sequence, TreeMatch.STARTS_WITH, (parent, stem) -> prefixes.addAll(parent.getChildrenForRetrieve(stem, sequencer)));
 		return prefixes;
 	}
 
@@ -162,7 +164,7 @@ public class Tree<S, H, V>{
 	 * @param callback	The callback to be executed on match found.
 	 * @return	The node that best matched the query based on the logic.
 	 */
-	private TreeNode<S, H, V> searchAndApply(S sequence, TreeMatch matchType, BiConsumer<TreeNode<S, H, V>, H> callback){
+	private Set<TreeNode<S, H, V>> searchAndApply(S sequence, TreeMatch matchType, BiConsumer<TreeNode<S, H, V>, H> callback){
 		Objects.requireNonNull(sequence);
 
 		int sequenceLength = sequencer.lengthOf(sequence);
@@ -173,8 +175,12 @@ public class Tree<S, H, V>{
 
 		H stem = sequencer.hashOf(sequence, sequenceOffset);
 		TreeNode<S, H, V> parent = root;
-		TreeNode<S, H, V> node = root.getChildForRetrieve(stem, sequencer);
-		while(node != null){
+		Set<TreeNode<S, H, V>> nodes = root.getChildrenForRetrieve(stem, sequencer);
+		Stack<TreeNode<S, H, V>> stack = new Stack<>();
+		stack.addAll(nodes);
+		while(!stack.isEmpty()){
+			TreeNode<S, H, V> node = stack.pop();
+
 			int nodeLength = node.getEndIndex() - node.getStartIndex();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesGet(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
@@ -196,31 +202,45 @@ public class Tree<S, H, V>{
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
-				TreeNode<S, H, V> next = node.getChildForRetrieve(stem, sequencer);
+				Set<TreeNode<S, H, V>> next = node.getChildrenForRetrieve(stem, sequencer);
 
 				//if there is no next, node could be a STARTS_WITH match
-				if(next == null)
+				if(next.isEmpty())
 					break;
 
 				parent = node;
-				node = next;
+				stack.addAll(next);
 			}
 		}
 
 		//EXACT matches
-		if(node != null && matchType == TreeMatch.EXACT){
-			//check length of last node against query
-			int endIndex = node.getEndIndex();
-			if(!node.isLeaf() || endIndex != sequenceLength)
-				return null;
+		Set<TreeNode<S, H, V>> result = new HashSet<>();
+		if(!stack.isEmpty() && matchType == TreeMatch.EXACT){
+			Iterator<TreeNode<S, H, V>> itr = stack.iterator();
+			while(itr.hasNext()){
+				TreeNode<S, H, V> node = itr.next();
 
-			//check actual sequence values
-			S seq = node.getSequence();
-			if(sequencer.lengthOf(seq) != sequenceLength || sequencer.matchesGet(seq, 0, sequence, 0, endIndex) != sequenceLength)
-				return null;
+				//check length of last node against query
+				int endIndex = node.getEndIndex();
+				if(!node.isLeaf() || endIndex != sequenceLength)
+					continue;
+
+				//check actual sequence values
+				S seq = node.getSequence();
+				if(sequencer.lengthOf(seq) != sequenceLength || sequencer.matchesGet(seq, 0, sequence, 0, endIndex) != sequenceLength)
+					continue;
+
+				result.add(node);
+			}
 		}
 
-		return node;
+		//call callback for each leaf node found so far
+		if(callback != null)
+			for(TreeNode<S, H, V> node : result)
+				if(node.isLeaf() && sequencer.startsWith(sequence, node.getSequence()))
+					callback.accept(parent, stem);
+
+		return result;
 	}
 
 	/**

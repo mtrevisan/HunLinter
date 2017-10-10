@@ -1,6 +1,7 @@
 package unit731.hunspeller.collections.tree.sequencers;
 
 import java.util.Map;
+import java.util.Set;
 import unit731.hunspeller.collections.tree.TreeNode;
 
 
@@ -53,7 +54,7 @@ public interface TreeSequencer<S, H>{
 	 * @param stem			The stem used to search the child in the given map.
 	 * @return	The child searched, or <code>null</code> if not found.
 	 */
-	<V> TreeNode<S, H, V> getChild(Map<H, TreeNode<S, H, V>> children, H stem);
+	<V> Set<TreeNode<S, H, V>> getChildren(Map<H, TreeNode<S, H, V>> children, H stem);
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to

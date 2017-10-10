@@ -232,10 +232,10 @@ public class Trie<S, H, V>{
 	}
 
 	/**
-	 * Search the given string and return an object if it lands on a sequence, essentially testing if the sequence exists in the trie.
+	 * Search the given string and return an object if it lands on a sequence, essentially testing if the sequence exists in the Trie.
 	 *
 	 * @param sequence	The sequence to search for
-	 * @return Whether the sequence is fully contained into this trie
+	 * @return Whether the sequence is fully contained into this Trie
 	 */
 	public boolean containsKey(S sequence){
 		return (get(sequence) != null);
@@ -244,7 +244,7 @@ public class Trie<S, H, V>{
 	/**
 	 * Apply a function to each leaf, traversing the tree in level order.
 	 * 
-	 * @param callback	Function that will be executed for each leaf of the trie
+	 * @param callback	Function that will be executed for each leaf of the Trie
 	 */
 	public void forEachLeaf(Consumer<TrieNode<S, H, V>> callback){
 		Objects.requireNonNull(callback);
@@ -260,7 +260,7 @@ public class Trie<S, H, V>{
 	 * Apply a function to each node, traversing the tree in level order, until the callback responds <code>true</code>.
 	 * 
 	 * @param root			Node to start with
-	 * @param callback	Function that will be executed for each node of the trie, it has to return <code>true</code> if a node matches
+	 * @param callback	Function that will be executed for each node of the Trie, it has to return <code>true</code> if a node matches
 	 * @return	<code>true</code> if the node is found
 	 */
 	public boolean find(TrieNode<S, H, V> root, Function<TrieNode<S, H, V>, Boolean> callback){
