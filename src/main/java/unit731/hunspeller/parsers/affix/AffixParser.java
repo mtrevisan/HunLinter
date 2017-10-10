@@ -23,10 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.collections.trie.sequencers.RegExpTrieSequencer;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
 import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
@@ -133,7 +130,7 @@ public class AffixParser{
 			BufferedReader br = context.getReader();
 			boolean isSuffix = context.isSuffix();
 			String ruleFlag = context.getFirstParameter();
-			String combineable = context.getSecondParameter();
+			char combineable = context.getSecondParameter().charAt(0);
 			int numEntries = Integer.parseInt(context.getThirdParameter());
 			if(numEntries == 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -142,9 +139,8 @@ public class AffixParser{
 			String flag = getFlag();
 			strategy = createFlagParsingStrategy(flag);
 
-//RegExpTrieSequencer sequencer = new RegExpTrieSequencer();
-//Trie<String[], String, List<AffixEntry>> prefixEntries = new Trie<>(sequencer);
-//Trie<String[], String, List<AffixEntry>> suffixEntries = new Trie<>(sequencer);
+//List<AffixEntry> prefixEntries = new ArrayList<>();
+//List<AffixEntry> suffixEntries = new ArrayList<>();
 			List<AffixEntry> entries = new ArrayList<>();
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
@@ -171,7 +167,7 @@ public class AffixParser{
 //lst.add(entry);
 //if(entry.isSuffix()){
 //	ArrayUtils.reverse(arr);
-//	suffixEntries.put(arr, lst);
+//	suffixEntries.add(arr, lst);
 //}
 //else
 //	prefixEntries.put(arr, lst);

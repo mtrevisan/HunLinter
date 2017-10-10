@@ -130,16 +130,23 @@ public class WordGenerator{
 //Collection<TrieNode<String[], String, List<AffixEntry>>> lst;
 //if(isSuffix){
 //	ArrayUtils.reverse(arr);
-//	lst = rule.getSuffixEntries().collectPrefixes(arr);
+//	for(AffixEntry entry : rule.getSuffixEntries()){
+//		Matcher match = entry.getMatch();
+//		//... only if it matches the given word
+//		if(match == null || PatternService.find(arr, match))
+//			en1.add(entry);
+//	}
 //}
-//else
-//	lst = rule.getPrefixEntries().collectPrefixes(arr);
+//else{
+//	for(AffixEntry entry : rule.getPrefixEntries()){
+//		Matcher match = entry.getMatch();
+//		//... only if it matches the given word
+//		if(match == null || PatternService.find(arr, match))
+//			en1.add(entry);
+//	}
+//}
 //en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//for(TrieNode<String[], String, List<AffixEntry>> entry : lst)
-//	en1.addAll(entry.getValue());
 //en1.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//if(!org.apache.commons.collections4.ListUtils.isEqualList(en0, en1))
-//	System.out.println("diff");
 				//List<RegExpPrefix<AffixEntry>> rePrefixes = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word));
 				//List<AffixEntry> applicableAffixes = rePrefixes.stream()
 				//	.map(RegExpPrefix::getNode)
