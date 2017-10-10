@@ -187,9 +187,9 @@ public class Tree<S, H, V>{
 
 			sequenceOffset += matches;
 
-			if(matches != max || matches == max && max != nodeLength)
+			if(matches != max || matches == max && max != nodeLength){
 				//not found
-				node = null;
+			}
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
 				if(callback != null && node.isLeaf() && sequencer.startsWith(sequence, node.getSequence()))
 					callback.accept(parent, stem);
