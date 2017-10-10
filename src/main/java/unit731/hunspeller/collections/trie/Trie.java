@@ -24,7 +24,7 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
  * @param <H>	The hash type (used to find a particular child).
  * @param <V>	The value type.
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Trie<S, H, V>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
@@ -43,7 +43,7 @@ public class Trie<S, H, V>{
 
 
 	private final TrieNode<S, H, V> root = TrieNode.makeRoot();
-	protected TrieSequencer<S, H> sequencer;
+	private TrieSequencer<S, H> sequencer;
 
 
 	public Trie(TrieSequencer<S, H> sequencer){
@@ -166,7 +166,7 @@ public class Trie<S, H, V>{
 	 * @param callback	The callback to be executed on match found.
 	 * @return	The node that best matched the query based on the logic.
 	 */
-	protected TrieNode<S, H, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, H, V>, H> callback){
+	private TrieNode<S, H, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, H, V>, H> callback){
 		Objects.requireNonNull(sequence);
 
 		int sequenceLength = sequencer.lengthOf(sequence);

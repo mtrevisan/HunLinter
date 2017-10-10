@@ -79,10 +79,6 @@ public class TrieNode<S, H, V>{
 		return (children != null? sequencer.getChild(children, stem): null);
 	}
 
-	public Set<TrieNode<S, H, V>> getChildrenForRetrieve(H stem, TrieSequencer<S, H> sequencer){
-		return new HashSet<>(Arrays.asList(getChildForRetrieve(stem, sequencer)));
-	}
-
 	public void addChild(H stem, TrieNode<S, H, V> node){
 		children = Optional.ofNullable(children)
 			.orElseGet(HashMap::new);
