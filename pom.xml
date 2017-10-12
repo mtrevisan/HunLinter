@@ -217,10 +217,10 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-<!--<dependency>
-	<groupId>org.apache.commons</groupId>
-	<artifactId>commons-collections4</artifactId>
-	<version>4.1</version>
-</dependency>-->
+<dependency>
+	<groupId>jakarta-regexp</groupId>
+	<artifactId>jakarta-regexp</artifactId>
+	<version>1.4</version>
+</dependency>
 	</dependencies>
 </project>
