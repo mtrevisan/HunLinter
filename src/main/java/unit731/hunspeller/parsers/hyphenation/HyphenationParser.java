@@ -387,7 +387,7 @@ public class HyphenationParser{
 		if(nonStandard != null)
 			//hyphenation is non-standard
 			hyphenatedWord = Arrays.asList(PatternService.split(nonStandard, REGEX_PATTERN_HYPHEN_MINUS));
-		else if(word.length() < options.getLeftMin() + options.getRightMin())
+		else if(word.length() <= options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{

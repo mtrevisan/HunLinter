@@ -224,10 +224,6 @@ public class Trie<S, H, V>{
 				return null;
 		}
 
-		//call callback for each leaf node found so far
-		if(node != null && callback != null && node.isLeaf() && sequencer.startsWith(sequence, node.getSequence()))
-			callback.accept(parent, stem);
-
 		return node;
 	}
 
