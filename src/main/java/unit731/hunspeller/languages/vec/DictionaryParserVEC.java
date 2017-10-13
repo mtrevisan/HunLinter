@@ -155,7 +155,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			}
 			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
 					&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-				throw new IllegalArgumentException("Plural missing after n or l, add u0 or U0");
+				throw new IllegalArgumentException("Plural missing after n or l, add " + (Word.isStressed(line)? "u0": "U0"));
 		}
 
 		Set<Matcher> keys = ERROR_CHECKS.keySet();
@@ -198,7 +198,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
 					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN)
 					&& PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
-				throw new IllegalArgumentException("Plural missing after n or l for word " + derivedWordWithoutDataFields + ", add u0 or U0");
+				throw new IllegalArgumentException("Plural missing after n or l for word " + derivedWordWithoutDataFields + ", add "
+					+ (Word.isStressed(derivedWord)? "u0": "U0"));
 		}
 
 		String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
