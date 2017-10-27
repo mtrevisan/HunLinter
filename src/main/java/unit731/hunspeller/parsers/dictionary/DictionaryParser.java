@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -94,7 +93,7 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
+				publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
 				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -168,24 +167,17 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic");
 
-			//collect duplicates
 			BloomFilter<String> duplicatesBloomFilter = collectDuplicates();
 
-			//extract duplicates
 			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
-			//write duplicates to file
 			writeDuplicates(duplicates, outputFile);
 
 			publish("Duplicates extracted successfully");
 
-			//open file with default editor
-			if(System.getProperty("os.name").toLowerCase().contains("windows"))
-				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + outputFile.getCanonicalPath());
-			else
-				Desktop.getDesktop().open(outputFile);
+			openFileWithChoosenEditor();
 
 			return null;
 		}
@@ -343,6 +335,14 @@ public class DictionaryParser{
 			result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 				.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
 			return result;
+		}
+
+		private void openFileWithChoosenEditor() throws InterruptedException, IOException{
+			ProcessBuilder builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", outputFile.getAbsolutePath());
+			builder.redirectErrorStream();
+			builder.redirectOutput();
+			Process process = builder.start();
+			process.waitFor();
 		}
 
 		@Override
@@ -552,7 +552,7 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening Dictionary file: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
 			setProgress(0);
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
