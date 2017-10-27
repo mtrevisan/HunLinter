@@ -173,7 +173,7 @@ public class DictionaryParser{
 
 			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
-			writeDuplicates(duplicates, outputFile);
+			writeDuplicates(duplicates);
 
 			publish("Duplicates extracted successfully");
 
@@ -291,7 +291,7 @@ public class DictionaryParser{
 			return result;
 		}
 
-		private void writeDuplicates(List<Duplicate> duplicates, File outputFile) throws IOException{
+		private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
 			publish("Write results to file");
 
 			long writtenSoFar = 0l;
