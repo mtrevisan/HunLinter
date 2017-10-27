@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(of = "lineIndex")
 @Getter
 public class Duplicate{
 
