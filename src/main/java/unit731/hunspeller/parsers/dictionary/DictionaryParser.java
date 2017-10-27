@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -179,6 +180,13 @@ public class DictionaryParser{
 			writeDuplicates(duplicates, outputFile);
 
 			publish("Duplicates extracted successfully");
+
+			//open file with default editor
+			if(System.getProperty("os.name").toLowerCase().contains("windows"))
+				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + outputFile.getCanonicalPath());
+			else
+				Desktop.getDesktop().open(outputFile);
+
 			return null;
 		}
 
