@@ -118,7 +118,7 @@ public class HyphenationParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening Hyphenation file: " + hypFile.getName());
+				publish("Opening Hyphenation file for parsing: " + hypFile.getName());
 				setProgress(0);
 
 				long readSoFar = 0l;

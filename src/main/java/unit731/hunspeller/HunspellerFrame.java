@@ -1182,7 +1182,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		try{
 			clearAffixFile();
 
-			printResultLine("Opening Affix file: " + affFile.getName());
+			printResultLine("Opening Affix file for parsing: " + affFile.getName());
 			affParser.parse(affFile);
 
 			printResultLine("Finished reading Affix file");
@@ -1305,7 +1305,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			codePath += "aids/" + affParser.getLanguage() + ".aid";
 			File aidFile = new File(codePath);
 			if(aidFile.exists()){
-				printResultLine("Opening AID file: " + aidFile.getName());
+				printResultLine("Opening AID file for parsing: " + aidFile.getName());
 
 				aidParser.parse(aidFile);
 				List<String> lines = aidParser.getLines();

@@ -59,7 +59,7 @@ public class ThesaurusParser{
 		@Override
 		protected List<ThesaurusEntry> doInBackground() throws Exception{
 			try{
-				publish("Opening Thesaurus file: " + theFile.getName());
+				publish("Opening Thesaurus file for parsing: " + theFile.getName());
 				setProgress(0);
 
 				long readSoFar = 0l;
