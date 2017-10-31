@@ -148,7 +148,7 @@ public class HyphenationParser{
 									throw new IllegalArgumentException("Cannot have more than two levels");
 							}
 							else if(!PatternService.find(line, VALID_RULE) && line.contains(HYPHEN_MINUS)){
-								String key = PatternService.replaceAll(line, REGEX_HYPHEN_MINUS, StringUtils.EMPTY);
+								String key = PatternService.clear(line, REGEX_HYPHEN_MINUS);
 								if(hypParser.nonStandardHyphenation.containsKey(key))
 									throw new IllegalArgumentException("Non-standard hyphenation " + line + " is already present");
 
@@ -206,7 +206,7 @@ public class HyphenationParser{
 		 */
 		private String removeComment(String line){
 			//remove comments
-			line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
+			line = PatternService.clear(line, REGEX_COMMENT);
 			//trim the entire string
 			return StringUtils.strip(line);
 		}
@@ -262,7 +262,7 @@ public class HyphenationParser{
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 		if(isAugmentedRule(rule)){
 			int augmentedIndex = rule.indexOf('/');
-			int count = PatternService.replaceAll((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule), REGEX_HYPHENATION_POINT, StringUtils.EMPTY).length();
+			int count = PatternService.clear((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule), REGEX_HYPHENATION_POINT).length();
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
@@ -364,7 +364,7 @@ public class HyphenationParser{
 	}
 
 	private static String getKeyFromData(String rule){
-		return PatternService.replaceAll(rule, REGEX_KEY, StringUtils.EMPTY);
+		return PatternService.clear(rule, REGEX_KEY);
 	}
 
 	/**
@@ -441,7 +441,7 @@ public class HyphenationParser{
 			for(TrieNode<String, Integer, String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getValue();
-				String reducedData = PatternService.replaceFirst(rule, REGEX_REDUCE, StringUtils.EMPTY);
+				String reducedData = PatternService.clear(rule, REGEX_REDUCE);
 				int ruleSize = reducedData.length();
 				for(int k = 0; k < ruleSize; k ++){
 					char chr = reducedData.charAt(k);
@@ -482,7 +482,7 @@ public class HyphenationParser{
 
 				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
 				if(augmentedPatternData != null){
-					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.replaceFirst(augmentedPatternData, REGEX_WORD_INITIAL, StringUtils.EMPTY));
+					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, REGEX_WORD_INITIAL));
 					m.find();
 					int index = m.start();
 
@@ -495,7 +495,7 @@ public class HyphenationParser{
 					if(indexBefore == null){
 						String rule = m.group("rule");
 						indexBefore = Integer.toString(1);
-						indexAfter = Integer.toString(PatternService.replaceAll(rule, REGEX_POINTS_AND_NUMBERS, StringUtils.EMPTY).length());
+						indexAfter = Integer.toString(PatternService.clear(rule, REGEX_POINTS_AND_NUMBERS).length());
 					}
 
 					//remove last characters from subword

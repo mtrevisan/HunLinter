@@ -3,12 +3,15 @@ package unit731.hunspeller.languages.vec;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
@@ -23,6 +26,9 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
+	private static final String START_TAGS = "/[^\\t\\n]*";
+
+	private static final Matcher KEEP_WORD_ONLY = PatternService.matcher("(/.*)?$");
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
@@ -35,46 +41,48 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
 
-	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*/[^\\t\\n]*";
-	private static final String NON_VANISHING_L_NOT_ENDING_IN_A = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*[^a]/[^\\t\\n]*";
-	private static final String VANISHING_L = "ƚ[^/]+/[^\\t\\n]*";
-	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]/[^\\t\\n]*";
+	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*" + START_TAGS;
+	private static final String NON_VANISHING_L_NOT_ENDING_IN_A = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*[^a]" + START_TAGS;
+	private static final String VANISHING_L = "ƚ[^/]+" + START_TAGS;
+	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");
-	private static final Matcher HAS_METAPHONESIS = PatternService.matcher("/[^\\t\\n]*mf");
-	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]/[^\\t\\n]*T0|[^aie]/[^\\t\\n]*B0|[^ieo]/[^\\t\\n]*C0|[^aio]/[^\\t\\n]*D0");
+	private static final Matcher HAS_METAPHONESIS = PatternService.matcher(START_TAGS + "mf");
+	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + "D0");
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
-	private static final Map<Matcher, String> ERROR_CHECKS = new HashMap<>();
+	private static final Map<Matcher, String> MISMATCH_CHECKS = new HashMap<>();
 	static{
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "E1"), "Cannot use E1 rule with vanishing el, use E2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "E2"), "Cannot use E2 rule with non-vanishing el, use E1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "G1"), "Cannot use G1 rule with vanishing el, use G2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "G2"), "Cannot use G2 rule with non-vanishing el, use G1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "F1"), "Cannot use F1 rule with vanishing el, use F2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "F2"), "Cannot use F2 rule with non-vanishing el, use F1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "P1"), "Cannot use P1 rule with vanishing el, use P2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "P2"), "Cannot use P2 rule with non-vanishing el, use P1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "Q1"), "Cannot use Q1 rule with vanishing el, use Q2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "Q2"), "Cannot use Q2 rule with non-vanishing el, use Q1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"), "Cannot use r0 rule with vanishing el, use r1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"), "Cannot use r1 rule with non-vanishing el, use r0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"), "Cannot use s1 rule with vanishing el, use s2");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), "Cannot use s2 rule with non-vanishing el, use s1");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), "Cannot use W0 rule with vanishing el, use W1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), "Cannot use W1 rule with non-vanishing el, use W0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "&0"), "Cannot use &0 rule with vanishing el, use &1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "&1"), "Cannot use &1 rule with non-vanishing el, use &0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), "Cannot use [0 rule with vanishing el, use [1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), "Cannot use [1 rule with non-vanishing el, use [0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"), "Cannot use (0 rule with vanishing el, use (1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"), "Cannot use (1 rule with non-vanishing el, use (0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0"), "Cannot use )0 rule with vanishing el, use )1");
-		ERROR_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\)1"), "Cannot use )1 rule with non-vanishing el, use )0");
-		ERROR_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"), "Cannot use <0 rule with vanishing el, use <1");
-		ERROR_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]/[^\\t\\n]*<1"), "Cannot use <1 rule with đ or ŧ, use <0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "E1"), "Cannot use E1 rule with vanishing el, use E2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "E2"), "Cannot use E2 rule with non-vanishing el, use E1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "G1"), "Cannot use G1 rule with vanishing el, use G2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "G2"), "Cannot use G2 rule with non-vanishing el, use G1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "F1"), "Cannot use F1 rule with vanishing el, use F2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "F2"), "Cannot use F2 rule with non-vanishing el, use F1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "P1"), "Cannot use P1 rule with vanishing el, use P2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "P2"), "Cannot use P2 rule with non-vanishing el, use P1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "Q1"), "Cannot use Q1 rule with vanishing el, use Q2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "Q2"), "Cannot use Q2 rule with non-vanishing el, use Q1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"), "Cannot use r0 rule with vanishing el, use r1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"), "Cannot use r1 rule with non-vanishing el, use r0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"), "Cannot use s1 rule with vanishing el, use s2");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), "Cannot use s2 rule with non-vanishing el, use s1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), "Cannot use W0 rule with vanishing el, use W1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), "Cannot use W1 rule with non-vanishing el, use W0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "&0"), "Cannot use &0 rule with vanishing el, use &1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "&1"), "Cannot use &1 rule with non-vanishing el, use &0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), "Cannot use [0 rule with vanishing el, use [1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), "Cannot use [1 rule with non-vanishing el, use [0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"), "Cannot use (0 rule with vanishing el, use (1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"), "Cannot use (1 rule with non-vanishing el, use (0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0"), "Cannot use )0 rule with vanishing el, use )1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\)1"), "Cannot use )1 rule with non-vanishing el, use )0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"), "Cannot use <0 rule with vanishing el, use <1");
+		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"), "Cannot use <1 rule with đ or ŧ, use <0");
 	}
+
+	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0", "Y0"));
 
 	private static final String TAB = "\t";
 
@@ -139,33 +147,41 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	@Override
 	protected void checkLine(String line) throws IllegalArgumentException{
-		if(!line.contains(TAB))
+		if(!line.contains(StringUtils.SPACE) && !line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
-
-		if(line.contains("/") && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
-				&& !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
-				boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
-				boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
-				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-				if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing, add mf");
-				else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed, remove mf");
-			}
-			if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
-					&& !PatternService.find(line, ENDS_IN_MAN) && PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-				throw new IllegalArgumentException("Plural missing after n or l, add " + (Word.isStressed(line)? "u0": "U0"));
-		}
-
-		Set<Matcher> keys = ERROR_CHECKS.keySet();
-		for(Matcher key : keys)
-			if(PatternService.find(line, key))
-				throw new IllegalArgumentException(ERROR_CHECKS.get(key));
 	}
 
 	@Override
 	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
+		venishingElCheck(production);
+
+		String derivedWord = production.getWord();
+		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
+			throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
+
+		partOfSpeechCheck(dicEntry);
+
+		String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
+		if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+			metaphonesisCheck(derivedWordWithoutDataFields);
+
+			northernPluralCheck(derivedWordWithoutDataFields);
+		}
+
+		mismatchCheck(derivedWordWithoutDataFields);
+
+		String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
+		for(String subword : splittedWords){
+			accentCheck(subword, production);
+
+			ciuiCheck(dicEntry, subword, production, derivedWord);
+		}
+
+		syllabationCheck(derivedWord, dicEntry);
+	}
+
+	private void venishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
@@ -173,63 +189,95 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with a vanishing el near a consonant: " + derivedWord);
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
-		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
-			throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
+	}
 
+	private void partOfSpeechCheck(DictionaryEntry dicEntry) throws IllegalArgumentException{
 		String[] dataFields = dicEntry.getDataFields();
 		for(String dataField : dataFields)
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
+	}
 
-		if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
-			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
-					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
-				boolean canHaveMetaphonesis = PatternService.find(derivedWordWithoutDataFields, CAN_HAVE_METAPHONESIS);
-				boolean hasMetaphonesisFlag = production.containsRuleFlag("mf");
-				boolean hasPluralFlag = PatternService.find(derivedWordWithoutDataFields, HAS_PLURAL);
-				if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + derivedWordWithoutDataFields + ", add mf");
-				else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed for word " + derivedWordWithoutDataFields + ", remove mf");
-			}
-			if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
-					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
-					&& !PatternService.find(derivedWordWithoutDataFields, ENDS_IN_MAN)
-					&& PatternService.find(derivedWordWithoutDataFields, MISSING_PLURAL_AFTER_N_OR_L))
-				throw new IllegalArgumentException("Plural missing after n or l for word " + derivedWordWithoutDataFields + ", add "
-					+ (Word.isStressed(derivedWord)? "u0": "U0"));
+	private void metaphonesisCheck(String line) throws IllegalArgumentException{
+		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
+			boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
+			boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
+			boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+			if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
+				throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+			else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
+				throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
 		}
+	}
 
-		String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
-		for(String subword : splittedWords){
-			if(PatternService.find(subword, MULTIPLE_ACCENTS))
-				throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
-			if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
-				boolean elBetweenVowelsRemoval = production.getRules().stream()
-					.map(AffixEntry::toString)
-					.map(L_BETWEEN_VOWELS::reset)
-					.anyMatch(Matcher::find);
-				if(!elBetweenVowelsRemoval)
-					throw new IllegalArgumentException("Word cannot have an accent here: " + derivedWord);
-			}
-			if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
-					&& !PatternService.find(subword, CIUI)){
-				boolean dBetweenVowelsRemoval = production.getRules().stream()
-					.map(AffixEntry::toString)
-					.map(D_BETWEEN_VOWELS::reset)
-					.anyMatch(Matcher::find);
-				if(!dBetweenVowelsRemoval)
-					throw new IllegalArgumentException("Word cannot have [cijɉñ]iV: " + derivedWord);
-			}
+	private void northernPluralCheck(String line) throws IllegalArgumentException{
+		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+				&& !PatternService.find(line, ENDS_IN_MAN)
+				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
+			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
+				+ (Word.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
+	}
+
+	private void mismatchCheck(String line) throws IllegalArgumentException{
+		Set<Matcher> keys = MISMATCH_CHECKS.keySet();
+		for(Matcher key : keys)
+			if(PatternService.find(line, key))
+				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " (" + line + ")");
+	}
+
+	private void missingAndSuperfluousCheck(String line) throws IllegalArgumentException{
+		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
+			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS)
+				if(!PatternService.find(line, PatternService.matcher(START_TAGS + rule))){
+					DictionaryEntry dicEntry = new DictionaryEntry(PatternService.replaceFirst(line, KEEP_WORD_ONLY, "/" + rule),
+						wordGenerator.getFlagParsingStrategy());
+					List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
+					try{
+						productions = wordGenerator.applyRules(dicEntry);
+					}
+					catch(IllegalArgumentException e){
+						//no productions result from the application of the rule
+					}
+					int numberOfProductions = productions.size();
+					if(numberOfProductions == 0)
+						throw new IllegalArgumentException("Superfluous rule, remove " + rule);
+					else if(numberOfProductions > 1)
+						throw new IllegalArgumentException("Missing rule, add " + rule);
+				}
+	}
+
+	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
+		String derivedWord = production.getWord();
+		if(PatternService.find(subword, MULTIPLE_ACCENTS))
+			throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
+
+		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
+			boolean elBetweenVowelsRemoval = production.getRules().stream()
+				.map(AffixEntry::toString)
+				.map(L_BETWEEN_VOWELS::reset)
+				.anyMatch(Matcher::find);
+			if(!elBetweenVowelsRemoval)
+				throw new IllegalArgumentException("Word cannot have an accent here: " + derivedWord);
 		}
+	}
 
-		//check syllabation
+	private void ciuiCheck(DictionaryEntry dicEntry, String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
+		if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
+			&& !PatternService.find(subword, CIUI)){
+			boolean dBetweenVowelsRemoval = production.getRules().stream()
+				.map(AffixEntry::toString)
+				.map(D_BETWEEN_VOWELS::reset)
+				.anyMatch(Matcher::find);
+			if(!dBetweenVowelsRemoval)
+				throw new IllegalArgumentException("Word cannot have [cijɉñ]iV: " + derivedWord);
+		}
+	}
+
+	private void syllabationCheck(String derivedWord, DictionaryEntry dicEntry) throws IllegalArgumentException{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
-				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
-				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
-				&& (!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
+			&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
+			&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
+			&& (!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())

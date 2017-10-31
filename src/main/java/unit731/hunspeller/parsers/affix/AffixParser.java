@@ -304,7 +304,7 @@ public class AffixParser{
 	 */
 	private String removeComment(String line){
 		//remove comments
-		line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
+		line = PatternService.clear(line, REGEX_COMMENT);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}
@@ -348,7 +348,7 @@ public class AffixParser{
 			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
 			if(compoundRules != null){
 				String rawRules = compoundRules.stream()
-					.map(rule -> PatternService.replaceAll(rule, REGEX_COMPOUND_RULES_OPERATORS, StringUtils.EMPTY))
+					.map(rule -> PatternService.clear(rule, REGEX_COMPOUND_RULES_OPERATORS))
 					.collect(Collectors.joining(StringUtils.EMPTY));
 				String[] parsedRules = strategy.parseRuleFlags(rawRules);
 				rawFlags.addAll(Arrays.asList(parsedRules));

@@ -88,7 +88,7 @@ public class AffixEntry{
 		if(isSuffix() && StringUtils.isNotBlank(regexToRemove) && addition.length() > 1 && regexToRemove.charAt(0) == addition.charAt(0))
 			log.warn("This line has characters in common between removed and added part: " + line);
 
-		entry = PatternService.replaceFirst(line, REGEX_ENTRY, StringUtils.EMPTY);
+		entry = PatternService.clear(line, REGEX_ENTRY);
 	}
 
 	public final boolean isSuffix(){
@@ -97,7 +97,7 @@ public class AffixEntry{
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
 		if(remove != null){
-			word = PatternService.replaceFirst(word, remove, StringUtils.EMPTY);
+			word = PatternService.clear(word, remove);
 			if(word.isEmpty() && !isFullstrip)
 				throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
 		}

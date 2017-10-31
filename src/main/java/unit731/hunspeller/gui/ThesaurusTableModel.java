@@ -71,7 +71,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex){
 		try{
-			String text = PatternService.replaceAll((String)aValue, REGEX_REPLACE, StringUtils.EMPTY);
+			String text = PatternService.clear((String)aValue, REGEX_REPLACE);
 
 			List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
 			meanings.clear();

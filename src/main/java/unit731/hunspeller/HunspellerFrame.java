@@ -1454,7 +1454,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				boolean hyphenationChanged = false;
 				boolean correctHyphenation = false;
 				if(!alreadyHasRule){
-					ruleMatchesText = addedRuleText.contains(PatternService.replaceAll(addedRule, REGEX_POINTS_AND_NUMBERS, StringUtils.EMPTY));
+					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, REGEX_POINTS_AND_NUMBERS));
 
 					if(ruleMatchesText){
 						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);

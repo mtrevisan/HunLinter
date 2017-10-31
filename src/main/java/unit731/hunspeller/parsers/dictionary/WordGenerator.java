@@ -17,6 +17,7 @@ import unit731.hunspeller.collections.trie.sequencers.RegExpTrieSequencer;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -60,6 +61,10 @@ public class WordGenerator{
 //			.forEach(production -> LOGGER.log(Level.INFO, "Produced word {0}", production));
 
 		return productions;
+	}
+
+	public FlagParsingStrategy getFlagParsingStrategy(){
+		return affParser.getFlagParsingStrategy();
 	}
 
 	private RuleProductionEntry getBaseProduction(DictionaryEntry dicEntry) throws IllegalArgumentException{

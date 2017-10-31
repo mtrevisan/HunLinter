@@ -42,4 +42,8 @@ public class PatternService{
 		return matcher.reset(text).replaceAll(replacement);
 	}
 
+	public static String clear(String text, Matcher matcher){
+		return replaceAll(text, matcher, StringUtils.EMPTY);
+	}
+
 }

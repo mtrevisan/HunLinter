@@ -58,7 +58,7 @@ public class DictionaryParser{
 
 	private final File dicFile;
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
-	private final WordGenerator wordGenerator;
+	protected final WordGenerator wordGenerator;
 	@Setter protected HyphenationParser hyphenationParser;
 	private final ExternalSorter sorter = new ExternalSorter();
 
@@ -610,7 +610,7 @@ public class DictionaryParser{
 
 	public String prepareTextForFilter(String text){
 		text = StringUtils.trim(text);
-		text = PatternService.replaceAll(text, REGEX_FILTER_EMPTY, StringUtils.EMPTY);
+		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
 		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
 		return "(?iu)(" + text + ")";
 	}
@@ -622,7 +622,7 @@ public class DictionaryParser{
 	/** Removes comment lines and then cleans up blank lines and trailing whitespace. */
 	private String cleanLine(String line){
 		//remove comments
-		line = PatternService.replaceAll(line, REGEX_COMMENT, StringUtils.EMPTY);
+		line = PatternService.clear(line, REGEX_COMMENT);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;
