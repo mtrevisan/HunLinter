@@ -31,6 +31,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher KEEP_WORD_ONLY = PatternService.matcher("(/.*)?$");
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
+	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]");
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
 
@@ -54,16 +55,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final Map<Matcher, String> MISMATCH_CHECKS = new HashMap<>();
 	static{
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "E1"), "Cannot use E1 rule with vanishing el, use E2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "E2"), "Cannot use E2 rule with non-vanishing el, use E1");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "G1"), "Cannot use G1 rule with vanishing el, use G2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "G2"), "Cannot use G2 rule with non-vanishing el, use G1");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "F1"), "Cannot use F1 rule with vanishing el, use F2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "F2"), "Cannot use F2 rule with non-vanishing el, use F1");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "P1"), "Cannot use P1 rule with vanishing el, use P2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "P2"), "Cannot use P2 rule with non-vanishing el, use P1");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "Q1"), "Cannot use Q1 rule with vanishing el, use Q2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "Q2"), "Cannot use Q2 rule with non-vanishing el, use Q1");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"), "Cannot use r0 rule with vanishing el, use r1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"), "Cannot use r1 rule with non-vanishing el, use r0");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"), "Cannot use s1 rule with vanishing el, use s2");
@@ -153,7 +144,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	@Override
 	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
-		venishingElCheck(production);
+		vanishingElCheck(production);
 
 		String derivedWord = production.getWord();
 		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
@@ -181,8 +172,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 		syllabationCheck(derivedWord, dicEntry);
 	}
 
-	private void venishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
+		if(derivedWord.contains(VANISHING_EL) && PatternService.find(derivedWord, NON_VANISHING_EL))
+			throw new IllegalArgumentException("Word with a vanishing el cannot contain non vanishing el: " + derivedWord);
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
