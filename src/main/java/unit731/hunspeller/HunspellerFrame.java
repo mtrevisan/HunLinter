@@ -1370,7 +1370,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
 				Runnable postExecution = () -> {
-					dicParser.setHyphenationParser(hypParser);
+					if(dicParser != null)
+						dicParser.setHyphenationParser(hypParser);
 
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 					dm.setSynonyms(theParser.getSynonyms());

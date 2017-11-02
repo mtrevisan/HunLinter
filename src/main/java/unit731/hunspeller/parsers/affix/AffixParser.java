@@ -121,7 +121,7 @@ public class AffixParser{
 			addData(TAG_COMPOUND_RULE, compoundRules);
 		}
 		catch(IOException e){
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getMessage());
 		}
 	};
 	private final Consumer<ParsingContext> FUN_AFFIX = context -> {
@@ -177,7 +177,7 @@ public class AffixParser{
 //addData(ruleFlag, new RuleEntry(isSuffix, combineable, entries, prefixEntries, suffixEntries));
 		}
 		catch(IOException e){
-			throw new RuntimeException(e);
+			throw new RuntimeException(e.getMessage());
 		}
 	};
 	/** Determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file */
@@ -200,9 +200,7 @@ public class AffixParser{
 					break;
 
 				default:
-					String errorMessage = "Unknown flag type: " + flag;
-					log.error(errorMessage);
-					throw new IllegalArgumentException(errorMessage);
+					throw new IllegalArgumentException("Unknown flag type: " + flag);
 			}
 		return stategy;
 	}
@@ -275,7 +273,7 @@ public class AffixParser{
 						fun.accept(context);
 					}
 					catch(RuntimeException e){
-						throw new IllegalArgumentException(e.getMessage());
+						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
 					}
 				}
 			}
