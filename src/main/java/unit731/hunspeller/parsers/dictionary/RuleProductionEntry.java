@@ -62,6 +62,12 @@ public class RuleProductionEntry implements Productable{
 			.anyMatch(dataField::equals);
 	}
 
+	public String getRulesSequence(){
+		return rules.stream()
+			.map(AffixEntry::getRuleFlag)
+			.collect(Collectors.joining(" > "));
+	}
+
 	/** Merge previous unproductive continuation classes with the continuation classes of the current rule */
 	private String[] mergeContinuationClasses(Set<String> otherRuleFlags, String[] currentContinuationClasses){
 		HashSet<String> newContinuationClasses = new HashSet<>(otherRuleFlags);

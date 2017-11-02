@@ -116,9 +116,9 @@ public class DictionaryParser{
 						readSoFar += line.length();
 						line = dicParser.cleanLine(line);
 						if(!line.isEmpty()){
-							try{
-								DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
+							try{
 								dicParser.checkLine(line);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
@@ -126,10 +126,7 @@ public class DictionaryParser{
 								subProductions.forEach(production -> dicParser.checkProduction(dictionaryWord, production));
 							}
 							catch(IllegalArgumentException e){
-								int tabIndex = line.indexOf('\t');
-								if(tabIndex < 0)
-									tabIndex = line.length();
-								publish(e.getMessage() + " on line " + lineIndex + ": " + line.substring(0, tabIndex));
+								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
 							}
 						}
 
@@ -207,8 +204,9 @@ public class DictionaryParser{
 					readSoFar += line.length();
 					line = dicParser.cleanLine(line);
 					if(!line.isEmpty()){
+						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+
 						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 							List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
 							for(RuleProductionEntry sub : subProductions){
@@ -218,7 +216,7 @@ public class DictionaryParser{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
+							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
 						}
 					}
 
@@ -577,8 +575,9 @@ public class DictionaryParser{
 
 					line = dicParser.cleanLine(line);
 					if(!line.isEmpty()){
+						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+
 						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 							List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
 							for(RuleProductionEntry production : subProductions){
@@ -587,7 +586,7 @@ public class DictionaryParser{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
+							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
 						}
 					}
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -144,32 +145,37 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	@Override
 	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
-		vanishingElCheck(production);
+		try{
+			vanishingElCheck(production);
 
-		String derivedWord = production.getWord();
-		if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
-			throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
+			String derivedWord = production.getWord();
+			if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
+				throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
 
-		partOfSpeechCheck(dicEntry);
+			partOfSpeechCheck(dicEntry);
 
-		String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
-		if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-			metaphonesisCheck(derivedWordWithoutDataFields);
+			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
+			if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
+					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+				metaphonesisCheck(derivedWordWithoutDataFields);
 
-			northernPluralCheck(derivedWordWithoutDataFields);
+				northernPluralCheck(derivedWordWithoutDataFields);
+			}
+
+			mismatchCheck(derivedWordWithoutDataFields);
+
+			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
+			for(String subword : splittedWords){
+				accentCheck(subword, production);
+
+				ciuiCheck(dicEntry, subword, production, derivedWord);
+			}
+
+			syllabationCheck(derivedWord, dicEntry);
 		}
-
-		mismatchCheck(derivedWordWithoutDataFields);
-
-		String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
-		for(String subword : splittedWords){
-			accentCheck(subword, production);
-
-			ciuiCheck(dicEntry, subword, production, derivedWord);
+		catch(IllegalArgumentException e){
+			throw new IllegalArgumentException(e.getMessage() + " (via " + production.getRulesSequence() + ")");
 		}
-
-		syllabationCheck(derivedWord, dicEntry);
 	}
 
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
