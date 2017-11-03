@@ -205,8 +205,8 @@ public class WordGenerator{
 		List<String> newDataFields = new ArrayList<>();
 		//Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
-		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal, that is DS, IS, and TS) suffixes, useful for zero
-		//	morphemes and affixes removed by splitting rules
+		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
+		//	removed by splitting rules
 		if(dataFields != null)
 			for(String dataField : dataFields)
 				if(!dataField.startsWith(TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(TAG_INFLECTIONAL_PREFIX)
