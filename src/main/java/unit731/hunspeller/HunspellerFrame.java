@@ -177,8 +177,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
-      parseScrollPane = new javax.swing.JScrollPane();
-      parseTextArea = new javax.swing.JTextArea();
+      parsingResultScrollPane = new javax.swing.JScrollPane();
+      parsingResultTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new javax.swing.JLayeredPane();
@@ -234,12 +234,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
       setTitle("Hunspeller");
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
 
-      parseTextArea.setEditable(false);
-      parseTextArea.setColumns(20);
-      parseTextArea.setRows(5);
-      DefaultCaret caret = (DefaultCaret)parseTextArea.getCaret();
+      parsingResultTextArea.setEditable(false);
+      parsingResultTextArea.setColumns(20);
+      parsingResultTextArea.setRows(5);
+      DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-      parseScrollPane.setViewportView(parseTextArea);
+      parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
@@ -710,16 +710,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(parseScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
                .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-               .addComponent(mainTabbedPane))
+               .addComponent(mainTabbedPane)
+               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING))
             .addContainerGap())
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
-            .addComponent(parseScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
@@ -1542,13 +1542,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 
 	private void clearResultTextArea(){
-		parseTextArea.setText(null);
+		parsingResultTextArea.setText(null);
 	}
 
 	@Override
 	public void printResultLine(String text){
 		String timeOfDay = LocalTime.now().format(TIME_FORMATTER);
-		parseTextArea.append(timeOfDay + StringUtils.SPACE + text + StringUtils.LF);
+		parsingResultTextArea.append(timeOfDay + StringUtils.SPACE + text + StringUtils.LF);
 	}
 
 	@Override
@@ -1634,8 +1634,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
-   private javax.swing.JScrollPane parseScrollPane;
-   private javax.swing.JTextArea parseTextArea;
+   private javax.swing.JScrollPane parsingResultScrollPane;
+   private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JPopupMenu.Separator recentFilesFileSeparator;
    private javax.swing.JButton theAddButton;
    private javax.swing.JMenuItem theFindDuplicatesMenuItem;

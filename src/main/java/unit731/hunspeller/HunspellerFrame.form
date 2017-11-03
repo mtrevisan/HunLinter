@@ -182,9 +182,9 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="parseScrollPane" alignment="1" max="32767" attributes="0"/>
                   <Component id="mainProgressBar" alignment="0" max="32767" attributes="0"/>
                   <Component id="mainTabbedPane" alignment="0" max="32767" attributes="0"/>
+                  <Component id="parsingResultScrollPane" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -194,7 +194,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="parseScrollPane" min="-2" pref="176" max="-2" attributes="0"/>
+              <Component id="parsingResultScrollPane" min="-2" pref="176" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="mainProgressBar" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -205,21 +205,21 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JScrollPane" name="parseScrollPane">
+    <Container class="javax.swing.JScrollPane" name="parsingResultScrollPane">
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextArea" name="parseTextArea">
+        <Component class="javax.swing.JTextArea" name="parsingResultTextArea">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="DefaultCaret caret = (DefaultCaret)parseTextArea.getCaret();&#xd;&#xa;caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();&#xd;&#xa;caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);"/>
           </AuxValues>
         </Component>
       </SubComponents>
