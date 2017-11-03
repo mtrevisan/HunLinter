@@ -14,14 +14,12 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -242,7 +240,7 @@ public class DictionaryParser{
 		private List<Duplicate> extractDuplicates(BloomFilter<String> duplicatesBloomFilter) throws IOException{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-			Set<Duplicate> result = new HashSet<>();
+			List<Duplicate> result = new ArrayList<>();
 
 			publish("Start extracting duplicates");
 
@@ -286,10 +284,9 @@ public class DictionaryParser{
 			duplicatesBloomFilter.clear();
 
 			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
-			ArrayList<Duplicate> dupls = new ArrayList<>(result);
-			Collections.sort(dupls, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
+			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 
-			return dupls;
+			return result;
 		}
 
 		private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
@@ -305,7 +302,8 @@ public class DictionaryParser{
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
 					writer.write(entries.stream()
-						.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + ")")
+						.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + " via "
+							+ duplicate.getProduction().getRulesSequence() + ")")
 						.collect(Collectors.joining(", ")));
 					writer.newLine();
 
