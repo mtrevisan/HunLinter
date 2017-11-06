@@ -200,11 +200,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
 			boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
 			boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
-			boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-			if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
-			else if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
+				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+				if(canHaveMetaphonesis && hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+				else if(!canHaveMetaphonesis && !hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+			}
 		}
 	}
 
@@ -261,7 +263,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void ciuiCheck(DictionaryEntry dicEntry, String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
 		if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
-			&& !PatternService.find(subword, CIUI)){
+				&& !PatternService.find(subword, CIUI)){
 			boolean dBetweenVowelsRemoval = production.getRules().stream()
 				.map(AffixEntry::toString)
 				.map(D_BETWEEN_VOWELS::reset)
@@ -273,9 +275,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void syllabationCheck(String derivedWord, DictionaryEntry dicEntry) throws IllegalArgumentException{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
-			&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
-			&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
-			&& (!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
+				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
+				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
+				&& (!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
