@@ -32,7 +32,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("(^|[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])ƚ|ƚ([^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]|$)");
 	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
