@@ -28,11 +28,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_EL = "ƚ";
 	private static final String START_TAGS = "/[^\\t\\n]*";
 
-	private static final Matcher KEEP_WORD_ONLY = PatternService.matcher("(/.*)?$");
-
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("(^|[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])ƚ|ƚ([^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]|$)");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
@@ -151,7 +149,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
 				throw new IllegalArgumentException("Word with rule B0 cannot rule &0:" + derivedWord);
 
-			partOfSpeechCheck(dicEntry);
+			partOfSpeechCheck(production);
 
 			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
 			if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
@@ -163,17 +161,23 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
+//			if(!production.getWord().equals(dicEntry.getWord()))
+//				missingAndSuperfluousCheck(production);
+//			else
+//				missingAndSuperfluousCheck(dicEntry);
+
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
-				ciuiCheck(dicEntry, subword, production, derivedWord);
+				ciuiCheck(subword, production, derivedWord);
 			}
 
-			syllabationCheck(derivedWord, dicEntry);
+			syllabationCheck(derivedWord, production);
 		}
 		catch(IllegalArgumentException e){
-			throw new IllegalArgumentException(e.getMessage() + " (via " + production.getRulesSequence() + ")");
+			String rulesSequence = production.getRulesSequence();
+			throw new IllegalArgumentException(e.getMessage() + (rulesSequence.length() > 0? " (via " + rulesSequence + ")": StringUtils.EMPTY));
 		}
 	}
 
@@ -189,8 +193,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
 	}
 
-	private void partOfSpeechCheck(DictionaryEntry dicEntry) throws IllegalArgumentException{
-		String[] dataFields = dicEntry.getDataFields();
+	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		String[] dataFields = production.getDataFields();
 		for(String dataField : dataFields)
 			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
@@ -225,25 +229,25 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " (" + line + ")");
 	}
 
-	private void missingAndSuperfluousCheck(String line) throws IllegalArgumentException{
-		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
-			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS)
-				if(!PatternService.find(line, PatternService.matcher(START_TAGS + rule))){
-					DictionaryEntry dicEntry = new DictionaryEntry(PatternService.replaceFirst(line, KEEP_WORD_ONLY, "/" + rule),
-						wordGenerator.getFlagParsingStrategy());
-					List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
-					try{
-						productions = wordGenerator.applyRules(dicEntry);
-					}
-					catch(IllegalArgumentException e){
-						//no productions result from the application of the rule
-					}
-					int numberOfProductions = productions.size();
-					if(numberOfProductions == 0)
-						throw new IllegalArgumentException("Superfluous rule, remove " + rule);
-					else if(numberOfProductions > 1)
-						throw new IllegalArgumentException("Missing rule, add " + rule);
+	private void missingAndSuperfluousCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
+			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
+				DictionaryEntry entry = new DictionaryEntry(production.getWord() + "/" + rule, wordGenerator.getFlagParsingStrategy());
+				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
+				try{
+					productions = wordGenerator.applyRules(entry);
 				}
+				catch(IllegalArgumentException e){
+					//no productions result from the application of the rule
+				}
+				int numberOfProductions = productions.size();
+
+				boolean hasRule = production.containsRuleFlag(rule);
+				if(hasRule && numberOfProductions == 0)
+					throw new IllegalArgumentException("Superfluous rule, remove " + rule);
+				else if(!hasRule && numberOfProductions > 1)
+					throw new IllegalArgumentException("Missing rule, add " + rule);
+			}
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
@@ -261,8 +265,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void ciuiCheck(DictionaryEntry dicEntry, String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
-		if(!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
+	private void ciuiCheck(String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
+		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
 				&& !PatternService.find(subword, CIUI)){
 			boolean dBetweenVowelsRemoval = production.getRules().stream()
 				.map(AffixEntry::toString)
@@ -273,11 +277,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void syllabationCheck(String derivedWord, DictionaryEntry dicEntry) throws IllegalArgumentException{
+	private void syllabationCheck(String derivedWord, RuleProductionEntry production) throws IllegalArgumentException{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
-				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
-				&& !dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
-				&& (!dicEntry.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
+				&& (!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
