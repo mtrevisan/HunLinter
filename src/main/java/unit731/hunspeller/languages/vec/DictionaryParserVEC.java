@@ -20,6 +20,7 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -141,7 +142,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProduction(DictionaryEntry dicEntry, RuleProductionEntry production) throws IllegalArgumentException{
+	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
 			vanishingElCheck(production);
 
@@ -151,7 +152,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			partOfSpeechCheck(production);
 
-			String derivedWordWithoutDataFields = derivedWord + dicEntry.getStrategy().joinRuleFlags(production.getRuleFlags());
+			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
 			if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
 				metaphonesisCheck(derivedWordWithoutDataFields);
