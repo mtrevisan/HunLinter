@@ -162,10 +162,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-//			if(!production.getWord().equals(dicEntry.getWord()))
-//				missingAndSuperfluousCheck(production);
-//			else
-//				missingAndSuperfluousCheck(dicEntry);
+//			missingAndSuperfluousCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -231,9 +228,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void missingAndSuperfluousCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
+		String word = production.getWord();
+		if(word.length() > 2 && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
 			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
-				DictionaryEntry entry = new DictionaryEntry(production.getWord() + "/" + rule, wordGenerator.getFlagParsingStrategy());
+				DictionaryEntry entry = new DictionaryEntry(word + "/" + rule, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
 				try{
 					productions = wordGenerator.applyRules(entry);
