@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
@@ -136,9 +137,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkLine(String line) throws IllegalArgumentException{
+	protected void checkLine(String line, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		if(!line.contains(StringUtils.SPACE) && !line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
+
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+		missingAndSuperfluousCheck(dicEntry);
 	}
 
 	@Override
@@ -162,7 +166,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-//			missingAndSuperfluousCheck(production);
+			missingAndSuperfluousCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -227,10 +231,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " (" + line + ")");
 	}
 
-	private void missingAndSuperfluousCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		String word = production.getWord();
-		if(word.length() > 2 && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
+	private void missingAndSuperfluousCheck(Productable productable) throws IllegalArgumentException{
+		String word = productable.getWord();
+		if(word.length() > 2 && !productable.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
+				&& !productable.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
 			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
 				DictionaryEntry entry = new DictionaryEntry(word + "/" + rule, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
@@ -242,7 +246,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				}
 				int numberOfProductions = productions.size();
 
-				boolean hasRule = production.containsRuleFlag(rule);
+				boolean hasRule = productable.containsRuleFlag(rule);
 				if(hasRule && numberOfProductions == 0)
 					throw new IllegalArgumentException("Superfluous rule, remove " + rule);
 				else if(!hasRule && numberOfProductions > 1)

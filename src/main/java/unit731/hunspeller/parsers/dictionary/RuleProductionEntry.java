@@ -48,6 +48,7 @@ public class RuleProductionEntry implements Productable{
 		return (ruleFlags.length > 0);
 	}
 
+	@Override
 	public boolean containsRuleFlag(String ruleFlag){
 		return Arrays.stream(ruleFlags)
 			.anyMatch(ruleFlag::equals);
@@ -57,6 +58,7 @@ public class RuleProductionEntry implements Productable{
 		return (dataFields.length > 0);
 	}
 
+	@Override
 	public boolean containsDataField(String dataField){
 		return Arrays.stream(dataFields)
 			.anyMatch(dataField::equals);

@@ -117,7 +117,7 @@ public class DictionaryParser{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
 							try{
-								dicParser.checkLine(line);
+								dicParser.checkLine(line, strategy);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
@@ -148,7 +148,7 @@ public class DictionaryParser{
 		}
 	};
 
-	protected void checkLine(String line) throws IllegalArgumentException{}
+	protected void checkLine(String line, FlagParsingStrategy strategy) throws IllegalArgumentException{}
 
 	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{}
 

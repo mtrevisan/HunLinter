@@ -74,11 +74,13 @@ public class DictionaryEntry implements Productable{
 			.collect(Collectors.toList());
 	}
 
+	@Override
 	public boolean containsRuleFlag(String ruleFlag){
 		return Arrays.stream(ruleFlags)
 			.anyMatch(flag -> flag.equals(ruleFlag));
 	}
 
+	@Override
 	public boolean containsDataField(String dataField){
 		return Arrays.stream(dataFields)
 			.anyMatch(field -> field.equals(dataField));

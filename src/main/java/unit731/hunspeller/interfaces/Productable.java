@@ -7,4 +7,7 @@ public interface Productable{
 	String[] getRuleFlags();
 	String[] getDataFields();
 
+	boolean containsRuleFlag(String ruleFlag);
+	boolean containsDataField(String dataField);
+
 }
