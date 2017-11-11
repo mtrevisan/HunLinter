@@ -73,7 +73,7 @@ public class WordGenerator{
 			String[] ruleFlags = dicEntry.getRuleFlags();
 			Set<String> otherRuleFlags = extractLeftOverContinuationClasses(ruleFlags, true);
 
-			return new RuleProductionEntry(dicEntry, otherRuleFlags, true);
+			return new RuleProductionEntry(dicEntry, otherRuleFlags);
 		}
 		catch(IllegalArgumentException e){
 			throw new IllegalArgumentException(word + " does not have a rule for flag " + e.getMessage());

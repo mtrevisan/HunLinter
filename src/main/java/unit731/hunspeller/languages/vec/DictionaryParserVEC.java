@@ -141,8 +141,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!line.contains(StringUtils.SPACE) && !line.contains(TAB))
 			throw new IllegalArgumentException("Line does not contains data fields");
 
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
-		missingAndSuperfluousCheck(dicEntry);
+//		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+//		missingAndSuperfluousCheck(dicEntry);
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			missingAndSuperfluousCheck(production);
+//			missingAndSuperfluousCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){

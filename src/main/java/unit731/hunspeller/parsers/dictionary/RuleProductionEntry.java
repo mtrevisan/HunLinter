@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -26,8 +27,8 @@ public class RuleProductionEntry implements Productable{
 	private final boolean combineable;
 
 
-	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> ruleFlags, boolean combineable){
-		this(dicEntry.getWord(), ruleFlags, null, dicEntry.getDataFields(), combineable);
+	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> otherRuleFlags){
+		this(dicEntry.getWord(), otherRuleFlags, null, dicEntry.getDataFields(), true);
 	}
 
 	public RuleProductionEntry(String word, Set<String> otherRuleFlags, String[] currentContinuationClasses, String[] dataFields, boolean combineable){
