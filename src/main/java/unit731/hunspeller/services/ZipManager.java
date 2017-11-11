@@ -51,6 +51,8 @@ public class ZipManager{
 	}
 
 	private void populateFilesList(File dir) throws IOException{
+		filesListInDir.clear();
+
 		File[] files = dir.listFiles();
 		for(File file : files){
 			if(file.isFile())

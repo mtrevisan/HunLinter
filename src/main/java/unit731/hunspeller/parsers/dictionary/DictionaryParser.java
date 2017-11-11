@@ -12,8 +12,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -120,6 +122,8 @@ public class DictionaryParser{
 								dicParser.checkLine(line, strategy);
 
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								//substitute base production with original line from dictionary
+								subProductions.set(0, new RuleProductionEntry(dictionaryWord));
 
 								subProductions.forEach(production -> dicParser.checkProduction(production, strategy));
 							}

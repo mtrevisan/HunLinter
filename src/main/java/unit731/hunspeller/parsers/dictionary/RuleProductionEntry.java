@@ -27,6 +27,10 @@ public class RuleProductionEntry implements Productable{
 	private final boolean combineable;
 
 
+	public RuleProductionEntry(DictionaryEntry dicEntry){
+		this(dicEntry, new HashSet<>(Arrays.asList(dicEntry.getRuleFlags())));
+	}
+
 	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> otherRuleFlags){
 		this(dicEntry.getWord(), otherRuleFlags, null, dicEntry.getDataFields(), true);
 	}

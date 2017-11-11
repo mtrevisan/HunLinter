@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -790,6 +791,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 				ZIPPER.zipDirectory(parentPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
 				printResultLine("Compression done");
+
+				//open directory
+				Desktop.getDesktop().open(new File(parentPath.toString()));
 			}
 			catch(IOException e){
 				log.error("Something very bad happend while creating package", e);
