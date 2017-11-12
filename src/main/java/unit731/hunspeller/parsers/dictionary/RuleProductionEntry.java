@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -31,7 +30,7 @@ public class RuleProductionEntry implements Productable{
 
 		word = productable.getWord();
 		ruleFlags = null;
-		dataFields = null;
+		dataFields = productable.getDataFields();
 		combineable = false;
 	}
 
@@ -39,15 +38,9 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(entry);
 
-//		String[] continuationClasses = entry.getContinuationClasses();
-//		Set<String> newRuleFlags = (continuationClasses != null && continuationClasses.length > 0?
-//			new HashSet<>(Arrays.asList(continuationClasses)): Collections.<String>emptySet());
-//		String[] newContinuationClasses = mergeContinuationClasses(newRuleFlags, continuationClasses);
-		String[] newDataFields = combineDataFields(originalDataFields, entry.getDataFields());
-
 		this.word = word;
 		ruleFlags = entry.getContinuationClasses();
-		this.dataFields = newDataFields;
+		this.dataFields = combineDataFields(originalDataFields, entry.getDataFields());
 		appliedRules.add(entry);
 		this.combineable = combineable;
 	}
@@ -101,14 +94,6 @@ public class RuleProductionEntry implements Productable{
 		return appliedRules.stream()
 			.map(AffixEntry::getRuleFlag)
 			.collect(Collectors.joining(" > "));
-	}
-
-	/** Merge previous unproductive continuation classes with the continuation classes of the current rule */
-	private String[] mergeContinuationClasses(Set<String> otherRuleFlags, String[] currentContinuationClasses){
-		HashSet<String> newContinuationClasses = new HashSet<>(otherRuleFlags);
-		if(currentContinuationClasses != null)
-			newContinuationClasses.addAll(Arrays.asList(currentContinuationClasses));
-		return newContinuationClasses.toArray(new String[0]);
 	}
 
 	public String[] getSignificantDataFields(){

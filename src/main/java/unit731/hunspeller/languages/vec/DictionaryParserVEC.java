@@ -197,9 +197,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] dataFields = production.getDataFields();
-		for(String dataField : dataFields)
-			if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
-				throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
+		if(dataFields != null)
+			for(String dataField : dataFields)
+				if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
+					throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
 	}
 
 	private void metaphonesisCheck(String line) throws IllegalArgumentException{
