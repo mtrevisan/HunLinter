@@ -260,7 +260,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
 
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
-			boolean elBetweenVowelsRemoval = production.getRules().stream()
+			boolean elBetweenVowelsRemoval = production.getAppliedRules().stream()
 				.map(AffixEntry::toString)
 				.map(L_BETWEEN_VOWELS::reset)
 				.anyMatch(Matcher::find);
@@ -272,7 +272,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void ciuiCheck(String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
 		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
 				&& !PatternService.find(subword, CIUI)){
-			boolean dBetweenVowelsRemoval = production.getRules().stream()
+			boolean dBetweenVowelsRemoval = production.getAppliedRules().stream()
 				.map(AffixEntry::toString)
 				.map(D_BETWEEN_VOWELS::reset)
 				.anyMatch(Matcher::find);

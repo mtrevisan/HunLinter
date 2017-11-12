@@ -39,7 +39,7 @@ public class ProductionTableModel extends AbstractTableModel{
 			return null;
 
 		RuleProductionEntry production = productions.get(rowIndex);
-		List<AffixEntry> rules = production.getRules();
+		List<AffixEntry> rules = production.getAppliedRules();
 		switch(columnIndex){
 			case 0:
 				return production.getWord();

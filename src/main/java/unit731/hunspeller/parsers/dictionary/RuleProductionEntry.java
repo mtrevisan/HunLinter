@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -11,9 +10,9 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
+import static unit731.hunspeller.parsers.dictionary.WordGenerator.TAG_PART_OF_SPEECH;
 
 
 @Getter
@@ -21,56 +20,85 @@ import unit731.hunspeller.interfaces.Productable;
 public class RuleProductionEntry implements Productable{
 
 	private final String word;
-	private final String[] ruleFlags;
+	private String[] ruleFlags;
 	private final String[] dataFields;
-	@Setter private List<AffixEntry> rules;
+	private final List<AffixEntry> appliedRules = new ArrayList<>();
 	private final boolean combineable;
 
 
-	public RuleProductionEntry(DictionaryEntry dicEntry){
-		this(dicEntry, new HashSet<>(Arrays.asList(dicEntry.getRuleFlags())));
+	public RuleProductionEntry(Productable productable){
+		Objects.requireNonNull(productable);
+
+		word = productable.getWord();
+		ruleFlags = null;
+		dataFields = null;
+		combineable = false;
 	}
 
-	public RuleProductionEntry(DictionaryEntry dicEntry, Set<String> otherRuleFlags){
-		this(dicEntry.getWord(), otherRuleFlags, null, dicEntry.getDataFields(), true);
-	}
-
-	public RuleProductionEntry(String word, Set<String> otherRuleFlags, String[] currentContinuationClasses, String[] dataFields, boolean combineable){
+	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry entry, boolean combineable){
 		Objects.requireNonNull(word);
-		Objects.requireNonNull(otherRuleFlags);
-		Objects.requireNonNull(dataFields);
+		Objects.requireNonNull(entry);
 
-		String[] newContinuationClasses = mergeContinuationClasses(otherRuleFlags, currentContinuationClasses);
+//		String[] continuationClasses = entry.getContinuationClasses();
+//		Set<String> newRuleFlags = (continuationClasses != null && continuationClasses.length > 0?
+//			new HashSet<>(Arrays.asList(continuationClasses)): Collections.<String>emptySet());
+//		String[] newContinuationClasses = mergeContinuationClasses(newRuleFlags, continuationClasses);
+		String[] newDataFields = combineDataFields(originalDataFields, entry.getDataFields());
 
 		this.word = word;
-		ruleFlags = newContinuationClasses;
-		this.dataFields = dataFields;
-		rules = new ArrayList<>();
+		ruleFlags = entry.getContinuationClasses();
+		this.dataFields = newDataFields;
+		appliedRules.add(entry);
 		this.combineable = combineable;
 	}
 
+	private String[] combineDataFields(String[] dataFields, String[] affixEntryDataFields){
+		List<String> newDataFields = new ArrayList<>();
+		//Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
+		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
+		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
+		//	removed by splitting rules
+		if(dataFields != null)
+			for(String dataField : dataFields)
+				if(!dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
+						&& (!dataField.startsWith(TAG_PART_OF_SPEECH) || affixEntryDataFields == null
+							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(TAG_PART_OF_SPEECH)))
+						&& (!dataField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryDataFields == null
+							|| !Arrays.stream(affixEntryDataFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
+					newDataFields.add(dataField);
+		if(affixEntryDataFields != null)
+			newDataFields.addAll(Arrays.asList(affixEntryDataFields));
+		return newDataFields.toArray(new String[0]);
+	}
+
 	public boolean hasRuleFlags(){
-		return (ruleFlags.length > 0);
+		return (ruleFlags != null && ruleFlags.length > 0);
 	}
 
 	@Override
 	public boolean containsRuleFlag(String ruleFlag){
-		return Arrays.stream(ruleFlags)
-			.anyMatch(ruleFlag::equals);
+		return (ruleFlags != null && Arrays.stream(ruleFlags).anyMatch(ruleFlag::equals));
+	}
+
+	public void removeRuleFlags(Set<String> ruleFlags){
+		if(this.ruleFlags != null)
+			this.ruleFlags = Arrays.stream(this.ruleFlags)
+				.filter(field -> !ruleFlags.contains(field))
+				.collect(Collectors.toList())
+				.toArray(new String[0]);
 	}
 
 	public boolean hasDataFields(){
-		return (dataFields.length > 0);
+		return (dataFields != null && dataFields.length > 0);
 	}
 
 	@Override
 	public boolean containsDataField(String dataField){
-		return Arrays.stream(dataFields)
-			.anyMatch(dataField::equals);
+		return (dataFields != null && Arrays.stream(dataFields).anyMatch(dataField::equals));
 	}
 
 	public String getRulesSequence(){
-		return rules.stream()
+		return appliedRules.stream()
 			.map(AffixEntry::getRuleFlag)
 			.collect(Collectors.joining(" > "));
 	}
@@ -86,7 +114,8 @@ public class RuleProductionEntry implements Productable{
 	public String[] getSignificantDataFields(){
 		return Arrays.stream(dataFields)
 			.sorted()
-			.filter(df -> !df.startsWith(WordGenerator.TAG_PHONETIC) && !df.startsWith(WordGenerator.TAG_STEM) && !df.startsWith(WordGenerator.TAG_ALLOMORPH))
+			.filter(df -> !df.startsWith(WordGenerator.TAG_PHONETIC) && !df.startsWith(WordGenerator.TAG_STEM)
+				&& !df.startsWith(WordGenerator.TAG_ALLOMORPH))
 			.collect(Collectors.toList())
 			.toArray(new String[0]);
 	}
