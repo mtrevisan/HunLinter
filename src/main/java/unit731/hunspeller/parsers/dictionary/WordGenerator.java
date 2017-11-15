@@ -53,32 +53,28 @@ public class WordGenerator{
 		Set<String> prefixes = affixes.getPrefixes();
 		Set<String> suffixes = affixes.getSuffixes();
 
-		List<RuleProductionEntry> productions = new ArrayList<>();
-		productions.add(getBaseProduction(dicEntry));
-
-		productions.addAll(getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes)));
+		List<RuleProductionEntry> firstfoldProductions = getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes));
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
+		for(RuleProductionEntry production : firstfoldProductions){
 			twofoldProductions.addAll(getTwofoldProductions(production, complexPrefixes));
 		}
-		productions.addAll(twofoldProductions);
 
+		checkTwofoldViolation(twofoldProductions);
+
+		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
+
+		List<RuleProductionEntry> productions = new ArrayList<>();
+		productions.add(baseProduction);
+		productions.addAll(firstfoldProductions);
+		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions){
 			lastfoldProductions.addAll(getLastfoldProductions(production, (complexPrefixes? suffixes: prefixes)));
 		}
 		productions.addAll(lastfoldProductions);
 
-//		productions
-//			.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
-
-		checkTwofoldViolation(productions);
-
-		//restore original rules
-//		productions.get(0).getRuleFlags()
-//		productions.set(0, new RuleProductionEntry(dicEntry));
-		//TODO
+//		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
 		return productions;
 	}
@@ -104,9 +100,6 @@ public class WordGenerator{
 
 			//add parent derivations
 			productions.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
-
-			//remove rule from parent production
-			production.removeRuleFlags(affixes);
 		}
 		return productions;
 	}

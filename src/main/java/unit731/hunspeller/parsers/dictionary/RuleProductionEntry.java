@@ -29,9 +29,7 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(productable);
 
 		word = productable.getWord();
-//FIXME uncomment and remove the following line
-//		ruleFlags = productable.getRuleFlags();
-ruleFlags = null;
+		ruleFlags = productable.getRuleFlags();
 		dataFields = productable.getDataFields();
 		combineable = false;
 	}
