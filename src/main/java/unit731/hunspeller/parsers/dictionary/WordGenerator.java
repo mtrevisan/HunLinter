@@ -53,20 +53,23 @@ public class WordGenerator{
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		productions.add(new RuleProductionEntry(dicEntry));
 
-		productions.addAll(applyAffixRules(dicEntry, (affParser.isComplexPrefixes()? prefixes: suffixes)));
+		boolean complexPrefixes = affParser.isComplexPrefixes();
+		Set<String> affixesSet = (complexPrefixes? prefixes: suffixes);
+		if(!affixesSet.isEmpty())
+			productions.addAll(applyAffixRules(dicEntry, affixesSet));
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions){
 			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
-			Set<String> twofoldPrefixes = (affParser.isComplexPrefixes()? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
-			if(!twofoldPrefixes.isEmpty()){
-				List<RuleProductionEntry> prods = applyAffixRules(production, twofoldPrefixes);
+			Set<String> twofoldAffixesSet = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
+			if(!twofoldAffixesSet.isEmpty()){
+				List<RuleProductionEntry> prods = applyAffixRules(production, twofoldAffixesSet);
 
 				//add parent derivations
 				prods.forEach(prod -> prod.getAppliedRules().add(0, production.getAppliedRules().get(0)));
 
 				//remove rule from parent production
-				production.removeRuleFlags(twofoldPrefixes);
+				production.removeRuleFlags(twofoldAffixesSet);
 
 				twofoldProductions.addAll(prods);
 			}
@@ -75,9 +78,12 @@ public class WordGenerator{
 
 		List<RuleProductionEntry> affixedProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions){
-			List<RuleProductionEntry> prods = applyAffixRules(production, (affParser.isComplexPrefixes()? suffixes: prefixes));
-			prods.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
-			affixedProductions.addAll(prods);
+			affixesSet = (complexPrefixes? suffixes: prefixes);
+			if(!affixesSet.isEmpty()){
+				List<RuleProductionEntry> prods = applyAffixRules(production, affixesSet);
+				prods.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
+				affixedProductions.addAll(prods);
+			}
 		}
 		productions.addAll(affixedProductions);
 
