@@ -72,6 +72,8 @@ public class WordGenerator{
 		}
 		productions.addAll(lastfoldProductions);
 
+		checkTwofoldViolation(lastfoldProductions);
+
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
 		return productions;
