@@ -151,10 +151,10 @@ public class AffixParser{
 				if(entry.getType() != ruleType)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ ruleType + ")");
-				if(!ruleFlag.equals(entry.getRuleFlag()))
+				if(!ruleFlag.equals(entry.getFlag()))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule flag (expected "
 						+ ruleFlag + ")");
-				if(!containsUnique(entry.getContinuationClasses()))
+				if(!containsUnique(entry.getRuleFlags()))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": multiple rule flags");
 
 				if(entries.contains(entry))

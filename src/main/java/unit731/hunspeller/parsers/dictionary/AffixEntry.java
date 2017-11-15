@@ -51,8 +51,8 @@ public class AffixEntry{
 
 	@Getter private final TYPE type;
 	//ID used to represent the affix
-	@Getter private final String ruleFlag;
-	@Getter private final String[] continuationClasses;
+	@Getter private final String flag;
+	@Getter private final String[] ruleFlags;
 	@Getter private final Matcher match;
 	//string to strip
 	private final Matcher remove;
@@ -69,7 +69,7 @@ public class AffixEntry{
 
 		String[] lineParts = PatternService.split(line, REGEX_PATTERN_SEPARATOR, 6);
 		String ruleType = lineParts[0];
-		this.ruleFlag = lineParts[1];
+		this.flag = lineParts[1];
 		String regexToRemove = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], REGEX_PATTERN_SLASH);
 		String addition = additionParts[0];
@@ -78,7 +78,7 @@ public class AffixEntry{
 
 		type = TYPE.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
-		continuationClasses = (classes.length > 0? classes: null);
+		ruleFlags = (classes.length > 0? classes: null);
 		match = (!POINT.equals(regexToMatch)?
 			PatternService.matcher(isSuffix()? regexToMatch + REGEX_END_OF_LINE: REGEX_START_OF_LINE + regexToMatch): null);
 		remove = (!ZERO.equals(regexToRemove)?

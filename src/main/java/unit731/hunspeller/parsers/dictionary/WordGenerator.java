@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -73,6 +74,11 @@ public class WordGenerator{
 //			.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
 		checkTwofoldViolation(productions);
+
+		//restore original rules
+//		productions.get(0).getRuleFlags()
+//		productions.set(0, new RuleProductionEntry(dicEntry));
+		//TODO
 
 		return productions;
 	}
@@ -207,6 +213,6 @@ public class WordGenerator{
 			if(production.hasRuleFlags())
 				throw new IllegalArgumentException("Twofold rule violated (" + production.getRulesSequence() + " still has rules "
 					+ Arrays.stream(production.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
-	}
+		}
 
 }

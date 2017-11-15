@@ -29,7 +29,9 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(productable);
 
 		word = productable.getWord();
-		ruleFlags = null;
+//FIXME uncomment and remove the following line
+//		ruleFlags = productable.getRuleFlags();
+ruleFlags = null;
 		dataFields = productable.getDataFields();
 		combineable = false;
 	}
@@ -39,7 +41,7 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(entry);
 
 		this.word = word;
-		ruleFlags = entry.getContinuationClasses();
+		ruleFlags = entry.getRuleFlags();
 		this.dataFields = combineDataFields(originalDataFields, entry.getDataFields());
 		appliedRules.add(entry);
 		this.combineable = combineable;
@@ -92,7 +94,7 @@ public class RuleProductionEntry implements Productable{
 
 	public String getRulesSequence(){
 		return appliedRules.stream()
-			.map(AffixEntry::getRuleFlag)
+			.map(AffixEntry::getFlag)
 			.collect(Collectors.joining(" > "));
 	}
 
