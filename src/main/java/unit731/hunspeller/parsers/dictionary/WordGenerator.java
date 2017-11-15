@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,41 +52,14 @@ public class WordGenerator{
 		Set<String> suffixes = affixes.getSuffixes();
 
 		List<RuleProductionEntry> productions = new ArrayList<>();
-		productions.add(new RuleProductionEntry(dicEntry));
+		productions.add(getBaseProduction(dicEntry));
 
 		boolean complexPrefixes = affParser.isComplexPrefixes();
-		Set<String> affixesSet = (complexPrefixes? prefixes: suffixes);
-		if(!affixesSet.isEmpty())
-			productions.addAll(applyAffixRules(dicEntry, affixesSet));
+		productions.addAll(getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes)));
 
-		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
-			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
-			Set<String> twofoldAffixesSet = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
-			if(!twofoldAffixesSet.isEmpty()){
-				List<RuleProductionEntry> prods = applyAffixRules(production, twofoldAffixesSet);
+		productions.addAll(getTwofoldProductions(productions, complexPrefixes));
 
-				//add parent derivations
-				prods.forEach(prod -> prod.getAppliedRules().add(0, production.getAppliedRules().get(0)));
-
-				//remove rule from parent production
-				production.removeRuleFlags(twofoldAffixesSet);
-
-				twofoldProductions.addAll(prods);
-			}
-		}
-		productions.addAll(twofoldProductions);
-
-		List<RuleProductionEntry> affixedProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
-			affixesSet = (complexPrefixes? suffixes: prefixes);
-			if(!affixesSet.isEmpty()){
-				List<RuleProductionEntry> prods = applyAffixRules(production, affixesSet);
-				prods.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
-				affixedProductions.addAll(prods);
-			}
-		}
-		productions.addAll(affixedProductions);
+		productions.addAll(getLastfoldProductions(productions, (complexPrefixes? suffixes: prefixes)));
 
 //		productions
 //			.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
@@ -93,6 +67,46 @@ public class WordGenerator{
 		checkTwofoldViolation(productions);
 
 		return productions;
+	}
+
+	private RuleProductionEntry getBaseProduction(DictionaryEntry dicEntry){
+		return new RuleProductionEntry(dicEntry);
+	}
+
+	private List<RuleProductionEntry> getFirstfoldProductions(DictionaryEntry dicEntry, Set<String> affixes){
+		return (!affixes.isEmpty()? applyAffixRules(dicEntry, affixes): Collections.<RuleProductionEntry>emptyList());
+	}
+
+	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> productions, boolean complexPrefixes) throws IllegalArgumentException{
+		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
+		for(RuleProductionEntry production : productions){
+			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
+			Set<String> twofoldAffixesSet = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
+			if(!twofoldAffixesSet.isEmpty()){
+				List<RuleProductionEntry> prods = applyAffixRules(production, twofoldAffixesSet);
+				
+				//add parent derivations
+				prods.forEach(prod -> prod.getAppliedRules().add(0, production.getAppliedRules().get(0)));
+				
+				//remove rule from parent production
+				production.removeRuleFlags(twofoldAffixesSet);
+				
+				twofoldProductions.addAll(prods);
+			}
+		}
+		return twofoldProductions;
+	}
+
+	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions, Set<String> affixes){
+		List<RuleProductionEntry> affixedProductions = new ArrayList<>();
+		for(RuleProductionEntry production : productions){
+			if(!affixes.isEmpty()){
+				List<RuleProductionEntry> prods = applyAffixRules(production, affixes);
+				prods.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
+				affixedProductions.addAll(prods);
+			}
+		}
+		return affixedProductions;
 	}
 
 	/** Separate the prefixes from the suffixes */
