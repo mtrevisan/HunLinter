@@ -152,7 +152,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			String derivedWord = production.getWord();
 			if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
-				throw new IllegalArgumentException("Word with rule B0 cannot have rule &0:" + derivedWord);
+				throw new IllegalArgumentException("Word with rule B0 cannot have rule &0: " + derivedWord);
 
 			partOfSpeechCheck(production);
 
