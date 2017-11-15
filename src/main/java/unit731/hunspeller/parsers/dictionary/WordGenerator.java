@@ -73,13 +73,13 @@ public class WordGenerator{
 		}
 		productions.addAll(twofoldProductions);
 
-		List<RuleProductionEntry> suffixedProductions = new ArrayList<>();
+		List<RuleProductionEntry> affixedProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions){
 			List<RuleProductionEntry> prods = applyAffixRules(production, (affParser.isComplexPrefixes()? suffixes: prefixes));
 			prods.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
-			suffixedProductions.addAll(prods);
+			affixedProductions.addAll(prods);
 		}
-		productions.addAll(suffixedProductions);
+		productions.addAll(affixedProductions);
 
 //		productions
 //			.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
