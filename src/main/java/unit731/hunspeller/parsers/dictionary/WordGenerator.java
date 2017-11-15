@@ -2,9 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -84,7 +82,7 @@ public class WordGenerator{
 	}
 
 	private List<RuleProductionEntry> getFirstfoldProductions(DictionaryEntry dicEntry, Set<String> affixes){
-		return (!affixes.isEmpty()? applyAffixRules(dicEntry, affixes): Collections.<RuleProductionEntry>emptyList());
+		return applyAffixRules(dicEntry, affixes);
 	}
 
 	private List<RuleProductionEntry> getTwofoldProductions(RuleProductionEntry production, boolean complexPrefixes) throws IllegalArgumentException{
@@ -94,13 +92,11 @@ public class WordGenerator{
 	}
 
 	private List<RuleProductionEntry> getLastfoldProductions(RuleProductionEntry production, Set<String> affixes){
-		List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
-		if(!affixes.isEmpty()){
-			productions = applyAffixRules(production, affixes);
+		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
 
-			//add parent derivations
-			productions.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
-		}
+		//add parent derivations
+		productions.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
+
 		return productions;
 	}
 
@@ -131,20 +127,21 @@ public class WordGenerator{
 	}
 
 	private List<RuleProductionEntry> applyAffixRules(Productable productable, Set<String> affixes){
-		String word = productable.getWord();
-		String[] ruleFlags = productable.getRuleFlags();
-		String[] dataFields = productable.getDataFields();
-
 		List<RuleProductionEntry> productions = new ArrayList<>();
-		for(String affix : affixes){
-			RuleEntry rule = affParser.getData(affix);
-			if(rule == null)
-				throw new IllegalArgumentException(affix);
+		if(!affixes.isEmpty()){
+			String word = productable.getWord();
+			String[] ruleFlags = productable.getRuleFlags();
+			String[] dataFields = productable.getDataFields();
 
-			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
-			if(applicableAffixes.isEmpty())
-				throw new IllegalArgumentException("Word has no applicable rules for " + affix + " from " + word
-					+ affParser.getStrategy().joinRuleFlags(ruleFlags));
+			for(String affix : affixes){
+				RuleEntry rule = affParser.getData(affix);
+				if(rule == null)
+					throw new IllegalArgumentException(affix);
+
+				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+				if(applicableAffixes.isEmpty())
+					throw new IllegalArgumentException("Word has no applicable rules for " + affix + " from " + word
+						+ affParser.getStrategy().joinRuleFlags(ruleFlags));
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
@@ -176,13 +173,14 @@ public class WordGenerator{
 				//	.flatMap(List::stream)
 				//	.collect(Collectors.toList());
 
-			for(AffixEntry entry : applicableAffixes){
-				//produce the new word
-				String newWord = entry.applyRule(word, affParser.isFullstrip());
+				for(AffixEntry entry : applicableAffixes){
+					//produce the new word
+					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-				RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, rule.isCombineable());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, rule.isCombineable());
 
-				productions.add(production);
+					productions.add(production);
+				}
 			}
 		}
 
