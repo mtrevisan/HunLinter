@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -84,7 +85,7 @@ public class ThesaurusParser{
 				publish("Finished reading Thesaurus file");
 			}
 			catch(IOException | IllegalArgumentException | NullPointerException e){
-				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
+				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return theParser.synonyms;
 		}

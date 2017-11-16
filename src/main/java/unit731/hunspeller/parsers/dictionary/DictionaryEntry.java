@@ -31,23 +31,6 @@ public class DictionaryEntry implements Productable{
 	private final FlagParsingStrategy strategy;
 
 
-	public DictionaryEntry(RuleProductionEntry production, FlagParsingStrategy strategy){
-		this(production.getWord(), production.getRuleFlags(), production.getDataFields(), strategy);
-	}
-
-	public DictionaryEntry(String word, String[] dicFlags, String[] dataFields, FlagParsingStrategy strategy){
-		Objects.requireNonNull(word);
-		Objects.requireNonNull(dicFlags);
-		Objects.requireNonNull(dataFields);
-		Objects.requireNonNull(strategy);
-
-		this.word = word;
-		ruleFlags = (dicFlags != null? dicFlags: new String[0]);
-		this.dataFields = dataFields;
-
-		this.strategy = strategy;
-	}
-
 	public DictionaryEntry(String line, FlagParsingStrategy strategy){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
@@ -61,6 +44,18 @@ public class DictionaryEntry implements Productable{
 		ruleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
 		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
+
+		this.strategy = strategy;
+	}
+
+	public DictionaryEntry(Productable productable, String ruleFlag, FlagParsingStrategy strategy){
+		Objects.requireNonNull(productable);
+		Objects.requireNonNull(ruleFlag);
+		Objects.requireNonNull(strategy);
+
+		word = productable.getWord();
+		ruleFlags = strategy.parseRuleFlags(ruleFlag);
+		dataFields = productable.getDataFields();
 
 		this.strategy = strategy;
 	}

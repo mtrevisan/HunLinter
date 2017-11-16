@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
@@ -135,7 +136,7 @@ public class DictionaryParser{
 				publish("Finished reading Dictionary file");
 			}
 			catch(IOException | IllegalArgumentException | NullPointerException e){
-				publish(e.getClass().getSimpleName() + ": " + e.getMessage());
+				publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}
@@ -160,18 +161,22 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic");
+			try{
+				publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic");
 
-			BloomFilter<String> duplicatesBloomFilter = collectDuplicates();
+				BloomFilter<String> duplicatesBloomFilter = collectDuplicates();
 
-			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
+				List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
-			writeDuplicates(duplicates);
+				writeDuplicates(duplicates);
 
-			publish("Duplicates extracted successfully");
+				publish("Duplicates extracted successfully");
 
-			openFileWithChoosenEditor();
-
+				openFileWithChoosenEditor();
+			}
+			catch(IOException | IllegalArgumentException | NullPointerException e){
+				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
 			return null;
 		}
 
@@ -357,49 +362,54 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Sorting file " + dicParser.dicFile.getName());
-			setProgress(0);
+			try{
+				publish("Sorting file " + dicParser.dicFile.getName());
+				setProgress(0);
 
-			//extract boundaries from the file (from comment to comment, or blank line)
-			dicParser.calculateDictionaryBoundaries();
+				//extract boundaries from the file (from comment to comment, or blank line)
+				dicParser.calculateDictionaryBoundaries();
 
-			setProgress(20);
+				setProgress(20);
 
-			Map.Entry<Integer, Integer> boundary = getBoundary(lineIndex);
-			if(boundary != null){
-				//split dictionary isolating the sorted section
-				List<File> chunks = splitDictionary(boundary);
+				Map.Entry<Integer, Integer> boundary = getBoundary(lineIndex);
+				if(boundary != null){
+					//split dictionary isolating the sorted section
+					List<File> chunks = splitDictionary(boundary);
 
-				setProgress(40);
+					setProgress(40);
 
-				//sort the chosen section
-				File sortSection = chunks.get(1);
-				ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(CHARSET)
-					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
-					.useZip(true)
-					.removeDuplicates(true)
-					.build();
-				dicParser.sorter.sort(sortSection, options, sortSection);
+					//sort the chosen section
+					File sortSection = chunks.get(1);
+					ExternalSorterOptions options = ExternalSorterOptions.builder()
+						.charset(CHARSET)
+						.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+						.useZip(true)
+						.removeDuplicates(true)
+						.build();
+					dicParser.sorter.sort(sortSection, options, sortSection);
 
-				setProgress(60);
+					setProgress(60);
 
-				//re-merge dictionary
-				mergeDictionary(chunks);
+					//re-merge dictionary
+					mergeDictionary(chunks);
 
-				setProgress(80);
+					setProgress(80);
 
-				//remove temporary files
-				chunks.forEach(File::delete);
+					//remove temporary files
+					chunks.forEach(File::delete);
 
-				publish("File " + dicParser.dicFile.getName() + " sorted");
+					publish("File " + dicParser.dicFile.getName() + " sorted");
 
-				dicParser.boundaries.clear();
+					dicParser.boundaries.clear();
+				}
+				else
+					publish("File " + dicParser.dicFile.getName() + " NOT sorted");
+
+				setProgress(100);
 			}
-			else
-				publish("File " + dicParser.dicFile.getName() + " NOT sorted");
-
-			setProgress(100);
+			catch(IOException | IllegalArgumentException | NullPointerException e){
+				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
 			return null;
 		}
 
@@ -547,49 +557,54 @@ public class DictionaryParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
-			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
-			setProgress(0);
+			try{
+				publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
+				setProgress(0);
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-			try(
-					BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
-					){
-				String line = br.readLine();
-				if(!NumberUtils.isCreatable(line))
-					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+				try(
+						BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
+						BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
+						){
+					String line = br.readLine();
+					if(!NumberUtils.isCreatable(line))
+						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-				int lineIndex = 1;
-				long readSoFar = 0l;
-				long totalSize = dicParser.dicFile.length();
-				while((line = br.readLine()) != null){
-					lineIndex ++;
-					readSoFar += line.length();
+					int lineIndex = 1;
+					long readSoFar = 0l;
+					long totalSize = dicParser.dicFile.length();
+					while((line = br.readLine()) != null){
+						lineIndex ++;
+						readSoFar += line.length();
 
-					line = dicParser.cleanLine(line);
-					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+						line = dicParser.cleanLine(line);
+						if(!line.isEmpty()){
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
-						try{
-							List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+							try{
+								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-							for(RuleProductionEntry production : subProductions){
-								writer.write(production.getWord());
-								writer.newLine();
+								for(RuleProductionEntry production : subProductions){
+									writer.write(production.getWord());
+									writer.newLine();
+								}
+							}
+							catch(IllegalArgumentException e){
+								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
 							}
 						}
-						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
-						}
+
+						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
 
-					setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+					setProgress(100);
+
+					publish("Wordlist extracted successfully");
 				}
-
-				setProgress(100);
-
-				publish("Wordlist extracted successfully");
+			}
+			catch(IOException | IllegalArgumentException | NullPointerException e){
+				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}

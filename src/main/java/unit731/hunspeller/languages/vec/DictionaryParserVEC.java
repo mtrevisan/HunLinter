@@ -97,8 +97,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0", "Y0"));
 
-	private static final String TAB = "\t";
-
 	private static final String POS_NOUN = "noun";
 	private static final String POS_PROPER_NOUN = "proper_noun";
 	private static final String POS_VERB = "verb";
@@ -183,7 +181,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-//			missingAndSuperfluousCheck(production);
+			missingAndSuperfluousCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -266,7 +264,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String word = productable.getWord();
 		if(word.length() > 2 && !productable.isPartOfSpeech(POS_PROPER_NOUN) && !productable.isPartOfSpeech(POS_ARTICLE))
 			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
-				DictionaryEntry entry = new DictionaryEntry(word + "/" + rule, wordGenerator.getFlagParsingStrategy());
+				DictionaryEntry entry = new DictionaryEntry(productable, rule, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
 				try{
 					productions = wordGenerator.applyRules(entry);
