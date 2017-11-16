@@ -29,7 +29,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_EL = "ƚ";
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
 	private static final String METAPHONESIS_RULE = "mf";
-	private static final String DIMINUTIVE_RULE = "&0";
+	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
+	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
+	private static final String DIMINUTIVE_EL_RULE_NON_VANISHING_EL = "[0";
+	private static final String DIMINUTIVE_EL_RULE_VANISHING_EL = "[1";
+	private static final String AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL = "(0";
+	private static final String AUGMENTATIVE_OTO_RULE_VANISHING_EL = "(1";
+	private static final String AUGMENTATIVE_ON_RULE_NON_VANISHING_EL = ")0";
+	private static final String AUGMENTATIVE_ON_RULE_VANISHING_EL = ")1";
+	private static final String PEJORATIVE_ATO_RULE = "§0";
+	private static final String PEJORATIVE_ATHO_RULE_NON_VANISHING_EL = "<0";
+	private static final String PEJORATIVE_ATHO_RULE_VANISHING_EL = "<1";
 	private static final String NORTHERN_PLURAL_ACCENTED_RULE = "U0";
 	private static final String START_TAGS = "/[^\\t\\n]*";
 
@@ -63,8 +73,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), "Cannot use s2 rule with non-vanishing el, use s1");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), "Cannot use W0 rule with vanishing el, use W1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), "Cannot use W1 rule with non-vanishing el, use W0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_RULE), "Cannot use &0 rule with vanishing el, use &1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "&1"), "Cannot use &1 rule with non-vanishing el, use &0");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_NON_VANISHING_EL), "Cannot use &0 rule with vanishing el, use &1");
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_VANISHING_EL), "Cannot use &1 rule with non-vanishing el, use &0");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), "Cannot use [0 rule with vanishing el, use [1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), "Cannot use [1 rule with non-vanishing el, use [0");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"), "Cannot use (0 rule with vanishing el, use (1");
@@ -149,8 +159,20 @@ public class DictionaryParserVEC extends DictionaryParser{
 			vanishingElCheck(production);
 
 			String derivedWord = production.getWord();
-			if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE) && production.containsRuleFlag(DIMINUTIVE_RULE))
-				throw new IllegalArgumentException("Word with rule B0 cannot have rule &0: " + derivedWord);
+			if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE)){
+				if(production.containsRuleFlag(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(DIMINUTIVE_ETO_RULE_VANISHING_EL))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule &0 or &1: " + derivedWord);
+				if(production.containsRuleFlag(DIMINUTIVE_EL_RULE_NON_VANISHING_EL) || production.containsRuleFlag(DIMINUTIVE_EL_RULE_VANISHING_EL))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule [0 or [1: " + derivedWord);
+				if(production.containsRuleFlag(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(AUGMENTATIVE_OTO_RULE_VANISHING_EL))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule (0 or (1: " + derivedWord);
+				if(production.containsRuleFlag(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL) || production.containsRuleFlag(AUGMENTATIVE_ON_RULE_VANISHING_EL))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule )0 or )1: " + derivedWord);
+				if(production.containsRuleFlag(PEJORATIVE_ATO_RULE))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule §0: " + derivedWord);
+				if(production.containsRuleFlag(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(PEJORATIVE_ATHO_RULE_VANISHING_EL))
+					throw new IllegalArgumentException("Word with rule B0 cannot have rule <0 or <1: " + derivedWord);
+			}
 
 			partOfSpeechCheck(production);
 
