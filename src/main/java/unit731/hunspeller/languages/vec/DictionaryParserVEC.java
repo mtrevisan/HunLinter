@@ -28,6 +28,9 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
+	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
+	private static final String METAPHONESIS_RULE = "mf";
+	private static final String DIMINUTIVE_RULE = "&0";
 	private static final String START_TAGS = "/[^\\t\\n]*";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
@@ -48,7 +51,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");
-	private static final Matcher HAS_METAPHONESIS = PatternService.matcher(START_TAGS + "mf");
 	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + "D0");
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
@@ -61,7 +63,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), "Cannot use s2 rule with non-vanishing el, use s1");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), "Cannot use W0 rule with vanishing el, use W1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), "Cannot use W1 rule with non-vanishing el, use W0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "&0"), "Cannot use &0 rule with vanishing el, use &1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_RULE), "Cannot use &0 rule with vanishing el, use &1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "&1"), "Cannot use &1 rule with non-vanishing el, use &0");
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), "Cannot use [0 rule with vanishing el, use [1");
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), "Cannot use [1 rule with non-vanishing el, use [0");
@@ -151,7 +153,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			vanishingElCheck(production);
 
 			String derivedWord = production.getWord();
-			if(production.containsRuleFlag("B0") && production.containsRuleFlag("&0"))
+			if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE) && production.containsRuleFlag(DIMINUTIVE_RULE))
 				throw new IllegalArgumentException("Word with rule B0 cannot have rule &0: " + derivedWord);
 
 			partOfSpeechCheck(production);
@@ -159,7 +161,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
 			if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
-				metaphonesisCheck(derivedWordWithoutDataFields);
+				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
 				northernPluralCheck(derivedWordWithoutDataFields);
 			}
@@ -203,10 +205,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
 	}
 
-	private void metaphonesisCheck(String line) throws IllegalArgumentException{
-		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
+	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
+		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
 			boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
-			boolean hasMetaphonesisFlag = PatternService.find(line, HAS_METAPHONESIS);
+			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
 				if(canHaveMetaphonesis && hasPluralFlag)
