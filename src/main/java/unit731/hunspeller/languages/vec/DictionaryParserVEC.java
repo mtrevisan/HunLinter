@@ -27,6 +27,8 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
+	private static final String START_TAGS = "/[^\\t\\n]*";
+
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
@@ -41,7 +43,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String PEJORATIVE_ATHO_RULE_NON_VANISHING_EL = "<0";
 	private static final String PEJORATIVE_ATHO_RULE_VANISHING_EL = "<1";
 	private static final String NORTHERN_PLURAL_ACCENTED_RULE = "U0";
-	private static final String START_TAGS = "/[^\\t\\n]*";
+	private static final String PLANTS_AND_PROFESSIONS_RULE = "V0";
+	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
@@ -92,10 +95,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL), "Word with rule B0 cannot have rule (0 or (1");
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL), "Word with rule B0 cannot have rule )0 or )1");
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(PEJORATIVE_ATO_RULE), "Word with rule B0 cannot have rule §0");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(COLLECTIVE_NOUNS_RULE), "Word with rule B0 cannot have rule Y0");
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL), "Word with rule B0 cannot have rule <0 or <1");
 	}
 
-	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0", "Y0"));
+	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0"));
 
 	private static final String POS_NOUN = "noun";
 	private static final String POS_PROPER_NOUN = "proper_noun";
@@ -181,7 +185,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			missingAndSuperfluousCheck(production);
+//			missingAndSuperfluousCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -262,9 +266,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void missingAndSuperfluousCheck(Productable productable) throws IllegalArgumentException{
 		String word = productable.getWord();
-		if(word.length() > 2 && !productable.isPartOfSpeech(POS_PROPER_NOUN) && !productable.isPartOfSpeech(POS_ARTICLE))
-			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
-				DictionaryEntry entry = new DictionaryEntry(productable, rule, wordGenerator.getFlagParsingStrategy());
+		if(word.length() > 2 && !productable.isPartOfSpeech(POS_PROPER_NOUN) && !productable.isPartOfSpeech(POS_ARTICLE)){
+			//Y0 but without V0
+			if(!productable.containsRuleFlag(PLANTS_AND_PROFESSIONS_RULE) && !productable.isPartOfSpeech(POS_VERB)){
+				DictionaryEntry entry = new DictionaryEntry(productable, COLLECTIVE_NOUNS_RULE, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
 				try{
 					productions = wordGenerator.applyRules(entry);
@@ -274,12 +279,32 @@ public class DictionaryParserVEC extends DictionaryParser{
 				}
 				int numberOfProductions = productions.size();
 
-				boolean hasRule = productable.containsRuleFlag(rule);
+				boolean hasRule = productable.containsRuleFlag(COLLECTIVE_NOUNS_RULE);
 				if(hasRule && numberOfProductions == 0)
-					throw new IllegalArgumentException("Superfluous rule for word " + productable.getWord() + ", remove " + rule);
+					throw new IllegalArgumentException("Superfluous rule for word " + productable.getWord() + ", remove " + COLLECTIVE_NOUNS_RULE);
 				else if(!hasRule && numberOfProductions > 1)
-					throw new IllegalArgumentException("Missing rule for word " + productable.getWord() + ", add " + rule);
+					throw new IllegalArgumentException("Missing rule for word " + productable.getWord() + ", add " + COLLECTIVE_NOUNS_RULE);
 			}
+
+
+//			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
+//				DictionaryEntry entry = new DictionaryEntry(productable, rule, wordGenerator.getFlagParsingStrategy());
+//				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
+//				try{
+//					productions = wordGenerator.applyRules(entry);
+//				}
+//				catch(IllegalArgumentException e){
+//					//no productions result from the application of the rule
+//				}
+//				int numberOfProductions = productions.size();
+//
+//				boolean hasRule = productable.containsRuleFlag(rule);
+//				if(hasRule && numberOfProductions == 0)
+//					throw new IllegalArgumentException("Superfluous rule for word " + productable.getWord() + ", remove " + rule);
+//				else if(!hasRule && numberOfProductions > 1)
+//					throw new IllegalArgumentException("Missing rule for word " + productable.getWord() + ", add " + rule);
+//			}
+		}
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
