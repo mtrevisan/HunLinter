@@ -50,7 +50,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_L = "ƚ[^/]+" + START_TAGS;
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
-	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])/");
+	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])$");
 	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + "D0");
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
@@ -163,7 +163,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
-				northernPluralCheck(derivedWordWithoutDataFields);
+				northernPluralCheck(production, derivedWordWithoutDataFields);
 			}
 
 			mismatchCheck(derivedWordWithoutDataFields);
@@ -208,7 +208,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
 		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
 				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
-			boolean canHaveMetaphonesis = PatternService.find(line, CAN_HAVE_METAPHONESIS);
+			boolean canHaveMetaphonesis = PatternService.find(production.getWord(), CAN_HAVE_METAPHONESIS);
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
@@ -220,8 +220,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void northernPluralCheck(String line) throws IllegalArgumentException{
-		if(!line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE) && !line.contains(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+	private void northernPluralCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
+		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
+				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
