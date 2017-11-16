@@ -31,6 +31,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String DIMINUTIVE_RULE = "&0";
+	private static final String NORTHERN_PLURAL_ACCENTED_RULE = "U0";
 	private static final String START_TAGS = "/[^\\t\\n]*";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
@@ -130,6 +131,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
+	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "mh", "ssh");
+
 
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
@@ -192,7 +195,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
 			throw new IllegalArgumentException("Word with a vanishing el near a consonant: " + derivedWord);
-		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag("U0"))
+		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag(NORTHERN_PLURAL_ACCENTED_RULE))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
 	}
 
@@ -285,7 +288,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
 				&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 				&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
-				&& (!production.isPartOfSpeech(POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
+				&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
