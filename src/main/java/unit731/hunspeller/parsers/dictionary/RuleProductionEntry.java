@@ -11,7 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
-import static unit731.hunspeller.parsers.dictionary.WordGenerator.TAG_PART_OF_SPEECH;
 
 
 @Getter
@@ -54,8 +53,8 @@ public class RuleProductionEntry implements Productable{
 		if(dataFields != null)
 			for(String dataField : dataFields)
 				if(!dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
-						&& (!dataField.startsWith(TAG_PART_OF_SPEECH) || affixEntryDataFields == null
-							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(TAG_PART_OF_SPEECH)))
+						&& (!dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || affixEntryDataFields == null
+							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
 						&& (!dataField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryDataFields == null
 							|| !Arrays.stream(affixEntryDataFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
 					newDataFields.add(dataField);

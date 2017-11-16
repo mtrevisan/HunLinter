@@ -159,8 +159,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			partOfSpeechCheck(production);
 
 			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
-			if(production.hasRuleFlags() && !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_VERB)
-					&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)){
+			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
 				northernPluralCheck(production, derivedWordWithoutDataFields);
@@ -206,8 +205,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
-		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)){
+		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
 			boolean canHaveMetaphonesis = PatternService.find(production.getWord(), CAN_HAVE_METAPHONESIS);
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
@@ -221,8 +219,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void northernPluralCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
-		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN)
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
@@ -238,8 +235,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void missingAndSuperfluousCheck(Productable productable) throws IllegalArgumentException{
 		String word = productable.getWord();
-		if(word.length() > 2 && !productable.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PROPER_NOUN)
-				&& !productable.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ARTICLE))
+		if(word.length() > 2 && !productable.isPartOfSpeech(POS_PROPER_NOUN) && !productable.isPartOfSpeech(POS_ARTICLE))
 			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
 				DictionaryEntry entry = new DictionaryEntry(word + "/" + rule, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
@@ -275,8 +271,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void ciuiCheck(String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
-		if(!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV)
-				&& !PatternService.find(subword, CIUI)){
+		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV) && !PatternService.find(subword, CIUI)){
 			boolean dBetweenVowelsRemoval = production.getAppliedRules().stream()
 				.map(AffixEntry::toString)
 				.map(D_BETWEEN_VOWELS::reset)
@@ -288,9 +283,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void syllabationCheck(String derivedWord, RuleProductionEntry production) throws IllegalArgumentException{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NUMERAL_LATIN)
-				&& !production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_UNIT_OF_MEASURE)
-				&& (!production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
+				&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
+				&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
+				&& (!production.isPartOfSpeech(POS_INTERJECTION) || !Arrays.asList("brr", "mh", "ssh").contains(derivedWord))){
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
