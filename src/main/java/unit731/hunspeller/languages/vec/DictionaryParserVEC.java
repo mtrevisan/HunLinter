@@ -85,6 +85,16 @@ public class DictionaryParserVEC extends DictionaryParser{
 		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"), "Cannot use <1 rule with đ or ŧ, use <0");
 	}
 
+	private static final Map<List<String>, String> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashMap<>();
+	static{
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL), "Word with rule B0 cannot have rule &0 or &1");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL), "Word with rule B0 cannot have rule [0 or [1");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL), "Word with rule B0 cannot have rule (0 or (1");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL), "Word with rule B0 cannot have rule )0 or )1");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(PEJORATIVE_ATO_RULE), "Word with rule B0 cannot have rule §0");
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.put(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL), "Word with rule B0 cannot have rule <0 or <1");
+	}
+
 	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0", "Y0"));
 
 	private static final String TAB = "\t";
@@ -158,23 +168,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			vanishingElCheck(production);
 
-			String derivedWord = production.getWord();
-			if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE)){
-				if(production.containsRuleFlag(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(DIMINUTIVE_ETO_RULE_VANISHING_EL))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule &0 or &1: " + derivedWord);
-				if(production.containsRuleFlag(DIMINUTIVE_EL_RULE_NON_VANISHING_EL) || production.containsRuleFlag(DIMINUTIVE_EL_RULE_VANISHING_EL))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule [0 or [1: " + derivedWord);
-				if(production.containsRuleFlag(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(AUGMENTATIVE_OTO_RULE_VANISHING_EL))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule (0 or (1: " + derivedWord);
-				if(production.containsRuleFlag(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL) || production.containsRuleFlag(AUGMENTATIVE_ON_RULE_VANISHING_EL))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule )0 or )1: " + derivedWord);
-				if(production.containsRuleFlag(PEJORATIVE_ATO_RULE))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule §0: " + derivedWord);
-				if(production.containsRuleFlag(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL) || production.containsRuleFlag(PEJORATIVE_ATHO_RULE_VANISHING_EL))
-					throw new IllegalArgumentException("Word with rule B0 cannot have rule <0 or <1: " + derivedWord);
-			}
+			incompatibilityCheck(production);
 
 			partOfSpeechCheck(production);
+
+			String derivedWord = production.getWord();
 
 			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
 			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
@@ -215,6 +213,16 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with a vanishing el near a consonant: " + derivedWord);
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag(NORTHERN_PLURAL_ACCENTED_RULE))
 			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
+	}
+
+	private void incompatibilityCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE)){
+			Set<List<String>> keys = ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.keySet();
+			for(List<String> key : keys)
+				for(String rule : key)
+					if(production.containsRuleFlag(rule))
+						throw new IllegalArgumentException(ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.get(key));
+		}
 	}
 
 	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
