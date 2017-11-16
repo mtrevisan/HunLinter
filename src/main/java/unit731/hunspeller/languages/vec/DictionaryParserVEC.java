@@ -166,11 +166,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(!production.hasDataFields())
 				throw new IllegalArgumentException("Line does not contains data fields");
 
+			partOfSpeechCheck(production);
+
 			vanishingElCheck(production);
 
 			incompatibilityCheck(production);
-
-			partOfSpeechCheck(production);
 
 			String derivedWord = production.getWord();
 
@@ -189,10 +189,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
-				ciuiCheck(subword, production, derivedWord);
+				ciuiCheck(subword, production);
 			}
 
-			syllabationCheck(derivedWord, production);
+			syllabationCheck(production, derivedWord);
 		}
 		catch(IllegalArgumentException e){
 			String message = e.getMessage();
@@ -203,16 +203,24 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
+	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		String[] dataFields = production.getDataFields();
+		if(dataFields != null)
+			for(String dataField : dataFields)
+				if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
+					throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
+	}
+
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(VANISHING_EL) && PatternService.find(derivedWord, NON_VANISHING_EL))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain non vanishing el: " + derivedWord);
+			throw new IllegalArgumentException("Word with a vanishing el cannot contain non vanishing el");
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant: " + derivedWord);
+			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant");
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
-			throw new IllegalArgumentException("Word with a vanishing el near a consonant: " + derivedWord);
+			throw new IllegalArgumentException("Word with a vanishing el near a consonant");
 		if(derivedWord.contains(VANISHING_EL) && production.containsRuleFlag(NORTHERN_PLURAL_ACCENTED_RULE))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0:" + derivedWord);
+			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0");
 	}
 
 	private void incompatibilityCheck(RuleProductionEntry production) throws IllegalArgumentException{
@@ -225,14 +233,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		String[] dataFields = production.getDataFields();
-		if(dataFields != null)
-			for(String dataField : dataFields)
-				if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word has an unknown Part Of Speech: " + dataField);
-	}
-
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
 			boolean canHaveMetaphonesis = PatternService.find(production.getWord(), CAN_HAVE_METAPHONESIS);
@@ -240,9 +240,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
 				if(canHaveMetaphonesis && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+					throw new IllegalArgumentException("Metaphonesis missing, add mf");
 				else if(!canHaveMetaphonesis && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+					throw new IllegalArgumentException("Metaphonesis not needed for word, remove mf");
 			}
 		}
 	}
@@ -251,7 +251,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN)
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
+			throw new IllegalArgumentException("Plural missing after n or l, add "
 				+ (Word.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
 	}
 
@@ -259,7 +259,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		Set<Matcher> keys = MISMATCH_CHECKS.keySet();
 		for(Matcher key : keys)
 			if(PatternService.find(line, key))
-				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " (" + line + ")");
+				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key));
 	}
 
 	private void missingAndSuperfluousCheck(Productable productable) throws IllegalArgumentException{
@@ -285,9 +285,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		String derivedWord = production.getWord();
 		if(PatternService.find(subword, MULTIPLE_ACCENTS))
-			throw new IllegalArgumentException("Word cannot have multiple accents: " + derivedWord);
+			throw new IllegalArgumentException("Word cannot have multiple accents");
 
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = production.getAppliedRules().stream()
@@ -295,22 +294,22 @@ public class DictionaryParserVEC extends DictionaryParser{
 				.map(L_BETWEEN_VOWELS::reset)
 				.anyMatch(Matcher::find);
 			if(!elBetweenVowelsRemoval)
-				throw new IllegalArgumentException("Word cannot have an accent here: " + derivedWord);
+				throw new IllegalArgumentException("Word cannot have an accent here");
 		}
 	}
 
-	private void ciuiCheck(String subword, RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
+	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV) && !PatternService.find(subword, CIUI)){
 			boolean dBetweenVowelsRemoval = production.getAppliedRules().stream()
 				.map(AffixEntry::toString)
 				.map(D_BETWEEN_VOWELS::reset)
 				.anyMatch(Matcher::find);
 			if(!dBetweenVowelsRemoval)
-				throw new IllegalArgumentException("Word cannot have [cijɉñ]iV: " + derivedWord);
+				throw new IllegalArgumentException("Word cannot have [cijɉñ]iV");
 		}
 	}
 
-	private void syllabationCheck(String derivedWord, RuleProductionEntry production) throws IllegalArgumentException{
+	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
 				&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 				&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
@@ -318,7 +317,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
 			if(hyphenation.hasErrors())
 				throw new IllegalArgumentException("Word is not syllabable (" + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
-					+ "): " + derivedWord);
+					+ ")");
 		}
 	}
 
