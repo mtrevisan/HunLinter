@@ -161,7 +161,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
+	protected void checkProduction(RuleProductionEntry production, DictionaryEntry dictionaryWord, FlagParsingStrategy strategy)
+			throws IllegalArgumentException{
 		try{
 			if(!production.hasDataFields())
 				throw new IllegalArgumentException("Line does not contains data fields");
@@ -183,7 +184,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			missingAndSuperfluousCheck(production);
+			missingAndSuperfluousCheck(production, dictionaryWord);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -262,10 +263,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " for word " + line);
 	}
 
-	private void missingAndSuperfluousCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void missingAndSuperfluousCheck(RuleProductionEntry production, DictionaryEntry dictionaryWord) throws IllegalArgumentException{
 		String word = production.getWord();
-		if(word.length() > 2 && !production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)
-				&& !production.isPartOfSpeech(POS_VERB)){
+		if(word.length() > 2 && !dictionaryWord.isPartOfSpeech(POS_PROPER_NOUN) && !dictionaryWord.isPartOfSpeech(POS_ARTICLE)
+				&& !dictionaryWord.isPartOfSpeech(POS_VERB)){
 			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
 				DictionaryEntry entry = new DictionaryEntry(production, rule, wordGenerator.getFlagParsingStrategy());
 				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
