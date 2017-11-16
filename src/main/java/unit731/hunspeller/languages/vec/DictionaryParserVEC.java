@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -142,17 +141,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkLine(String line, FlagParsingStrategy strategy) throws IllegalArgumentException{
-		if(!line.contains(StringUtils.SPACE) && !line.contains(TAB))
-			throw new IllegalArgumentException("Line does not contains data fields");
-
-//		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
-//		missingAndSuperfluousCheck(dicEntry);
-	}
-
-	@Override
 	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
+			if(!production.hasDataFields())
+				throw new IllegalArgumentException("Line does not contains data fields");
+
 			vanishingElCheck(production);
 
 			String derivedWord = production.getWord();
@@ -182,8 +175,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 			syllabationCheck(derivedWord, production);
 		}
 		catch(IllegalArgumentException e){
+			String message = e.getMessage();
 			String rulesSequence = production.getRulesSequence();
-			throw new IllegalArgumentException(e.getMessage() + (rulesSequence.length() > 0? " (via " + rulesSequence + ")": StringUtils.EMPTY));
+			if(rulesSequence.length() > 0)
+				message += " (via " + rulesSequence + ")";
+			throw new IllegalArgumentException(message);
 		}
 	}
 
