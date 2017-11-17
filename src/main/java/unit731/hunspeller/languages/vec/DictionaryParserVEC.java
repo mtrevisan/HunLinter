@@ -174,7 +174,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throws IllegalArgumentException{
 		try{
 			if(!production.hasDataFields())
-				throw new IllegalArgumentException("Line does not contains data fields");
+				throw new IllegalArgumentException("Line does not contains any data fields");
 
 			partOfSpeechCheck(production);
 
