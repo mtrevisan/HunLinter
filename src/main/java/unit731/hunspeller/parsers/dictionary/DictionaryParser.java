@@ -120,7 +120,7 @@ public class DictionaryParser{
 							try{
 								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-								subProductions.forEach(production -> dicParser.checkProduction(production, dictionaryWord, strategy));
+								subProductions.forEach(production -> dicParser.checkProduction(production, strategy));
 							}
 							catch(IllegalArgumentException e){
 								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
@@ -147,8 +147,7 @@ public class DictionaryParser{
 		}
 	};
 
-	protected void checkProduction(RuleProductionEntry production, DictionaryEntry dictionaryWord, FlagParsingStrategy strategy)
-		throws IllegalArgumentException{}
+	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{}
 
 
 	@AllArgsConstructor

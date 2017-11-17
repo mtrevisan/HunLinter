@@ -89,6 +89,12 @@ public class RuleProductionEntry implements Productable{
 		return (dataFields != null && Arrays.stream(dataFields).anyMatch(dataField::equals));
 	}
 
+	public boolean hasProductionRule(String ruleFlag){
+		return appliedRules.stream()
+			.map(AffixEntry::getFlag)
+			.anyMatch(ruleFlag::equals);
+	}
+
 	public String getRulesSequence(){
 		return appliedRules.stream()
 			.map(AffixEntry::getFlag)

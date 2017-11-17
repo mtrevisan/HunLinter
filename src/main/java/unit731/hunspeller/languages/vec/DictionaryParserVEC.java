@@ -29,6 +29,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String START_TAGS = "/[^\\t\\n]*";
 
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
+	private static final String ADJECTIVE_SECOND_CLASS_RULE = "C0";
+	private static final String ADJECTIVE_THIRD_CLASS_RULE = "D0";
+	private static final String PLURAL_NOUN_MASCULINE_RULE = "T0";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
 	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
@@ -43,6 +46,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String PEJORATIVE_ATHO_RULE_VANISHING_EL = "<1";
 	private static final String NORTHERN_PLURAL_ACCENTED_RULE = "U0";
 	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
+	private static final String FINAL_SONORIZATION_RULE = "I0";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
@@ -62,7 +66,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])$");
-	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + "D0");
+	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + ADJECTIVE_THIRD_CLASS_RULE);
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
@@ -97,7 +101,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, "Word with rule B0 cannot have rule <0 or <1"));
 	}
 
-	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList("I0"));
+//	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList(FINAL_SONORIZATION_RULE));
 
 	private static final String POS_NOUN = "noun";
 	private static final String POS_PROPER_NOUN = "proper_noun";
@@ -161,7 +165,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProduction(RuleProductionEntry production, DictionaryEntry dictionaryWord, FlagParsingStrategy strategy)
+	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy)
 			throws IllegalArgumentException{
 		try{
 			if(!production.hasDataFields())
@@ -184,7 +188,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			missingAndSuperfluousCheck(production, dictionaryWord);
+			finalSonorizationCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -263,27 +267,29 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " for word " + line);
 	}
 
-	private void missingAndSuperfluousCheck(RuleProductionEntry production, DictionaryEntry dictionaryWord) throws IllegalArgumentException{
+	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
-		if(word.length() > 2 && !dictionaryWord.isPartOfSpeech(POS_PROPER_NOUN) && !dictionaryWord.isPartOfSpeech(POS_ARTICLE)
-				&& !dictionaryWord.isPartOfSpeech(POS_VERB)){
-			for(String rule : MISSING_AND_SUPERFLUOUS_CHECKS){
-				DictionaryEntry entry = new DictionaryEntry(production, rule, wordGenerator.getFlagParsingStrategy());
-				List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
-				try{
-					productions = wordGenerator.applyRules(entry);
-				}
-				catch(IllegalArgumentException e){
-					//no productions result from the application of the rule
-				}
-				int numberOfProductions = productions.size();
-
-				boolean hasRule = production.containsRuleFlag(rule);
-				if(hasRule && numberOfProductions == 0)
-					throw new IllegalArgumentException("Superfluous rule for word " + production.getWord() + ", remove " + rule);
-				else if(!hasRule && numberOfProductions > 1)
-					throw new IllegalArgumentException("Missing rule for word " + production.getWord() + ", add " + rule);
+		if(word.length() > 2 && !word.contains(VANISHING_EL)
+				&& !production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_VERB)
+				&& production.getAppliedRules().size() < 2
+				&& !production.hasProductionRule(ADJECTIVE_FIRST_CLASS_RULE)&& !production.hasProductionRule(PLURAL_NOUN_MASCULINE_RULE)
+				&& !production.hasProductionRule(ADJECTIVE_THIRD_CLASS_RULE) && !production.hasProductionRule(ADJECTIVE_SECOND_CLASS_RULE)
+				&& !production.hasProductionRule("T4")){
+			DictionaryEntry entry = new DictionaryEntry(production, FINAL_SONORIZATION_RULE, wordGenerator.getFlagParsingStrategy());
+			List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
+			try{
+				productions = wordGenerator.applyRules(entry);
 			}
+			catch(IllegalArgumentException e){
+				//no productions result from the application of the rule
+			}
+			int numberOfProductions = productions.size();
+
+			boolean hasRule = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
+			if(hasRule && numberOfProductions == 0)
+				throw new IllegalArgumentException("Superfluous rule for word " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
+			else if(!hasRule && numberOfProductions > 1)
+				throw new IllegalArgumentException("Missing rule for word " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
 		}
 	}
 
