@@ -1045,7 +1045,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		String newRule = hypAddRuleTextField.getText();
-		String foundRule = hypParser.addRule(hypParser.correctOrthography(newRule));
+		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT));
 		if(foundRule == null){
 			try{
 				File hypFile = getHyphenationFile();
@@ -1472,10 +1472,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 	private static void hyphenateAddRule(HunspellerFrame frame){
 		try{
 			String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
-			String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText());
+			String addedRule = frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT);
 			String addedRuleCount = null;
 			if(StringUtils.isNotBlank(addedRule)){
-				addedRule = frame.hypParser.correctOrthography(addedRule);
 				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule);
 				boolean ruleMatchesText = false;
 				boolean hyphenationChanged = false;
@@ -1484,9 +1483,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, REGEX_POINTS_AND_NUMBERS));
 
 					if(ruleMatchesText){
-						addedRuleText = frame.hypParser.correctOrthography(addedRuleText);
 						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
-						addedRule = frame.hypParser.correctOrthography(addedRule);
 						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
 
 						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");

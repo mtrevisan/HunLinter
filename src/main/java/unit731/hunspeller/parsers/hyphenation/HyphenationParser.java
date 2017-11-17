@@ -245,12 +245,10 @@ public class HyphenationParser{
 	public String addRule(String rule){
 		validateRule(rule);
 
-		String newRule = null;
 		String key = getKeyFromData(rule);
-		if(!patterns.containsKey(key)){
+		String newRule = patterns.get(key);
+		if(newRule == null)
 			patterns.put(key, rule);
-			newRule = rule;
-		}
 		return newRule;
 	}
 
