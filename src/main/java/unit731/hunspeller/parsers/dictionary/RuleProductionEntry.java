@@ -95,6 +95,12 @@ public class RuleProductionEntry implements Productable{
 			.anyMatch(ruleFlag::equals);
 	}
 
+	public boolean hasProductionRule(AffixEntry.TYPE type){
+		return appliedRules.stream()
+			.map(AffixEntry::getType)
+			.anyMatch(type::equals);
+	}
+
 	public String getRulesSequence(){
 		return appliedRules.stream()
 			.map(AffixEntry::getFlag)

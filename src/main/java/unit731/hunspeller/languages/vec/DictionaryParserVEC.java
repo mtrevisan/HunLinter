@@ -32,6 +32,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String ADJECTIVE_SECOND_CLASS_RULE = "C0";
 	private static final String ADJECTIVE_THIRD_CLASS_RULE = "D0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "T0";
+	private static final String VARIANT_TRANSFORMATIONS_RULE = "T2";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
 	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
@@ -269,12 +270,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
-		if(word.length() > 2 && !word.contains(VANISHING_EL)
+		if(word.length() > 2 && production.getAppliedRules().size() < 2 && production.hasProductionRule(AffixEntry.TYPE.SUFFIX)
+				&& !word.contains(VANISHING_EL)
 				&& !production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_VERB)
-				&& production.getAppliedRules().size() < 2
 				&& !production.hasProductionRule(ADJECTIVE_FIRST_CLASS_RULE)&& !production.hasProductionRule(PLURAL_NOUN_MASCULINE_RULE)
 				&& !production.hasProductionRule(ADJECTIVE_THIRD_CLASS_RULE) && !production.hasProductionRule(ADJECTIVE_SECOND_CLASS_RULE)
-				&& !production.hasProductionRule("T4")){
+				&& !production.hasProductionRule(VARIANT_TRANSFORMATIONS_RULE)){
 			DictionaryEntry entry = new DictionaryEntry(production, FINAL_SONORIZATION_RULE, wordGenerator.getFlagParsingStrategy());
 			List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
 			try{
