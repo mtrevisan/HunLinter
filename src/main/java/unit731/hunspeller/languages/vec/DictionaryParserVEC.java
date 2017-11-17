@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -193,7 +194,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			finalSonorizationCheck(production);
+//			finalSonorizationCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -324,18 +325,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
-		String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
-//		if(!correctedDerivedWord.equals(derivedWord))
-//			throw new IllegalArgumentException("Word " + derivedWord + " is mispelled");
+		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
+			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
+			String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
+			if(!correctedDerivedWord.equals(derivedWord))
+				throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 
-		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
-				&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
-				&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
-				&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){
-			Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
-			if(hyphenation.hasErrors())
-				throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
-					+ " is not syllabable");
+			if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
+					&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
+					&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
+					&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){
+				Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
+				if(hyphenation.hasErrors())
+					throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
+						+ " is not syllabable");
+			}
 		}
 	}
 

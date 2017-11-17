@@ -113,7 +113,7 @@ public class Word{
 	private static String markDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx < 0){
-			String phones = Grapheme.preConvertGraphemesIntoPhones(word);
+			String phones = Grapheme.handleJHJWPhonemes(word);
 			int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)

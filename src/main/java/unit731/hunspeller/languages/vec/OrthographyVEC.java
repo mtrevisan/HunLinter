@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
@@ -12,32 +13,37 @@ import unit731.hunspeller.services.PatternService;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrthographyVEC extends Orthography{
 
-	private static final Matcher REGEX_A_GRAVE = PatternService.matcher("a\\\\");
-	private static final Matcher REGEX_E_GRAVE = PatternService.matcher("e\\\\");
-	private static final Matcher REGEX_O_GRAVE = PatternService.matcher("o\\\\");
-	private static final Matcher REGEX_E_ACUTE = PatternService.matcher("e/");
-	private static final Matcher REGEX_I_ACUTE = PatternService.matcher("(?:i/|ì)");
-	private static final Matcher REGEX_O_ACUTE = PatternService.matcher("o/");
-	private static final Matcher REGEX_U_ACUTE = PatternService.matcher("(?:u/|ù)");
+	private static final String APOSTROPHE2 = "'";
 
-	private static final Matcher REGEX_H = PatternService.matcher("(^|[^dfkjlnpstx])h");
-	private static final Matcher REGEX_DH = PatternService.matcher("dh");
-	private static final Matcher REGEX_JH = PatternService.matcher("jh");
-	private static final Matcher REGEX_LH = PatternService.matcher("lh");
-	private static final Matcher REGEX_NH = PatternService.matcher("nh");
-	private static final Matcher REGEX_TH = PatternService.matcher("th");
+	private static final String A_GRAVE = "a\\";
+	private static final String E_GRAVE = "e\\";
+	private static final String O_GRAVE = "o\\";
+	private static final String E_ACUTE = "e/";
+	private static final String I_ACUTE = "i/";
+	private static final String I_ACUTE_WRONG_ACCENT = "ì";
+	private static final String O_ACUTE = "o/";
+	private static final String U_ACUTE = "u/";
+	private static final String U_ACUTE_WRONG_ACCENT = "ù";
 
-	private static final Matcher REGEX_MB_MP = PatternService.matcher("m([bp])");
-	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^j(?=[^aeiouàèéíòóúh])");
+	private static final Matcher REGEX_H = PatternService.matcher("([^adeèfhijklmnoòpstux])h");
+	private static final String DH = "dh";
+	private static final String JH = "jh";
+	private static final String LH = "lh";
+	private static final String NH = "nh";
+	private static final String TH = "th";
+
+	private static final String MB = "mb";
+	private static final String MP = "mp";
+	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + Grapheme.JJH_PHONEME + "(?=[^aeiouàèéíòóúh])");
 	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternService.matcher("^i(?=[aeiouàèéíòóú])");
 	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternService.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
-	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóú])");
-	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú])ƚ(?=[aeiouàèéíòóú])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóú])");
+	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
+	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher("fh(?=[^aeiouàèéíòóú])");
 	private static final Matcher REGEX_X_INTO_S = PatternService.matcher("x(?=[cfkpt])");
-	private static final Matcher REGEX_S_INTO_X = PatternService.matcher("s(?=([mnñbdgjɉsvrlŧ]|jh))");
+	private static final Matcher REGEX_S_INTO_X = PatternService.matcher("s(?=([mnñbdg" + Grapheme.JJH_PHONEME + "ɉsvrlŧ]))");
 
-	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([cjñ])i([aeiou])");
+	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([c" + Grapheme.JJH_PHONEME + "ñ])i([aeiou])");
 
 	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternService.matcher("([^aeiou]){1}\\1+");
 
@@ -52,30 +58,22 @@ public class OrthographyVEC extends Orthography{
 
 	@Override
 	public String correctOrthography(String word){
-		//apply stress
-		word = PatternService.replaceAll(word, REGEX_A_GRAVE, "à");
-		word = PatternService.replaceAll(word, REGEX_E_GRAVE, "è");
-		word = PatternService.replaceAll(word, REGEX_O_GRAVE, "ò");
-		word = PatternService.replaceAll(word, REGEX_E_ACUTE, "é");
-		word = PatternService.replaceAll(word, REGEX_I_ACUTE, "í");
-		word = PatternService.replaceAll(word, REGEX_O_ACUTE, "ó");
-		word = PatternService.replaceAll(word, REGEX_U_ACUTE, "ú");
+		word = correctStress(word);
 
 		//correct h occurrences not after d, f, k, j, l, n, p, s, t, x
 		word = PatternService.replaceAll(word, REGEX_H, "$1");
-		//rewrite characters
-		word = PatternService.replaceAll(word, REGEX_DH, "đ");
-		word = PatternService.replaceAll(word, REGEX_JH, "ɉ");
-		word = PatternService.replaceAll(word, REGEX_LH, "ƚ");
-		word = PatternService.replaceAll(word, REGEX_NH, "ñ");
-		word = PatternService.replaceAll(word, REGEX_TH, "ŧ");
+		word = rewriteCharacters(word);
 
 		//correct mb/mp occurrences into nb/np
-		word = PatternService.replaceAll(word, REGEX_MB_MP, "n$1");
+		word = StringUtils.replace(word, MB, "nb");
+		word = StringUtils.replace(word, MP, "np");
+
+		word = Grapheme.handleJHJWPhonemes(word);
+
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
 		word = PatternService.replaceFirst(word, REGEX_J_INTO_I, "i");
-		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, "j");
-		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1j");
+		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, Grapheme.JJH_PHONEME);
+		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + Grapheme.JJH_PHONEME);
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		word = PatternService.replaceFirst(word, REGEX_LH_INITIAL_INTO_L, "l");
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
@@ -86,13 +84,37 @@ public class OrthographyVEC extends Orthography{
 		word = PatternService.replaceAll(word, REGEX_X_INTO_S, "s");
 		word = PatternService.replaceAll(word, REGEX_S_INTO_X, "x");
 
-		//correct morphologic error
+		//correct morphological errors
 		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
+
+		word = Grapheme.rollbackJHJWPhonemes(word);
 
 		word = eliminateConsonantGeminates(word);
 
 		word = correctApostrophes(word);
 
+		return word;
+	}
+
+	private String correctStress(String word){
+		word = StringUtils.replace(word, A_GRAVE, "à");
+		word = StringUtils.replace(word, E_GRAVE, "è");
+		word = StringUtils.replace(word, O_GRAVE, "ò");
+		word = StringUtils.replace(word, E_ACUTE, "é");
+		word = StringUtils.replace(word, I_ACUTE, "í");
+		word = StringUtils.replace(word, I_ACUTE_WRONG_ACCENT, "í");
+		word = StringUtils.replace(word, O_ACUTE, "ó");
+		word = StringUtils.replace(word, U_ACUTE, "ú");
+		word = StringUtils.replace(word, U_ACUTE_WRONG_ACCENT, "ú");
+		return word;
+	}
+
+	private String rewriteCharacters(String word){
+		word = StringUtils.replace(word, DH, "đ");
+		word = StringUtils.replace(word, JH, "ɉ");
+		word = StringUtils.replace(word, LH, "ƚ");
+		word = StringUtils.replace(word, NH, "ñ");
+		word = StringUtils.replace(word, TH, "ŧ");
 		return word;
 	}
 
@@ -120,7 +142,7 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains("'") && !HyphenationParser.HYPHEN.equals(syllabe)
+			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APOSTROPHE2) && !HyphenationParser.HYPHEN.equals(syllabe)
 				&& Word.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;
