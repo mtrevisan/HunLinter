@@ -117,7 +117,7 @@ public class WordGenerator{
 
 				RuleEntry rule = affParser.getData(ruleFlag);
 				if(rule == null)
-					throw new IllegalArgumentException(ruleFlag);
+					throw new IllegalArgumentException("Non-existent rule " + ruleFlag + " found");
 
 				if(rule.isSuffix())
 					suffixes.add(ruleFlag);
