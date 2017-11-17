@@ -127,6 +127,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String POS_PREFIX = "prefix";
 	private static final String POS_INTERJECTION = "interjection";
 	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
+
+	private static final String IS_MASCULINE = "masculine";
+	private static final String IS_FEMENINE = "femenine";
+	private static final String IS_PROCOMPLEMENTAR_VERB = "procomplementar";
 	
 	private static final Set<String> PART_OF_SPEECH = new HashSet<>();
 	static{
@@ -189,7 +193,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-			finalSonorizationCheck(production);
+//			finalSonorizationCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
