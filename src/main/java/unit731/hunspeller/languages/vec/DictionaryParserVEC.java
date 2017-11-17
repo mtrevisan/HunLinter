@@ -193,7 +193,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			mismatchCheck(derivedWordWithoutDataFields);
 
-//			finalSonorizationCheck(production);
+			finalSonorizationCheck(production);
 
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
@@ -324,6 +324,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
+		String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
+//		if(!correctedDerivedWord.equals(derivedWord))
+//			throw new IllegalArgumentException("Word " + derivedWord + " is mispelled");
+
 		if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
 				&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 				&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)

@@ -14,8 +14,7 @@ public class Grapheme{
 
 	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóú])i([aeiouàèéíòóú])");
-	private static final Matcher ETEROPHONIC_SEQUENCE_W1 = PatternService.matcher("((^|[^s])t)u([aeiouàèéíòóú])");
-	private static final Matcher ETEROPHONIC_SEQUENCE_W2 = PatternService.matcher("((^|[^t])[kgrs])u([aeiouàèéíòóú])");
+	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs])u([aeiouàèéíòóú])");
 
 
 	public static boolean endsInVowel(String word){
@@ -59,8 +58,7 @@ public class Grapheme{
 
 	private static String phonizeEterophonicSequence(String word){
 		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
-		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W1, "$1w$3");
-		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W2, "$1w$3");
+		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
 		return word;
 	}
 

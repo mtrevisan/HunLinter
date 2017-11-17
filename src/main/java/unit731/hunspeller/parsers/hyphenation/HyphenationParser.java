@@ -232,16 +232,17 @@ public class HyphenationParser{
 	}
 
 	public String correctOrthography(String text){
+		text = text.toLowerCase(Locale.ROOT);
 		return orthography.correctOrthography(text);
 	}
 
 	/**
+	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * 
 	 * @param rule	The rule to add
 	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule){
-		rule = correctOrthography(rule);
-
 		validateRule(rule);
 
 		String newRule = null;
@@ -328,6 +329,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
+	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object
@@ -338,6 +340,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation including an additional rule
+	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
@@ -345,7 +348,6 @@ public class HyphenationParser{
 	 * @throws CloneNotSupportedException	If the Trie does not support the {@code Cloneable} interface
 	 */
 	public Hyphenation hyphenate(String word, String addedRule) throws CloneNotSupportedException{
-		addedRule = correctOrthography(addedRule);
 		String key = getKeyFromData(addedRule);
 		Hyphenation hyph = null;
 		if(!patterns.containsKey(key)){
@@ -358,8 +360,10 @@ public class HyphenationParser{
 		return hyph;
 	}
 
+	/**
+	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 */
 	public boolean hasRule(String rule){
-		rule = correctOrthography(rule);
 		String key = getKeyFromData(rule);
 		return patterns.containsKey(key);
 	}
@@ -370,6 +374,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
+	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The trie containing the subdivision rules
@@ -378,7 +383,6 @@ public class HyphenationParser{
 	private Hyphenation hyphenate(String word, Trie<String, Integer, String> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
-		word = correctOrthography(word.toLowerCase(Locale.ROOT));
 		word = PatternService.replaceAll(word, REGEX_HYPHENS, SOFT_HYPHEN);
 
 		List<String> hyphenatedWord;
