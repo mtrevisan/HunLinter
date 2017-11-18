@@ -34,13 +34,6 @@ public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
 	}
 
 	@Override
-	public String[] getTrueSequence(String[] sequence, int startIndex, int endIndex){
-		return Arrays.asList(sequence)
-			.subList(startIndex, endIndex)
-			.toArray(new String[0]);
-	}
-
-	@Override
 	public String hashOf(String[] sequence, int index){
 		return sequence[index];
 	}

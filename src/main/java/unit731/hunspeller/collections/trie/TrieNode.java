@@ -64,8 +64,8 @@ public class TrieNode<S, H, V>{
 			this.value = value;
 	}
 
-	public boolean isLeaf(){
-		return (value != null);
+	public boolean isLeaf(TrieSequencer<S, H> sequencer){
+		return (value != null && sequencer.lengthOf(sequence) == endIndex);
 	}
 
 	public TrieNode<S, H, V> getChildForInsert(H stem){

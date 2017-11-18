@@ -24,16 +24,6 @@ public interface TrieSequencer<S, H>{
 	boolean startsWith(S sequence, S prefix);
 
 	/**
-	 * Calculates the true sequence.
-	 * 
-	 * @param sequence	The sequence.
-	 * @param startIndex	The starting index.
-	 * @param endIndex	The ending index.
-	 * @return	The true sequence.
-	 */
-	S getTrueSequence(S sequence, int startIndex, int endIndex);
-
-	/**
 	 * Calculates the hash of the element at the given index in the given sequence. The hash is used as a key to quickly retrieve entries.
 	 * Typical implementations based on characters return the ASCII value of the character, since it yields dense numerical values.
 	 * The more dense the hashes returned (the smaller the difference between the minimum and maximum returnable hash means it's more dense),

@@ -189,14 +189,14 @@ public class Trie<S, H, V>{
 				//not found
 				node = null;
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
-				if(callback != null && node.isLeaf() && sequencer.startsWith(sequence, node.getSequence()))
+				if(callback != null && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
 					callback.accept(parent, stem);
 
 				break;
 			}
 			else{
 				//call callback for each leaf node found so far
-				if(callback != null && node.isLeaf() && sequencer.startsWith(sequence, node.getSequence()))
+				if(callback != null && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
@@ -215,7 +215,7 @@ public class Trie<S, H, V>{
 		if(node != null && matchType == TrieMatch.EXACT){
 			//check length of last node against query
 			int endIndex = node.getEndIndex();
-			if(!node.isLeaf() || endIndex != sequenceLength)
+			if(!node.isLeaf(sequencer) || endIndex != sequenceLength)
 				return null;
 
 			//check actual sequence values
@@ -246,7 +246,7 @@ public class Trie<S, H, V>{
 		Objects.requireNonNull(callback);
 
 		find(root, node -> {
-			if(node.isLeaf())
+			if(node.isLeaf(sequencer))
 				callback.accept(node);
 			return false;
 		});

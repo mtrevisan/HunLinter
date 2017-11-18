@@ -17,11 +17,6 @@ public class StringTrieSequencer implements TrieSequencer<String, Integer>{
 	}
 
 	@Override
-	public String getTrueSequence(String sequence, int startIndex, int endIndex){
-		return sequence.substring(startIndex, endIndex);
-	}
-
-	@Override
 	public Integer hashOf(String sequence, int index){
 		return (int)sequence.charAt(index);
 	}
