@@ -325,7 +325,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if(!production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
 			String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
 			if(!correctedDerivedWord.equals(derivedWord))
