@@ -160,7 +160,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
 
-	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "mh", "ssh");
+	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh");
 
 
 	private final Orthography orthography = OrthographyVEC.getInstance();
@@ -327,9 +327,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
-			String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
-			if(!correctedDerivedWord.equals(derivedWord))
-				throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
+			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord)){
+				String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
+				if(!correctedDerivedWord.equals(derivedWord))
+					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
+			}
 
 			if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
 					&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
