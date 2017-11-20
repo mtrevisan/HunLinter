@@ -50,6 +50,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
@@ -77,6 +78,7 @@ import unit731.hunspeller.services.filelistener.FileListenerManager;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
 import unit731.hunspeller.services.ZipManager;
+import unit731.hunspeller.services.filelistener.FileChangeListener;
 
 
 /**
@@ -84,7 +86,7 @@ import unit731.hunspeller.services.ZipManager;
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
  */
 @Slf4j
-public class HunspellerFrame extends JFrame implements ActionListener, FileListener, PropertyChangeListener, Resultable, Undoable{
+public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -141,7 +143,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(this);
 		wordGenerator = new WordGenerator(affParser);
-		flm = new FileListenerManager(this);
+		flm = new FileListenerManager();
 
 		initComponents();
 
@@ -1148,52 +1150,52 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 
 	@Override
-	public void fileCreated(FileChangeEvent fce) throws Exception{}
+	public void fileDeleted(Path path){
+		printResultLine("File " + path.toFile().getName() + " deleted");
 
-	@Override
-	public void fileDeleted(FileChangeEvent fce) throws Exception{
-		FileName fn = fce.getFile().getName();
-		printResultLine("File " + fn.getBaseName() + " deleted");
-
-		if(hasAFFExtension(fn))
-			clearAffixFile();
-		else if(hasAIDExtension(fn))
-			clearAidFile();
+//		String absolutePath = path.toString().toLowerCase();
+//		if(hasAFFExtension(absolutePath))
+//			clearAffixFile();
+//		else if(hasAIDExtension(absolutePath))
+//			clearAidFile();
 	}
 
 	@Override
-	public void fileChanged(FileChangeEvent fce) throws Exception{
-		FileName fn = fce.getFile().getName();
-		printResultLine("File " + fn.getBaseName() + " changed");
+	public void fileModified(Path path){
+		printResultLine("File " + path.toFile().getName() + " modified");
 
-		if(hasAFFExtension(fn))
-			openAffixFile();
-		else if(hasAIDExtension(fn))
-			openAidFile();
-		else if(isHyphenationFile(fn)){
-			openHyphenationFile();
-
-			//clear hyphenation
-			formerHyphenationText = null;
-			clearHyphenation();
-		}
+//		String absolutePath = path.toString().toLowerCase();
+//		if(hasAFFExtension(absolutePath))
+//			openAffixFile();
+//		else if(hasAIDExtension(absolutePath))
+//			openAidFile();
+//		else if(isHyphenationFile(absolutePath)){
+//			openHyphenationFile();
+//
+//			//clear hyphenation
+//			formerHyphenationText = null;
+//			clearHyphenation();
+//		}
 	}
 
-	private boolean hasAFFExtension(FileName fn){
-		return "aff".equals(fn.getExtension());
+	private boolean hasAFFExtension(String path){
+		return path.endsWith(".aff");
 	}
 
-	private boolean hasAIDExtension(FileName fn){
-		return "aid".equals(fn.getExtension());
+	private boolean hasAIDExtension(String path){
+		return path.endsWith(".aid");
 	}
 
-	private boolean isHyphenationFile(FileName fn){
-		return (fn.getBaseName().startsWith("hyph_") && "dic".equals(fn.getExtension()));
+	private boolean isHyphenationFile(String path){
+		String baseName = FilenameUtils.getBaseName(path);
+		return (baseName.startsWith("hyph_") && path.endsWith(".dic"));
 	}
 
 
 	private void openAffixFile(){
 		try{
+			flm.stop();
+
 			clearAffixFile();
 
 			printResultLine("Opening Affix file for parsing: " + affFile.getName());
@@ -1239,7 +1241,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 			dicMenu.setEnabled(true);
 			fileCreatePackageMenuItem.setEnabled(true);
 
-			flm.addFile(affFile);
+			try{
+				flm.register(affFile.getParent(), "*.aff", "*.dic", "*.aid");
+				flm.start();
+			}
+			catch(IOException e){
+				printResultLine("Unable to register file change listener");
+			}
 		}
 		catch(IOException | IllegalArgumentException | NullPointerException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1341,8 +1349,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 				printResultLine("Finished reading Aid file");
 			}
-
-			flm.addFile(aidFile);
 		}
 		catch(IOException | NullPointerException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1421,8 +1427,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileListe
 
 				hypParserWorker.execute();
 			}
-
-			flm.addFile(hypFile);
 		}
 	}
 
