@@ -83,12 +83,6 @@
 						</filter>
 						<!-- FIXME: strenghten the inclusions -->
 						<filter>
-							<artifact>org.apache.commons:commons-vfs2</artifact>
-							<includes>
-								<include>**</include>
-							</includes>
-						</filter> 
-						<filter>
 							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
 							<includes>
 								<include>**</include>
@@ -135,7 +129,6 @@
 
 		<!-- Apache -->
 		<org.apache.commons.lang3.version>3.6</org.apache.commons.lang3.version>
-		<org.apache.commons.vfs2.version>2.1</org.apache.commons.vfs2.version>
 		<org.apache.commons.io.version>2.5</org.apache.commons.io.version>
 
 		<!-- Murmur3 Hash -->
@@ -163,11 +156,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${org.apache.commons.lang3.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-vfs2</artifactId>
-			<version>${org.apache.commons.vfs2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

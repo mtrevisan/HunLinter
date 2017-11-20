@@ -299,7 +299,7 @@ public class HyphenationParser{
 			Map<Integer, List<String>> content = new HashMap<>();
 			patterns.forEachLeaf(node -> {
 				String rule = node.getValue();
-				content.computeIfAbsent(rule.length(), ArrayList::new)
+				content.computeIfAbsent(rule.length(), key -> new ArrayList<>())
 					.add(rule);
 			});
 			if(!nonStandardHyphenation.isEmpty()){
