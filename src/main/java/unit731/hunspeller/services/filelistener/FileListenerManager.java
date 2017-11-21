@@ -13,6 +13,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,9 +26,10 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 
-//https://gist.github.com/hindol-viz/394ebc553673e2cd0699
-//https://github.com/Hindol/commons
-//https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory
+/**
+ * @see <a href="https://gist.github.com/hindol-viz/394ebc553673e2cd0699">Hindol viz</a>
+ * @see <a href="https://github.com/Hindol/commons">Hindol commons</a>
+ */
 @Slf4j
 public class FileListenerManager implements FileListener, Runnable{
 
@@ -87,8 +89,6 @@ public class FileListenerManager implements FileListener, Runnable{
 			catch(IOException e){
 				log.error("Exception while watching {}", dir, e);
 			}
-
-			dirPathToListeners.put(dir, newConcurrentSet());
 		}
 		dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
 			.add(listener);
@@ -170,7 +170,8 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private void notifyListeners(WatchKey key){
-		for(WatchEvent<?> event : key.pollEvents()){
+		List<WatchEvent<?>> pollEvents = key.pollEvents();
+		for(WatchEvent<?> event : pollEvents){
 			WatchEvent.Kind<?> eventKind = event.kind();
 			if(eventKind.equals(StandardWatchEventKinds.OVERFLOW)){
 				//overflow occurs when the watch event queue is overflown with events

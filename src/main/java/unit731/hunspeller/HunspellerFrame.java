@@ -90,6 +90,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
+	private static final String EXTENSION_AFF = ".aff";
+	private static final String EXTENSION_DIC = ".dic";
+	private static final String EXTENSION_AID = ".aid";
+
 	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -1153,42 +1157,42 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	public void fileDeleted(Path path){
 		printResultLine("File " + path.toFile().getName() + " deleted");
 
-//		String absolutePath = path.toString().toLowerCase();
-//		if(hasAFFExtension(absolutePath))
-//			clearAffixFile();
-//		else if(hasAIDExtension(absolutePath))
-//			clearAidFile();
+		String absolutePath = path.toString().toLowerCase();
+		if(hasAFFExtension(absolutePath))
+			clearAffixFile();
+		else if(hasAIDExtension(absolutePath))
+			clearAidFile();
 	}
 
 	@Override
 	public void fileModified(Path path){
 		printResultLine("File " + path.toFile().getName() + " modified");
 
-//		String absolutePath = path.toString().toLowerCase();
-//		if(hasAFFExtension(absolutePath))
-//			openAffixFile();
-//		else if(hasAIDExtension(absolutePath))
-//			openAidFile();
-//		else if(isHyphenationFile(absolutePath)){
-//			openHyphenationFile();
-//
-//			//clear hyphenation
-//			formerHyphenationText = null;
-//			clearHyphenation();
-//		}
+		String absolutePath = path.toString().toLowerCase();
+		if(hasAFFExtension(absolutePath))
+			openAffixFile();
+		else if(hasAIDExtension(absolutePath))
+			openAidFile();
+		else if(isHyphenationFile(absolutePath)){
+			openHyphenationFile();
+
+			//clear hyphenation
+			formerHyphenationText = null;
+			clearHyphenation();
+		}
 	}
 
 	private boolean hasAFFExtension(String path){
-		return path.endsWith(".aff");
+		return path.endsWith(EXTENSION_AFF);
 	}
 
 	private boolean hasAIDExtension(String path){
-		return path.endsWith(".aid");
+		return path.endsWith(EXTENSION_AID);
 	}
 
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
-		return (baseName.startsWith("hyph_") && path.endsWith(".dic"));
+		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
 	}
 
 
@@ -1204,7 +1208,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			printResultLine("Finished reading Affix file");
 
 			String language = affParser.getLanguage();
-			File dicFile = getFile(language + ".dic");
+			File dicFile = getFile(language + EXTENSION_DIC);
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
 
 			dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
@@ -1331,7 +1335,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			clearAidFile();
 
 			String codePath = getCurrentWorkingDirectory();
-			codePath += "aids/" + affParser.getLanguage() + ".aid";
+			codePath += "aids/" + affParser.getLanguage() + EXTENSION_AID;
 			File aidFile = new File(codePath);
 			if(aidFile.exists()){
 				printResultLine("Opening AID file for parsing: " + aidFile.getName());
@@ -1535,7 +1539,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private File getDictionaryFile(){
-		return getFile(affParser.getLanguage() + ".dic");
+		return getFile(affParser.getLanguage() + EXTENSION_DIC);
 	}
 
 	private File getThesaurusFile(){
@@ -1543,7 +1547,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private File getHyphenationFile(){
-		return getFile("hyph_" + affParser.getLanguage() + ".dic");
+		return getFile("hyph_" + affParser.getLanguage() + EXTENSION_DIC);
 	}
 
 
