@@ -1,5 +1,6 @@
 package unit731.hunspeller.languages.vec;
 
+import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -11,14 +12,14 @@ public class Word{
 
 	private static final String ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
 
+	private static final String VOWELS = "aeiou";
+
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
-	private static final Matcher STRESSED = PatternService.matcher("[àèéíòóú]");
-	private static final Matcher STRESSED_LAST = PatternService.matcher("[àèéíòóú]$");
+	private static final char COMBINING_GRAVE_ACCENT = '\u0300';
+	private static final char COMBINING_ACUTE_ACCENT = '\u0301';
 
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
-//	private static final Matcher LAST_UNSTRESSED_VOWEL = PatternService.matcher("[aeiou][^aeiou]*$");
-	private static final Matcher LAST_UNSTRESSED_VOWEL = PatternService.matcher("[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[ei])?((s[ae]r)?[àé]|[sx]é)([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -52,18 +53,57 @@ public class Word{
 	}*/
 
 	private static int getLastUnstressedVowelIndex(String word, int idx){
-		Matcher m = LAST_UNSTRESSED_VOWEL.reset(idx < 0? word: word.substring(0, idx));
-		return (m.find()? m.start(): -1);
+		for(int i = (idx >= 0? idx: word.length()) - 1; i >= 0; i --){
+			char chr = word.charAt(i);
+			if(VOWELS.indexOf(chr) != -1)
+				return i;
+		}
+		return -1;
 	}
 
 
 	public static boolean isStressed(String word){
-		return PatternService.find(word, STRESSED);
+		return (countAccents(word) > 0);
+	}
+
+	public static boolean isStressedLastGrapheme(String word){
+		String normalizedWord = normalize(word);
+		char chr = normalizedWord.charAt(normalizedWord.length() - 1);
+		return (chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT);
+	}
+
+	public static boolean hasMultipleAccents(String word){
+		return (countAccents(word) > 1);
+	}
+
+	private static int countAccents(String word){
+		String normalizedWord = normalize(word);
+		int count = 0;
+		for(int i = 0; i < normalizedWord.length(); i ++){
+			char chr = normalizedWord.charAt(i);
+			//collect number of acute and grave accents
+			if(chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT)
+				count ++;
+		}
+		return count;
 	}
 
 	private static int getIndexOfStress(String word){
-		Matcher m = STRESSED.reset(word);
-		return (m.find()? m.start(): -1);
+		int otherCombinigMarks = 0;
+		String normalizedWord = normalize(word);
+		for(int i = 0; i < normalizedWord.length(); i ++){
+			char chr = normalizedWord.charAt(i);
+			//collect number of acute and grave accents
+			if(chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT)
+				return i - otherCombinigMarks - 1;
+			else if(chr >= 0x0300 && chr <= 0x036F)
+				otherCombinigMarks ++;
+		}
+		return -1;
+	}
+
+	private static String normalize(String word){
+		return Normalizer.normalize(word, Normalizer.Form.NFD);
 	}
 
 /*	var isStressAcute = function(chr){
@@ -84,11 +124,18 @@ public class Word{
 
 	//NOTE: duplicated in Grapheme
 	var suppressStress = function(word){
-		word = Normalizer.normalize(word, Normalizer.Form.NFD);
+		word = normalize(word);
 		return word.replaceAll("\\p{M}", StringUtils.EMPTY);
 	};*/
 
 	private static String suppressDefaultStress(String word){
+//		String a = normalize(word)
+//			.replaceAll("\\p{M}+", "");
+//		String b = normalize(word)
+//			.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+//		String c = normalize(word)
+//			.replaceAll("\\p{InCombining_Diacritical_Marks}+", "");
+
 		word = StringUtils.replace(word, "à", "a");
 		word = StringUtils.replace(word, "é", "e");
 		word = StringUtils.replace(word, "í", "i");
@@ -140,7 +187,7 @@ public class Word{
 			return null;
 
 		int idx = getIndexOfStress(word);
-		if(idx >= 0 && !PatternService.find(word, STRESSED_LAST)){
+		if(idx >= 0 && !isStressedLastGrapheme(word)){
 			String subword = word.substring(idx, idx + 2);
 			String tmp = (!Grapheme.isDiphtong(subword) && !Grapheme.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
 				suppressDefaultStress(word): word);

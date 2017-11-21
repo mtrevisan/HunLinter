@@ -300,7 +300,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		if(hasMultipleAccents(subword))
+		if(Word.hasMultipleAccents(subword))
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
@@ -311,18 +311,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(!elBetweenVowelsRemoval)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent here");
 		}
-	}
-
-	private boolean hasMultipleAccents(String word){
-		String normalizedWord = Normalizer.normalize(word, Normalizer.Form.NFD);
-		int count = 0;
-		for(int i = 0; i < normalizedWord.length(); i ++){
-			char chr = normalizedWord.charAt(i);
-			//collect number of acute and grave accents
-			if(chr == '\u0300' || chr == '\u0301')
-				count ++;
-		}
-		return (count > 1);
 	}
 
 	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
