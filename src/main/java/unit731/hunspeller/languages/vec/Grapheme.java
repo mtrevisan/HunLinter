@@ -16,16 +16,11 @@ public class Grapheme{
 	private static final Matcher DIPHTONG = PatternService.matcher("[iu][íú]|[àèéòó][iu]");
 	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
 //	private static final Matcher HYATUS = PatternService.matcher("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
-	private static final Matcher ENDS_IN_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$");
 
 	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 
-
-	public static boolean endsInVowel(String word){
-		return PatternService.find(word, ENDS_IN_VOWEL);
-	}
 
 	public static boolean isDiphtong(String group){
 		return PatternService.find(group, DIPHTONG);

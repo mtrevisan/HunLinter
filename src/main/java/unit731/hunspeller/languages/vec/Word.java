@@ -10,9 +10,11 @@ import unit731.hunspeller.services.PatternService;
 
 public class Word{
 
-	private static final String ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
-
-	private static final String VOWELS = "aeiou";
+	private static final String VOWELS_PLAIN = "aAeEiIoOuU";
+	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + "àÀéÉèÈíÍóÓòÒúÚ";
+	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
+	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
+	private static final String SORTING_ALPHABET = "-/.0123456789" + ALPHABET + "ʼ'";
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
@@ -40,6 +42,17 @@ public class Word{
 	}
 
 
+	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$
+	public static boolean endsInVowel(String word){
+		int i = word.length();
+		while((-- i) >= 0){
+			char chr = word.charAt(i);
+			if(ALPHABET.indexOf(chr) != -1)
+				return (VOWELS_EXTENDED.indexOf(chr) != -1);
+		}
+		return false;
+	}
+
 	public static int getLastVowelIndex(String word){
 		Matcher m = LAST_STRESSED_VOWEL.reset(word);
 		return (m.find()? m.start(): -1);
@@ -52,26 +65,31 @@ public class Word{
 		return getLastVowelIndex(word.substring(0, idx));
 	}*/
 
+	//[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$
 	private static int getLastUnstressedVowelIndex(String word, int idx){
-		for(int i = (idx >= 0? idx: word.length()) - 1; i >= 0; i --){
+		int i = (idx >= 0? idx: word.length());
+		while((-- i) >= 0){
 			char chr = word.charAt(i);
-			if(VOWELS.indexOf(chr) != -1)
+			if(VOWELS_PLAIN.indexOf(chr) != -1)
 				return i;
 		}
 		return -1;
 	}
 
 
+	//[àèéíòóú]
 	public static boolean isStressed(String word){
 		return (countAccents(word) > 0);
 	}
 
+	//[àèéíòóú]$
 	public static boolean isStressedLastGrapheme(String word){
 		String normalizedWord = normalize(word);
 		char chr = normalizedWord.charAt(normalizedWord.length() - 1);
 		return (chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT);
 	}
 
+	//([^àèéíòóú]*[àèéíòóú]){2,}
 	public static boolean hasMultipleAccents(String word){
 		return (countAccents(word) > 1);
 	}
@@ -88,6 +106,7 @@ public class Word{
 		return count;
 	}
 
+	//[àèéíòóú]
 	private static int getIndexOfStress(String word){
 		int otherCombinigMarks = 0;
 		String normalizedWord = normalize(word);
@@ -164,7 +183,7 @@ public class Word{
 			int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
-			if(Grapheme.endsInVowel(phones))
+			if(endsInVowel(phones))
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
 			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
 				idx --;
@@ -206,7 +225,7 @@ public class Word{
 			int size = Math.min(len1, len2);
 			len1 -= len2;
 			for(int i = 0; i < size; i ++){
-				result = ALPHABET.indexOf(str1.charAt(i)) - ALPHABET.indexOf(str2.charAt(i));
+				result = SORTING_ALPHABET.indexOf(str1.charAt(i)) - SORTING_ALPHABET.indexOf(str2.charAt(i));
 				if(result != 0)
 					break;
 			}
