@@ -8,10 +8,10 @@ import unit731.hunspeller.services.PatternService;
 public class Grapheme{
 
 	public static final String JJH_PHONEME = "ʝ";
-	public static final String J_CHAR = "j";
-	public static final String I_CHAR = "i";
-	public static final String W_CHAR = "w";
-	public static final String U_CHAR = "u";
+	private static final String J_GRAPHEME = "j";
+	private static final String I_GRAPHEME = "i";
+	private static final String W_GRAPHEME = "w";
+	private static final String U_GRAPHEME = "u";
 
 	private static final Matcher DIPHTONG = PatternService.matcher("[iu][íú]|[àèéòó][iu]");
 	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
@@ -45,10 +45,14 @@ public class Grapheme{
 	 */
 	public static String handleJHJWPhonemes(String word){
 		//this step is mandatory before eterophonic sequence VjV
-		word = StringUtils.replace(word, J_CHAR, JJH_PHONEME);
+		if(word.contains(J_GRAPHEME))
+			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
+
 		//phonize etherophonic sequences
-		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
-		word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
+		if(word.contains(U_GRAPHEME))
+			word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
+		if(word.contains(I_GRAPHEME))
+			word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
 		return word;
 	}
 
@@ -60,9 +64,9 @@ public class Grapheme{
 	 */
 	public static String rollbackJHJWPhonemes(String word){
 		//this step is mandatory before eterophonic sequence VjV
-		word = StringUtils.replace(word, J_CHAR, I_CHAR);
-		word = StringUtils.replace(word, W_CHAR, U_CHAR);
-		word = StringUtils.replace(word, JJH_PHONEME, J_CHAR);
+		word = StringUtils.replace(word, J_GRAPHEME, I_GRAPHEME);
+		word = StringUtils.replace(word, W_GRAPHEME, U_GRAPHEME);
+		word = StringUtils.replace(word, JJH_PHONEME, J_GRAPHEME);
 		return word;
 	}
 

@@ -69,7 +69,11 @@ public class RuleProductionEntry implements Productable{
 
 	@Override
 	public boolean containsRuleFlag(String ruleFlag){
-		return (ruleFlags != null && Arrays.stream(ruleFlags).anyMatch(ruleFlag::equals));
+		if(ruleFlags != null)
+			for(String flag : ruleFlags)
+				if(flag.equals(ruleFlag))
+					return true;
+		return false;
 	}
 
 	public void removeRuleFlags(Set<String> ruleFlags){
@@ -86,7 +90,11 @@ public class RuleProductionEntry implements Productable{
 
 	@Override
 	public boolean containsDataField(String dataField){
-		return (dataFields != null && Arrays.stream(dataFields).anyMatch(dataField::equals));
+		if(dataFields != null)
+			for(String field : dataFields)
+				if(field.equals(dataField))
+					return true;
+		return false;
 	}
 
 	public boolean hasProductionRule(String ruleFlag){
