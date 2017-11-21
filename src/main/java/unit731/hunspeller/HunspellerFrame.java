@@ -1242,7 +1242,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			fileCreatePackageMenuItem.setEnabled(true);
 
 			try{
-				flm.register(affFile.getParent(), "*.aff", "*.dic", "*.aid");
+				flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
 				flm.start();
 			}
 			catch(IOException e){
