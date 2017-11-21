@@ -318,6 +318,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		int count = 0;
 		for(int i = 0; i < normalizedWord.length(); i ++){
 			char chr = normalizedWord.charAt(i);
+			//collect number of acute and grave accents
 			if(chr == '\u0300' || chr == '\u0301')
 				count ++;
 		}
