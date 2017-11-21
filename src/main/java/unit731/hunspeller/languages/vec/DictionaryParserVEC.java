@@ -2,6 +2,7 @@ package unit731.hunspeller.languages.vec;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
@@ -54,7 +54,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
-	private static final String[] ACCENTS = "àèéíòóú".split(StringUtils.EMPTY);
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
@@ -315,9 +314,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private boolean hasMultipleAccents(String word){
+		String normalizedWord = Normalizer.normalize(word, Normalizer.Form.NFD);
 		int count = 0;
-		for(String accent : ACCENTS)
-			count += StringUtils.countMatches(word, accent);
+		for(int i = 0; i < normalizedWord.length(); i ++){
+			char chr = normalizedWord.charAt(i);
+			if(chr == '\u0300' || chr == '\u0301')
+				count ++;
+		}
 		return (count > 1);
 	}
 
