@@ -2,6 +2,8 @@ package unit731.hunspeller.languages.vec;
 
 import java.text.Normalizer;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +41,15 @@ public class Word{
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER);
 		NO_STRESS = PatternService.matcher(sj.toString());
+	}
+
+	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
+	static{
+		ACUTE_STRESSES.put("a", "à");
+		ACUTE_STRESSES.put("e", "é");
+		ACUTE_STRESSES.put("i", "í");
+		ACUTE_STRESSES.put("o", "ó");
+		ACUTE_STRESSES.put("u", "ú");
 	}
 
 
@@ -163,7 +174,8 @@ public class Word{
 	}
 
 	private static char addStressAcute(char chr){
-		return replaceCharacter(chr, "aeiou", "àéíóú");
+		String c = String.valueOf(chr);
+		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
 	/*private static char addStressGrave(char chr){
