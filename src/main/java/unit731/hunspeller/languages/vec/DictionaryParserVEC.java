@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
@@ -53,7 +54,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
-	private static final Matcher MULTIPLE_ACCENTS = PatternService.matcher("([^àèéíòóú]*[àèéíòóú]){2,}");
+	private static final String[] ACCENTS = "àèéíòóú".split(StringUtils.EMPTY);
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
@@ -300,7 +301,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		if(PatternService.find(subword, MULTIPLE_ACCENTS))
+		if(hasMultipleAccents(subword))
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
@@ -311,6 +312,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(!elBetweenVowelsRemoval)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent here");
 		}
+	}
+
+	private boolean hasMultipleAccents(String word){
+		int count = 0;
+		for(String accent : ACCENTS)
+			count += StringUtils.countMatches(word, accent);
+		return (count > 1);
 	}
 
 	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
