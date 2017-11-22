@@ -106,7 +106,7 @@ public class ExternalSorter{
 
 	private List<String> sortList(List<String> list, ExternalSorterOptions options){
 		if(options.isSortInParallel())
-			list = list.stream()
+			list = list.stream().parallel()
 				.sorted(options.getComparator())
 				.collect(Collectors.toCollection(ArrayList<String>::new));
 		else

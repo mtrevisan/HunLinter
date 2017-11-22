@@ -95,7 +95,9 @@ public class WordGenerator{
 		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
 
 		//add parent derivations
-		productions.forEach(prod -> prod.getAppliedRules().addAll(0, production.getAppliedRules()));
+		List<AffixEntry> appliedRules = production.getAppliedRules();
+		if(appliedRules != null)
+			productions.forEach(prod -> prod.getAppliedRules().addAll(0, appliedRules));
 
 		return productions;
 	}

@@ -2,15 +2,18 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
+import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 @Getter
@@ -18,9 +21,9 @@ import unit731.hunspeller.interfaces.Productable;
 public class RuleProductionEntry implements Productable{
 
 	private final String word;
-	private String[] ruleFlags;
+	private final String[] ruleFlags;
 	private final String[] dataFields;
-	private final List<AffixEntry> appliedRules = new ArrayList<>();
+	private List<AffixEntry> appliedRules;
 	private final boolean combineable;
 
 
@@ -40,6 +43,7 @@ public class RuleProductionEntry implements Productable{
 		this.word = word;
 		ruleFlags = entry.getRuleFlags();
 		this.dataFields = combineDataFields(originalDataFields, entry.getDataFields());
+		appliedRules = new ArrayList<>();
 		appliedRules.add(entry);
 		this.combineable = combineable;
 	}
@@ -76,14 +80,6 @@ public class RuleProductionEntry implements Productable{
 		return false;
 	}
 
-	public void removeRuleFlags(Set<String> ruleFlags){
-		if(this.ruleFlags != null)
-			this.ruleFlags = Arrays.stream(this.ruleFlags)
-				.filter(field -> !ruleFlags.contains(field))
-				.collect(Collectors.toList())
-				.toArray(new String[0]);
-	}
-
 	public boolean hasDataFields(){
 		return (dataFields != null && dataFields.length > 0);
 	}
@@ -98,28 +94,41 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public boolean hasProductionRule(String ruleFlag){
-		return appliedRules.stream()
-			.map(AffixEntry::getFlag)
-			.anyMatch(ruleFlag::equals);
+		if(appliedRules != null)
+			for(AffixEntry appliedRule : appliedRules)
+				if(appliedRule.getFlag().equals(ruleFlag))
+					return true;
+		return false;
 	}
 
 	public boolean hasProductionRule(AffixEntry.TYPE type){
-		return appliedRules.stream()
-			.map(AffixEntry::getType)
-			.anyMatch(type::equals);
+		if(appliedRules != null)
+			for(AffixEntry appliedRule : appliedRules)
+				if(appliedRule.getType() == type)
+					return true;
+		return false;
 	}
 
 	public String getRulesSequence(){
-		return appliedRules.stream()
+		return (appliedRules != null? appliedRules.stream()
 			.map(AffixEntry::getFlag)
-			.collect(Collectors.joining(" > "));
+			.collect(Collectors.joining(" > ")): StringUtils.EMPTY);
 	}
 
+//	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
 	public String[] getSignificantDataFields(){
+//		List<String> significant = new ArrayList<>();
+//		if(dataFields != null)
+//			for(String dataField : dataFields)
+//				if(!dataField.startsWith(WordGenerator.TAG_PHONETIC) && !dataField.startsWith(WordGenerator.TAG_STEM)
+//						&& !dataField.startsWith(WordGenerator.TAG_ALLOMORPH))
+//					significant.add(dataField);
+//		Collections.sort(significant, comparator);
+//		return significant.toArray(new String[0]);
 		return Arrays.stream(dataFields)
-			.sorted()
 			.filter(df -> !df.startsWith(WordGenerator.TAG_PHONETIC) && !df.startsWith(WordGenerator.TAG_STEM)
 				&& !df.startsWith(WordGenerator.TAG_ALLOMORPH))
+			.sorted()
 			.collect(Collectors.toList())
 			.toArray(new String[0]);
 	}
@@ -139,10 +148,10 @@ public class RuleProductionEntry implements Productable{
 //	}
 
 	public String toStringWithSignificantDataFields(){
-		StringJoiner sj = (new StringJoiner(StringUtils.SPACE))
-			.add(word);
+		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		sj.add(word);
 		String[] significantDataFields = getSignificantDataFields();
-		if(significantDataFields != null && significantDataFields.length > 0)
+		if(significantDataFields.length > 0)
 			sj.add(String.join(StringUtils.SPACE, significantDataFields));
 		return sj.toString();
 	}
