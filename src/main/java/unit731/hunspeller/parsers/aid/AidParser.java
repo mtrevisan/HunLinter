@@ -11,9 +11,10 @@ import lombok.Getter;
 import unit731.hunspeller.services.FileService;
 
 
+@Getter
 public class AidParser{
 
-	@Getter private final List<String> lines = new ArrayList<>();
+	private final List<String> lines = new ArrayList<>();
 
 
 	/**

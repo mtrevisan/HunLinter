@@ -360,6 +360,9 @@ public class HyphenationParser{
 
 	/**
 	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * 
+	 * @param rule	The rule to be checked
+	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(String rule){
 		String key = getKeyFromData(rule);

@@ -3,7 +3,6 @@ package unit731.hunspeller.interfaces;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 
 
-
 public interface Productable{
 
 	String getWord();

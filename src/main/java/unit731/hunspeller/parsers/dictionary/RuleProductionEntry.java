@@ -2,8 +2,6 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -12,8 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 @Getter
