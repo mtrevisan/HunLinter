@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import lombok.Getter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
@@ -149,15 +150,28 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
 	protected final boolean add(byte[] bytes){
-		//NOTE: use the trick mentioned in "Less Hashing, Same Performance: Building a Better Bloom Filter"
-		//by Kirsch et.al. From abstract 'only two hash functions are necessary to effectively
-		//implement a Bloom filter without any loss in the asymptotic false positive probability'
-		//Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned
-		//in the above paper
+		boolean bitsChanged = calculateIndexes(bytes, index -> {});
+		addedElements ++;
+		return bitsChanged;
+	}
+
+	private List<Integer> indexes(byte[] bytes){
+		List<Integer> indexes = new ArrayList<>();
+		calculateIndexes(bytes, indexes::add);
+		return indexes;
+	}
+
+	/**
+	 * NOTE: use the trick mentioned in "Less Hashing, Same Performance: Building a Better Bloom Filter" by Kirsch et.al.
+	 * From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
+	 * asymptotic false positive probability'.
+	 * Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
+	 */
+	private boolean calculateIndexes(byte[] bytes, Consumer<Integer> callback){
+		boolean bitsChanged = false;
 		long hash64 = getLongHash64(bytes);
 		int hash1 = (int)hash64;
 		int hash2 = (int)(hash64 >>> 32);
-		boolean bitsChanged = false;
 		for(int i = 1; i <= hashFunctions; i ++){
 			int nextHash = hash1 + i * hash2;
 			//hashcode should be positive, flip all the bits if it's negative
@@ -165,24 +179,10 @@ public abstract class AbstractBloomFilter<T> implements BloomFilter<T>{
 				nextHash = ~nextHash;
 			int index = nextHash % bitArray.bitSize();
 			bitsChanged |= bitArray.set(index);
-		}
-		addedElements ++;
-		return bitsChanged;
-	}
 
-	private List<Integer> indexes(byte[] bytes){
-		List<Integer> indexes = new ArrayList<>();
-		long hash64 = getLongHash64(bytes);
-		int hash1 = (int)hash64;
-		int hash2 = (int)(hash64 >>> 32);
-		for(int i = 1; i <= hashFunctions; i ++){
-			int nextHash = hash1 + i * hash2;
-			if(nextHash < 0)
-				nextHash = ~nextHash;
-			int index = nextHash % bitArray.bitSize();
-			indexes.add(index);
+			callback.accept(index);
 		}
-		return indexes;
+		return bitsChanged;
 	}
 
 	private boolean contains(byte[] bytes){

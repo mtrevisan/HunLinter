@@ -2,7 +2,6 @@ package unit731.hunspeller.languages.vec;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
