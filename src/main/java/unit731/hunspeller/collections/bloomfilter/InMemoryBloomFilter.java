@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
 import unit731.hunspeller.collections.bloomfilter.core.JavaBitArray;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
@@ -33,6 +34,7 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
  *
  * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
  */
+@Slf4j
 public class InMemoryBloomFilter<T> implements BloomFilter<T>{
 
 	private static final double LN2 = Math.log(2);
@@ -299,7 +301,7 @@ public class InMemoryBloomFilter<T> implements BloomFilter<T>{
 				((Closeable)bitArray).close();
 			}
 			catch(IOException e){
-				e.printStackTrace();
+				log.error("Error closing the Bloom filter", e);
 			}
 		}
 	}
