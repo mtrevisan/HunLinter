@@ -1,27 +1,31 @@
 package unit731.hunspeller.gui;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import unit731.hunspeller.services.RecentItems;
 
 
 /** A menu used to store and display recently used files. */
-public abstract class RecentFileMenu extends JMenu{
+public class RecentFileMenu extends JMenu{
 
 	private static final long serialVersionUID = 5949478291911784729L;
 
 
 	private final RecentItems recentItems;
+	private final Consumer<String> onSelectFile;
 
 
-	public RecentFileMenu(RecentItems recentItems, String text, char mnemonic){
+	public RecentFileMenu(RecentItems recentItems, Consumer<String> onSelectFile){
 		super();
 
-		setText(text);
-		setMnemonic(mnemonic);
+		Objects.nonNull(recentItems);
+		Objects.nonNull(onSelectFile);
 
 		this.recentItems = recentItems;
+		this.onSelectFile = onSelectFile;
 
 		addEntries();
 	}
@@ -42,19 +46,12 @@ public abstract class RecentFileMenu extends JMenu{
 
 				addEntries();
 
-				onSelectFile(path);
+				onSelectFile.accept(path);
 			});
 			add(newMenuItem, i);
 
 			i ++;
 		}
 	}
-
-	/**
-	 * Event that fires when a recent file is selected from the menu. Override this when implementing.
-	 *
-	 * @param filePath The file that was selected.
-	 */
-	public abstract void onSelectFile(String filePath);
 
 }

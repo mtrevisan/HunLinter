@@ -620,11 +620,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       fileMenu.add(fileExitMenuItem);
 
       mainMenuBar.add(fileMenu);
-      fileMenu.add(new RecentFileMenu(recentItems, "Recent files", 'R'){
-         public void onSelectFile(String filePath){
-            loadFile(filePath);
-         }
-      }, 3);
+      RecentFileMenu rfm = new RecentFileMenu(recentItems, this::loadFile);
+      rfm.setText("Recent files");
+      rfm.setMnemonic('R');
+      fileMenu.add(rfm, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
