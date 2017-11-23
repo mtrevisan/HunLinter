@@ -50,9 +50,6 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
 		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
-			if(currentFilter != null)
-				currentFilter.close();
-
 			int size = filters.size();
 			currentFilter = new BloomFilter<>(type, (int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
 				falsePositiveProbability * Math.pow(tighteningRatio, size));

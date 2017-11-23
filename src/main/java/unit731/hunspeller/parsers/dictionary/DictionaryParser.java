@@ -243,7 +243,6 @@ public class DictionaryParser{
 
 				bloomFilter.close();
 				bloomFilter.clear();
-				duplicatesBloomFilter.close();
 			}
 
 			return duplicatesBloomFilter;
@@ -294,6 +293,7 @@ public class DictionaryParser{
 						+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 				}
 
+				duplicatesBloomFilter.close();
 				duplicatesBloomFilter.clear();
 
 				Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
