@@ -1,12 +1,12 @@
 package unit731.hunspeller.collections.bloomfilter;
 
-import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.junit.Assert;
 
 import org.junit.Test;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
 public class BloomFilterTest{
@@ -18,7 +18,7 @@ public class BloomFilterTest{
 
 	@Test
 	public void defaultFilter(){
-		BloomFilter<String> filter = new InMemoryBloomFilter<>(10 * MAX, FPP);
+		BloomFilterInterface<String> filter = new BloomFilter<>(BitArrayBuilder.Type.JAVA, 10 * MAX, FPP);
 
 		//generate two one-million uuid arrays
 		List<String> contained = new ArrayList<>();

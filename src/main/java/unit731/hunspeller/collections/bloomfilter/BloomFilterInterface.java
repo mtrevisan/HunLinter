@@ -1,4 +1,4 @@
-package unit731.hunspeller.collections.bloomfilter.interfaces;
+package unit731.hunspeller.collections.bloomfilter;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -38,7 +38,7 @@ import unit731.hunspeller.collections.bloomfilter.decompose.Decomposer;
  *
  * @param <T> the type of objects to be stored in the filter
  */
-public interface BloomFilter<T>{
+public interface BloomFilterInterface<T>{
 
 	/**
 	 * Add the given value object to the bloom filter by decomposing it using

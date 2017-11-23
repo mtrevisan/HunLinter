@@ -30,7 +30,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -40,6 +39,8 @@ import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
 public class DictionaryParser{
@@ -164,7 +165,7 @@ public class DictionaryParser{
 			try{
 				publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic");
 
-				BloomFilter<String> duplicatesBloomFilter = collectDuplicates();
+				BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
 				List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
@@ -180,10 +181,11 @@ public class DictionaryParser{
 			return null;
 		}
 
-		private BloomFilter<String> collectDuplicates() throws IOException{
+		private BloomFilterInterface<String> collectDuplicates() throws IOException{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-			BloomFilter<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(500_000, 0.000_000_2, 2.);
+			BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
+			BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 500_000, 0.000_000_2, 2.);
 			duplicatesBloomFilter.setCharset(CHARSET);
 
 			setProgress(0);
@@ -192,7 +194,7 @@ public class DictionaryParser{
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-				BloomFilter<String> bloomFilter = new ScalableInMemoryBloomFilter<>(10_000_000, 0.000_000_01, 1.3);
+				BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 10_000_000, 0.000_000_01, 1.3);
 				bloomFilter.setCharset(CHARSET);
 
 				int lineIndex = 1;
@@ -238,7 +240,7 @@ public class DictionaryParser{
 			return duplicatesBloomFilter;
 		}
 
-		private List<Duplicate> extractDuplicates(BloomFilter<String> duplicatesBloomFilter) throws IOException{
+		private List<Duplicate> extractDuplicates(BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 			List<Duplicate> result = new ArrayList<>();

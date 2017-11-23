@@ -2,7 +2,7 @@ package unit731.hunspeller.collections.bloomfilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
 /**
@@ -14,25 +14,25 @@ import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
  *
  * @param <T> the type of object to be stored in the filter
  */
-public class ScalableInMemoryBloomFilter<T> extends InMemoryBloomFilter<T>{
+public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
 
-	private final List<BloomFilter<T>> filters = new ArrayList<>();
+	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
 
 
-	public ScalableInMemoryBloomFilter(int initialNumberOfElements, double falsePositiveProbability){
-		this(initialNumberOfElements, falsePositiveProbability, 2., 0.85);
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability){
+		this(type, initialNumberOfElements, falsePositiveProbability, 2., 0.85);
 	}
 
-	public ScalableInMemoryBloomFilter(int initialNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
-		this(initialNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85);
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
+		this(type, initialNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85);
 	}
 
-	public ScalableInMemoryBloomFilter(int initialNumberOfElements, double falsePositiveProbability, double growRatioWhenFull,
-			double tighteningRatio){
-		super(initialNumberOfElements, falsePositiveProbability);
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability,
+			double growRatioWhenFull, double tighteningRatio){
+		super(type, initialNumberOfElements, falsePositiveProbability);
 
 		if(growRatioWhenFull <= 1.)
 			throw new IllegalArgumentException("Grow ratio when full must be strictly greater than one");
@@ -48,13 +48,13 @@ public class ScalableInMemoryBloomFilter<T> extends InMemoryBloomFilter<T>{
 		if(value == null)
 			return false;
 
-		BloomFilter<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
+		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
 		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
 			if(currentFilter != null)
 				currentFilter.close();
 
 			int size = filters.size();
-			currentFilter = new InMemoryBloomFilter<>((int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
+			currentFilter = new BloomFilter<>(type, (int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
 				falsePositiveProbability * Math.pow(tighteningRatio, size));
 			currentFilter.setCharset(currentCharset);
 			filters.add(0, currentFilter);
@@ -71,7 +71,7 @@ public class ScalableInMemoryBloomFilter<T> extends InMemoryBloomFilter<T>{
 	@Override
 	public int getAddedElements(){
 		return filters.stream()
-			.mapToInt(BloomFilter::getAddedElements)
+			.mapToInt(BloomFilterInterface::getAddedElements)
 			.sum();
 	}
 
@@ -90,18 +90,18 @@ public class ScalableInMemoryBloomFilter<T> extends InMemoryBloomFilter<T>{
 //			p *= 1 - filter.getFalsePositiveProbability() * Math.pow(tighteningRatio, i);
 //		}
 //		return 1. - p;
-		BloomFilter<T> filter = filters.get(filters.size() - 1);
+		BloomFilterInterface<T> filter = filters.get(filters.size() - 1);
 		return filter.getFalsePositiveProbability() / (1. - tighteningRatio);
 	}
 
 	@Override
 	public void clear(){
-		filters.forEach(BloomFilter::clear);
+		filters.forEach(BloomFilterInterface::clear);
 	}
 
 	@Override
 	public void close(){
-		filters.forEach(BloomFilter::close);
+		filters.forEach(BloomFilterInterface::close);
 	}
 
 }

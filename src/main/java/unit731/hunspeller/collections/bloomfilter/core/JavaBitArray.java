@@ -11,11 +11,11 @@ public class JavaBitArray implements BitArray{
 	private final BitSet bitSet;
 
 
-	public JavaBitArray(int numBits){
-		if(numBits <= 0)
+	public JavaBitArray(int bits){
+		if(bits <= 0)
 			throw new IllegalArgumentException("Number of bits must be strict positive");
 
-		bitSet = new BitSet(numBits);
+		bitSet = new BitSet(bits);
 	}
 
 	public JavaBitArray(long[] data){

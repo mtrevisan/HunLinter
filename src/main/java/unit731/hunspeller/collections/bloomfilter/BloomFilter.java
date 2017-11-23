@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter;
 
-import unit731.hunspeller.collections.bloomfilter.interfaces.BloomFilter;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
-import unit731.hunspeller.collections.bloomfilter.core.JavaBitArray;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
 import unit731.hunspeller.collections.bloomfilter.decompose.Decomposer;
 import unit731.hunspeller.collections.bloomfilter.decompose.DefaultDecomposer;
@@ -35,7 +34,7 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
  * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
  */
 @Slf4j
-public class InMemoryBloomFilter<T> implements BloomFilter<T>{
+public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
@@ -48,6 +47,8 @@ public class InMemoryBloomFilter<T> implements BloomFilter<T>{
 	/** The default {@link Charset} is the platform encoding charset */
 	protected transient Charset currentCharset = Charset.defaultCharset();
 
+
+	protected final BitArrayBuilder.Type type;
 	/** The {@link BitArray} instance that holds the entire data */
 	private final BitArray bitArray;
 	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
@@ -70,44 +71,48 @@ public class InMemoryBloomFilter<T> implements BloomFilter<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
+	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 */
-	public InMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability){
-		this(expectedNumberOfElements, falsePositiveProbability, null, null);
+	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability){
+		this(type, expectedNumberOfElements, falsePositiveProbability, null, null);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
+	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
 	 */
-	public InMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer){
-		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null);
+	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer){
+		this(type, expectedNumberOfElements, falsePositiveProbability, decomposer, null);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
+	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
 	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link AbstractBloomFilter#DEFAULT_HASHER} will be used
 	 */
-	public InMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher){
+	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher){
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
 			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
 
+		this.type = type;
 		expectedElements = expectedNumberOfElements;
 		this.falsePositiveProbability = falsePositiveProbability;
 
 		bitsRequired = optimalBitSize(expectedNumberOfElements, falsePositiveProbability);
 		hashFunctions = optimalNumberOfHashFunctions(falsePositiveProbability);
-		bitArray = createBitArray(bitsRequired);
+		bitArray = BitArrayBuilder.getBitArray(type, bitsRequired);
 
 		this.decomposer = decomposer;
 		this.hasher = (hasher != null? hasher: DEFAULT_HASHER);
@@ -135,16 +140,6 @@ public class InMemoryBloomFilter<T> implements BloomFilter<T>{
 	 */
 	public static int optimalNumberOfHashFunctions(double falsePositiveProbability){
 		return Math.max(1, (int)Math.round(-Math.log(falsePositiveProbability) / LN2));
-	}
-
-	/**
-	 * Create a new {@link BitArray} instance for the given number of bits.
-	 *
-	 * @param numBits	The number of required bits in the underlying array
-	 * @return the {@link BitArray} implementation to be used
-	 */
-	private BitArray createBitArray(int numBits){
-		return new JavaBitArray(numBits);
 	}
 
 	//Main functions that govern the bloom filter
