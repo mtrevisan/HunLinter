@@ -245,7 +245,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to add
 	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
@@ -335,7 +335,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object
@@ -346,7 +346,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation including an additional rule
-	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
@@ -367,7 +367,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to be checked
 	 * @return	Whether the hyphenator has the given rule
@@ -383,7 +383,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The trie containing the subdivision rules
