@@ -193,7 +193,15 @@ public class HyphenationParser{
 
 				publish("Finished reading Hyphenation file");
 			}
-			catch(IOException | IllegalArgumentException | NullPointerException e){
+			catch(NullPointerException e){
+				String message = e.getMessage();
+				if(message == null){
+					StackTraceElement stackTrace0 = e.getStackTrace()[0];
+					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+				}
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Hyphenation parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;

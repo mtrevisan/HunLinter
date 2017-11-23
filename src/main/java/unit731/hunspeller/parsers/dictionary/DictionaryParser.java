@@ -163,7 +163,7 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic");
+				publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic (pass 1/3)");
 
 				BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
@@ -173,9 +173,18 @@ public class DictionaryParser{
 
 				publish("Duplicates extracted successfully");
 
-				openFileWithChoosenEditor();
+				if(!duplicates.isEmpty())
+					openFileWithChoosenEditor();
 			}
-			catch(IOException | IllegalArgumentException | NullPointerException e){
+			catch(NullPointerException e){
+				String message = e.getMessage();
+				if(message == null){
+					StackTraceElement stackTrace0 = e.getStackTrace()[0];
+					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+				}
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
@@ -184,7 +193,7 @@ public class DictionaryParser{
 		private BloomFilterInterface<String> collectDuplicates() throws IOException{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-			BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
+			BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.MEMORY_MAPPED_FILE;
 			BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 500_000, 0.000_000_2, 2.);
 			duplicatesBloomFilter.setCharset(CHARSET);
 
@@ -241,81 +250,87 @@ public class DictionaryParser{
 		}
 
 		private List<Duplicate> extractDuplicates(BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-
 			List<Duplicate> result = new ArrayList<>();
 
-			publish("Start extracting duplicates");
+			if(duplicatesBloomFilter.getAddedElements() > 0){
+				publish("Start extracting duplicates (pass 2/3)");
 
-			setProgress(0);
-			try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
-				String line = br.readLine();
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-				int lineIndex = 1;
-				long readSoFar = 0l;
-				long totalSize = dicParser.dicFile.length();
-				while((line = br.readLine()) != null){
-					lineIndex ++;
-					readSoFar += line.length();
-					line = dicParser.cleanLine(line);
-					if(!line.isEmpty()){
-						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-							List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
-							for(RuleProductionEntry sub : subProductions){
-								String text = sub.toStringWithSignificantDataFields();
-								if(duplicatesBloomFilter.contains(text))
-									result.add(new Duplicate(sub, dictionaryWord, lineIndex));
+				setProgress(0);
+				try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
+					String line = br.readLine();
+
+					int lineIndex = 1;
+					long readSoFar = 0l;
+					long totalSize = dicParser.dicFile.length();
+					while((line = br.readLine()) != null){
+						lineIndex ++;
+						readSoFar += line.length();
+						line = dicParser.cleanLine(line);
+						if(!line.isEmpty()){
+							try{
+								DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								for(RuleProductionEntry sub : subProductions){
+									String text = sub.toStringWithSignificantDataFields();
+									if(duplicatesBloomFilter.contains(text))
+										result.add(new Duplicate(sub, dictionaryWord, lineIndex));
+								}
+							}
+							catch(IllegalArgumentException e){
+								publish(e.getMessage());
 							}
 						}
-						catch(IllegalArgumentException e){
-							publish(e.getMessage());
-						}
+
+						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
+					setProgress(100);
 
-					setProgress((int)((readSoFar * 100.) / totalSize));
+					int totalDuplicates = duplicatesBloomFilter.getAddedElements();
+					double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
+					publish("Total duplicates: " + COUNTER_FORMATTER.format(totalDuplicates));
+					publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
+						+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 				}
-				setProgress(100);
 
-				int totalDuplicates = duplicatesBloomFilter.getAddedElements();
-				double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-				publish("Total duplicates: " + COUNTER_FORMATTER.format(totalDuplicates));
-				publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
-					+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
+				duplicatesBloomFilter.clear();
+
+				Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
+				Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 			}
-
-			duplicatesBloomFilter.clear();
-
-			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
-			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
+			else
+				publish("No duplicates found, skip remaining passes");
 
 			return result;
 		}
 
 		private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
-			publish("Write results to file");
-
-			long writtenSoFar = 0l;
 			long totalSize = duplicates.size();
-			setProgress(0);
-			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProgress((int)(100. / (totalSize + 1)));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
-				for(List<Duplicate> entries : mergedDuplicates){
-					writer.write(entries.get(0).getProduction().getWord());
-					writer.write(": ");
-					writer.write(entries.stream()
-						.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + " via "
-							+ duplicate.getProduction().getRulesSequence() + ")")
-						.collect(Collectors.joining(", ")));
-					writer.newLine();
+			if(totalSize > 0){
+				publish("Write results to file (pass 3/3)");
 
-					writtenSoFar ++;
-					setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
+				long writtenSoFar = 0l;
+				setProgress(0);
+				List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
+				setProgress((int)(100. / (totalSize + 1)));
+				try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
+					for(List<Duplicate> entries : mergedDuplicates){
+						writer.write(entries.get(0).getProduction().getWord());
+						writer.write(": ");
+						writer.write(entries.stream()
+							.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + " via "
+								+ duplicate.getProduction().getRulesSequence() + ")")
+							.collect(Collectors.joining(", ")));
+						writer.newLine();
+
+						writtenSoFar ++;
+						setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
+					}
+					setProgress(100);
+
+					publish("File written: " + outputFile.getAbsolutePath());
 				}
-				setProgress(100);
-
-				publish("File written: " + outputFile.getAbsolutePath());
 			}
 		}
 
@@ -409,7 +424,15 @@ public class DictionaryParser{
 
 				setProgress(100);
 			}
-			catch(IOException | IllegalArgumentException | NullPointerException e){
+			catch(NullPointerException e){
+				String message = e.getMessage();
+				if(message == null){
+					StackTraceElement stackTrace0 = e.getStackTrace()[0];
+					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+				}
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
@@ -605,7 +628,15 @@ public class DictionaryParser{
 					publish("Wordlist extracted successfully");
 				}
 			}
-			catch(IOException | IllegalArgumentException | NullPointerException e){
+			catch(NullPointerException e){
+				String message = e.getMessage();
+				if(message == null){
+					StackTraceElement stackTrace0 = e.getStackTrace()[0];
+					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+				}
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;

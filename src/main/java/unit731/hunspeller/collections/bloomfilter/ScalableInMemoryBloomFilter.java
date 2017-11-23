@@ -90,8 +90,13 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 //			p *= 1 - filter.getFalsePositiveProbability() * Math.pow(tighteningRatio, i);
 //		}
 //		return 1. - p;
-		BloomFilterInterface<T> filter = filters.get(filters.size() - 1);
-		return filter.getFalsePositiveProbability() / (1. - tighteningRatio);
+		int size = filters.size();
+		double probability = 0.;
+		if(size > 0){
+			BloomFilterInterface<T> filter = filters.get(size - 1);
+			probability = filter.getFalsePositiveProbability() / (1. - tighteningRatio);
+		}
+		return probability;
 	}
 
 	@Override
