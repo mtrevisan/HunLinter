@@ -23,6 +23,9 @@ public class Word{
 	private static final char COMBINING_GRAVE_ACCENT = '\u0300';
 	private static final char COMBINING_ACUTE_ACCENT = '\u0301';
 
+	private static final String A = "a";
+	private static final String A_COMBINING_GRAVE_ACCENT = A + COMBINING_GRAVE_ACCENT;
+
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -159,23 +162,10 @@ public class Word{
 	};*/
 
 	private static String suppressDefaultStress(String word){
-//		String a = normalize(word)
-//			.replaceAll("\\p{M}+", "");
-//		String b = normalize(word)
-//			.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-//		String c = normalize(word)
-//			.replaceAll("\\p{InCombining_Diacritical_Marks}+", "");
-
-//		String normalizedWord = normalize(word);
-//		normalizedWord = StringUtils.replace(normalizedWord, "a" + COMBINING_GRAVE_ACCENT, "a");
-//		normalizedWord = StringUtils.replace(normalizedWord, String.valueOf(COMBINING_ACUTE_ACCENT), StringUtils.EMPTY);
-//		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
-
-		word = StringUtils.replace(word, "à", "a");
-		word = StringUtils.replace(word, "é", "e");
-		word = StringUtils.replace(word, "í", "i");
-		word = StringUtils.replace(word, "ó", "o");
-		return StringUtils.replace(word, "ú", "u");
+		String normalizedWord = normalize(word);
+		normalizedWord = StringUtils.replace(normalizedWord, A_COMBINING_GRAVE_ACCENT, A);
+		normalizedWord = StringUtils.replace(normalizedWord, String.valueOf(COMBINING_ACUTE_ACCENT), StringUtils.EMPTY);
+		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
 	}
 
 	private static char addStressAcute(char chr){
