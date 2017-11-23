@@ -14,6 +14,8 @@ import java.util.Arrays;
 /**
  * An implementation of {@link BitArray} that uses a memory-mapped file to persist all changes synchronously for the underlying
  * bit array. This is useful for stateful bit-arrays which are expensive to construct yet need the best overall performance.
+ * 
+ * NOTE: for some reason this class does not work!!
  */
 public class MemoryMappedFileBitArray implements BitArray{
 

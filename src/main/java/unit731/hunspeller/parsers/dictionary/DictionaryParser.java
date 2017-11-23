@@ -193,7 +193,7 @@ public class DictionaryParser{
 		private BloomFilterInterface<String> collectDuplicates() throws IOException{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-			BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.MEMORY_MAPPED_FILE;
+			BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
 			BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 500_000, 0.000_000_2, 2.);
 			duplicatesBloomFilter.setCharset(CHARSET);
 

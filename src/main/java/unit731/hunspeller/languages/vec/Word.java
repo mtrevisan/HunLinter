@@ -166,6 +166,11 @@ public class Word{
 //		String c = normalize(word)
 //			.replaceAll("\\p{InCombining_Diacritical_Marks}+", "");
 
+//		String normalizedWord = normalize(word);
+//		normalizedWord = StringUtils.replace(normalizedWord, "a" + COMBINING_GRAVE_ACCENT, "a");
+//		normalizedWord = StringUtils.replace(normalizedWord, String.valueOf(COMBINING_ACUTE_ACCENT), StringUtils.EMPTY);
+//		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
+
 		word = StringUtils.replace(word, "à", "a");
 		word = StringUtils.replace(word, "é", "e");
 		word = StringUtils.replace(word, "í", "i");
@@ -182,10 +187,10 @@ public class Word{
 		return replaceCharacter(chr, "aeiou", "àèíòú");
 	}*/
 
-	/** Replaces a char in the 'from' string to the corresponding char in the 'to' string, returning the char itself if not in 'from'. */
+	/** Replaces a char in the 'from' string to the corresponding char in the 'to' string, returning the char itself if not in 'from'. * /
 	private static char replaceCharacter(char chr, String from, String to){
 		return (chr + to).charAt(from.indexOf(chr) + 1);
-	};
+	};*/
 
 
 	private static String markDefaultStress(String word){
