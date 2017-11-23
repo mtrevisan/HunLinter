@@ -55,7 +55,7 @@ public class JavaBitArray implements BitArray{
 	}
 
 	@Override
-	public int bitSize(){
+	public int size(){
 		return bitSet.size();
 	}
 

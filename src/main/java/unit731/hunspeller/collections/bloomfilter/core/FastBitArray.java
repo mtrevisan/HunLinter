@@ -1,7 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
-import lombok.Getter;
-
 
 /**
  * A fast bit-set implementation that allows direct access to data property so that it can be easily serialized.
@@ -10,9 +8,6 @@ public class FastBitArray implements BitArray{
 
 	/** The data-set */
 	private final long[] data;
-
-	/** The current bit count */
-	@Getter private int bitCount;
 
 
 	/**
@@ -25,7 +20,6 @@ public class FastBitArray implements BitArray{
 			throw new IllegalArgumentException("Number of bits must be strict positive");
 
 		data = new long[(int)(bits >>> 6) + 1];
-		bitCount = 0;
 	}
 
 	public FastBitArray(long[] data){
@@ -33,9 +27,6 @@ public class FastBitArray implements BitArray{
 			throw new IllegalArgumentException("Data must be valued");
 
 		this.data = data;
-		bitCount = 0;
-		for(long value : data)
-			bitCount += Long.bitCount(value);
 	}
 
 	@Override
@@ -48,7 +39,6 @@ public class FastBitArray implements BitArray{
 	public boolean set(int index){
 		if(!get(index)){
 			data[index >> 6] |= (1l << index);
-			bitCount ++;
 			return true;
 		}
 		return false;
@@ -56,10 +46,8 @@ public class FastBitArray implements BitArray{
 
 	@Override
 	public void clear(int index){
-		if(get(index)){
+		if(get(index))
 			data[index >> 6] &= ~(1l << index);
-			bitCount --;
-		}
 	}
 
 	@Override
@@ -75,7 +63,7 @@ public class FastBitArray implements BitArray{
 	 * @return total number of bits allocated
 	 */
 	@Override
-	public int bitSize(){
+	public int size(){
 		return data.length * Long.SIZE;
 	}
 

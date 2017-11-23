@@ -177,7 +177,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
-			int index = nextHash % bitArray.bitSize();
+			int index = nextHash % bitArray.size();
 			bitsChanged |= bitArray.set(index);
 
 			callback.accept(index);
@@ -199,7 +199,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
-			int index = nextHash % bitArray.bitSize();
+			int index = nextHash % bitArray.size();
 			if(!bitArray.get(index))
 				return false;
 		}

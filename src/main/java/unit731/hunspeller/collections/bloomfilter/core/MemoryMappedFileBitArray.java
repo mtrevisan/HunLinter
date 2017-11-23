@@ -61,7 +61,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	@Override
 	public boolean get(int index){
 		if(index > maxElements)
-			throw new IndexOutOfBoundsException("Index is greater than max elements permitted");
+			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
 		int pos = index >> 3;
 		int bit = 1 << (index & 0x07);
@@ -71,40 +71,34 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 	@Override
 	public boolean set(int index){
-		if(index > maxElements)
-			throw new IndexOutOfBoundsException("Index is greater than max elements permitted");
-
-		int pos = index >> 3;
-		int bit = 1 << (index & 0x07);
-		byte bite = buffer.get(pos);
-		bite = (byte)(bite | bit);
-		buffer.put(pos, bite);
-		return true;
+		if(!get(index)){
+			int pos = index >> 3;
+			int bit = 1 << (index & 0x07);
+			buffer.put(pos, (byte)(buffer.get(pos) | bit));
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public void clear(int index){
 		if(index > maxElements)
-			throw new IndexOutOfBoundsException("Index is greater than max elements permitted");
+			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
 		int pos = index >> 3;
-		int bit = 1 << (index & 0x07);
-		bit = ~bit;
-		byte bite = buffer.get(pos);
-		bite = (byte)(bite & bit);
-		buffer.put(pos, bite);
+		int bit = ~(1 << (index & 0x07));
+		buffer.put(pos, (byte)(buffer.get(pos) & bit));
 	}
 
 	@Override
 	public void clearAll(){
-		byte bite = 0;
 		if(buffer != null)
 			for(int index = 0; index < numberOfBytes; index ++)
-				buffer.put(index, bite);
+				buffer.put(index, (byte)0);
 	}
 
 	@Override
-	public int bitSize(){
+	public int size(){
 		return numberOfBytes;
 	}
 

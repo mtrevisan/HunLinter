@@ -46,7 +46,7 @@ public interface BitArray extends Closeable{
 	 *
 	 * @return the number of bytes being used
 	 */
-	int bitSize();
+	int size();
 
 	@Override
 	default void close() throws IOException{}
