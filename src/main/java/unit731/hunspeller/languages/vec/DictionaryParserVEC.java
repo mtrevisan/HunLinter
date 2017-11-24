@@ -2,6 +2,7 @@ package unit731.hunspeller.languages.vec;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,34 +73,37 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
 	private static final Map<Matcher, String> MISMATCH_CHECKS = new HashMap<>();
+	private static final String CANNOT_USE_RULE_WITH_VANISHING_EL = "Cannot use {0} rule with vanishing el, use {1}";
+	private static final String CANNOT_USE_RULE_WITH_NON_VANISHING_EL = "Cannot use {0} rule with non-vanishing el, use {1}";
 	static{
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"), "Cannot use r0 rule with vanishing el, use r1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"), "Cannot use r1 rule with non-vanishing el, use r0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"), "Cannot use s1 rule with vanishing el, use s2");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), "Cannot use s2 rule with non-vanishing el, use s1");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), "Cannot use W0 rule with vanishing el, use W1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), "Cannot use W1 rule with non-vanishing el, use W0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_NON_VANISHING_EL), "Cannot use &0 rule with vanishing el, use &1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_VANISHING_EL), "Cannot use &1 rule with non-vanishing el, use &0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), "Cannot use [0 rule with vanishing el, use [1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), "Cannot use [1 rule with non-vanishing el, use [0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"), "Cannot use (0 rule with vanishing el, use (1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"), "Cannot use (1 rule with non-vanishing el, use (0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0"), "Cannot use )0 rule with vanishing el, use )1");
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\)1"), "Cannot use )1 rule with non-vanishing el, use )0");
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"), "Cannot use <0 rule with vanishing el, use <1");
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "r0", "r1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "r1", "r0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "s1", "s2"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "s2", "s1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "W0", "W1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "W1", "W0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_NON_VANISHING_EL), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&0", "&1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_VANISHING_EL), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&1", "&0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "[0", "[1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "[1", "[0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(0", "(1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(1", "(0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, ")0", ")1"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\)1"), MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, ")1", ")0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"), MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "<0", "<1"));
 		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"), "Cannot use <1 rule with đ or ŧ, use <0");
 	}
 
 	private static final Set<List<String>> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
+	private static final String WORD_WITH_RULE_B0_CANNOT_HAVE = "Word with rule B0 cannot have rule {0}";
 	static{
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL, "Word with rule B0 cannot have rule &0 or &1"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL, "Word with rule B0 cannot have rule [0 or [1"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL, "Word with rule B0 cannot have rule (0 or (1"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL, "Word with rule B0 cannot have rule )0 or )1"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATO_RULE, "Word with rule B0 cannot have rule §0"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(COLLECTIVE_NOUNS_RULE, "Word with rule B0 cannot have rule Y0"));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, "Word with rule B0 cannot have rule <0 or <1"));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "&0 or &1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "[0 or [1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "(0 or (1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, ")0 or )1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATO_RULE, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "§0")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(COLLECTIVE_NOUNS_RULE, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "Y0")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "<0 or <1")));
 	}
 
 //	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList(FINAL_SONORIZATION_RULE));
