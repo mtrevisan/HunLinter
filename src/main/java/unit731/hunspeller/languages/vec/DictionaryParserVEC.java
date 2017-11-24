@@ -130,11 +130,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String IS_SINGULAR_MASCULINE = "singular_masculine";
 	private static final String IS_SINGULAR_FEMENINE = "singular_femenine";
+	private static final String IS_PLURAL = "plural";
 	private static final String IS_PLURAL_MASCULINE = "plural_masculine";
 	private static final String IS_PLURAL_FEMENINE = "plural_femenine";
 	private static final String IS_PROCOMPLEMENTAR_VERB = "procomplementar";
 	private static final String IS_INTERROGATIVE = "interrogative";
-	
+
 	private static final Set<String> PART_OF_SPEECH = new HashSet<>();
 	static{
 		PART_OF_SPEECH.add(POS_NOUN);
@@ -161,6 +162,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 		PART_OF_SPEECH.add(POS_INTERJECTION);
 		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
 	}
+	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>();
+	static{
+		INFLECTIONAL_SUFFIX.add(IS_SINGULAR_MASCULINE);
+		INFLECTIONAL_SUFFIX.add(IS_SINGULAR_FEMENINE);
+		INFLECTIONAL_SUFFIX.add(IS_PLURAL);
+		INFLECTIONAL_SUFFIX.add(IS_PLURAL_MASCULINE);
+		INFLECTIONAL_SUFFIX.add(IS_PLURAL_FEMENINE);
+		INFLECTIONAL_SUFFIX.add(IS_PROCOMPLEMENTAR_VERB);
+		INFLECTIONAL_SUFFIX.add(IS_INTERROGATIVE);
+	}
+	private static final Set<String> INFLECTIONAL_PREFIX = new HashSet<>();
 
 	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh");
 
@@ -180,6 +192,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				throw new IllegalArgumentException("Line does not contains any data fields");
 
 			partOfSpeechCheck(production);
+			inflectionalSuffixCheck(production);
 
 			vanishingElCheck(production);
 
@@ -222,6 +235,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 			for(String dataField : dataFields)
 				if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Part Of Speech: " + dataField);
+	}
+
+	private void inflectionalSuffixCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		String[] dataFields = production.getDataFields();
+		if(dataFields != null)
+			for(String dataField : dataFields){
+				if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !INFLECTIONAL_SUFFIX.contains(dataField.substring(3)))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Suffix: " + dataField);
+				if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX) && !INFLECTIONAL_PREFIX.contains(dataField.substring(3)))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Prefix: " + dataField);
+			}
 	}
 
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
