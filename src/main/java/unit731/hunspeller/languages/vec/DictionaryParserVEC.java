@@ -104,75 +104,30 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 //	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList(FINAL_SONORIZATION_RULE));
 
-	private static final String POS_NOUN = "noun";
 	private static final String POS_PROPER_NOUN = "proper_noun";
 	private static final String POS_VERB = "verb";
-	private static final String POS_ADJECTIVE = "adjective";
-	private static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
-	private static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
-	private static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
-	private static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
-	private static final String POS_QUANTIFIER = "quantifier";
-	private static final String POS_NUMERAL_LATIN = "numeral_latin";
-	private static final String POS_NUMERAL_CARDENAL = "numeral_cardenal";
-	private static final String POS_NUMERAL_ORDENAL = "numeral_ordenal";
-	private static final String POS_NUMERAL_COLLECTIVE = "numeral_collective";
-	private static final String POS_NUMERAL_FRACTIONAL = "numeral_fractional";
-	private static final String POS_NUMERAL_MULTIPLICATIVE = "numeral_multiplicative";
 	private static final String POS_ARTICLE = "article";
 	private static final String POS_PRONOUN = "pronoun";
-	private static final String POS_PREPOSITION = "preposition";
 	private static final String POS_ADVERB = "adverb";
-	private static final String POS_CONJUNCTION = "conjunction";
-	private static final String POS_PREFIX = "prefix";
+	private static final String POS_NUMERAL_LATIN = "numeral_latin";
 	private static final String POS_INTERJECTION = "interjection";
 	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
 
-	private static final String IS_SINGULAR_MASCULINE = "singular_masculine";
-	private static final String IS_SINGULAR_FEMENINE = "singular_femenine";
-	private static final String IS_PLURAL = "plural";
-	private static final String IS_PLURAL_MASCULINE = "plural_masculine";
-	private static final String IS_PLURAL_FEMENINE = "plural_femenine";
-	private static final String IS_PROCOMPLEMENTAR_VERB = "procomplementar";
-	private static final String IS_INTERROGATIVE = "interrogative";
+	private static final Set<String> PART_OF_SPEECH = new HashSet<>(Arrays.asList("noun", POS_PROPER_NOUN, POS_VERB, "adjective", "adjective_possessive", "adjective_demonstrative",
+		"adjective_identificative", "adjective_interrogative", "quantifier", POS_NUMERAL_LATIN, "numeral_cardenal", "numeral_ordenal", "numeral_collective", "numeral_fractional",
+		"numeral_multiplicative", POS_ARTICLE, POS_PRONOUN, "preposition", POS_ADVERB, "conjunction", "prefix", POS_INTERJECTION, POS_UNIT_OF_MEASURE));
+	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>(Arrays.asList("singular_masculine", "singular_femenine", "plural", "plural_masculine", "plural_femenine", "procomplementar", "interrogative"));
+	private static final Set<String> TERMINAL_SUFFIX = new HashSet<>(Arrays.asList("indicative_present", "indicative_imperfect", "indicative_future", "subjunctive_present", "subjunctive_imperfect",
+		"conditional_present", "infinitive_simple", "gerund_simple", "participle_active", "participle_passive", "participle_perfect", "participle_perfect_strong", "participle_imperfect"));
 
-	private static final Set<String> PART_OF_SPEECH = new HashSet<>();
+	private static final Map<String, Set<String>> DATA_FIELDS = new HashMap<>();
 	static{
-		PART_OF_SPEECH.add(POS_NOUN);
-		PART_OF_SPEECH.add(POS_PROPER_NOUN);
-		PART_OF_SPEECH.add(POS_VERB);
-		PART_OF_SPEECH.add(POS_ADJECTIVE);
-		PART_OF_SPEECH.add(POS_ADJECTIVE_POSSESSIVE);
-		PART_OF_SPEECH.add(POS_ADJECTIVE_DEMONSTRATIVE);
-		PART_OF_SPEECH.add(POS_ADJECTIVE_IDENTIFICATIVE);
-		PART_OF_SPEECH.add(POS_ADJECTIVE_INTERROGATIVE);
-		PART_OF_SPEECH.add(POS_QUANTIFIER);
-		PART_OF_SPEECH.add(POS_NUMERAL_LATIN);
-		PART_OF_SPEECH.add(POS_NUMERAL_CARDENAL);
-		PART_OF_SPEECH.add(POS_NUMERAL_ORDENAL);
-		PART_OF_SPEECH.add(POS_NUMERAL_COLLECTIVE);
-		PART_OF_SPEECH.add(POS_NUMERAL_FRACTIONAL);
-		PART_OF_SPEECH.add(POS_NUMERAL_MULTIPLICATIVE);
-		PART_OF_SPEECH.add(POS_ARTICLE);
-		PART_OF_SPEECH.add(POS_PRONOUN);
-		PART_OF_SPEECH.add(POS_PREPOSITION);
-		PART_OF_SPEECH.add(POS_ADVERB);
-		PART_OF_SPEECH.add(POS_CONJUNCTION);
-		PART_OF_SPEECH.add(POS_PREFIX);
-		PART_OF_SPEECH.add(POS_INTERJECTION);
-		PART_OF_SPEECH.add(POS_UNIT_OF_MEASURE);
+		DATA_FIELDS.put(WordGenerator.TAG_PART_OF_SPEECH, PART_OF_SPEECH);
+		DATA_FIELDS.put(WordGenerator.TAG_INFLECTIONAL_SUFFIX, INFLECTIONAL_SUFFIX);
+		DATA_FIELDS.put(WordGenerator.TAG_TERMINAL_SUFFIX, TERMINAL_SUFFIX);
+		DATA_FIELDS.put(WordGenerator.TAG_STEM, null);
+		DATA_FIELDS.put(WordGenerator.TAG_ALLOMORPH, null);
 	}
-	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>();
-	static{
-		INFLECTIONAL_SUFFIX.add(IS_SINGULAR_MASCULINE);
-		INFLECTIONAL_SUFFIX.add(IS_SINGULAR_FEMENINE);
-		INFLECTIONAL_SUFFIX.add(IS_PLURAL);
-		INFLECTIONAL_SUFFIX.add(IS_PLURAL_MASCULINE);
-		INFLECTIONAL_SUFFIX.add(IS_PLURAL_FEMENINE);
-		INFLECTIONAL_SUFFIX.add(IS_PROCOMPLEMENTAR_VERB);
-		INFLECTIONAL_SUFFIX.add(IS_INTERROGATIVE);
-	}
-	private static final Set<String> INFLECTIONAL_PREFIX = new HashSet<>();
 
 	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh");
 
@@ -191,8 +146,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(!production.hasDataFields())
 				throw new IllegalArgumentException("Line does not contains any data fields");
 
-			partOfSpeechCheck(production);
-			inflectionalSuffixCheck(production);
+			dataFieldCheck(production);
 
 			vanishingElCheck(production);
 
@@ -229,30 +183,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void partOfSpeechCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void dataFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] dataFields = production.getDataFields();
 		if(dataFields != null)
-			for(String dataField : dataFields)
-				if(dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) && !PART_OF_SPEECH.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Part Of Speech: " + dataField);
-	}
-
-	private void inflectionalSuffixCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		String[] dataFields = production.getDataFields();
-		if(dataFields != null){
 			for(String dataField : dataFields){
-				try{
-					String isType = dataField.substring(3);
-					if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !INFLECTIONAL_SUFFIX.contains(isType))
-						throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Suffix: " + dataField);
-					if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX) && !INFLECTIONAL_PREFIX.contains(isType))
-						throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Prefix: " + dataField);
-				}
-				catch(StringIndexOutOfBoundsException e){
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional part: " + dataField);
-				}
+				if(dataField.length() < 4)
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid Data Field prefix: " + dataField);
+
+				String dataFieldPrefix = dataField.substring(0, 3);
+				if(!DATA_FIELDS.containsKey(dataFieldPrefix))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field prefix: " + dataField);
+
+				Set<String> dataFieldTypes = DATA_FIELDS.get(dataFieldPrefix);
+				if(dataFieldTypes != null && !dataFieldTypes.contains(dataField.substring(3)))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field value: " + dataField);
 			}
-		}
 	}
 
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
