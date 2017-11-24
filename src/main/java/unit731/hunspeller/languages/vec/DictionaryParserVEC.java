@@ -128,9 +128,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String POS_INTERJECTION = "interjection";
 	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
 
-	private static final String IS_MASCULINE = "masculine";
-	private static final String IS_FEMENINE = "femenine";
+	private static final String IS_SINGULAR_MASCULINE = "singular_masculine";
+	private static final String IS_SINGULAR_FEMENINE = "singular_femenine";
+	private static final String IS_PLURAL_MASCULINE = "plural_masculine";
+	private static final String IS_PLURAL_FEMENINE = "plural_femenine";
 	private static final String IS_PROCOMPLEMENTAR_VERB = "procomplementar";
+	private static final String IS_INTERROGATIVE = "interrogative";
 	
 	private static final Set<String> PART_OF_SPEECH = new HashSet<>();
 	static{
