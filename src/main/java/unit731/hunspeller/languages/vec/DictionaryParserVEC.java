@@ -239,13 +239,20 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void inflectionalSuffixCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] dataFields = production.getDataFields();
-		if(dataFields != null)
+		if(dataFields != null){
 			for(String dataField : dataFields){
-				if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !INFLECTIONAL_SUFFIX.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Suffix: " + dataField);
-				if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX) && !INFLECTIONAL_PREFIX.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Prefix: " + dataField);
+				try{
+					String isType = dataField.substring(3);
+					if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !INFLECTIONAL_SUFFIX.contains(isType))
+						throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Suffix: " + dataField);
+					if(dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX) && !INFLECTIONAL_PREFIX.contains(isType))
+						throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional Prefix: " + dataField);
+				}
+				catch(StringIndexOutOfBoundsException e){
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Inflectional part: " + dataField);
+				}
 			}
+		}
 	}
 
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
