@@ -10,9 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -26,22 +24,29 @@ import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
-import unit731.hunspeller.services.memento.Caretaker;
+import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
 @Slf4j
 @Getter
-public class ThesaurusParser{
+public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Pattern REGEX_PATTERN_LF = PatternService.pattern(StringUtils.LF);
 
 
-	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
-	private boolean modified = false;
+	//NOTE: All members are private and accessible only by Originator
+	@AllArgsConstructor
+	public class Memento{
+
+		private final ThesaurusDictionary dictionary;
+
+	}
+
+	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
 	private final Undoable undoable;
-	private final Caretaker<ThesaurusEntry> undoCaretaker = new Caretaker<>(ThesaurusEntry.class);
-	private final Caretaker<ThesaurusEntry> redoCaretaker = new Caretaker<>(ThesaurusEntry.class);
+	private final ThesaurusCaretaker undoCaretaker = new ThesaurusCaretaker();
+	private final ThesaurusCaretaker redoCaretaker = new ThesaurusCaretaker();
 
 
 	public ThesaurusParser(Undoable undoable){
@@ -72,10 +77,8 @@ public class ThesaurusParser{
 
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
-						if(!line.isEmpty()){
-							ThesaurusEntry thesaurusIndex = new ThesaurusEntry(line, br);
-							theParser.synonyms.add(thesaurusIndex);
-						}
+						if(!line.isEmpty())
+							theParser.dictionary.add(new ThesaurusEntry(line, br));
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
@@ -95,7 +98,7 @@ public class ThesaurusParser{
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
-			return theParser.synonyms;
+			return theParser.getSynonymsDictionary();
 		}
 
 		@Override
@@ -114,7 +117,15 @@ public class ThesaurusParser{
 	};
 
 	public int getSynonymsCounter(){
-		return synonyms.size();
+		return dictionary.size();
+	}
+
+	public boolean isDictionaryModified(){
+		return dictionary.isModified();
+	}
+
+	public List<ThesaurusEntry> getSynonymsDictionary(){
+		return dictionary.getSynonyms();
 	}
 
 	/**
@@ -141,7 +152,7 @@ public class ThesaurusParser{
 
 		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
 			try{
-				undoCaretaker.pushMemento(synonyms);
+				undoCaretaker.pushMemento(createMemento());
 
 				if(undoable != null)
 					undoable.onUndoChange(true);
@@ -159,12 +170,7 @@ public class ThesaurusParser{
 					.forEachOrdered(sj::add);
 				String mm = sj.toString();
 
-				ThesaurusEntry foundSynonym = null;
-				for(ThesaurusEntry synonym : this.synonyms)
-					if(synonym.getSynonym().equals(meaning)){
-						foundSynonym = synonym;
-						break;
-					}
+				ThesaurusEntry foundSynonym = dictionary.findByMeaning(meaning);
 
 				MeaningEntry entry = new MeaningEntry(mm);
 				if(foundSynonym != null)
@@ -172,10 +178,8 @@ public class ThesaurusParser{
 					foundSynonym.getMeanings().add(entry);
 				else
 					//add to list if synonym does not exists
-					this.synonyms.add(new ThesaurusEntry(meaning, Arrays.asList(entry)));
+					dictionary.add(new ThesaurusEntry(meaning, Arrays.asList(entry)));
 			}
-
-			modified = true;
 		}
 
 		return duplicationResult;
@@ -186,8 +190,9 @@ public class ThesaurusParser{
 		boolean forcedInsertion = false;
 		List<ThesaurusEntry> duplicates = new ArrayList<>();
 		try{
+			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 			for(String meaning : means)
-				for(ThesaurusEntry synonym : this.synonyms)
+				for(ThesaurusEntry synonym : synonyms)
 					if(synonym.getSynonym().equals(meaning)){
 						long countSamePartOfSpeech = synonym.getMeanings().stream()
 							.map(MeaningEntry::getPartOfSpeech)
@@ -207,34 +212,42 @@ public class ThesaurusParser{
 		return new DuplicationResult(duplicates, forcedInsertion);
 	}
 
-	public void setMeanings(ThesaurusEntry synonym, List<MeaningEntry> meanings, String text){
+	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		try{
-			undoCaretaker.pushMemento(synonyms);
+			undoCaretaker.pushMemento(createMemento());
 
-			if(StringUtils.isNotBlank(text)){
-				String[] lines = PatternService.split(text, REGEX_PATTERN_LF);
-				meanings.clear();
-				for(String line : lines)
-					meanings.add(new MeaningEntry(line));
-			}
+			dictionary.setMeanings(index, meanings, text);
 
 			if(undoable != null)
 				undoable.onUndoChange(true);
 		}
-		catch(IOException ex){
-			log.warn("Error while storing a memento", ex);
+		catch(IOException e){
+			try{
+				undoCaretaker.popMemento();
+			}
+			catch(IOException ioe){
+				log.warn("Error while removing a memento", ioe);
+			}
+
+			log.warn("Error while storing a memento", e);
 		}
+		catch(Exception e){
+			try{
+				undoCaretaker.popMemento();
+			}
+			catch(IOException ioe){
+				log.warn("Error while removing a memento", ioe);
+			}
 
-		synonym.setMeanings(meanings);
-
-		modified = true;
+			log.warn("Error while modifying the meanings", e);
+		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
 		int count = selectedRowIDs.length;
 		if(count > 0){
 			try{
-				undoCaretaker.pushMemento(synonyms);
+				undoCaretaker.pushMemento(createMemento());
 
 				if(undoable != null)
 					undoable.onUndoChange(true);
@@ -244,24 +257,17 @@ public class ThesaurusParser{
 			}
 
 			for(int i = 0; i < count; i ++)
-				synonyms.remove(selectedRowIDs[i] - i);
-
-			modified = true;
+				dictionary.remove(selectedRowIDs[i] - i);
 		}
 	}
 
 	public List<String> extractDuplicates(){
-		Set<String> allItems = new HashSet<>();
-		List<String> duplicatedSynonyms = synonyms.stream()
-			.map(ThesaurusEntry::getSynonym)
-			.filter(s -> !allItems.add(s))
-			.collect(Collectors.toList());
-		return duplicatedSynonyms;
+		return dictionary.extractDuplicates();
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
 		//sort the synonyms
-		synonyms.sort((s0, s1) -> s0.compareTo(s1));
+		dictionary.sort();
 
 		//save index and data files
 		Charset charset = StandardCharsets.UTF_8;
@@ -273,13 +279,14 @@ public class ThesaurusParser{
 			indexWriter.write(charset.name());
 			indexWriter.write(StringUtils.LF);
 			//save counter
-			indexWriter.write(Integer.toString(synonyms.size()));
+			indexWriter.write(Integer.toString(dictionary.size()));
 			indexWriter.write(StringUtils.LF);
 			//save charset
 			dataWriter.write(charset.name());
 			dataWriter.write(StringUtils.LF);
 			//save data
 			int idx = charset.name().length() + 1;
+			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 			for(ThesaurusEntry synonym : synonyms){
 				String syn = synonym.getSynonym();
 				indexWriter.write(syn);
@@ -304,12 +311,12 @@ public class ThesaurusParser{
 				idx += syn.getBytes(charset).length + meaningsLength + 2;
 			}
 
-			modified = false;
+			dictionary.resetModified();
 		}
 	}
 
 	public void clear(){
-		synonyms.clear();
+		dictionary.clear();
 	}
 
 	public boolean canUndo(){
@@ -323,15 +330,15 @@ public class ThesaurusParser{
 	public boolean restorePreviousSnapshot() throws IOException{
 		boolean restored = false;
 		if(canUndo()){
-			redoCaretaker.pushMemento(synonyms);
-			List<ThesaurusEntry> poppedSynonyms = undoCaretaker.popMemento();
+			redoCaretaker.pushMemento(createMemento());
+
+			Memento memento = undoCaretaker.popMemento();
 			if(undoable != null){
 				undoable.onUndoChange(canUndo());
 				undoable.onRedoChange(true);
 			}
 
-			synonyms.clear();
-			synonyms.addAll(poppedSynonyms);
+			restoreMemento(memento);
 
 			restored = true;
 		}
@@ -341,19 +348,29 @@ public class ThesaurusParser{
 	public boolean restoreNextSnapshot() throws IOException{
 		boolean restored = false;
 		if(canRedo()){
-			undoCaretaker.pushMemento(synonyms);
-			List<ThesaurusEntry> poppedSynonyms = redoCaretaker.popMemento();
+			undoCaretaker.pushMemento(createMemento());
+
+			Memento memento = redoCaretaker.popMemento();
 			if(undoable != null){
 				undoable.onUndoChange(true);
 				undoable.onRedoChange(canRedo());
 			}
 
-			synonyms.clear();
-			synonyms.addAll(poppedSynonyms);
+			restoreMemento(memento);
 
 			restored = true;
 		}
 		return restored;
+	}
+
+	@Override
+	public Memento createMemento(){
+		return new Memento(dictionary);
+	}
+
+	@Override
+	public void restoreMemento(Memento memento){
+		dictionary.restore(memento.dictionary);
 	}
 
 }

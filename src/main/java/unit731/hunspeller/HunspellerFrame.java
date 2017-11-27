@@ -344,10 +344,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                int col = target.getSelectedColumn();
                if(col == 1){
                   int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-                  ThesaurusEntry synonym = theParser.getSynonyms().get(row);
                   BiConsumer<List<MeaningEntry>, String> okButtonAction = (meanings, text) -> {
                      try{
-                        theParser.setMeanings(synonym, meanings, text);
+                        theParser.setMeanings(row, meanings, text);
 
                         // ... and save the files
                         saveThesaurusFiles();
@@ -356,6 +355,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                         printResultLine(ex.getMessage());
                      }
                   };
+                  ThesaurusEntry synonym = theParser.getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(parent, synonym, okButtonAction, (Resultable)parent);
                   dialog.setVisible(true);
                }
@@ -812,7 +812,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    }//GEN-LAST:event_fileExitMenuItemActionPerformed
 
 	private void exit(){
-		if(theParser.isModified()){
+		if(theParser.isDictionaryModified()){
 			//there are unsaved synonyms, ask the user if he really want to quit
 			Object[] options ={"Quit", "Cancel"};
 			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?", "Warning!", JOptionPane.YES_NO_OPTION,
@@ -1384,7 +1384,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 						dicParser.setHyphenationParser(hypParser);
 
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-					dm.setSynonyms(theParser.getSynonyms());
+					dm.setSynonyms(theParser.getSynonymsDictionary());
 
 					updateSynonymsCounter();
 

@@ -61,7 +61,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	@Override
 	public int compareTo(ThesaurusEntry other){
 		return new CompareToBuilder()
-			.append(synonym, other.synonym)
+			.append(synonym, other.getSynonym())
 			.toComparison();
 	}
 

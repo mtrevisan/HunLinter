@@ -1,4 +1,4 @@
-package unit731.hunspeller.services.memento;
+package unit731.hunspeller.parsers.thesaurus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -10,20 +10,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Stack;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
+import unit731.hunspeller.services.memento.CaretakerInterface;
 
 
-/**
- * @see <a href="https://github.com/jmcalma/MementoPattern">Memento Pattern</a>
- * 
- * @param <T>	Type for the data (stored as a list)
- */
-public class Caretaker<T>{
+public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Memento>{
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
@@ -33,13 +28,12 @@ public class Caretaker<T>{
 	private final CollectionType collectionType;
 
 
-	public Caretaker(Class<T> cl){
-		Objects.requireNonNull(cl);
-
-		collectionType = JSON_MAPPER.getTypeFactory().constructCollectionType(List.class, cl);
+	public ThesaurusCaretaker(){
+		collectionType = JSON_MAPPER.getTypeFactory().constructCollectionType(List.class, ThesaurusEntry.class);
 	}
 
-	public void pushMemento(List<T> memento) throws IOException{
+	@Override
+	public void pushMemento(ThesaurusParser.Memento memento) throws IOException{
 		String json = JSON_MAPPER.writeValueAsString(memento);
 		byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
 		Path mementoFile = createFile(bytes);
@@ -54,7 +48,8 @@ public class Caretaker<T>{
 		return mementoFile;
 	}
 
-	public List<T> popMemento() throws IOException{
+	@Override
+	public ThesaurusParser.Memento popMemento() throws IOException{
 		Path mementoFile = mementos.pop();
 
 		byte[] bytes = Files.readAllBytes(mementoFile);
@@ -62,6 +57,7 @@ public class Caretaker<T>{
 		return JSON_MAPPER.readValue(json, collectionType);
 	}
 
+	@Override
 	public boolean canUndo(){
 		return !mementos.empty();
 	}
