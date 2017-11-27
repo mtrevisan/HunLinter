@@ -259,6 +259,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String word = production.getWord();
 		List<AffixEntry> appliedRules = production.getAppliedRules();
 		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && production.hasProductionRule(AffixEntry.TYPE.SUFFIX)
+				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
+				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
 				&& !word.contains(VANISHING_EL)
 				&& !production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_VERB)
 				&& !production.hasProductionRule(ADJECTIVE_FIRST_CLASS_RULE)&& !production.hasProductionRule(PLURAL_NOUN_MASCULINE_RULE)
