@@ -31,9 +31,6 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 @Getter
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
-	private static final Pattern REGEX_PATTERN_LF = PatternService.pattern(StringUtils.LF);
-
-
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
 	public class Memento{
@@ -98,6 +95,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
+
+			theParser.dictionary.resetModified();
+
 			return theParser.getSynonymsDictionary();
 		}
 
