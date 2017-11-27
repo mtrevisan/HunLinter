@@ -185,11 +185,11 @@
 		</dependency>
 
 		<!-- Memory usage -->
-		<dependency>
+<!--		<dependency>
 			<groupId>com.carrotsearch</groupId>
 			<artifactId>java-sizeof</artifactId>
 			<version>${com.carrotsearch.sizeof.version}</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- Logging -->
 		<dependency>
