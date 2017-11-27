@@ -42,11 +42,16 @@ public class Caretaker<T>{
 	public void pushMemento(List<T> memento) throws IOException{
 		String json = JSON_MAPPER.writeValueAsString(memento);
 		byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
+		Path mementoFile = createFile(bytes);
+
+		mementos.push(mementoFile);
+	}
+
+	private Path createFile(byte[] bytes) throws IOException{
 		Path mementoFile = Files.createTempFile("memento", ".zip");
 		mementoFile.toFile().deleteOnExit();
 		Files.write(mementoFile, bytes);
-
-		mementos.push(mementoFile);
+		return mementoFile;
 	}
 
 	public List<T> popMemento() throws IOException{
