@@ -40,22 +40,23 @@ public class ProductionTableModel extends AbstractTableModel{
 
 		RuleProductionEntry production = productions.get(rowIndex);
 		List<AffixEntry> rules = production.getAppliedRules();
+		int rulesSize = (rules != null? rules.size(): 0);
 		switch(columnIndex){
 			case 0:
 				return production.getWord();
 
 			case 1:
-		final String[] dataFields = production.getDataFields();
+				String[] dataFields = production.getDataFields();
 				return (dataFields != null? String.join(StringUtils.SPACE, dataFields): StringUtils.EMPTY);
 
 			case 2:
-				return (rules.size() > 0? rules.get(0): null);
+				return (rulesSize > 0? rules.get(0): null);
 
 			case 3:
-				return (rules.size() > 1? rules.get(1): null);
+				return (rulesSize > 1? rules.get(1): null);
 
 			case 4:
-				return (rules.size() > 2? rules.get(2): null);
+				return (rulesSize > 2? rules.get(2): null);
 
 			default:
 				return null;
