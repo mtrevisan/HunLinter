@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.thesaurus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Stack;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
@@ -25,12 +23,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 
 
 	private final Stack<Path> mementos = new Stack<>();
-	private final CollectionType collectionType;
 
-
-	public ThesaurusCaretaker(){
-		collectionType = JSON_MAPPER.getTypeFactory().constructCollectionType(List.class, ThesaurusEntry.class);
-	}
 
 	@Override
 	public void pushMemento(ThesaurusParser.Memento memento) throws IOException{
@@ -54,7 +47,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 
 		byte[] bytes = Files.readAllBytes(mementoFile);
 		String json = new String(decompress(bytes), DEFAULT_CHARSET);
-		return JSON_MAPPER.readValue(json, collectionType);
+		return JSON_MAPPER.readValue(json, ThesaurusParser.Memento.class);
 	}
 
 	@Override

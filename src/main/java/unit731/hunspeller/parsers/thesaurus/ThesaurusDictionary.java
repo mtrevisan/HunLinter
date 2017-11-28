@@ -1,9 +1,13 @@
 package unit731.hunspeller.parsers.thesaurus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -19,10 +23,38 @@ public class ThesaurusDictionary{
 	private static final Pattern REGEX_PATTERN_LF = PatternService.pattern(StringUtils.LF);
 
 
+	@JsonProperty
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 
+	@JsonIgnore
 	private boolean modified;
 
+
+	public boolean add(String partOfSpeech, List<String> meanings){
+		boolean result = false;
+		for(String meaning : meanings){
+			StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
+			sj.add(partOfSpeech);
+			meanings.stream()
+				.filter(m -> !m.equals(meaning))
+				.forEachOrdered(sj::add);
+			String mm = sj.toString();
+
+			ThesaurusEntry foundSynonym = findByMeaning(meaning);
+
+			MeaningEntry entry = new MeaningEntry(mm);
+			if(foundSynonym != null)
+				//add to meanings if synonym does exists
+				foundSynonym.getMeanings().add(entry);
+			else
+				//add to list if synonym does not exists
+				result = synonyms.add(new ThesaurusEntry(meaning, Arrays.asList(entry)));
+		}
+
+		modified = true;
+
+		return result;
+	}
 
 	public boolean add(ThesaurusEntry entry){
 		boolean result = synonyms.add(entry);
@@ -77,7 +109,7 @@ public class ThesaurusDictionary{
 		modified = true;
 	}
 
-	public ThesaurusEntry findByMeaning(String meaning){
+	private ThesaurusEntry findByMeaning(String meaning){
 		ThesaurusEntry foundSynonym = null;
 		for(ThesaurusEntry synonym : synonyms)
 			if(synonym.getSynonym().equals(meaning)){

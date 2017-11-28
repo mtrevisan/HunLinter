@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.thesaurus;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,13 +12,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Resultable;
@@ -33,9 +34,11 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
-	public class Memento{
+	@NoArgsConstructor(access = AccessLevel.PRIVATE)
+	protected static class Memento{
 
-		private final ThesaurusDictionary dictionary;
+		@JsonProperty
+		private ThesaurusDictionary dictionary;
 
 	}
 
@@ -139,16 +142,16 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 			throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-		String[] meanings = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
-		List<String> means = Arrays.stream(meanings)
+		String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
+		List<String> meanings = Arrays.stream(means)
 			.map(String::trim)
 			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.collect(Collectors.toList());
-		if(means.size() < 1)
+		if(meanings.size() < 1)
 			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
 
-		DuplicationResult duplicationResult = extractDuplicates(means, partOfSpeech, duplicatesDiscriminator);
+		DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
 
 		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
 			try{
@@ -161,25 +164,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				log.warn("Error while storing a memento", ex);
 			}
 
-			for(String meaning : means){
-				//insert the new synonym
-				StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
-				sj.add(partOfSpeech);
-				means.stream()
-					.filter(m -> !m.equals(meaning))
-					.forEachOrdered(sj::add);
-				String mm = sj.toString();
-
-				ThesaurusEntry foundSynonym = dictionary.findByMeaning(meaning);
-
-				MeaningEntry entry = new MeaningEntry(mm);
-				if(foundSynonym != null)
-					//add to meanings if synonym does exists
-					foundSynonym.getMeanings().add(entry);
-				else
-					//add to list if synonym does not exists
-					dictionary.add(new ThesaurusEntry(meaning, Arrays.asList(entry)));
-			}
+			dictionary.add(partOfSpeech, meanings);
 		}
 
 		return duplicationResult;
