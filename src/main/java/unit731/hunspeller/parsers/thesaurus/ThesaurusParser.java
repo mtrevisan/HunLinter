@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
+import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.memento.OriginatorInterface;
@@ -91,11 +92,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 

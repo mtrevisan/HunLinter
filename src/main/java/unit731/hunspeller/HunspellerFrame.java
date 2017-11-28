@@ -74,6 +74,7 @@ import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.Debouncer;
+import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
@@ -952,11 +953,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			printResultLine("Insertion error: " + e.getMessage());
 		}
 		catch(Exception e){
-			String message = e.getMessage();
-			if(message == null){
-				StackTraceElement stackTrace0 = e.getStackTrace()[0];
-				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-			}
+			String message = ExceptionService.getMessage(e, getClass());
 			printResultLine("Insertion error: " + message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
@@ -1004,11 +1001,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			printResultLine("Deletion error: " + e.getMessage());
 		}
 		catch(Exception e){
-			String message = e.getMessage();
-			if(message == null){
-				StackTraceElement stackTrace0 = e.getStackTrace()[0];
-				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-			}
+			String message = ExceptionService.getMessage(e, getClass());
 			printResultLine("Deletion error: " + message);
 		}
 	}
@@ -1272,11 +1265,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		catch(Exception e){
-			String message = e.getMessage();
-			if(message == null){
-				StackTraceElement stackTrace0 = e.getStackTrace()[0];
-				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-			}
+			String message = ExceptionService.getMessage(e, getClass());
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}
@@ -1381,11 +1370,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		catch(Exception e){
-			String message = e.getMessage();
-			if(message == null){
-				StackTraceElement stackTrace0 = e.getStackTrace()[0];
-				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-			}
+			String message = ExceptionService.getMessage(e, getClass());
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}

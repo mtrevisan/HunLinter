@@ -41,6 +41,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
+import unit731.hunspeller.services.ExceptionService;
 
 
 public class DictionaryParser{
@@ -140,11 +141,7 @@ public class DictionaryParser{
 				publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
@@ -188,11 +185,7 @@ public class DictionaryParser{
 				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
@@ -436,11 +429,7 @@ public class DictionaryParser{
 				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
@@ -640,11 +629,7 @@ public class DictionaryParser{
 				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;

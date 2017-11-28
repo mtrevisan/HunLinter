@@ -34,6 +34,7 @@ import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 
@@ -197,11 +198,7 @@ public class HyphenationParser{
 				publish(e instanceof ClosedChannelException? "Hyphenation parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
-				String message = e.getMessage();
-				if(message == null){
-					StackTraceElement stackTrace0 = e.getStackTrace()[0];
-					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
-				}
+				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
