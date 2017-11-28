@@ -106,8 +106,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "<0 or <1")));
 	}
 
-//	private static final Set<String> MISSING_AND_SUPERFLUOUS_CHECKS = new HashSet<>(Arrays.asList(FINAL_SONORIZATION_RULE));
-
 	private static final String POS_PROPER_NOUN = "proper_noun";
 	private static final String POS_VERB = "verb";
 	private static final String POS_ARTICLE = "article";
@@ -144,8 +142,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy)
-			throws IllegalArgumentException{
+	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
 			if(!production.hasDataFields())
 				throw new IllegalArgumentException("Line does not contains any data fields");
