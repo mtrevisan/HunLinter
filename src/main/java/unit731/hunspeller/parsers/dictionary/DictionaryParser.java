@@ -136,16 +136,16 @@ public class DictionaryParser{
 
 				publish("Finished reading Dictionary file");
 			}
-			catch(NullPointerException e){
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
 				String message = e.getMessage();
 				if(message == null){
 					StackTraceElement stackTrace0 = e.getStackTrace()[0];
 					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
 				}
 				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}
@@ -184,16 +184,16 @@ public class DictionaryParser{
 				if(!duplicates.isEmpty())
 					openFileWithChoosenEditor();
 			}
-			catch(NullPointerException e){
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
 				String message = e.getMessage();
 				if(message == null){
 					StackTraceElement stackTrace0 = e.getStackTrace()[0];
 					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
 				}
 				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}
@@ -432,16 +432,16 @@ public class DictionaryParser{
 
 				setProgress(100);
 			}
-			catch(NullPointerException e){
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
 				String message = e.getMessage();
 				if(message == null){
 					StackTraceElement stackTrace0 = e.getStackTrace()[0];
 					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
 				}
 				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}
@@ -636,16 +636,16 @@ public class DictionaryParser{
 					publish("Wordlist extracted successfully");
 				}
 			}
-			catch(NullPointerException e){
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
 				String message = e.getMessage();
 				if(message == null){
 					StackTraceElement stackTrace0 = e.getStackTrace()[0];
 					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
 				}
 				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			return null;
 		}

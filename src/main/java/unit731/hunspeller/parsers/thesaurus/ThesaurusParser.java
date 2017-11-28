@@ -87,16 +87,16 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 				publish("Finished reading Thesaurus file");
 			}
-			catch(NullPointerException e){
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
 				String message = e.getMessage();
 				if(message == null){
 					StackTraceElement stackTrace0 = e.getStackTrace()[0];
 					message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
 				}
 				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 
 			theParser.dictionary.resetModified();
