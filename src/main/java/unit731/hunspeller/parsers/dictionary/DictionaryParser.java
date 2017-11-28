@@ -649,6 +649,7 @@ public class DictionaryParser{
 		return "(?iu)(" + text + ")";
 	}
 
+
 	private boolean isComment(String line){
 		return PatternService.find(line, REGEX_COMMENT);
 	}
