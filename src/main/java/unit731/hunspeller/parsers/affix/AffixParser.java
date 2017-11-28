@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -343,9 +344,10 @@ public class AffixParser{
 
 			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
 			if(compoundRules != null){
-				String rawRules = compoundRules.stream()
-					.map(rule -> PatternService.clear(rule, REGEX_COMPOUND_RULES_OPERATORS))
-					.collect(Collectors.joining(StringUtils.EMPTY));
+				StringJoiner sj = new StringJoiner(StringUtils.EMPTY);
+				for(String compoundRule : compoundRules)
+					sj.add(PatternService.clear(compoundRule, REGEX_COMPOUND_RULES_OPERATORS));
+				String rawRules = sj.toString();
 				String[] parsedRules = strategy.parseRuleFlags(rawRules);
 				rawFlags.addAll(Arrays.asList(parsedRules));
 			}

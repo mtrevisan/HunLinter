@@ -121,11 +121,10 @@ public class ThesaurusDictionary{
 
 	public List<String> extractDuplicates(){
 		Set<String> allItems = new HashSet<>();
-		List<String> duplicatedSynonyms = synonyms.stream()
+		return synonyms.stream()
 			.map(ThesaurusEntry::getSynonym)
 			.filter(s -> !allItems.add(s))
 			.collect(Collectors.toList());
-		return duplicatedSynonyms;
 	}
 
 }

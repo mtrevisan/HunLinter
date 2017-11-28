@@ -289,10 +289,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
-			boolean elBetweenVowelsRemoval = production.getAppliedRules().stream()
-				.map(AffixEntry::toString)
-				.map(L_BETWEEN_VOWELS::reset)
-				.anyMatch(Matcher::find);
+			boolean elBetweenVowelsRemoval = false;
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			for(AffixEntry appliedRule : appliedRules)
+				if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
+					elBetweenVowelsRemoval = true;
+					break;
+				}
 			if(!elBetweenVowelsRemoval)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent here");
 		}
@@ -300,10 +303,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV) && !PatternService.find(subword, CIUI)){
-			boolean dBetweenVowelsRemoval = production.getAppliedRules().stream()
-				.map(AffixEntry::toString)
-				.map(D_BETWEEN_VOWELS::reset)
-				.anyMatch(Matcher::find);
+			boolean dBetweenVowelsRemoval = false;
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			for(AffixEntry appliedRule : appliedRules)
+				if(PatternService.find(appliedRule.toString(), D_BETWEEN_VOWELS)){
+					dBetweenVowelsRemoval = true;
+					break;
+				}
 			if(!dBetweenVowelsRemoval)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
 		}

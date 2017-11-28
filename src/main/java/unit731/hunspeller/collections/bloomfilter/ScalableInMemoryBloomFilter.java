@@ -62,14 +62,22 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	@Override
 	public boolean contains(T value){
-		return (value != null && filters.stream().anyMatch(f -> f.contains(value)));
+		boolean result = false;
+		if(value != null)
+			for(BloomFilterInterface<T> filter : filters)
+				if(filter.contains(value)){
+					result = true;
+					break;
+				}
+		return result;
 	}
 
 	@Override
 	public int getAddedElements(){
-		return filters.stream()
-			.mapToInt(BloomFilterInterface::getAddedElements)
-			.sum();
+		int sum = 0;
+		for(BloomFilterInterface<T> filter : filters)
+			sum += filter.getAddedElements();
+		return sum;
 	}
 
 	@Override

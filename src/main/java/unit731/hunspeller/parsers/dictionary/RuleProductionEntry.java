@@ -106,9 +106,11 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public String getRulesSequence(){
-		return (appliedRules != null? appliedRules.stream()
-			.map(AffixEntry::getFlag)
-			.collect(Collectors.joining(" > ")): StringUtils.EMPTY);
+		StringJoiner sj = new StringJoiner(" > ");
+		if(appliedRules != null)
+			for(AffixEntry appliedRule : appliedRules)
+				sj.add(appliedRule.getFlag());
+		return sj.toString();
 	}
 
 //	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
