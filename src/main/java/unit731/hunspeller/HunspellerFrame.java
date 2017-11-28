@@ -948,7 +948,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
-		catch(NullPointerException | ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
+		catch(NullPointerException e){
+			String message = e.getMessage();
+			if(message == null){
+				StackTraceElement stackTrace0 = e.getStackTrace()[0];
+				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+			}
+			printResultLine("Insertion error: " + message);
+		}
+		catch(ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
 			printResultLine("Insertion error: " + e.getMessage());
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
@@ -992,7 +1000,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			//... and save the files
 			saveThesaurusFiles();
 		}
-		catch(NullPointerException | ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
+		catch(NullPointerException e){
+			String message = e.getMessage();
+			if(message == null){
+				StackTraceElement stackTrace0 = e.getStackTrace()[0];
+				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+			}
+			printResultLine("Deletion error: " + message);
+		}
+		catch(ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
 			printResultLine("Deletion error: " + e.getMessage());
 		}
 	}
@@ -1252,7 +1268,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Unable to register file change listener");
 			}
 		}
-		catch(IOException | IllegalArgumentException | NullPointerException e){
+		catch(NullPointerException e){
+			String message = e.getMessage();
+			if(message == null){
+				StackTraceElement stackTrace0 = e.getStackTrace()[0];
+				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+			}
+			printResultLine(e.getClass().getSimpleName() + ": " + message);
+		}
+		catch(IOException | IllegalArgumentException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}
@@ -1353,7 +1377,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Finished reading Aid file");
 			}
 		}
-		catch(IOException | NullPointerException e){
+		catch(NullPointerException e){
+			String message = e.getMessage();
+			if(message == null){
+				StackTraceElement stackTrace0 = e.getStackTrace()[0];
+				message = stackTrace0.getFileName() + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+			}
+			printResultLine(e.getClass().getSimpleName() + ": " + message);
+		}
+		catch(IOException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}
