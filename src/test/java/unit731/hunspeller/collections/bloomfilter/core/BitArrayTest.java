@@ -12,7 +12,7 @@ public class BitArrayTest{
 
 
 	@Test
-	public void fast(){
+	public void fast() throws IOException{
 		FastBitArray bits = new FastBitArray(MAX);
 		for(int i = 0; i < MAX; i ++){
 			Assert.assertFalse(bits.get(i));
@@ -21,10 +21,11 @@ public class BitArrayTest{
 			bits.clear(i);
 			Assert.assertFalse(bits.get(i));
 		}
+		bits.close();
 	}
 
 	@Test
-	public void java(){
+	public void java() throws IOException{
 		JavaBitArray bits = new JavaBitArray(MAX);
 		for(int i = 0; i < MAX; i ++){
 			Assert.assertFalse(bits.get(i));
@@ -33,6 +34,7 @@ public class BitArrayTest{
 			bits.clear(i);
 			Assert.assertFalse(bits.get(i));
 		}
+		bits.close();
 	}
 
 	@Test
@@ -47,6 +49,7 @@ public class BitArrayTest{
 			bits.clear(i);
 			Assert.assertFalse(bits.get(i));
 		}
+		bits.close();
 	}
 
 }
