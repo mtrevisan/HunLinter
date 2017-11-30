@@ -67,7 +67,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_L = "ƚ[^/]+" + START_TAGS;
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
-	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("[eo]([kƚñstxv]o|nt[eo]|[lnr])$");
+	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("([eo]([dđkƚñstŧxv]o|nt[eo]|[lnr])|o[lr][kd]o|orse|exe)$");
 	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS + "C0|[^aio]" + START_TAGS + ADJECTIVE_THIRD_CLASS_RULE);
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
@@ -95,15 +95,20 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private static final Set<List<String>> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
-	private static final String WORD_WITH_RULE_B0_CANNOT_HAVE = "Word with rule B0 cannot have rule {0}";
+	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1}";
 	static{
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "&0 or &1")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "[0 or [1")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "(0 or (1")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, ")0 or )1")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATO_RULE, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "§0")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(COLLECTIVE_NOUNS_RULE, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "Y0")));
-		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_B0_CANNOT_HAVE, "<0 or <1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "&0 or &1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "[0 or [1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "(0 or (1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", ")0 or )1")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATO_RULE, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "§0")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(COLLECTIVE_NOUNS_RULE, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "Y0")));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "<0 or <1")));
+	}
+
+	private static final Set<List<String>> VARIANT_TRANSFORMATION_MISMATCH_CHECKS = new HashSet<>();
+	static{
+		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL, MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "&0 or &1")));
 	}
 
 	private static final String POS_PROPER_NOUN = "proper_noun";
@@ -214,8 +219,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void incompatibilityCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		if(production.containsRuleFlag(ADJECTIVE_FIRST_CLASS_RULE))
-			for(List<String> key : ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS){
+		commonIncompatibilityCheck(production, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS);
+		commonIncompatibilityCheck(production, VARIANT_TRANSFORMATIONS_RULE, VARIANT_TRANSFORMATION_MISMATCH_CHECKS);
+	}
+
+	private void commonIncompatibilityCheck(RuleProductionEntry production, String ruleFlag, Set<List<String>> checks) throws IllegalArgumentException{
+		if(production.containsRuleFlag(ruleFlag))
+			for(List<String> key : checks){
 				int size = key.size() - 1;
 				for(int i = 0; i < size; i ++)
 					if(production.containsRuleFlag(key.get(i)))
