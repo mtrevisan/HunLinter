@@ -16,7 +16,7 @@ public class Word{
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
-	private static final String SORTING_ALPHABET = "-/.0123456789" + ALPHABET + "ʼ'";
+	private static final String SORTING_ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
