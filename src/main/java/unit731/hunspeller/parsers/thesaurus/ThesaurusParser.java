@@ -89,7 +89,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				publish("Finished reading Thesaurus file");
 			}
 			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": "
+					+ e.getMessage());
 			}
 			catch(Exception e){
 				String message = ExceptionService.getMessage(e, getClass());
@@ -129,8 +130,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	/**
-	 * @param synonymAndMeanings	The line representing all the synonyms of a word along with their part of speech
-	 * @param duplicatesDiscriminator	Function called to ask the user what to do is duplicates are found (return <code>true</code> to force insertion)
+	 * @param synonymAndMeanings			The line representing all the synonyms of a word along with their part of speech
+	 * @param duplicatesDiscriminator	Function called to ask the user what to do is duplicates are found (return <code>true</code> to force
+	 *												insertion)
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
@@ -168,7 +170,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator) throws IllegalArgumentException{
+	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
+			throws IllegalArgumentException{
 		boolean forcedInsertion = false;
 		List<ThesaurusEntry> duplicates = new ArrayList<>();
 		try{
