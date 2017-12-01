@@ -151,8 +151,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>(Arrays.asList("singular_masculine", "singular_femenine", "plural",
 		"plural_masculine", "plural_femenine", "procomplementar", "interrogative"));
 	private static final Set<String> TERMINAL_SUFFIX = new HashSet<>(Arrays.asList("indicative_present", "indicative_imperfect",
-		"indicative_future", "subjunctive_present", "subjunctive_imperfect", "conditional_present", "infinitive_simple", "gerund_simple",
-		"participle_active", "participle_passive", "participle_perfect", "participle_perfect_strong", "participle_imperfect"));
+		"indicative_future", "subjunctive_present", "subjunctive_imperfect", "conditional_present", "imperative_present", "infinitive_simple",
+		"gerund_simple", "participle_active", "participle_passive", "participle_perfect", "participle_perfect_strong", "participle_imperfect"));
 
 	private static final Map<String, Set<String>> DATA_FIELDS = new HashMap<>();
 	static{
