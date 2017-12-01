@@ -133,6 +133,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	static{
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL,
 			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "&0 or &1")));
+		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL,
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", ")0 or )1")));
 	}
 
 	private static final String POS_PROPER_NOUN = "proper_noun";
@@ -173,6 +175,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 		super(dicFile, wordGenerator, charset);
 	}
 
+/*
+TODO
+having word1/rules1 and word2/rules2
+if rules2 is a subset of rules1 and rule R can transform word1 into word2
+
+https://github.com/hunspell/hunspell/blob/58dfe79637982c5c49658c57c3b01d4f44c07c19/src/tools/munch.cxx
+*/
 	@Override
 	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
