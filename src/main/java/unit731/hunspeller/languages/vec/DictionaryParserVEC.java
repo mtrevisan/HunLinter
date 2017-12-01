@@ -149,7 +149,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		"numeral_cardenal", "numeral_ordenal", "numeral_collective", "numeral_fractional", "numeral_multiplicative", POS_ARTICLE, POS_PRONOUN,
 		"preposition", POS_ADVERB, "conjunction", "prefix", POS_INTERJECTION, POS_UNIT_OF_MEASURE));
 	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>(Arrays.asList("singular_masculine", "singular_femenine", "plural",
-		"plural_masculine", "plural_femenine", "procomplementar", "interrogative"));
+		"plural_masculine", "plural_femenine", "procomplementar", "interrogative", "second_singular", "second_plural"));
 	private static final Set<String> TERMINAL_SUFFIX = new HashSet<>(Arrays.asList("indicative_present", "indicative_imperfect",
 		"indicative_future", "subjunctive_present", "subjunctive_imperfect", "conditional_present", "imperative_present", "infinitive_simple",
 		"gerund_simple", "participle_active", "participle_passive", "participle_perfect", "participle_perfect_strong", "participle_imperfect"));
