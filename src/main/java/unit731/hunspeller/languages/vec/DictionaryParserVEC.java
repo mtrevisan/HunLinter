@@ -175,13 +175,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 		super(dicFile, wordGenerator, charset);
 	}
 
-/*
-TODO
-having word1/rules1 and word2/rules2
-if rules2 is a subset of rules1 and rule R can transform word1 into word2
-
-https://github.com/hunspell/hunspell/blob/58dfe79637982c5c49658c57c3b01d4f44c07c19/src/tools/munch.cxx
-*/
 	@Override
 	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{

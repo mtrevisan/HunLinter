@@ -120,9 +120,10 @@ public class DictionaryParser{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
 							try{
-								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-								subProductions.forEach(production -> dicParser.checkProduction(production, strategy));
+								for(RuleProductionEntry production : productions)
+									dicParser.checkProduction(production, strategy);
 							}
 							catch(IllegalArgumentException e){
 								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
@@ -218,10 +219,10 @@ public class DictionaryParser{
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
 						try{
-							List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-							for(RuleProductionEntry sub : subProductions){
-								String text = sub.toStringWithSignificantDataFields();
+							for(RuleProductionEntry production : productions){
+								String text = production.toStringWithSignificantDataFields();
 								if(!bloomFilter.add(text))
 									duplicatesBloomFilter.add(text);
 							}
@@ -271,11 +272,11 @@ public class DictionaryParser{
 						if(!line.isEmpty()){
 							try{
 								DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
-								for(RuleProductionEntry sub : subProductions){
-									String text = sub.toStringWithSignificantDataFields();
+								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								for(RuleProductionEntry production : productions){
+									String text = production.toStringWithSignificantDataFields();
 									if(duplicatesBloomFilter.contains(text))
-										result.add(new Duplicate(sub, dictionaryWord, lineIndex));
+										result.add(new Duplicate(production, dictionaryWord, lineIndex));
 								}
 							}
 							catch(IllegalArgumentException e){
@@ -605,9 +606,9 @@ public class DictionaryParser{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
 							try{
-								List<RuleProductionEntry> subProductions = dicParser.wordGenerator.applyRules(dictionaryWord);
+								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-								for(RuleProductionEntry production : subProductions){
+								for(RuleProductionEntry production : productions){
 									writer.write(production.getWord());
 									writer.newLine();
 								}
@@ -633,6 +634,99 @@ public class DictionaryParser{
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
+		}
+
+		@Override
+		protected void process(List<String> chunks){
+			resultable.printResultLine(chunks);
+		}
+	};
+
+
+	@AllArgsConstructor
+	public static class ReducerWorker extends SwingWorker<Void, String>{
+
+		private final AffixParser affParser;
+		private final DictionaryParser dicParser;
+		private final File outputFile;
+		private final Resultable resultable;
+
+
+		@Override
+		protected Void doInBackground() throws Exception{
+			try{
+				publish("Opening Dictionary file for reduce: " + affParser.getLanguage() + ".dic");
+				setProgress(0);
+
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
+				try(
+						BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
+						BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
+						){
+					String line = br.readLine();
+					if(!NumberUtils.isCreatable(line))
+						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+
+					int lineIndex = 1;
+					long readSoFar = 0l;
+					long totalSize = dicParser.dicFile.length();
+					while((line = br.readLine()) != null){
+						lineIndex ++;
+						readSoFar += line.length();
+
+						line = dicParser.cleanLine(line);
+						if(!line.isEmpty()){
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+
+							try{
+								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
+
+								//TODO
+/*
+TODO
+having word1/rules1 df1 and word2/rules2 df2
+if df1 is equals to df2 and rules2 is a subset of rules1 and rule R can transform word1 into word2
+
+https://github.com/hunspell/hunspell/blob/58dfe79637982c5c49658c57c3b01d4f44c07c19/src/tools/munch.cxx
+*/
+//								for(RuleProductionEntry production : productions){
+//									writer.write(production.getWord());
+//									writer.newLine();
+//								}
+							}
+							catch(IllegalArgumentException e){
+								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
+							}
+						}
+
+						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+					}
+
+					setProgress(100);
+
+					publish("Reducers extracted successfully");
+
+//					if(!duplicates.isEmpty())
+//						openFileWithChoosenEditor();
+				}
+			}
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Reducer thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
+				String message = ExceptionService.getMessage(e, getClass());
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			return null;
+		}
+
+		private void openFileWithChoosenEditor() throws InterruptedException, IOException{
+			ProcessBuilder builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", outputFile.getAbsolutePath());
+			builder.redirectErrorStream();
+			builder.redirectOutput();
+			Process process = builder.start();
+			process.waitFor();
 		}
 
 		@Override
