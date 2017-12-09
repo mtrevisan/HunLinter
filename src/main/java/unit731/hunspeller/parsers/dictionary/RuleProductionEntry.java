@@ -89,6 +89,10 @@ public class RuleProductionEntry implements Productable{
 		return false;
 	}
 
+	public boolean hasProductionRules(){
+		return (appliedRules != null && !appliedRules.isEmpty());
+	}
+
 	public boolean hasProductionRule(String ruleFlag){
 		if(appliedRules != null)
 			for(AffixEntry appliedRule : appliedRules)
@@ -137,8 +141,7 @@ public class RuleProductionEntry implements Productable{
 //		Collections.sort(significant, comparator);
 //		return significant.toArray(new String[0]);
 		return Arrays.stream(dataFields)
-			.filter(df -> !df.startsWith(WordGenerator.TAG_PHONETIC) && !df.startsWith(WordGenerator.TAG_STEM)
-				&& !df.startsWith(WordGenerator.TAG_ALLOMORPH))
+			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
 			.sorted()
 			.collect(Collectors.toList())
 			.toArray(new String[0]);

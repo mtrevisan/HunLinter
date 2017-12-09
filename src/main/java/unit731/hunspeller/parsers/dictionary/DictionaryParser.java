@@ -325,8 +325,9 @@ public class DictionaryParser{
 						writer.write(entries.get(0).getProduction().getWord());
 						writer.write(": ");
 						writer.write(entries.stream()
-							.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex() + " via "
-								+ duplicate.getProduction().getRulesSequence() + ")")
+							.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex()
+								+ (duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence():
+									StringUtils.EMPTY) + ")")
 							.collect(Collectors.joining(", ")));
 						writer.newLine();
 
