@@ -334,7 +334,7 @@ public class AffixParser{
 		return Charset.forName(getData(TAG_CHARACTER_SET));
 	}
 
-	public boolean definesFlag(String ruleFlag){
+	public boolean isProductiveFlag(String ruleFlag){
 		if(rawFlags == null){
 			rawFlags = new HashSet<>();
 			rawFlags.add(getData(TAG_KEEP_CASE));
@@ -376,6 +376,18 @@ public class AffixParser{
 			isSuffix = ((RuleEntry)affix).isSuffix();
 		return isSuffix;
 	}
+
+    public Set<String> getProductiveAffixes(){
+        //keeps only items with RuleEntry as value
+        Set<String> affixes = new HashSet<>();
+        Set<String> keys = data.keySet();
+        for(String key : keys){
+            Object affix = getData(key);
+            if(RuleEntry.class.isAssignableFrom(affix.getClass()))
+                affixes.add(key);
+        }
+        return affixes;
+    }
 
 	public String getFlag(){
 		return getData(TAG_FLAG);

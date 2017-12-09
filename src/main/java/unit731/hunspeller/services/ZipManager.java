@@ -10,28 +10,21 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class ZipManager{
 
-	private static final Matcher REGEX_PATH_SEPARATOR = PatternService.matcher("\\\\");
-
-
-	private final List<String> filesListInDir = new ArrayList<>();
-
-
 	public void zipDirectory(File dir, int compressionLevel, String zipFilename) throws FileNotFoundException, IOException{
-		populateFilesList(dir);
-		int startIndex = dir.getAbsolutePath().length() + 1;
-
 		Files.deleteIfExists((new File(zipFilename)).toPath());
 
+		List<String> filesListInDir = extractFilesList(dir);
+
 		//now zip files one by one
-		//create ZipOutputStream to write to the zip file
+		int startIndex = dir.getAbsolutePath().length() + 1;
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
 			zos.setLevel(compressionLevel);
 
@@ -50,16 +43,18 @@ public class ZipManager{
 		}
 	}
 
-	private void populateFilesList(File dir) throws IOException{
-		filesListInDir.clear();
+	private List<String> extractFilesList(File dir) throws IOException{
+		List<String> filesListInDir = new ArrayList<>();
 
 		File[] files = dir.listFiles();
 		for(File file : files){
 			if(file.isFile())
-				filesListInDir.add(PatternService.replaceAll(file.getAbsolutePath(), REGEX_PATH_SEPARATOR, "/"));
+				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
 			else
-				populateFilesList(file);
+				filesListInDir.addAll(extractFilesList(file));
 		}
+
+		return filesListInDir;
 	}
 
 	public static void zipFile(File file, int compressionLevel, String zipFilename) throws FileNotFoundException, IOException{

@@ -103,14 +103,14 @@ public class WordGenerator{
 	}
 
 	/** Separate the prefixes from the suffixes */
-	private Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
+	public Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
 		if(ruleFlags != null)
 			for(String ruleFlag : ruleFlags){
 				//always keep these flags
-				if(affParser.definesFlag(ruleFlag)){
+				if(affParser.isProductiveFlag(ruleFlag)){
 					terminalAffixes.add(ruleFlag);
 					continue;
 				}

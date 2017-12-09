@@ -27,7 +27,9 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.interfaces.Resultable;
@@ -44,6 +46,7 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.services.ExceptionService;
 
 
+@Slf4j
 public class DictionaryParser{
 
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
@@ -110,7 +113,7 @@ public class DictionaryParser{
 						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 					int lineIndex = 1;
-					long readSoFar = 0l;
+					long readSoFar = line.length();
 					long totalSize = dicParser.dicFile.length();
 					while((line = br.readLine()) != null){
 						lineIndex ++;
@@ -180,7 +183,7 @@ public class DictionaryParser{
 				publish("Duplicates extracted successfully");
 
 				if(!duplicates.isEmpty())
-					openFileWithChoosenEditor();
+					openFileWithChoosenEditor(outputFile);
 			}
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -209,7 +212,7 @@ public class DictionaryParser{
 				bloomFilter.setCharset(CHARSET);
 
 				int lineIndex = 1;
-				long readSoFar = 0l;
+				long readSoFar = line.length();
 				long totalSize = dicParser.dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
@@ -255,6 +258,7 @@ public class DictionaryParser{
 
 			if(duplicatesBloomFilter.getAddedElements() > 0){
 				publish("Start extracting duplicates (pass 2/3)");
+				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
@@ -263,7 +267,7 @@ public class DictionaryParser{
 					String line = br.readLine();
 
 					int lineIndex = 1;
-					long readSoFar = 0l;
+					long readSoFar = line.length();
 					long totalSize = dicParser.dicFile.length();
 					while((line = br.readLine()) != null){
 						lineIndex ++;
@@ -308,12 +312,12 @@ public class DictionaryParser{
 		}
 
 		private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
-			long totalSize = duplicates.size();
+			int totalSize = duplicates.size();
 			if(totalSize > 0){
 				publish("Write results to file (pass 3/3)");
-
-				long writtenSoFar = 0l;
 				setProgress(0);
+
+				int writtenSoFar = 0;
 				List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 				setProgress((int)(100. / (totalSize + 1)));
 				try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
@@ -354,14 +358,6 @@ public class DictionaryParser{
 			result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 				.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
 			return result;
-		}
-
-		private void openFileWithChoosenEditor() throws InterruptedException, IOException{
-			ProcessBuilder builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", outputFile.getAbsolutePath());
-			builder.redirectErrorStream();
-			builder.redirectOutput();
-			Process process = builder.start();
-			process.waitFor();
 		}
 
 		@Override
@@ -595,7 +591,7 @@ public class DictionaryParser{
 						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 					int lineIndex = 1;
-					long readSoFar = 0l;
+					long readSoFar = line.length();
 					long totalSize = dicParser.dicFile.length();
 					while((line = br.readLine()) != null){
 						lineIndex ++;
@@ -604,7 +600,6 @@ public class DictionaryParser{
 						line = dicParser.cleanLine(line);
 						if(!line.isEmpty()){
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-
 							try{
 								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
@@ -643,99 +638,6 @@ public class DictionaryParser{
 	};
 
 
-	@AllArgsConstructor
-	public static class ReducerWorker extends SwingWorker<Void, String>{
-
-		private final AffixParser affParser;
-		private final DictionaryParser dicParser;
-		private final File outputFile;
-		private final Resultable resultable;
-
-
-		@Override
-		protected Void doInBackground() throws Exception{
-			try{
-				publish("Opening Dictionary file for reduce: " + affParser.getLanguage() + ".dic");
-				setProgress(0);
-
-				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-
-				try(
-						BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
-						BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
-						){
-					String line = br.readLine();
-					if(!NumberUtils.isCreatable(line))
-						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
-
-					int lineIndex = 1;
-					long readSoFar = 0l;
-					long totalSize = dicParser.dicFile.length();
-					while((line = br.readLine()) != null){
-						lineIndex ++;
-						readSoFar += line.length();
-
-						line = dicParser.cleanLine(line);
-						if(!line.isEmpty()){
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-
-							try{
-								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
-
-								//TODO
-/*
-TODO
-having word1/rules1 df1 and word2/rules2 df2
-if df1 is equals to df2 and rules2 is a subset of rules1 and rule R can transform word1 into word2
-
-https://github.com/hunspell/hunspell/blob/58dfe79637982c5c49658c57c3b01d4f44c07c19/src/tools/munch.cxx
-*/
-//								for(RuleProductionEntry production : productions){
-//									writer.write(production.getWord());
-//									writer.newLine();
-//								}
-							}
-							catch(IllegalArgumentException e){
-								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
-							}
-						}
-
-						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
-					}
-
-					setProgress(100);
-
-					publish("Reducers extracted successfully");
-
-//					if(!duplicates.isEmpty())
-//						openFileWithChoosenEditor();
-				}
-			}
-			catch(IOException | IllegalArgumentException e){
-				publish(e instanceof ClosedChannelException? "Reducer thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-			}
-			catch(Exception e){
-				String message = ExceptionService.getMessage(e, getClass());
-				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			return null;
-		}
-
-		private void openFileWithChoosenEditor() throws InterruptedException, IOException{
-			ProcessBuilder builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", outputFile.getAbsolutePath());
-			builder.redirectErrorStream();
-			builder.redirectOutput();
-			Process process = builder.start();
-			process.waitFor();
-		}
-
-		@Override
-		protected void process(List<String> chunks){
-			resultable.printResultLine(chunks);
-		}
-	};
-
-
 	public String prepareTextForFilter(String text){
 		text = StringUtils.trim(text);
 		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
@@ -755,6 +657,26 @@ https://github.com/hunspell/hunspell/blob/58dfe79637982c5c49658c57c3b01d4f44c07c
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;
+	}
+
+	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
+	private static void openFileWithChoosenEditor(File file) throws InterruptedException, IOException{
+		ProcessBuilder builder = null;
+		if(SystemUtils.IS_OS_WINDOWS)
+			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_LINUX)
+			builder = new ProcessBuilder("edit", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_MAC)
+			builder = new ProcessBuilder("open", file.getAbsolutePath());
+
+		if(builder != null){
+			builder.redirectErrorStream();
+			builder.redirectOutput();
+			Process process = builder.start();
+			process.waitFor();
+		}
+		else
+			log.warn("Cannot open file " + file.getName() + ", OS not recognized (" + SystemUtils.OS_NAME + ")");
 	}
 
 }

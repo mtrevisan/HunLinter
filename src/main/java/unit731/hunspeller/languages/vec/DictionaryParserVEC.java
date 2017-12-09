@@ -129,8 +129,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "<0 or <1")));
 	}
 
+	//also V0/)0 - &0/&1
 	private static final Set<List<String>> VARIANT_TRANSFORMATION_MISMATCH_CHECKS = new HashSet<>();
 	static{
+		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList("V0",
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "V0")));
+		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList("v0",
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "v0")));
+		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList("T1",
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "T1")));
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL,
 			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "&0 or &1")));
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL,

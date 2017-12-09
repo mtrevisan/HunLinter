@@ -105,6 +105,19 @@ public class RuleProductionEntry implements Productable{
 		return false;
 	}
 
+	public boolean hasDoublefoldAffixRule(){
+		int prefixRules = 0;
+		int suffixRules = 0;
+		if(appliedRules != null && appliedRules.size() > 1)
+			for(AffixEntry appliedRule : appliedRules){
+				if(appliedRule.getType() == AffixEntry.TYPE.PREFIX)
+					prefixRules ++;
+				else
+					suffixRules ++;
+			}
+		return (prefixRules > 1 || suffixRules > 1);
+	}
+
 	public String getRulesSequence(){
 		StringJoiner sj = new StringJoiner(" > ");
 		if(appliedRules != null)

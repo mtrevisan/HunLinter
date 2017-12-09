@@ -796,7 +796,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Compression done");
 
 				//open directory
-				Desktop.getDesktop().open(new File(parentPath.toString()));
+				if(Desktop.isDesktopSupported())
+					Desktop.getDesktop().open(new File(parentPath.toString()));
 			}
 			catch(IOException e){
 				log.error("Something very bad happend while creating package", e);
