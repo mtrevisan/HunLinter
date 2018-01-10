@@ -640,7 +640,7 @@ public class DictionaryParser{
 
 
 	public String prepareTextForFilter(String text){
-		text = StringUtils.trim(text);
+		text = StringUtils.strip(text);
 		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
 		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
 		return "(?iu)(" + text + ")";
