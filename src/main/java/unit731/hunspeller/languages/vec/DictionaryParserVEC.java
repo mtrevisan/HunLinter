@@ -349,13 +349,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV) && !PatternService.find(subword, CIUI)){
 			boolean dBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(AffixEntry appliedRule : appliedRules)
-				if(PatternService.find(appliedRule.toString(), D_BETWEEN_VOWELS)){
-					dBetweenVowelsRemoval = true;
-					break;
-				}
-			if(!dBetweenVowelsRemoval)
-				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
+			if(appliedRules != null){
+				for(AffixEntry appliedRule : appliedRules)
+					if(PatternService.find(appliedRule.toString(), D_BETWEEN_VOWELS)){
+						dBetweenVowelsRemoval = true;
+						break;
+					}
+				if(!dBetweenVowelsRemoval)
+					throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
+			}
 		}
 	}
 
