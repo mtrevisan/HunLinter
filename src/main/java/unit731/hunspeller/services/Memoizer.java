@@ -1,40 +1,67 @@
 package unit731.hunspeller.services;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Memoizer<T, U>{
 
-	private final Map<T, U> cache = new ConcurrentHashMap<>();
+	private static final Object DEFAULT_OBJECT = new Object();
 
 
-	//thread-safe and recursion-safe implementation using a re-entrant lock
-//    private final Map<T, U> cache = new HashMap<>();
-//    private final ReentrantLock lock = new ReentrantLock();
+	public static <T> Supplier<T> memoize(Supplier<T> supplier){
+		Map<Object, T> cache = new ConcurrentHashMap<>();
+		return () -> cache.computeIfAbsent(DEFAULT_OBJECT, t -> supplier.get());
+	}
+
 	public static <T, U> Function<T, U> memoize(Function<T, U> function){
-		return new Memoizer<T, U>().doMemoize(function);
+		Map<T, U> cache = new ConcurrentHashMap<>();
+		return input -> cache.computeIfAbsent(input, function);
 	}
 
-	private Function<T, U> doMemoize(Function<T, U> function){
-		return input -> cache.computeIfAbsent(input, function::apply);
+	/**
+	 * Thread-safe and recursion-safe implementation using a re-entrant lock
+	 *
+	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
+	 */
+	public static <T> Supplier<T> memoizeThreadAndRecursionSafe(Supplier<T> supplier){
+		Map<Object, T> cache = new HashMap<>();
+		ReentrantLock lock = new ReentrantLock();
+		return () -> {
+			lock.lock();
+			try{
+				return cache.computeIfAbsent(DEFAULT_OBJECT, t -> supplier.get());
+			}
+			finally{
+				lock.unlock();
+			}
+		};
 	}
 
-	//thread-safe and recursion-safe implementation using a re-entrant lock
-	//https://opencredo.com/lambda-memoization-in-java-8/
-//    private Function<T, U> doMemoize(Function<T, U> function){
-//        return input -> {
-//            lock.lock();
-//            try{
-//                return cache.computeIfAbsent(input, function::apply);
-//            }
-//            finally{
-//                lock.unlock();
-//            }
-//        };
-//    }
+	/**
+	 * Thread-safe and recursion-safe implementation using a re-entrant lock
+	 *
+	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
+	 */
+	public static <T, U> Function<T, U> memoizeThreadAndRecursionSafe(Function<T, U> function){
+		Map<T, U> cache = new HashMap<>();
+		ReentrantLock lock = new ReentrantLock();
+		return input -> {
+			lock.lock();
+			try{
+				return cache.computeIfAbsent(input, function::apply);
+			}
+			finally{
+				lock.unlock();
+			}
+		};
+	}
 
 }
