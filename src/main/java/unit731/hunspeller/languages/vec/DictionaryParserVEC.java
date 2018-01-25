@@ -335,11 +335,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(AffixEntry appliedRule : appliedRules)
-				if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
-					elBetweenVowelsRemoval = true;
-					break;
-				}
+			if(appliedRules != null)
+				for(AffixEntry appliedRule : appliedRules)
+					if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
+						elBetweenVowelsRemoval = true;
+						break;
+					}
 			if(!elBetweenVowelsRemoval)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent here");
 		}
