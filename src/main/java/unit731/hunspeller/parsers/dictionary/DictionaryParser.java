@@ -704,12 +704,11 @@ public class DictionaryParser{
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
 
-					publish("File written: " + outputFile.getAbsolutePath());
+					publish("Support file written");
 				}
 
 
 				//sort file by length first and by alphabet after:
-				//TODO by length first
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(CHARSET)
 					.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(dicParser.getLanguage())))
@@ -720,7 +719,7 @@ public class DictionaryParser{
 
 				setProgress(100);
 
-				publish("File sorted");
+				publish("Support file sorted");
 
 
 				publish("Start extracting minimal pairs (pass 2/2)");
@@ -772,14 +771,25 @@ System.out.println(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(
 						setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
 					}
 
-					setProgress(100);
-
 					publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
 				}
 
 				Files.move(temporaryPath, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-				publish("Minimal pairs extracted successfully");
+				publish("Minimal pairs file written");
+
+				//sort file alphabetically:
+				options = ExternalSorterOptions.builder()
+					.charset(CHARSET)
+					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+					.useZip(true)
+					.removeDuplicates(true)
+					.build();
+				dicParser.sorter.sort(outputFile, options, outputFile);
+
+				setProgress(100);
+
+				publish("Minimal pairs extracted successfully: " + outputFile.getAbsolutePath());
 
 				openFileWithChoosenEditor(outputFile);
 			}
