@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
-public class Word{
+public class WordVEC{
 
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU";
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + "àÀéÉèÈíÍóÓòÒúÚ";
@@ -186,7 +186,7 @@ public class Word{
 	private static String markDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx < 0){
-			String phones = Grapheme.handleJHJWPhonemes(word);
+			String phones = GraphemeVEC.handleJHJWPhonemes(word);
 			int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
@@ -215,7 +215,7 @@ public class Word{
 		int idx = getIndexOfStress(word);
 		if(idx >= 0 && !isStressedLastGrapheme(word)){
 			String subword = word.substring(idx, idx + 2);
-			String tmp = (!Grapheme.isDiphtong(subword) && !Grapheme.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
+			String tmp = (!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
 				suppressDefaultStress(word): word);
 			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 				word = tmp;

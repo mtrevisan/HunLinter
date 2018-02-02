@@ -289,7 +289,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
-				+ (Word.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
+				+ (WordVEC.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
 	}
 
 	private void mismatchCheck(String line) throws IllegalArgumentException{
@@ -329,10 +329,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		if(Word.hasMultipleAccents(subword))
+		if(WordVEC.hasMultipleAccents(subword))
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
-		if(Word.isStressed(subword) && !subword.equals(Word.unmarkDefaultStress(subword))){
+		if(WordVEC.isStressed(subword) && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			if(appliedRules != null)

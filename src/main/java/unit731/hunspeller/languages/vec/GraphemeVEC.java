@@ -5,13 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
-public class Grapheme{
+public class GraphemeVEC{
 
 	public static final String JJH_PHONEME = "ʝ";
 	private static final String J_GRAPHEME = "j";
 	private static final String I_GRAPHEME = "i";
 	private static final String W_GRAPHEME = "w";
 	private static final String U_GRAPHEME = "u";
+
+	private static final String SAME_GRAPHEME_LLH = "lƚ";
+	private static final String SAME_GRAPHEME_JJH = "jɉ";
 
 	private static final Matcher DIPHTONG = PatternService.matcher("[iu][íú]|[àèéòó][iu]");
 	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
@@ -21,6 +24,12 @@ public class Grapheme{
 	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 
+
+	public static boolean isSameGrapheme(char chr1, char chr2){
+		return (chr1 == chr2
+			|| SAME_GRAPHEME_LLH.indexOf(chr1) >= 0 && SAME_GRAPHEME_LLH.indexOf(chr2) >= 0
+			|| SAME_GRAPHEME_JJH.indexOf(chr1) >= 0 && SAME_GRAPHEME_JJH.indexOf(chr2) >= 0);
+	}
 
 	public static boolean isDiphtong(String group){
 		return PatternService.find(group, DIPHTONG);

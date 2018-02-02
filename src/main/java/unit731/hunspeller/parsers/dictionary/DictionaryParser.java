@@ -46,8 +46,8 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.languages.vec.Grapheme;
-import unit731.hunspeller.languages.vec.Word;
+import unit731.hunspeller.languages.vec.GraphemeVEC;
+import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.HammingDistance;
 
@@ -691,7 +691,7 @@ public class DictionaryParser{
 								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
 								for(RuleProductionEntry production : productions){
-									String word = Grapheme.handleJHJWPhonemes(production.getWord());
+									String word = GraphemeVEC.handleJHJWPhonemes(production.getWord());
 									writer.write(word);
 									writer.newLine();
 								}
@@ -712,7 +712,7 @@ public class DictionaryParser{
 				//TODO by length first
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(CHARSET)
-					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+					.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(dicParser.getLanguage())))
 					.useZip(true)
 					.removeDuplicates(true)
 					.build();
@@ -754,10 +754,10 @@ public class DictionaryParser{
 										Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 										char left = difference.getLeft();
 										char right = difference.getRight();
-										if(Word.CONSONANTS.indexOf(left) >= 0 && Word.CONSONANTS.indexOf(right) >= 0){
-											destinationWriter.write(left + ">" + right + ": " + sourceLine + ", " + line2);
+										if(WordVEC.CONSONANTS.indexOf(left) >= 0 && WordVEC.CONSONANTS.indexOf(right) >= 0 && !GraphemeVEC.isSameGrapheme(left, right)){
+											destinationWriter.write(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(sourceLine + ", " + line2));
 											destinationWriter.newLine();
-System.out.println(left + ">" + right + ": " + sourceLine + ", " + line2);
+System.out.println(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(sourceLine + ", " + line2));
 										}
 									}
 								}

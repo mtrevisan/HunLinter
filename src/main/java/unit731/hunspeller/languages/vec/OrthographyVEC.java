@@ -34,16 +34,16 @@ public class OrthographyVEC extends Orthography{
 
 	private static final String MB = "mb";
 	private static final String MP = "mp";
-	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + Grapheme.JJH_PHONEME + "(?=[^aeiouàèéíòóúh])");
+	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéíòóúh])");
 	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternService.matcher("^i(?=[aeiouàèéíòóú])");
 	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternService.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher("fh(?=[^aeiouàèéíòóú])");
 	private static final Matcher REGEX_X_INTO_S = PatternService.matcher("x(?=[cfkpt])");
-	private static final Matcher REGEX_S_INTO_X = PatternService.matcher("s(?=([mnñbdg" + Grapheme.JJH_PHONEME + "ɉsvrlŧ]))");
+	private static final Matcher REGEX_S_INTO_X = PatternService.matcher("s(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
 
-	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([c" + Grapheme.JJH_PHONEME + "ñ])i([aeiou])");
+	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([c" + GraphemeVEC.JJH_PHONEME + "ñ])i([aeiou])");
 
 	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternService.matcher("([^aeiou]){1}\\1+");
 
@@ -68,12 +68,12 @@ public class OrthographyVEC extends Orthography{
 		word = StringUtils.replace(word, MB, "nb");
 		word = StringUtils.replace(word, MP, "np");
 
-		word = Grapheme.handleJHJWPhonemes(word);
+		word = GraphemeVEC.handleJHJWPhonemes(word);
 
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
 		word = PatternService.replaceFirst(word, REGEX_J_INTO_I, "i");
-		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, Grapheme.JJH_PHONEME);
-		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + Grapheme.JJH_PHONEME);
+		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
+		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		word = PatternService.replaceFirst(word, REGEX_LH_INITIAL_INTO_L, "l");
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
@@ -87,7 +87,7 @@ public class OrthographyVEC extends Orthography{
 		//correct morphological errors
 		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
 
-		word = Grapheme.rollbackJHJWPhonemes(word);
+		word = GraphemeVEC.rollbackJHJWPhonemes(word);
 
 		word = eliminateConsonantGeminates(word);
 
@@ -143,7 +143,7 @@ public class OrthographyVEC extends Orthography{
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APOSTROPHE2) && !HyphenationParser.HYPHEN.equals(syllabe)
-				&& Word.getLastVowelIndex(syllabe) < 0);
+				&& WordVEC.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;
 	}
