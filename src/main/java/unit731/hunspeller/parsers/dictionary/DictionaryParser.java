@@ -9,6 +9,8 @@ import java.io.OutputStreamWriter;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -655,7 +657,7 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic");
+				publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic (pass 1/2)");
 				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -697,6 +699,43 @@ public class DictionaryParser{
 					setProgress(100);
 
 					publish("File written: " + outputFile.getAbsolutePath());
+
+
+					publish("Start extracting minimal pairs (pass 2/2)");
+					setProgress(0);
+
+					int totalPairs = 0;
+					Path temporaryPath = Files.createTempFile(outputFile.getName(), ".tmp");
+					try(
+							BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), CHARSET);
+							BufferedWriter destinationWriter = Files.newBufferedWriter(temporaryPath, CHARSET);
+							){
+						String sourceLine;
+						int lineIndexSource = 0;
+						long readSoFarSource = 0;
+						long totalSizeSource = outputFile.length();
+						while((sourceLine = sourceBR.readLine()) != null){
+							lineIndexSource ++;
+							readSoFarSource += sourceLine.length();
+
+							sourceBR.mark((int)(totalSizeSource - readSoFarSource));
+
+							String line2;
+							while((line2 = sourceBR.readLine()) != null){
+								//TODO calculate distance
+							}
+
+							sourceBR.reset();
+
+							setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
+						}
+
+						setProgress(100);
+
+						publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
+					}
+
+					Files.move(temporaryPath, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 					publish("Minimal pairs extracted successfully");
 
