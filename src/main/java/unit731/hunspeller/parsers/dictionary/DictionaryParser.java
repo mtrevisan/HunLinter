@@ -46,6 +46,8 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
+import unit731.hunspeller.languages.vec.Grapheme;
+import unit731.hunspeller.languages.vec.Word;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.HammingDistance;
 
@@ -689,7 +691,8 @@ public class DictionaryParser{
 								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
 								for(RuleProductionEntry production : productions){
-									writer.write(production.getWord());
+									String word = Grapheme.handleJHJWPhonemes(production.getWord());
+									writer.write(word);
 									writer.newLine();
 								}
 							}
@@ -725,18 +728,23 @@ public class DictionaryParser{
 						if(sourceLine.length() >= MINIMAL_PAIR_LENGTH){
 							sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
+							String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
 							String line2;
 							while((line2 = sourceBR.readLine()) != null)
 								if(line2.length() >= MINIMAL_PAIR_LENGTH){
 									try{
 										//calculate distance
-										int distance = HammingDistance.getDistance(sourceLine, line2);
+										String line2Lowercase = line2.toLowerCase(Locale.ROOT);
+										int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
 										if(distance == 1){
-											Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLine, line2);
-
-											destinationWriter.write(difference.getLeft() + ">" + difference.getRight() + ": " + sourceLine + ", " + line2);
-											destinationWriter.newLine();
+											Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
+											char left = difference.getLeft();
+											char right = difference.getRight();
+											if(Word.CONSONANTS.indexOf(left) >= 0 && Word.CONSONANTS.indexOf(right) >= 0){
+												destinationWriter.write(left + ">" + right + ": " + sourceLine + ", " + line2);
+												destinationWriter.newLine();
 System.out.println(difference.getLeft() + ">" + difference.getRight() + ": " + sourceLine + ", " + line2);
+											}
 										}
 									}
 									catch(IllegalArgumentException e){}
