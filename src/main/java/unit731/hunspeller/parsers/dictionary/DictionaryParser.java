@@ -9,8 +9,6 @@ import java.io.OutputStreamWriter;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -48,7 +46,6 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.vec.DictionaryParserVEC;
-import unit731.hunspeller.languages.vec.GraphemeVEC;
 import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.HammingDistance;
@@ -691,7 +688,7 @@ public class DictionaryParser{
 
 								for(RuleProductionEntry production : productions)
 									if(shouldBeProcessed(production)){
-										String word = GraphemeVEC.handleJHJWPhonemes(production.getWord());
+										String word = production.getWord();
 										writer.write(word);
 										writer.newLine();
 									}
@@ -748,14 +745,13 @@ public class DictionaryParser{
 									Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 									char left = difference.getLeft();
 									char right = difference.getRight();
-									if(WordVEC.CONSONANTS.indexOf(left) >= 0 && WordVEC.CONSONANTS.indexOf(right) >= 0 && !GraphemeVEC.isSameGrapheme(left, right)){
+									if(WordVEC.CONSONANTS.indexOf(left) >= 0 && WordVEC.CONSONANTS.indexOf(right) >= 0){
 										String key = left + "/" + right;
-										String value = GraphemeVEC.rollbackJHJWPhonemes(sourceLine + "/" + line2);
+										String value = sourceLine + "/" + line2;
 										minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
 											.add(value);
 
 										totalPairs ++;
-System.out.println(key + ": " + value);
 									}
 								}
 							}
@@ -822,6 +818,8 @@ System.out.println(key + ": " + value);
 
 		private boolean shouldBeProcessed(RuleProductionEntry production){
 			return (production.getWord().length() >= MINIMAL_PAIR_LENGTH
+				&& production.getWord().indexOf('ƚ') < 0
+				&& production.getWord().indexOf('ɉ') < 0
 				&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_NOUN)
 				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE)
 				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_POSSESSIVE)
