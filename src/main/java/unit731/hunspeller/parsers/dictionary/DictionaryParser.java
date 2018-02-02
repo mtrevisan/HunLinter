@@ -704,10 +704,23 @@ public class DictionaryParser{
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
 
-					setProgress(100);
-
 					publish("File written: " + outputFile.getAbsolutePath());
 				}
+
+
+				//sort file by length first and by alphabet after:
+				//TODO by length first
+				ExternalSorterOptions options = ExternalSorterOptions.builder()
+					.charset(CHARSET)
+					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+					.useZip(true)
+					.removeDuplicates(true)
+					.build();
+				dicParser.sorter.sort(outputFile, options, outputFile);
+
+				setProgress(100);
+
+				publish("File sorted");
 
 
 				publish("Start extracting minimal pairs (pass 2/2)");
@@ -728,27 +741,30 @@ public class DictionaryParser{
 						if(sourceLine.length() >= MINIMAL_PAIR_LENGTH){
 							sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
-							String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
-							String line2;
-							while((line2 = sourceBR.readLine()) != null)
-								if(line2.length() >= MINIMAL_PAIR_LENGTH){
-									try{
-										//calculate distance
-										String line2Lowercase = line2.toLowerCase(Locale.ROOT);
-										int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
-										if(distance == 1){
-											Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
-											char left = difference.getLeft();
-											char right = difference.getRight();
-											if(Word.CONSONANTS.indexOf(left) >= 0 && Word.CONSONANTS.indexOf(right) >= 0){
-												destinationWriter.write(left + ">" + right + ": " + sourceLine + ", " + line2);
-												destinationWriter.newLine();
-System.out.println(difference.getLeft() + ">" + difference.getRight() + ": " + sourceLine + ", " + line2);
-											}
+							try{
+								String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
+
+								String line2;
+								while((line2 = sourceBR.readLine()) != null){
+									String line2Lowercase = line2.toLowerCase(Locale.ROOT);
+
+									//calculate distance
+									int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
+									if(distance == 1){
+										Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
+										char left = difference.getLeft();
+										char right = difference.getRight();
+										if(Word.CONSONANTS.indexOf(left) >= 0 && Word.CONSONANTS.indexOf(right) >= 0){
+											destinationWriter.write(left + ">" + right + ": " + sourceLine + ", " + line2);
+											destinationWriter.newLine();
+System.out.println(left + ">" + right + ": " + sourceLine + ", " + line2);
 										}
 									}
-									catch(IllegalArgumentException e){}
 								}
+							}
+							catch(IllegalArgumentException e){
+								//length varied, consider another line for minimal pair search
+							}
 
 							sourceBR.reset();
 						}
