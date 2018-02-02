@@ -817,9 +817,10 @@ public class DictionaryParser{
 		}
 
 		private boolean shouldBeProcessed(RuleProductionEntry production){
-			return (production.getWord().length() >= MINIMAL_PAIR_LENGTH
-				&& production.getWord().indexOf('ƚ') < 0
-				&& production.getWord().indexOf('ɉ') < 0
+			String word = production.getWord();
+			return (word.length() >= MINIMAL_PAIR_LENGTH
+				&& word.indexOf('ƚ') < 0
+				&& word.indexOf('ɉ') < 0
 				&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_NOUN)
 				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE)
 				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_POSSESSIVE)
