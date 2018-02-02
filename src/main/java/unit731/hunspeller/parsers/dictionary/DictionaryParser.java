@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -46,6 +47,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.HammingDistance;
 
 
 @Slf4j
@@ -648,6 +650,9 @@ public class DictionaryParser{
 	@AllArgsConstructor
 	public static class MinimalPairsWorker extends SwingWorker<Void, String>{
 
+		private static final int MINIMAL_PAIR_LENGTH = 3;
+
+
 		private final AffixParser affParser;
 		private final DictionaryParser dicParser;
 		private final File outputFile;
@@ -699,48 +704,60 @@ public class DictionaryParser{
 					setProgress(100);
 
 					publish("File written: " + outputFile.getAbsolutePath());
+				}
 
 
-					publish("Start extracting minimal pairs (pass 2/2)");
-					setProgress(0);
+				publish("Start extracting minimal pairs (pass 2/2)");
+				setProgress(0);
 
-					int totalPairs = 0;
-					Path temporaryPath = Files.createTempFile(outputFile.getName(), ".tmp");
-					try(
-							BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), CHARSET);
-							BufferedWriter destinationWriter = Files.newBufferedWriter(temporaryPath, CHARSET);
-							){
-						String sourceLine;
-						int lineIndexSource = 0;
-						long readSoFarSource = 0;
-						long totalSizeSource = outputFile.length();
-						while((sourceLine = sourceBR.readLine()) != null){
-							lineIndexSource ++;
-							readSoFarSource += sourceLine.length();
+				int totalPairs = 0;
+				Path temporaryPath = Files.createTempFile(outputFile.getName(), ".tmp");
+				try(
+						BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), CHARSET);
+						BufferedWriter destinationWriter = Files.newBufferedWriter(temporaryPath, CHARSET);
+						){
+					String sourceLine;
+					long readSoFarSource = 0;
+					long totalSizeSource = outputFile.length();
+					while((sourceLine = sourceBR.readLine()) != null){
+						readSoFarSource += sourceLine.length();
 
+						if(sourceLine.length() >= MINIMAL_PAIR_LENGTH){
 							sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
 							String line2;
-							while((line2 = sourceBR.readLine()) != null){
-								//TODO calculate distance
-							}
+							while((line2 = sourceBR.readLine()) != null)
+								if(line2.length() >= MINIMAL_PAIR_LENGTH){
+									try{
+										//calculate distance
+										int distance = HammingDistance.getDistance(sourceLine, line2);
+										if(distance == 1){
+											Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLine, line2);
+
+											destinationWriter.write(difference.getLeft() + ">" + difference.getRight() + ": " + sourceLine + ", " + line2);
+											destinationWriter.newLine();
+System.out.println(difference.getLeft() + ">" + difference.getRight() + ": " + sourceLine + ", " + line2);
+										}
+									}
+									catch(IllegalArgumentException e){}
+								}
 
 							sourceBR.reset();
-
-							setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
 						}
 
-						setProgress(100);
-
-						publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
+						setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
 					}
 
-					Files.move(temporaryPath, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+					setProgress(100);
 
-					publish("Minimal pairs extracted successfully");
-
-					openFileWithChoosenEditor(outputFile);
+					publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
 				}
+
+				Files.move(temporaryPath, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+				publish("Minimal pairs extracted successfully");
+
+				openFileWithChoosenEditor(outputFile);
 			}
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Minimal pairs thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
