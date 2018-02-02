@@ -66,6 +66,11 @@ import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
+import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
+import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
+import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
+import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
@@ -129,11 +134,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(HunspellerFrame::hyphenateAddRule, 400);
 	private final FileListenerManager flm;
 
-	private SwingWorker<Void, String> dicCorrectnessWorker;
-	private SwingWorker<Void, String> dicDuplicatesWorker;
-	private SwingWorker<Void, String> dicSorterWorker;
-	private SwingWorker<Void, String> dicWordlistWorker;
-	private SwingWorker<Void, String> dicMinimalPairsWorker;
+	private CorrectnessWorker dicCorrectnessWorker;
+	private DuplicatesWorker dicDuplicatesWorker;
+	private SorterWorker dicSorterWorker;
+	private WordlistWorker dicWordlistWorker;
+	private MinimalPairsWorker dicMinimalPairsWorker;
 	private SwingWorker<List<ThesaurusEntry>, String> theParserWorker;
 	private SwingWorker<Void, String> hypParserWorker;
 	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
@@ -165,16 +170,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
 		enableMenuItemFromWorker.put(ThesaurusParser.ParserWorker.class, () -> theMenu.setEnabled(true));
-		enableMenuItemFromWorker.put(DictionaryParser.CorrectnessWorker.class, () -> {
+		enableMenuItemFromWorker.put(CorrectnessWorker.class, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(DictionaryParser.DuplicatesWorker.class, () -> {
+		enableMenuItemFromWorker.put(DuplicatesWorker.class, () -> {
 			dicExtractDuplicatesMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(DictionaryParser.SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
-		enableMenuItemFromWorker.put(DictionaryParser.WordlistWorker.class, () -> {
+		enableMenuItemFromWorker.put(SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableMenuItemFromWorker.put(WordlistWorker.class, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
@@ -360,6 +365,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                   };
                   ThesaurusEntry synonym = theParser.getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(parent, synonym, okButtonAction, (Resultable)parent);
+                  dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
                }
             }
@@ -924,10 +930,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
-        MenuSelectionManager.defaultManager().clearSelectedPath();
+		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-        ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(this, theParser.extractDuplicates());
-        dialog.setVisible(true);
+		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(this, theParser.extractDuplicates());
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
 
 	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theAddButtonActionPerformed
@@ -1192,7 +1199,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	@Override
 	public void fileModified(Path path){
-		printResultLine("File " + path.toFile().getName() + " modified");
+//		printResultLine("File " + path.toFile().getName() + " modified");
 
 		String absolutePath = path.toString().toLowerCase();
 		if(hasAFFExtension(absolutePath))
@@ -1238,6 +1245,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
 
 			dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
+			dicDialog.setLocationRelativeTo(this);
 			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
 			dicDialog.setCellRenderer(dicCellRenderer);
 			dicDialog.addListSelectionListener(e -> {
@@ -1251,7 +1259,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 							mainProgressBar.setValue(0);
 
 
-							dicSorterWorker = new DictionaryParser.SorterWorker(dicParser, selectedRow, this);
+							dicSorterWorker = new SorterWorker(dicParser, selectedRow, this);
 							dicSorterWorker.addPropertyChangeListener(this);
 							dicSorterWorker.execute();
 						}
@@ -1311,7 +1319,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicSortDictionaryMenuItem.setEnabled(false);
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new DictionaryParser.CorrectnessWorker(affParser, dicParser, this);
+			dicCorrectnessWorker = new CorrectnessWorker(affParser, dicParser, this);
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1327,7 +1335,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DictionaryParser.DuplicatesWorker(affParser, dicParser, outputFile, this);
+				dicDuplicatesWorker = new DuplicatesWorker(affParser, dicParser, outputFile, this);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1348,7 +1356,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new DictionaryParser.WordlistWorker(affParser, dicParser, outputFile, this);
+				dicWordlistWorker = new WordlistWorker(affParser, dicParser, outputFile, this);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -1369,7 +1377,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new DictionaryParser.MinimalPairsWorker(affParser, dicParser, outputFile, this);
+				dicMinimalPairsWorker = new MinimalPairsWorker(affParser, dicParser, outputFile, this);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}

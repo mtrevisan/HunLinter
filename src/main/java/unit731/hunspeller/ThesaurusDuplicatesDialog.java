@@ -34,8 +34,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);
-
-		setLocationRelativeTo(parent);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -100,7 +98,9 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(new javax.swing.JFrame(), Arrays.asList("a", "b", "c"));
+				javax.swing.JFrame parent = new javax.swing.JFrame();
+				ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(parent, Arrays.asList("a", "b", "c"));
+				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override
 					public void windowClosing(java.awt.event.WindowEvent e){

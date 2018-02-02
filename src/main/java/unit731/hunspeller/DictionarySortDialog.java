@@ -33,7 +33,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 
 	public DictionarySortDialog(DictionaryParser dicParser, Frame parent, String title, String message){
-		super(parent, true);
+		super(parent, title, true);
 
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(title);
@@ -45,12 +45,9 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		initComponents();
 
-		setTitle(title);
 		lblMessage.setText(message);
 
 		addCancelByEscapeKey();
-
-		setLocationRelativeTo(parent);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -194,7 +191,9 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		/* Create and display the dialog */
 		java.awt.EventQueue.invokeLater(() -> {
-			DictionarySortDialog dialog = new DictionarySortDialog(null, new javax.swing.JFrame(), "title", "message");
+			javax.swing.JFrame parent = new javax.swing.JFrame();
+			DictionarySortDialog dialog = new DictionarySortDialog(null, parent, "title", "message");
+			dialog.setLocationRelativeTo(parent);
 			dialog.setListData(new String[]{"a", "b", "c"});
 			dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 				@Override

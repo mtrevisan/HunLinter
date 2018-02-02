@@ -40,8 +40,6 @@ public class HelpDialog extends JDialog{
 
 		addCancelByEscapeKey();
 
-		setLocationRelativeTo(parent);
-
 
 		try{
 			BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/favicon.jpg"));
@@ -161,7 +159,9 @@ public class HelpDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				HelpDialog dialog = new HelpDialog(new javax.swing.JFrame());
+				javax.swing.JFrame parent = new javax.swing.JFrame();
+				HelpDialog dialog = new HelpDialog(parent);
+				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override
 					public void windowClosing(java.awt.event.WindowEvent e){

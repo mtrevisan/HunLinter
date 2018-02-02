@@ -183,6 +183,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh");
 
+	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
+
 
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
@@ -192,7 +194,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	protected void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
+	public void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
 			if(!production.hasDataFields())
 				throw new IllegalArgumentException("Line does not contains any data fields");
@@ -390,6 +392,31 @@ public class DictionaryParserVEC extends DictionaryParser{
 						+ " is not syllabable");
 			}
 		}
+	}
+
+
+	@Override
+	public boolean isConsonant(char chr){
+		return (WordVEC.CONSONANTS.indexOf(chr) >= 0);
+	}
+
+	@Override
+	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
+		String word = production.getWord();
+		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
+			&& word.indexOf('ƚ') < 0
+			&& word.indexOf('ɉ') < 0
+			&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NOUN)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_POSSESSIVE)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_DEMONSTRATIVE)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_IDENTIFICATIVE)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_INTERROGATIVE)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_QUANTIFIER)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PREPOSITION)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)
+			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_CONJUNCTION)));
 	}
 
 	@Override

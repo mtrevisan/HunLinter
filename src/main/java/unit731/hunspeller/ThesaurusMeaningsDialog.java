@@ -54,8 +54,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		meaningsTextArea.setText(content);
 
 		this.resultable = resultable;
-
-		setLocationRelativeTo(parent);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -189,7 +187,9 @@ public class ThesaurusMeaningsDialog extends JDialog{
 					new MeaningEntry("(art)|el|la")
 				));
 				ThesaurusEntry synonym = new ThesaurusEntry("synonym", meanings);
-				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(new javax.swing.JFrame(), synonym, (means, text) -> {}, null);
+				javax.swing.JFrame parent = new javax.swing.JFrame();
+				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(parent, synonym, (means, text) -> {}, null);
+				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override
 					public void windowClosing(java.awt.event.WindowEvent e){
