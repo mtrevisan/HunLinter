@@ -29,6 +29,9 @@ public class Memoizer<T, U>{
 	/**
 	 * Thread-safe and recursion-safe implementation using a re-entrant lock
 	 *
+	 * @param <T>			Type of input to the function
+	 * @param supplier	The function to be memoized
+	 * @return				The new memoized function
 	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
 	 */
 	public static <T> Supplier<T> memoizeThreadAndRecursionSafe(Supplier<T> supplier){
@@ -48,6 +51,10 @@ public class Memoizer<T, U>{
 	/**
 	 * Thread-safe and recursion-safe implementation using a re-entrant lock
 	 *
+	 * @param <T>			Type of input to the function
+	 * @param <U>			Type of output from the function
+	 * @param function	The function to be memoized
+	 * @return				The new memoized function
 	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
 	 */
 	public static <T, U> Function<T, U> memoizeThreadAndRecursionSafe(Function<T, U> function){
