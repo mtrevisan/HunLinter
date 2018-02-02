@@ -619,11 +619,92 @@ public class DictionaryParser{
 
 					setProgress(100);
 
+					publish("File written: " + outputFile.getAbsolutePath());
+
 					publish("Wordlist extracted successfully");
+
+					openFileWithChoosenEditor(outputFile);
 				}
 			}
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			}
+			catch(Exception e){
+				String message = ExceptionService.getMessage(e, getClass());
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
+			return null;
+		}
+
+		@Override
+		protected void process(List<String> chunks){
+			resultable.printResultLine(chunks);
+		}
+	};
+
+
+	@AllArgsConstructor
+	public static class MinimalPairsWorker extends SwingWorker<Void, String>{
+
+		private final AffixParser affParser;
+		private final DictionaryParser dicParser;
+		private final File outputFile;
+		private final Resultable resultable;
+
+
+		@Override
+		protected Void doInBackground() throws Exception{
+			try{
+				publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic");
+				setProgress(0);
+
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
+				try(
+						BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
+						BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
+						){
+					String line = br.readLine();
+					if(!NumberUtils.isCreatable(line))
+						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+
+					int lineIndex = 1;
+					long readSoFar = line.length();
+					long totalSize = dicParser.dicFile.length();
+					while((line = br.readLine()) != null){
+						lineIndex ++;
+						readSoFar += line.length();
+
+						line = dicParser.cleanLine(line);
+						if(!line.isEmpty()){
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+							try{
+								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
+
+								for(RuleProductionEntry production : productions){
+									writer.write(production.getWord());
+									writer.newLine();
+								}
+							}
+							catch(IllegalArgumentException e){
+								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
+							}
+						}
+
+						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+					}
+
+					setProgress(100);
+
+					publish("File written: " + outputFile.getAbsolutePath());
+
+					publish("Minimal pairs extracted successfully");
+
+					openFileWithChoosenEditor(outputFile);
+				}
+			}
+			catch(IOException | IllegalArgumentException e){
+				publish(e instanceof ClosedChannelException? "Minimal pairs thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 			}
 			catch(Exception e){
 				String message = ExceptionService.getMessage(e, getClass());

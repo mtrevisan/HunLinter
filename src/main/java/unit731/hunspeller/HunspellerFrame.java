@@ -133,6 +133,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private SwingWorker<Void, String> dicDuplicatesWorker;
 	private SwingWorker<Void, String> dicSorterWorker;
 	private SwingWorker<Void, String> dicWordlistWorker;
+	private SwingWorker<Void, String> dicMinimalPairsWorker;
 	private SwingWorker<List<ThesaurusEntry>, String> theParserWorker;
 	private SwingWorker<Void, String> hypParserWorker;
 	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
@@ -1359,8 +1360,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void extractMinimalPairs(){
-		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			dicExtractWordlistMenuItem.setEnabled(false);
+		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
+			dicExtractMinimalPairsMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
@@ -1368,12 +1369,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new DictionaryParser.WordlistWorker(affParser, dicParser, outputFile, this);
-				dicWordlistWorker.addPropertyChangeListener(this);
-				dicWordlistWorker.execute();
+				dicMinimalPairsWorker = new DictionaryParser.MinimalPairsWorker(affParser, dicParser, outputFile, this);
+				dicMinimalPairsWorker.addPropertyChangeListener(this);
+				dicMinimalPairsWorker.execute();
 			}
 			else{
-				dicExtractWordlistMenuItem.setEnabled(true);
+				dicExtractMinimalPairsMenuItem.setEnabled(true);
 				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 		}
