@@ -206,14 +206,14 @@ public class DictionaryParser{
 			BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 500_000, 0.000_000_2, 2.);
 			duplicatesBloomFilter.setCharset(CHARSET);
 
+			BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 10_000_000, 0.000_000_01, 1.3);
+			bloomFilter.setCharset(CHARSET);
+
 			setProgress(0);
 			try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
 				String line = br.readLine();
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
-
-				BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 10_000_000, 0.000_000_01, 1.3);
-				bloomFilter.setCharset(CHARSET);
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
@@ -241,17 +241,17 @@ public class DictionaryParser{
 
 					setProgress((int)((readSoFar * 100.) / totalSize));
 				}
-				setProgress(100);
-
-				int totalProductions = bloomFilter.getAddedElements();
-				double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-				publish("Total productions: " + COUNTER_FORMATTER.format(totalProductions));
-				publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
-					+ " (overall duplicates ≲ " + (int)Math.ceil(totalProductions * falsePositiveProbability) + ")");
-
-				bloomFilter.close();
-				bloomFilter.clear();
 			}
+			setProgress(100);
+
+			int totalProductions = bloomFilter.getAddedElements();
+			double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+			publish("Total productions: " + COUNTER_FORMATTER.format(totalProductions));
+			publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
+				+ " (overall duplicates ≲ " + (int)Math.ceil(totalProductions * falsePositiveProbability) + ")");
+
+			bloomFilter.close();
+			bloomFilter.clear();
 
 			return duplicatesBloomFilter;
 		}
@@ -293,14 +293,14 @@ public class DictionaryParser{
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
-
-					int totalDuplicates = duplicatesBloomFilter.getAddedElements();
-					double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-					publish("Total duplicates: " + COUNTER_FORMATTER.format(totalDuplicates));
-					publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
-						+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 				}
 				setProgress(100);
+
+				int totalDuplicates = duplicatesBloomFilter.getAddedElements();
+				double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
+				publish("Total duplicates: " + COUNTER_FORMATTER.format(totalDuplicates));
+				publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
+					+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 
 				duplicatesBloomFilter.close();
 				duplicatesBloomFilter.clear();
@@ -337,10 +337,10 @@ public class DictionaryParser{
 						writtenSoFar ++;
 						setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
 					}
-
-					publish("File written: " + outputFile.getAbsolutePath());
 				}
 				setProgress(100);
+
+				publish("File written: " + outputFile.getAbsolutePath());
 			}
 		}
 
@@ -619,14 +619,15 @@ public class DictionaryParser{
 
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
-
-					publish("File written: " + outputFile.getAbsolutePath());
-
-					publish("Wordlist extracted successfully");
-
-					openFileWithChoosenEditor(outputFile);
 				}
+
 				setProgress(100);
+
+				publish("File written: " + outputFile.getAbsolutePath());
+
+				publish("Wordlist extracted successfully");
+
+				openFileWithChoosenEditor(outputFile);
 			}
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -700,9 +701,8 @@ public class DictionaryParser{
 
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
-
-					publish("Support file written");
 				}
+				publish("Support file written");
 
 				//sort file by length first and by alphabet after:
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
