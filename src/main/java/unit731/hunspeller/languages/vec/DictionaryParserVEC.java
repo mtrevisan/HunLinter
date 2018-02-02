@@ -144,19 +144,28 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", ")0 or )1")));
 	}
 
-	private static final String POS_PROPER_NOUN = "proper_noun";
-	private static final String POS_VERB = "verb";
-	private static final String POS_ARTICLE = "article";
-	private static final String POS_PRONOUN = "pronoun";
-	private static final String POS_ADVERB = "adverb";
-	private static final String POS_NUMERAL_LATIN = "numeral_latin";
-	private static final String POS_INTERJECTION = "interjection";
-	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
+	public static final String POS_PROPER_NOUN = "proper_noun";
+	public static final String POS_NOUN = "noun";
+	public static final String POS_ADJECTIVE = "adjective";
+	public static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
+	public static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
+	public static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
+	public static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
+	public static final String POS_QUANTIFIER = "quantifier";
+	public static final String POS_VERB = "verb";
+	public static final String POS_ARTICLE = "article";
+	public static final String POS_PRONOUN = "pronoun";
+	public static final String POS_PREPOSITION = "preposition";
+	public static final String POS_ADVERB = "adverb";
+	public static final String POS_CONJUNCTION = "conjunction";
+	public static final String POS_NUMERAL_LATIN = "numeral_latin";
+	public static final String POS_INTERJECTION = "interjection";
+	public static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
 
-	private static final Set<String> PART_OF_SPEECH = new HashSet<>(Arrays.asList("noun", POS_PROPER_NOUN, POS_VERB, "adjective",
-		"adjective_possessive", "adjective_demonstrative", "adjective_identificative", "adjective_interrogative", "quantifier", POS_NUMERAL_LATIN,
-		"numeral_cardenal", "numeral_ordenal", "numeral_collective", "numeral_fractional", "numeral_multiplicative", POS_ARTICLE, POS_PRONOUN,
-		"preposition", POS_ADVERB, "conjunction", "prefix", POS_INTERJECTION, POS_UNIT_OF_MEASURE));
+	private static final Set<String> PART_OF_SPEECH = new HashSet<>(Arrays.asList(POS_NOUN, POS_PROPER_NOUN, POS_VERB, POS_ADJECTIVE,
+		POS_ADJECTIVE_POSSESSIVE, POS_ADJECTIVE_DEMONSTRATIVE, POS_ADJECTIVE_IDENTIFICATIVE, POS_ADJECTIVE_INTERROGATIVE, POS_QUANTIFIER,
+		POS_NUMERAL_LATIN, "numeral_cardenal", "numeral_ordenal", "numeral_collective", "numeral_fractional", "numeral_multiplicative",
+		POS_ARTICLE, POS_PRONOUN, POS_PREPOSITION, POS_ADVERB, POS_CONJUNCTION, "prefix", POS_INTERJECTION, POS_UNIT_OF_MEASURE));
 	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>(Arrays.asList("singular_masculine", "singular_femenine", "plural",
 		"plural_masculine", "plural_femenine", "procomplementar", "interrogative", "second_singular", "second_plural"));
 	private static final Set<String> TERMINAL_SUFFIX = new HashSet<>(Arrays.asList("indicative_present", "indicative_imperfect",

@@ -17,6 +17,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,6 +47,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
+import unit731.hunspeller.languages.vec.DictionaryParserVEC;
 import unit731.hunspeller.languages.vec.GraphemeVEC;
 import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.services.ExceptionService;
@@ -106,10 +108,10 @@ public class DictionaryParser{
 		protected Void doInBackground() throws Exception{
 			try{
 				publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
-				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
+				setProgress(0);
 				try(BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET)){
 					String line = br.readLine();
 					//ignore any BOM marker on first line
@@ -141,9 +143,8 @@ public class DictionaryParser{
 
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
-
-					setProgress(100);
 				}
+				setProgress(100);
 
 				publish("Finished reading Dictionary file");
 			}
@@ -243,7 +244,6 @@ public class DictionaryParser{
 
 					setProgress((int)((readSoFar * 100.) / totalSize));
 				}
-
 				setProgress(100);
 
 				int totalProductions = bloomFilter.getAddedElements();
@@ -296,7 +296,6 @@ public class DictionaryParser{
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
-					setProgress(100);
 
 					int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 					double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
@@ -304,6 +303,7 @@ public class DictionaryParser{
 					publish("False positive probability is " + PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
 						+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 				}
+				setProgress(100);
 
 				duplicatesBloomFilter.close();
 				duplicatesBloomFilter.clear();
@@ -340,10 +340,10 @@ public class DictionaryParser{
 						writtenSoFar ++;
 						setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
 					}
-					setProgress(100);
 
 					publish("File written: " + outputFile.getAbsolutePath());
 				}
+				setProgress(100);
 			}
 		}
 
@@ -585,10 +585,10 @@ public class DictionaryParser{
 		protected Void doInBackground() throws Exception{
 			try{
 				publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
-				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
+				setProgress(0);
 				try(
 						BufferedReader br = Files.newBufferedReader(dicParser.dicFile.toPath(), CHARSET);
 						BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), CHARSET);
@@ -623,14 +623,13 @@ public class DictionaryParser{
 						setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 					}
 
-					setProgress(100);
-
 					publish("File written: " + outputFile.getAbsolutePath());
 
 					publish("Wordlist extracted successfully");
 
 					openFileWithChoosenEditor(outputFile);
 				}
+				setProgress(100);
 			}
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -664,7 +663,7 @@ public class DictionaryParser{
 		@Override
 		protected Void doInBackground() throws Exception{
 			try{
-				publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic (pass 1/2)");
+				publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic (pass 1/3)");
 				setProgress(0);
 
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -690,11 +689,12 @@ public class DictionaryParser{
 							try{
 								List<RuleProductionEntry> productions = dicParser.wordGenerator.applyRules(dictionaryWord);
 
-								for(RuleProductionEntry production : productions){
-									String word = GraphemeVEC.handleJHJWPhonemes(production.getWord());
-									writer.write(word);
-									writer.newLine();
-								}
+								for(RuleProductionEntry production : productions)
+									if(shouldBeProcessed(production)){
+										String word = GraphemeVEC.handleJHJWPhonemes(production.getWord());
+										writer.write(word);
+										writer.newLine();
+									}
 							}
 							catch(IllegalArgumentException e){
 								publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
@@ -706,7 +706,6 @@ public class DictionaryParser{
 
 					publish("Support file written");
 				}
-
 
 				//sort file by length first and by alphabet after:
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -722,59 +721,77 @@ public class DictionaryParser{
 				publish("Support file sorted");
 
 
-				publish("Start extracting minimal pairs (pass 2/2)");
+				publish("Start extracting minimal pairs (pass 2/3)");
 				setProgress(0);
 
 				int totalPairs = 0;
-				Path temporaryPath = Files.createTempFile(outputFile.getName(), ".tmp");
-				try(
-						BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), CHARSET);
-						BufferedWriter destinationWriter = Files.newBufferedWriter(temporaryPath, CHARSET);
-						){
+				Map<String, List<String>> minimalPairs = new HashMap<>();
+				try(BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), CHARSET)){
 					String sourceLine;
 					long readSoFarSource = 0;
 					long totalSizeSource = outputFile.length();
 					while((sourceLine = sourceBR.readLine()) != null){
 						readSoFarSource += sourceLine.length();
 
-						if(sourceLine.length() >= MINIMAL_PAIR_LENGTH){
-							sourceBR.mark((int)(totalSizeSource - readSoFarSource));
+						sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 
-							try{
-								String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
+						try{
+							String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
 
-								String line2;
-								while((line2 = sourceBR.readLine()) != null){
-									String line2Lowercase = line2.toLowerCase(Locale.ROOT);
+							String line2;
+							while((line2 = sourceBR.readLine()) != null){
+								String line2Lowercase = line2.toLowerCase(Locale.ROOT);
 
-									//calculate distance
-									int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
-									if(distance == 1){
-										Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
-										char left = difference.getLeft();
-										char right = difference.getRight();
-										if(WordVEC.CONSONANTS.indexOf(left) >= 0 && WordVEC.CONSONANTS.indexOf(right) >= 0 && !GraphemeVEC.isSameGrapheme(left, right)){
-											destinationWriter.write(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(sourceLine + ", " + line2));
-											destinationWriter.newLine();
-System.out.println(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(sourceLine + ", " + line2));
-										}
+								//calculate distance
+								int distance = HammingDistance.getDistance(sourceLineLowercase, line2Lowercase);
+								if(distance == 1){
+									Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
+									char left = difference.getLeft();
+									char right = difference.getRight();
+									if(WordVEC.CONSONANTS.indexOf(left) >= 0 && WordVEC.CONSONANTS.indexOf(right) >= 0 && !GraphemeVEC.isSameGrapheme(left, right)){
+										String key = left + "/" + right;
+										String value = GraphemeVEC.rollbackJHJWPhonemes(sourceLine + "/" + line2);
+										minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
+											.add(value);
+
+										totalPairs ++;
+System.out.println(key + ": " + value);
 									}
 								}
 							}
-							catch(IllegalArgumentException e){
-								//length varied, consider another line for minimal pair search
-							}
-
-							sourceBR.reset();
 						}
+						catch(IllegalArgumentException e){
+							//length varied, consider another line for minimal pair search
+						}
+
+						sourceBR.reset();
 
 						setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
 					}
+				}
+				setProgress(100);
 
-					publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
+				publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
+
+
+				publish("Reordering minimal pairs (pass 3/3)");
+				setProgress(0);
+
+				//write result
+				try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), CHARSET)){
+					int index = 0;
+					int size = minimalPairs.size();
+					for(String key : minimalPairs.keySet()){
+						List<String> values = minimalPairs.get(key);
+
+						destinationWriter.write(key + ": " + values.stream().collect(Collectors.joining(", ")));
+						destinationWriter.newLine();
+
+						setProgress((int)((index * 100.) / size));
+					}
 				}
 
-				Files.move(temporaryPath, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				setProgress(100);
 
 				publish("Minimal pairs file written");
 
@@ -801,6 +818,21 @@ System.out.println(left + ">" + right + ": " + GraphemeVEC.rollbackJHJWPhonemes(
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
+		}
+
+		private boolean shouldBeProcessed(RuleProductionEntry production){
+			return (production.getWord().length() >= MINIMAL_PAIR_LENGTH
+				&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_NOUN)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_POSSESSIVE)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_DEMONSTRATIVE)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_IDENTIFICATIVE)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADJECTIVE_INTERROGATIVE)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_QUANTIFIER)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_PRONOUN)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_PREPOSITION)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_ADVERB)
+				|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_CONJUNCTION)));
 		}
 
 		@Override
