@@ -649,7 +649,7 @@ public class DictionaryParser{
 	@AllArgsConstructor
 	public static class MinimalPairsWorker extends SwingWorker<Void, String>{
 
-		private static final int MINIMAL_PAIR_LENGTH = 3;
+		private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 
 		private final AffixParser affParser;
@@ -818,7 +818,7 @@ public class DictionaryParser{
 
 		private boolean shouldBeProcessed(RuleProductionEntry production){
 			String word = production.getWord();
-			return (word.length() >= MINIMAL_PAIR_LENGTH
+			return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 				&& word.indexOf('ƚ') < 0
 				&& word.indexOf('ɉ') < 0
 				&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + DictionaryParserVEC.POS_NOUN)
