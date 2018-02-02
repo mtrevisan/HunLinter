@@ -102,7 +102,12 @@ public class WordGenerator{
 		return productions;
 	}
 
-	/** Separate the prefixes from the suffixes */
+	/**
+	 * Separate the prefixes from the suffixes
+	 * 
+	 * @param ruleFlags	List of flags
+	 * @return	An object with separated flags, one for each group
+	 */
 	public Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
