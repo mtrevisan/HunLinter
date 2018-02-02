@@ -230,6 +230,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicSeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
+      dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
@@ -673,6 +674,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       });
       dicMenu.add(dicExtractWordlistMenuItem);
 
+      dicExtractMinimalPairsMenuItem.setMnemonic('m');
+      dicExtractMinimalPairsMenuItem.setText("Extrat minimal pairs...");
+      dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicExtractMinimalPairsMenuItemActionPerformed(evt);
+         }
+      });
+      dicMenu.add(dicExtractMinimalPairsMenuItem);
+
       mainMenuBar.add(dicMenu);
 
       theMenu.setMnemonic('T');
@@ -900,6 +910,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		extractDictionaryWordlist();
    }//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
+
+   private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		extractMinimalPairs();
+   }//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
 
 	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_dicInputTextFieldKeyReleased
 		productionDebouncer.call(this);
@@ -1342,6 +1358,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		}
 	}
 
+	private void extractMinimalPairs(){
+		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
+			dicExtractWordlistMenuItem.setEnabled(false);
+			dicSortDictionaryMenuItem.setEnabled(false);
+
+			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
+			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+				mainProgressBar.setValue(0);
+
+				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				dicWordlistWorker = new DictionaryParser.WordlistWorker(affParser, dicParser, outputFile, this);
+				dicWordlistWorker.addPropertyChangeListener(this);
+				dicWordlistWorker.execute();
+			}
+			else{
+				dicExtractWordlistMenuItem.setEnabled(true);
+				dicSortDictionaryMenuItem.setEnabled(true);
+			}
+		}
+	}
+
 
 	private void openAidFile(){
 		try{
@@ -1626,6 +1663,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
+   private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JLabel dicInputLabel;
    private javax.swing.JTextField dicInputTextField;
