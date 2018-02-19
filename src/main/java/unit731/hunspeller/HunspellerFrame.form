@@ -112,7 +112,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="109"/>
-                <Property name="text" type="java.lang.String" value="Extrat minimal pairs..."/>
+                <Property name="text" type="java.lang.String" value="Extract minimal pairs..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractMinimalPairsMenuItemActionPerformed"/>

@@ -682,7 +682,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicMenu.add(dicExtractWordlistMenuItem);
 
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
-      dicExtractMinimalPairsMenuItem.setText("Extrat minimal pairs...");
+      dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
       dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractMinimalPairsMenuItemActionPerformed(evt);
