@@ -849,6 +849,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		HelpDialog dialog = new HelpDialog(this);
+		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
