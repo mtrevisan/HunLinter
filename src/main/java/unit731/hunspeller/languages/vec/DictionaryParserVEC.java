@@ -56,9 +56,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
-	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
-	private static final Matcher NHIV = PatternService.matcher("[cijɉñ]i[aàeèéiíoòóuú]");
-	private static final Matcher CIUI = PatternService.matcher("ciuí$");
+//	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
+	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
+//	private static final Matcher CIUI = PatternService.matcher("ciuí$");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
 
@@ -313,7 +313,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
 		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && production.hasProductionRule(AffixEntry.TYPE.SUFFIX)
+		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && false//!production.hasProductionRule(AffixEntry.TYPE.PREFIX)
 				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
 				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
 				&& !word.contains(VANISHING_EL)
@@ -340,8 +340,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		if(WordVEC.hasMultipleAccents(subword))
-			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
+//		if(WordVEC.hasMultipleAccents(subword))
+//			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
 		if(WordVEC.isStressed(subword) && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
@@ -358,18 +358,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN) && PatternService.find(subword, NHIV) && !PatternService.find(subword, CIUI)){
-			boolean dBetweenVowelsRemoval = false;
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null){
-				for(AffixEntry appliedRule : appliedRules)
-					if(PatternService.find(appliedRule.toString(), D_BETWEEN_VOWELS)){
-						dBetweenVowelsRemoval = true;
-						break;
-					}
-				if(!dBetweenVowelsRemoval)
-					throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
-			}
+		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN)){
+			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
+			if(PatternService.find(phonemizedSubword, CIJJHNHIV))
+				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
 		}
 	}
 

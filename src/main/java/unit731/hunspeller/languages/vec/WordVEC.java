@@ -12,7 +12,7 @@ import unit731.hunspeller.services.PatternService;
 
 public class WordVEC{
 
-	private static final String VOWELS_PLAIN = "aAeEiIoOuU";
+	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + "àÀéÉèÈíÍóÓòÒúÚ";
 	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
@@ -186,7 +186,7 @@ public class WordVEC{
 	private static String markDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx < 0){
-			String phones = GraphemeVEC.handleJHJWPhonemes(word);
+			String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 			int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)

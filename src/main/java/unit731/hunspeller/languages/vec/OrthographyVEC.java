@@ -1,5 +1,6 @@
 package unit731.hunspeller.languages.vec;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import lombok.AccessLevel;
@@ -34,9 +35,12 @@ public class OrthographyVEC extends Orthography{
 
 	private static final String MB = "mb";
 	private static final String MP = "mp";
-	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéíòóúh])");
+	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéí" + GraphemeVEC.I_UMLAUT_PHONEME + "òóúh])");
 	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternService.matcher("^i(?=[aeiouàèéíòóú])");
 	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternService.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
+	private static final List<Matcher> REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
+		PatternService.matcher("b[ae]roi[aeèi]r")
+	);
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher("fh(?=[^aeiouàèéíòóú])");
@@ -68,12 +72,19 @@ public class OrthographyVEC extends Orthography{
 		word = StringUtils.replace(word, MB, "nb");
 		word = StringUtils.replace(word, MP, "np");
 
-		word = GraphemeVEC.handleJHJWPhonemes(word);
+		word = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
 		word = PatternService.replaceFirst(word, REGEX_J_INTO_I, "i");
 		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
-		word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
+		boolean iInsideIntoJFalsePositive = false;
+		for(Matcher m : REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES)
+			if(PatternService.find(word, m)){
+				iInsideIntoJFalsePositive = true;
+				break;
+			}
+		if(!iInsideIntoJFalsePositive)
+			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		word = PatternService.replaceFirst(word, REGEX_LH_INITIAL_INTO_L, "l");
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
@@ -87,7 +98,7 @@ public class OrthographyVEC extends Orthography{
 		//correct morphological errors
 		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
 
-		word = GraphemeVEC.rollbackJHJWPhonemes(word);
+		word = GraphemeVEC.rollbackJHJWIUmlautPhonemes(word);
 
 		word = eliminateConsonantGeminates(word);
 

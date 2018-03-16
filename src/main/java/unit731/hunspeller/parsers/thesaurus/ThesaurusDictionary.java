@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -18,7 +19,8 @@ import unit731.hunspeller.services.PatternService;
 @Getter
 public class ThesaurusDictionary{
 
-	private static final Pattern REGEX_PATTERN_LF = PatternService.pattern(StringUtils.LF);
+	private static final Pattern REGEX_LF = PatternService.pattern(StringUtils.LF);
+	private static final Matcher REGEX_POS = PatternService.matcher("\\([^)]+\\)");
 
 
 	@JsonProperty
@@ -38,7 +40,8 @@ public class ThesaurusDictionary{
 				.forEachOrdered(sj::add);
 			String mm = sj.toString();
 
-			ThesaurusEntry foundSynonym = findByMeaning(meaning);
+			String mean = PatternService.replaceAll(meaning, REGEX_POS, StringUtils.EMPTY);
+			ThesaurusEntry foundSynonym = findByMeaning(mean);
 
 			MeaningEntry entry = new MeaningEntry(mm);
 			if(foundSynonym != null)
@@ -46,7 +49,7 @@ public class ThesaurusDictionary{
 				foundSynonym.getMeanings().add(entry);
 			else
 				//add to list if synonym does not exists
-				result = synonyms.add(new ThesaurusEntry(meaning, Arrays.asList(entry)));
+				result = synonyms.add(new ThesaurusEntry(mean, Arrays.asList(entry)));
 		}
 
 		modified = true;
@@ -96,7 +99,7 @@ public class ThesaurusDictionary{
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		if(StringUtils.isNotBlank(text)){
-			String[] lines = PatternService.split(text, REGEX_PATTERN_LF);
+			String[] lines = PatternService.split(text, REGEX_LF);
 			meanings.clear();
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));
