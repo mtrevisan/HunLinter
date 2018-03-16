@@ -44,6 +44,7 @@ import unit731.hunspeller.services.PatternService;
  * 
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
+ * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non-standard readme</a>
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
@@ -77,6 +78,8 @@ public class HyphenationParser{
 	private static final Matcher REGEX_REDUCE = PatternService.matcher("/.+$");
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|\\s*%.*$");
 	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
+
+	private static enum Level{COMPOUND, NON_COMPOUND};
 
 
 	private final Comparator<String> comparator;
@@ -136,7 +139,7 @@ public class HyphenationParser{
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-					int level = 0;
+					Level level = Level.COMPOUND;
 					hypParser.options = new HyphenationOptions();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
@@ -148,10 +151,11 @@ public class HyphenationParser{
 						if(!line.isEmpty()){
 							if(hypParser.options.parseLine(line)){}
 							else if(line.startsWith(NEXT_LEVEL)){
-								level ++;
-
-								if(level > 1)
+								if(level == Level.NON_COMPOUND)
 									throw new IllegalArgumentException("Cannot have more than two levels");
+
+								//start non-compound level
+								level = Level.NON_COMPOUND;
 							}
 							else if(line.contains(HYPHEN_MINUS)){
 								String key = PatternService.clear(line, REGEX_HYPHEN_MINUS_OR_EQUALS);
@@ -164,13 +168,7 @@ public class HyphenationParser{
 								validateRule(line);
 
 								String key = getKeyFromData(line);
-								String foundNodeValue = hypParser.patterns.get(key);
-								boolean duplicatedRule = false;
-								if(foundNodeValue != null){
-									String clearedLine = PatternService.clear(line, REGEX_REDUCE);
-									String clearedFoundNodeValue = PatternService.clear(foundNodeValue, REGEX_REDUCE);
-									duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
-								}
+								boolean duplicatedRule = isRuleDuplicated(key, line);
 								if(duplicatedRule)
 									publish("Duplication found: " + key + " <-> " + line);
 								else
@@ -182,15 +180,11 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					if(level == 1){
+					if(level == Level.NON_COMPOUND){
 						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
 //						if(hypParser.options[1].getNoHyphen() == null)
 //							//en dash and right single quotation mark
 //							hypParser.options[1].setNoHyphen(new String[]{"\\u2013", "\\u2019"});
-//						line = "1-1/=,1,1";
-//						hypParser.patterns[1].add(getKeyFromData(line), line);
-//						line = "1'1";
-//						hypParser.patterns[1].add(getKeyFromData(line), line);
 //						hypParser.options[1].setLeftMin(hypParser.options[0].getLeftMin());
 //						hypParser.options[1].setRightMin(hypParser.options[0].getRightMin());
 //						hypParser.options[1].setLeftCompoundMin(hypParser.options[0].getLeftCompoundMin() > 0? hypParser.options[0].getLeftCompoundMin(): (hypParser.options[0].getLeftMin() > 0? hypParser.options[0].getLeftMin(): 3));
@@ -199,6 +193,9 @@ public class HyphenationParser{
 
 					setProgress(100);
 				}
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
+//103 352 B compact trie
+//106 800 B basic trie
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
 //103 352 B compact trie
 //106 800 B basic trie
@@ -214,6 +211,17 @@ public class HyphenationParser{
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
+		}
+
+		private boolean isRuleDuplicated(String key, String line){
+			boolean duplicatedRule = false;
+			String foundNodeValue = hypParser.patterns.get(key);
+			if(foundNodeValue != null){
+				String clearedLine = PatternService.clear(line, REGEX_REDUCE);
+				String clearedFoundNodeValue = PatternService.clear(foundNodeValue, REGEX_REDUCE);
+				duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
+			}
+			return duplicatedRule;
 		}
 
 		/**
