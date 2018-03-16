@@ -79,7 +79,12 @@ public class HyphenationParser{
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|\\s*%.*$");
 	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
-	private static enum Level{COMPOUND, NON_COMPOUND};
+	private static enum Level{
+		//defines the rules to be used at compound word boundaries
+		COMPOUND,
+		//defines the rules to be used within words or word parts
+		NON_COMPOUND
+	};
 
 
 	private final Comparator<String> comparator;
@@ -180,6 +185,15 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
+//					if(level == Level.COMPOUND && "UTF-8"){
+//						//add default NOHYPHEN
+//						if(hypParser.options[0].getNoHyphen() == null){
+//							if(!hypParser.options[0].getNoHyphen().contains("\\u2013"))
+//								hypParser.options[0].getNoHyphen().add("\\u2013");
+//							if(!hypParser.options[0].getNoHyphen().contains("\\u2019"))
+//								hypParser.options[0].getNoHyphen().add("\\u2019");
+//						}
+//					}
 					if(level == Level.NON_COMPOUND){
 						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
 //						if(hypParser.options[1].getNoHyphen() == null)
