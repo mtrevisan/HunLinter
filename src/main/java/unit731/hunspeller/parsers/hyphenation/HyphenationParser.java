@@ -165,7 +165,13 @@ public class HyphenationParser{
 
 								String key = getKeyFromData(line);
 								String foundNodeValue = hypParser.patterns.get(key);
-								if(foundNodeValue != null && PatternService.clear(line, REGEX_REDUCE).equals(PatternService.clear(foundNodeValue, REGEX_REDUCE)))
+								boolean duplicatedRule = false;
+								if(foundNodeValue != null){
+									String clearedLine = PatternService.clear(line, REGEX_REDUCE);
+									String clearedFoundNodeValue = PatternService.clear(foundNodeValue, REGEX_REDUCE);
+									duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
+								}
+								if(duplicatedRule)
 									publish("Duplication found: " + key + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
