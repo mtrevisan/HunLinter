@@ -68,6 +68,10 @@ public class TrieNode<S, H, V>{
 		return (value != null && sequencer.lengthOf(sequence) == endIndex);
 	}
 
+	public int getLength(){
+		return endIndex - startIndex;
+	}
+
 	public TrieNode<S, H, V> getChildForInsert(H stem){
 		return (children != null? children.get(stem): null);
 	}
@@ -119,17 +123,16 @@ public class TrieNode<S, H, V>{
 	 * child of this node when this method returns.
 	 *
 	 * @param index	The relative index (starting at 0 and going to end - start - 1) in the sequence.
-	 * @param value	The new value of this node.
+	 * @param newValue	The new value of this node.
 	 * @param sequencer	The sequencer to use to determine the place of the node in the children's list
 	 * @return	The reference to the child node created that's sequence starts at index.
 	 */
-	public TrieNode<S, H, V> split(int index, V value, TrieSequencer<S, H> sequencer){
+	public TrieNode<S, H, V> split(int index, V newValue, TrieSequencer<S, H> sequencer){
 		TrieNode<S, H, V> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		lowerNode.children = children;
-		if(lowerNode.startIndex == endIndex - 1)
-			this.value = null;
-		children = null;
+		value = newValue;
 		endIndex = lowerNode.startIndex;
+		children = null;
 
 		H stem = sequencer.hashOf(sequence, endIndex);
 		addChild(stem, lowerNode);
