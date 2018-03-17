@@ -33,6 +33,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 public class DictionaryParser{
 
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
+	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
 
 	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
 	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
@@ -163,6 +164,7 @@ public class DictionaryParser{
 		text = StringUtils.strip(text);
 		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
 		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
+		text = PatternService.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
 		return "(?iu)(" + text + ")";
 	}
 

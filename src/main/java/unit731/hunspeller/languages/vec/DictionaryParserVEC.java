@@ -313,7 +313,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
 		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && production.hasProductionRule(AffixEntry.TYPE.SUFFIX)
+		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) //&& !production.hasProductionRule(AffixEntry.TYPE.PREFIX)
 				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
 				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
 				&& !word.contains(VANISHING_EL)
