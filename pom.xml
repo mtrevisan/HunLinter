@@ -4,7 +4,7 @@
 
 	<groupId>unit731</groupId>
 	<artifactId>Hunspeller</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -28,7 +28,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -137,10 +137,10 @@
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
 
 		<!-- Lombok -->
-		<org.projectlombok.version>1.16.18</org.projectlombok.version>
+		<org.projectlombok.version>1.16.20</org.projectlombok.version>
 
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.9.3</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.9.4</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
 		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>

@@ -73,7 +73,7 @@ public class Trie<S, H, V>{
 		int sequenceOffset = 0;
 		TrieNode<S, H, V> node = root;
 		while(node != null){
-			int nodeLength = node.getEndIndex() - node.getStartIndex();
+			int nodeLength = node.getLength();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesPut(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 
@@ -179,7 +179,7 @@ public class Trie<S, H, V>{
 		TrieNode<S, H, V> parent = root;
 		TrieNode<S, H, V> node = root.getChildForRetrieve(stem, sequencer);
 		while(node != null){
-			int nodeLength = node.getEndIndex() - node.getStartIndex();
+			int nodeLength = node.getLength();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesGet(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
 

@@ -2,6 +2,9 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,7 +42,7 @@ public class HyphenationOptions{
 	@Builder.Default private int rightMin = 2;
 	private int leftCompoundMin;
 	private int rightCompoundMin;
-	private String[] noHyphen;
+	@Builder.Default private List<String> noHyphen = new ArrayList<>();
 
 
 	public void clear(){
@@ -47,7 +50,7 @@ public class HyphenationOptions{
 		rightMin = 2;
 		leftCompoundMin = 0;
 		rightCompoundMin = 0;
-		noHyphen = null;
+		noHyphen.clear();
 	}
 
 	public boolean parseLine(String line){
@@ -69,7 +72,7 @@ public class HyphenationOptions{
 			managed = true;
 		}
 		else if(line.startsWith(NO_HYPHEN)){
-			noHyphen = PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR);
+			noHyphen = Arrays.asList(PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR));
 			managed = true;
 		}
 		return managed;
@@ -89,7 +92,7 @@ public class HyphenationOptions{
 			writeValue(writer, MIN_COMPOUND_LEFT_HYPHENATION, leftCompoundMin);
 		if(rightCompoundMin > 0)
 			writeValue(writer, MIN_COMPOUND_RIGHT_HYPHENATION, rightCompoundMin);
-		if(noHyphen != null)
+		if(!noHyphen.isEmpty())
 			writeValue(writer, NO_HYPHEN, StringUtils.join(noHyphen, NO_HYPHEN_SEPARATOR));
 	}
 

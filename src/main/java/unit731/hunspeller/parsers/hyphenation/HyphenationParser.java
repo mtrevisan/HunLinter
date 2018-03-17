@@ -44,6 +44,7 @@ import unit731.hunspeller.services.PatternService;
  * 
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
+ * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non-standard readme</a>
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
@@ -54,26 +55,36 @@ public class HyphenationParser{
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
 	public static final String HYPHEN = "\u2010";
 	public static final String HYPHEN_MINUS = "\u002D";
+	private static final String HYPHEN_EQUALS = "=";
 	private static final String SOFT_HYPHEN = "\u00AD";
 
 	private static final String WORD_BOUNDARY = ".";
+	private static final String AUGMENTED_RULE = "/";
 
 	private static final Pattern REGEX_PATTERN_COMMA = PatternService.pattern(",");
 
-	private static final Matcher VALID_RULE = PatternService.matcher("[\\d]");
-	private static final Matcher AUGMENTED_RULE = PatternService.matcher("^(?<rule>.+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<indexBefore>\\d+),(?<indexAfter>\\d+))?$");
-	private static final Matcher AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
+	private static final Matcher REGEX_VALID_RULE = PatternService.matcher("[\\d]");
+	private static final Matcher REGEX_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	private static final Matcher REGEX_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
-	private static final Matcher REGEX_HYPHEN_MINUS = PatternService.matcher(HYPHEN_MINUS);
+	private static final Matcher REGEX_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
 	private static final Matcher REGEX_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN) + "]");
+	private static final Matcher REGEX_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher REGEX_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher REGEX_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
 
 	private static final Matcher REGEX_REDUCE = PatternService.matcher("/.+$");
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|\\s*%.*$");
-	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^\\.");
+	private static final Matcher REGEX_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
+
+	private static enum Level{
+		//defines the rules to be used at compound word boundaries
+		COMPOUND,
+		//defines the rules to be used within words or word parts
+		NON_COMPOUND
+	};
 
 
 	private final Comparator<String> comparator;
@@ -82,6 +93,7 @@ public class HyphenationParser{
 	
 	private Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
 	private HyphenationOptions options;
+	private final Map<String, String> customHyphenation = new HashMap<>();
 	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
 
 
@@ -132,7 +144,7 @@ public class HyphenationParser{
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-					int level = 0;
+					Level level = Level.COMPOUND;
 					hypParser.options = new HyphenationOptions();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
@@ -144,23 +156,25 @@ public class HyphenationParser{
 						if(!line.isEmpty()){
 							if(hypParser.options.parseLine(line)){}
 							else if(line.startsWith(NEXT_LEVEL)){
-								level ++;
-
-								if(level > 1)
+								if(level == Level.NON_COMPOUND)
 									throw new IllegalArgumentException("Cannot have more than two levels");
-							}
-							else if(!PatternService.find(line, VALID_RULE) && line.contains(HYPHEN_MINUS)){
-								String key = PatternService.clear(line, REGEX_HYPHEN_MINUS);
-								if(hypParser.nonStandardHyphenation.containsKey(key))
-									throw new IllegalArgumentException("Non-standard hyphenation " + line + " is already present");
 
-								hypParser.nonStandardHyphenation.put(key, line);
+								//start non-compound level
+								level = Level.NON_COMPOUND;
+							}
+							else if(line.contains(HYPHEN_MINUS)){
+								String key = PatternService.clear(line, REGEX_HYPHEN_MINUS_OR_EQUALS);
+								if(hypParser.customHyphenation.containsKey(key))
+									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
+
+								hypParser.customHyphenation.put(key, line);
 							}
 							else{
 								validateRule(line);
 
 								String key = getKeyFromData(line);
-								if(hypParser.patterns.containsKey(key))
+								boolean duplicatedRule = isRuleDuplicated(key, line);
+								if(duplicatedRule)
 									publish("Duplication found: " + key + " <-> " + line);
 								else
 									//insert current pattern into the trie (remove all numbers)
@@ -171,15 +185,20 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					if(level == 1){
+//					if(level == Level.COMPOUND && "UTF-8"){
+//						//add default NOHYPHEN
+//						if(hypParser.options[0].getNoHyphen() == null){
+//							if(!hypParser.options[0].getNoHyphen().contains("\\u2013"))
+//								hypParser.options[0].getNoHyphen().add("\\u2013");
+//							if(!hypParser.options[0].getNoHyphen().contains("\\u2019"))
+//								hypParser.options[0].getNoHyphen().add("\\u2019");
+//						}
+//					}
+					if(level == Level.NON_COMPOUND){
 						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
 //						if(hypParser.options[1].getNoHyphen() == null)
 //							//en dash and right single quotation mark
 //							hypParser.options[1].setNoHyphen(new String[]{"\\u2013", "\\u2019"});
-//						line = "1-1/=,1,1";
-//						hypParser.patterns[1].add(getKeyFromData(line), line);
-//						line = "1'1";
-//						hypParser.patterns[1].add(getKeyFromData(line), line);
 //						hypParser.options[1].setLeftMin(hypParser.options[0].getLeftMin());
 //						hypParser.options[1].setRightMin(hypParser.options[0].getRightMin());
 //						hypParser.options[1].setLeftCompoundMin(hypParser.options[0].getLeftCompoundMin() > 0? hypParser.options[0].getLeftCompoundMin(): (hypParser.options[0].getLeftMin() > 0? hypParser.options[0].getLeftMin(): 3));
@@ -188,6 +207,9 @@ public class HyphenationParser{
 
 					setProgress(100);
 				}
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
+//103 352 B compact trie
+//106 800 B basic trie
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
 //103 352 B compact trie
 //106 800 B basic trie
@@ -203,6 +225,17 @@ public class HyphenationParser{
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
 			return null;
+		}
+
+		private boolean isRuleDuplicated(String key, String line){
+			boolean duplicatedRule = false;
+			String foundNodeValue = hypParser.patterns.get(key);
+			if(foundNodeValue != null){
+				String clearedLine = PatternService.clear(line, REGEX_REDUCE);
+				String clearedFoundNodeValue = PatternService.clear(foundNodeValue, REGEX_REDUCE);
+				duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
+			}
+			return duplicatedRule;
 		}
 
 		/**
@@ -234,6 +267,7 @@ public class HyphenationParser{
 		patterns.clear();
 		if(options != null)
 			options.clear();
+		customHyphenation.clear();
 		nonStandardHyphenation.clear();
 	}
 
@@ -252,9 +286,13 @@ public class HyphenationParser{
 		validateRule(rule);
 
 		String key = getKeyFromData(rule);
+		//TODO
+		//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+		//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 		String newRule = patterns.get(key);
 		if(newRule == null)
 			patterns.put(key, rule);
+			
 		return newRule;
 	}
 
@@ -264,23 +302,24 @@ public class HyphenationParser{
 	 * @param rule	Rule to be validated
 	 */
 	public static void validateRule(String rule){
-		if(!PatternService.find(rule, VALID_RULE))
+		if(!PatternService.find(rule, REGEX_VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
-		if(isAugmentedRule(rule)){
-			int augmentedIndex = rule.indexOf('/');
+
+		int augmentedIndex = rule.indexOf('/');
+		if(augmentedIndex >= 0){
 			int count = PatternService.clear((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule), REGEX_HYPHENATION_POINT).length();
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
 			String[] parts = PatternService.split(rule, REGEX_PATTERN_COMMA);
 			if(parts.length > 1){
-				Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
+				Matcher m = REGEX_AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
 				m.find();
 				int index = m.start();
 
 				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
 				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
-				if(startIndex <= 0 || startIndex >= index)
+				if(startIndex < 0 || startIndex >= index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
 				if(length < 0 || startIndex + length < index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
@@ -288,10 +327,6 @@ public class HyphenationParser{
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 			}
 		}
-	}
-
-	private static boolean isAugmentedRule(String rule){
-		return rule.contains("/");
 	}
 
 	public void save(File hypFile) throws IOException{
@@ -308,12 +343,16 @@ public class HyphenationParser{
 				content.computeIfAbsent(rule.length(), key -> new ArrayList<>())
 					.add(rule);
 			});
+			if(!customHyphenation.isEmpty()){
+				Collection<String> customs = customHyphenation.values();
+				for(String hyphenation : customs)
+					writeln(writer, hyphenation);
+//				writeln(writer, NEXT_LEVEL);
+			}
 			if(!nonStandardHyphenation.isEmpty()){
-				//non-standard hyphenations
 				Collection<String> nonStandards = nonStandardHyphenation.values();
 				for(String hyphenation : nonStandards)
 					writeln(writer, hyphenation);
-				writeln(writer, NEXT_LEVEL);
 			}
 			//sort values
 			content.values()
@@ -391,14 +430,15 @@ public class HyphenationParser{
 		boolean[] uppercases = extractUppercases(word);
 
 		word = PatternService.replaceAll(word, REGEX_HYPHENS, SOFT_HYPHEN);
+		word = PatternService.clear(word, REGEX_WORD_BOUNDARIES);
 
 		List<String> hyphenatedWord;
 		boolean[] errors;
 
-		String nonStandard = nonStandardHyphenation.get(word);
-		if(nonStandard != null)
-			//hyphenation is non-standard
-			hyphenatedWord = Arrays.asList(PatternService.split(nonStandard, REGEX_PATTERN_HYPHEN_MINUS));
+		String custom = customHyphenation.get(word);
+		if(custom != null)
+			//hyphenation is custom
+			hyphenatedWord = Arrays.asList(PatternService.split(custom, REGEX_PATTERN_HYPHEN_MINUS));
 		else if(word.length() <= options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
@@ -409,6 +449,7 @@ public class HyphenationParser{
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
+
 		return new Hyphenation(hyphenatedWord, errors);
 	}
 
@@ -421,10 +462,10 @@ public class HyphenationParser{
 		return uppercases;
 	}
 
-	private List<String> restoreUppercases(List<String> hyphenatedWord, boolean[] uppercase){
-		int size = uppercase.length;
+	private List<String> restoreUppercases(List<String> hyphenatedWord, boolean[] uppercases){
+		int size = uppercases.length;
 		for(int i = 0; i < size; i ++)
-			if(uppercase[i]){
+			if(uppercases[i]){
 				int j = i;
 				int indexSoFar = 0;
 				String syll = hyphenatedWord.get(indexSoFar);
@@ -465,7 +506,7 @@ public class HyphenationParser{
 							int dd = Character.digit(chr, 10);
 							if(dd > indexes[idx]){
 								indexes[idx] = dd;
-								augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
+								augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
 							}
 						}
 					}
@@ -494,28 +535,28 @@ public class HyphenationParser{
 
 				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
 				if(augmentedPatternData != null){
-					Matcher m = AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, REGEX_WORD_INITIAL));
+					Matcher m = REGEX_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, REGEX_WORD_INITIAL));
 					m.find();
 					int index = m.start();
 
-					m = AUGMENTED_RULE.reset(augmentedPatternData);
+					m = REGEX_AUGMENTED_RULE.reset(augmentedPatternData);
 					m.find();
 					String addBefore = m.group("addBefore");
 					addAfter = m.group("addAfter");
-					String indexBefore = m.group("indexBefore");
-					String indexAfter = m.group("indexAfter");
-					if(indexBefore == null){
+					String start = m.group("start");
+					String cut = m.group("cut");
+					if(start == null){
 						String rule = m.group("rule");
-						indexBefore = Integer.toString(1);
-						indexAfter = Integer.toString(PatternService.clear(rule, REGEX_POINTS_AND_NUMBERS).length());
+						start = Integer.toString(1);
+						cut = Integer.toString(PatternService.clear(rule, REGEX_POINTS_AND_NUMBERS).length());
 					}
 
 					//remove last characters from subword
 					//  ll3a/aa=b,2,2
 					//syll
 					//sylaa-b
-					int end = subword.length() - index + Integer.parseInt(indexBefore) - 1;
-					after = end + Integer.parseInt(indexAfter) - endIndex;
+					int end = subword.length() - index + Integer.parseInt(start) - 1;
+					after = end + Integer.parseInt(cut) - endIndex;
 					subword = subword.substring(0, end) + addBefore;
 				}
 
