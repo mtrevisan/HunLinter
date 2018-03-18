@@ -130,7 +130,11 @@ public class TrieNode<S, H, V>{
 	public TrieNode<S, H, V> split(int index, V newValue, TrieSequencer<S, H> sequencer){
 		TrieNode<S, H, V> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		lowerNode.children = children;
-		value = newValue;
+//		value = newValue;
+		if(lowerNode.startIndex == endIndex - 1)
+			value = null;
+		else
+			value = newValue;
 		endIndex = lowerNode.startIndex;
 		children = null;
 
