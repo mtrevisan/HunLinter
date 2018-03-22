@@ -28,7 +28,7 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VANISHING_EL = "ƚ";
-	private static final String START_TAGS = "/[^\\t\\n]*";
+	private static final String START_TAGS = "/[^\\t\\n]*?";
 
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
 	private static final String ADJECTIVE_SECOND_CLASS_RULE = "C0";
@@ -89,9 +89,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "W0", "W1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "W1", "W0"));
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_NON_VANISHING_EL),
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "&0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&0", "&1"));
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + DIMINUTIVE_ETO_RULE_VANISHING_EL),
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "&1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&1", "&0"));
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "[0", "[1"));
@@ -181,7 +181,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		DATA_FIELDS.put(WordGenerator.TAG_ALLOMORPH, null);
 	}
 
-	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh");
+	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh", "iu");
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
