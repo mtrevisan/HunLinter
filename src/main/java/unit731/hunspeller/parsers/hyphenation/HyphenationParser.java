@@ -154,31 +154,33 @@ public class HyphenationParser{
 							continue;
 
 						if(!line.isEmpty()){
-							if(hypParser.options.parseLine(line)){}
-							else if(line.startsWith(NEXT_LEVEL)){
-								if(level == Level.NON_COMPOUND)
-									throw new IllegalArgumentException("Cannot have more than two levels");
+							boolean parsedLine = hypParser.options.parseLine(line);
+							if(!parsedLine){
+								if(line.startsWith(NEXT_LEVEL)){
+									if(level == Level.NON_COMPOUND)
+										throw new IllegalArgumentException("Cannot have more than two levels");
 
-								//start non-compound level
-								level = Level.NON_COMPOUND;
-							}
-							else if(line.contains(HYPHEN_MINUS)){
-								String key = PatternService.clear(line, REGEX_HYPHEN_MINUS_OR_EQUALS);
-								if(hypParser.customHyphenation.containsKey(key))
-									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
+									//start non-compound level
+									level = Level.NON_COMPOUND;
+								}
+								else if(line.contains(HYPHEN_MINUS)){
+									String key = PatternService.clear(line, REGEX_HYPHEN_MINUS_OR_EQUALS);
+									if(hypParser.customHyphenation.containsKey(key))
+										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-								hypParser.customHyphenation.put(key, line);
-							}
-							else{
-								validateRule(line);
+									hypParser.customHyphenation.put(key, line);
+								}
+								else{
+									validateRule(line);
 
-								String key = getKeyFromData(line);
-								boolean duplicatedRule = isRuleDuplicated(key, line);
-								if(duplicatedRule)
-									publish("Duplication found: " + key + " <-> " + line);
-								else
-									//insert current pattern into the trie (remove all numbers)
-									hypParser.patterns.put(key, line);
+									String key = getKeyFromData(line);
+									boolean duplicatedRule = isRuleDuplicated(key, line);
+									if(duplicatedRule)
+										publish("Duplication found: " + key + " <-> " + line);
+									else
+										//insert current pattern into the trie (remove all numbers)
+										hypParser.patterns.put(key, line);
+								}
 							}
 						}
 
