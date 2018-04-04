@@ -288,9 +288,6 @@ public class HyphenationParser{
 		validateRule(rule);
 
 		String key = getKeyFromData(rule);
-		//TODO
-		//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
-		//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 		String newRule = patterns.get(key);
 		if(newRule == null)
 			patterns.put(key, rule);
@@ -328,6 +325,10 @@ public class HyphenationParser{
 				if(startIndex + length >= parts[0].length())
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 			}
+
+			//TODO
+			//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+			//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 		}
 	}
 
