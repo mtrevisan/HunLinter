@@ -19,8 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -176,7 +174,7 @@ public class HyphenationParser{
 									String key = getKeyFromData(line);
 									boolean duplicatedRule = isRuleDuplicated(key, line);
 									if(duplicatedRule)
-										publish("Duplication found: " + key + " <-> " + line);
+										publish("Duplication found: " + line);
 									else
 										//insert current pattern into the trie (remove all numbers)
 										hypParser.patterns.put(key, line);
@@ -432,7 +430,9 @@ public class HyphenationParser{
 	private Hyphenation hyphenate(String word, Trie<String, Integer, String> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
+		//clear already present hyphens
 		word = PatternService.replaceAll(word, REGEX_HYPHENS, SOFT_HYPHEN);
+		//clear already present word boundaries' characters
 		word = PatternService.clear(word, REGEX_WORD_BOUNDARIES);
 
 		List<String> hyphenatedWord;
@@ -446,7 +446,8 @@ public class HyphenationParser{
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
-			HyphenationBreak hyphBreak = getHyphenationIndexes(word, patterns);
+			HyphenationBreak hyphBreak = calculateBrakpoints(word, patterns);
+
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
@@ -485,28 +486,35 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak getHyphenationIndexes(String word, Trie<String, Integer, String> patterns){
+	private HyphenationBreak calculateBrakpoints(String word, Trie<String, Integer, String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
 		int wordSize = word.length();
+		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
+		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
+			//find all the prefixes of w.substring(i)
 			Iterable<TrieNode<String, Integer, String>> prefixes = patterns.collectPrefixes(w.substring(i));
 			for(TrieNode<String, Integer, String> prefix : prefixes){
 				int j = -1;
 				String rule = prefix.getValue();
+				//remove non-standard part
 				String reducedData = PatternService.clear(rule, REGEX_REDUCE);
 				int ruleSize = reducedData.length();
+				//cycle the pattern's characters searching for numbers
 				for(int k = 0; k < ruleSize; k ++){
 					char chr = reducedData.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
 					else{
 						int idx = i + j;
+						//check if a break point should be skipped based on left and right min options
 						if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
 							int dd = Character.digit(chr, 10);
+							//check if the break number is great than the one stored so far
 							if(dd > indexes[idx]){
 								indexes[idx] = dd;
 								augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
@@ -574,21 +582,6 @@ public class HyphenationParser{
 		result.add(subword);
 
 		return result;
-	}
-
-	public String formatHyphenation(Hyphenation hyphenation, StringJoiner sj, Function<String, String> errorFormatter){
-		List<String> syllabes = hyphenation.getSyllabes();
-		boolean[] erros = hyphenation.getErrors();
-		int size = syllabes.size();
-		for(int i = 0; i < size; i ++){
-			Function<String, String> fun = (erros[i]? errorFormatter: Function.identity());
-			sj.add(fun.apply(syllabes.get(i)));
-		}
-		return sj.toString();
-	}
-
-	public long countSyllabes(Hyphenation hyphenation){
-		return hyphenation.getSyllabes().size();
 	}
 
 }

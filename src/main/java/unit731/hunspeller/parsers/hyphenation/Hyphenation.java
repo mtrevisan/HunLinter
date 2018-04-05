@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -15,6 +17,10 @@ public class Hyphenation{
 	@NonNull
 	private final boolean[] errors;
 
+
+	public long countSyllabes(){
+		return syllabes.size();
+	}
 
 	/**
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
@@ -62,6 +68,15 @@ public class Hyphenation{
 				break;
 			}
 		return response;
+	}
+
+	public String formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
+		int size = syllabes.size();
+		for(int i = 0; i < size; i ++){
+			Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
+			sj.add(fun.apply(syllabes.get(i)));
+		}
+		return sj.toString();
 	}
 
 }

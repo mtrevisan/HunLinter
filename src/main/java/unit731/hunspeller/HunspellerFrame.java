@@ -1517,9 +1517,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			text = frame.hypParser.correctOrthography(text);
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
-			text = frame.hypParser.formatHyphenation(hyphenation, new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>"),
+			text = hyphenation.formatHyphenation(new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>"),
 				syllabe -> "<b style=\"color:red\">" + syllabe + "</b>");
-			count = Long.toString(frame.hypParser.countSyllabes(hyphenation));
+			count = Long.toString(hyphenation.countSyllabes());
 
 			frame.hypAddRuleTextField.setEnabled(true);
 		}
@@ -1557,9 +1557,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-						String text = frame.hypParser.formatHyphenation(hyphenation, baseStringJoiner.get(), errorFormatter);
-						addedRuleText = frame.hypParser.formatHyphenation(addedRuleHyphenation, baseStringJoiner.get(), errorFormatter);
-						addedRuleCount = Long.toString(frame.hypParser.countSyllabes(addedRuleHyphenation));
+						String text = hyphenation.formatHyphenation(baseStringJoiner.get(), errorFormatter);
+						addedRuleText = addedRuleHyphenation.formatHyphenation(baseStringJoiner.get(), errorFormatter);
+						addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
 
 						hyphenationChanged = !text.equals(addedRuleText);
 						correctHyphenation = !addedRuleHyphenation.hasErrors();
