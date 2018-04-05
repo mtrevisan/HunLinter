@@ -91,8 +91,7 @@ public class HyphenationParser{
 	
 	private Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
 	private HyphenationOptions options;
-	private final Map<String, String> customHyphenation = new HashMap<>();
-	private final Map<String, String> nonStandardHyphenation = new HashMap<>();
+	private final Map<String, String> customHyphenations = new HashMap<>();
 
 
 	public HyphenationParser(String language){
@@ -163,10 +162,10 @@ public class HyphenationParser{
 								}
 								else if(line.contains(HYPHEN_MINUS)){
 									String key = PatternService.clear(line, REGEX_HYPHEN_MINUS_OR_EQUALS);
-									if(hypParser.customHyphenation.containsKey(key))
+									if(hypParser.customHyphenations.containsKey(key))
 										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-									hypParser.customHyphenation.put(key, line);
+									hypParser.customHyphenations.put(key, line);
 								}
 								else{
 									validateRule(line);
@@ -267,8 +266,7 @@ public class HyphenationParser{
 		patterns.clear();
 		if(options != null)
 			options.clear();
-		customHyphenation.clear();
-		nonStandardHyphenation.clear();
+		customHyphenations.clear();
 	}
 
 	public String correctOrthography(String text){
@@ -344,16 +342,11 @@ public class HyphenationParser{
 				content.computeIfAbsent(rule.length(), key -> new ArrayList<>())
 					.add(rule);
 			});
-			if(!customHyphenation.isEmpty()){
-				Collection<String> customs = customHyphenation.values();
-				for(String hyphenation : customs)
-					writeln(writer, hyphenation);
+			if(!customHyphenations.isEmpty()){
+				Collection<String> compounds = customHyphenations.values();
+				for(String pattern : compounds)
+					writeln(writer, pattern);
 //				writeln(writer, NEXT_LEVEL);
-			}
-			if(!nonStandardHyphenation.isEmpty()){
-				Collection<String> nonStandards = nonStandardHyphenation.values();
-				for(String hyphenation : nonStandards)
-					writeln(writer, hyphenation);
 			}
 			//sort values
 			content.values()
@@ -419,6 +412,7 @@ public class HyphenationParser{
 		return PatternService.clear(rule, REGEX_KEY);
 	}
 
+
 	/**
 	 * Performs hyphenation
 	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
@@ -438,10 +432,10 @@ public class HyphenationParser{
 		List<String> hyphenatedWord;
 		boolean[] errors;
 
-		String custom = customHyphenation.get(word);
-		if(custom != null)
+		String customHyphenation = customHyphenations.get(word);
+		if(customHyphenation != null)
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(PatternService.split(custom, REGEX_PATTERN_HYPHEN_MINUS));
+			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, REGEX_PATTERN_HYPHEN_MINUS));
 		else if(word.length() <= options.getLeftMin() + options.getRightMin())
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
@@ -527,6 +521,7 @@ public class HyphenationParser{
 		return new HyphenationBreak(indexes, augmentedPatternData);
 	}
 
+	//FIXME add some comments or refactor!!
 	private List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
 		List<String> result = new ArrayList<>();
 		int startIndex = 0;
@@ -544,6 +539,7 @@ public class HyphenationParser{
 					addAfter = null;
 				}
 
+				//manage augmented patterns:
 				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
 				if(augmentedPatternData != null){
 					Matcher m = REGEX_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, REGEX_WORD_INITIAL));
