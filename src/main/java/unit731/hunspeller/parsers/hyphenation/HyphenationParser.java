@@ -440,7 +440,7 @@ public class HyphenationParser{
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 		else{
-			HyphenationBreak hyphBreak = calculateBrakpoints(word, patterns);
+			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns);
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 		}
@@ -480,7 +480,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBrakpoints(String word, Trie<String, Integer, String> patterns){
+	private HyphenationBreak calculateBreakpoints(String word, Trie<String, Integer, String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -500,19 +500,17 @@ public class HyphenationParser{
 				int ruleSize = reducedData.length();
 				//cycle the pattern's characters searching for numbers
 				for(int k = 0; k < ruleSize; k ++){
+					int idx = i + j;
 					char chr = reducedData.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
-					else{
-						int idx = i + j;
-						//check if a break point should be skipped based on left and right min options
-						if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
-							int dd = Character.digit(chr, 10);
-							//check if the break number is great than the one stored so far
-							if(dd > indexes[idx]){
-								indexes[idx] = dd;
-								augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
-							}
+					//check if a break point should be skipped based on left and right min options
+					else if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+						int dd = Character.digit(chr, 10);
+						//check if the break number is great than the one stored so far
+						if(dd > indexes[idx]){
+							indexes[idx] = dd;
+							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
 						}
 					}
 				}
