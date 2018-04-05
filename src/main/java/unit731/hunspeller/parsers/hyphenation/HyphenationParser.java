@@ -14,11 +14,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -85,10 +87,11 @@ public class HyphenationParser{
 	};
 
 
+	private static final Set<String> REDUCED_PATTERNS = new HashSet<>();
+
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	
 	private Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
@@ -131,6 +134,7 @@ public class HyphenationParser{
 			try{
 				publish("Opening Hyphenation file for parsing: " + hypFile.getName());
 				setProgress(0);
+				REDUCED_PATTERNS.clear();
 
 				long readSoFar = 0l;
 				long totalSize = hypFile.length();
@@ -300,9 +304,11 @@ public class HyphenationParser{
 		if(!PatternService.find(rule, REGEX_VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 
+		String cleanedRule = rule;
 		int augmentedIndex = rule.indexOf('/');
 		if(augmentedIndex >= 0){
-			int count = PatternService.clear((augmentedIndex > 0? rule.substring(0, augmentedIndex): rule), REGEX_HYPHENATION_POINT).length();
+			cleanedRule = rule.substring(0, augmentedIndex);
+			int count = PatternService.clear(cleanedRule, REGEX_HYPHENATION_POINT).length();
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
@@ -321,11 +327,21 @@ public class HyphenationParser{
 				if(startIndex + length >= parts[0].length())
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 			}
-
-			//TODO
-			//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
-			//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 		}
+
+
+		//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+		//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
+		String alreadyPresentRule = null;
+		for(String pattern : REDUCED_PATTERNS)
+			if(pattern.contains(cleanedRule) || cleanedRule.contains(pattern)){
+				alreadyPresentRule = pattern;
+				break;
+			}
+		if(alreadyPresentRule != null)
+			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
+
+		REDUCED_PATTERNS.add(cleanedRule);
 	}
 
 	public void save(File hypFile) throws IOException{
