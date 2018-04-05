@@ -68,7 +68,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 */
 	private void visit(RadixTreeNode<V> node, String prefixAllowed, String prefix, RadixTreeVisitor<V, ?> visitor){
-		if(node.hasValue() && prefix.startsWith(prefixAllowed))
+		if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix)))
 			visitor.visit(prefix, node.getValue());
 
 		int prefixLen = prefix.length();
@@ -180,7 +180,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	/**
-	 * Gets a list of values whose associated keys have the given prefix.
+	 * Gets a list of values whose associated keys have the given prefix, or are contained into the prefix.
 	 *
 	 * @param prefix	The prefix to look for
 	 * @return	The list of values
