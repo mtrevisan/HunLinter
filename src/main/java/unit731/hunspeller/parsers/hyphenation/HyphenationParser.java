@@ -282,7 +282,7 @@ public class HyphenationParser{
 	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to add
-	 * @return A {@link TrieNode} if a rule was already in place, <code>null</code> if the insertion has completed successfully
+	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule){
 		validateRule(rule);
