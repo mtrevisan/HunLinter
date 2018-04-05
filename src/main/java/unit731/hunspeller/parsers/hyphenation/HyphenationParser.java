@@ -27,9 +27,8 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.collections.trie.TrieNode;
-import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
+import unit731.hunspeller.collections.radixtree.RadixTree;
+import unit731.hunspeller.collections.radixtree.RadixTreeVisitor;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -92,7 +91,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
+	private RadixTree<String> patterns = new RadixTree<>();
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
 
@@ -110,7 +109,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, Trie<String, Integer, String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, RadixTree patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -179,7 +178,7 @@ public class HyphenationParser{
 									if(duplicatedRule)
 										publish("Duplication found: " + line);
 									else
-										//insert current pattern into the trie (remove all numbers)
+										//insert current pattern into the radix tree (remove all numbers)
 										hypParser.patterns.put(key, line);
 								}
 							}
@@ -351,13 +350,22 @@ public class HyphenationParser{
 			writeln(writer, charset.name());
 			//save options
 			options.write(writer);
-			//extract data from the trie
+			//extract data from the radix tree
 			Map<Integer, List<String>> content = new HashMap<>();
-			patterns.forEachLeaf(node -> {
-				String rule = node.getValue();
-				content.computeIfAbsent(rule.length(), key -> new ArrayList<>())
-					.add(rule);
-			});
+			RadixTreeVisitor<String, Boolean> visitor = new RadixTreeVisitor<String, Boolean>(){
+
+				@Override
+				public void visit(String key, String value){
+					content.computeIfAbsent(value.length(), k -> new ArrayList<>())
+						.add(value);
+				}
+
+				@Override
+				public Boolean getResult(){
+					return false;
+				}
+			};
+			patterns.visit(visitor);
 			if(!customHyphenations.isEmpty()){
 				Collection<String> compounds = customHyphenations.values();
 				for(String pattern : compounds)
@@ -398,7 +406,7 @@ public class HyphenationParser{
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
 	 * @return the hyphenation object
-	 * @throws CloneNotSupportedException	If the Trie does not support the {@code Cloneable} interface
+	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
 	public Hyphenation hyphenate(String word, String addedRule) throws CloneNotSupportedException{
 		String key = getKeyFromData(addedRule);
@@ -434,10 +442,10 @@ public class HyphenationParser{
 	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
-	 * @param patterns	The trie containing the patterns
+	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Trie<String, Integer, String> patterns){
+	private Hyphenation hyphenate(String word, RadixTree patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
@@ -496,7 +504,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, Trie<String, Integer, String> patterns){
+	private HyphenationBreak calculateBreakpoints(String word, RadixTree patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -507,10 +515,9 @@ public class HyphenationParser{
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			Iterable<TrieNode<String, Integer, String>> prefixes = patterns.collectPrefixes(w.substring(i));
-			for(TrieNode<String, Integer, String> prefix : prefixes){
+			List<String> prefixes = patterns.getValuesWithPrefix(w.substring(i));
+			for(String rule : prefixes){
 				int j = -1;
-				String rule = prefix.getValue();
 				//remove non-standard part
 				String reducedData = PatternService.clear(rule, REGEX_REDUCE);
 				int ruleSize = reducedData.length();
