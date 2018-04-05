@@ -20,12 +20,12 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 			return new String[0];
 
 		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in ASCII encoding");
+			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);
 
 		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_EMPTY)): new String[0]);
 		for(String flag : flags)
 			if(StringUtils.isBlank(flag))
-				throw new IllegalArgumentException("Flag must be a valid ASCII character");
+				throw new IllegalArgumentException("Flag must be a valid ASCII character: " + flag + " from " + textFlags);
 		return flags;
 	}
 

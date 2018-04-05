@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.List;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -28,6 +29,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected Void doInBackground() throws Exception{
+		int lineIndex = 1;
 		try{
 			publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
 
@@ -42,7 +44,6 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-				int lineIndex = 1;
 				long readSoFar = line.length();
 				long totalSize = dicParser.getDicFile().length();
 				while((line = br.readLine()) != null){
@@ -75,7 +76,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
-			publish(e.getClass().getSimpleName() + ": " + message);
+			publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
 		}
 		return null;
 	}

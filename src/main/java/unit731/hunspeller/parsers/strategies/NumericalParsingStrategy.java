@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.strategies;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -26,10 +27,10 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 			try{
 				int numericalFlag = Integer.parseInt(flag);
 				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]");
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + textFlags);
 			}
 			catch(NumberFormatException e){
-				throw new IllegalArgumentException("Flag must be an integer number");
+				throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + textFlags);
 			}
 		}
 		return flags;
@@ -43,10 +44,10 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 			try{
 				int numericalFlag = Integer.parseInt(flag);
 				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]");
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + Arrays.deepToString(textFlags));
 			}
 			catch(NumberFormatException e){
-				throw new IllegalArgumentException("Each flag must be an integer number");
+				throw new IllegalArgumentException("Each flag must be an integer number: " + flag + " from " + Arrays.deepToString(textFlags));
 			}
 		}
 

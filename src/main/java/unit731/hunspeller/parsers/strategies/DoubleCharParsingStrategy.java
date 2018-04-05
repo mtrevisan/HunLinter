@@ -17,7 +17,7 @@ public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 	@Override
 	public String[] parseRuleFlags(String textFlags){
 		if(textFlags != null && textFlags.length() % 2 != 0)
-			throw new IllegalArgumentException("Flag must be of length two or a multiple");
+			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
 		return (textFlags != null && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_DOUBLE)):
 			new String[0]);
@@ -29,7 +29,7 @@ public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 			return StringUtils.EMPTY;
 		for(String flag : textFlags)
 			if(flag == null || flag.length() != 2)
-				throw new IllegalArgumentException("Each flag must be of length two");
+				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + textFlags);
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);
 	}

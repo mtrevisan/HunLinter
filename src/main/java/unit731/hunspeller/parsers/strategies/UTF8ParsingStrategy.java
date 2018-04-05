@@ -20,12 +20,12 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 			return new String[0];
 
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
+			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
 
 		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_EMPTY)): new String[0]);
 		for(String flag : flags)
 			if(StringUtils.isBlank(flag))
-				throw new IllegalArgumentException("Flag must be a valid UTF-8 character");
+				throw new IllegalArgumentException("Flag must be a valid UTF-8 character: " + flag + " from " + textFlags);
 		return flags;
 	}
 
