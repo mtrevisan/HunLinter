@@ -142,7 +142,7 @@ public class HyphenationParser{
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
 					Level level = Level.COMPOUND;
-					hypParser.options = new HyphenationOptions();
+					hypParser.options = HyphenationOptions.builder().build();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
@@ -417,7 +417,7 @@ public class HyphenationParser{
 	 * Performs hyphenation
 	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
-	 * @param word			String to hyphenate
+	 * @param word	String to hyphenate
 	 * @param patterns	The trie containing the patterns
 	 * @return the hyphenation object
 	 */
