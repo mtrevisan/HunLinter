@@ -46,7 +46,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 */
 	public void visit(RadixTreeVisitor<V, ?> visitor){
-		visit(StringUtils.EMPTY, visitor);
+		visit(visitor, StringUtils.EMPTY);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param prefix	The prefix used to restrict visitation
 	 * @param visitor	The visitor
 	 */
-	public void visit(String prefix, RadixTreeVisitor<V, ?> visitor){
+	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
 		visit(root, prefix, StringUtils.EMPTY, visitor);
 	}
 
@@ -72,12 +72,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			visitor.visit(prefix, node.getValue());
 
 		int prefixLen = prefix.length();
-		if(prefixAllowed.length() <= prefixLen)
-			for(RadixTreeNode<V> child : node){
-				String newPrefix = prefix + child.getPrefix();
-				if(newPrefix.length() <= prefixLen || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
-					visit(child, prefixAllowed, newPrefix, visitor);
-			}
+		for(RadixTreeNode<V> child : node){
+			String newPrefix = prefix + child.getPrefix();
+			if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
+				visit(child, prefixAllowed, newPrefix, visitor);
+		}
 	}
 
 	@Override
@@ -106,7 +105,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				return found;
 			}
 		};
-		visit((String)keyToCheck, visitor);
+		visit(visitor, (String)keyToCheck);
 		return visitor.getResult();
 	}
 
@@ -151,7 +150,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				return result;
 			}
 		};
-		visit((String)keyToCheck, visitor);
+		visit(visitor, (String)keyToCheck);
 		return visitor.getResult();
 	}
 
@@ -176,7 +175,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				return result;
 			}
 		};
-		visit(prefix, visitor);
+		visit(visitor, prefix);
 		return visitor.getResult();
 	}
 
@@ -204,7 +203,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				return result;
 			}
 		};
-		visit(prefix, visitor);
+		visit(visitor, prefix);
 		return visitor.getResult();
 	}
 
@@ -232,7 +231,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				return result;
 			}
 		};
-		visit(prefix, visitor);
+		visit(visitor, prefix);
 		return visitor.getResult();
 	}
 
