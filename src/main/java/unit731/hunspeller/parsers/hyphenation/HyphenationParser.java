@@ -354,9 +354,11 @@ public class HyphenationParser{
 			Map<Integer, List<String>> content = new HashMap<>();
 			RadixTreeVisitor<String, Boolean> visitor = new RadixTreeVisitor<String, Boolean>(false){
 				@Override
-				public void visit(String key, String value){
+				public boolean visit(String key, String value){
 					content.computeIfAbsent(value.length(), k -> new ArrayList<>())
 						.add(value);
+
+					return false;
 				}
 			};
 			patterns.visit(visitor);

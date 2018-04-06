@@ -27,7 +27,8 @@ public abstract class RadixTreeVisitor<V, R>{
 	 *
 	 * @param key	The key of the node being visited
 	 * @param value	The value of the node being visited
+	 * @return	Whether to stop visiting the tree
 	 */
-	public abstract void visit(String key, V value);
+	public abstract boolean visit(String key, V value);
 
 }
