@@ -91,41 +91,29 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(!(keyToCheck instanceof String))
 			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
 
-		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(){
-			private boolean found;
-
+		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
 			@Override
 			public void visit(String key, V value){
 				if(key.equals(keyToCheck))
-					found = true;
-			}
-
-			@Override
-			public Boolean getResult(){
-				return found;
+					result = true;
 			}
 		};
 		visit(visitor, (String)keyToCheck);
+
 		return visitor.getResult();
 	}
 
 	@Override
 	public boolean containsValue(Object val){
-		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(){
-			private boolean found;
-
+		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
 			@Override
 			public void visit(String key, V value){
 				if(val == value || (value != null && value.equals(val)))
-					found = true;
-			}
-
-			@Override
-			public Boolean getResult(){
-				return found;
+					result = true;
 			}
 		};
 		visit(visitor);
+
 		return visitor.getResult();
 	}
 
@@ -136,21 +124,15 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(!(keyToCheck instanceof String))
 			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
 
-		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(){
-			private V result;
-
+		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
 			@Override
 			public void visit(String key, V value){
 				if(key.equals(keyToCheck))
 					result = value;
 			}
-
-			@Override
-			public V getResult(){
-				return result;
-			}
 		};
 		visit(visitor, (String)keyToCheck);
+
 		return visitor.getResult();
 	}
 
@@ -162,20 +144,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<Map.Entry<String, V>> getEntriesWithPrefix(String prefix){
-		RadixTreeVisitor<V, List<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, List<Map.Entry<String, V>>>(){
-			private final List<Map.Entry<String, V>> result = new ArrayList<>();
-
+		RadixTreeVisitor<V, List<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, List<Map.Entry<String, V>>>(new ArrayList<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(new AbstractMap.SimpleEntry<>(key, value));
 			}
-
-			@Override
-			public List<Map.Entry<String, V>> getResult(){
-				return result;
-			}
 		};
 		visit(visitor, prefix);
+
 		return visitor.getResult();
 	}
 
@@ -190,20 +166,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(prefix == null)
 			throw new NullPointerException(PREFIX_CANNOT_BE_NULL);
 
-		RadixTreeVisitor<V, List<V>> visitor = new RadixTreeVisitor<V, List<V>>(){
-			private final List<V> result = new ArrayList<>();
-
+		RadixTreeVisitor<V, List<V>> visitor = new RadixTreeVisitor<V, List<V>>(new ArrayList<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(value);
 			}
-
-			@Override
-			public List<V> getResult(){
-				return result;
-			}
 		};
 		visit(visitor, prefix);
+
 		return visitor.getResult();
 	}
 
@@ -218,20 +188,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(prefix == null)
 			throw new NullPointerException(PREFIX_CANNOT_BE_NULL);
 
-		RadixTreeVisitor<V, List<String>> visitor = new RadixTreeVisitor<V, List<String>>(){
-			private final List<String> result = new ArrayList<>();
-
+		RadixTreeVisitor<V, List<String>> visitor = new RadixTreeVisitor<V, List<String>>(new ArrayList<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(key);
 			}
-
-			@Override
-			public List<String> getResult(){
-				return result;
-			}
 		};
 		visit(visitor, prefix);
+
 		return visitor.getResult();
 	}
 
@@ -248,80 +212,56 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public int size(){
-		RadixTreeVisitor<V, Integer> visitor = new RadixTreeVisitor<V, Integer>(){
-			private int count;
-
+		RadixTreeVisitor<V, Integer> visitor = new RadixTreeVisitor<V, Integer>(0){
 			@Override
 			public void visit(String key, V value){
-				 count ++;
-			}
-
-			@Override
-			public Integer getResult(){
-				return count;
+				 result ++;
 			}
 		};
 		visit(visitor);
+
 		return visitor.getResult();
 	}
 
 	@Override
 	public Set<Map.Entry<String, V>> entrySet(){
 		//TODO documentation of Map.entrySet() specifies that this is a view of the entries, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Set<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, Set<Map.Entry<String, V>>>(){
-			private final Set<Map.Entry<String, V>> result = new HashSet<>();
-
+		RadixTreeVisitor<V, Set<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, Set<Map.Entry<String, V>>>(new HashSet<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(new AbstractMap.SimpleEntry<>(key, value));
 			}
-
-			@Override
-			public Set<Map.Entry<String, V>> getResult(){
-				return result;
-			}
 		};
 		visit(visitor);
+
 		return visitor.getResult();
 	}
 
 	@Override
 	public Set<String> keySet(){
 		//TODO documentation of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(){
-			private final Set<String> result = new TreeSet<>();
-
+		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(new TreeSet<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(key);
 			}
-
-			@Override
-			public Set<String> getResult(){
-				return result;
-			}
 		};
 		visit(visitor);
+
 		return visitor.getResult();
 	}
 
 	@Override
 	public Collection<V> values(){
 		//TODO documentation of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(){
-			private final Collection<V> result = new ArrayList<>();
-
+		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(new ArrayList<>()){
 			@Override
 			public void visit(String key, V value){
 				result.add(value);
 			}
-
-			@Override
-			public Collection<V> getResult(){
-				return result;
-			}
 		};
 		visit(visitor);
+
 		return visitor.getResult();
 	}
 
