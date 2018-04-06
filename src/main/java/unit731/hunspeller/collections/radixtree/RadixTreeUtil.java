@@ -48,7 +48,7 @@ public class RadixTreeUtil{
 	 * @param outputPrefix	Prefix to be printed to output
 	 */
 	private static <V extends Serializable> void dumpTree(RadixTreeNode<V> node, String outputPrefix){
-		System.out.format((node.hasValue()? "%s{%s : %s}%n": "%s{%s}%n"), outputPrefix, node.getPrefix(), node.getValue());
+		System.out.format((node.hasValue()? "%s{%s : %s}%n": "%s{%s}%n"), outputPrefix, node.getKey(), node.getValue());
 
 		for(RadixTreeNode<V> child : node)
 			dumpTree(child, outputPrefix + "\t");

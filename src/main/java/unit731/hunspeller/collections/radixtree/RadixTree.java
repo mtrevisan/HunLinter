@@ -73,7 +73,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		int prefixLen = prefix.length();
 		for(RadixTreeNode<V> child : node){
-			String newPrefix = prefix + child.getPrefix();
+			String newPrefix = prefix + child.getKey();
 			if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
 				visit(child, prefixAllowed, newPrefix, visitor);
 		}
@@ -287,7 +287,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Set<String> keySet(){
-		//TODO documentation Of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
+		//TODO documentation of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(){
 			private final Set<String> result = new TreeSet<>();
 
@@ -307,7 +307,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Collection<V> values(){
-		//TODO documentation Of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
+		//TODO documentation of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(){
 			private final Collection<V> result = new ArrayList<>();
 
@@ -343,21 +343,20 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	private V put(String key, V value, RadixTreeNode<V> node){
 		V ret = null;
 
-		int largestPrefix = RadixTreeUtil.largestPrefixLength(key, node.getPrefix());
-		if(largestPrefix == node.getPrefix().length() && largestPrefix == key.length()){
+		int largestPrefix = RadixTreeUtil.largestPrefixLength(key, node.getKey());
+		if(largestPrefix == node.getKey().length() && largestPrefix == key.length()){
 			//found a node with an exact match
 			ret = node.getValue();
 			node.setValue(value);
-			node.setHasValue(true);
 		}
-		else if(largestPrefix == 0 || (largestPrefix < key.length() && largestPrefix >= node.getPrefix().length())){
+		else if(largestPrefix == 0 || (largestPrefix < key.length() && largestPrefix >= node.getKey().length())){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
 			String leftoverKey = key.substring(largestPrefix);
 
 			boolean found = false;
 			for(RadixTreeNode<V> child : node)
-				if(child.getPrefix().charAt(0) == leftoverKey.charAt(0)){
+				if(child.getKey().charAt(0) == leftoverKey.charAt(0)){
 					found = true;
 					ret = put(leftoverKey, value, child);
 					break;
@@ -369,14 +368,13 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				node.getChildren().add(n);
 			}
 		}
-		else if(largestPrefix < node.getPrefix().length()){
+		else if(largestPrefix < node.getKey().length()){
 			//kKey and node.getPrefix() share a prefix, so split node
-			String leftoverPrefix = node.getPrefix().substring(largestPrefix);
+			String leftoverPrefix = node.getKey().substring(largestPrefix);
 			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
-			n.setHasValue(node.hasValue());
 			n.getChildren().addAll(node.getChildren());
 
-			node.setPrefix(node.getPrefix().substring(0, largestPrefix));
+			node.setKey(node.getKey().substring(0, largestPrefix));
 			node.getChildren().clear();
 			node.getChildren().add(n);
 
@@ -384,14 +382,13 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				//the largest prefix is equal to the key, so set this node's value
 				ret = node.getValue();
 				node.setValue(value);
-				node.setHasValue(true);
 			}
 			else{
 				//there's a leftover suffix on the key, so add another child 
 				String leftoverKey = key.substring(largestPrefix);
 				RadixTreeNode<V> keyNode = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(keyNode);
-				node.setHasValue(false);
+				node.setValue(null);
 			}
 		}
 		else{
@@ -415,7 +412,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		String sKey = (String)key;
 		if(sKey.isEmpty()){
 			V value = root.getValue();
-			root.setHasValue(false);
+			root.setValue(null);
 			return value;
 		}
 
@@ -434,8 +431,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		Iterator<RadixTreeNode<V>> iter = node.getChildren().iterator();
 		while(iter.hasNext()){
 			RadixTreeNode<V> child = iter.next();
-			int largestPrefix = RadixTreeUtil.largestPrefixLength(key, child.getPrefix());
-			if(largestPrefix == child.getPrefix().length() && largestPrefix == key.length()){
+			int largestPrefix = RadixTreeUtil.largestPrefixLength(key, child.getKey());
+			if(largestPrefix == child.getKey().length() && largestPrefix == key.length()){
 				//found our match, remove the value from this node
 				if(child.getChildren().isEmpty()){
 					//leaf node, simply remove from parent
@@ -446,17 +443,16 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				else if(child.hasValue()){
 					//internal node
 					ret = child.getValue();
-					child.setHasValue(false);
+					child.setValue(null);
 
 					if(child.getChildren().size() == 1){
 						//the subchild's prefix can be reused, with a little modification
 						RadixTreeNode<V> subchild = child.getChildren().iterator().next();
-						String newPrefix = child.getPrefix() + subchild.getPrefix();
+						String newPrefix = child.getKey() + subchild.getKey();
 
 						//merge child node with its single child
 						child.setValue(subchild.getValue());
-						child.setHasValue(subchild.hasValue());
-						child.setPrefix(newPrefix);
+						child.setKey(newPrefix);
 						child.getChildren().clear();
 					}
 
