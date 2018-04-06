@@ -267,8 +267,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Set<Map.Entry<String, V>> entrySet(){
-		//TODO documentation Of Map.entrySet() specifies that this is a view of the entries, and modifications to this collection should be
-		//      reflected in the parent structure
+		//TODO documentation of Map.entrySet() specifies that this is a view of the entries, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Set<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, Set<Map.Entry<String, V>>>(){
 			private final Set<Map.Entry<String, V>> result = new HashSet<>();
 
@@ -288,8 +287,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Set<String> keySet(){
-		//TODO documentation Of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be
-		//      reflected in the parent structure
+		//TODO documentation Of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(){
 			private final Set<String> result = new TreeSet<>();
 
@@ -309,8 +307,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Collection<V> values(){
-		//TODO documentation Of Map.values() specifies that this is a view of the values, and modifications to this collection should be
-		//      reflected in the parent structure
+		//TODO documentation Of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(){
 			private final Collection<V> result = new ArrayList<>();
 

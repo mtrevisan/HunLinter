@@ -22,7 +22,7 @@ public class RadixTreeUtil{
 	 */
 	public static int largestPrefixLength(CharSequence a, CharSequence b){
 		int len = 0;
-		for(int i = 0; i < Math.min(a.length(), b.length());  ++ i){
+		for(int i = 0; i < Math.min(a.length(), b.length()); i ++){
 			if(a.charAt(i) != b.charAt(i))
 				break;
 
