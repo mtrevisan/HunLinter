@@ -613,27 +613,27 @@ public class RadixTreeTest{
 		Assert.assertNotNull(tree.containsKey("ape"));
 	}
 
-//	@Test
-//	public void testGetPrefixes(){
-//		RadixTree<String> tree = new RadixTree<>();
-//
-//		tree.put("h", "h");
-//		tree.put("hey", "hey");
-//		tree.put("hell", "hell");
-//		tree.put("hello", "hello");
-//		tree.put("hat", "hat");
-//		tree.put("cat", "cat");
-//
-//		Assert.assertNotNull(tree.getPrefixes("helloworld"));
-//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("h"));
-//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("hell"));
-//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("hello"));
-//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("he"));
-//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("hat"));
-//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("cat"));
-//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("hey"));
-//		Assert.assertNull(tree.getPrefixes("animal"));
-//	}
+	@Test
+	public void testGetPrefixes(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("h", "h");
+		tree.put("hey", "hey");
+		tree.put("hell", "hell");
+		tree.put("hello", "hello");
+		tree.put("hat", "hat");
+		tree.put("cat", "cat");
+
+		Assert.assertFalse(tree.getValuesWithPrefix("helloworld").isEmpty());
+		Assert.assertTrue(tree.getValuesWithPrefix("helloworld").contains("h"));
+		Assert.assertTrue(tree.getValuesWithPrefix("helloworld").contains("hell"));
+		Assert.assertTrue(tree.getValuesWithPrefix("helloworld").contains("hello"));
+		Assert.assertTrue(!tree.getValuesWithPrefix("helloworld").contains("he"));
+		Assert.assertTrue(!tree.getValuesWithPrefix("helloworld").contains("hat"));
+		Assert.assertTrue(!tree.getValuesWithPrefix("helloworld").contains("cat"));
+		Assert.assertTrue(!tree.getValuesWithPrefix("helloworld").contains("hey"));
+		Assert.assertTrue(tree.getValuesWithPrefix("animal").isEmpty());
+	}
 
 	@Test
 	public void testContainsChildInsert(){
