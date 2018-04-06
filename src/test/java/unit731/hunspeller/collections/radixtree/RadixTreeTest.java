@@ -33,6 +33,7 @@ public class RadixTreeTest{
 	public void testEmptyTree(){
 		RadixTree<Integer> tree = new RadixTree<>();
 
+		Assert.assertTrue(tree.isEmpty());
 		Assert.assertEquals(0, tree.size());
 	}
 
@@ -371,5 +372,394 @@ public class RadixTreeTest{
 		Arrays.sort(b);
 		Assert.assertArrayEquals(a, b);
 	}
+
+
+	@Test
+	public void testSearchForPartialParentAndLeafKeyWhenOverlapExists(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("abcd", "abcd");
+		tree.put("abce", "abce");
+
+		Assert.assertEquals(0, tree.getValuesWithPrefix("abe").size());
+		Assert.assertEquals(0, tree.getValuesWithPrefix("abd").size());
+	}
+
+	@Test
+	public void testSearchForLeafNodesWhenOverlapExists(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("abcd", "abcd");
+		tree.put("abce", "abce");
+
+		Assert.assertEquals(1, tree.getValuesWithPrefix("abcd").size());
+		Assert.assertEquals(1, tree.getValuesWithPrefix("abce").size());
+	}
+
+	@Test
+	public void testSearchForStringSmallerThanSharedParentWhenOverlapExists(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("abcd", "abcd");
+		tree.put("abce", "abce");
+
+		Assert.assertEquals(2, tree.getValuesWithPrefix("ab").size());
+		Assert.assertEquals(2, tree.getValuesWithPrefix("a").size());
+	}
+
+	@Test
+	public void testSearchForStringEqualToSharedParentWhenOverlapExists(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("abcd", "abcd");
+		tree.put("abce", "abce");
+
+		Assert.assertEquals(2, tree.getValuesWithPrefix("abc").size());
+	}
+
+	@Test
+	public void testInsert(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("bat", "bat");
+		tree.put("ape", "ape");
+		tree.put("bath", "bath");
+		tree.put("banana", "banana");
+
+		Assert.assertEquals(new RadixTreeNode("ple", "apple"), tree.find("apple"));
+		Assert.assertEquals(new RadixTreeNode("t", "bat"), tree.find("bat"));
+		Assert.assertEquals(new RadixTreeNode("e", "ape"), tree.find("ape"));
+		Assert.assertEquals(new RadixTreeNode("h", "bath"), tree.find("bath"));
+		Assert.assertEquals(new RadixTreeNode("nana", "banana"), tree.find("banana"));
+	}
+
+	@Test
+	public void testInsertExistingUnrealNodeConvertsItToReal(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("applepie", "applepie");
+		tree.put("applecrisp", "applecrisp");
+
+		Assert.assertFalse(tree.containsKey("apple"));
+
+		tree.put("apple", "apple");
+
+		Assert.assertTrue(tree.containsKey("apple"));
+	}
+
+//	@Test
+//	public void testDuplicatesNotAllowed(){
+//		RadixTree<String> tree = new RadixTree<>();
+//
+//		tree.put("apple", "apple");
+//
+//		try{
+//			tree.put("apple", "apple2");
+//			Assert.fail("Duplicate should not have been allowed");
+//		}
+//		catch(DuplicateKeyException e){
+//			Assert.assertEquals("Duplicate key: 'apple'", e.getMessage());
+//		}
+//	}
+
+	@Test
+	public void testInsertWithRepeatingPatternsInKey(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("xbox 360", "xbox 360");
+		tree.put("xbox", "xbox");
+		tree.put("xbox 360 games", "xbox 360 games");
+		tree.put("xbox games", "xbox games");
+		tree.put("xbox xbox 360", "xbox xbox 360");
+		tree.put("xbox xbox", "xbox xbox");
+		tree.put("xbox 360 xbox games", "xbox 360 xbox games");
+		tree.put("xbox games 360", "xbox games 360");
+		tree.put("xbox 360 360", "xbox 360 360");
+		tree.put("xbox 360 xbox 360", "xbox 360 xbox 360");
+		tree.put("360 xbox games 360", "360 xbox games 360");
+		tree.put("xbox xbox 361", "xbox xbox 361");
+
+		Assert.assertEquals(12, tree.size());
+	}
+
+	@Test
+	public void testDeleteNodeWithNoChildren(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+
+		Assert.assertNotNull(tree.remove("apple"));
+	}
+
+	@Test
+	public void testDeleteNodeWithOneChild(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("applepie", "applepie");
+
+		Assert.assertNotNull(tree.remove("apple"));
+		Assert.assertTrue(tree.containsKey("applepie"));
+		Assert.assertFalse(tree.containsKey("apple"));
+	}
+
+	@Test
+	public void testDeleteNodeWithMultipleChildren(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("applepie", "applepie");
+		tree.put("applecrisp", "applecrisp");
+
+		Assert.assertNotNull(tree.remove("apple"));
+		Assert.assertTrue(tree.containsKey("applepie"));
+		Assert.assertTrue(tree.containsKey("applecrisp"));
+		Assert.assertFalse(tree.containsKey("apple"));
+	}
+
+	@Test
+	public void testCantDeleteSomethingThatDoesntExist(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		Assert.assertNull(tree.remove("apple"));
+	}
+
+	@Test
+	public void testCantDeleteSomethingThatWasAlreadyDeleted(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.remove("apple");
+
+		Assert.assertNull(tree.remove("apple"));
+	}
+
+	@Test
+	public void testChildrenNotAffectedWhenOneIsDeleted(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+		tree.put("applepie", "applepie");
+		tree.put("ape", "ape");
+
+		tree.remove("apple");
+
+		Assert.assertTrue(tree.containsKey("appleshack"));
+		Assert.assertTrue(tree.containsKey("applepie"));
+		Assert.assertTrue(tree.containsKey("ape"));
+		Assert.assertFalse(tree.containsKey("apple"));
+	}
+
+	@Test
+	public void testSiblingsNotAffectedWhenOneIsDeleted(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ball", "ball");
+
+		tree.remove("apple");
+
+		Assert.assertTrue(tree.containsKey("ball"));
+	}
+
+	@Test
+	public void testCantDeleteUnrealNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ape", "ape");
+
+		Assert.assertNull(tree.remove("ap"));
+	}
+
+	@Test
+	public void testCantFindRootNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		Assert.assertNull(tree.find(""));
+	}
+
+	@Test
+	public void testFindSimpleInsert(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+
+		Assert.assertNotNull(tree.find("apple"));
+	}
+
+	@Test
+	public void testContainsSimpleInsert(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+
+		Assert.assertTrue(tree.containsKey("apple"));
+	}
+
+	@Test
+	public void testFindChildInsert(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ape", "ape");
+		tree.put("appletree", "appletree");
+		tree.put("appleshackcream", "appleshackcream");
+
+		Assert.assertNotNull(tree.find("appletree"));
+		Assert.assertNotNull(tree.find("appleshackcream"));
+		Assert.assertNotNull(tree.containsKey("ape"));
+	}
+
+//	@Test
+//	public void testGetPrefixes(){
+//		RadixTree<String> tree = new RadixTree<>();
+//
+//		tree.put("h", "h");
+//		tree.put("hey", "hey");
+//		tree.put("hell", "hell");
+//		tree.put("hello", "hello");
+//		tree.put("hat", "hat");
+//		tree.put("cat", "cat");
+//
+//		Assert.assertNotNull(tree.getPrefixes("helloworld"));
+//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("h"));
+//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("hell"));
+//		Assert.assertTrue(tree.getPrefixes("helloworld").contains("hello"));
+//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("he"));
+//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("hat"));
+//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("cat"));
+//		Assert.assertTrue(!tree.getPrefixes("helloworld").contains("hey"));
+//		Assert.assertNull(tree.getPrefixes("animal"));
+//	}
+
+	@Test
+	public void testContainsChildInsert(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ape", "ape");
+		tree.put("appletree", "appletree");
+		tree.put("appleshackcream", "appleshackcream");
+
+		Assert.assertTrue(tree.containsKey("appletree"));
+		Assert.assertTrue(tree.containsKey("appleshackcream"));
+		Assert.assertTrue(tree.containsKey("ape"));
+	}
+
+	@Test
+	public void testCantFindNonexistantNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		Assert.assertNull(tree.find("apple"));
+	}
+
+	@Test
+	public void testDoesntContainNonexistantNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		Assert.assertFalse(tree.containsKey("apple"));
+	}
+
+	@Test
+	public void testCantFindUnrealNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ape", "ape");
+
+		Assert.assertNull(tree.find("ap"));
+	}
+
+	@Test
+	public void testDoesntContainUnrealNode(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("ape", "ape");
+
+		Assert.assertFalse(tree.containsKey("ap"));
+	}
+
+	@Test
+	public void testSearchPrefix_LimitGreaterThanPossibleResults(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+		tree.put("appleshackcream", "appleshackcream");
+		tree.put("applepie", "applepie");
+		tree.put("ape", "ape");
+
+		List<String> result = tree.getValuesWithPrefix("app");
+		Assert.assertEquals(4, result.size());
+
+		Assert.assertTrue(result.contains("appleshack"));
+		Assert.assertTrue(result.contains("appleshackcream"));
+		Assert.assertTrue(result.contains("applepie"));
+		Assert.assertTrue(result.contains("apple"));
+	}
+
+	@Test
+	public void testSearchPrefix_LimitLessThanPossibleResults(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+		tree.put("appleshackcream", "appleshackcream");
+		tree.put("applepie", "applepie");
+		tree.put("ape", "ape");
+
+		List<String> result = tree.getValuesWithPrefix("appl");
+		Assert.assertEquals(4, result.size());
+
+		Assert.assertTrue(result.contains("appleshack"));
+		Assert.assertTrue(result.contains("applepie"));
+		Assert.assertTrue(result.contains("apple"));
+	}
+
+	@Test
+	public void testGetSize(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+		tree.put("appleshackcream", "appleshackcream");
+		tree.put("applepie", "applepie");
+		tree.put("ape", "ape");
+
+		Assert.assertTrue(tree.size() == 5);
+	}
+
+	@Test
+	public void testDeleteReducesSize(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+
+		tree.remove("appleshack");
+
+		Assert.assertTrue(tree.size() == 1);
+	}
+
+//	@Test
+//	public void testComplete(){
+//		RadixTree<String> tree = new RadixTree<>();
+//
+//		tree.put("apple", "apple");
+//		tree.put("appleshack", "appleshack");
+//		tree.put("applepie", "applepie");
+//		tree.put("applegold", "applegold");
+//		tree.put("applegood", "applegood");
+//
+//		Assert.assertEquals("", tree.complete("z"));
+//		Assert.assertEquals("apple", tree.complete("a"));
+//		Assert.assertEquals("apple", tree.complete("app"));
+//		Assert.assertEquals("appleshack", tree.complete("apples"));
+//		Assert.assertEquals("applego", tree.complete("appleg"));
+//	}
 
 }

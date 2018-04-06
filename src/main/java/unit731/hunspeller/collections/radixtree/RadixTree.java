@@ -57,7 +57,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 */
 	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
-		visit(root, null, prefix, StringUtils.EMPTY, visitor);
+		visit(root, null, prefix, root.getKey(), visitor);
 	}
 
 	/**
@@ -331,7 +331,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 					Collection<RadixTreeNode<V>> children = node.getChildren();
 
 					//if there is no children of the node we need to delete it from the its parent children list
-					if(children.isEmpty() && parent != null){
+					if(children.isEmpty()){
 						Collection<RadixTreeNode<V>> parentChildren = parent.getChildren();
 						Iterator<RadixTreeNode<V>> itr = parentChildren.iterator();
 						while(itr.hasNext())
