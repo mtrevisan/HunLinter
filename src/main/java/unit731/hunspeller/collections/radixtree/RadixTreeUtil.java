@@ -15,10 +15,10 @@ public class RadixTreeUtil{
 	/**
 	 * Finds the length of the largest prefix for two character sequences.
 	 *
-	 * @param a character sequence
-	 * @param b character sequence
-	 * @return the length of largest prefix of <code>a</code> and <code>b</code>
-	 * @throws IllegalArgumentException if either <code>a</code> or <code>b</code> is <code>null</code>
+	 * @param a	Character sequence
+	 * @param b	Character sequence
+	 * @return	The length of largest prefix of <code>a</code> and <code>b</code>
+	 * @throws IllegalArgumentException	If either <code>a</code> or <code>b</code> is <code>null</code>
 	 */
 	public static int largestPrefixLength(CharSequence a, CharSequence b){
 		int len = 0;
@@ -35,7 +35,7 @@ public class RadixTreeUtil{
 	 * Prints a radix tree to <code>System.out</code>.
 	 *
 	 * @param tree	The tree
-	 * @param <V> the type of values stored in the tree
+	 * @param <V>	The type of values stored in the tree
 	 */
 	public static <V extends Serializable> void dumpTree(RadixTree<V> tree){
 		dumpTree(tree.getRoot(), StringUtils.EMPTY);
@@ -44,14 +44,11 @@ public class RadixTreeUtil{
 	/**
 	 * Prints a subtree to <code>System.out</code>.
 	 *
-	 * @param node the subtree
-	 * @param outputPrefix prefix to be printed to output
+	 * @param node	The subtree
+	 * @param outputPrefix	Prefix to be printed to output
 	 */
-	static <V extends Serializable> void dumpTree(RadixTreeNode<V> node, String outputPrefix){
-		if(node.hasValue())
-			System.out.format("%s{%s : %s}%n", outputPrefix, node.getPrefix(), node.getValue());
-		else
-			System.out.format("%s{%s}%n", outputPrefix, node.getPrefix(), node.getValue());
+	private static <V extends Serializable> void dumpTree(RadixTreeNode<V> node, String outputPrefix){
+		System.out.format((node.hasValue()? "%s{%s : %s}%n": "%s{%s}%n"), outputPrefix, node.getPrefix(), node.getValue());
 
 		for(RadixTreeNode<V> child : node)
 			dumpTree(child, outputPrefix + "\t");

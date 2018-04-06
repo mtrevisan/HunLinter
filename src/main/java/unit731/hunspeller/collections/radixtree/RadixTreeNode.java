@@ -11,9 +11,9 @@ import lombok.Setter;
 /**
  * A node in a radix tree.
  *
- * @param <V> the type of values stored in the tree
+ * @param <V>	The type of values stored in the tree
  */
-class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>>, Comparable<RadixTreeNode<V>>, Serializable{
+public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>>, Comparable<RadixTreeNode<V>>, Serializable{
 
 	/** The prefix at this node */
 	@Getter
@@ -26,15 +26,14 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 	private V value;
 
 	/**
-	 * Whether or not this node stores a value. This value is mainly used by
-	 * {@link RadixTreeVisitor} to figure out whether or not this node should
-	 * be visited.
+	 * Whether or not this node stores a value.
+	 * This value is mainly used by {@link RadixTreeVisitor} to figure out whether or not this node should be visited.
 	 */
 	private boolean hasValue;
 
 	/**
-	 * The children for this node. Note, because we use {@link TreeSet} here,
-	 * traversal of {@link RadixTree} will be in lexicographical order.
+	 * The children for this node.
+	 * Note, because we use {@link TreeSet} here, traversal of {@link RadixTree} will be in lexicographical order.
 	 */
 	private Collection<RadixTreeNode<V>> children;
 
@@ -42,10 +41,10 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 	/**
 	 * Constructs a node from the given prefix.
 	 *
-	 * @param prefix the prefix
-	 * @param value the value
+	 * @param prefix	The prefix
+	 * @param value	The value
 	 */
-	RadixTreeNode(String prefix){
+	public RadixTreeNode(String prefix){
 		this(prefix, null);
 
 		this.hasValue = false;
@@ -54,10 +53,10 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 	/**
 	 * Constructs a node from the given prefix and value.
 	 *
-	 * @param prefix the prefix
-	 * @param value the value
+	 * @param prefix	The prefix
+	 * @param value	The value
 	 */
-	RadixTreeNode(String prefix, V value){
+	public RadixTreeNode(String prefix, V value){
 		this.prefix = prefix;
 		this.value = value;
 		this.hasValue = true;
@@ -66,9 +65,9 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 	/**
 	 * Gets the children of this node.
 	 *
-	 * @return the list of children
+	 * @return	The list of children
 	 */
-	Collection<RadixTreeNode<V>> getChildren(){
+	public Collection<RadixTreeNode<V>> getChildren(){
 		//delayed creation of children to reduce memory cost
 		if(children == null)
 			children = new TreeSet<>();
@@ -79,21 +78,19 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 	/**
 	 * Whether or not this node has a value attached to it.
 	 *
-	 * @return whether or not this node has a value
+	 * @return	Whether or not this node has a value
 	 */
-	boolean hasValue(){
+	public boolean hasValue(){
 		return hasValue;
 	}
 
 	/**
 	 * Sets whether or not this node has a value attached to it.
 	 *
-	 * @param hasValue  <code>true</code> if this node will have a value,
-	 * <code>false</code> otherwise. If <code>false</code>,
-	 * {@link #getValue()} will return <code>null</code>
-	 * after this call.
+	 * @param hasValue	<code>true</code> if this node will have a value, <code>false</code> otherwise. If <code>false</code>,
+	 *							{@link #getValue()} will return <code>null</code> after this call.
 	 */
-	void setHasValue(boolean hasValue){
+	public void setHasValue(boolean hasValue){
 		this.hasValue = hasValue;
 
 		if(!hasValue)
@@ -116,7 +113,7 @@ class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>
 
 				@Override
 				public void remove(){
-					// Unimplemented
+					//unimplemented
 				}
 			};
 		}
