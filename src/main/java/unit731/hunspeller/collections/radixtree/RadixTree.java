@@ -16,11 +16,13 @@ import org.apache.commons.lang3.StringUtils;
 
 
 /**
- * A radix tree. Radix trees are String to Object mappings which allow quick lookups on the strings. Radix trees also make it easy to grab the objects
+ * A radix tree.
+ * Radix trees are String to Object mappings which allow quick lookups on the strings. Radix trees also make it easy to grab the objects
  * with a common prefix.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Radix_tree">Wikipedia</a>
- * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree</a>
+ * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree 1</a>
+ * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
  *
  * @param <V> the type of values stored in the tree
  */
@@ -341,7 +343,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 							}
 
 						//if parent is not real node and has only one child then they need to be merged.
-						if(parentChildren.size() == 1 && !parent.hasValue())
+						if(parentChildren.size() == 1 && !parent.hasValue() && parent != root)
 							mergeNodes(parent, parentChildren.iterator().next());
 					}
 					else if(children.size() == 1)
