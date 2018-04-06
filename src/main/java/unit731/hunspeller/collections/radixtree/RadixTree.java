@@ -307,7 +307,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	/**
-	 * Remove the value with the given key from the subtree rooted at the given node.
+	 * Insert the value with the given key from the subtree rooted at the given node.
 	 *
 	 * @param key	The key
 	 * @param node	The node to start searching from
@@ -322,7 +322,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			ret = node.getValue();
 			node.setValue(value);
 		}
-		else if(largestPrefix == 0 || (largestPrefix < key.length() && largestPrefix >= node.getKey().length())){
+		else if(largestPrefix == 0 || largestPrefix < key.length() && largestPrefix >= node.getKey().length()){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
 			String leftoverKey = key.substring(largestPrefix);
@@ -342,7 +342,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			}
 		}
 		else if(largestPrefix < node.getKey().length()){
-			//kKey and node.getPrefix() share a prefix, so split node
+			//key and node.getPrefix() share a prefix, so split node
 			String leftoverPrefix = node.getKey().substring(largestPrefix);
 			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
@@ -432,9 +432,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 
-	/**
-	 * Prints the tree to <code>System.out</code>.
-	 */
+	/** Prints the tree to <code>System.out</code>. */
 	public void dump(){
 		dump(root, StringUtils.EMPTY);
 	}
