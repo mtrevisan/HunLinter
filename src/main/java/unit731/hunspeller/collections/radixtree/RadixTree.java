@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -94,23 +95,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public boolean containsKey(Object keyToCheck){
-		if(keyToCheck == null)
-			throw new NullPointerException(KEY_CANNOT_BE_NULL);
-		if(!(keyToCheck instanceof String))
-			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
-
-		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				if(key.equals(keyToCheck))
-					result = true;
-
-				return result;
-			}
-		};
-		visit(visitor, (String)keyToCheck);
-
-		return visitor.getResult();
+		RadixTreeNode<V> foundNode = find((String)keyToCheck);
+		return (foundNode != null);
 	}
 
 	@Override
@@ -132,21 +118,26 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V get(Object keyToCheck){
+		RadixTreeNode<V> foundNode = find((String)keyToCheck);
+		return (foundNode != null? foundNode.getValue(): null);
+	}
+
+	public RadixTreeNode<V> find(String keyToCheck){
 		if(keyToCheck == null)
 			throw new NullPointerException(KEY_CANNOT_BE_NULL);
 		if(!(keyToCheck instanceof String))
 			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
 
-		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
+		RadixTreeVisitor<V, RadixTreeNode<V>> visitor = new RadixTreeVisitor<V, RadixTreeNode<V>>(null){
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				if(key.equals(keyToCheck))
-					result = node.getValue();
+					result = node;
 
 				return (result != null);
 			}
 		};
-		visit(visitor, (String)keyToCheck);
+		visit(visitor, keyToCheck);
 
 		return visitor.getResult();
 	}
@@ -163,7 +154,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				V value = node.getValue();
-				result.add(new AbstractMap.SimpleEntry<>(key, value));
+				Map.Entry<String, V> entry = new AbstractMap.SimpleEntry<>(key, value);
+				result.add(entry);
 
 				return false;
 			}
@@ -181,21 +173,10 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<V> getValuesWithPrefix(String prefix){
-		if(prefix == null)
-			throw new NullPointerException(PREFIX_CANNOT_BE_NULL);
-
-		RadixTreeVisitor<V, List<V>> visitor = new RadixTreeVisitor<V, List<V>>(new ArrayList<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				V value = node.getValue();
-				result.add(value);
-
-				return false;
-			}
-		};
-		visit(visitor, prefix);
-
-		return visitor.getResult();
+		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(prefix);
+		return entries.stream()
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -206,20 +187,10 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<String> getKeysWithPrefix(String prefix){
-		if(prefix == null)
-			throw new NullPointerException(PREFIX_CANNOT_BE_NULL);
-
-		RadixTreeVisitor<V, List<String>> visitor = new RadixTreeVisitor<V, List<String>>(new ArrayList<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				result.add(key);
-
-				return false;
-			}
-		};
-		visit(visitor, prefix);
-
-		return visitor.getResult();
+		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(prefix);
+		return entries.stream()
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -250,52 +221,24 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Set<Map.Entry<String, V>> entrySet(){
-		//TODO documentation of Map.entrySet() specifies that this is a view of the entries, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Set<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, Set<Map.Entry<String, V>>>(new HashSet<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				V value = node.getValue();
-				result.add(new AbstractMap.SimpleEntry<>(key, value));
-
-				return false;
-			}
-		};
-		visit(visitor);
-
-		return visitor.getResult();
+		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+		return new HashSet<>(entries);
 	}
 
 	@Override
 	public Set<String> keySet(){
-		//TODO documentation of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(new TreeSet<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				result.add(key);
-
-				return false;
-			}
-		};
-		visit(visitor);
-
-		return visitor.getResult();
+		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+		return entries.stream()
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toSet());
 	}
 
 	@Override
 	public Collection<V> values(){
-		//TODO documentation of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
-		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(new ArrayList<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				V value = node.getValue();
-				result.add(value);
-
-				return false;
-			}
-		};
-		visit(visitor);
-
-		return visitor.getResult();
+		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+		return entries.stream()
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toSet());
 	}
 
 	@Override
