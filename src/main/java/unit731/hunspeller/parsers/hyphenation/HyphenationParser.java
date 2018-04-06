@@ -28,6 +28,7 @@ import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.RadixTree;
+import unit731.hunspeller.collections.radixtree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.RadixTreeVisitor;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
@@ -354,7 +355,8 @@ public class HyphenationParser{
 			Map<Integer, List<String>> content = new HashMap<>();
 			RadixTreeVisitor<String, Boolean> visitor = new RadixTreeVisitor<String, Boolean>(false){
 				@Override
-				public boolean visit(String key, String value){
+				public boolean visit(String key, RadixTreeNode<String> node, RadixTreeNode<String> parent){
+					String value = node.getValue();
 					content.computeIfAbsent(value.length(), k -> new ArrayList<>())
 						.add(value);
 

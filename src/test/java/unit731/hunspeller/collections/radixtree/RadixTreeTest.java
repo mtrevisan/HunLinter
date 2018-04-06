@@ -41,6 +41,8 @@ public class RadixTreeTest{
 
 		Assert.assertEquals(1, tree.size());
 		Assert.assertTrue(tree.containsKey("test"));
+		Assert.assertFalse(tree.containsKey("tes"));
+		Assert.assertFalse(tree.containsKey("testt"));
 	}
 
 	@Test

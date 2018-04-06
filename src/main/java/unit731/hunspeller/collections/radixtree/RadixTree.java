@@ -57,7 +57,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 */
 	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
-		visit(root, prefix, StringUtils.EMPTY, visitor);
+		visit(root, null, prefix, StringUtils.EMPTY, visitor);
 	}
 
 	/**
@@ -67,17 +67,17 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param prefix	The prefix
 	 * @param visitor	The visitor
 	 */
-	private boolean visit(RadixTreeNode<V> node, String prefixAllowed, String prefix, RadixTreeVisitor<V, ?> visitor){
+	private boolean visit(RadixTreeNode<V> node, RadixTreeNode<V> parent, String prefixAllowed, String prefix, RadixTreeVisitor<V, ?> visitor){
 		boolean exitValue = false;
 		if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix)))
-			exitValue = visitor.visit(prefix, node.getValue());
+			exitValue = visitor.visit(prefix, node, parent);
 
 		if(!exitValue){
 			int prefixLen = prefix.length();
 			for(RadixTreeNode<V> child : node){
 				String newPrefix = prefix + child.getKey();
 				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen)){
-					exitValue = visit(child, prefixAllowed, newPrefix, visitor);
+					exitValue = visit(child, node, prefixAllowed, newPrefix, visitor);
 
 					if(exitValue)
 						break;
@@ -101,7 +101,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				if(key.equals(keyToCheck))
 					result = true;
 
@@ -117,8 +117,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	public boolean containsValue(Object val){
 		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
 			@Override
-			public boolean visit(String key, V value){
-				if(val == value || (value != null && value.equals(val)))
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				V value = node.getValue();
+				if(val == value || value != null && value.equals(val))
 					result = true;
 
 				return result;
@@ -138,11 +139,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				if(key.equals(keyToCheck))
-					result = value;
+					result = node.getValue();
 
-				return false;
+				return (result != null);
 			}
 		};
 		visit(visitor, (String)keyToCheck);
@@ -160,7 +161,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	public List<Map.Entry<String, V>> getEntriesWithPrefix(String prefix){
 		RadixTreeVisitor<V, List<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, List<Map.Entry<String, V>>>(new ArrayList<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				V value = node.getValue();
 				result.add(new AbstractMap.SimpleEntry<>(key, value));
 
 				return false;
@@ -184,7 +186,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		RadixTreeVisitor<V, List<V>> visitor = new RadixTreeVisitor<V, List<V>>(new ArrayList<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				V value = node.getValue();
 				result.add(value);
 
 				return false;
@@ -208,7 +211,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		RadixTreeVisitor<V, List<String>> visitor = new RadixTreeVisitor<V, List<String>>(new ArrayList<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				result.add(key);
 
 				return false;
@@ -234,7 +237,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	public int size(){
 		RadixTreeVisitor<V, Integer> visitor = new RadixTreeVisitor<V, Integer>(0){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				result ++;
 
 				return false;
@@ -250,7 +253,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		//TODO documentation of Map.entrySet() specifies that this is a view of the entries, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Set<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, Set<Map.Entry<String, V>>>(new HashSet<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				V value = node.getValue();
 				result.add(new AbstractMap.SimpleEntry<>(key, value));
 
 				return false;
@@ -266,7 +270,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		//TODO documentation of Map.keySet() specifies that this is a view of the keys, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Set<String>> visitor = new RadixTreeVisitor<V, Set<String>>(new TreeSet<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				result.add(key);
 
 				return false;
@@ -282,7 +286,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		//TODO documentation of Map.values() specifies that this is a view of the values, and modifications to this collection should be reflected in the parent structure
 		RadixTreeVisitor<V, Collection<V>> visitor = new RadixTreeVisitor<V, Collection<V>>(new ArrayList<>()){
 			@Override
-			public boolean visit(String key, V value){
+			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				V value = node.getValue();
 				result.add(value);
 
 				return false;
@@ -376,69 +381,54 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(!(key instanceof String))
 			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
 
-		//manage special case for removing empty string (root node)
-		String k = (String)key;
-		if(k.isEmpty()){
-			V value = root.getValue();
-			root.setValue(null);
-			return value;
-		}
+		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
+			@Override
+			public boolean visit(String k, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+				if(k.equals(key)){
+					result = node.getValue();
+					Collection<RadixTreeNode<V>> children = node.getChildren();
 
-		return remove(k, root);
+					//if there is no children of the node we need to delete it from the its parent children list
+					if(children.isEmpty() && parent != null){
+						Collection<RadixTreeNode<V>> parentChildren = parent.getChildren();
+						Iterator<RadixTreeNode<V>> itr = parentChildren.iterator();
+						while(itr.hasNext())
+							if(itr.next().getKey().equals(node.getKey())){
+								itr.remove();
+								break;
+							}
+
+						//if parent is not real node and has only one child then they need to be merged.
+						if(parentChildren.size() == 1 && !parent.hasValue())
+							mergeNodes(parent, parentChildren.iterator().next());
+					}
+					else if(children.size() == 1)
+						//we need to merge the only child of this node with itself
+						mergeNodes(node, children.iterator().next());
+					else
+						node.setValue(null);
+				}
+
+				return (result != null);
+			}
+		};
+
+		visit(visitor, (String)key);
+
+		return visitor.getResult();
 	}
 
 	/**
-	 * Remove the value with the given key from the subtree rooted at the given node.
+	 * Merge a child into its parent node.
+	 * The operation is valid only if it is a child of the parent node and the parent node is not a real node.
 	 *
-	 * @param key	The key
-	 * @param node	The node to start searching from
-	 * @return	The value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
+	 * @param parent	The parent Node
+	 * @param child	The child Node
 	 */
-	private V remove(String key, RadixTreeNode<V> node){
-		V removedValue = null;
-		Iterator<RadixTreeNode<V>> itr = node.getChildren().iterator();
-		while(itr.hasNext()){
-			RadixTreeNode<V> child = itr.next();
-
-			int largestPrefix = RadixTreeUtil.largestPrefixLength(key, child.getKey());
-			if(largestPrefix == child.getKey().length() && largestPrefix == key.length()){
-				Collection<RadixTreeNode<V>> children = child.getChildren();
-				//found our match, remove the value from this node
-				if(children.isEmpty()){
-					removedValue = child.getValue();
-
-					//leaf node, simply remove from parent
-					itr.remove();
-					break;
-				}
-				else if(child.hasValue()){
-					//internal node
-					removedValue = child.getValue();
-					child.setValue(null);
-
-					if(children.size() == 1){
-						//the subchild's prefix can be reused, with a little modification
-						RadixTreeNode<V> subchild = children.iterator().next();
-						String newPrefix = child.getKey() + subchild.getKey();
-
-						//merge child node with its single child
-						child.setValue(subchild.getValue());
-						child.setKey(newPrefix);
-						children.clear();
-					}
-
-					break;
-				}
-			}
-			else if(largestPrefix > 0 && largestPrefix < key.length()){
-				//continue down subtree of child
-				String leftoverKey = key.substring(largestPrefix);
-				removedValue = remove(leftoverKey, child);
-				break;
-			}
-		}
-
-		return removedValue;
+	private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
+		parent.setKey(parent.getKey() + child.getKey());
+		parent.setValue(child.getValue());
+		parent.getChildren().clear();
 	}
 
 }
