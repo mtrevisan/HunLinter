@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +27,8 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @param <V> the type of values stored in the tree
  */
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
 
 	public static final String PREFIX_CANNOT_BE_NULL = "prefix cannot be null";
@@ -37,9 +39,19 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	/**
 	 * The root node in this tree
 	 */
-	@Getter
 	private final RadixTreeNode<V> root = new RadixTreeNode<>(StringUtils.EMPTY);
+	private boolean noDuplicatedAllowed;
 
+
+	public static <T extends Serializable> RadixTree<T> createTree(){
+		return new RadixTree<>();
+	}
+
+	public static <T extends Serializable> RadixTree<T> createTreeNoDuplicates(){
+		RadixTree<T> tree = new RadixTree<>();
+		tree.noDuplicatedAllowed = true;
+		return tree;
+	}
 
 	/**
 	 * Traverses this radix tree using the given visitor.
@@ -247,13 +259,19 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(key == null)
 			throw new NullPointerException(KEY_CANNOT_BE_NULL);
 
-		return put(key, value, root);
+		try{
+			return put(key, value, root);
+		}
+		catch(DuplicateKeyException e){
+			throw new DuplicateKeyException("Duplicate key: '" + key + "'");
+		}
 	}
 
 	/**
 	 * Insert the value with the given key from the subtree rooted at the given node.
 	 *
 	 * @param key	The key
+	 * @param value	The value
 	 * @param node	The node to start searching from
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 */
@@ -264,6 +282,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(largestPrefix == node.getKey().length() && largestPrefix == key.length()){
 			//found a node with an exact match
 			ret = node.getValue();
+			if(noDuplicatedAllowed && ret != null)
+				throw new DuplicateKeyException();
+
 			node.setValue(value);
 		}
 		else if(largestPrefix == 0 || largestPrefix < key.length() && largestPrefix >= node.getKey().length()){

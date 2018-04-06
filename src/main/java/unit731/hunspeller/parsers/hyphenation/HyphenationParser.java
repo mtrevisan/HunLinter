@@ -92,7 +92,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private RadixTree<String> patterns = new RadixTree<>();
+	private RadixTree<String> patterns = RadixTree.createTree();
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
 
