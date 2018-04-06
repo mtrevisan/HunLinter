@@ -376,15 +376,15 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(!(key instanceof String))
 			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
 
-		//special case for removing empty string (root node)
-		String sKey = (String)key;
-		if(sKey.isEmpty()){
+		//manage special case for removing empty string (root node)
+		String k = (String)key;
+		if(k.isEmpty()){
 			V value = root.getValue();
 			root.setValue(null);
 			return value;
 		}
 
-		return remove(sKey, root);
+		return remove(k, root);
 	}
 
 	/**
@@ -395,33 +395,36 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 */
 	private V remove(String key, RadixTreeNode<V> node){
-		V ret = null;
-		Iterator<RadixTreeNode<V>> iter = node.getChildren().iterator();
-		while(iter.hasNext()){
-			RadixTreeNode<V> child = iter.next();
+		V removedValue = null;
+		Iterator<RadixTreeNode<V>> itr = node.getChildren().iterator();
+		while(itr.hasNext()){
+			RadixTreeNode<V> child = itr.next();
+
 			int largestPrefix = RadixTreeUtil.largestPrefixLength(key, child.getKey());
 			if(largestPrefix == child.getKey().length() && largestPrefix == key.length()){
+				Collection<RadixTreeNode<V>> children = child.getChildren();
 				//found our match, remove the value from this node
-				if(child.getChildren().isEmpty()){
+				if(children.isEmpty()){
+					removedValue = child.getValue();
+
 					//leaf node, simply remove from parent
-					ret = child.getValue();
-					iter.remove();
+					itr.remove();
 					break;
 				}
 				else if(child.hasValue()){
 					//internal node
-					ret = child.getValue();
+					removedValue = child.getValue();
 					child.setValue(null);
 
-					if(child.getChildren().size() == 1){
+					if(children.size() == 1){
 						//the subchild's prefix can be reused, with a little modification
-						RadixTreeNode<V> subchild = child.getChildren().iterator().next();
+						RadixTreeNode<V> subchild = children.iterator().next();
 						String newPrefix = child.getKey() + subchild.getKey();
 
 						//merge child node with its single child
 						child.setValue(subchild.getValue());
 						child.setKey(newPrefix);
-						child.getChildren().clear();
+						children.clear();
 					}
 
 					break;
@@ -430,12 +433,12 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			else if(largestPrefix > 0 && largestPrefix < key.length()){
 				//continue down subtree of child
 				String leftoverKey = key.substring(largestPrefix);
-				ret = remove(leftoverKey, child);
+				removedValue = remove(leftoverKey, child);
 				break;
 			}
 		}
 
-		return ret;
+		return removedValue;
 	}
 
 }
