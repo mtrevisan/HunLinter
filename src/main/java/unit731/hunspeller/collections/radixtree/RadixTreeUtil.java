@@ -13,25 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 public class RadixTreeUtil{
 
 	/**
-	 * Finds the length of the largest prefix for two character sequences.
-	 *
-	 * @param a	Character sequence
-	 * @param b	Character sequence
-	 * @return	The length of largest prefix of <code>a</code> and <code>b</code>
-	 * @throws IllegalArgumentException	If either <code>a</code> or <code>b</code> is <code>null</code>
-	 */
-	public static int largestPrefixLength(CharSequence a, CharSequence b){
-		int len = 0;
-		for(int i = 0; i < Math.min(a.length(), b.length()); i ++){
-			if(a.charAt(i) != b.charAt(i))
-				break;
-
-			 ++ len;
-		}
-		return len;
-	}
-
-	/**
 	 * Prints a radix tree to <code>System.out</code>.
 	 *
 	 * @param tree	The tree

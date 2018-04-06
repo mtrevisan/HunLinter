@@ -103,4 +103,20 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 		return key.compareTo(node.getKey());
 	}
 
+	/**
+	 * Finds the length of the largest prefix
+	 *
+	 * @param key	Character sequence
+	 * @return	The length of largest prefix of <code>a</code> and <code>b</code>
+	 * @throws IllegalArgumentException	If either <code>a</code> or <code>b</code> is <code>null</code>
+	 */
+	public int largestPrefixLength(CharSequence key){
+		int len;
+		int size = Math.min(this.key.length(), key.length());
+		for(len = 0; len < size; len ++)
+			if(this.key.charAt(len) != key.charAt(len))
+				break;
+		return len;
+	}
+
 }

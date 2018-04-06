@@ -316,7 +316,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	private V put(String key, V value, RadixTreeNode<V> node){
 		V ret = null;
 
-		int largestPrefix = RadixTreeUtil.largestPrefixLength(key, node.getKey());
+		int largestPrefix = node.largestPrefixLength(key);
 		if(largestPrefix == node.getKey().length() && largestPrefix == key.length()){
 			//found a node with an exact match
 			ret = node.getValue();
@@ -411,24 +411,24 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 				return (result != null);
 			}
+
+			/**
+			 * Merge a child into its parent node.
+			 * The operation is valid only if it is a child of the parent node and the parent node is not a real node.
+			 *
+			 * @param parent	The parent Node
+			 * @param child	The child Node
+			 */
+			private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
+				parent.setKey(parent.getKey() + child.getKey());
+				parent.setValue(child.getValue());
+				parent.getChildren().clear();
+			}
 		};
 
 		visit(visitor, (String)key);
 
 		return visitor.getResult();
-	}
-
-	/**
-	 * Merge a child into its parent node.
-	 * The operation is valid only if it is a child of the parent node and the parent node is not a real node.
-	 *
-	 * @param parent	The parent Node
-	 * @param child	The child Node
-	 */
-	private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
-		parent.setKey(parent.getKey() + child.getKey());
-		parent.setValue(child.getValue());
-		parent.getChildren().clear();
 	}
 
 }
