@@ -431,4 +431,25 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		return visitor.getResult();
 	}
 
+
+	/**
+	 * Prints the tree to <code>System.out</code>.
+	 */
+	public void dump(){
+		dump(root, StringUtils.EMPTY);
+	}
+
+	/**
+	 * Prints a subtree to <code>System.out</code>.
+	 *
+	 * @param node	The subtree
+	 * @param outputPrefix	Prefix to be printed to output
+	 */
+	private void dump(RadixTreeNode<V> node, String outputPrefix){
+		System.out.format((node.hasValue()? "%s{%s : %s}%n": "%s{%s}%n"), outputPrefix, node.getKey(), node.getValue());
+
+		for(RadixTreeNode<V> child : node)
+			dump(child, outputPrefix + "\t");
+	}
+
 }
