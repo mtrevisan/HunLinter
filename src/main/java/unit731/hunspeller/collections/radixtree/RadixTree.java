@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -372,25 +371,6 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		visit(visitor, (String)key);
 
 		return visitor.getResult();
-	}
-
-
-	/** Prints the tree to <code>System.out</code>. */
-	public void dump(){
-		dump(root, StringUtils.EMPTY);
-	}
-
-	/**
-	 * Prints a subtree to <code>System.out</code>.
-	 *
-	 * @param node	The subtree
-	 * @param outputPrefix	Prefix to be printed to output
-	 */
-	private void dump(RadixTreeNode<V> node, String outputPrefix){
-		System.out.format((node.hasValue()? "%s{%s : %s}%n": "%s{%s}%n"), outputPrefix, node.getKey(), node.getValue());
-
-		for(RadixTreeNode<V> child : node)
-			dump(child, outputPrefix + "\t");
 	}
 
 }
