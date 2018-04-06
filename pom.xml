@@ -25,6 +25,25 @@
 				</executions>
 			</plugin>
 			<!-- Maven JavaDoc Plugin -->
+			<!-- FIXME -->
+<!--			<plugin>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok-maven-plugin</artifactId>
+				<version>1.16.18.1</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>delombok</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+							<outputDirectory>${delombok.output}</outputDirectory>
+							<addOutputDirectory>false</addOutputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -35,9 +54,12 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<sourcepath>${delombok.output}</sourcepath>
+						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 			<!-- Maven Deploy Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
