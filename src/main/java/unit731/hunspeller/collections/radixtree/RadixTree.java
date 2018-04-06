@@ -373,4 +373,37 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		return visitor.getResult();
 	}
 
+	/**
+	 * Complete the a prefix to the point where ambiguity starts.
+	 *
+	 * Example:
+	 * If a tree contain "blah1", "blah2"
+	 * complete("b") -> return "blah"
+	 *
+	 * @param basePrefix	The prefix to be completed
+	 * @return	The unambiguous completion of the string
+	 */
+	public String completePrefix(String basePrefix){
+		return completePrefix(basePrefix, root, StringUtils.EMPTY);
+	}
+
+	private String completePrefix(String key, RadixTreeNode<V> node, String basePrefix){
+		int largestPrefix = node.largestPrefixLength(key);
+		int keyLength = key.length();
+		int nodeKeyLength = node.getKey().length();
+		String completedPrefix = StringUtils.EMPTY;
+		if(largestPrefix == keyLength && largestPrefix <= nodeKeyLength)
+			completedPrefix = basePrefix + node.getKey();
+		else if(nodeKeyLength == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
+			String beginning = key.substring(0, largestPrefix);
+			String ending = key.substring(largestPrefix);
+			for(RadixTreeNode<V> child : node.getChildren())
+				if(child.getKey().startsWith(String.valueOf(ending.charAt(0)))){
+					completedPrefix = completePrefix(ending, child, basePrefix + beginning);
+					break;
+				}
+		}
+		return completedPrefix;
+	}
+
 }

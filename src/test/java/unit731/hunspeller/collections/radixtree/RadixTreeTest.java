@@ -745,21 +745,21 @@ public class RadixTreeTest{
 		Assert.assertTrue(tree.size() == 1);
 	}
 
-//	@Test
-//	public void testComplete(){
-//		RadixTree<String> tree = new RadixTree<>();
-//
-//		tree.put("apple", "apple");
-//		tree.put("appleshack", "appleshack");
-//		tree.put("applepie", "applepie");
-//		tree.put("applegold", "applegold");
-//		tree.put("applegood", "applegood");
-//
-//		Assert.assertEquals("", tree.complete("z"));
-//		Assert.assertEquals("apple", tree.complete("a"));
-//		Assert.assertEquals("apple", tree.complete("app"));
-//		Assert.assertEquals("appleshack", tree.complete("apples"));
-//		Assert.assertEquals("applego", tree.complete("appleg"));
-//	}
+	@Test
+	public void testCompletePrefix(){
+		RadixTree<String> tree = new RadixTree<>();
+
+		tree.put("apple", "apple");
+		tree.put("appleshack", "appleshack");
+		tree.put("applepie", "applepie");
+		tree.put("applegold", "applegold");
+		tree.put("applegood", "applegood");
+
+		Assert.assertEquals("", tree.completePrefix("z"));
+		Assert.assertEquals("apple", tree.completePrefix("a"));
+		Assert.assertEquals("apple", tree.completePrefix("app"));
+		Assert.assertEquals("appleshack", tree.completePrefix("apples"));
+		Assert.assertEquals("applego", tree.completePrefix("appleg"));
+	}
 
 }
