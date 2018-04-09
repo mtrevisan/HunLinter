@@ -1,10 +1,11 @@
-package unit731.hunspeller.collections.trie.sequencers;
+package unit731.hunspeller.collections.radixtree.sequencers;
 
+import java.io.Serializable;
 import java.util.Map;
-import unit731.hunspeller.collections.trie.TrieNode;
+import unit731.hunspeller.collections.radixtree.RadixTreeNode;
 
 
-public interface TrieSequencer<S, H>{
+public interface RadixTreeSequencerInterface<S, H>{
 
 	/**
 	 * Calculates the length of the sequence.
@@ -43,7 +44,7 @@ public interface TrieSequencer<S, H>{
 	 * @param stem			The stem used to search the child in the given map.
 	 * @return	The child searched, or <code>null</code> if not found.
 	 */
-	<V> TrieNode<S, H, V> getChild(Map<H, TrieNode<S, H, V>> children, H stem);
+	<V extends Serializable> RadixTreeNode<V> getChild(Map<H, RadixTreeNode<V>> children, H stem);
 
 	/**
 	 * Determines the maximum number of elements that match between sequences A and B where comparison starts at the given indices up to
