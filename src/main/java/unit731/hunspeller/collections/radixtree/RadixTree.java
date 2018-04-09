@@ -278,8 +278,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	private V put(String key, V value, RadixTreeNode<V> node){
 		V ret = null;
 
+		String nodeKey = node.getKey();
 		int largestPrefix = node.largestPrefixLength(key);
-		if(largestPrefix == node.getKey().length() && largestPrefix == key.length()){
+		int keyLength = key.length();
+		int nodeKeyLength = nodeKey.length();
+		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
 			//found a node with an exact match
 			ret = node.getValue();
 			if(noDuplicatedAllowed && ret != null)
@@ -287,7 +290,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 			node.setValue(value);
 		}
-		else if(largestPrefix == 0 || largestPrefix < key.length() && largestPrefix >= node.getKey().length()){
+		else if(largestPrefix == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
 			String leftoverKey = key.substring(largestPrefix);
@@ -306,17 +309,17 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				node.getChildren().add(n);
 			}
 		}
-		else if(largestPrefix < node.getKey().length()){
+		else if(largestPrefix < nodeKeyLength){
 			//key and node.getPrefix() share a prefix, so split node
-			String leftoverPrefix = node.getKey().substring(largestPrefix);
+			String leftoverPrefix = nodeKey.substring(largestPrefix);
 			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
 
-			node.setKey(node.getKey().substring(0, largestPrefix));
+			node.setKey(nodeKey.substring(0, largestPrefix));
 			node.getChildren().clear();
 			node.getChildren().add(n);
 
-			if(largestPrefix == key.length()){
+			if(largestPrefix == keyLength){
 				//the largest prefix is equal to the key, so set this node's value
 				ret = node.getValue();
 				node.setValue(value);
