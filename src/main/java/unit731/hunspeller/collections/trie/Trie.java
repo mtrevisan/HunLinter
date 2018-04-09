@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 
 
 /**
@@ -43,10 +43,10 @@ public class Trie<S, H, V>{
 
 
 	private final TrieNode<S, H, V> root = TrieNode.makeRoot();
-	private TrieSequencer<S, H> sequencer;
+	private TrieSequencerInterface<S, H> sequencer;
 
 
-	public Trie(TrieSequencer<S, H> sequencer){
+	public Trie(TrieSequencerInterface<S, H> sequencer){
 		this.sequencer = sequencer;
 	}
 

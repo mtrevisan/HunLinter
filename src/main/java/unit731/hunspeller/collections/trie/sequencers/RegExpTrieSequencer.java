@@ -7,7 +7,7 @@ import unit731.hunspeller.collections.trie.TrieNode;
 import unit731.hunspeller.services.PatternService;
 
 
-public class RegExpTrieSequencer implements TrieSequencer<String[], String>{
+public class RegExpTrieSequencer implements TrieSequencerInterface<String[], String>{
 
 	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 

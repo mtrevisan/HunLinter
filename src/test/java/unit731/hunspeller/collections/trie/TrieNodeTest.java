@@ -3,14 +3,14 @@ package unit731.hunspeller.collections.trie;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
-import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 
 
 public class TrieNodeTest{
 
 	@Test
 	public void removeChildWithoutChildren(){
-		TrieSequencer<String, Integer> sequencer = new StringTrieSequencer();
+		TrieSequencerInterface<String, Integer> sequencer = new StringTrieSequencer();
 		String sequence = "abcd";
 		TrieNode<String, Integer, String> node = new TrieNode<>(sequence, 0, 3, null);
 
@@ -22,7 +22,7 @@ public class TrieNodeTest{
 
 	@Test
 	public void removeChildWithOneChild(){
-		TrieSequencer<String, Integer> sequencer = new StringTrieSequencer();
+		TrieSequencerInterface<String, Integer> sequencer = new StringTrieSequencer();
 		String sequence = "abc";
 		TrieNode<String, Integer, String> node = new TrieNode<>(sequence, 0, 3, null);
 		TrieNode<String, Integer, String> node1 = new TrieNode<>("abcd", 3, 3, null);
@@ -37,7 +37,7 @@ public class TrieNodeTest{
 	@Test
 	public void nodeSplit(){
 		//create: abc, abc-d, and abc-e
-		TrieSequencer<String, Integer> sequencer = new StringTrieSequencer();
+		TrieSequencerInterface<String, Integer> sequencer = new StringTrieSequencer();
 		TrieNode<String, Integer, String> node0 = new TrieNode<>("abc", 0, 3, null);
 		TrieNode<String, Integer, String> node1 = new TrieNode<>("abcd", 3, 3, null);
 		TrieNode<String, Integer, String> node2 = new TrieNode<>("abce", 3, 3, null);

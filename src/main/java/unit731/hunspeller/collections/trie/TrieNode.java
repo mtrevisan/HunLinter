@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import unit731.hunspeller.collections.trie.sequencers.TrieSequencer;
+import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 
 
 /**
@@ -64,7 +64,7 @@ public class TrieNode<S, H, V>{
 			this.value = value;
 	}
 
-	public boolean isLeaf(TrieSequencer<S, H> sequencer){
+	public boolean isLeaf(TrieSequencerInterface<S, H> sequencer){
 		return (value != null && sequencer.lengthOf(sequence) == endIndex);
 	}
 
@@ -76,7 +76,7 @@ public class TrieNode<S, H, V>{
 		return (children != null? children.get(stem): null);
 	}
 
-	public TrieNode<S, H, V> getChildForRetrieve(H stem, TrieSequencer<S, H> sequencer){
+	public TrieNode<S, H, V> getChildForRetrieve(H stem, TrieSequencerInterface<S, H> sequencer){
 		return (children != null? sequencer.getChild(children, stem): null);
 	}
 
@@ -86,7 +86,7 @@ public class TrieNode<S, H, V>{
 		children.put(stem, node);
 	}
 
-	public TrieNode<S, H, V> removeChild(H stem, TrieSequencer<S, H> sequencer){
+	public TrieNode<S, H, V> removeChild(H stem, TrieSequencerInterface<S, H> sequencer){
 		TrieNode<S, H, V> removedNode = null;
 		if(children != null){
 			TrieNode<S, H, V> node = sequencer.getChild(children, stem);
@@ -127,7 +127,7 @@ public class TrieNode<S, H, V>{
 	 * @param sequencer	The sequencer to use to determine the place of the node in the children's list
 	 * @return	The reference to the child node created that's sequence starts at index.
 	 */
-	public TrieNode<S, H, V> split(int index, V newValue, TrieSequencer<S, H> sequencer){
+	public TrieNode<S, H, V> split(int index, V newValue, TrieSequencerInterface<S, H> sequencer){
 		TrieNode<S, H, V> lowerNode = new TrieNode<>(sequence, startIndex + index, endIndex, value);
 		lowerNode.children = children;
 //		value = newValue;
