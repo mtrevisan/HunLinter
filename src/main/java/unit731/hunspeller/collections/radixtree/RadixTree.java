@@ -424,7 +424,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			String beginning = key.substring(0, largestPrefix);
 			String ending = key.substring(largestPrefix);
 			for(RadixTreeNode<V> child : node.getChildren())
-				if(child.getKey().startsWith(String.valueOf(ending.charAt(0)))){
+				if(child.getKey().charAt(0) == ending.charAt(0)){
 					completedPrefix = completePrefix(ending, child, basePrefix + beginning);
 					break;
 				}
