@@ -416,10 +416,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	private String completePrefix(String key, RadixTreeNode<V> node, String basePrefix){
 		int largestPrefix = node.largestPrefixLength(key);
 		int keyLength = key.length();
-		int nodeKeyLength = node.getKey().length();
+		String nodeKey = node.getKey();
+		int nodeKeyLength = nodeKey.length();
 		String completedPrefix = StringUtils.EMPTY;
 		if(largestPrefix == keyLength && largestPrefix <= nodeKeyLength)
-			completedPrefix = basePrefix + node.getKey();
+			completedPrefix = basePrefix + nodeKey;
 		else if(nodeKeyLength == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			String beginning = key.substring(0, largestPrefix);
 			String ending = key.substring(largestPrefix);
