@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.radixtree;
 
-import java.io.Serializable;
 import lombok.Getter;
 
 
@@ -11,7 +10,7 @@ import lombok.Getter;
  * @param <V> the type stored in the radix tree we will visit
  * @param <R> the type used for results
  */
-public abstract class RadixTreeVisitor<V extends Serializable, R>{
+public abstract class RadixTreeVisitor<V, R>{
 
 	/** An overall result from the traversal of the radix tree. */
 	@Getter

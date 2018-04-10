@@ -15,7 +15,7 @@ import lombok.Setter;
  * @param <V>	The type of values stored in the tree
  */
 @EqualsAndHashCode(of = {"key", "value"})
-public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>>, Comparable<RadixTreeNode<V>>, Serializable{
+public class RadixTreeNode<V> implements Iterable<RadixTreeNode<V>>, Comparable<RadixTreeNode<V>>, Serializable{
 
 	/** The key at this node */
 	@Getter
