@@ -40,7 +40,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * The root node in this tree
 	 */
 	private final RadixTreeNode<V> root = new RadixTreeNode<>(StringUtils.EMPTY);
-	private boolean noDuplicatedAllowed;
+	private boolean noDuplicatesAllowed;
 
 
 	public static <T extends Serializable> RadixTree<T> createTree(){
@@ -49,7 +49,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	public static <T extends Serializable> RadixTree<T> createTreeNoDuplicates(){
 		RadixTree<T> tree = new RadixTree<>();
-		tree.noDuplicatedAllowed = true;
+		tree.noDuplicatesAllowed = true;
 		return tree;
 	}
 
@@ -285,7 +285,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
 			//found a node with an exact match
 			ret = node.getValue();
-			if(noDuplicatedAllowed && ret != null)
+			if(noDuplicatesAllowed && ret != null)
 				throw new DuplicateKeyException();
 
 			node.setValue(value);
