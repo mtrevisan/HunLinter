@@ -279,7 +279,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		V ret = null;
 
 		String nodeKey = node.getKey();
-		int largestPrefix = node.largestPrefixLength(key);
+		int largestPrefix = largestPrefixLength(key, nodeKey);
 		int keyLength = key.length();
 		int nodeKeyLength = nodeKey.length();
 		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
@@ -414,7 +414,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	private String completePrefix(String key, RadixTreeNode<V> node, String basePrefix){
-		int largestPrefix = node.largestPrefixLength(key);
+		int largestPrefix = largestPrefixLength(key, node.getKey());
 		int keyLength = key.length();
 		String nodeKey = node.getKey();
 		int nodeKeyLength = nodeKey.length();
@@ -431,6 +431,23 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 				}
 		}
 		return completedPrefix;
+	}
+
+	/**
+	 * Finds the length of the largest prefix
+	 *
+	 * @param keyA	Character sequence A
+	 * @param keyB	Character sequence B
+	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
+	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
+	 */
+	public int largestPrefixLength(String keyA, String keyB){
+		int len;
+		int size = Math.min(keyA.length(), keyB.length());
+		for(len = 0; len < size; len ++)
+			if(keyA.charAt(len) != keyB.charAt(len))
+				break;
+		return len;
 	}
 
 }
