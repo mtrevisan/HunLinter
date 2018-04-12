@@ -60,50 +60,6 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		return tree;
 	}
 
-	/**
-	 * Traverses this radix tree using the given visitor.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 */
-	public void visit(RadixTreeVisitor<V, ?> visitor){
-		visit(visitor, StringUtils.EMPTY);
-	}
-
-	/**
-	 * Traverses this radix tree using the given visitor and starting at the given prefix.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 * @param prefix	The prefix used to restrict visitation
-	 */
-	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
-		Objects.requireNonNull(visitor);
-		Objects.requireNonNull(prefix);
-
-		Stack<VisitElement> stack = new Stack<>();
-		stack.push(new VisitElement(root, null, prefix, root.getKey()));
-		while(!stack.isEmpty()){
-			VisitElement elem = stack.pop();
-			RadixTreeNode<V> node = elem.node;
-			String prefixAllowed = elem.prefixAllowed;
-			prefix = elem.prefix;
-
-			if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix))){
-				boolean exitValue = visitor.visit(prefix, node, elem.parent);
-				if(exitValue)
-					break;
-			}
-
-			int prefixLen = prefix.length();
-			for(RadixTreeNode<V> child : node){
-				String newPrefix = prefix + child.getKey();
-				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
-					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
-			}
-		}
-	}
-
 	@Override
 	public void clear(){
 		root.getChildren().clear();
@@ -403,6 +359,50 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		visit(visitor, (String)key);
 
 		return visitor.getResult();
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 */
+	public void visit(RadixTreeVisitor<V, ?> visitor){
+		visit(visitor, StringUtils.EMPTY);
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor and starting at the given prefix.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 * @param prefix	The prefix used to restrict visitation
+	 */
+	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
+		Objects.requireNonNull(visitor);
+		Objects.requireNonNull(prefix);
+
+		Stack<VisitElement> stack = new Stack<>();
+		stack.push(new VisitElement(root, null, prefix, root.getKey()));
+		while(!stack.isEmpty()){
+			VisitElement elem = stack.pop();
+			RadixTreeNode<V> node = elem.node;
+			String prefixAllowed = elem.prefixAllowed;
+			prefix = elem.prefix;
+
+			if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix))){
+				boolean exitValue = visitor.visit(prefix, node, elem.parent);
+				if(exitValue)
+					break;
+			}
+
+			int prefixLen = prefix.length();
+			for(RadixTreeNode<V> child : node){
+				String newPrefix = prefix + child.getKey();
+				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
+					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
+			}
+		}
 	}
 
 	/**
