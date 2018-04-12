@@ -405,43 +405,6 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	/**
-	 * Complete the a prefix to the point where ambiguity starts.
-	 *
-	 * Example:
-	 * If a tree contain "blah1", "blah2"
-	 * complete("b") -> return "blah"
-	 *
-	 * @param basePrefix	The prefix to be completed
-	 * @return	The unambiguous completion of the string
-	 */
-	public String completePrefix(String basePrefix){
-		Objects.requireNonNull(basePrefix);
-
-		return completePrefix(root, basePrefix, StringUtils.EMPTY);
-	}
-
-	private String completePrefix(RadixTreeNode<V> node, String key, String basePrefix){
-		String nodeKey = node.getKey();
-		int keyLength = key.length();
-		int nodeKeyLength = nodeKey.length();
-		int largestPrefix = largestPrefixLength(key, nodeKey);
-
-		String completedPrefix = StringUtils.EMPTY;
-		if(largestPrefix == keyLength && largestPrefix <= nodeKeyLength)
-			completedPrefix = String.join(StringUtils.EMPTY, basePrefix, nodeKey);
-		else if(nodeKeyLength == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
-			String beginning = key.substring(0, largestPrefix);
-			String ending = key.substring(largestPrefix);
-			for(RadixTreeNode<V> child : node.getChildren())
-				if(child.getKey().charAt(0) == ending.charAt(0)){
-					completedPrefix = completePrefix(child, ending, String.join(StringUtils.EMPTY, basePrefix, beginning));
-					break;
-				}
-		}
-		return completedPrefix;
-	}
-
-	/**
 	 * Finds the length of the largest prefix
 	 *
 	 * @param keyA	Character sequence A
