@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
 
 	@AllArgsConstructor
-	private class StackElement{
+	private class VisitElement{
 		private final RadixTreeNode<V> node;
 		private final RadixTreeNode<V> parent;
 		private final String prefixAllowed;
@@ -81,17 +81,16 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefix);
 
-		Stack<StackElement> stack = new Stack<>();
-		stack.push(new StackElement(root, null, prefix, root.getKey()));
+		Stack<VisitElement> stack = new Stack<>();
+		stack.push(new VisitElement(root, null, prefix, root.getKey()));
 		while(!stack.isEmpty()){
-			StackElement elem = stack.pop();
+			VisitElement elem = stack.pop();
 			RadixTreeNode<V> node = elem.node;
 			String prefixAllowed = elem.prefixAllowed;
 			prefix = elem.prefix;
 
 			if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix))){
 				boolean exitValue = visitor.visit(prefix, node, elem.parent);
-
 				if(exitValue)
 					break;
 			}
@@ -100,7 +99,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			for(RadixTreeNode<V> child : node){
 				String newPrefix = prefix + child.getKey();
 				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
-					stack.push(new StackElement(child, node, prefixAllowed, newPrefix));
+					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
 	}
