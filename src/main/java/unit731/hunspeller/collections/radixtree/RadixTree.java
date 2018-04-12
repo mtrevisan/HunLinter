@@ -81,7 +81,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				V v = node.getValue();
-				result = (value == v || value.equals(v));
+				result = (v == value || v.equals(value));
 
 				return result;
 			}
@@ -320,10 +320,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 					//if there is no children of the node we need to delete it from the its parent children list
 					if(children.isEmpty()){
+						String key = node.getKey();
 						Collection<RadixTreeNode<V>> parentChildren = parent.getChildren();
 						Iterator<RadixTreeNode<V>> itr = parentChildren.iterator();
 						while(itr.hasNext())
-							if(itr.next().getKey().equals(node.getKey())){
+							if(itr.next().getKey().equals(key)){
 								itr.remove();
 								break;
 							}
