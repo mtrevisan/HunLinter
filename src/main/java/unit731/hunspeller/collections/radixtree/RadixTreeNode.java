@@ -60,6 +60,7 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	public Collection<RadixTreeNode<V>> getChildren(){
 		//delayed creation of children to reduce memory cost
 		children = ObjectUtils.defaultIfNull(children, new TreeSet<>());
+
 		return children;
 	}
 
