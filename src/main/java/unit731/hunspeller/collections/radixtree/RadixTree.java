@@ -121,8 +121,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
 				V v = node.getValue();
-				if(value == v || v != null && v.equals(value))
-					result = true;
+				result = (value == v || value.equals(v));
 
 				return result;
 			}
@@ -216,14 +215,6 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	@Override
-	public void putAll(Map<? extends String, ? extends V> map){
-		Objects.requireNonNull(map);
-
-		map.entrySet()
-			.forEach(entry -> put(entry.getKey(), entry.getValue()));
-	}
-
-	@Override
 	public int size(){
 		RadixTreeVisitor<V, Integer> visitor = new RadixTreeVisitor<V, Integer>(0){
 			@Override
@@ -258,6 +249,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		return entries.stream()
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toSet());
+	}
+
+	@Override
+	public void putAll(Map<? extends String, ? extends V> map){
+		Objects.requireNonNull(map);
+
+		map.entrySet()
+			.forEach(entry -> put(entry.getKey(), entry.getValue()));
 	}
 
 	@Override
@@ -447,11 +446,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
 	private int largestPrefixLength(String keyA, String keyB){
-		int len;
+		int len = 0;
 		int size = Math.min(keyA.length(), keyB.length());
-		for(len = 0; len < size; len ++)
+		while(len < size){
 			if(keyA.charAt(len) != keyB.charAt(len))
 				break;
+
+			len ++;
+		}
 		return len;
 	}
 
