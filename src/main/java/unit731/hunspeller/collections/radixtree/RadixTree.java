@@ -35,7 +35,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	/**
 	 * The root node in this tree
 	 */
-	private final RadixTreeNode<V> root = new RadixTreeNode<>(StringUtils.EMPTY);
+	private final RadixTreeNode<V> root = RadixTreeNode.createEmptyNode();
 	private boolean noDuplicatesAllowed;
 
 

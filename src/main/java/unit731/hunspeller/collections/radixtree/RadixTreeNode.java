@@ -2,11 +2,14 @@ package unit731.hunspeller.collections.radixtree;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeSet;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -34,13 +37,8 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	private Collection<RadixTreeNode<V>> children;
 
 
-	/**
-	 * Constructs a node from the given prefix.
-	 *
-	 * @param key	The prefix
-	 */
-	public RadixTreeNode(String key){
-		this(key, null);
+	public static <T extends Serializable> RadixTreeNode<T> createEmptyNode(){
+		return new RadixTreeNode<>(StringUtils.EMPTY, null);
 	}
 
 	/**
@@ -61,9 +59,7 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	 */
 	public Collection<RadixTreeNode<V>> getChildren(){
 		//delayed creation of children to reduce memory cost
-		if(children == null)
-			children = new TreeSet<>();
-
+		children = ObjectUtils.defaultIfNull(children, new TreeSet<>());
 		return children;
 	}
 
@@ -78,26 +74,7 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 
 	@Override
 	public Iterator<RadixTreeNode<V>> iterator(){
-		if(children == null){
-			return new Iterator<RadixTreeNode<V>>(){
-				@Override
-				public boolean hasNext(){
-					return false;
-				}
-
-				@Override
-				public RadixTreeNode<V> next(){
-					return null;
-				}
-
-				@Override
-				public void remove(){
-					//unimplemented
-				}
-			};
-		}
-
-		return children.iterator();
+		return (children != null? children.iterator(): Collections.<RadixTreeNode<V>>emptyIterator());
 	}
 
 	@Override
