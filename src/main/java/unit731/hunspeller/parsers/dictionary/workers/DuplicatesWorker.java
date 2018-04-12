@@ -194,9 +194,10 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
 					writer.write(entries.stream()
-						.map(duplicate -> duplicate.getDictionaryWord().getWord() + " (" + duplicate.getLineIndex()
-							+ (duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence():
-								StringUtils.EMPTY) + ")")
+						.map(duplicate -> 
+							String.join(StringUtils.EMPTY, duplicate.getDictionaryWord().getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
+						)
 						.collect(Collectors.joining(", ")));
 					writer.newLine();
 

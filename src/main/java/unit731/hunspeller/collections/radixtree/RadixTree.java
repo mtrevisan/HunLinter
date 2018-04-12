@@ -43,9 +43,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 
-	/**
-	 * The root node in this tree
-	 */
+	/** The root node in this tree */
 	private final RadixTreeNode<V> root = RadixTreeNode.createEmptyNode();
 	private boolean noDuplicatesAllowed;
 
@@ -351,7 +349,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			 * @param child	The child Node
 			 */
 			private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
-				parent.setKey(parent.getKey() + child.getKey());
+				parent.setKey(String.join(StringUtils.EMPTY, parent.getKey(), child.getKey()));
 				parent.setValue(child.getValue());
 				parent.getChildren().clear();
 			}
@@ -399,7 +397,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 			int prefixLen = prefix.length();
 			for(RadixTreeNode<V> child : node){
-				String newPrefix = prefix + child.getKey();
+				String newPrefix = String.join(StringUtils.EMPTY, prefix, child.getKey());
 				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
@@ -419,23 +417,24 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	public String completePrefix(String basePrefix){
 		Objects.requireNonNull(basePrefix);
 
-		return completePrefix(basePrefix, root, StringUtils.EMPTY);
+		return completePrefix(root, basePrefix, StringUtils.EMPTY);
 	}
 
-	private String completePrefix(String key, RadixTreeNode<V> node, String basePrefix){
-		int largestPrefix = largestPrefixLength(key, node.getKey());
-		int keyLength = key.length();
+	private String completePrefix(RadixTreeNode<V> node, String key, String basePrefix){
 		String nodeKey = node.getKey();
+		int keyLength = key.length();
 		int nodeKeyLength = nodeKey.length();
+		int largestPrefix = largestPrefixLength(key, nodeKey);
+
 		String completedPrefix = StringUtils.EMPTY;
 		if(largestPrefix == keyLength && largestPrefix <= nodeKeyLength)
-			completedPrefix = basePrefix + nodeKey;
+			completedPrefix = String.join(StringUtils.EMPTY, basePrefix, nodeKey);
 		else if(nodeKeyLength == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			String beginning = key.substring(0, largestPrefix);
 			String ending = key.substring(largestPrefix);
 			for(RadixTreeNode<V> child : node.getChildren())
 				if(child.getKey().charAt(0) == ending.charAt(0)){
-					completedPrefix = completePrefix(ending, child, basePrefix + beginning);
+					completedPrefix = completePrefix(child, ending, String.join(StringUtils.EMPTY, basePrefix, beginning));
 					break;
 				}
 		}

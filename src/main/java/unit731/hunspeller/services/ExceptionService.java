@@ -1,5 +1,8 @@
 package unit731.hunspeller.services;
 
+import org.apache.commons.lang3.StringUtils;
+
+
 
 public class ExceptionService{
 
@@ -16,7 +19,7 @@ public class ExceptionService{
 					break;
 				}
 			message = stackTrace0.getFileName();
-			message = message.substring(0, message.indexOf('.')) + "." + stackTrace0.getMethodName() + ":" + stackTrace0.getLineNumber();
+			message = String.join(StringUtils.EMPTY, message.substring(0, message.indexOf('.')), ".", stackTrace0.getMethodName(), ":", Integer.toString(stackTrace0.getLineNumber()));
 		}
 		return message;
 	}
