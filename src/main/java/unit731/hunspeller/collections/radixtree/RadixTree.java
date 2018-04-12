@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -30,11 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
-
-	public static final String PREFIX_CANNOT_BE_NULL = "prefix cannot be null";
-	public static final String KEY_CANNOT_BE_NULL = "key cannot be null";
-	public static final String KEYS_MUST_BE_STRING_INSTANCES = "keys must be String instances";
-
 
 	/**
 	 * The root node in this tree
@@ -82,6 +78,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 */
 	private boolean visit(RadixTreeNode<V> node, RadixTreeNode<V> parent, String prefixAllowed, String prefix, RadixTreeVisitor<V, ?> visitor){
+		Objects.requireNonNull(prefixAllowed);
+		Objects.requireNonNull(visitor);
+
 		boolean exitValue = false;
 		if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix)))
 			exitValue = visitor.visit(prefix, node, parent);
@@ -108,17 +107,21 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public boolean containsKey(Object keyToCheck){
+		validateKey(keyToCheck);
+
 		RadixTreeNode<V> foundNode = find((String)keyToCheck);
 		return (foundNode != null);
 	}
 
 	@Override
-	public boolean containsValue(Object val){
+	public boolean containsValue(Object value){
+		Objects.requireNonNull(value);
+
 		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				V value = node.getValue();
-				if(val == value || value != null && value.equals(val))
+				V v = node.getValue();
+				if(value == v || v != null && v.equals(value))
 					result = true;
 
 				return result;
@@ -131,15 +134,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V get(Object keyToCheck){
+		validateKey(keyToCheck);
+
 		RadixTreeNode<V> foundNode = find((String)keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
 	public RadixTreeNode<V> find(String keyToCheck){
-		if(keyToCheck == null)
-			throw new NullPointerException(KEY_CANNOT_BE_NULL);
-		if(!(keyToCheck instanceof String))
-			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
+		Objects.requireNonNull(keyToCheck);
 
 		RadixTreeVisitor<V, RadixTreeNode<V>> visitor = new RadixTreeVisitor<V, RadixTreeNode<V>>(null){
 			@Override
@@ -163,6 +165,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<Map.Entry<String, V>> getEntriesWithPrefix(String prefix){
+		Objects.requireNonNull(prefix);
+
 		RadixTreeVisitor<V, List<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, List<Map.Entry<String, V>>>(new ArrayList<>()){
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
@@ -213,6 +217,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public void putAll(Map<? extends String, ? extends V> map){
+		Objects.requireNonNull(map);
+
 		map.entrySet()
 			.forEach(entry -> put(entry.getKey(), entry.getValue()));
 	}
@@ -256,8 +262,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V put(String key, V value){
-		if(key == null)
-			throw new NullPointerException(KEY_CANNOT_BE_NULL);
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
 
 		try{
 			return put(key, value, root);
@@ -344,10 +350,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V remove(Object key){
-		if(key == null)
-			throw new NullPointerException(KEY_CANNOT_BE_NULL);
-		if(!(key instanceof String))
-			throw new ClassCastException(KEYS_MUST_BE_STRING_INSTANCES);
+		validateKey(key);
 
 		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
 			@Override
@@ -410,6 +413,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The unambiguous completion of the string
 	 */
 	public String completePrefix(String basePrefix){
+		Objects.requireNonNull(basePrefix);
+
 		return completePrefix(basePrefix, root, StringUtils.EMPTY);
 	}
 
@@ -441,13 +446,19 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
-	public int largestPrefixLength(String keyA, String keyB){
+	private int largestPrefixLength(String keyA, String keyB){
 		int len;
 		int size = Math.min(keyA.length(), keyB.length());
 		for(len = 0; len < size; len ++)
 			if(keyA.charAt(len) != keyB.charAt(len))
 				break;
 		return len;
+	}
+
+	private void validateKey(Object key){
+		Objects.requireNonNull(key);
+		if(!(key instanceof String))
+			throw new IllegalArgumentException("key must be a String");
 	}
 
 }
