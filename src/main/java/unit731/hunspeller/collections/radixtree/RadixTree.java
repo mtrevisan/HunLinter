@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,15 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
+
+	@AllArgsConstructor
+	private class StackElement{
+		private final RadixTreeNode<V> node;
+		private final RadixTreeNode<V> parent;
+		private final String prefixAllowed;
+		private final String prefix;
+	}
+
 
 	/**
 	 * The root node in this tree
@@ -60,44 +71,38 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	/**
-	 * Traverses this radix tree using the given visitor.
-	 * Only values with the given prefix will be visited. Note that the tree will be traversed in lexicographical order.
+	 * Traverses this radix tree using the given visitor and starting at the given prefix.
+	 * Note that the tree will be traversed in lexicographical order.
 	 *
-	 * @param prefix	The prefix used to restrict visitation
 	 * @param visitor	The visitor
+	 * @param prefix	The prefix used to restrict visitation
 	 */
 	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
-		visit(root, null, prefix, root.getKey(), visitor);
-	}
-
-	/**
-	 * Visits the given node of this tree with the given prefix and visitor. Also, recursively visits the left/right subtrees of this node.
-	 *
-	 * @param node	The node
-	 * @param prefix	The prefix
-	 * @param visitor	The visitor
-	 */
-	private boolean visit(RadixTreeNode<V> node, RadixTreeNode<V> parent, String prefixAllowed, String prefix, RadixTreeVisitor<V, ?> visitor){
-		Objects.requireNonNull(prefixAllowed);
 		Objects.requireNonNull(visitor);
+		Objects.requireNonNull(prefix);
 
-		boolean exitValue = false;
-		if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix)))
-			exitValue = visitor.visit(prefix, node, parent);
+		Stack<StackElement> stack = new Stack<>();
+		stack.push(new StackElement(root, null, prefix, root.getKey()));
+		while(!stack.isEmpty()){
+			StackElement elem = stack.pop();
+			RadixTreeNode<V> node = elem.node;
+			String prefixAllowed = elem.prefixAllowed;
+			prefix = elem.prefix;
 
-		if(!exitValue){
+			if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix))){
+				boolean exitValue = visitor.visit(prefix, node, elem.parent);
+
+				if(exitValue)
+					break;
+			}
+
 			int prefixLen = prefix.length();
 			for(RadixTreeNode<V> child : node){
 				String newPrefix = prefix + child.getKey();
-				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen)){
-					exitValue = visit(child, node, prefixAllowed, newPrefix, visitor);
-
-					if(exitValue)
-						break;
-				}
+				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
+					stack.push(new StackElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
-		return exitValue;
 	}
 
 	@Override
