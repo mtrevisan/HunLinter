@@ -92,7 +92,7 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 
 				@Override
 				public void remove(){
-					//unimplemented
+					throw new UnsupportedOperationException("This method is not implemented");
 				}
 			};
 		}
