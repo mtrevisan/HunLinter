@@ -17,17 +17,6 @@ public class RadixTreeTest{
 
 
 	@Test
-	public void testLargestPrefix(){
-		RadixTree<Integer> tree = RadixTree.createTree();
-		Assert.assertEquals(5, tree.largestPrefixLength("abcdefg", "abcdexyz"));
-		Assert.assertEquals(3, tree.largestPrefixLength("abcdefg", "abcxyz"));
-		Assert.assertEquals(3, tree.largestPrefixLength("abcdefg", "abctuvxyz"));
-		Assert.assertEquals(0, tree.largestPrefixLength("abcdefg", StringUtils.EMPTY));
-		Assert.assertEquals(0, tree.largestPrefixLength(StringUtils.EMPTY, "abcxyz"));
-		Assert.assertEquals(0, tree.largestPrefixLength("xyz", "abcxyz"));
-	}
-
-	@Test
 	public void testEmptyTree(){
 		RadixTree<Integer> tree = RadixTree.createTree();
 
