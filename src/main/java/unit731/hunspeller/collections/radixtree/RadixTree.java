@@ -325,7 +325,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 						Collection<RadixTreeNode<V>> parentChildren = parent.getChildren();
 						Iterator<RadixTreeNode<V>> itr = parentChildren.iterator();
 						while(itr.hasNext())
-							if(itr.next().getKey().equals(key)){
+							if(sequencer.equals(itr.next().getKey(), key)){
 								itr.remove();
 								break;
 							}
@@ -352,7 +352,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			 * @param child	The child Node
 			 */
 			private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
-				parent.setKey(String.join(StringUtils.EMPTY, parent.getKey(), child.getKey()));
+				parent.setKey(sequencer.concat(parent.getKey(), child.getKey()));
 				parent.setValue(child.getValue());
 				parent.getChildren().clear();
 			}
@@ -400,7 +400,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 			int prefixLen = prefix.length();
 			for(RadixTreeNode<V> child : node){
-				String newPrefix = String.join(StringUtils.EMPTY, prefix, child.getKey());
+				String newPrefix = sequencer.concat(prefix, child.getKey());
 				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}

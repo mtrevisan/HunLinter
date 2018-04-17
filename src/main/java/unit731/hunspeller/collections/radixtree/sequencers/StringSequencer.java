@@ -1,5 +1,7 @@
 package unit731.hunspeller.collections.radixtree.sequencers;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 public class StringSequencer implements SequencerInterface{
 
@@ -35,7 +37,7 @@ public class StringSequencer implements SequencerInterface{
 
 	@Override
 	public String concat(String sequenceA, String sequenceB){
-		return sequenceA + sequenceB;
+		return String.join(StringUtils.EMPTY, sequenceA, sequenceB);
 	}
 	
 }
