@@ -242,7 +242,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		V ret = null;
 
 		String nodeKey = node.getKey();
-		int largestPrefix = largestPrefixLength(key, nodeKey);
+		int largestPrefix = longestCommonPrefixLength(key, nodeKey);
 		int keyLength = key.length();
 		int nodeKeyLength = nodeKey.length();
 		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
@@ -405,14 +405,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	/**
-	 * Finds the length of the largest prefix
+	 * Finds the length of the Longest Common Prefix
 	 *
 	 * @param keyA	Character sequence A
 	 * @param keyB	Character sequence B
 	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
-	private int largestPrefixLength(String keyA, String keyB){
+	private int longestCommonPrefixLength(String keyA, String keyB){
 		int len = 0;
 		int size = Math.min(keyA.length(), keyB.length());
 		while(len < size){
