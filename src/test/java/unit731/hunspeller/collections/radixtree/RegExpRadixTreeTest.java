@@ -787,36 +787,36 @@ public class RegExpRadixTreeTest{
 		Assert.assertFalse(tree.containsKey("c"));
 	}
 
-//	@Test
-//	public void duplicatedEntryRegExp(){
-//		RadixTree<Integer> tree = RadixTree.createTree(new RegExpSequencer());
-//
-//		tree.put("a[bc]c", 1);
-//		tree.put("a[bc]c", 2);
-//
-//		Assert.assertFalse(tree.containsKey("a"));
-//		Assert.assertFalse(tree.containsKey("ab"));
-//		Assert.assertTrue(tree.containsKey("abc"));
-//		Assert.assertEquals(2, tree.get("acc").intValue());
-//		Assert.assertFalse(tree.containsKey("c"));
-//	}
+	@Test
+	public void duplicatedEntryRegExp(){
+		RadixTree<Integer> tree = RadixTree.createTree(new RegExpSequencer());
 
-//	@Test
-//	public void collectPrefixesRegExp(){
-//		RadixTree<Integer> tree = RadixTree.createTree(new RegExpSequencer());
-//
-//		tree.put("a", 1);
-//		tree.put("a[bcd]", 2);
-//		tree.put("[^ac]c", 3);
-//		tree.put("cd", 4);
-//		tree.put("aec", 5);
-//
-//		Integer[] datas = tree.getValuesWithPrefix("abcd")
-//			.toArray(new Integer[0]);
-//		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
-//		datas = tree.getValuesWithPrefix("ec")
-//			.toArray(new Integer[0]);
-//		Assert.assertArrayEquals(new Integer[]{3}, datas);
-//	}
+		tree.put("a[bc]c", 1);
+		tree.put("a[bc]c", 2);
+
+		Assert.assertFalse(tree.containsKey("a"));
+		Assert.assertFalse(tree.containsKey("ab"));
+		Assert.assertTrue(tree.containsKey("abc"));
+		Assert.assertEquals(2, tree.get("acc").intValue());
+		Assert.assertFalse(tree.containsKey("c"));
+	}
+
+	@Test
+	public void collectPrefixesRegExp(){
+		RadixTree<Integer> tree = RadixTree.createTree(new RegExpSequencer());
+
+		tree.put("a", 1);
+		tree.put("a[bcd]", 2);
+		tree.put("[^ac]c", 3);
+		tree.put("cd", 4);
+		tree.put("aec", 5);
+
+		Integer[] datas = tree.getValuesWithPrefix("abcd")
+			.toArray(new Integer[0]);
+		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
+		datas = tree.getValuesWithPrefix("ec")
+			.toArray(new Integer[0]);
+		Assert.assertArrayEquals(new Integer[]{3}, datas);
+	}
 
 }

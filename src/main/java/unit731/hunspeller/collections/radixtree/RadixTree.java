@@ -391,16 +391,16 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			String prefixAllowed = elem.prefixAllowed;
 			prefix = elem.prefix;
 
-			if(node.hasValue() && (prefix.startsWith(prefixAllowed) || prefixAllowed.startsWith(prefix))){
+			if(node.hasValue() && (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix))){
 				boolean exitValue = visitor.visit(prefix, node, elem.parent);
 				if(exitValue)
 					break;
 			}
 
-			int prefixLen = prefix.length();
+			int prefixLen = sequencer.length(prefix);
 			for(RadixTreeNode<V> child : node){
 				String newPrefix = sequencer.concat(prefix, child.getKey());
-				if(prefixLen >= prefixAllowed.length() || prefixLen >= newPrefix.length() || newPrefix.charAt(prefixLen) == prefixAllowed.charAt(prefixLen))
+				if(prefixLen >= sequencer.length(prefixAllowed) || prefixLen >= newPrefix.length() || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
@@ -416,9 +416,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 */
 	private int longestCommonPrefixLength(String keyA, String keyB){
 		int len = 0;
-		int size = Math.min(keyA.length(), keyB.length());
+		int size = Math.min(sequencer.length(keyA), sequencer.length(keyB));
 		while(len < size){
-			if(keyA.charAt(len) != keyB.charAt(len))
+			if(!sequencer.equalsAtIndex(keyA, keyB, len))
 				break;
 
 			len ++;
