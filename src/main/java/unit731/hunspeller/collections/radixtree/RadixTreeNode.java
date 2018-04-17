@@ -3,8 +3,8 @@ package unit731.hunspeller.collections.radixtree;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.TreeSet;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  * @param <V>	The type of values stored in the tree
  */
 @EqualsAndHashCode(of = {"key"})
-public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>>, Comparable<RadixTreeNode<V>>, Serializable{
+public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTreeNode<V>>, Serializable{
 
 	/** The key at this node */
 	@Getter
@@ -35,7 +35,6 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 
 	/**
 	 * The children for this node.
-	 * Note, because we use {@link TreeSet} here, traversal of {@link RadixTree} will be in lexicographical order.
 	 */
 	private Collection<RadixTreeNode<V>> children;
 
@@ -62,7 +61,7 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	 */
 	public Collection<RadixTreeNode<V>> getChildren(){
 		//delayed creation of children to reduce memory cost
-		children = ObjectUtils.defaultIfNull(children, new TreeSet<>());
+		children = ObjectUtils.defaultIfNull(children, new HashSet<>());
 
 		return children;
 	}
@@ -79,11 +78,6 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	@Override
 	public Iterator<RadixTreeNode<V>> iterator(){
 		return (children != null? children.iterator(): Collections.<RadixTreeNode<V>>emptyIterator());
-	}
-
-	@Override
-	public int compareTo(RadixTreeNode<V> node){
-		return key.compareTo(node.key);
 	}
 
 }
