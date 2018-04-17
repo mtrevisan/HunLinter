@@ -3,7 +3,6 @@ package unit731.hunspeller.services;
 import org.apache.commons.lang3.StringUtils;
 
 
-
 public class ExceptionService{
 
 	public static String getMessage(Exception e, Class<?> cl){

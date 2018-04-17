@@ -23,6 +23,9 @@ public class RadixTreeNode<V extends Serializable> implements Iterable<RadixTree
 	/** The key at this node */
 	@Getter
 	@Setter
+//String key;
+//Character[] asd = ArrayUtils.toObject(key.toCharArray());
+//String[] asd = (key.isEmpty()? new String[0]: ArrayUtils.toObject(PatternService.split(key, REGEX_PATTERN)));
 	private String key;
 
 	/** The value stored at this node, <code>null</code> if an internal node */

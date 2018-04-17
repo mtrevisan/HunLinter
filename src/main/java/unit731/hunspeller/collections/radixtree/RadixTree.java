@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
+import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 
 
 /**
@@ -46,6 +48,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	/** The root node in this tree */
 	private final RadixTreeNode<V> root = RadixTreeNode.createEmptyNode();
 	private boolean noDuplicatesAllowed;
+	private final SequencerInterface sequencer = new StringSequencer();
 
 
 	public static <T extends Serializable> RadixTree<T> createTree(){
@@ -103,7 +106,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		RadixTreeVisitor<V, RadixTreeNode<V>> visitor = new RadixTreeVisitor<V, RadixTreeNode<V>>(null){
 			@Override
 			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				if(key.equals(keyToCheck))
+				if(sequencer.equals(key, keyToCheck))
 					result = node;
 
 				return (result != null);
@@ -243,8 +246,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 		String nodeKey = node.getKey();
 		int largestPrefix = longestCommonPrefixLength(key, nodeKey);
-		int keyLength = key.length();
-		int nodeKeyLength = nodeKey.length();
+		int keyLength = sequencer.length(key);
+		int nodeKeyLength = sequencer.length(nodeKey);
 		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
 			//found a node with an exact match
 			ret = node.getValue();
@@ -256,11 +259,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		else if(largestPrefix == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
-			String leftoverKey = key.substring(largestPrefix);
+			String leftoverKey = sequencer.subSequence(key, largestPrefix);
 
 			boolean found = false;
 			for(RadixTreeNode<V> child : node)
-				if(child.getKey().charAt(0) == leftoverKey.charAt(0)){
+				if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
 					found = true;
 					ret = put(leftoverKey, value, child);
 					break;
@@ -274,11 +277,11 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		}
 		else if(largestPrefix < nodeKeyLength){
 			//key and node.getPrefix() share a prefix, so split node
-			String leftoverPrefix = nodeKey.substring(largestPrefix);
+			String leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix);
 			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
 
-			node.setKey(nodeKey.substring(0, largestPrefix));
+			node.setKey(sequencer.subSequence(nodeKey, 0, largestPrefix));
 			node.getChildren().clear();
 			node.getChildren().add(n);
 
@@ -289,7 +292,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			}
 			else{
 				//there's a leftover suffix on the key, so add another child 
-				String leftoverKey = key.substring(largestPrefix);
+				String leftoverKey = sequencer.subSequence(key, largestPrefix);
 				RadixTreeNode<V> keyNode = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(keyNode);
 				node.setValue(null);
@@ -297,7 +300,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		}
 		else{
 			//node.getPrefix() is a prefix of key, so add as child
-			String leftoverKey = key.substring(largestPrefix);
+			String leftoverKey = sequencer.subSequence(key, largestPrefix);
 			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverKey, value);
 			node.getChildren().add(n);
 		}
@@ -312,7 +315,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
 			@Override
 			public boolean visit(String k, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				if(k.equals(key)){
+				if(sequencer.equals(k, (String)key)){
 					result = node.getValue();
 					Collection<RadixTreeNode<V>> children = node.getChildren();
 
