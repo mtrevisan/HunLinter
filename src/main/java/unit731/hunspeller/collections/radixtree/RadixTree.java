@@ -12,13 +12,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
-import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 
 
 /**
@@ -32,7 +29,6 @@ import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
  *
  * @param <V> the type of values stored in the tree
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
 
@@ -48,16 +44,19 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	/** The root node in this tree */
 	private final RadixTreeNode<V> root = RadixTreeNode.createEmptyNode();
 	private boolean noDuplicatesAllowed;
-	private final SequencerInterface sequencer = new StringSequencer();
+	private SequencerInterface sequencer;
 
 
-	public static <T extends Serializable> RadixTree<T> createTree(){
-		return new RadixTree<>();
+	public static <T extends Serializable> RadixTree<T> createTree(SequencerInterface sequencer){
+		RadixTree<T> tree = new RadixTree<>();
+		tree.sequencer = sequencer;
+		return tree;
 	}
 
-	public static <T extends Serializable> RadixTree<T> createTreeNoDuplicates(){
+	public static <T extends Serializable> RadixTree<T> createTreeNoDuplicates(SequencerInterface sequencer){
 		RadixTree<T> tree = new RadixTree<>();
 		tree.noDuplicatesAllowed = true;
+		tree.sequencer = sequencer;
 		return tree;
 	}
 

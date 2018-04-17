@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.RadixTree;
 import unit731.hunspeller.collections.radixtree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.RadixTreeVisitor;
+import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -92,7 +93,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private RadixTree<String> patterns = RadixTree.createTree();
+	private RadixTree<String> patterns = RadixTree.createTree(new StringSequencer());
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
 
