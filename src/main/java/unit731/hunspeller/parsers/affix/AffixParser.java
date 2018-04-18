@@ -377,17 +377,17 @@ public class AffixParser{
 		return isSuffix;
 	}
 
-    public Set<String> getProductiveAffixes(){
-        //keeps only items with RuleEntry as value
-        Set<String> affixes = new HashSet<>();
-        Set<String> keys = data.keySet();
-        for(String key : keys){
-            Object affix = getData(key);
-            if(RuleEntry.class.isAssignableFrom(affix.getClass()))
-                affixes.add(key);
-        }
-        return affixes;
-    }
+	public Set<String> getProductiveAffixes(){
+		//keeps only items with RuleEntry as value
+		Set<String> affixes = new HashSet<>();
+		Set<String> keys = data.keySet();
+		for(String key : keys){
+			Object affix = getData(key);
+			if(RuleEntry.class.isAssignableFrom(affix.getClass()))
+				affixes.add(key);
+		}
+		return affixes;
+	}
 
 	public String getFlag(){
 		return getData(TAG_FLAG);
