@@ -6,30 +6,27 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{
 
 	public static <T extends Serializable> RegExpRadixTree<T> createTree(){
-		RegExpRadixTree<T> tree = new RegExpRadixTree<>();
-		SequencerInterface<String[]> sequencer = new RegExpSequencer();
-		tree.root = RadixTreeNode.createEmptyNode(sequencer.getNullSequence());
-		tree.sequencer = sequencer;
-		return tree;
+		return new RegExpRadixTree<>();
 	}
 
 	public static <T extends Serializable> RegExpRadixTree<T> createTreeNoDuplicates(){
 		RegExpRadixTree<T> tree = new RegExpRadixTree<>();
-		SequencerInterface<String[]> sequencer = new RegExpSequencer();
-		tree.root = RadixTreeNode.createEmptyNode(sequencer.getNullSequence());
-		tree.sequencer = sequencer;
 		tree.noDuplicatesAllowed = true;
 		return tree;
+	}
+
+	private RegExpRadixTree(){
+		SequencerInterface<String[]> seq = new RegExpSequencer();
+
+		root = RadixTreeNode.createEmptyNode(seq.getNullSequence());
+		this.sequencer = seq;
 	}
 
 	public boolean containsKey(String keyToCheck){
