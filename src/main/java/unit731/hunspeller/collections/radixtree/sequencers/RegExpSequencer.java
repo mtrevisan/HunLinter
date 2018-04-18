@@ -27,10 +27,8 @@ public class RegExpSequencer implements SequencerInterface{
 		if(count > me.length)
 			return false;
 
-		int i = 0;
-		int j = 0;
-		while(-- count >= 0)
-			if(!matches(me[j ++], pre[i ++]))
+		for(int i = 0; i < count; i ++)
+			if(!matches(me[i], pre[i]))
 				return false;
 		return true;
 	}
