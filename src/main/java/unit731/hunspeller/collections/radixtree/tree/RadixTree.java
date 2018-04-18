@@ -233,7 +233,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			return put(key, value, root);
 		}
 		catch(DuplicateKeyException e){
-			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'", e);
+			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'");
 		}
 	}
 
