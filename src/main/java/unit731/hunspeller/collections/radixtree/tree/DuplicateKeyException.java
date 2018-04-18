@@ -11,4 +11,8 @@ public class DuplicateKeyException extends RuntimeException{
 		super(msg);
 	}
 
+	public DuplicateKeyException(String msg, Throwable cause){
+		super(msg, cause);
+	}
+
 }
