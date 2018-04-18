@@ -151,7 +151,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 *
 	 * @param prefix	The prefix to look for
 	 * @return	The list of values
-	 * @throws NullPointerException	If prefix is <code>null</code>
+	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
 	public List<V> getValuesWithPrefix(S prefix){
 		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(prefix);
@@ -397,8 +397,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			prefix = elem.prefix;
 
 			if(node.hasValue() && (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix))){
-				boolean exitValue = visitor.visit(prefix, node, elem.parent);
-				if(exitValue)
+				boolean stop = visitor.visit(prefix, node, elem.parent);
+				if(stop)
 					break;
 			}
 
