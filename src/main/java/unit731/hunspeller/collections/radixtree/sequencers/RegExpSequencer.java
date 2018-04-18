@@ -41,13 +41,6 @@ public class RegExpSequencer implements SequencerInterface{
 	}
 
 	@Override
-	public boolean equalsAtIndex(String sequenceA, String sequenceB, int index){
-		String[] seqA = splitSequence(sequenceA);
-		String[] seqB = splitSequence(sequenceB);
-		return matches(seqA[index], seqB[index]);
-	}
-
-	@Override
 	public boolean equals(String sequenceA, String sequenceB){
 		String[] seqA = splitSequence(sequenceA);
 		String[] seqB = splitSequence(sequenceB);
@@ -62,8 +55,17 @@ public class RegExpSequencer implements SequencerInterface{
 	}
 
 	@Override
+	public boolean equalsAtIndex(String sequenceA, String sequenceB, int index){
+		String[] seqA = splitSequence(sequenceA);
+		String[] seqB = splitSequence(sequenceB);
+
+		return matches(seqA[index], seqB[index]);
+	}
+
+	@Override
 	public String subSequence(String sequence, int beginIndex){
 		String[] seq = splitSequence(sequence);
+
 		String[] sub = ArrayUtils.subarray(seq, beginIndex, seq.length);
 		return StringUtils.join(sub, StringUtils.EMPTY);
 	}
@@ -71,6 +73,7 @@ public class RegExpSequencer implements SequencerInterface{
 	@Override
 	public String subSequence(String sequence, int beginIndex, int endIndex){
 		String[] seq = splitSequence(sequence);
+
 		String[] sub = ArrayUtils.subarray(seq, beginIndex, endIndex);
 		return StringUtils.join(sub, StringUtils.EMPTY);
 	}
@@ -79,6 +82,7 @@ public class RegExpSequencer implements SequencerInterface{
 	public String concat(String sequenceA, String sequenceB){
 		String[] seqA = splitSequence(sequenceA);
 		String[] seqB = splitSequence(sequenceB);
+
 		String[] whole = ArrayUtils.addAll(seqA, seqB);
 		return StringUtils.join(whole, StringUtils.EMPTY);
 	}

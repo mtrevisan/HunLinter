@@ -16,9 +16,9 @@ public interface SequencerInterface{
 
 	int length(String sequence);
 
-	boolean equalsAtIndex(String sequenceA, String sequenceB, int index);
-
 	boolean equals(String sequenceA, String sequenceB);
+
+	boolean equalsAtIndex(String sequenceA, String sequenceB, int index);
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.
