@@ -1,7 +1,9 @@
 package unit731.hunspeller.collections.radixtree.sequencers;
 
 
-public interface SequencerInterface{
+public interface SequencerInterface<S>{
+
+	S getNullSequence();
 
 	/**
 	 * Tests if this sequence starts with the specified prefix.
@@ -12,13 +14,13 @@ public interface SequencerInterface{
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals(Object)} method.
 	 */
-	boolean startsWith(String sequence, String prefix);
+	boolean startsWith(S sequence, S prefix);
 
-	int length(String sequence);
+	int length(S sequence);
 
-	boolean equals(String sequenceA, String sequenceB);
+	boolean equals(S sequenceA, S sequenceB);
 
-	boolean equalsAtIndex(String sequenceA, String sequenceB, int index);
+	boolean equalsAtIndex(S sequenceA, S sequenceB, int index);
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.
@@ -35,7 +37,7 @@ public interface SequencerInterface{
 	 * @return	The specified subsequence.
 	 * @exception IndexOutOfBoundsException	If {@code beginIndex} is negative or larger than the length of this {@code RadixTreeKey} object.
 	 */
-	String subSequence(String sequence, int beginIndex);
+	S subSequence(S sequence, int beginIndex);
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.
@@ -55,8 +57,8 @@ public interface SequencerInterface{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or {@code endIndex} is larger than the length of
 	 *														this {@code RadixTreeKey} object, or {@code beginIndex} is larger than {@code endIndex}.
 	 */
-	String subSequence(String sequence, int beginIndex, int endIndex);
+	S subSequence(S sequence, int beginIndex, int endIndex);
 
-	String concat(String sequence, String other);
+	S concat(S sequence, S other);
 
 }

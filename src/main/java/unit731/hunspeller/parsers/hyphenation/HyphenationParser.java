@@ -93,7 +93,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private RadixTree<String> patterns = RadixTree.createTree(new StringSequencer());
+	private RadixTree<String, String> patterns = RadixTree.createTree(new StringSequencer());
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
 
@@ -354,9 +354,9 @@ public class HyphenationParser{
 			options.write(writer);
 			//extract data from the radix tree
 			Map<Integer, List<String>> content = new HashMap<>();
-			RadixTreeVisitor<String, Boolean> visitor = new RadixTreeVisitor<String, Boolean>(false){
+			RadixTreeVisitor<String, String, Boolean> visitor = new RadixTreeVisitor<String, String, Boolean>(false){
 				@Override
-				public boolean visit(String key, RadixTreeNode<String> node, RadixTreeNode<String> parent){
+				public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
 					String value = node.getValue();
 					content.computeIfAbsent(value.length(), k -> new ArrayList<>())
 						.add(value);

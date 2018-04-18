@@ -14,7 +14,6 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
@@ -27,34 +26,37 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree 1</a>
  * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
  *
- * @param <V> the type of values stored in the tree
+ * @param <S>	The sequence/key type
+ * @param <V>	The type of values stored in the tree
  */
 @Getter
-public class RadixTree<V extends Serializable> implements Map<String, V>, Serializable{
+public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializable{
 
 	@AllArgsConstructor
 	private class VisitElement{
-		private final RadixTreeNode<V> node;
-		private final RadixTreeNode<V> parent;
-		private final String prefixAllowed;
-		private final String prefix;
+		private final RadixTreeNode<S, V> node;
+		private final RadixTreeNode<S, V> parent;
+		private final S prefixAllowed;
+		private final S prefix;
 	}
 
 
 	/** The root node in this tree */
-	private final RadixTreeNode<V> root = RadixTreeNode.createEmptyNode();
-	private boolean noDuplicatesAllowed;
-	private SequencerInterface sequencer;
+	protected RadixTreeNode<S, V> root;
+	protected boolean noDuplicatesAllowed;
+	protected SequencerInterface<S> sequencer;
 
 
-	public static <T extends Serializable> RadixTree<T> createTree(SequencerInterface sequencer){
-		RadixTree<T> tree = new RadixTree<>();
+	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
+		RadixTree<K, T> tree = new RadixTree<>();
+		tree.root = RadixTreeNode.createEmptyNode(sequencer.getNullSequence());
 		tree.sequencer = sequencer;
 		return tree;
 	}
 
-	public static <T extends Serializable> RadixTree<T> createTreeNoDuplicates(SequencerInterface sequencer){
-		RadixTree<T> tree = new RadixTree<>();
+	public static <K, T extends Serializable> RadixTree<K, T> createTreeNoDuplicates(SequencerInterface<K> sequencer){
+		RadixTree<K, T> tree = new RadixTree<>();
+		tree.root = RadixTreeNode.createEmptyNode(sequencer.getNullSequence());
 		tree.noDuplicatesAllowed = true;
 		tree.sequencer = sequencer;
 		return tree;
@@ -67,9 +69,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public boolean containsKey(Object keyToCheck){
-		validateKey(keyToCheck);
+		Objects.requireNonNull(keyToCheck);
 
-		RadixTreeNode<V> foundNode = find((String)keyToCheck);
+		RadixTreeNode<S, V> foundNode = find((S)keyToCheck);
 		return (foundNode != null);
 	}
 
@@ -77,9 +79,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	public boolean containsValue(Object value){
 		Objects.requireNonNull(value);
 
-		RadixTreeVisitor<V, Boolean> visitor = new RadixTreeVisitor<V, Boolean>(false){
+		RadixTreeVisitor<S, V, Boolean> visitor = new RadixTreeVisitor<S, V, Boolean>(false){
 			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				V v = node.getValue();
 				result = (v == value || v.equals(value));
 
@@ -93,18 +95,18 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V get(Object keyToCheck){
-		validateKey(keyToCheck);
+		Objects.requireNonNull(keyToCheck);
 
-		RadixTreeNode<V> foundNode = find((String)keyToCheck);
+		RadixTreeNode<S, V> foundNode = find((S)keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
-	public RadixTreeNode<V> find(String keyToCheck){
+	public RadixTreeNode<S, V> find(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
-		RadixTreeVisitor<V, RadixTreeNode<V>> visitor = new RadixTreeVisitor<V, RadixTreeNode<V>>(null){
+		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
 			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				if(sequencer.equals(key, keyToCheck))
 					result = node;
 
@@ -123,14 +125,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The list of values
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<Map.Entry<String, V>> getEntriesWithPrefix(String prefix){
+	public List<Map.Entry<S, V>> getEntriesWithPrefix(S prefix){
 		Objects.requireNonNull(prefix);
 
-		RadixTreeVisitor<V, List<Map.Entry<String, V>>> visitor = new RadixTreeVisitor<V, List<Map.Entry<String, V>>>(new ArrayList<>()){
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
 			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				V value = node.getValue();
-				Map.Entry<String, V> entry = new AbstractMap.SimpleEntry<>(key, value);
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(key, value);
 				result.add(entry);
 
 				return false;
@@ -148,8 +150,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The list of values
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<V> getValuesWithPrefix(String prefix){
-		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(prefix);
+	public List<V> getValuesWithPrefix(S prefix){
+		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(prefix);
 		return entries.stream()
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toList());
@@ -162,8 +164,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The list of prefixes
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<String> getKeysWithPrefix(String prefix){
-		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(prefix);
+	public List<S> getKeysWithPrefix(S prefix){
+		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(prefix);
 		return entries.stream()
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
@@ -176,9 +178,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public int size(){
-		RadixTreeVisitor<V, Integer> visitor = new RadixTreeVisitor<V, Integer>(0){
+		RadixTreeVisitor<S, V, Integer> visitor = new RadixTreeVisitor<S, V, Integer>(0){
 			@Override
-			public boolean visit(String key, RadixTreeNode<V> node, RadixTreeNode<V> parent){
+			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				result ++;
 
 				return false;
@@ -190,14 +192,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	@Override
-	public Set<Map.Entry<String, V>> entrySet(){
-		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+	public Set<Map.Entry<S, V>> entrySet(){
+		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getNullSequence());
 		return new HashSet<>(entries);
 	}
 
 	@Override
-	public Set<String> keySet(){
-		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+	public Set<S> keySet(){
+		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getNullSequence());
 		return entries.stream()
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toSet());
@@ -205,14 +207,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public Collection<V> values(){
-		List<Map.Entry<String, V>> entries = getEntriesWithPrefix(StringUtils.EMPTY);
+		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getNullSequence());
 		return entries.stream()
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toSet());
 	}
 
 	@Override
-	public void putAll(Map<? extends String, ? extends V> map){
+	public void putAll(Map<? extends S, ? extends V> map){
 		Objects.requireNonNull(map);
 
 		map.entrySet()
@@ -220,7 +222,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	}
 
 	@Override
-	public V put(String key, V value){
+	public V put(S key, V value){
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
@@ -240,10 +242,10 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param node	The node to start searching from
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 */
-	private V put(String key, V value, RadixTreeNode<V> node){
+	private V put(S key, V value, RadixTreeNode<S, V> node){
 		V ret = null;
 
-		String nodeKey = node.getKey();
+		S nodeKey = node.getKey();
 		int largestPrefix = longestCommonPrefixLength(key, nodeKey);
 		int keyLength = sequencer.length(key);
 		int nodeKeyLength = sequencer.length(nodeKey);
@@ -258,10 +260,10 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		else if(largestPrefix == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
-			String leftoverKey = sequencer.subSequence(key, largestPrefix);
+			S leftoverKey = sequencer.subSequence(key, largestPrefix);
 
 			boolean found = false;
-			for(RadixTreeNode<V> child : node)
+			for(RadixTreeNode<S, V> child : node)
 				if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
 					found = true;
 					ret = put(leftoverKey, value, child);
@@ -270,14 +272,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 			if(!found){
 				//no child exists with any prefix of the given key, so add a new one
-				RadixTreeNode<V> n = new RadixTreeNode<>(leftoverKey, value);
+				RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(n);
 			}
 		}
 		else if(largestPrefix < nodeKeyLength){
 			//key and node.getPrefix() share a prefix, so split node
-			String leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix);
-			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
+			S leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix);
+			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
 
 			node.setKey(sequencer.subSequence(nodeKey, 0, largestPrefix));
@@ -291,16 +293,16 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			}
 			else{
 				//there's a leftover suffix on the key, so add another child 
-				String leftoverKey = sequencer.subSequence(key, largestPrefix);
-				RadixTreeNode<V> keyNode = new RadixTreeNode<>(leftoverKey, value);
+				S leftoverKey = sequencer.subSequence(key, largestPrefix);
+				RadixTreeNode<S, V> keyNode = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(keyNode);
 				node.setValue(null);
 			}
 		}
 		else{
 			//node.getPrefix() is a prefix of key, so add as child
-			String leftoverKey = sequencer.subSequence(key, largestPrefix);
-			RadixTreeNode<V> n = new RadixTreeNode<>(leftoverKey, value);
+			S leftoverKey = sequencer.subSequence(key, largestPrefix);
+			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
 			node.getChildren().add(n);
 		}
 
@@ -309,20 +311,20 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 
 	@Override
 	public V remove(Object key){
-		validateKey(key);
+		Objects.requireNonNull(key);
 
-		RadixTreeVisitor<V, V> visitor = new RadixTreeVisitor<V, V>(null){
+		RadixTreeVisitor<S, V, V> visitor = new RadixTreeVisitor<S, V, V>(null){
 			@Override
-			public boolean visit(String k, RadixTreeNode<V> node, RadixTreeNode<V> parent){
-				if(sequencer.equals(k, (String)key)){
+			public boolean visit(S k, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(sequencer.equals(k, (S)key)){
 					result = node.getValue();
-					Collection<RadixTreeNode<V>> children = node.getChildren();
+					Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
 					//if there is no children of the node we need to delete it from the its parent children list
 					if(children.isEmpty()){
-						String key = node.getKey();
-						Collection<RadixTreeNode<V>> parentChildren = parent.getChildren();
-						Iterator<RadixTreeNode<V>> itr = parentChildren.iterator();
+						S key = node.getKey();
+						Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
+						Iterator<RadixTreeNode<S, V>> itr = parentChildren.iterator();
 						while(itr.hasNext())
 							if(sequencer.equals(itr.next().getKey(), key)){
 								itr.remove();
@@ -350,14 +352,14 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			 * @param parent	The parent Node
 			 * @param child	The child Node
 			 */
-			private void mergeNodes(RadixTreeNode<V> parent, RadixTreeNode<V> child){
+			private void mergeNodes(RadixTreeNode<S, V> parent, RadixTreeNode<S, V> child){
 				parent.setKey(sequencer.concat(parent.getKey(), child.getKey()));
 				parent.setValue(child.getValue());
 				parent.getChildren().clear();
 			}
 		};
 
-		visit(visitor, (String)key);
+		visit(visitor, (S)key);
 
 		return visitor.getResult();
 	}
@@ -368,8 +370,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 *
 	 * @param visitor	The visitor
 	 */
-	public void visit(RadixTreeVisitor<V, ?> visitor){
-		visit(visitor, StringUtils.EMPTY);
+	public void visit(RadixTreeVisitor<S, V, ?> visitor){
+		visit(visitor, sequencer.getNullSequence());
 	}
 
 	/**
@@ -379,7 +381,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @param visitor	The visitor
 	 * @param prefix	The prefix used to restrict visitation
 	 */
-	public void visit(RadixTreeVisitor<V, ?> visitor, String prefix){
+	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefix){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefix);
 
@@ -387,8 +389,8 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 		stack.push(new VisitElement(root, null, prefix, root.getKey()));
 		while(!stack.isEmpty()){
 			VisitElement elem = stack.pop();
-			RadixTreeNode<V> node = elem.node;
-			String prefixAllowed = elem.prefixAllowed;
+			RadixTreeNode<S, V> node = elem.node;
+			S prefixAllowed = elem.prefixAllowed;
 			prefix = elem.prefix;
 
 			if(node.hasValue() && (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix))){
@@ -398,9 +400,9 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			}
 
 			int prefixLen = sequencer.length(prefix);
-			for(RadixTreeNode<V> child : node){
-				String newPrefix = sequencer.concat(prefix, child.getKey());
-				if(prefixLen >= sequencer.length(prefixAllowed) || prefixLen >= newPrefix.length() || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
+			for(RadixTreeNode<S, V> child : node){
+				S newPrefix = sequencer.concat(prefix, child.getKey());
+				if(prefixLen >= sequencer.length(prefixAllowed) || prefixLen >= sequencer.length(newPrefix) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
@@ -414,7 +416,7 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
-	private int longestCommonPrefixLength(String keyA, String keyB){
+	private int longestCommonPrefixLength(S keyA, S keyB){
 		int len = 0;
 		int size = Math.min(sequencer.length(keyA), sequencer.length(keyB));
 		while(len < size){
@@ -424,12 +426,6 @@ public class RadixTree<V extends Serializable> implements Map<String, V>, Serial
 			len ++;
 		}
 		return len;
-	}
-
-	private void validateKey(Object key){
-		Objects.requireNonNull(key);
-		if(!(key instanceof String))
-			throw new IllegalArgumentException("key must be a String");
 	}
 
 }

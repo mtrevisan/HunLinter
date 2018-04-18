@@ -3,7 +3,12 @@ package unit731.hunspeller.collections.radixtree.sequencers;
 import org.apache.commons.lang3.StringUtils;
 
 
-public class StringSequencer implements SequencerInterface{
+public class StringSequencer implements SequencerInterface<String>{
+
+	@Override
+	public String getNullSequence(){
+		return StringUtils.EMPTY;
+	}
 
 	@Override
 	public boolean startsWith(String sequence, String prefix){

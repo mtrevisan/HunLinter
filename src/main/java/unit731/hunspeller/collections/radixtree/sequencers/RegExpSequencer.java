@@ -1,92 +1,69 @@
 package unit731.hunspeller.collections.radixtree.sequencers;
 
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.Memoizer;
 import unit731.hunspeller.services.PatternService;
 
 
-public class RegExpSequencer implements SequencerInterface{
+public class RegExpSequencer implements SequencerInterface<String[]>{
 
 	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternService.split(seq, REGEX_PATTERN)));
-
 
 	@Override
-	public boolean startsWith(String sequence, String prefix){
-		String[] me = splitSequence(sequence);
-		String[] pre = splitSequence(prefix);
+	public String[] getNullSequence(){
+		return new String[0];
+	}
 
-		int count = pre.length;
-		if(count > me.length)
+	@Override
+	public boolean startsWith(String[] sequence, String[] prefix){
+		int count = prefix.length;
+		if(count > sequence.length)
 			return false;
 
 		for(int i = 0; i < count; i ++)
-			if(!matches(me[i], pre[i]))
+			if(!matches(sequence[i], prefix[i]))
 				return false;
 		return true;
 	}
 
 	@Override
-	public int length(String sequence){
-		return splitSequence(sequence).length;
+	public int length(String[] sequence){
+		return sequence.length;
 	}
 
 	@Override
-	public boolean equals(String sequenceA, String sequenceB){
-		String[] seqA = splitSequence(sequenceA);
-		String[] seqB = splitSequence(sequenceB);
-
-		if(seqA.length != seqB.length)
+	public boolean equals(String[] sequenceA, String[] sequenceB){
+		if(sequenceA.length != sequenceB.length)
 			return false;
 
-		for(int i = 0; i < seqA.length; i ++)
-			if(!matches(seqA[i], seqB[i]))
+		for(int i = 0; i < sequenceA.length; i ++)
+			if(!matches(sequenceA[i], sequenceB[i]))
 				return false;
 		return true;
 	}
 
 	@Override
-	public boolean equalsAtIndex(String sequenceA, String sequenceB, int index){
-		String[] seqA = splitSequence(sequenceA);
-		String[] seqB = splitSequence(sequenceB);
-
-		return matches(seqA[index], seqB[index]);
+	public boolean equalsAtIndex(String[] sequenceA, String[] sequenceB, int index){
+		return matches(sequenceA[index], sequenceB[index]);
 	}
 
 	@Override
-	public String subSequence(String sequence, int beginIndex){
-		String[] seq = splitSequence(sequence);
-
-		String[] sub = ArrayUtils.subarray(seq, beginIndex, seq.length);
-		return StringUtils.join(sub, StringUtils.EMPTY);
+	public String[] subSequence(String[] sequence, int beginIndex){
+		return ArrayUtils.subarray(sequence, beginIndex, sequence.length);
 	}
 
 	@Override
-	public String subSequence(String sequence, int beginIndex, int endIndex){
-		String[] seq = splitSequence(sequence);
-
-		String[] sub = ArrayUtils.subarray(seq, beginIndex, endIndex);
-		return StringUtils.join(sub, StringUtils.EMPTY);
+	public String[] subSequence(String[] sequence, int beginIndex, int endIndex){
+		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
 	}
 
 	@Override
-	public String concat(String sequenceA, String sequenceB){
-		String[] seqA = splitSequence(sequenceA);
-		String[] seqB = splitSequence(sequenceB);
-
-		String[] whole = ArrayUtils.addAll(seqA, seqB);
-		return StringUtils.join(whole, StringUtils.EMPTY);
-	}
-
-	public static String[] splitSequence(String sequence){
-		return FN_SPLIT_SEQUENCE.apply(sequence);
+	public String[] concat(String[] sequenceA, String[] sequenceB){
+		return ArrayUtils.addAll(sequenceA, sequenceB);
 	}
 
 	private boolean matches(String fieldA, String fieldB){
@@ -100,6 +77,10 @@ public class RegExpSequencer implements SequencerInterface{
 		else
 			response = fieldA.equals(fieldB);
 		return response;
+	}
+
+	public static String[] splitSequence(String sequence){
+		return (sequence.isEmpty()? new String[0]: PatternService.split(sequence, REGEX_PATTERN));
 	}
 
 }
