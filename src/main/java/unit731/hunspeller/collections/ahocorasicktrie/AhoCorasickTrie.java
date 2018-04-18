@@ -12,6 +12,8 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.ahocorasicktrie.sequencers.SequencerInterface;
+import unit731.hunspeller.collections.ahocorasicktrie.sequencers.StringSequencer;
 
 
 /**
@@ -22,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Serializable{
+public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 
 	/** check array of the Double Array Trie structure */
 	protected int check[];
@@ -31,54 +33,23 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	/** the size of base and check array */
 	protected int size;
 
-	/** fail table of the Aho-Corasick automata */
+	/** table of the fail transitions of the automaton mapping: "state" -> "new state" */
 	protected int fail[];
-	/** output table of the Aho-Corasick automata */
+	/** table of the outputs of every state mapping: "state" -> "matched patterns" */
 	protected int[][] output;
 	/** outer value array */
-	private List<V> values;
+	private V[] values;
 	/** the length of every key */
-	private List<Integer> keyLengths;
+	private int[] keyLengths;
 
 
 	/**
-	 * Build from a map
+	 * Build a AhoCorasickDoubleArrayTrie from a map
 	 *
 	 * @param map	A map containing key-value pairs
-	 *
-	 * @param <K>	The sequence/key type
-	 * @param <T>	The type of values stored in the tree
-	 * @return	An Aho-Corasick Trie
 	 */
-	public static <K, T extends Serializable> AhoCorasickTrie<K, T> create(Map<K, T> map){
-		AhoCorasickTrie<K, T> trie = new AhoCorasickTrie<>();
-
-		//save the value
-		trie.values = new ArrayList<>(map.values());
-		trie.keyLengths = new ArrayList<>(trie.values.size());
-
-		//constructing a binary trie
-		Set<K> keySet = map.keySet();
-		int index = 0;
-		State rootState = new State();
-		for(K keyword : keySet){
-			State currentState = rootState;
-			for(Character character : keyword.toCharArray())
-				currentState = currentState.addState(character);
-			currentState.addEmit(index);
-			trie.keyLengths.set(index, keyword.length());
-		}
-
-		//building a double-array trie based on a binary trie
-		buildDoubleArrayTrie(keySet.size());
-		used = null;
-
-		//build the failure table and merge the output table
-		constructFailureStates();
-		rootState = null;
-		loseWeight();
-
-		return trie;
+	public void create(Map<S, V> map){
+		new Builder().build(map);
 	}
 
 	/**
@@ -119,7 +90,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 				for(int hit : hitArray){
 					//begin index in text (inclusive): position - keyLengths[hit]
 					//end index in text (exclusive): position
-					boolean stop = visitor.visit(values.get(hit));
+					boolean stop = visitor.visit(values[hit]);
 					if(stop)
 						return;
 				}
@@ -191,7 +162,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	@Override
 	public V get(Object key){
 		int index = get((String)key, 0, 0, 0);
-		return (index >= 0? values.get(index): null);
+		return (index >= 0? values[index]: null);
 	}
 
 	/**
@@ -261,7 +232,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 
 	@Override
 	public int size(){
-		return values.size();
+		return values.length;
 	}
 
 	@Override
@@ -271,289 +242,265 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 
 
 
-//	/**
-//	 * Build a AhoCorasickDoubleArrayTrie from a map
-//	 *
-//	 * @param map a map containing key-value pairs
-//	 */
-//	public void build(Map<String, V> map){
-//		new Builder().build(map);
-//	}
-
 	/** A builder to build the AhoCorasickTrie */
 	private class Builder{
 
-//		/** the root state of trie */
-//		private State rootState = new State();
-//		/** whether the position has been used */
-//		private boolean used[];
-//		/** the allocSize of the dynamic array */
-//		private int allocSize;
-//		/** a parameter controls the memory growth speed of the dynamic array */
-//		private int progress;
-//		/** the next position to check unused memory */
-//		private int nextCheckPos;
-//		/** the size of the key-pair sets */
-//		private int keySize;
-//
-//
-//		/**
-//		 * Build from a map
-//		 *
-//		 * @param map	A map containing key-value pairs
-//		 */
-//		public void build(Map<String, V> map){
-//			//save the value
-//			values = new ArrayList<>(map.values());
-//			keyLengths = new ArrayList<>(values.size());
-//
-//			//constructing a binary trie
-//			Set<String> keySet = map.keySet();
-//			addAllKeywords(keySet);
-//
-//			//building a double-array trie based on a binary trie
-//			buildDoubleArrayTrie(keySet.size());
-//			used = null;
-//
-//			//build the failure table and merge the output table
-//			constructFailureStates();
-//			rootState = null;
-//			loseWeight();
-//		}
-//
-//		/**
-//		 * fetch siblings of a parent node
-//		 *
-//		 * @param parent parent node
-//		 * @param siblings parent node's child nodes, i . e . the siblings
-//		 * @return the amount of the siblings
-//		 */
-//		private int fetch(State parent, List<Map.Entry<Integer, State>> siblings){
-//			if(parent.isAcceptable()){
-//				State fakeNode = new State( - (parent.getDepth() + 1));  // 此节点是parent的子节点，同时具备parent的输出
-//				fakeNode.addEmit(parent.getLargestValueId());
-//				siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
-//			}
-//			for(Map.Entry<Character, State> entry : parent.getSuccess().entrySet()){
-//				siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
-//			}
-//			return siblings.size();
-//		}
-//
-//		/**
-//		 * add a keyword
-//		 *
-//		 * @param keyword a keyword
-//		 * @param index the index of the keyword
-//		 */
-//		private void addKeyword(String keyword, int index){
-//			State currentState = this.rootState;
-//			for(Character character : keyword.toCharArray())
-//				currentState = currentState.addState(character);
-//			currentState.addEmit(index);
-//			keyLengths[index] = keyword.length();
-//		}
-//
-//		/**
-//		 * add a collection of keywords
-//		 *
-//		 * @param keywordSet the collection holding keywords
-//		 */
-//		private void addAllKeywords(Collection<String> keywordSet){
-//			int i = 0;
-//			for(String keyword : keywordSet)
-//				addKeyword(keyword, i ++);
-//		}
-//
-//		/**
-//		 * construct failure table
-//		 */
-//		private void constructFailureStates(){
-//			fail = new int[size + 1];
-//			fail[1] = base[0];
-//			output = new int[size + 1][];
-//			Queue<State> queue = new ArrayDeque<>();
-//
-//			// 第一步，将深度为1的节点的failure设为根节点
-//			for(State depthOneState : this.rootState.getStates()){
-//				depthOneState.setFailure(this.rootState, fail);
-//				queue.add(depthOneState);
-//				constructOutput(depthOneState);
-//			}
-//
-//			// 第二步，为深度 > 1 的节点建立failure表，这是一个bfs
-//			while( ! queue.isEmpty()){
-//				State currentState = queue.remove();
-//
-//				for(Character transition : currentState.getTransitions()){
-//					State targetState = currentState.nextState(transition);
-//					queue.add(targetState);
-//
-//					State traceFailureState = currentState.getFailure();
-//					while(traceFailureState.nextState(transition) == null){
-//						traceFailureState = traceFailureState.getFailure();
-//					}
-//					State newFailureState = traceFailureState.nextState(transition);
-//					targetState.setFailure(newFailureState, fail);
-//					targetState.addEmit(newFailureState.emit());
-//					constructOutput(targetState);
-//				}
-//			}
-//		}
-//
-//		/**
-//		 * construct output table
-//		 */
-//		private void constructOutput(State targetState){
-//			Collection<Integer> emit = targetState.emit();
-//			if(emit == null || emit.isEmpty()){
-//				return;
-//			}
-//			int output[] = new int[emit.size()];
-//			Iterator<Integer> it = emit.iterator();
-//			for(int i = 0; i < output.length;  ++ i){
-//				output[i] = it.next();
-//			}
-//			AhoCorasickTrie.this.output[targetState.getIndex()] = output;
-//		}
-//
-//		private void buildDoubleArrayTrie(int keySize){
-//			progress = 0;
-//			this.keySize = keySize;
-//			resize(65536 * 32); // 32个双字节
-//
-//			base[0] = 1;
-//			nextCheckPos = 0;
-//
-//			State root_node = this.rootState;
-//
-//			List<Map.Entry<Integer, State>> siblings = new ArrayList<>(root_node.getSuccess().entrySet().size());
-//			fetch(root_node, siblings);
-//			insert(siblings);
-//		}
-//
-//		/**
-//		 * allocate the memory of the dynamic array
-//		 *
-//		 * @param newSize
-//		 * @return
-//		 */
-//		private int resize(int newSize){
-//			int[] base2 = new int[newSize];
-//			int[] check2 = new int[newSize];
-//			boolean used2[] = new boolean[newSize];
-//			if(allocSize > 0){
-//				System.arraycopy(base, 0, base2, 0, allocSize);
-//				System.arraycopy(check, 0, check2, 0, allocSize);
-//				System.arraycopy(used, 0, used2, 0, allocSize);
-//			}
-//
-//			base = base2;
-//			check = check2;
-//			used = used2;
-//
-//			return allocSize = newSize;
-//		}
-//
-//		/**
-//		 * insert the siblings to double array trie
-//		 *
-//		 * @param siblings the siblings being inserted
-//		 * @return the position to insert them
-//		 */
-//		private int insert(List<Map.Entry<Integer, State>> siblings){
-//			int begin = 0;
-//			int pos = Math.max(siblings.get(0).getKey() + 1, nextCheckPos) - 1;
-//			int nonzero_num = 0;
-//			int first = 0;
-//
-//			if(allocSize <= pos)
-//				resize(pos + 1);
-//
-//			outer:
-//			// 此循环体的目标是找出满足base[begin + a1...an]  == 0的n个空闲空间,a1...an是siblings中的n个节点
-//			while(true){
-//				pos ++;
-//
-//				if(allocSize <= pos){
-//					resize(pos + 1);
-//				}
-//
-//				if(check[pos] != 0){
-//					nonzero_num ++;
-//					continue;
-//				}
-//				else if(first == 0){
-//					nextCheckPos = pos;
-//					first = 1;
-//				}
-//
-//				begin = pos - siblings.get(0).getKey(); // 当前位置离第一个兄弟节点的距离
-//				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
-//					// progress can be zero // 防止progress产生除零错误
-//					double l = (1.05 > keySize / (progress + 1)? 1.05: keySize / (progress + 1));
-//					resize((int)(allocSize * l));
-//				}
-//
-//				if(used[begin]){
-//					continue;
-//				}
-//
-//				for(int i = 1; i < siblings.size(); i ++){
-//					if(check[begin + siblings.get(i).getKey()] != 0){
-//						continue outer;
-//					}
-//				}
-//
-//				break;
-//			}
-//
-//			// -- Simple heuristics --
-//			// if the percentage of non-empty contents in check between the
-//			// index
-//			// 'next_check_pos' and 'check' is greater than some constant value
-//			// (e.g. 0.9),
-//			// new 'next_check_pos' index is written by 'check'.
-//			if(1.0 * nonzero_num / (pos - nextCheckPos + 1) >= 0.95){
-//				nextCheckPos = pos; // 从位置 next_check_pos 开始到 pos 间，如果已占用的空间在95%以上，下次插入节点时，直接从 pos 位置处开始查找
-//			}
-//			used[begin] = true;
-//
-//			size = (size > begin + siblings.get(siblings.size() - 1).getKey() + 1) ? size : begin + siblings.get(siblings.size() - 1).getKey() + 1;
-//
-//			for(Map.Entry<Integer, State> sibling : siblings){
-//				check[begin + sibling.getKey()] = begin;
-//			}
-//
-//			for(Map.Entry<Integer, State> sibling : siblings){
-//				List<Map.Entry<Integer, State>> new_siblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
-//
-//				if(fetch(sibling.getValue(), new_siblings) == 0) // 一个词的终止且不为其他词的前缀，其实就是叶子节点
-//				{
-//					base[begin + sibling.getKey()] = ( - sibling.getValue().getLargestValueId() - 1);
-//					progress ++;
-//				}
-//				else{
-//					int h = insert(new_siblings);   // dfs
-//					base[begin + sibling.getKey()] = h;
-//				}
-//				sibling.getValue().setIndex(begin + sibling.getKey());
-//			}
-//			return begin;
-//		}
-//
-//		/**
-//		 * free the unnecessary memory
-//		 */
-//		private void loseWeight(){
-//			int nbase[] = new int[size + 65535];
-//			System.arraycopy(base, 0, nbase, 0, size);
-//			base = nbase;
-//
-//			int ncheck[] = new int[size + 65535];
-//			System.arraycopy(check, 0, ncheck, 0, size);
-//			check = ncheck;
-//		}
+		/** the root state of trie */
+		private State<S> rootState = new State<>();
+		/** whether the position has been used */
+		private boolean used[];
+		/** the allocSize of the dynamic array */
+		private int allocSize;
+		/** a parameter controls the memory growth speed of the dynamic array */
+		private int progress;
+		/** the next position to check unused memory */
+		private int nextCheckPos;
+		/** the size of the key-pair sets */
+		private int keySize;
+
+		private SequencerInterface<S> sequencer;
+
+		/**
+		 * Build from a map
+		 *
+		 * @param map	A map containing key-value pairs
+		 */
+		@SuppressWarnings("unchecked")
+		public void build(Map<S, V> map){
+			//save the value
+			values = (V[])map.values().toArray();
+			keyLengths = new int[values.length];
+
+			//constructing a binary trie
+			int i = 0;
+			Set<S> keySet = map.keySet();
+			for(S keyword : keySet)
+				addKeyword(keyword, i ++);
+
+			//building a double-array trie based on a binary trie
+			buildDoubleArrayTrie(keySet.size());
+			used = null;
+
+			//build the failure table and merge the output table
+			constructFailureStates();
+			rootState = null;
+			loseWeight();
+		}
+
+		/**
+		 * add a keyword
+		 *
+		 * @param keyword a keyword
+		 * @param index the index of the keyword
+		 */
+		private void addKeyword(S keyword, int index){
+			State<S> currentState = rootState;
+			int size = sequencer.length(keyword);
+			for(int i = 0; i < size; i ++)
+				currentState = currentState.addState(sequencer.charAtIndex(keyword, i));
+			currentState.addEmit(index);
+			keyLengths[index] = sequencer.length(keyword);
+		}
+
+		/**
+		 * fetch siblings of a parent node
+		 *
+		 * @param parent parent node
+		 * @param siblings parent node's child nodes, i . e . the siblings
+		 * @return the amount of the siblings
+		 */
+		private int fetch(State<S> parent, List<Map.Entry<Integer, State<S>>> siblings){
+			if(parent.isAcceptable()){
+				State<S> fakeNode = new State<>(-(parent.getDepth() + 1));  // 此节点是parent的子节点，同时具备parent的输出
+				fakeNode.addEmit(parent.getLargestValueId());
+				siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
+			}
+			for(Map.Entry<S, State<S>> entry : parent.getSuccess().entrySet())
+				siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
+			return siblings.size();
+		}
+
+		/**
+		 * construct failure table
+		 */
+		private void constructFailureStates(){
+			fail = new int[size + 1];
+			fail[1] = base[0];
+			output = new int[size + 1][];
+			Queue<State<S>> queue = new ArrayDeque<>();
+
+			// 第一步，将深度为1的节点的failure设为根节点
+			for(State<S> depthOneState : this.rootState.getStates()){
+				depthOneState.setFailure(this.rootState, fail);
+				queue.add(depthOneState);
+				constructOutput(depthOneState);
+			}
+
+			// 第二步，为深度 > 1 的节点建立failure表，这是一个bfs
+			while(!queue.isEmpty()){
+				State<S> currentState = queue.remove();
+
+				for(S transition : currentState.getTransitions()){
+					State<S> targetState = currentState.nextState(transition);
+					queue.add(targetState);
+
+					State<S> traceFailureState = currentState.getFailure();
+					while(traceFailureState.nextState(transition) == null)
+						traceFailureState = traceFailureState.getFailure();
+
+					State<S> newFailureState = traceFailureState.nextState(transition);
+					targetState.setFailure(newFailureState, fail);
+					targetState.addEmit(newFailureState.emit());
+					constructOutput(targetState);
+				}
+			}
+		}
+
+		/**
+		 * construct output table
+		 */
+		private void constructOutput(State<S> targetState){
+			Collection<Integer> emit = targetState.emit();
+			if(emit == null || emit.isEmpty())
+				return;
+
+			int output[] = new int[emit.size()];
+			Iterator<Integer> it = emit.iterator();
+			for(int i = 0; i < output.length;  ++ i)
+				output[i] = it.next();
+			AhoCorasickTrie.this.output[targetState.getIndex()] = output;
+		}
+
+		private void buildDoubleArrayTrie(int keySize){
+			progress = 0;
+			this.keySize = keySize;
+			resize(65536 * 32); // 32个双字节
+
+			base[0] = 1;
+			nextCheckPos = 0;
+
+			State<S> root_node = this.rootState;
+
+			List<Map.Entry<Integer, State<S>>> siblings = new ArrayList<>(root_node.getSuccess().entrySet().size());
+			fetch(root_node, siblings);
+			insert(siblings);
+		}
+
+		/**
+		 * allocate the memory of the dynamic array
+		 *
+		 * @param newSize
+		 * @return
+		 */
+		private int resize(int newSize){
+			int[] base2 = new int[newSize];
+			int[] check2 = new int[newSize];
+			boolean used2[] = new boolean[newSize];
+			if(allocSize > 0){
+				System.arraycopy(base, 0, base2, 0, allocSize);
+				System.arraycopy(check, 0, check2, 0, allocSize);
+				System.arraycopy(used, 0, used2, 0, allocSize);
+			}
+
+			base = base2;
+			check = check2;
+			used = used2;
+
+			return allocSize = newSize;
+		}
+
+		/**
+		 * insert the siblings to double array trie
+		 *
+		 * @param siblings the siblings being inserted
+		 * @return the position to insert them
+		 */
+		private int insert(List<Map.Entry<Integer, State<S>>> siblings){
+			int begin = 0;
+			int pos = Math.max(siblings.get(0).getKey() + 1, nextCheckPos) - 1;
+			int nonzero_num = 0;
+			int first = 0;
+
+			if(allocSize <= pos)
+				resize(pos + 1);
+
+			outer:
+			// 此循环体的目标是找出满足base[begin + a1...an]  == 0的n个空闲空间,a1...an是siblings中的n个节点
+			while(true){
+				pos ++;
+
+				if(allocSize <= pos)
+					resize(pos + 1);
+
+				if(check[pos] != 0){
+					nonzero_num ++;
+					continue;
+				}
+				else if(first == 0){
+					nextCheckPos = pos;
+					first = 1;
+				}
+
+				begin = pos - siblings.get(0).getKey(); // 当前位置离第一个兄弟节点的距离
+				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
+					//progress can be zero // 防止progress产生除零错误
+					double l = (1.05 > keySize / (progress + 1)? 1.05: keySize / (progress + 1));
+					resize((int)(allocSize * l));
+				}
+
+				if(used[begin])
+					continue;
+
+				for(int i = 1; i < siblings.size(); i ++)
+					if(check[begin + siblings.get(i).getKey()] != 0)
+						continue outer;
+
+				break;
+			}
+
+			// -- Simple heuristics --
+			// if the percentage of non-empty contents in check between the
+			// index
+			// 'next_check_pos' and 'check' is greater than some constant value
+			// (e.g. 0.9),
+			// new 'next_check_pos' index is written by 'check'.
+			if(1.0 * nonzero_num / (pos - nextCheckPos + 1) >= 0.95)
+				nextCheckPos = pos; // 从位置 next_check_pos 开始到 pos 间，如果已占用的空间在95%以上，下次插入节点时，直接从 pos 位置处开始查找
+			used[begin] = true;
+
+			size = (size > begin + siblings.get(siblings.size() - 1).getKey() + 1) ? size : begin + siblings.get(siblings.size() - 1).getKey() + 1;
+
+			for(Map.Entry<Integer, State<S>> sibling : siblings)
+				check[begin + sibling.getKey()] = begin;
+
+			for(Map.Entry<Integer, State<S>> sibling : siblings){
+				List<Map.Entry<Integer, State<S>>> new_siblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
+
+				if(fetch(sibling.getValue(), new_siblings) == 0){ // 一个词的终止且不为其他词的前缀，其实就是叶子节点
+					base[begin + sibling.getKey()] = ( - sibling.getValue().getLargestValueId() - 1);
+					progress ++;
+				}
+				else{
+					int h = insert(new_siblings);   // dfs
+					base[begin + sibling.getKey()] = h;
+				}
+				sibling.getValue().setIndex(begin + sibling.getKey());
+			}
+			return begin;
+		}
+
+		/**
+		 * free the unnecessary memory
+		 */
+		private void loseWeight(){
+			int nbase[] = new int[size + 65535];
+			System.arraycopy(base, 0, nbase, 0, size);
+			base = nbase;
+
+			int ncheck[] = new int[size + 65535];
+			System.arraycopy(check, 0, ncheck, 0, size);
+			check = ncheck;
+		}
 
 	}
 

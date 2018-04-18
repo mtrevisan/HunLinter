@@ -25,8 +25,9 @@ import org.apache.commons.lang3.ObjectUtils;
  * </p>
  *
  * @author Robert Bor
+ * @param <S>
  */
-public class State{
+public class State<S>{
 
 	/** The length of the pattern string, also the depth of this state */
 	@Getter
@@ -34,13 +35,13 @@ public class State{
 
 	/** The fail function jumps to this state if there is no match */
 	@Getter
-	private State failure;
+	private State<S> failure;
 
 	/** As long as this state is reachable, record the pattern string */
 	private Set<Integer> emits;
 	/** The goto table, also known as the transfer function. Moves to the next state based on the next character of the string */
 	@Getter
-	private final Map<Character, State> success = new TreeMap<>();
+	private final Map<S, State<S>> success = new TreeMap<>();
 
 	/** Corresponding subscripts in a double array */
 	@Getter
@@ -115,7 +116,7 @@ public class State{
 	 * @param failState
 	 * @param fail
 	 */
-	public void setFailure(State failState, int fail[]){
+	public void setFailure(State<S> failState, int fail[]){
 		failure = failState;
 
 		fail[index] = failure.index;
@@ -128,8 +129,8 @@ public class State{
 	 * @param ignoreRootState	Whether to ignore the root node, if it is the root node to call it should be true, otherwise false
 	 * @return Transfer results
 	 */
-	private State nextState(Character character, boolean ignoreRootState){
-		State nextState = success.get(character);
+	private State<S> nextState(S character, boolean ignoreRootState){
+		State<S> nextState = success.get(character);
 		if(!ignoreRootState && nextState == null && depth == 0)
 			nextState = this;
 
@@ -142,7 +143,7 @@ public class State{
 	 * @param character
 	 * @return
 	 */
-	public State nextState(Character character){
+	public State<S> nextState(S character){
 		return nextState(character, false);
 	}
 
@@ -152,24 +153,24 @@ public class State{
 	 * @param character
 	 * @return
 	 */
-	public State nextStateIgnoreRootState(Character character){
+	public State<S> nextStateIgnoreRootState(S character){
 		return nextState(character, true);
 	}
 
-	public State addState(Character character){
-		State nextState = nextStateIgnoreRootState(character);
+	public State<S> addState(S character){
+		State<S> nextState = nextStateIgnoreRootState(character);
 		if(nextState == null){
-			nextState = new State(depth + 1);
+			nextState = new State<>(depth + 1);
 			success.put(character, nextState);
 		}
 		return nextState;
 	}
 
-	public Collection<State> getStates(){
+	public Collection<State<S>> getStates(){
 		return success.values();
 	}
 
-	public Collection<Character> getTransitions(){
+	public Collection<S> getTransitions(){
 		return success.keySet();
 	}
 

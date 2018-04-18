@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.arabidopsis.ahocorasick.AhoCorasick;
+import org.arabidopsis.ahocorasick.SearchResult;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
@@ -93,7 +96,8 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private RadixTree<String, String> patterns = RadixTree.createTree(new StringSequencer());
+//	private RadixTree<String, String> patterns = RadixTree.createTree(new StringSequencer());
+	private AhoCorasick patterns = new AhoCorasick();
 	private HyphenationOptions options;
 	private final Map<String, String> customHyphenations = new HashMap<>();
 
@@ -111,7 +115,8 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 	}
 
-	public HyphenationParser(String language, RadixTree patterns, HyphenationOptions options){
+//	public HyphenationParser(String language, RadixTree<String, String> patterns, HyphenationOptions options){
+	public HyphenationParser(String language, AhoCorasick patterns, HyphenationOptions options){
 		this(language);
 
 		Objects.requireNonNull(patterns);
@@ -181,10 +186,11 @@ public class HyphenationParser{
 										publish("Duplication found: " + line);
 									else
 										//insert current pattern into the radix tree (remove all numbers)
-										hypParser.patterns.put(key, line);
+										hypParser.patterns.add(key, line);
 								}
 							}
 						}
+						hypParser.patterns.prepare();
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
@@ -233,10 +239,11 @@ public class HyphenationParser{
 
 		private boolean isRuleDuplicated(String key, String line){
 			boolean duplicatedRule = false;
-			String foundNodeValue = hypParser.patterns.get(key);
-			if(foundNodeValue != null){
+//			String foundNodeValue = hypParser.patterns.get(key);
+			Iterator<SearchResult> foundNodeValue = hypParser.patterns.search(key.toCharArray());
+			if(foundNodeValue != null && foundNodeValue.hasNext()){
 				String clearedLine = PatternService.clear(line, REGEX_REDUCE);
-				String clearedFoundNodeValue = PatternService.clear(foundNodeValue, REGEX_REDUCE);
+				String clearedFoundNodeValue = PatternService.clear((String)foundNodeValue.next().getOutputs().iterator().next(), REGEX_REDUCE);
 				duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 			}
 			return duplicatedRule;
@@ -268,7 +275,7 @@ public class HyphenationParser{
 	};
 
 	public void clear(){
-		patterns.clear();
+//		patterns.clear();
 		if(options != null)
 			options.clear();
 		customHyphenations.clear();
@@ -291,6 +298,7 @@ public class HyphenationParser{
 		String key = getKeyFromData(rule);
 		String newRule = patterns.get(key);
 		if(newRule == null)
+//			patterns.put(key, rule);
 			patterns.put(key, rule);
 			
 		return newRule;
@@ -444,7 +452,7 @@ public class HyphenationParser{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, RadixTree patterns){
+	private Hyphenation hyphenate(String word, RadixTree<String, String> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
@@ -503,7 +511,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, RadixTree patterns){
+	private HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
