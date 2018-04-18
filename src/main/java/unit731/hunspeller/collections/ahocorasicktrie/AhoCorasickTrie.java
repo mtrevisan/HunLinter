@@ -26,35 +26,34 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	protected int check[];
 	/** base array of the Double Array Trie structure */
 	protected int base[];
-	/** fail table of the Aho Corasick automata */
-	protected int fail[];
-	/** output table of the Aho Corasick automata */
-	protected int[][] output;
-	/** outer value array */
-	protected V[] v;
-
-	/** the length of every key */
-	protected int[] l;
-
 	/** the size of base and check array */
 	protected int size;
+
+	/** fail table of the Aho-Corasick automata */
+	protected int fail[];
+	/** output table of the Aho-Corasick automata */
+	protected int[][] output;
+	/** outer value array */
+	protected V[] values;
+
+	/** the length of every key */
+	protected int[] keyLengths;
 
 
 	/**
 	 * Parse text
 	 *
-	 * @param text The text
-	 * @return a list of outputs
+	 * @param text	The text
+	 * @return	A list of outputs
 	 */
 	public List<Hit<V>> parseText(CharSequence text){
-		int position = 1;
-		int currentState = 0;
 		List<Hit<V>> collectedEmits = new ArrayList<>();
-		for(int i = 0; i < text.length();  ++ i){
-			currentState = getState(currentState, text.charAt(i));
-			storeEmits(position, currentState, collectedEmits);
-			 ++ position;
-		}
+		Visitor<V> visitor = (begin, end, value) -> {
+			Hit<V> hit = new Hit<>(begin, end, value);
+			collectedEmits.add(hit);
+			return false;
+		};
+		parseText(text, visitor);
 
 		return collectedEmits;
 	}
@@ -62,86 +61,21 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	/**
 	 * Parse text
 	 *
-	 * @param text The text
-	 * @param processor A processor which handles the output
+	 * @param text	The text
+	 * @param processor	A processor which handles the output
 	 */
-	public void parseText(CharSequence text, IHit<V> processor){
-		int position = 1;
+	public void parseText(CharSequence text, Visitor<V> processor){
 		int currentState = 0;
-		for(int i = 0; i < text.length();  ++ i){
-			currentState = getState(currentState, text.charAt(i));
-			int[] hitArray = output[currentState];
-			if(hitArray != null){
-				for(int hit : hitArray){
-					processor.hit(position - l[hit], position, v[hit]);
-				}
-			}
-			 ++ position;
-		}
-	}
+		for(int position = 1; position <= text.length(); position ++){
+			currentState = getState(currentState, text.charAt(position - 1));
 
-	/**
-	 * Parse text
-	 *
-	 * @param text The text
-	 * @param processor A processor which handles the output
-	 */
-	public void parseText(CharSequence text, IHitCancellable<V> processor){
-		int currentState = 0;
-		for(int i = 0; i < text.length(); i ++){
-			final int position = i + 1;
-			currentState = getState(currentState, text.charAt(i));
 			int[] hitArray = output[currentState];
-			if(hitArray != null){
+			if(hitArray != null)
 				for(int hit : hitArray){
-					boolean proceed = processor.hit(position - l[hit], position, v[hit]);
-					if( ! proceed){
+					boolean proceed = processor.hit(position - keyLengths[hit], position, values[hit]);
+					if(!proceed)
 						return;
-					}
 				}
-			}
-		}
-	}
-
-	/**
-	 * Parse text
-	 *
-	 * @param text The text
-	 * @param processor A processor which handles the output
-	 */
-	public void parseText(char[] text, IHit<V> processor){
-		int position = 1;
-		int currentState = 0;
-		for(char c : text){
-			currentState = getState(currentState, c);
-			int[] hitArray = output[currentState];
-			if(hitArray != null){
-				for(int hit : hitArray){
-					processor.hit(position - l[hit], position, v[hit]);
-				}
-			}
-			 ++ position;
-		}
-	}
-
-	/**
-	 * Parse text
-	 *
-	 * @param text The text
-	 * @param processor A processor which handles the output
-	 */
-	public void parseText(char[] text, IHitFull<V> processor){
-		int position = 1;
-		int currentState = 0;
-		for(char c : text){
-			currentState = getState(currentState, c);
-			int[] hitArray = output[currentState];
-			if(hitArray != null){
-				for(int hit : hitArray){
-					processor.hit(position - l[hit], position, v[hit], hit);
-				}
-			}
-			 ++ position;
 		}
 	}
 
@@ -156,9 +90,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 		for(int i = 0; i < text.length();  ++ i){
 			currentState = getState(currentState, text.charAt(i));
 			int[] hitArray = output[currentState];
-			if(hitArray != null){
+			if(hitArray != null)
 				return true;
-			}
 		}
 		return false;
 	}
@@ -177,9 +110,9 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 			int[] hitArray = output[currentState];
 			if(hitArray != null){
 				int hitIndex = hitArray[0];
-				return new Hit<>(position - l[hitIndex], position, v[hitIndex]);
+				return new Hit<>(position - keyLengths[hitIndex], position, values[hitIndex]);
 			}
-			 ++ position;
+			position ++;
 		}
 		return null;
 	}
@@ -192,9 +125,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 */
 	public V get(String key){
 		int index = exactMatchSearch(key);
-		if(index >= 0){
-			return v[index];
-		}
+		if(index >= 0)
+			return values[index];
 
 		return null;
 	}
@@ -207,8 +139,10 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * @return The value
 	 */
 	public V get(int index){
-		return v[index];
+		return values[index];
 	}
+
+
 
 	@Override
 	public boolean isEmpty(){
@@ -265,49 +199,13 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 	}
 
+
 	/**
 	 * Processor handles the output when hit a keyword
 	 * 
 	 * @param <V>
 	 */
-	public interface IHit<V>{
-
-		/**
-		 * Hit a keyword, you can use some code like text.substring(begin, end) to get the keyword
-		 *
-		 * @param begin the beginning index, inclusive.
-		 * @param end the ending index, exclusive.
-		 * @param value the value assigned to the keyword
-		 */
-		void hit(int begin, int end, V value);
-
-	}
-
-	/**
-	 * Processor handles the output when hit a keyword, with more detail
-	 * 
-	 * @param <V>
-	 */
-	public interface IHitFull<V>{
-
-		/**
-		 * Hit a keyword, you can use some code like text.substring(begin, end) to get the keyword
-		 *
-		 * @param begin the beginning index, inclusive.
-		 * @param end the ending index, exclusive.
-		 * @param value the value assigned to the keyword
-		 * @param index the index of the value assigned to the keyword, you can use the integer as a perfect hash value
-		 */
-		void hit(int begin, int end, V value, int index);
-
-	}
-
-	/**
-	 * Callback that allows to cancel the search process.
-	 * 
-	 * @param <V>
-	 */
-	public interface IHitCancellable<V>{
+	public interface Visitor<V>{
 
 		/**
 		 * Hit a keyword, you can use some code like text.substring(begin, end) to get the keyword
@@ -369,20 +267,6 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 			newCurrentState = transitionWithRoot(currentState, character);
 		}
 		return newCurrentState;
-	}
-
-	/**
-	 * store output
-	 *
-	 * @param position
-	 * @param currentState
-	 * @param collectedEmits
-	 */
-	private void storeEmits(int position, int currentState, List<Hit<V>> collectedEmits){
-		int[] hitArray = output[currentState];
-		if(hitArray != null)
-			for(int hit : hitArray)
-				collectedEmits.add(new Hit<>(position - l[hit], position, v[hit]));
 	}
 
 	/**
@@ -523,7 +407,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * @return
 	 */
 	public int size(){
-		return v.length;
+		return values.length;
 	}
 
 	/**
@@ -561,8 +445,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 		@SuppressWarnings("unchecked")
 		public void build(Map<String, V> map){
 			// 把值保存下来
-			v = (V[])map.values().toArray();
-			l = new int[v.length];
+			values = (V[])map.values().toArray();
+			keyLengths = new int[values.length];
 			Set<String> keySet = map.keySet();
 			// 构建二分trie树
 			addAllKeywords(keySet);
@@ -606,7 +490,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 				currentState = currentState.addState(character);
 			}
 			currentState.addEmit(index);
-			l[index] = keyword.length();
+			keyLengths[index] = keyword.length();
 		}
 
 		/**
