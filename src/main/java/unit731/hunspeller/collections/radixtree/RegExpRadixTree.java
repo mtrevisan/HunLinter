@@ -6,10 +6,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{
 
 	public static <T extends Serializable> RegExpRadixTree<T> createTree(){
