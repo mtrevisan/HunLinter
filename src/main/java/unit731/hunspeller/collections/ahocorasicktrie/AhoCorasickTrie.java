@@ -36,11 +36,50 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	/** output table of the Aho-Corasick automata */
 	protected int[][] output;
 	/** outer value array */
-	protected V[] values;
-
+	private List<V> values;
 	/** the length of every key */
-	protected int[] keyLengths;
+	private List<Integer> keyLengths;
 
+
+	/**
+	 * Build from a map
+	 *
+	 * @param map	A map containing key-value pairs
+	 *
+	 * @param <K>	The sequence/key type
+	 * @param <T>	The type of values stored in the tree
+	 * @return	An Aho-Corasick Trie
+	 */
+	public static <K, T extends Serializable> AhoCorasickTrie<K, T> create(Map<K, T> map){
+		AhoCorasickTrie<K, T> trie = new AhoCorasickTrie<>();
+
+		//save the value
+		trie.values = new ArrayList<>(map.values());
+		trie.keyLengths = new ArrayList<>(trie.values.size());
+
+		//constructing a binary trie
+		Set<K> keySet = map.keySet();
+		int index = 0;
+		State rootState = new State();
+		for(K keyword : keySet){
+			State currentState = rootState;
+			for(Character character : keyword.toCharArray())
+				currentState = currentState.addState(character);
+			currentState.addEmit(index);
+			trie.keyLengths.set(index, keyword.length());
+		}
+
+		//building a double-array trie based on a binary trie
+		buildDoubleArrayTrie(keySet.size());
+		used = null;
+
+		//build the failure table and merge the output table
+		constructFailureStates();
+		rootState = null;
+		loseWeight();
+
+		return trie;
+	}
 
 	/**
 	 * Gets a list of hits whose associated value is contained into the <code>text</code>.
@@ -80,7 +119,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 				for(int hit : hitArray){
 					//begin index in text (inclusive): position - keyLengths[hit]
 					//end index in text (exclusive): position
-					boolean stop = visitor.visit(values[hit]);
+					boolean stop = visitor.visit(values.get(hit));
 					if(stop)
 						return;
 				}
@@ -152,7 +191,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	@Override
 	public V get(Object key){
 		int index = get((String)key, 0, 0, 0);
-		return (index >= 0? values[index]: null);
+		return (index >= 0? values.get(index): null);
 	}
 
 	/**
@@ -222,7 +261,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 
 	@Override
 	public int size(){
-		return values.length;
+		return values.size();
 	}
 
 	@Override
@@ -240,51 +279,43 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 //	public void build(Map<String, V> map){
 //		new Builder().build(map);
 //	}
-//
-//	/**
-//	 * A builder to build the AhoCorasickTrie
-//	 */
-//	private class Builder{
-//
+
+	/** A builder to build the AhoCorasickTrie */
+	private class Builder{
+
 //		/** the root state of trie */
 //		private State rootState = new State();
 //		/** whether the position has been used */
 //		private boolean used[];
-//		/**
-//		 * the allocSize of the dynamic array
-//		 */
+//		/** the allocSize of the dynamic array */
 //		private int allocSize;
-//		/**
-//		 * a parameter controls the memory growth speed of the dynamic array
-//		 */
+//		/** a parameter controls the memory growth speed of the dynamic array */
 //		private int progress;
-//		/**
-//		 * the next position to check unused memory
-//		 */
+//		/** the next position to check unused memory */
 //		private int nextCheckPos;
-//		/**
-//		 * the size of the key-pair sets
-//		 */
+//		/** the size of the key-pair sets */
 //		private int keySize;
 //
 //
 //		/**
 //		 * Build from a map
 //		 *
-//		 * @param map a map containing key-value pairs
+//		 * @param map	A map containing key-value pairs
 //		 */
-//		@SuppressWarnings("unchecked")
 //		public void build(Map<String, V> map){
-//			// 把值保存下来
-//			values = (V[])map.values().toArray();
-//			keyLengths = new int[values.length];
+//			//save the value
+//			values = new ArrayList<>(map.values());
+//			keyLengths = new ArrayList<>(values.size());
+//
+//			//constructing a binary trie
 //			Set<String> keySet = map.keySet();
-//			// 构建二分trie树
 //			addAllKeywords(keySet);
-//			// 在二分trie树的基础上构建双数组trie树
+//
+//			//building a double-array trie based on a binary trie
 //			buildDoubleArrayTrie(keySet.size());
 //			used = null;
-//			// 构建failure表并且合并output表
+//
+//			//build the failure table and merge the output table
 //			constructFailureStates();
 //			rootState = null;
 //			loseWeight();
@@ -317,9 +348,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 //		 */
 //		private void addKeyword(String keyword, int index){
 //			State currentState = this.rootState;
-//			for(Character character : keyword.toCharArray()){
+//			for(Character character : keyword.toCharArray())
 //				currentState = currentState.addState(character);
-//			}
 //			currentState.addEmit(index);
 //			keyLengths[index] = keyword.length();
 //		}
@@ -331,9 +361,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 //		 */
 //		private void addAllKeywords(Collection<String> keywordSet){
 //			int i = 0;
-//			for(String keyword : keywordSet){
+//			for(String keyword : keywordSet)
 //				addKeyword(keyword, i ++);
-//			}
 //		}
 //
 //		/**
@@ -525,7 +554,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 //			System.arraycopy(check, 0, ncheck, 0, size);
 //			check = ncheck;
 //		}
-//
-//	}
+
+	}
 
 }
