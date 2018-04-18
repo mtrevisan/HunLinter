@@ -1,7 +1,6 @@
 package unit731.hunspeller.collections.radixtree;
 
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import java.io.Serializable;
 import java.util.List;
@@ -62,12 +61,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public V put(String key, V value){
-		try{
-			return put(RegExpSequencer.splitSequence(key), value);
-		}
-		catch(DuplicateKeyException e){
-			throw new DuplicateKeyException("Duplicate key: '" + key + "'");
-		}
+		return put(RegExpSequencer.splitSequence(key), value);
 	}
 
 	public V remove(String key){

@@ -3,6 +3,7 @@ package unit731.hunspeller.collections.radixtree.sequencers;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.Memoizer;
 import unit731.hunspeller.services.PatternService;
 
@@ -85,6 +86,11 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 
 	public static String[] splitSequence(String sequence){
 		return FN_SPLIT_SEQUENCE.apply(sequence);
+	}
+
+	@Override
+	public String toString(String[] sequence){
+		return String.join(StringUtils.EMPTY, sequence);
 	}
 
 }

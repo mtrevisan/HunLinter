@@ -61,4 +61,6 @@ public interface SequencerInterface<S>{
 
 	S concat(S sequence, S other);
 
+	String toString(S sequence);
+
 }
