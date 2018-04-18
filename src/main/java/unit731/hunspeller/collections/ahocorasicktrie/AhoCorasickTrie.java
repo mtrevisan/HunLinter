@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -48,13 +49,13 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * @return	A list of values
 	 * @throws NullPointerException	If the text is <code>null</code>
 	 */
-	public List<V> extractSubstrings(CharSequence text){
+	public List<V> extractSubstrings(String text){
 		List<V> collectedEmits = new ArrayList<>();
 		Visitor<V> visitor = value -> {
 			collectedEmits.add(value);
 			return false;
 		};
-		extractSubstrings(text, visitor);
+		visit(text, visitor);
 
 		return collectedEmits;
 	}
@@ -63,11 +64,12 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * Call a given callback for every hit whose associated value is contained into the <code>text</code>.
 	 *
 	 * @param text	Source text to check
-	 * @param processor	A processor which handles the output
+	 * @param visitor	A visitor which handles the output
 	 * @throws NullPointerException	If the text is <code>null</code>
 	 */
-	public void extractSubstrings(CharSequence text, Visitor<V> processor){
+	public void visit(String text, Visitor<V> visitor){
 		Objects.requireNonNull(text);
+		Objects.requireNonNull(visitor);
 
 		int currentState = 0;
 		for(int position = 1; position <= text.length(); position ++){
@@ -78,16 +80,37 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 				for(int hit : hitArray){
 					//begin index in text (inclusive): position - keyLengths[hit]
 					//end index in text (exclusive): position
-					boolean stop = processor.visit(values[hit]);
+					boolean stop = visitor.visit(values[hit]);
 					if(stop)
 						return;
 				}
 		}
 	}
 
+	/** Transmit state, supports failure function */
+	private int getState(int currentState, char character){
+		int newCurrentState = transition(currentState, character);
+		while(newCurrentState == -1){
+			currentState = fail[currentState];
+			newCurrentState = transition(currentState, character);
+		}
+		return newCurrentState;
+	}
+
+	/** Transition of a state */
+	private int transition(int nodePosition, char chr){
+		int b = base[nodePosition];
+		int p = b + chr + 1;
+		if(b != check[p])
+			//if the state is root and it failed, then returns the root
+			return (nodePosition == 0? 0: -1);
+
+		return p;
+	}
+
 	@Override
 	public boolean isEmpty(){
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		return (size() == 0);
 	}
 
 	/**
@@ -100,30 +123,24 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	public boolean containsKey(Object key){
 		Objects.requireNonNull(key);
 
-		boolean[] result = new boolean[]{false};
-		Visitor<V> visitor = value -> {
-			result[0] = true;
-			return result[0];
-		};
-		extractSubstrings((String)key, visitor);
-
-		return result[0];
+		int foundNode = get((String)key, 0, 0, 0);
+		return (foundNode >= 0);
 	}
 
 	@Override
 	public boolean containsValue(Object value){
+		Objects.requireNonNull(value);
+
+		boolean[] result = new boolean[]{false};
+		Visitor<V> visitor = v -> {
+			result[0] = (v == value || v.equals(value));
+			return result[0];
+		};
+		//TODO
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-	}
+//		visit(visitor);
 
-	@Override
-	public V get(Object key){
-		Objects.requireNonNull(key);
-
-		int index = find((String)key);
-		if(index >= 0)
-			return values[index];
-
-		return null;
+//		return result[0];
 	}
 
 	/**
@@ -132,8 +149,10 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * @param key	The key
 	 * @return	The value index of the key, <code>-1</code> indicates <code>null</code> (it can be used as a perfect hash function)
 	 */
-	public int find(String key){
-		return find(key, 0, 0, 0);
+	@Override
+	public V get(Object key){
+		int index = get((String)key, 0, 0, 0);
+		return (index >= 0? values[index]: null);
 	}
 
 	/**
@@ -145,19 +164,19 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	 * @param nodePosition	The starting position of the node for searching
 	 * @return	The value index of the key, <code>-1</code> indicates <code>null</code> (it can be used as a perfect hash function)
 	 */
-	private int find(String key, int position, int length, int nodePosition){
+	private int get(String key, int position, int length, int nodePosition){
+		Objects.requireNonNull(key);
+
 		if(length <= 0)
 			length = key.length();
-		if(nodePosition <= 0)
+		if(nodePosition < 0)
 			nodePosition = 0;
 
 		int result = -1;
-
-		char[] keyChars = key.toCharArray();
 		int b = base[nodePosition];
 		int p;
 		for(int i = position; i < length; i ++){
-			p = b + (int)keyChars[i] + 1;
+			p = b + key.charAt(i) + 1;
 			if(b == check[p])
 				b = base[p];
 			else
@@ -212,47 +231,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 	}
 
 
-	/**
-	 * Transmit state, supports failure function
-	 */
-	private int getState(int currentState, char character){
-		int newCurrentState = transitionWithRoot(currentState, character);
-		while(newCurrentState == -1){
-			currentState = fail[currentState];
-			newCurrentState = transitionWithRoot(currentState, character);
-		}
-		return newCurrentState;
-	}
 
-	/**
-	 * Transition of a state, if the state is root and it failed, then returns the root
-	 */
-	private int transitionWithRoot(int nodePosition, char chr){
-		int b = base[nodePosition];
-		int p = b + chr + 1;
-		if(b != check[p])
-			return (nodePosition == 0? 0: -1);
-
-		return p;
-	}
-
-	/**
-	 * transition of a state
-	 */
-//	private int transition(int current, char c){
-//		int b = current;
-//		int p;
-//
-//		p = b + c + 1;
-//		if(b == check[p])
-//			b = base[p];
-//		else
-//			return -1;
-//
-//		p = b;
-//		return p;
-//	}
-//
 //	/**
 //	 * Build a AhoCorasickDoubleArrayTrie from a map
 //	 *
@@ -260,39 +239,6 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>, Se
 //	 */
 //	public void build(Map<String, V> map){
 //		new Builder().build(map);
-//	}
-//
-//	/**
-//	 * match exactly by a key
-//	 *
-//	 * @param keyChars the char array of the key
-//	 * @param pos the begin index of char array
-//	 * @param len the length of the key
-//	 * @param nodePos the starting position of the node for searching
-//	 * @return the value index of the key, minus indicates null
-//	 */
-//	private int exactMatchSearch(char[] keyChars, int pos, int len, int nodePos){
-//		int result = -1;
-//
-//		int b = base[nodePos];
-//		int p;
-//
-//		for(int i = pos; i < len; i ++){
-//			p = b + (int)(keyChars[i]) + 1;
-//			if(b == check[p]){
-//				b = base[p];
-//			}
-//			else{
-//				return result;
-//			}
-//		}
-//
-//		p = b;
-//		int n = base[p];
-//		if(b == check[p] && n < 0){
-//			result =  - n - 1;
-//		}
-//		return result;
 //	}
 //
 //	/**
