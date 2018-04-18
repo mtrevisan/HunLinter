@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.radixtree;
 
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import java.io.Serializable;
 
 

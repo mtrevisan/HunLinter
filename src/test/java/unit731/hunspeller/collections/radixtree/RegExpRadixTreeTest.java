@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.radixtree;
 
+import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
 import org.junit.Assert;
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
@@ -94,20 +96,17 @@ public class RegExpRadixTreeTest{
 		assertEqualsWithSort(tree.getValuesWithPrefix("asd").toArray(new Integer[0]), new Integer[0]);
 	}
 
-	//FIXME
-//	@Test
-//	public void testSpook(){
-//		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
-//
-//		tree.put("pook", 1);
-//		tree.put("spook", 2);
-//
-//		Assert.assertEquals(2, tree.size());
-//		Assert.assertEquals(tree.keySet(), new HashSet<>(Arrays.asList(
-//			RegExpSequencer.splitSequence("pook"),
-//			RegExpSequencer.splitSequence("spook")
-//		)));
-//	}
+	@Test
+	public void testSpook(){
+		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+
+		tree.put("pook", 1);
+		tree.put("spook", 2);
+
+		Assert.assertEquals(2, tree.size());
+		Assert.assertEquals(tree.keySet().stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
+			new HashSet<>(Arrays.asList("pook", "spook")));
+	}
 
 	@Test
 	public void testRemoval(){
