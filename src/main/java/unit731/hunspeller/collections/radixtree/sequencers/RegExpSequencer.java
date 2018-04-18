@@ -1,7 +1,9 @@
 package unit731.hunspeller.collections.radixtree.sequencers;
 
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunspeller.services.Memoizer;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -11,6 +13,8 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
+
+	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternService.split(seq, REGEX_PATTERN)));
 
 
 	@Override
@@ -80,7 +84,7 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	}
 
 	public static String[] splitSequence(String sequence){
-		return (sequence.isEmpty()? new String[0]: PatternService.split(sequence, REGEX_PATTERN));
+		return FN_SPLIT_SEQUENCE.apply(sequence);
 	}
 
 }
