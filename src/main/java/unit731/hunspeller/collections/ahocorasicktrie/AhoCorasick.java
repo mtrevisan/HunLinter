@@ -79,7 +79,7 @@ public class AhoCorasick<V>{
 				int targetState = kv.getValue();
 
 				int state = fail.get(parent);
-				while(isFail(state, transition))
+				while(state != INITIAL_STATE && !goTo.get(state).containsKey(transition))
 					state = fail.get(state);
 
 				fail.put(targetState, goTo(state, transition));
