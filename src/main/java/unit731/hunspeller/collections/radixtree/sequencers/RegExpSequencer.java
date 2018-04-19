@@ -18,9 +18,23 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternService.split(seq, REGEX_PATTERN)));
 
 
+	public static String[] splitSequence(String sequence){
+		return FN_SPLIT_SEQUENCE.apply(sequence);
+	}
+
 	@Override
 	public String[] getNullSequence(){
 		return new String[0];
+	}
+
+	@Override
+	public int length(String[] sequence){
+		return sequence.length;
+	}
+
+	@Override
+	public String[] charAt(String[] sequence, int index){
+		return new String[]{sequence[index]};
 	}
 
 	@Override
@@ -33,11 +47,6 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 			if(!matches(sequence[i], prefix[i]))
 				return false;
 		return true;
-	}
-
-	@Override
-	public int length(String[] sequence){
-		return sequence.length;
 	}
 
 	@Override
@@ -77,10 +86,6 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 		else
 			response = fieldA.equals(fieldB);
 		return response;
-	}
-
-	public static String[] splitSequence(String sequence){
-		return FN_SPLIT_SEQUENCE.apply(sequence);
 	}
 
 	@Override

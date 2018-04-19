@@ -11,13 +11,18 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
-	public boolean startsWith(String sequence, String prefix){
-		return sequence.startsWith(prefix);
+	public String charAt(String sequence, int index){
+		return String.valueOf(sequence.charAt(index));
 	}
 
 	@Override
 	public int length(String sequence){
 		return sequence.length();
+	}
+
+	@Override
+	public boolean startsWith(String sequence, String prefix){
+		return sequence.startsWith(prefix);
 	}
 
 	@Override
@@ -44,5 +49,5 @@ public class StringSequencer implements SequencerInterface<String>{
 	public String toString(String sequence){
 		return sequence;
 	}
-	
+
 }

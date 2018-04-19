@@ -105,7 +105,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 					//find the deepest node labeled by a proper suffix of the current child
 					RadixTreeNode<S, V> fail = node.getFailNode();
-					while(fail != root){
+					while(fail != root && !couldTransit(node, currentKey)){
 						int lcpLength = longestCommonPrefixLength(wholeKey, wholeSubkey);
 						if(lcpLength > 0){
 							if(lcpLength < sequencer.length(wholeKey)){
@@ -134,7 +134,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 							}
 
 							//link fail to node
-							node.setFailNode(fail);
+							node.setFailNode(fail != root? fail: root);
 
 							break;
 						}
@@ -145,6 +145,20 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					//TODO
 					//out(u) += out(f(u))
 				}
+			}
+
+			private boolean couldTransit(RadixTreeNode<S, V> node, S prefix){
+				boolean result = false;
+				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
+				S seq0 = sequencer.charAt(prefix, 0);
+				while(itr.hasNext()){
+					RadixTreeNode<S, V> child = itr.next();
+					if(sequencer.startsWith(child.getKey(), seq0)){
+						result = true;
+						break;
+					}
+				}
+				return result;
 			}
 		};
 		traverse(traverser);

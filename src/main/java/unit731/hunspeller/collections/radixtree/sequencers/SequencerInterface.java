@@ -5,6 +5,10 @@ public interface SequencerInterface<S>{
 
 	S getNullSequence();
 
+	int length(S sequence);
+
+	S charAt(S sequence, int index);
+
 	/**
 	 * Tests if this sequence starts with the specified prefix.
 	 *
@@ -15,8 +19,6 @@ public interface SequencerInterface<S>{
 	 *				determined by the {@link #equals(Object)} method.
 	 */
 	boolean startsWith(S sequence, S prefix);
-
-	int length(S sequence);
 
 	boolean equals(S sequenceA, S sequenceB);
 

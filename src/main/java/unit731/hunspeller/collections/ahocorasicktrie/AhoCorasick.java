@@ -72,22 +72,22 @@ public class AhoCorasick<V>{
 		}
 
 		while(!queue.isEmpty()){
-			int node = queue.remove();
+			int nodeId = queue.remove();
 
-			for(Map.Entry<Character, Integer> kv : goTo.get(node).entrySet()){
+			for(Map.Entry<Character, Integer> kv : goTo.get(nodeId).entrySet()){
 				char transition = kv.getKey();
-				int targetState = kv.getValue();
+				int node = kv.getValue();
 
-				int state = fail.get(node);
+				int state = fail.get(nodeId);
 				while(state != INITIAL_STATE && !goTo.get(state).containsKey(transition))
 					state = fail.get(state);
 
-				fail.put(targetState, goTo(state, transition));
+				fail.put(node, goTo(state, transition));
 
-				output(targetState).addAll(output(fail.get(targetState)));
+				output(node).addAll(output(fail.get(node)));
 
 
-				queue.add(targetState);
+				queue.add(node);
 			}
 		}
 	}
