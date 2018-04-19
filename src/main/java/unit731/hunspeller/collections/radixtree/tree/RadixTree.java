@@ -99,13 +99,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				S currentKey = node.getKey();
 				int keySize = sequencer.length(currentKey);
+				boolean nodeSplitted = false;
 				for(int i = 1; i <= keySize; i ++){
 					S subkey = sequencer.subSequence(currentKey, 0, i);
 					S wholeSubkey = sequencer.concat(wholeKey, subkey);
 
 					//find the deepest node labeled by a proper suffix of the current child
 					RadixTreeNode<S, V> fail = node.getFailNode();
-					while(fail != root && !couldTransit(node, currentKey)){
+					while(fail != root /*&& !couldTransit(node, currentKey)*/){
 						int lcpLength = longestCommonPrefixLength(wholeKey, wholeSubkey);
 						if(lcpLength > 0){
 							if(lcpLength < sequencer.length(wholeKey)){
@@ -136,30 +137,33 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 							//link fail to node
 							node.setFailNode(fail != root? fail: root);
 
+							nodeSplitted = true;
 							break;
 						}
 
 						fail = fail.getFailNode();
 					}
+					if(nodeSplitted)
+						break;
 
 					//TODO
 					//out(u) += out(f(u))
 				}
 			}
 
-			private boolean couldTransit(RadixTreeNode<S, V> node, S prefix){
-				boolean result = false;
-				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
-				S seq0 = sequencer.charAt(prefix, 0);
-				while(itr.hasNext()){
-					RadixTreeNode<S, V> child = itr.next();
-					if(sequencer.startsWith(child.getKey(), seq0)){
-						result = true;
-						break;
-					}
-				}
-				return result;
-			}
+//			private boolean couldTransit(RadixTreeNode<S, V> node, S prefix){
+//				boolean result = false;
+//				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
+//				S seq0 = sequencer.charAt(prefix, 0);
+//				while(itr.hasNext()){
+//					RadixTreeNode<S, V> child = itr.next();
+//					if(sequencer.startsWith(child.getKey(), seq0)){
+//						result = true;
+//						break;
+//					}
+//				}
+//				return result;
+//			}
 		};
 		traverse(traverser);
 

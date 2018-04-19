@@ -7,7 +7,7 @@ public interface SequencerInterface<S>{
 
 	int length(S sequence);
 
-	S charAt(S sequence, int index);
+//	S charAt(S sequence, int index);
 
 	/**
 	 * Tests if this sequence starts with the specified prefix.

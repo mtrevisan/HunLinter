@@ -32,10 +32,10 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 		return sequence.length;
 	}
 
-	@Override
-	public String[] charAt(String[] sequence, int index){
-		return new String[]{sequence[index]};
-	}
+//	@Override
+//	public String[] charAt(String[] sequence, int index){
+//		return new String[]{sequence[index]};
+//	}
 
 	@Override
 	public boolean startsWith(String[] sequence, String[] prefix){
