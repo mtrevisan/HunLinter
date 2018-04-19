@@ -333,6 +333,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 			for(State<S> depthOneState : this.rootState.getStates()){
 				depthOneState.setFailure(this.rootState, fail);
 				queue.add(depthOneState);
+
 				constructOutput(depthOneState);
 			}
 
@@ -350,6 +351,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 
 					State<S> newFailureState = traceFailureState.nextState(transition);
 					targetState.setFailure(newFailureState, fail);
+
 					targetState.addEmit(newFailureState.emit());
 					constructOutput(targetState);
 				}

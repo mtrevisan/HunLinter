@@ -85,6 +85,7 @@ public class AhoCorasick {
         char a = keys[i];
         State s = r.get(a);
         q.add(s);
+
         r = r.getFail();
         while (r.get(a) == null)
           r = r.getFail();

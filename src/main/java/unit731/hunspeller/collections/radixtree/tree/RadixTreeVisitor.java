@@ -5,7 +5,7 @@ import lombok.Getter;
 
 
 /**
- * An interface for implementing visitors that can traverse {@link RadixTree}.
+ * An interface for implementing visitors that can visit {@link RadixTree}.
  * A visitor defines how to treat a key/value pair in the radix tree, and can also return a result from the traversal.
  *
  * @param <S>	The sequence/key type

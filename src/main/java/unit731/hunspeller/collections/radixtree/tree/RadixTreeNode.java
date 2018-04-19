@@ -35,6 +35,10 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	 */
 	private Collection<RadixTreeNode<S, V>> children;
 
+	@Getter
+	@Setter
+	private RadixTreeNode<S, V> failNode;
+
 
 	public static <K, T extends Serializable> RadixTreeNode<K, T> createEmptyNode(K emptySequence){
 		return new RadixTreeNode<>(emptySequence, null);

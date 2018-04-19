@@ -38,30 +38,28 @@ public class AhoCorasick<V>{
 
 	private void initializeGoTo(String... patterns){
 		int newState = 0;
-		for(String s : patterns){
-
+		for(String pattern : patterns){
 			int state = INITIAL_STATE;
 			int chrIdx = 0;
-			while(goTo.get(state).containsKey(s.charAt(chrIdx)) && (chrIdx < s.length())){
-				state = goTo(state, s.charAt(chrIdx));
-				chrIdx++;
+			while(goTo.get(state).containsKey(pattern.charAt(chrIdx)) && chrIdx < pattern.length()){
+				state = goTo(state, pattern.charAt(chrIdx));
+				chrIdx ++;
 			}
 
-			while(chrIdx < s.length()){
+			while(chrIdx < pattern.length()){
 				newState = newState + 1;
 				goTo.put(newState, new HashMap<>());
 
 				Map<Character, Integer> charToState = goTo.get(state);
-				if(charToState == null){
+				if(charToState == null)
 					charToState = new HashMap<>();
-				}
-				charToState.put(s.charAt(chrIdx), newState);
+				charToState.put(pattern.charAt(chrIdx), newState);
 				goTo.put(state, charToState);
 				state = newState;
-				chrIdx++;
+				chrIdx ++;
 			}
 
-			output.put(state, new ArrayList<>(Arrays.asList(s)));
+			output.put(state, new ArrayList<>(Arrays.asList(pattern)));
 		}
 	}
 
@@ -102,9 +100,9 @@ public class AhoCorasick<V>{
 				state = fail.get(state);
 			state = goTo(state, chr);
 
-			List<V> matched = output(state);
+			List<String> matched = output(state);
 			for(int j = 0; j < matched.size(); j++){
-				V found = matched.get(j);
+				String found = matched.get(j);
 				//begin index in text (inclusive): (i - found.length()) + 1
 				//end index in text (exclusive): i
 				boolean stop = visitor.visit(found);

@@ -2,6 +2,7 @@ package unit731.hunspeller.collections.radixtree.tree;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -21,12 +23,16 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 /**
  * A radix tree.
- * Radix trees are String to Object mappings which allow quick lookups on the strings. Radix trees also make it easy to grab the objects
+ * Radix trees are key-value mappings which allow quick lookups on the strings. Radix trees also make it easy to grab the values
  * with a common prefix.
+ * If {@link #prepare() prepare} is called, an implementation of the Aho-Corasick string matching algorithm (described in the paper
+ * "Efficient String Matching: An Aid to Bibliographic Search", written by Alfred V. Aho and Margaret J. Corasick, Bell Laboratories, 1975)
+ * is created, allowing for fast dictionary matching.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Radix_tree">Wikipedia</a>
  * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree 1</a>
  * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
@@ -49,6 +55,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	protected SequencerInterface<S> sequencer;
 	protected boolean noDuplicatesAllowed;
 
+	private boolean prepared;
+
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
 		RadixTree<K, T> tree = new RadixTree<>();
@@ -65,9 +73,48 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return tree;
 	}
 
+	/** Initializes the fail transitions of all states (except for the root). */
+	public void prepare(){
+		//process children of the root
+		root.getChildren()
+			.forEach(child -> child.setFailNode(root));
+
+		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				S currentKey = node.getKey();
+
+				//find the deepest node labeled by a proper suffix of the current child
+				RadixTreeNode<S, V> fail = parent.getFailNode();
+				while(fail.nextState(transition) == null)
+					fail = fail.getFailNode();
+
+				node.setFailNode(fail.nextState(transition));
+
+				//TODO
+				//out(u) += out(f(u))
+			}
+		};
+		traverse(traverser);
+
+		prepared = true;
+	}
+
 	@Override
 	public void clear(){
 		root.getChildren().clear();
+	}
+
+	public void clearFailTransitions(){
+		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				node.setFailNode(null);
+			}
+		};
+		traverse(traverser);
+
+		prepared = false;
 	}
 
 	@Override
@@ -228,6 +275,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public V put(S key, V value){
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
+
+		if(prepared)
+			throw new IllegalStateException("Can't add a new node after prepare() was called");
 
 		try{
 			return put(key, value, root);
@@ -409,6 +459,26 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
+	}
+
+	/**
+	 * Performa a BFS on the tree
+	 *
+	 * @param traverser	The traverser
+	 */
+	public void traverse(RadixTreeTraverser<S, V> traverser){
+		Queue<RadixTreeNode<S, V>> queue = new ArrayDeque<>();
+		queue.add(root);
+		while(!queue.isEmpty()){
+			RadixTreeNode<S, V> parent = queue.remove();
+			for(RadixTreeNode<S, V> child : parent.getChildren()){
+				traverser.traverse(child, parent);
+
+				queue.add(child);
+			}
+		}
+
+		prepared = true;
 	}
 
 	/**
