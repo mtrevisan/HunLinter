@@ -341,11 +341,11 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 				for(S transition : parent.getTransitions()){
 					State<S> targetState = parent.nextState(transition);
 
-					State<S> traceFailureState = parent.getFailure();
-					while(traceFailureState.nextState(transition) == null)
-						traceFailureState = traceFailureState.getFailure();
+					State<S> state = parent.getFailure();
+					while(state.nextState(transition) == null)
+						state = state.getFailure();
 
-					State<S> newFailureState = traceFailureState.nextState(transition);
+					State<S> newFailureState = state.nextState(transition);
 					targetState.setFailure(newFailureState, fail);
 
 					targetState.addEmit(newFailureState.emit());

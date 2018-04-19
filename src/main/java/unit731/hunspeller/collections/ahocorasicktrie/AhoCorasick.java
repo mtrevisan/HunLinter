@@ -76,18 +76,18 @@ public class AhoCorasick<V>{
 
 			for(Map.Entry<Character, Integer> kv : goTo.get(parent).entrySet()){
 				char transition = kv.getKey();
-				int stateReachableFromCurr = kv.getValue();
+				int targetState = kv.getValue();
 
 				int state = fail.get(parent);
 				while(isFail(state, transition))
 					state = fail.get(state);
 
-				fail.put(stateReachableFromCurr, goTo(state, transition));
+				fail.put(targetState, goTo(state, transition));
 
-				output(stateReachableFromCurr).addAll(output(fail.get(stateReachableFromCurr)));
+				output(targetState).addAll(output(fail.get(targetState)));
 
 
-				queue.add(stateReachableFromCurr);
+				queue.add(targetState);
 			}
 		}
 	}

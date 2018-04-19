@@ -83,16 +83,16 @@ public class AhoCorasick {
       char[] keys = parent.keys();
       for (int i = 0; i < keys.length; i++) {
         char transition = keys[i];
-        State s = parent.get(transition);
+        State targetState = parent.get(transition);
 
         parent = parent.getFail();
-        while (parent.get(transition) == null)
+        while(parent.get(transition) == null)
           parent = parent.getFail();
-        s.setFail(parent.get(transition));
-        s.getOutputs().addAll(parent.get(transition).getOutputs());
+        targetState.setFail(parent.get(transition));
+        targetState.getOutputs().addAll(parent.get(transition).getOutputs());
 
 		  
-		  q.add(s);
+		  q.add(targetState);
       }
     }
   }
