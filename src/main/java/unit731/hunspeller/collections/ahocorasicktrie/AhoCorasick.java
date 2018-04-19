@@ -92,24 +92,24 @@ public class AhoCorasick<V>{
 	}
 
 	public void match(String text, Visitor<V> visitor){
-		int state = INITIAL_STATE;
-		for(int i = 0; i < text.length(); i++){
-			char chr = text.charAt(i);
-
-			while(isFail(state, chr))
-				state = fail.get(state);
-			state = goTo(state, chr);
-
-			List<String> matched = output(state);
-			for(int j = 0; j < matched.size(); j++){
-				String found = matched.get(j);
-				//begin index in text (inclusive): (i - found.length()) + 1
-				//end index in text (exclusive): i
-				boolean stop = visitor.visit(found);
-				if(stop)
-					return;
-			}
-		}
+//		int state = INITIAL_STATE;
+//		for(int i = 0; i < text.length(); i++){
+//			char chr = text.charAt(i);
+//
+//			while(isFail(state, chr))
+//				state = fail.get(state);
+//			state = goTo(state, chr);
+//
+//			List<String> matched = output(state);
+//			for(int j = 0; j < matched.size(); j++){
+//				String found = matched.get(j);
+//				//begin index in text (inclusive): (i - found.length()) + 1
+//				//end index in text (exclusive): i
+//				boolean stop = visitor.visit(found);
+//				if(stop)
+//					return;
+//			}
+//		}
 	}
 
 	private boolean isFail(int state, char character){

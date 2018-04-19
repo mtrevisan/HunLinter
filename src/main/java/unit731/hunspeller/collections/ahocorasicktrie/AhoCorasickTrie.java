@@ -11,9 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.ahocorasicktrie.sequencers.SequencerInterface;
-import unit731.hunspeller.collections.ahocorasicktrie.sequencers.StringSequencer;
 
 
 /**
@@ -258,7 +255,7 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 		/** the size of the key-pair sets */
 		private int keySize;
 
-		private SequencerInterface<S> sequencer;
+//		private SequencerInterface<S> sequencer;
 
 		/**
 		 * Build from a map
@@ -294,12 +291,12 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 		 * @param index the index of the keyword
 		 */
 		private void addKeyword(S keyword, int index){
-			State<S> currentState = rootState;
-			int size = sequencer.length(keyword);
-			for(int i = 0; i < size; i ++)
-				currentState = currentState.addState(sequencer.charAtIndex(keyword, i));
-			currentState.addEmit(index);
-			keyLengths[index] = sequencer.length(keyword);
+//			State<S> currentState = rootState;
+//			int size = sequencer.length(keyword);
+//			for(int i = 0; i < size; i ++)
+//				currentState = currentState.addState(sequencer.charAtIndex(keyword, i));
+//			currentState.addEmit(index);
+//			keyLengths[index] = sequencer.length(keyword);
 		}
 
 		/**
@@ -315,8 +312,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 				fakeNode.addEmit(parent.getLargestValueId());
 				siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 			}
-			for(Map.Entry<S, State<S>> entry : parent.getSuccess().entrySet())
-				siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
+//			for(Map.Entry<S, State<S>> entry : parent.getSuccess().entrySet())
+//				siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
 			return siblings.size();
 		}
 

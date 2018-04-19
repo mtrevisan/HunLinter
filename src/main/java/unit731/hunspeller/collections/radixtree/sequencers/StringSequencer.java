@@ -31,11 +31,6 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
-	public String subSequence(String sequence, int beginIndex){
-		return sequence.substring(beginIndex);
-	}
-
-	@Override
 	public String subSequence(String sequence, int beginIndex, int endIndex){
 		return sequence.substring(beginIndex, endIndex);
 	}

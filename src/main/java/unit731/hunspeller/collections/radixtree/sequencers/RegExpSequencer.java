@@ -57,11 +57,6 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	}
 
 	@Override
-	public String[] subSequence(String[] sequence, int beginIndex){
-		return ArrayUtils.subarray(sequence, beginIndex, sequence.length);
-	}
-
-	@Override
 	public String[] subSequence(String[] sequence, int beginIndex, int endIndex){
 		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
 	}

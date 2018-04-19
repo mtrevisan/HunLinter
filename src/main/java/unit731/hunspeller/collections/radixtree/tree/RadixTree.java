@@ -73,7 +73,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return tree;
 	}
 
-	/** Initializes the fail transitions of all states (except for the root). */
+	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
 		//process children of the root
 		root.getChildren()
@@ -83,16 +83,20 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			@Override
 			public void traverse(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				S currentKey = node.getKey();
+				int keySize = sequencer.length(currentKey);
+				for(int i = 1; i <= keySize; i ++){
+					S subkey = sequencer.subSequence(currentKey, 0, i);
 
-				//find the deepest node labeled by a proper suffix of the current child
-				RadixTreeNode<S, V> fail = parent.getFailNode();
-				while(fail.nextState(transition) == null)
-					fail = fail.getFailNode();
+					//find the deepest node labeled by a proper suffix of the current child
+//					RadixTreeNode<S, V> fail = parent.getFailNode();
+//					while(fail.nextNode(transition) == null)
+//						fail = fail.getFailNode();
+//
+//					node.setFailNode(fail.nextNode(transition));
 
-				node.setFailNode(fail.nextState(transition));
-
-				//TODO
-				//out(u) += out(f(u))
+					//TODO
+					//out(u) += out(f(u))
+				}
 			}
 		};
 		traverse(traverser);
@@ -313,7 +317,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		else if(largestPrefix == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
-			S leftoverKey = sequencer.subSequence(key, largestPrefix);
+			S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
 
 			boolean found = false;
 			for(RadixTreeNode<S, V> child : node)
@@ -331,7 +335,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		}
 		else if(largestPrefix < nodeKeyLength){
 			//key and node.getPrefix() share a prefix, so split node
-			S leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix);
+			S leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix, nodeKeyLength);
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
 
@@ -346,7 +350,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			}
 			else{
 				//there's a leftover suffix on the key, so add another child 
-				S leftoverKey = sequencer.subSequence(key, largestPrefix);
+				S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
 				RadixTreeNode<S, V> keyNode = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(keyNode);
 				node.setValue(null);
@@ -354,7 +358,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		}
 		else{
 			//node.getPrefix() is a prefix of key, so add as child
-			S leftoverKey = sequencer.subSequence(key, largestPrefix);
+			S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
 			node.getChildren().add(n);
 		}
@@ -482,7 +486,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	/**
-	 * Performa a BFS on the tree, calling the traverser for each node found
+	 * Performa a BFS traversal on the tree, calling the traverser for each node found
 	 *
 	 * @param traverser	The traverser
 	 */

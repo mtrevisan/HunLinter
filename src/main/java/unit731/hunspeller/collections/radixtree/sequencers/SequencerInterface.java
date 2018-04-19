@@ -24,23 +24,6 @@ public interface SequencerInterface<S>{
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.
-	 * The subsequence begins with the string at the specified index and extends to the end of this sequence.
-	 * <p>
-	 * Examples:
-	 * <blockquote><pre>
-	 * "[^s]unhappy".substring(2) returns "nhappy"
-	 * "emptiness".substring(9) returns "" (an empty string)
-	 * </pre></blockquote>
-	 *
-	 * @param sequence	The sequence.
-	 * @param beginIndex	The beginning index, inclusive.
-	 * @return	The specified subsequence.
-	 * @exception IndexOutOfBoundsException	If {@code beginIndex} is negative or larger than the length of this {@code RadixTreeKey} object.
-	 */
-	S subSequence(S sequence, int beginIndex);
-
-	/**
-	 * Returns a sequence that is a subsequence of this sequence.
 	 * The subsequence begins at the specified {@code beginIndex} and extends to the character at index {@code endIndex - 1}.
 	 * Thus the length of the sequence is {@code endIndex - beginIndex}.
 	 * <p>
