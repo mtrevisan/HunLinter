@@ -92,12 +92,29 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				int keySize = sequencer.length(currentKey);
 				for(int i = 1; i <= keySize; i ++){
 					S subkey = sequencer.subSequence(currentKey, 0, i);
+					S wholeSubkey = sequencer.concat(wholeKey, subkey);
 
 					//find the deepest node labeled by a proper suffix of the current child
+					RadixTreeNode<S, V> fail = parent.getFailNode();
+					while(fail != null){
+						int lcpLength = longestCommonPrefixLength(wholeKey, wholeSubkey);
+						if(lcpLength > 0){
+							//TODO split fail and node
+
+							//link node to fail
+							node.setFailNode(fail);
+
+							break;
+						}
+
+						fail = fail.getFailNode();
+					}
+
 //					RadixTreeNode<S, V> fail = parent.getFailNode();
 //					while(fail.nextNode(transition) == null)
 //						fail = fail.getFailNode();
-//
+//					}
+
 //					node.setFailNode(fail.nextNode(transition));
 
 					//TODO
