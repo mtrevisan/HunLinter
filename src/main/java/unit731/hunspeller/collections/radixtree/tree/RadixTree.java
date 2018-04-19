@@ -42,17 +42,26 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializable{
 
 	@AllArgsConstructor
-	private class VisitElement{
-		private final RadixTreeNode<S, V> node;
-		private final RadixTreeNode<S, V> parent;
-		private final S prefixAllowed;
-		private final S prefix;
+	private class TraverseElement{
+
+		protected final RadixTreeNode<S, V> node;
+		protected final S prefix;
+
 	}
 
-	@AllArgsConstructor
-	private class TraverseElement{
-		private final RadixTreeNode<S, V> node;
-		private final S prefix;
+	private class VisitElement extends TraverseElement{
+
+		private final RadixTreeNode<S, V> parent;
+		private final S prefixAllowed;
+
+
+		VisitElement(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, S prefixAllowed, S prefix){
+			super(node, prefix);
+
+			this.parent = parent;
+			this.prefixAllowed = prefixAllowed;
+		}
+
 	}
 
 
@@ -99,9 +108,32 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					while(fail != root){
 						int lcpLength = longestCommonPrefixLength(wholeKey, wholeSubkey);
 						if(lcpLength > 0){
-							//TODO split fail and node
+							if(lcpLength < sequencer.length(wholeKey)){
+								//split fail
+								int nodeKeyLength = sequencer.length(wholeKey);
+								S leftoverPrefix = sequencer.subSequence(wholeKey, lcpLength, nodeKeyLength);
+								RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, fail.getValue());
+								n.getChildren().addAll(fail.getChildren());
 
-							//link node to fail
+								fail.setKey(sequencer.subSequence(wholeKey, 0, lcpLength));
+								fail.getChildren().clear();
+								fail.getChildren().add(n);
+								fail.setValue(null);
+							}
+							if(lcpLength < sequencer.length(wholeSubkey)){
+								//split node
+								int nodeKeyLength = sequencer.length(wholeSubkey);
+								S leftoverPrefix = sequencer.subSequence(wholeSubkey, lcpLength, nodeKeyLength);
+								RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
+								n.getChildren().addAll(node.getChildren());
+
+								node.setKey(sequencer.subSequence(wholeSubkey, 0, lcpLength));
+								node.getChildren().clear();
+								node.getChildren().add(n);
+								node.setValue(null);
+							}
+
+							//link fail to node
 							node.setFailNode(fail);
 
 							break;
@@ -109,13 +141,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 						fail = fail.getFailNode();
 					}
-
-//					RadixTreeNode<S, V> fail = parent.getFailNode();
-//					while(fail.nextNode(transition) == null)
-//						fail = fail.getFailNode();
-//					}
-
-//					node.setFailNode(fail.nextNode(transition));
 
 					//TODO
 					//out(u) += out(f(u))
@@ -465,6 +490,28 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	/**
+	 * Performa a BFS traversal on the tree, calling the traverser for each node found
+	 *
+	 * @param traverser	The traverser
+	 */
+	public void traverse(RadixTreeTraverser<S, V> traverser){
+		Queue<TraverseElement> queue = new ArrayDeque<>();
+		queue.add(new TraverseElement(root, root.getKey()));
+		while(!queue.isEmpty()){
+			TraverseElement elem = queue.remove();
+			RadixTreeNode<S, V> parent = elem.node;
+			S prefix = elem.prefix;
+			for(RadixTreeNode<S, V> child : parent.getChildren()){
+				traverser.traverse(prefix, child, parent);
+
+				queue.add(new TraverseElement(child, sequencer.concat(prefix, child.getKey())));
+			}
+		}
+
+		prepared = true;
+	}
+
+	/**
 	 * Traverses this radix tree using the given visitor.
 	 * Note that the tree will be traversed in lexicographical order.
 	 *
@@ -506,28 +553,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
 			}
 		}
-	}
-
-	/**
-	 * Performa a BFS traversal on the tree, calling the traverser for each node found
-	 *
-	 * @param traverser	The traverser
-	 */
-	public void traverse(RadixTreeTraverser<S, V> traverser){
-		Queue<TraverseElement> queue = new ArrayDeque<>();
-		queue.add(new TraverseElement(root, root.getKey()));
-		while(!queue.isEmpty()){
-			TraverseElement elem = queue.remove();
-			RadixTreeNode<S, V> parent = elem.node;
-			S prefix = elem.prefix;
-			for(RadixTreeNode<S, V> child : parent.getChildren()){
-				traverser.traverse(prefix, child, parent);
-
-				queue.add(new TraverseElement(child, sequencer.concat(prefix, child.getKey())));
-			}
-		}
-
-		prepared = true;
 	}
 
 }
