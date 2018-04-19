@@ -49,6 +49,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		private final S prefix;
 	}
 
+	@AllArgsConstructor
+	private class TraverseElement{
+		private final RadixTreeNode<S, V> node;
+		private final S prefix;
+	}
+
 
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
@@ -81,7 +87,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
 			@Override
-			public void traverse(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				S currentKey = node.getKey();
 				int keySize = sequencer.length(currentKey);
 				for(int i = 1; i <= keySize; i ++){
@@ -112,7 +118,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public void clearFailTransitions(){
 		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
 			@Override
-			public void traverse(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				node.setFailNode(null);
 			}
 		};
@@ -135,7 +141,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		RadixTreeVisitor<S, V, Boolean> visitor = new RadixTreeVisitor<S, V, Boolean>(false){
 			@Override
-			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				V v = node.getValue();
 				result = (v == value || v.equals(value));
 
@@ -160,8 +166,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
 			@Override
-			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				if(sequencer.equals(key, keyToCheck))
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(sequencer.equals(wholeKey, keyToCheck))
 					result = node;
 
 				return (result != null);
@@ -184,9 +190,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
 			@Override
-			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				V value = node.getValue();
-				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(key, value);
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
 				result.add(entry);
 
 				return false;
@@ -234,7 +240,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public int size(){
 		RadixTreeVisitor<S, V, Integer> visitor = new RadixTreeVisitor<S, V, Integer>(0){
 			@Override
-			public boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				result ++;
 
 				return false;
@@ -392,8 +398,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		RadixTreeVisitor<S, V, V> visitor = new RadixTreeVisitor<S, V, V>(null){
 			@Override
-			public boolean visit(S k, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				if(sequencer.equals(k, (S)key)){
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(sequencer.equals(wholeKey, (S)key)){
 					result = node.getValue();
 					Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
@@ -491,14 +497,16 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param traverser	The traverser
 	 */
 	public void traverse(RadixTreeTraverser<S, V> traverser){
-		Queue<RadixTreeNode<S, V>> queue = new ArrayDeque<>();
-		queue.add(root);
+		Queue<TraverseElement> queue = new ArrayDeque<>();
+		queue.add(new TraverseElement(root, root.getKey()));
 		while(!queue.isEmpty()){
-			RadixTreeNode<S, V> parent = queue.remove();
+			TraverseElement elem = queue.remove();
+			RadixTreeNode<S, V> parent = elem.node;
+			S prefix = elem.prefix;
 			for(RadixTreeNode<S, V> child : parent.getChildren()){
-				traverser.traverse(child, parent);
+				traverser.traverse(prefix, child, parent);
 
-				queue.add(child);
+				queue.add(new TraverseElement(child, sequencer.concat(prefix, child.getKey())));
 			}
 		}
 

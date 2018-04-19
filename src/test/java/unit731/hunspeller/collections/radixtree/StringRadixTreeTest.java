@@ -57,6 +57,23 @@ public class StringRadixTreeTest{
 	}
 
 	@Test
+	public void testPrepare(){
+		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+
+		tree.put("test", 1);
+		tree.put("tent", 2);
+		tree.put("tank", 3);
+		tree.put("rest", 4);
+		tree.prepare();
+
+		Assert.assertEquals(4, tree.size());
+		Assert.assertEquals(1, tree.get("test").intValue());
+		Assert.assertEquals(2, tree.get("tent").intValue());
+		Assert.assertEquals(3, tree.get("tank").intValue());
+		Assert.assertEquals(4, tree.get("rest").intValue());
+	}
+
+	@Test
 	public void testMultipleInsertionOfTheSameKey(){
 		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
 

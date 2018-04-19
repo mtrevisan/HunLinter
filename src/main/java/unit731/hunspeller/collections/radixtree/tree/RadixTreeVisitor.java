@@ -26,11 +26,11 @@ public abstract class RadixTreeVisitor<S, V extends Serializable, R>{
 	/**
 	 * Visits a node in a radix tree.
 	 *
-	 * @param key	The key of the node being visited
+	 * @param wholeKey	The whole key of the node being visited
 	 * @param node	The node that is being visited
 	 * @param parent	The parent of the node being visited
 	 * @return	Whether to stop visiting the tree
 	 */
-	public abstract boolean visit(S key, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
+	public abstract boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
 
 }
