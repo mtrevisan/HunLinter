@@ -72,13 +72,13 @@ public class AhoCorasick<V>{
 		}
 
 		while(!queue.isEmpty()){
-			int parent = queue.remove();
+			int node = queue.remove();
 
-			for(Map.Entry<Character, Integer> kv : goTo.get(parent).entrySet()){
+			for(Map.Entry<Character, Integer> kv : goTo.get(node).entrySet()){
 				char transition = kv.getKey();
 				int targetState = kv.getValue();
 
-				int state = fail.get(parent);
+				int state = fail.get(node);
 				while(state != INITIAL_STATE && !goTo.get(state).containsKey(transition))
 					state = fail.get(state);
 

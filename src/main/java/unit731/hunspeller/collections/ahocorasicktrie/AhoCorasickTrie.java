@@ -336,12 +336,12 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 
 			// 第二步，为深度 > 1 的节点建立failure表，这是一个bfs
 			while(!queue.isEmpty()){
-				State<S> parent = queue.remove();
+				State<S> node = queue.remove();
 
-				for(S transition : parent.getTransitions()){
-					State<S> targetState = parent.nextState(transition);
+				for(S transition : node.getTransitions()){
+					State<S> targetState = node.nextState(transition);
 
-					State<S> state = parent.getFailure();
+					State<S> state = node.getFailure();
 					while(state.nextState(transition) == null)
 						state = state.getFailure();
 

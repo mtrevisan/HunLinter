@@ -78,19 +78,19 @@ public class AhoCorasick {
 
     this.prepareRoot();
     while(!q.isEmpty()){
-      State parent = q.pop();
+      State node = q.pop();
 
-      char[] keys = parent.keys();
+      char[] keys = node.keys();
       for(int i = 0; i < keys.length; i ++){
         char transition = keys[i];
-        State targetState = parent.get(transition);
+        State targetState = node.get(transition);
 
-        parent = parent.getFail();
-        while(parent.get(transition) == null)
-          parent = parent.getFail();
+        node = node.getFail();
+        while(node.get(transition) == null)
+          node = node.getFail();
 
-        targetState.setFail(parent.get(transition));
-        targetState.getOutputs().addAll(parent.get(transition).getOutputs());
+        targetState.setFail(node.get(transition));
+        targetState.getOutputs().addAll(node.get(transition).getOutputs());
 
 		  
 		  q.add(targetState);
