@@ -362,6 +362,26 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return ret;
 	}
 
+	/**
+	 * Finds the length of the Longest Common Prefix
+	 *
+	 * @param keyA	Character sequence A
+	 * @param keyB	Character sequence B
+	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
+	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
+	 */
+	private int longestCommonPrefixLength(S keyA, S keyB){
+		int len = 0;
+		int size = Math.min(sequencer.length(keyA), sequencer.length(keyB));
+		while(len < size){
+			if(!sequencer.equalsAtIndex(keyA, keyB, len))
+				break;
+
+			len ++;
+		}
+		return len;
+	}
+
 	@Override
 	public V remove(Object key){
 		Objects.requireNonNull(key);
@@ -462,7 +482,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	/**
-	 * Performa a BFS on the tree
+	 * Performa a BFS on the tree, calling the traverser for each node found
 	 *
 	 * @param traverser	The traverser
 	 */
@@ -479,26 +499,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		}
 
 		prepared = true;
-	}
-
-	/**
-	 * Finds the length of the Longest Common Prefix
-	 *
-	 * @param keyA	Character sequence A
-	 * @param keyB	Character sequence B
-	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
-	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
-	 */
-	private int longestCommonPrefixLength(S keyA, S keyB){
-		int len = 0;
-		int size = Math.min(sequencer.length(keyA), sequencer.length(keyB));
-		while(len < size){
-			if(!sequencer.equalsAtIndex(keyA, keyB, len))
-				break;
-
-			len ++;
-		}
-		return len;
 	}
 
 }
