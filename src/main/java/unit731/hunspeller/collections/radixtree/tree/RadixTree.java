@@ -326,10 +326,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		V ret = null;
 
 		S nodeKey = node.getKey();
-		int largestPrefix = longestCommonPrefixLength(key, nodeKey);
+		int lcpLength = longestCommonPrefixLength(key, nodeKey);
 		int keyLength = sequencer.length(key);
 		int nodeKeyLength = sequencer.length(nodeKey);
-		if(largestPrefix == nodeKeyLength && largestPrefix == keyLength){
+		if(lcpLength == nodeKeyLength && lcpLength == keyLength){
 			//found a node with an exact match
 			ret = node.getValue();
 			if(noDuplicatesAllowed && ret != null)
@@ -337,10 +337,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 			node.setValue(value);
 		}
-		else if(largestPrefix == 0 || largestPrefix < keyLength && largestPrefix >= nodeKeyLength){
+		else if(lcpLength == 0 || lcpLength < keyLength && lcpLength >= nodeKeyLength){
 			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
 			//a new node to this node
-			S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
+			S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
 
 			boolean found = false;
 			for(RadixTreeNode<S, V> child : node)
@@ -356,24 +356,24 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				node.getChildren().add(n);
 			}
 		}
-		else if(largestPrefix < nodeKeyLength){
+		else if(lcpLength < nodeKeyLength){
 			//key and node.getPrefix() share a prefix, so split node
-			S leftoverPrefix = sequencer.subSequence(nodeKey, largestPrefix, nodeKeyLength);
+			S leftoverPrefix = sequencer.subSequence(nodeKey, lcpLength, nodeKeyLength);
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
 			n.getChildren().addAll(node.getChildren());
 
-			node.setKey(sequencer.subSequence(nodeKey, 0, largestPrefix));
+			node.setKey(sequencer.subSequence(nodeKey, 0, lcpLength));
 			node.getChildren().clear();
 			node.getChildren().add(n);
 
-			if(largestPrefix == keyLength){
+			if(lcpLength == keyLength){
 				//the largest prefix is equal to the key, so set this node's value
 				ret = node.getValue();
 				node.setValue(value);
 			}
 			else{
 				//there's a leftover suffix on the key, so add another child 
-				S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
+				S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
 				RadixTreeNode<S, V> keyNode = new RadixTreeNode<>(leftoverKey, value);
 				node.getChildren().add(keyNode);
 				node.setValue(null);
@@ -381,7 +381,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		}
 		else{
 			//node.getPrefix() is a prefix of key, so add as child
-			S leftoverKey = sequencer.subSequence(key, largestPrefix, keyLength);
+			S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
 			node.getChildren().add(n);
 		}
