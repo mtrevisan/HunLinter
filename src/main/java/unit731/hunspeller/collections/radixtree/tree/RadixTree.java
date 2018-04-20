@@ -55,14 +55,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	private class VisitElement extends TraverseElement{
 
 		private final RadixTreeNode<S, V> parent;
-		private final S prefixAllowed;
 
 
-		VisitElement(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, S prefixAllowed, S prefix){
+		VisitElement(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, S prefix){
 			super(node, prefix);
 
 			this.parent = parent;
-			this.prefixAllowed = prefixAllowed;
 		}
 
 	}
@@ -550,19 +548,18 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * Note that the tree will be traversed in lexicographical order.
 	 *
 	 * @param visitor	The visitor
-	 * @param prefix	The prefix used to restrict visitation
+	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
-	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefix){
+	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
 		Objects.requireNonNull(visitor);
-		Objects.requireNonNull(prefix);
+		Objects.requireNonNull(prefixAllowed);
 
 		Stack<VisitElement> stack = new Stack<>();
-		stack.push(new VisitElement(root, null, prefix, root.getKey()));
+		stack.push(new VisitElement(root, null, root.getKey()));
 		while(!stack.isEmpty()){
 			VisitElement elem = stack.pop();
 			RadixTreeNode<S, V> node = elem.node;
-			S prefixAllowed = elem.prefixAllowed;
-			prefix = elem.prefix;
+			S prefix = elem.prefix;
 
 			if(node.hasValue() && (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix))){
 				boolean stop = visitor.visit(prefix, node, elem.parent);
@@ -574,7 +571,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			for(RadixTreeNode<S, V> child : node){
 				S newPrefix = sequencer.concat(prefix, child.getKey());
 				if(prefixLen >= sequencer.length(prefixAllowed) || prefixLen >= sequencer.length(newPrefix) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
-					stack.push(new VisitElement(child, node, prefixAllowed, newPrefix));
+					stack.push(new VisitElement(child, node, newPrefix));
 			}
 		}
 	}
