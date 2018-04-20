@@ -92,6 +92,10 @@ public class AhoCorasick<V>{
 		}
 	}
 
+	public static void main(String[] args){
+		AhoCorasick<String> tree = new AhoCorasick<>("test", "tent", "tank", "rest");
+	}
+
 	public void match(String text, Visitor<V> visitor){
 //		int state = INITIAL_STATE;
 //		for(int i = 0; i < text.length(); i++){

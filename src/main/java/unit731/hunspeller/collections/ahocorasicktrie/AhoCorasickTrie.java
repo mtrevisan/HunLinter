@@ -327,8 +327,8 @@ public class AhoCorasickTrie<S, V extends Serializable> implements Map<S, V>{
 			Queue<State<S>> queue = new ArrayDeque<>();
 
 			// 第一步，将深度为1的节点的failure设为根节点
-			for(State<S> depthOneState : this.rootState.getStates()){
-				depthOneState.setFailure(this.rootState, fail);
+			for(State<S> depthOneState : rootState.getStates()){
+				depthOneState.setFailure(rootState, fail);
 				queue.add(depthOneState);
 
 				constructOutput(depthOneState);

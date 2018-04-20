@@ -100,6 +100,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
 			@Override
 			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(parent == root)
+					return;
+
 				S currentKey = node.getKey();
 				int keySize = sequencer.length(currentKey);
 				boolean nodeSplitted = false;
@@ -108,8 +111,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					S wholeSubkey = sequencer.concat(wholeKey, subkey);
 
 					//find the deepest node labeled by a proper suffix of the current child
-					RadixTreeNode<S, V> fail = node.getFailNode();
-					while(fail != root /*&& !couldTransit(node, currentKey)*/){
+					RadixTreeNode<S, V> fail = parent.getFailNode();
+					while(fail != null /*&& !couldTransit(node, currentKey)*/){
 						int lcpLength = longestCommonPrefixLength(wholeKey, wholeSubkey);
 						if(lcpLength > 0){
 							if(lcpLength < sequencer.length(wholeKey)){
@@ -168,7 +171,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 //				return result;
 //			}
 		};
-		traverse(traverser);
+		traverseBFS(traverser);
 
 		prepared = true;
 	}
@@ -185,7 +188,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				node.setFailNode(null);
 			}
 		};
-		traverse(traverser);
+		traverseBFS(traverser);
 
 		prepared = false;
 	}
@@ -515,7 +518,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 *
 	 * @param traverser	The traverser
 	 */
-	public void traverse(RadixTreeTraverser<S, V> traverser){
+	public void traverseBFS(RadixTreeTraverser<S, V> traverser){
 		Queue<TraverseElement> queue = new ArrayDeque<>();
 		queue.add(new TraverseElement(root, root.getKey()));
 		while(!queue.isEmpty()){

@@ -68,12 +68,12 @@ public class AhoCorasick {
    * transitions of all states except for the root.
    */
   private void prepareFailTransitions() {
-    Queue<State> q = new Queue<State>();
+    Queue<State> q = new Queue<>();
 
     for (int i = 0; i < 256; i++)
-      if (this.root.get((char) i) != null) {
-        this.root.get((char) i).setFail(this.root);
-        q.add(this.root.get((char) i));
+      if (root.get((char) i) != null) {
+        root.get((char) i).setFail(root);
+        q.add(root.get((char) i));
       }
 
     this.prepareRoot();
