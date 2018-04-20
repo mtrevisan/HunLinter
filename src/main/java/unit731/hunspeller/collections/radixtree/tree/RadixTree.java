@@ -104,6 +104,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					return;
 
 				S currentKey = node.getKey();
+//				S wholeSubkey = sequencer.concat(wholeKey, currentKey);
 
 				//find the deepest node labeled by a proper suffix of the current child
 				RadixTreeNode<S, V> fail = parent.getFailNode();
@@ -121,7 +122,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 					fail = fail.getFailNode();
 				}
-
 				if(fail == null)
 					node.setFailNode(root);
 
