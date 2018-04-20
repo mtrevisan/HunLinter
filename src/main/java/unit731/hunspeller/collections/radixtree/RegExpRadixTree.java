@@ -25,7 +25,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	private RegExpRadixTree(){
 		SequencerInterface<String[]> seq = new RegExpSequencer();
 
-		root = RadixTreeNode.createEmptyNode(seq.getNullSequence());
+		root = RadixTreeNode.createEmptyNode(seq.getEmptySequence());
 		this.sequencer = seq;
 	}
 

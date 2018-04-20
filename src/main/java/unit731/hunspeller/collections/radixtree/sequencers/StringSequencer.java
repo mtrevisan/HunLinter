@@ -6,14 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 public class StringSequencer implements SequencerInterface<String>{
 
 	@Override
-	public String getNullSequence(){
+	public String getEmptySequence(){
 		return StringUtils.EMPTY;
 	}
 
-//	@Override
-//	public String charAt(String sequence, int index){
-//		return String.valueOf(sequence.charAt(index));
-//	}
+	@Override
+	public String charAt(String sequence, int index){
+		return String.valueOf(sequence.charAt(index));
+	}
 
 	@Override
 	public int length(String sequence){

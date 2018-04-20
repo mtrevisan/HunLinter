@@ -22,7 +22,7 @@ public class StringRadixTree<V extends Serializable> extends RadixTree<String, V
 	private StringRadixTree(){
 		SequencerInterface<String> seq = new StringSequencer();
 
-		root = RadixTreeNode.createEmptyNode(seq.getNullSequence());
+		root = RadixTreeNode.createEmptyNode(seq.getEmptySequence());
 		this.sequencer = seq;
 	}
 
