@@ -141,7 +141,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 							}
 
 							//link fail to node
-							node.setFailNode(fail != root? fail: root);
+							node.setFailNode(fail);
 
 							nodeSplitted = true;
 							break;
