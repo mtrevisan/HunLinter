@@ -34,6 +34,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree 1</a>
  * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
+ * @see <a href="http://docplayer.net/storage/63/50019668/1524237578/_U5NLg4tdVIt5CYrnzIXoA/50019668.pdf">Aho-Corasik Algorithm in Pattern Matching</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
@@ -103,63 +104,29 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					return;
 
 				S currentKey = node.getKey();
-				int keySize = sequencer.length(currentKey);
-				boolean nodeSplitted = false;
-				for(int i = 1; i <= keySize; i ++){
-					S subkey = sequencer.subSequence(currentKey, 0, i);
-//					S wholeSubkey = sequencer.concat(wholeKey, subkey);
 
-					//find the deepest node labeled by a proper suffix of the current child
-					RadixTreeNode<S, V> fail = parent.getFailNode();
-					while(fail != null /*&& !couldTransit(node, currentKey)*/){
-						RadixTreeNode<S, V> state = transit(fail, currentKey);
-						S stateKey = state.getKey();
+				//find the deepest node labeled by a proper suffix of the current child
+				RadixTreeNode<S, V> fail = parent.getFailNode();
+				while(fail != null /*&& !couldTransit(node, currentKey)*/){
+					RadixTreeNode<S, V> state = transit(fail, currentKey);
+					S stateKey = state.getKey();
 
-						int lcpLength = longestCommonPrefixLength(stateKey, subkey);
-						if(lcpLength > 0){
-							if(lcpLength < sequencer.length(wholeKey)){
-								//split fail
-								int nodeKeyLength = sequencer.length(wholeKey);
-								S leftoverPrefix = sequencer.subSequence(wholeKey, lcpLength, nodeKeyLength);
-								RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, fail.getValue());
-								n.getChildren().addAll(fail.getChildren());
+					int lcpLength = longestCommonPrefixLength(stateKey, currentKey);
+					if(lcpLength > 0){
+						//link fail to node
+						node.setFailNode(fail);
 
-								fail.setKey(sequencer.subSequence(wholeKey, 0, lcpLength));
-								fail.getChildren().clear();
-								fail.getChildren().add(n);
-								fail.setValue(null);
-							}
-							if(lcpLength < sequencer.length(subkey)){
-								//split node
-								int nodeKeyLength = sequencer.length(subkey);
-								S leftoverPrefix = sequencer.subSequence(subkey, lcpLength, nodeKeyLength);
-								RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
-								n.getChildren().addAll(node.getChildren());
-
-								node.setKey(sequencer.subSequence(subkey, 0, lcpLength));
-								node.getChildren().clear();
-								node.getChildren().add(n);
-								node.setValue(null);
-							}
-
-							//link fail to node
-							node.setFailNode(fail);
-
-							nodeSplitted = true;
-							break;
-						}
-
-						fail = fail.getFailNode();
-					}
-					if(nodeSplitted)
 						break;
+					}
 
-					if(fail == null)
-						node.setFailNode(root);
-
-					//TODO
-					//out(u) += out(f(u))
+					fail = fail.getFailNode();
 				}
+
+				if(fail == null)
+					node.setFailNode(root);
+
+				//TODO
+				//out(u) += out(f(u))
 			}
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
