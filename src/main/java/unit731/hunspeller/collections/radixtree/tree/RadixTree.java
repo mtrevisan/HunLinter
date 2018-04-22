@@ -518,8 +518,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				queue.add(new TraverseElement(child, sequencer.concat(prefix, child.getKey())));
 			}
 		}
-
-		prepared = true;
 	}
 
 	/**
