@@ -185,7 +185,7 @@ public class HyphenationParser{
 								}
 							}
 						}
-						hypParser.patterns.prepare();
+//						hypParser.patterns.prepare();
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
