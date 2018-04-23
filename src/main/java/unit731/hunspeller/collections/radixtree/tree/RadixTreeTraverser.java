@@ -14,10 +14,10 @@ public abstract class RadixTreeTraverser<S, V extends Serializable>{
 	/**
 	 * Traverse all the radix tree.
 	 *
-	 * @param parentKey	The whole key of the node being visited up to the parent
+	 * @param wholeKey	The whole key of the node being visited
 	 * @param node	The node that is being traversed
 	 * @param parent	The parent of the node being traversed
 	 */
-	public abstract void traverse(S parentKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
+	public abstract void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
 
 }
