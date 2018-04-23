@@ -62,6 +62,7 @@ public class StringRadixTreeTest{
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
+		tree.put("tentest", 21);
 		tree.put("tank", 3);
 		tree.put("rest", 4);
 		tree.prepare();

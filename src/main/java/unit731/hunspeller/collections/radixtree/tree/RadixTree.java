@@ -105,18 +105,52 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					return;
 
 				S currentKey = node.getKey();
+				int keySize = sequencer.length(currentKey);
+				for(int i = 1; i <= keySize; i ++){
+					S subkey = sequencer.subSequence(currentKey, 0, i);
 
-				//find the deepest node labeled by a proper suffix of the current child
-				RadixTreeNode<S, V> fail = parent.getFailNode();
-				while(fail != root && transit(fail, currentKey) == null)
-					fail = fail.getFailNode();
+					//FIXME should consider one character at a time and split in case
 
-				RadixTreeNode<S, V> state = transit(fail, currentKey);
-				//link fail to node
-				node.setFailNode(state);
+					//find the deepest node labeled by a proper suffix of the current child
+					RadixTreeNode<S, V> fail = parent.getFailNode();
+					while(fail != root && transit(fail, subkey) == null)
+						fail = fail.getFailNode();
 
-				//TODO
-				//out(u) += out(f(u))
+					RadixTreeNode<S, V> state = transit(fail, subkey);
+					int lcpLength = longestCommonPrefixLength(subkey, state.getKey());
+					if(lcpLength > 0){
+						if(lcpLength < sequencer.length(state.getKey())){
+							//split fail
+							int nodeKeyLength = sequencer.length(state.getKey());
+							S leftoverPrefix = sequencer.subSequence(state.getKey(), lcpLength, nodeKeyLength);
+							RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, state.getValue());
+							n.getChildren().addAll(state.getChildren());
+
+							state.setKey(sequencer.subSequence(state.getKey(), 0, lcpLength));
+							state.getChildren().clear();
+							state.getChildren().add(n);
+							state.setValue(null);
+						}
+						if(lcpLength < sequencer.length(subkey)){
+							//split node
+							int nodeKeyLength = sequencer.length(subkey);
+							S leftoverPrefix = sequencer.subSequence(subkey, lcpLength, nodeKeyLength);
+							RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverPrefix, node.getValue());
+							n.getChildren().addAll(node.getChildren());
+
+							node.setKey(sequencer.subSequence(subkey, 0, lcpLength));
+							node.getChildren().clear();
+							node.getChildren().add(n);
+							node.setValue(null);
+						}
+
+						//link fail to node
+						node.setFailNode(state);
+
+						//TODO
+						//out(u) += out(f(u))
+					}
+				}
 			}
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
