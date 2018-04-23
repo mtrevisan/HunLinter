@@ -74,6 +74,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	protected boolean noDuplicatesAllowed;
 
 	private boolean prepared;
+	private boolean putAll;
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
@@ -131,20 +132,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				}
 				return result;
 			}
-
-//			private boolean couldTransit(RadixTreeNode<S, V> node, S prefix){
-//				boolean result = false;
-//				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
-//				S seq0 = sequencer.charAt(prefix, 0);
-//				while(itr.hasNext()){
-//					RadixTreeNode<S, V> child = itr.next();
-//					if(sequencer.startsWith(child.getKey(), seq0)){
-//						result = true;
-//						break;
-//					}
-//				}
-//				return result;
-//			}
 		};
 		traverseBFS(traverser);
 
@@ -318,8 +305,17 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public void putAll(Map<? extends S, ? extends V> map){
 		Objects.requireNonNull(map);
 
+		putAll = true;
+		boolean wasPrepared = prepared;
+		if(prepared)
+			clearFailTransitions();
+
 		map.entrySet()
 			.forEach(entry -> put(entry.getKey(), entry.getValue()));
+
+		putAll = false;
+		if(wasPrepared)
+			prepare();
 	}
 
 	@Override
@@ -327,11 +323,17 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
-		if(prepared)
-			throw new IllegalStateException("Can't add a new node after prepare() was called");
+		boolean wasPrepared = prepared;
+		if(!putAll && prepared)
+			clearFailTransitions();
 
 		try{
-			return put(key, value, root);
+			V previousValue = put(key, value, root);
+
+			if(!putAll && wasPrepared)
+				prepare();
+
+			return previousValue;
 		}
 		catch(DuplicateKeyException e){
 			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'");
