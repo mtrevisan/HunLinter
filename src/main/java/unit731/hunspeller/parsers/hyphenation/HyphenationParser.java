@@ -452,17 +452,25 @@ public class HyphenationParser{
 		word = PatternService.clear(word, REGEX_WORD_BOUNDARIES);
 
 		List<String> hyphenatedWord;
+		List<String> rules;
 		boolean[] errors;
 
 		String customHyphenation = customHyphenations.get(word);
-		if(customHyphenation != null)
+		if(customHyphenation != null){
 			//hyphenation is custom
 			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, REGEX_PATTERN_HYPHEN_MINUS));
-		else if(word.length() <= options.getLeftMin() + options.getRightMin())
+
+			rules = hyphenatedWord;
+		}
+		else if(word.length() <= options.getLeftMin() + options.getRightMin()){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
+
+			rules = hyphenatedWord;
+		}
 		else{
 			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns);
+			rules = hyphBreak.getRules();
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 		}
@@ -470,7 +478,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, errors);
+		return new Hyphenation(hyphenatedWord, rules, errors);
 	}
 
 	private boolean[] extractUppercases(String word){
@@ -509,6 +517,8 @@ public class HyphenationParser{
 		int wordSize = word.length();
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
+		//the rules applied to the word
+		String[] rules = new String[wordSize];
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
@@ -531,13 +541,14 @@ public class HyphenationParser{
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
 							indexes[idx] = dd;
+							rules[idx] = rule;
 							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
 						}
 					}
 				}
 			}
 		}
-		return new HyphenationBreak(indexes, augmentedPatternData);
+		return new HyphenationBreak(indexes, Arrays.asList(rules), augmentedPatternData);
 	}
 
 	//FIXME add some comments or refactor!!

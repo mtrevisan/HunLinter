@@ -15,6 +15,8 @@ public class Hyphenation{
 	@NonNull
 	private final List<String> syllabes;
 	@NonNull
+	private final List<String> rules;
+	@NonNull
 	private final boolean[] errors;
 
 

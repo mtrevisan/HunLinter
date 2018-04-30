@@ -22,6 +22,7 @@ import java.text.NumberFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -216,6 +217,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       hypSyllabationOutputLabel = new javax.swing.JLabel();
       hypSyllabesCountLabel = new javax.swing.JLabel();
       hypSyllabesCountOutputLabel = new javax.swing.JLabel();
+      hypRulesLabel = new javax.swing.JLabel();
+      hypRulesOutputLabel = new javax.swing.JLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
       hypAddRuleButton = new javax.swing.JButton();
@@ -474,6 +477,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
       hypSyllabesCountOutputLabel.setText("...");
 
+      hypRulesLabel.setLabelFor(hypSyllabesCountOutputLabel);
+      hypRulesLabel.setText("Rules:");
+
+      hypRulesOutputLabel.setText("...");
+
       hypAddRuleLabel.setLabelFor(hypAddRuleTextField);
       hypAddRuleLabel.setText("Add rule:");
 
@@ -509,6 +517,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       hypLayeredPane.setLayer(hypSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypSyllabesCountLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypSyllabesCountOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      hypLayeredPane.setLayer(hypRulesLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      hypLayeredPane.setLayer(hypRulesOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -550,7 +560,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
                   .addComponent(hypAddRuleSyllabationLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                  .addComponent(hypAddRuleSyllabationOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, hypLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(hypRulesLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(hypRulesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addContainerGap())
       );
       hypLayeredPaneLayout.setVerticalGroup(
@@ -568,6 +582,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypSyllabesCountLabel)
                .addComponent(hypSyllabesCountOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(hypRulesLabel)
+               .addComponent(hypRulesOutputLabel))
             .addGap(18, 18, 18)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleLabel)
@@ -581,7 +599,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabesCountLabel)
                .addComponent(hypAddRuleSyllabesCountOutputLabel))
-            .addContainerGap(87, Short.MAX_VALUE))
+            .addContainerGap(67, Short.MAX_VALUE))
       );
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
@@ -1513,6 +1531,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		formerHyphenationText = text;
 
 		String count = null;
+		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
 			text = frame.hypParser.correctOrthography(text);
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
@@ -1520,6 +1539,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			text = hyphenation.formatHyphenation(new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>"),
 				syllabe -> "<b style=\"color:red\">" + syllabe + "</b>");
 			count = Long.toString(hyphenation.countSyllabes());
+			rules = hyphenation.getRules();
 
 			frame.hypAddRuleTextField.setEnabled(true);
 		}
@@ -1531,6 +1551,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		frame.hypSyllabationOutputLabel.setText(text);
 		frame.hypSyllabesCountOutputLabel.setText(count);
+		frame.hypRulesOutputLabel.setText(rules.stream()
+			.filter(StringUtils::isNotBlank)
+			.collect(Collectors.joining(StringUtils.SPACE)));
 
 		frame.hypAddRuleTextField.setText(null);
 		frame.hypAddRuleButton.setEnabled(false);
@@ -1591,6 +1614,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		hypWordTextField.setText(null);
 		hypSyllabationOutputLabel.setText(null);
 		hypSyllabesCountOutputLabel.setText(null);
+		hypRulesOutputLabel.setText(null);
 		hypAddRuleTextField.setText(null);
 		hypAddRuleButton.setEnabled(false);
 		hypAddRuleSyllabationOutputLabel.setText(null);
@@ -1700,6 +1724,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
    private javax.swing.JTextField hypAddRuleTextField;
    private javax.swing.JLayeredPane hypLayeredPane;
+   private javax.swing.JLabel hypRulesLabel;
+   private javax.swing.JLabel hypRulesOutputLabel;
    private javax.swing.JLabel hypSyllabationLabel;
    private javax.swing.JLabel hypSyllabationOutputLabel;
    private javax.swing.JLabel hypSyllabesCountLabel;

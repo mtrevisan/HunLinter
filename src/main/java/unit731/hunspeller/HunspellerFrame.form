@@ -551,6 +551,11 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="hypAddRuleSyllabationOutputLabel" max="32767" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="hypRulesLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="hypRulesOutputLabel" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -574,6 +579,11 @@
                           <Component id="hypSyllabesCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="hypSyllabesCountOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="hypRulesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="hypRulesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="hypAddRuleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -590,7 +600,7 @@
                           <Component id="hypAddRuleSyllabesCountLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="hypAddRuleSyllabesCountOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="87" max="32767" attributes="0"/>
+                      <EmptySpace pref="67" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -636,6 +646,19 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="hypSyllabesCountOutputLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="..."/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="hypRulesLabel">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="hypSyllabesCountOutputLabel"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Rules:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="hypRulesOutputLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
