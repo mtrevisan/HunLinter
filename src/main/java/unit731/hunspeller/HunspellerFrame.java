@@ -1,8 +1,12 @@
 package unit731.hunspeller;
 
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -31,15 +36,23 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.MenuSelectionManager;
@@ -101,7 +114,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
 
-	private static final Matcher REGEX_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
+	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
+
+	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+?>");
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 	private static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
@@ -158,6 +173,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		flm = new FileListenerManager();
 
 		initComponents();
+
+		JPopupMenu copyingPopupMenu = createCopyingPopupMenu();
+		addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 
 //File currentDir = new File("C:\\Users\\mauro\\Projects\\VenetanHTML5App\\public_html\\app\\tools\\lang\\data\\dict-vec-oxt\\dictionaries");
 //File currentDir = new File("C:\\ApacheHTDocs\\VenetanHTML5App\\public_html\\app\\tools\\lang\\data\\dict-vec-oxt\\dictionaries");
@@ -477,7 +495,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
       hypSyllabesCountOutputLabel.setText("...");
 
-      hypRulesLabel.setLabelFor(hypSyllabesCountOutputLabel);
+      hypRulesLabel.setLabelFor(hypRulesOutputLabel);
       hypRulesLabel.setText("Rules:");
 
       hypRulesOutputLabel.setText("...");
@@ -776,6 +794,69 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
+	private JPopupMenu createCopyingPopupMenu(){
+		JPopupMenu popupMenu = new JPopupMenu();
+
+		JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
+		try{
+			BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/popup_copy.png"));
+			ImageIcon icon = new ImageIcon(img.getScaledInstance(hypRulesOutputLabel.getHeight(), hypRulesOutputLabel.getHeight(), Image.SCALE_SMOOTH));
+			copyMenuItem.setIcon(icon);
+		}
+		catch(IOException e){}
+		copyMenuItem.addActionListener(e -> {
+			String textToCopy = null;
+			Component c = popupMenu.getInvoker();
+			if(c instanceof JTextField)
+				textToCopy = ((JTextField)c).getText();
+			else if(c instanceof JLabel)
+				textToCopy = ((JLabel)c).getText();
+
+			if(textToCopy != null){
+				textToCopy = removeHTMLCode(textToCopy);
+
+				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clipboard.setContents(new StringSelection(textToCopy), null);
+			}
+		});
+		popupMenu.add(copyMenuItem);
+
+		return popupMenu;
+	}
+
+	/**
+	 * Add a popup menu to the specified text fields.
+	 *
+	 * @param popupMenu	The pop-up to attach to the fields
+	 * @param fields	Components for which to add the popup menu
+	 */
+	private void addPopupMenu(JPopupMenu popupMenu, JComponent... fields){
+		//add mouse listeners to the specified fields
+		for(JComponent field : fields){
+			field.addMouseListener(new MouseAdapter(){
+				@Override
+				public void mousePressed(MouseEvent e){
+					processMouseEvent(e);
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e){
+					processMouseEvent(e);
+				}
+
+				private void processMouseEvent(MouseEvent e){
+					if(e.isPopupTrigger()){
+						popupMenu.show(e.getComponent(), e.getX(), e.getY());
+						popupMenu.setInvoker(field);
+					}
+				}
+			});
+		}
+	}
+
+	private String removeHTMLCode(String text){
+		return PatternService.clear(text, MATCHER_HTML_CODE);
+	}
 
    private void fileOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileOpenAFFMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1572,7 +1653,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				boolean hyphenationChanged = false;
 				boolean correctHyphenation = false;
 				if(!alreadyHasRule){
-					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, REGEX_POINTS_AND_NUMBERS));
+					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS));
 
 					if(ruleMatchesText){
 						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
