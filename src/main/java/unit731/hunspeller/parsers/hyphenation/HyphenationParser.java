@@ -63,9 +63,10 @@ public class HyphenationParser{
 
 	private static final Pattern PATTERN_COMMA = PatternService.pattern(",");
 
-	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("[\\d]");
-	private static final Matcher MATCHER_VALID_RULE_START = PatternService.matcher("^\\.[\\d]");
-	private static final Matcher MATCHER_VALID_RULE_END = PatternService.matcher("[\\d]\\.$");
+	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("^\\.?[^.]+\\.?$");
+	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
+	private static final Matcher MATCHER_INVALID_RULE_START = PatternService.matcher("^\\.[\\d]");
+	private static final Matcher MATCHER_INVALID_RULE_END = PatternService.matcher("[\\d]\\.$");
 	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
@@ -303,9 +304,11 @@ public class HyphenationParser{
 	 * @param rule	Rule to be validated
 	 */
 	public static void validateRule(String rule){
-		if(!PatternService.find(rule, MATCHER_VALID_RULE))
+		if(!PatternService.find(rule, MATCHER_VALID_RULE_BREAK_POINTS))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
-		if(PatternService.find(rule, MATCHER_VALID_RULE_START) || PatternService.find(rule, MATCHER_VALID_RULE_END))
+		if(!PatternService.find(rule, MATCHER_VALID_RULE))
+			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
+		if(PatternService.find(rule, MATCHER_INVALID_RULE_START) || PatternService.find(rule, MATCHER_INVALID_RULE_END))
 			throw new IllegalArgumentException("Rule " + rule + " has an invalid hyphenation point");
 
 		String cleanedRule = rule;
