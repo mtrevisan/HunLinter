@@ -166,7 +166,7 @@ public class HyphenationParser{
 									//start non-compound level
 									level = Level.NON_COMPOUND;
 								}
-								else if(line.contains(HYPHEN_MINUS)){
+								else if(line.contains(HYPHEN_MINUS) || line.contains(HYPHEN_EQUALS)){
 									String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
 									if(hypParser.customHyphenations.containsKey(key))
 										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
