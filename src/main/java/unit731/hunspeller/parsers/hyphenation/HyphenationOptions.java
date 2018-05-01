@@ -55,18 +55,26 @@ public class HyphenationOptions{
 		boolean managed = false;
 		if(line.startsWith(MIN_LEFT_HYPHENATION)){
 			leftMin = Integer.parseInt(extractValue(line));
+			if(leftMin <= 0)
+				leftMin = 2;
 			managed = true;
 		}
 		else if(line.startsWith(MIN_RIGHT_HYPHENATION)){
 			rightMin = Integer.parseInt(extractValue(line));
+			if(rightMin <= 0)
+				rightMin = 2;
 			managed = true;
 		}
 		else if(line.startsWith(MIN_COMPOUND_LEFT_HYPHENATION)){
 			leftCompoundMin = Integer.parseInt(extractValue(line));
+			if(leftCompoundMin < 0)
+				leftCompoundMin = 0;
 			managed = true;
 		}
 		else if(line.startsWith(MIN_COMPOUND_RIGHT_HYPHENATION)){
 			rightCompoundMin = Integer.parseInt(extractValue(line));
+			if(rightCompoundMin < 0)
+				rightCompoundMin = 0;
 			managed = true;
 		}
 		else if(line.startsWith(NO_HYPHEN)){
