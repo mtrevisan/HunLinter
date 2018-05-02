@@ -106,7 +106,7 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private final Map<Level, RadixTree<String>> patterns = new EnumMap(Level.class);
+	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap(Level.class);
 	private HyphenationOptions options;
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap(Level.class);
 
@@ -124,7 +124,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
-			patterns.put(level, RadixTree.createTree());
+			patterns.put(level, RadixTree.createTree(new StringSequencer()));
 			customHyphenations.put(level, new HashMap<>());
 		}
 	}
@@ -401,9 +401,9 @@ public class HyphenationParser{
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
 		//extract (compound) data from the radix tree
 		Map<Integer, List<String>> content = new HashMap<>();
-		RadixTreeVisitor<String, Boolean> visitor = new RadixTreeVisitor<String, Boolean>(false){
+		RadixTreeVisitor<String, String, Boolean> visitor = new RadixTreeVisitor<String, String, Boolean>(false){
 			@Override
-			public boolean visit(String key, RadixTreeNode<String> node, RadixTreeNode<String> parent){
+			public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
 				String value = node.getValue();
 				content.computeIfAbsent(value.length(), k -> new ArrayList<>())
 					.add(value);
@@ -508,7 +508,7 @@ public class HyphenationParser{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String>> patterns){
+	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
@@ -579,7 +579,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String>> patterns, Level level){
+	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
