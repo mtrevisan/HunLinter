@@ -40,7 +40,7 @@ public class HyphenationOptions{
 	@Builder.Default private int rightMin = 2;
 	private int leftCompoundMin;
 	private int rightCompoundMin;
-	@Builder.Default private Set<String> noHyphen = new HashSet<>();
+	@Builder.Default private final Set<String> noHyphen = new HashSet<>();
 
 
 	public static HyphenationOptions createEmpty(){

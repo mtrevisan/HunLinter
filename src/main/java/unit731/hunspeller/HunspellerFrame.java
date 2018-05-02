@@ -237,6 +237,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       hypRulesOutputLabel = new javax.swing.JLabel();
       hypAddRuleLabel = new javax.swing.JLabel();
       hypAddRuleTextField = new javax.swing.JTextField();
+      hypAddRuleLevelComboBox = new javax.swing.JComboBox<>();
       hypAddRuleButton = new javax.swing.JButton();
       hypAddRuleSyllabationLabel = new javax.swing.JLabel();
       hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
@@ -508,6 +509,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
          }
       });
 
+      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Compound Level", "Non-compound Level" }));
+      hypAddRuleLevelComboBox.setEnabled(false);
+
       hypAddRuleButton.setMnemonic('A');
       hypAddRuleButton.setText("Add rule");
       hypAddRuleButton.setEnabled(false);
@@ -537,6 +541,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       hypLayeredPane.setLayer(hypRulesOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      hypLayeredPane.setLayer(hypAddRuleLevelComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleSyllabationLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       hypLayeredPane.setLayer(hypAddRuleSyllabationOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -566,6 +571,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                   .addComponent(hypAddRuleLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(hypAddRuleTextField)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                  .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                   .addGap(18, 18, 18)
                   .addComponent(hypAddRuleButton))
                .addGroup(hypLayeredPaneLayout.createSequentialGroup()
@@ -606,7 +613,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleLabel)
                .addComponent(hypAddRuleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-               .addComponent(hypAddRuleButton))
+               .addComponent(hypAddRuleButton)
+               .addComponent(hypAddRuleLevelComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addGroup(hypLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(hypAddRuleSyllabationLabel)
@@ -1179,7 +1187,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		String newRule = hypAddRuleTextField.getText();
-		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT));
+		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
+		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT), level);
 		if(foundRule == null){
 			try{
 				File hypFile = getHyphenationFile();
@@ -1190,6 +1199,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					hyphenate(this);
 				}
 
+				hypAddRuleLevelComboBox.setEnabled(false);
 				hypAddRuleButton.setEnabled(false);
 				hypAddRuleTextField.setText(null);
 				hypAddRuleSyllabationOutputLabel.setText(null);
@@ -1635,6 +1645,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			.collect(Collectors.joining(StringUtils.SPACE)));
 
 		frame.hypAddRuleTextField.setText(null);
+		frame.hypAddRuleLevelComboBox.setEnabled(false);
 		frame.hypAddRuleButton.setEnabled(false);
 		frame.hypAddRuleSyllabationOutputLabel.setText(null);
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
@@ -1644,9 +1655,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		try{
 			String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
 			String addedRule = frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT);
+			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 			String addedRuleCount = null;
 			if(StringUtils.isNotBlank(addedRule)){
-				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule);
+				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule, level);
 				boolean ruleMatchesText = false;
 				boolean hyphenationChanged = false;
 				boolean correctHyphenation = false;
@@ -1655,7 +1667,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 					if(ruleMatchesText){
 						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
-						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule);
+						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
 
 						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
@@ -1670,12 +1682,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 				if(alreadyHasRule || !ruleMatchesText)
 					addedRuleText = null;
-				frame.hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
+				boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
+				frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
+				frame.hypAddRuleButton.setEnabled(enableAddRule);
 			}
 			else{
 				addedRuleText = null;
 
 				frame.hypAddRuleTextField.setText(null);
+				frame.hypAddRuleLevelComboBox.setEnabled(false);
 				frame.hypAddRuleButton.setEnabled(false);
 				frame.hypAddRuleSyllabationOutputLabel.setText(null);
 				frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
@@ -1695,6 +1710,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		hypSyllabesCountOutputLabel.setText(null);
 		hypRulesOutputLabel.setText(null);
 		hypAddRuleTextField.setText(null);
+		hypAddRuleLevelComboBox.setEnabled(false);
 		hypAddRuleButton.setEnabled(false);
 		hypAddRuleSyllabationOutputLabel.setText(null);
 		hypAddRuleSyllabesCountOutputLabel.setText(null);
@@ -1797,6 +1813,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JButton hypAddRuleButton;
    private javax.swing.JLabel hypAddRuleLabel;
+   private javax.swing.JComboBox<String> hypAddRuleLevelComboBox;
    private javax.swing.JLabel hypAddRuleSyllabationLabel;
    private javax.swing.JLabel hypAddRuleSyllabationOutputLabel;
    private javax.swing.JLabel hypAddRuleSyllabesCountLabel;

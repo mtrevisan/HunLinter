@@ -537,6 +537,8 @@
                               <Component id="hypAddRuleLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="hypAddRuleTextField" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="hypAddRuleLevelComboBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="hypAddRuleButton" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -589,6 +591,7 @@
                           <Component id="hypAddRuleLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="hypAddRuleTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="hypAddRuleButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="hypAddRuleLevelComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -678,6 +681,20 @@
               <Events>
                 <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="hypAddRuleTextFieldKeyReleased"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="hypAddRuleLevelComboBox">
+              <Properties>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="2">
+                    <StringItem index="0" value="Compound Level"/>
+                    <StringItem index="1" value="Non-compound Level"/>
+                  </StringArray>
+                </Property>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JButton" name="hypAddRuleButton">
               <Properties>
