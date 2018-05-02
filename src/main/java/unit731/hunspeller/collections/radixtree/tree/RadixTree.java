@@ -94,6 +94,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
+		//FIXME trasform this tree into a trie
+
 		//process children of the root
 		root.getChildren()
 			.forEach(child -> child.setFailNode(root));
