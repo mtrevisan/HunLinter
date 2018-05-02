@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -22,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -58,8 +58,8 @@ public class HyphenationParser{
 	public static final String HYPHEN_MINUS = "\u002D";
 	private static final String HYPHEN_EQUALS = "=";
 	private static final String SOFT_HYPHEN = "\u00AD";
-	private static final String EN_DASH = "\\u2013";
-	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\\u2019";
+	private static final String EN_DASH = "\u2013";
+	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static final String WORD_BOUNDARY = ".";
 	private static final String AUGMENTED_RULE = "/";
@@ -91,6 +91,8 @@ public class HyphenationParser{
 		//defines the rules to be used within words or word parts
 		NON_COMPOUND
 	};
+
+	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
@@ -125,17 +127,6 @@ public class HyphenationParser{
 		}
 	}
 
-	public HyphenationParser(String language, RadixTree<String> patternsCompound, RadixTree<String> patternsNonCompound, HyphenationOptions options){
-		this(language);
-
-		Objects.requireNonNull(patterns);
-		Objects.requireNonNull(options);
-
-		patterns.put(Level.COMPOUND, patternsCompound);
-		patterns.put(Level.NON_COMPOUND, patternsNonCompound);
-		this.options = options;
-	}
-
 	@AllArgsConstructor
 	public static class ParserWorker extends SwingWorker<Void, String>{
 
@@ -147,6 +138,8 @@ public class HyphenationParser{
 
 		@Override
 		protected Void doInBackground() throws Exception{
+			LOCK_SAVING.lock();
+
 			try{
 				publish("Opening Hyphenation file for parsing: " + hypFile.getName());
 				setProgress(0);
@@ -245,6 +238,9 @@ public class HyphenationParser{
 				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
+			finally{
+				LOCK_SAVING.unlock();
+			}
 			return null;
 		}
 
@@ -285,12 +281,19 @@ public class HyphenationParser{
 	};
 
 	public void clear(){
-		for(Level level : Level.values()){
-			patterns.get(level).clear();
-			customHyphenations.get(level).clear();
+		LOCK_SAVING.lock();
+
+		try{
+			for(Level level : Level.values()){
+				patterns.get(level).clear();
+				customHyphenations.get(level).clear();
+			}
+			if(options != null)
+				options.clear();
 		}
-		if(options != null)
-			options.clear();
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public String correctOrthography(String text){
@@ -306,14 +309,21 @@ public class HyphenationParser{
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule, Level level){
-		validateRule(rule, level);
+		LOCK_SAVING.lock();
 
-		String key = getKeyFromData(rule);
-		String newRule = patterns.get(level).get(key);
-		if(newRule == null)
-			patterns.get(level).put(key, rule);
-			
-		return newRule;
+		try{
+			validateRule(rule, level);
+
+			String key = getKeyFromData(rule);
+			String newRule = patterns.get(level).get(key);
+			if(newRule == null)
+				patterns.get(level).put(key, rule);
+
+			return newRule;
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	/**
@@ -372,18 +382,25 @@ public class HyphenationParser{
 	}
 
 	public void save(File hypFile) throws IOException{
-		Charset charset = StandardCharsets.UTF_8;
-		try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
-			//save charset
-			writeln(writer, charset.name());
-			//save options
-			options.write(writer);
+		LOCK_SAVING.lock();
 
-			savePatternsByLevel(writer, Level.COMPOUND);
+		try{
+			Charset charset = StandardCharsets.UTF_8;
+			try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
+				//save charset
+				writeln(writer, charset.name());
+				//save options
+				options.write(writer);
 
-			writeln(writer, NEXT_LEVEL);
+				savePatternsByLevel(writer, Level.COMPOUND);
 
-			savePatternsByLevel(writer, Level.NON_COMPOUND);
+				writeln(writer, NEXT_LEVEL);
+
+				savePatternsByLevel(writer, Level.NON_COMPOUND);
+			}
+		}
+		finally{
+			LOCK_SAVING.unlock();
 		}
 	}
 
@@ -446,16 +463,23 @@ public class HyphenationParser{
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
 	public Hyphenation hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
-		String key = getKeyFromData(addedRule);
-		Hyphenation hyph = null;
-		if(!patterns.get(level).containsKey(key)){
-			patterns.get(level).put(key, addedRule);
+		LOCK_SAVING.lock();
 
-			hyph = hyphenate(word, patterns);
+		try{
+			String key = getKeyFromData(addedRule);
+			Hyphenation hyph = null;
+			if(!patterns.get(level).containsKey(key)){
+				patterns.get(level).put(key, addedRule);
 
-			patterns.get(level).remove(key);
+				hyph = hyphenate(word, patterns);
+
+				patterns.get(level).remove(key);
+			}
+			return hyph;
 		}
-		return hyph;
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	/**
@@ -466,8 +490,15 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(String rule, Level level){
-		String key = getKeyFromData(rule);
-		return patterns.get(level).containsKey(key);
+		LOCK_SAVING.lock();
+
+		try{
+			String key = getKeyFromData(rule);
+			return patterns.get(level).containsKey(key);
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	private static String getKeyFromData(String rule){

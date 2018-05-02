@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
@@ -32,6 +33,8 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 @Slf4j
 @Getter
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+
+	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
@@ -65,6 +68,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		@Override
 		protected List<ThesaurusEntry> doInBackground() throws Exception{
+			LOCK_SAVING.lock();
+
 			try{
 				publish("Opening Thesaurus file for parsing: " + theFile.getName());
 				setProgress(0);
@@ -96,6 +101,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
 			}
+			finally{
+				LOCK_SAVING.unlock();
+			}
 
 			theParser.dictionary.resetModified();
 
@@ -118,15 +126,36 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	};
 
 	public int getSynonymsCounter(){
-		return dictionary.size();
+		LOCK_SAVING.lock();
+
+		try{
+			return dictionary.size();
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public boolean isDictionaryModified(){
-		return dictionary.isModified();
+		LOCK_SAVING.lock();
+
+		try{
+			return dictionary.isModified();
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return dictionary.getSynonyms();
+		LOCK_SAVING.lock();
+
+		try{
+			return dictionary.getSynonyms();
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	/**
@@ -136,69 +165,85 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE, 2);
-		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
-			throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
+		LOCK_SAVING.lock();
 
-		String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
-		List<String> meanings = Arrays.stream(means)
-			.map(String::trim)
-			.filter(StringUtils::isNotBlank)
-			.distinct()
-			.collect(Collectors.toList());
-		if(meanings.size() < 1)
-			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
+		try{
+			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE, 2);
+			String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
+				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-		DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
+			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
+			List<String> meanings = Arrays.stream(means)
+				.map(String::trim)
+				.filter(StringUtils::isNotBlank)
+				.distinct()
+				.collect(Collectors.toList());
+			if(meanings.size() < 1)
+				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
 
-		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
-			try{
-				undoCaretaker.pushMemento(createMemento());
+			DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
 
-				if(undoable != null)
-					undoable.onUndoChange(true);
+			if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
+				try{
+					undoCaretaker.pushMemento(createMemento());
+
+					if(undoable != null)
+						undoable.onUndoChange(true);
+				}
+				catch(IOException ex){
+					log.warn("Error while storing a memento", ex);
+				}
+
+				dictionary.add(partOfSpeech, meanings);
 			}
-			catch(IOException ex){
-				log.warn("Error while storing a memento", ex);
-			}
 
-			dictionary.add(partOfSpeech, meanings);
+			return duplicationResult;
 		}
-
-		return duplicationResult;
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
 	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
 			throws IllegalArgumentException{
-		boolean forcedInsertion = false;
-		List<ThesaurusEntry> duplicates = new ArrayList<>();
+		LOCK_SAVING.lock();
+
 		try{
-			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(String meaning : means)
-				for(ThesaurusEntry synonym : synonyms)
-					if(synonym.getSynonym().equals(meaning)){
-						long countSamePartOfSpeech = 0;
-						List<MeaningEntry> meanings = synonym.getMeanings();
-						for(MeaningEntry m : meanings)
-							if(m.getPartOfSpeech().equals(partOfSpeech))
-								countSamePartOfSpeech ++;
-						if(countSamePartOfSpeech > 0l)
-							throw new IllegalArgumentException("Duplicate detected for " + meaning);
-					}
+			boolean forcedInsertion = false;
+			List<ThesaurusEntry> duplicates = new ArrayList<>();
+			try{
+				List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+				for(String meaning : means)
+					for(ThesaurusEntry synonym : synonyms)
+						if(synonym.getSynonym().equals(meaning)){
+							long countSamePartOfSpeech = 0;
+							List<MeaningEntry> meanings = synonym.getMeanings();
+							for(MeaningEntry m : meanings)
+								if(m.getPartOfSpeech().equals(partOfSpeech))
+									countSamePartOfSpeech ++;
+							if(countSamePartOfSpeech > 0l)
+								throw new IllegalArgumentException("Duplicate detected for " + meaning);
+						}
+			}
+			catch(IllegalArgumentException e){
+				if(!duplicatesDiscriminator.get())
+					throw e;
+
+				duplicates.clear();
+				forcedInsertion = true;
+			}
+			return new DuplicationResult(duplicates, forcedInsertion);
 		}
-		catch(IllegalArgumentException e){
-			if(!duplicatesDiscriminator.get())
-				throw e;
-			
-			duplicates.clear();
-			forcedInsertion = true;
+		finally{
+			LOCK_SAVING.unlock();
 		}
-		return new DuplicationResult(duplicates, forcedInsertion);
 	}
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
+		LOCK_SAVING.lock();
+
 		try{
 			undoCaretaker.pushMemento(createMemento());
 
@@ -227,82 +272,113 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 			log.warn("Error while modifying the meanings", e);
 		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
-		int count = selectedRowIDs.length;
-		if(count > 0){
-			try{
-				undoCaretaker.pushMemento(createMemento());
+		LOCK_SAVING.lock();
 
-				if(undoable != null)
-					undoable.onUndoChange(true);
-			}
-			catch(IOException ex){
-				log.warn("Error while storing a memento", ex);
-			}
+		try{
+			int count = selectedRowIDs.length;
+			if(count > 0){
+				try{
+					undoCaretaker.pushMemento(createMemento());
 
-			for(int i = 0; i < count; i ++)
-				dictionary.remove(selectedRowIDs[i] - i);
+					if(undoable != null)
+						undoable.onUndoChange(true);
+				}
+				catch(IOException ex){
+					log.warn("Error while storing a memento", ex);
+				}
+
+				for(int i = 0; i < count; i ++)
+					dictionary.remove(selectedRowIDs[i] - i);
+			}
+		}
+		finally{
+			LOCK_SAVING.unlock();
 		}
 	}
 
 	public List<String> extractDuplicates(){
-		return dictionary.extractDuplicates();
+		LOCK_SAVING.lock();
+
+		try{
+			return dictionary.extractDuplicates();
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
-		//sort the synonyms
-		dictionary.sort();
+		LOCK_SAVING.lock();
 
-		//save index and data files
-		Charset charset = StandardCharsets.UTF_8;
-		try(
-				BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
-				){
-			//save charset
-			indexWriter.write(charset.name());
-			indexWriter.write(StringUtils.LF);
-			//save counter
-			indexWriter.write(Integer.toString(dictionary.size()));
-			indexWriter.write(StringUtils.LF);
-			//save charset
-			dataWriter.write(charset.name());
-			dataWriter.write(StringUtils.LF);
-			//save data
-			int idx = charset.name().length() + 1;
-			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(ThesaurusEntry synonym : synonyms){
-				String syn = synonym.getSynonym();
-				indexWriter.write(syn);
-				indexWriter.write(ThesaurusEntry.PIPE);
-				indexWriter.write(Integer.toString(idx));
+		try{
+			//sort the synonyms
+			dictionary.sort();
+
+			//save index and data files
+			Charset charset = StandardCharsets.UTF_8;
+			try(
+					BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
+					BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
+					){
+				//save charset
+				indexWriter.write(charset.name());
 				indexWriter.write(StringUtils.LF);
-
-				int meaningsCount = synonym.getMeanings().size();
-				dataWriter.write(syn);
-				dataWriter.write(ThesaurusEntry.PIPE);
-				dataWriter.write(Integer.toString(meaningsCount));
+				//save counter
+				indexWriter.write(Integer.toString(dictionary.size()));
+				indexWriter.write(StringUtils.LF);
+				//save charset
+				dataWriter.write(charset.name());
 				dataWriter.write(StringUtils.LF);
-				List<MeaningEntry> meanings = synonym.getMeanings();
-				int meaningsLength = 1;
-				for(MeaningEntry meaning : meanings){
-					dataWriter.write(meaning.toString());
-					dataWriter.write(StringUtils.LF);
+				//save data
+				int idx = charset.name().length() + 1;
+				List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+				for(ThesaurusEntry synonym : synonyms){
+					String syn = synonym.getSynonym();
+					indexWriter.write(syn);
+					indexWriter.write(ThesaurusEntry.PIPE);
+					indexWriter.write(Integer.toString(idx));
+					indexWriter.write(StringUtils.LF);
 
-					meaningsLength += meaning.toString().getBytes(charset).length + 1;
+					int meaningsCount = synonym.getMeanings().size();
+					dataWriter.write(syn);
+					dataWriter.write(ThesaurusEntry.PIPE);
+					dataWriter.write(Integer.toString(meaningsCount));
+					dataWriter.write(StringUtils.LF);
+					List<MeaningEntry> meanings = synonym.getMeanings();
+					int meaningsLength = 1;
+					for(MeaningEntry meaning : meanings){
+						dataWriter.write(meaning.toString());
+						dataWriter.write(StringUtils.LF);
+
+						meaningsLength += meaning.toString().getBytes(charset).length + 1;
+					}
+
+					idx += syn.getBytes(charset).length + meaningsLength + 2;
 				}
 
-				idx += syn.getBytes(charset).length + meaningsLength + 2;
+				dictionary.resetModified();
 			}
-
-			dictionary.resetModified();
+		}
+		finally{
+			LOCK_SAVING.unlock();
 		}
 	}
 
 	public void clear(){
-		dictionary.clear();
+		LOCK_SAVING.lock();
+
+		try{
+			dictionary.clear();
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public boolean canUndo(){
