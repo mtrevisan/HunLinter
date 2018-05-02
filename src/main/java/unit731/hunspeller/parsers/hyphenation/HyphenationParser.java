@@ -61,6 +61,7 @@ public class HyphenationParser{
 	private static final String EN_DASH = "\u2013";
 	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
+	private static final String ONE = "1";
 	private static final String WORD_BOUNDARY = ".";
 	private static final String AUGMENTED_RULE = "/";
 
@@ -153,7 +154,7 @@ public class HyphenationParser{
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-					//start compound level
+					//start with compound level
 					Level level = Level.COMPOUND;
 					REDUCED_PATTERNS.get(level).clear();
 
@@ -172,7 +173,7 @@ public class HyphenationParser{
 									if(level == Level.NON_COMPOUND)
 										throw new IllegalArgumentException("Cannot have more than two levels");
 
-									//start non-compound level
+									//start with non-compound level
 									level = Level.NON_COMPOUND;
 									REDUCED_PATTERNS.get(level).clear();
 								}
@@ -201,29 +202,20 @@ public class HyphenationParser{
 					}
 
 					if(level == Level.COMPOUND && charset == StandardCharsets.UTF_8){
-						//en-dash and right single quotation mark added by default
+						//en-dash and right single quotation mark added by default (retro-compatibility)
 						hypParser.options.getNoHyphen().addAll(Arrays.asList(EN_DASH, RIGHT_SINGLE_QUOTATION_MARK));
-//						hypParser.options[0].getNoHyphen().addAll(Arrays.asList(EN_DASH, RIGHT_SINGLE_QUOTATION_MARK));
-					}
-					if(level == Level.NON_COMPOUND){
-						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
-//						hypParser.options[1].setLeftMin(hypParser.options[0].getLeftMin());
-//						hypParser.options[1].setRightMin(hypParser.options[0].getRightMin());
-//						hypParser.options[1].setLeftCompoundMin(hypParser.options[0].getLeftCompoundMin() > 0? hypParser.options[0].getLeftCompoundMin(): (hypParser.options[0].getLeftMin() > 0? hypParser.options[0].getLeftMin(): 3));
-//						hypParser.options[1].setRightCompoundMin(hypParser.options[0].getRightCompoundMin() > 0? hypParser.options[0].getRightCompoundMin(): (hypParser.options[0].getRightMin() > 0? hypParser.options[0].getRightMin(): 3));
+
+						line = ONE + EN_DASH + ONE;
+						if(!isRuleDuplicated(EN_DASH, line, level))
+							hypParser.patterns.get(level).put(EN_DASH, line);
+
+						line = ONE + RIGHT_SINGLE_QUOTATION_MARK + ONE;
+						if(!isRuleDuplicated(RIGHT_SINGLE_QUOTATION_MARK, line, level))
+							hypParser.patterns.get(level).put(RIGHT_SINGLE_QUOTATION_MARK, line);
 					}
 
 					setProgress(100);
 				}
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
@@ -284,10 +276,10 @@ public class HyphenationParser{
 		LOCK_SAVING.lock();
 
 		try{
-			for(Level level : Level.values()){
-				patterns.get(level).clear();
-				customHyphenations.get(level).clear();
-			}
+			patterns.values()
+				.forEach(RadixTree::clear);
+			customHyphenations.values()
+				.forEach(Map::clear);
 			if(options != null)
 				options.clear();
 		}
@@ -526,7 +518,10 @@ public class HyphenationParser{
 		List<String> rules;
 		boolean[] errors;
 
-		String customHyphenation = customHyphenations.get(Level.COMPOUND).get(word);
+		//FIXME manage second level
+		Level level = Level.COMPOUND;
+
+		String customHyphenation = customHyphenations.get(level).get(word);
 		if(customHyphenation != null){
 			//hyphenation is custom
 			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
@@ -540,7 +535,7 @@ public class HyphenationParser{
 			rules = hyphenatedWord;
 		}
 		else{
-			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns);
+			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level);
 			rules = hyphBreak.getRules();
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
@@ -581,7 +576,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String>> patterns){
+	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -594,8 +589,7 @@ public class HyphenationParser{
 		String[] augmentedPatternData = new String[wordSize];
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			//FIXME manage second level
-			List<String> prefixes = patterns.get(Level.COMPOUND).getValuesWithPrefix(w.substring(i));
+			List<String> prefixes = patterns.get(level).getValuesWithPrefix(w.substring(i));
 			for(String rule : prefixes){
 				int j = -1;
 				//remove non-standard part
