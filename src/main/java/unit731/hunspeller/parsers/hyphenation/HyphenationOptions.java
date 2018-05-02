@@ -2,9 +2,9 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,8 +40,13 @@ public class HyphenationOptions{
 	@Builder.Default private int rightMin = 2;
 	private int leftCompoundMin;
 	private int rightCompoundMin;
-	@Builder.Default private List<String> noHyphen = new ArrayList<>();
+	@Builder.Default private Set<String> noHyphen = new HashSet<>();
 
+
+	public static HyphenationOptions createEmpty(){
+		return HyphenationOptions.builder()
+			.build();
+	}
 
 	public void clear(){
 		leftMin = 2;
@@ -78,7 +83,7 @@ public class HyphenationOptions{
 			managed = true;
 		}
 		else if(line.startsWith(NO_HYPHEN)){
-			noHyphen = Arrays.asList(PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR));
+			noHyphen.addAll(Arrays.asList(PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR)));
 			managed = true;
 		}
 		return managed;

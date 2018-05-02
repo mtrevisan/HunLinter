@@ -57,6 +57,8 @@ public class HyphenationParser{
 	public static final String HYPHEN_MINUS = "\u002D";
 	private static final String HYPHEN_EQUALS = "=";
 	private static final String SOFT_HYPHEN = "\u00AD";
+	private static final String EN_DASH = "\\u2013";
+	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\\u2019";
 
 	private static final String WORD_BOUNDARY = ".";
 	private static final String AUGMENTED_RULE = "/";
@@ -149,7 +151,7 @@ public class HyphenationParser{
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
 					Level level = Level.COMPOUND;
-					hypParser.options = HyphenationOptions.builder().build();
+					hypParser.options = HyphenationOptions.createEmpty();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 
@@ -191,20 +193,13 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-//					if(level == Level.COMPOUND && "UTF-8"){
-//						//add default NOHYPHEN
-//						if(hypParser.options[0].getNoHyphen() == null){
-//							if(!hypParser.options[0].getNoHyphen().contains("\\u2013"))
-//								hypParser.options[0].getNoHyphen().add("\\u2013");
-//							if(!hypParser.options[0].getNoHyphen().contains("\\u2019"))
-//								hypParser.options[0].getNoHyphen().add("\\u2019");
-//						}
-//					}
+					if(level == Level.COMPOUND && charset == StandardCharsets.UTF_8){
+						//en-dash and right single quotation mark added by default
+						hypParser.options.getNoHyphen().addAll(Arrays.asList(EN_DASH, RIGHT_SINGLE_QUOTATION_MARK));
+//						hypParser.options[0].getNoHyphen().addAll(Arrays.asList(EN_DASH, RIGHT_SINGLE_QUOTATION_MARK));
+					}
 					if(level == Level.NON_COMPOUND){
 						//default first level (after the NEXTLEVEL tag): hyphen and ASCII apostrophe
-//						if(hypParser.options[1].getNoHyphen() == null)
-//							//en dash and right single quotation mark
-//							hypParser.options[1].setNoHyphen(new String[]{"\\u2013", "\\u2019"});
 //						hypParser.options[1].setLeftMin(hypParser.options[0].getLeftMin());
 //						hypParser.options[1].setRightMin(hypParser.options[0].getRightMin());
 //						hypParser.options[1].setLeftCompoundMin(hypParser.options[0].getLeftCompoundMin() > 0? hypParser.options[0].getLeftCompoundMin(): (hypParser.options[0].getLeftMin() > 0? hypParser.options[0].getLeftMin(): 3));
@@ -213,10 +208,16 @@ public class HyphenationParser{
 
 					setProgress(100);
 				}
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns) + com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.nonStandardHyphenation));
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
 
