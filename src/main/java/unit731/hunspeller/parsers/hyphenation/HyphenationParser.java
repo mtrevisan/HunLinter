@@ -617,15 +617,15 @@ public class HyphenationParser{
 		return new HyphenationBreak(indexes, Arrays.asList(rules), augmentedPatternData);
 	}
 
-	//FIXME add some comments or refactor!!
 	private List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
 		List<String> result = new ArrayList<>();
+
 		int startIndex = 0;
 		int endIndex = 0;
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
-		for(int i = 0; i < size; i ++){
+		for(int i = 0; i < size; i ++, endIndex ++)
 			if(hyphBreak.getIndexes()[i] % 2 != 0){
 				String subword = word.substring(startIndex, endIndex);
 
@@ -666,8 +666,7 @@ public class HyphenationParser{
 				result.add(subword);
 				startIndex = endIndex;
 			}
-			endIndex ++;
-		}
+
 		String subword = word.substring(startIndex);
 		if(StringUtils.isNotBlank(addAfter))
 			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
