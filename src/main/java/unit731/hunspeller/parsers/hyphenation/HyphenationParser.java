@@ -536,9 +536,10 @@ public class HyphenationParser{
 		}
 		else{
 			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level);
-			rules = hyphBreak.getRules();
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
+
+			rules = Arrays.asList(hyphBreak.getRules());
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
@@ -587,6 +588,7 @@ public class HyphenationParser{
 		String[] rules = new String[wordSize];
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
+		//FIXME using the Aho-Corasick tree will reduce the number of for-each to two
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValuesWithPrefix(w.substring(i));
@@ -614,7 +616,7 @@ public class HyphenationParser{
 				}
 			}
 		}
-		return new HyphenationBreak(indexes, Arrays.asList(rules), augmentedPatternData);
+		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
 	private List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
