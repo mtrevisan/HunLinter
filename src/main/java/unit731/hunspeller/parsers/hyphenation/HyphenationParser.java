@@ -304,12 +304,12 @@ public class HyphenationParser{
 	 * @param rule	Rule to be validated
 	 */
 	public static void validateRule(String rule){
-		if(!PatternService.find(rule, MATCHER_VALID_RULE_BREAK_POINTS))
-			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 		if(!PatternService.find(rule, MATCHER_VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
+		if(!PatternService.find(rule, MATCHER_VALID_RULE_BREAK_POINTS))
+			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 		if(PatternService.find(rule, MATCHER_INVALID_RULE_START) || PatternService.find(rule, MATCHER_INVALID_RULE_END))
-			throw new IllegalArgumentException("Rule " + rule + " has an invalid hyphenation point");
+			throw new IllegalArgumentException("Rule " + rule + " is invalid, the hyphenation point should not be adjacent to a dot");
 
 		String cleanedRule = rule;
 		int augmentedIndex = rule.indexOf('/');
