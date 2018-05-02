@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
@@ -115,7 +116,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		bitArray = BitArrayBuilder.getBitArray(type, bitsRequired);
 
 		this.decomposer = decomposer;
-		this.hasher = (hasher != null? hasher: DEFAULT_HASHER);
+		this.hasher = ObjectUtils.defaultIfNull(hasher, DEFAULT_HASHER);
 
 		addedElements = 0;
 	}
