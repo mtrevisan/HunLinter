@@ -1,4 +1,4 @@
-package unit731.hunspeller.collections.radixtree;
+package unit731.hunspeller.collections.radixtree.tree;
 
 
 public class DuplicateKeyException extends RuntimeException{

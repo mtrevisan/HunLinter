@@ -15,27 +15,27 @@ import org.apache.commons.lang3.tuple.Pair;
 public class HammingDistance{
 
 	/**
-     * Find the Hamming Distance between two strings with the same length.
-     *
-     * <p>The distance starts with zero, and for each occurrence of a different character in either String, it increments the distance
-     * by 1, and finally return its value.</p>
-     *
-     * <p>Since the Hamming Distance can only be calculated between strings of equal length, input of different lengths
-     * will throw IllegalArgumentException</p>
-     *
-     * <pre>
-     * distance.apply("", "")               = 0
-     * distance.apply("pappa", "pappa")     = 0
-     * distance.apply("1011101", "1011111") = 1
-     * distance.apply("ATCG", "ACCC")       = 2
-     * distance.apply("karolin", "kerstin"  = 3
-     * </pre>
-     *
-     * @param left	the first CharSequence, must not be <code>null</code>
-     * @param right	the second CharSequence, must not be <code>null</code>
-     * @return	the hamming distance between the given strings
-     * @throws IllegalArgumentException	if either input is <code>null</code> or if they do not have the same length
-     */
+	 * Find the Hamming Distance between two strings with the same length.
+	 *
+	 * <p>The distance starts with zero, and for each occurrence of a different character in either String, it increments the distance
+	 * by 1, and finally return its value.</p>
+	 *
+	 * <p>Since the Hamming Distance can only be calculated between strings of equal length, input of different lengths
+	 * will throw IllegalArgumentException</p>
+	 *
+	 * <pre>
+	 * distance.apply("", "")               = 0
+	 * distance.apply("pappa", "pappa")     = 0
+	 * distance.apply("1011101", "1011111") = 1
+	 * distance.apply("ATCG", "ACCC")       = 2
+	 * distance.apply("karolin", "kerstin"  = 3
+	 * </pre>
+	 *
+	 * @param left	the first CharSequence, must not be <code>null</code>
+	 * @param right	the second CharSequence, must not be <code>null</code>
+	 * @return	the hamming distance between the given strings
+	 * @throws IllegalArgumentException	if either input is <code>null</code> or if they do not have the same length
+	 */
 	public static int getDistance(CharSequence left, CharSequence right){
 		Objects.requireNonNull(left);
 		Objects.requireNonNull(right);

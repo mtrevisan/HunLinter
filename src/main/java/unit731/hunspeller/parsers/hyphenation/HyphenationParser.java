@@ -28,9 +28,10 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.radixtree.RadixTree;
-import unit731.hunspeller.collections.radixtree.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.RadixTreeVisitor;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
+import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -197,6 +198,7 @@ public class HyphenationParser{
 								}
 							}
 						}
+//						hypParser.patterns.prepare();
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
