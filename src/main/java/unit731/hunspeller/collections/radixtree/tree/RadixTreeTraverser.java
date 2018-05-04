@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @param <S>	The sequence/key type
  * @param <V> the type stored in the radix tree we will visit
  */
-public abstract class RadixTreeTraverser<S, V extends Serializable>{
+public interface RadixTreeTraverser<S, V extends Serializable>{
 
 	/**
 	 * Traverse all the radix tree.
@@ -18,6 +18,6 @@ public abstract class RadixTreeTraverser<S, V extends Serializable>{
 	 * @param node	The node that is being traversed
 	 * @param parent	The parent of the node being traversed
 	 */
-	public abstract void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
+	void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
 
 }

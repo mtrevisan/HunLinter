@@ -183,12 +183,7 @@ System.out.println(generateGraphvizRepresentation(false));
 	}
 
 	public void clearFailTransitions(){
-		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				node.setFailNode(null);
-			}
-		};
+		RadixTreeTraverser<S, V> traverser = (wholeKey, node, parent) -> node.setFailNode(null);
 		traverseBFS(traverser);
 
 		prepared = false;
@@ -198,6 +193,7 @@ System.out.println(generateGraphvizRepresentation(false));
 	public boolean containsKey(Object keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
+		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (foundNode != null);
 	}
@@ -224,6 +220,7 @@ System.out.println(generateGraphvizRepresentation(false));
 	public V get(Object keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
+		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
@@ -589,6 +586,7 @@ System.out.println(generateGraphvizRepresentation(false));
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public V remove(Object key){
 		Objects.requireNonNull(key);
 
@@ -738,30 +736,15 @@ System.out.println(generateGraphvizRepresentation(false));
 			.append("graph [rankdir=LR];")
 			.append(GRAPHVIZ_NEW_LINE);
 
-		RadixTreeTraverser<S, V> traverserForward = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				graphvizAppendForwardTransition(sb, node, parent);
-			}
-		};
+		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphvizAppendForwardTransition(sb, node, parent);
 		traverseBFS(traverserForward);
 
 		if(prepared){
-			RadixTreeTraverser<S, V> traverserFailure = new RadixTreeTraverser<S, V>(){
-				@Override
-				public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-					graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
-				}
-			};
+			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
 			traverseBFS(traverserFailure);
 		}
 
-		RadixTreeTraverser<S, V> traverserNode = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				graphvizAppendNode(sb, node);
-			}
-		};
+		RadixTreeTraverser<S, V> traverserNode = (wholeKey, node, parent) -> graphvizAppendNode(sb, node);
 		graphvizAppendNode(sb, root);
 		traverseBFS(traverserNode);
 

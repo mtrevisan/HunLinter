@@ -23,6 +23,9 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 @EqualsAndHashCode(of = {"key", "value"})
 public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixTreeNode<S, V>>, Serializable{
 
+	private static final long serialVersionUID = -627223674493970063L;
+
+
 	/** The key at this node */
 	@Setter
 	private S key;

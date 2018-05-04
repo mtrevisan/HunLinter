@@ -3,6 +3,9 @@ package unit731.hunspeller.collections.radixtree.tree;
 
 public class DuplicateKeyException extends RuntimeException{
 
+	private static final long serialVersionUID = 7292569015644514555L;
+
+
 	public DuplicateKeyException(){
 		super();
 	}
