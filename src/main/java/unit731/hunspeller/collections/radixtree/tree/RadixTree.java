@@ -728,9 +728,15 @@ System.out.println(generateGraphvizRepresentation(false));
 	}
 
 
+	/**
+	 * @see <a href="http://www.webgraphviz.com/">GraphVIZ</a>
+	 * 
+	 * @param displayEdgesToInitialState	Whether to include the failure edges directing to the root node
+	 * @return	The GraphVIZ representation of this tree
+	 */
 	public String generateGraphvizRepresentation(boolean displayEdgesToInitialState){
 		StringBuilder sb = new StringBuilder();
-		sb.append("digraph automaton {")
+		sb.append("digraph automaton{")
 			.append(GRAPHVIZ_NEW_LINE)
 			.append(GRAPHVIZ_TAB)
 			.append("graph [rankdir=LR];")
