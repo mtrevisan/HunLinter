@@ -215,37 +215,37 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
-	/**
-	 * Perform a search and return all the entries that are contained into the given text.
-	 * 
-	 * @param text	The text to search into
-	 * @return	The iterator of all the entries found inside the given text
-	 */
-//	pstringic Iterator<RadixTreeNode<S, V>> search(S text){
-//	sbtringjects.requireNonNull(text);
-//string
-//	satringdixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
-//	st@ringOverride
-//	stpringublic boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-//	st	ringif(sequencer.equals(wholeKey, keyToCheck))
-//	st	ring	result = node;
-//string
-//	st	ringreturn (result != null);
-//	st}ring
-//	s;tring
-//	sitringsitPrefixedBy(visitor, keyToCheck);
-//string
-//	setringturn visitor.getResult();
-//	}string
-//string
-//	pstringate RadixTreeNode<S, V> getNextNode(RadixTreeNode<S, V> currentNode, Character character){
-//	satringdixTreeNode<S, V> newCurrentState = currentNode.nextNode(character);
-//	shtringile(newCurrentState == null){
-//	stcringurrentNode = currentNode.getFailNode();
-//	stnringewCurrentState = currentNode.nextNode(character);
-//	string
-//	setringturn newCurrentState;
-//	}string
+//	/**
+//	 * Perform a search and return all the entries that are contained into the given text.
+//	 * 
+//	 * @param text	The text to search into
+//	 * @return	The iterator of all the entries found inside the given text
+//	 */
+//	public Iterator<RadixTreeNode<S, V>> search(S text){
+//		Objects.requireNonNull(text);
+//
+//		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
+//			@Override
+//			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+//				if(sequencer.equals(wholeKey, keyToCheck))
+//					result = node;
+//
+//				return (result != null);
+//			}
+//		};
+//		visitPrefixedBy(visitor, keyToCheck);
+//
+//		return visitor.getResult();
+//	}
+//
+//	private RadixTreeNode<S, V> getNextNode(RadixTreeNode<S, V> currentNode, Character character){
+//		RadixTreeNode<S, V> newCurrentState = currentNode.nextNode(character);
+//		while(newCurrentState == null){
+//			currentNode = currentNode.getFailNode();
+//			newCurrentState = currentNode.nextNode(character);
+//		}
+//		return newCurrentState;
+//	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
@@ -713,22 +713,24 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				graphvizAppendForwardTransition(sb, node, parent);
 			}
 		};
-		RadixTreeTraverser<S, V> traverserFailure = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
-			}
-		};
+		traverseBFS(traverserForward);
+
+		if(prepared){
+			RadixTreeTraverser<S, V> traverserFailure = new RadixTreeTraverser<S, V>(){
+				@Override
+				public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+					graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
+				}
+			};
+			traverseBFS(traverserFailure);
+		}
+
 		RadixTreeTraverser<S, V> traverserNode = new RadixTreeTraverser<S, V>(){
 			@Override
 			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				graphvizAppendNode(sb, node);
 			}
 		};
-		traverseBFS(traverserForward);
-		if(prepared)
-			traverseBFS(traverserFailure);
-		graphvizAppendNode(sb, root);
 		traverseBFS(traverserNode);
 
 		sb.append("}");
