@@ -519,7 +519,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param visitor	The visitor
 	 */
 	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor){
-		visitPrefixedBy(visitor, sequencer.getEmptySequence());
+		BiFunction<S, S, Boolean> condition = (prefix, prefixAllowed) -> (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix));
+		visit(visitor, sequencer.getEmptySequence(), condition);
 	}
 
 	/**
@@ -530,6 +531,19 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
 	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
+		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> (sequencer.startsWith(prefix, preAllowed) || sequencer.startsWith(preAllowed, prefix));
+		visit(visitor, prefixAllowed, condition);
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor and starting at the given prefix.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 * @param prefixAllowed	The prefix used to restrict visitation
+	 * @param condition	Condition that has to be verified in order to match
+	 */
+	private void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed, BiFunction<S, S, Boolean> condition){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefixAllowed);
 
@@ -540,7 +554,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			RadixTreeNode<S, V> node = elem.node;
 			S prefix = elem.prefix;
 
-			if(node.hasValue() && (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix))){
+			if(node.hasValue() && condition.apply(prefix, prefixAllowed)){
 				boolean stop = visitor.visit(prefix, node, elem.parent);
 				if(stop)
 					break;
