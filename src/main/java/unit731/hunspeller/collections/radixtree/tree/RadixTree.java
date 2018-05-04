@@ -139,11 +139,16 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 						//TODO
 						//out(u) += out(f(u))
+
+						break;
 					}
 				}
 
 				if(node.getFailNode() == null)
 					node.setFailNode(root);
+
+prepared = true;
+System.out.println(generateGraphvizRepresentation(false));
 			}
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
@@ -751,6 +756,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	private void graphvizAppendFailureTransitions(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, boolean displayEdgesToInitialState){
+if(node.getFailNode() != null)
 		if(displayEdgesToInitialState || node.getFailNode() != root || node == root)
 			sb.append(GRAPHVIZ_TAB)
 				.append(node.hashCode())
