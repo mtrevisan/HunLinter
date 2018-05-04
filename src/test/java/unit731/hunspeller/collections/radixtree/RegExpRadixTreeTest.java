@@ -815,7 +815,7 @@ public class RegExpRadixTreeTest{
 		Integer[] datas = tree.getValues("abcd")
 			.toArray(new Integer[0]);
 		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
-		datas = tree.getValuesPrefixedBy("ec")
+		datas = tree.getValues("ec")
 			.toArray(new Integer[0]);
 		Assert.assertArrayEquals(new Integer[]{3}, datas);
 	}
