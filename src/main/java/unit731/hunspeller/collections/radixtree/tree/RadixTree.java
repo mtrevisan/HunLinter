@@ -243,15 +243,6 @@ System.out.println(generateGraphvizRepresentation(false));
 //
 //		return visitor.getResult();
 //	}
-//
-//	private RadixTreeNode<S, V> getNextNode(RadixTreeNode<S, V> currentNode, Character character){
-//		RadixTreeNode<S, V> newCurrentState = currentNode.nextNode(character);
-//		while(newCurrentState == null){
-//			currentNode = currentNode.getFailNode();
-//			newCurrentState = currentNode.nextNode(character);
-//		}
-//		return newCurrentState;
-//	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
@@ -773,18 +764,18 @@ if(node.getFailNode() != null)
 			.append(GRAPHVIZ_NEW_LINE);
 	}
 
-	public static void main(String[] args){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new unit731.hunspeller.collections.radixtree.sequencers.StringSequencer());
+public static void main(String[] args){
+	RadixTree<String, Integer> tree = RadixTree.createTree(new unit731.hunspeller.collections.radixtree.sequencers.StringSequencer());
 
-		tree.put("he", 1);
-		tree.put("she", 2);
-		tree.put("his", 3);
-		tree.put("hers", 4);
-		tree.prepare();
+	tree.put("he", 1);
+	tree.put("she", 2);
+	tree.put("his", 3);
+	tree.put("hers", 4);
+	tree.prepare();
 
-		String representation = tree.generateGraphvizRepresentation(false);
-		//http://www.webgraphviz.com/
-		System.out.println(representation);
-	}
+	String representation = tree.generateGraphvizRepresentation(false);
+	//http://www.webgraphviz.com/
+	System.out.println(representation);
+}
 
 }
