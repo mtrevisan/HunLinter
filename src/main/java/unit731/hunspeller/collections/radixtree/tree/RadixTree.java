@@ -726,7 +726,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			}
 		};
 		traverseBFS(traverserForward);
-		traverseBFS(traverserFailure);
+		if(prepared)
+			traverseBFS(traverserFailure);
 		graphvizAppendNode(sb, root);
 		traverseBFS(traverserNode);
 
