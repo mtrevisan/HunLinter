@@ -183,7 +183,7 @@ public class HyphenationParser{
 									if(hypParser.customHyphenations.get(level).containsKey(key))
 										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-									hypParser.customHyphenations.get(level).put(key, line);
+									hypParser.customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, HYPHEN_MINUS));
 								}
 								else{
 									validateRule(line, level);

@@ -11,11 +11,6 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
-	public String charAt(String sequence, int index){
-		return String.valueOf(sequence.charAt(index));
-	}
-
-	@Override
 	public int length(String sequence){
 		return sequence.length();
 	}

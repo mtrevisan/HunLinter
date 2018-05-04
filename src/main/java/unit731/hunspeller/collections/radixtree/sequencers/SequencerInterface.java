@@ -7,8 +7,6 @@ public interface SequencerInterface<S>{
 
 	int length(S sequence);
 
-	S charAt(S sequence, int index);
-
 	/**
 	 * Tests if this sequence starts with the specified prefix.
 	 *
@@ -26,21 +24,28 @@ public interface SequencerInterface<S>{
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.
+	 * The subsequence begins at the specified {@code beginIndex} and extends to the end of the sequence.
+	 *
+	 * @param sequence	The sequence.
+	 * @param beginIndex	The beginning index, inclusive.
+	 * @return	The specified substring.
+	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
+	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
+	 */
+	default S subSequence(S sequence, int beginIndex){
+		return subSequence(sequence, beginIndex, length(sequence));
+	}
+
+	/**
+	 * Returns a sequence that is a subsequence of this sequence.
 	 * The subsequence begins at the specified {@code beginIndex} and extends to the character at index {@code endIndex - 1}.
-	 * Thus the length of the sequence is {@code endIndex - beginIndex}.
-	 * <p>
-	 * Examples:
-	 * <blockquote><pre>
-	 * "hamburger".substring(4, 8) returns "urge"
-	 * "smiles".substring(1, 5) returns "mile"
-	 * </pre></blockquote>
 	 *
 	 * @param sequence	The sequence.
 	 * @param beginIndex	The beginning index, inclusive.
 	 * @param endIndex	The ending index, exclusive.
 	 * @return	The specified substring.
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or {@code endIndex} is larger than the length of
-	 *														this {@code RadixTreeKey} object, or {@code beginIndex} is larger than {@code endIndex}.
+	 *														this sequence, or {@code beginIndex} is larger than {@code endIndex}.
 	 */
 	S subSequence(S sequence, int beginIndex, int endIndex);
 
