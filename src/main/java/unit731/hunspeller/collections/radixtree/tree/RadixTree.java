@@ -232,7 +232,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The list of values
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<Map.Entry<S, V>> getEntriesWithPrefix(S prefix){
+	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
 
 		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
@@ -257,8 +257,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The list of values
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
-	public List<V> getValuesWithPrefix(S prefix){
-		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(prefix);
+	public List<V> getValuesPrefixedBy(S prefix){
+		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
 		return entries.stream()
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toList());
@@ -271,8 +271,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The list of prefixes
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<S> getKeysWithPrefix(S prefix){
-		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(prefix);
+	public List<S> getKeysPrefixedBy(S prefix){
+		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
 		return entries.stream()
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toList());
@@ -300,13 +300,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	@Override
 	public Set<Map.Entry<S, V>> entrySet(){
-		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getEmptySequence());
+		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		return new HashSet<>(entries);
 	}
 
 	@Override
 	public Set<S> keySet(){
-		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getEmptySequence());
+		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		return entries.stream()
 			.map(Map.Entry::getKey)
 			.collect(Collectors.toSet());
@@ -314,7 +314,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	@Override
 	public Collection<V> values(){
-		List<Map.Entry<S, V>> entries = getEntriesWithPrefix(sequencer.getEmptySequence());
+		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		return entries.stream()
 			.map(Map.Entry::getValue)
 			.collect(Collectors.toSet());

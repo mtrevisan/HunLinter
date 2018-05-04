@@ -41,16 +41,16 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		return find(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
-	public List<Map.Entry<String[], V>> getEntriesWithPrefix(String prefix){
-		return getEntriesWithPrefix(RegExpSequencer.splitSequence(prefix));
+	public List<Map.Entry<String[], V>> getEntriesPrefixedBy(String prefix){
+		return getEntriesPrefixedBy(RegExpSequencer.splitSequence(prefix));
 	}
 
-	public List<V> getValuesWithPrefix(String prefix){
-		return getValuesWithPrefix(RegExpSequencer.splitSequence(prefix));
+	public List<V> getValuesPrefixedBy(String prefix){
+		return getValuesPrefixedBy(RegExpSequencer.splitSequence(prefix));
 	}
 
-	public List<String[]> getKeysWithPrefix(String prefix){
-		return getKeysWithPrefix(RegExpSequencer.splitSequence(prefix));
+	public List<String[]> getKeysPrefixedBy(String prefix){
+		return getKeysPrefixedBy(RegExpSequencer.splitSequence(prefix));
 	}
 
 	public void putAllWithFlatKey(Map<? extends String, ? extends V> map){
