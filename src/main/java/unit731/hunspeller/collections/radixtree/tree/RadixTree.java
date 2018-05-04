@@ -46,6 +46,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	private static final long serialVersionUID = -5213027224293608217L;
 
+	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = " [style=dashed, color=gray, constraint=false];";
+	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = " [shape=circle, label=\"\"];";
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT = " [shape=doublecircle, label=\"\"];";
+	private static final String GRAPHVIZ_STYLE_ARROW = " -> ";
+	private static final char GRAPHVIZ_TAB = '\t';
+	private static final char GRAPHVIZ_NEW_LINE = '\n';
+
 
 	@AllArgsConstructor
 	private class TraverseElement{
@@ -207,6 +214,38 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
+
+	/**
+	 * Perform a search and return all the entries that are contained into the given text.
+	 * 
+	 * @param text	The text to search into
+	 * @return	The iterator of all the entries found inside the given text
+	 */
+//	pstringic Iterator<RadixTreeNode<S, V>> search(S text){
+//	sbtringjects.requireNonNull(text);
+//string
+//	satringdixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
+//	st@ringOverride
+//	stpringublic boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+//	st	ringif(sequencer.equals(wholeKey, keyToCheck))
+//	st	ring	result = node;
+//string
+//	st	ringreturn (result != null);
+//	st}ring
+//	s;tring
+//	sitringsitPrefixedBy(visitor, keyToCheck);
+//string
+//	setringturn visitor.getResult();
+//	}string
+//string
+//	pstringate RadixTreeNode<S, V> getNextNode(RadixTreeNode<S, V> currentNode, Character character){
+//	satringdixTreeNode<S, V> newCurrentState = currentNode.nextNode(character);
+//	shtringile(newCurrentState == null){
+//	stcringurrentNode = currentNode.getFailNode();
+//	stnringewCurrentState = currentNode.nextNode(character);
+//	string
+//	setringturn newCurrentState;
+//	}string
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
@@ -438,7 +477,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 */
 	private V put(S key, V value, RadixTreeNode<S, V> node){
-		//FIXME manage Aho-Corasick!
 		V ret = null;
 
 		S nodeKey = node.getKey();
@@ -635,7 +673,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param condition	Condition that has to be verified in order to match
 	 */
 	private void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed, BiFunction<S, S, Boolean> condition){
-		//FIXME manage Aho-Corasick!
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefixAllowed);
 
@@ -659,6 +696,70 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					stack.push(new VisitElement(child, node, newPrefix));
 			}
 		}
+	}
+
+
+	public String generateGraphvizRepresentation(boolean displayEdgesToInitialState){
+		StringBuilder sb = new StringBuilder();
+		sb.append("digraph automaton {")
+			.append(GRAPHVIZ_NEW_LINE)
+			.append(GRAPHVIZ_TAB)
+			.append("graph [rankdir=LR];")
+			.append(GRAPHVIZ_NEW_LINE);
+
+		RadixTreeTraverser<S, V> traverserForward = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				graphvizAppendForwardTransition(sb, node, parent);
+			}
+		};
+		RadixTreeTraverser<S, V> traverserFailure = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
+			}
+		};
+		RadixTreeTraverser<S, V> traverserNode = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				graphvizAppendNode(sb, node);
+			}
+		};
+		traverseBFS(traverserForward);
+		traverseBFS(traverserFailure);
+		graphvizAppendNode(sb, root);
+		traverseBFS(traverserNode);
+
+		sb.append("}");
+		return sb.toString();
+	}
+
+	private void graphvizAppendForwardTransition(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+		sb.append(GRAPHVIZ_TAB)
+			.append(parent.hashCode())
+			.append(GRAPHVIZ_STYLE_ARROW)
+			.append(node.hashCode())
+			.append(" [label=")
+			.append(node.getKey())
+			.append(", weight=100, style=bold];")
+			.append(GRAPHVIZ_NEW_LINE);
+	}
+
+	private void graphvizAppendFailureTransitions(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, boolean displayEdgesToInitialState){
+		if(displayEdgesToInitialState || node.getFailNode() != root || node == root)
+			sb.append(GRAPHVIZ_TAB)
+				.append(node.hashCode())
+				.append(GRAPHVIZ_STYLE_ARROW)
+				.append(node.getFailNode().hashCode())
+				.append(GRAPHVIZ_STYLE_FAILURE_TRANSITION)
+				.append(GRAPHVIZ_NEW_LINE);
+	}
+
+	private void graphvizAppendNode(StringBuilder sb, RadixTreeNode<S, V> node){
+		sb.append(GRAPHVIZ_TAB)
+			.append(node.hashCode())
+			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT: GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
+			.append(GRAPHVIZ_NEW_LINE);
 	}
 
 }
