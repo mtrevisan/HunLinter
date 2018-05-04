@@ -47,13 +47,19 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	private static final long serialVersionUID = -5213027224293608217L;
 
-	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = " [style=dashed, color=gray, constraint=false];";
-	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = " [shape=circle, label=\"\"];";
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = " [shape=doublecircle, label=\"";
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = "\"];";
-	private static final String GRAPHVIZ_STYLE_ARROW = " -> ";
+	private static final String GRAPHVIZ_STYLE_BEGIN = " [";
+	private static final String GRAPHVIZ_STYLE_END = "];";
+	private static final String GRAPHVIZ_STYLE_STRING_BOUNDARY = "\"";
+	private static final String GRAPHVIZ_ATTRIBUTE_SEPARATOR = ", ";
 	private static final char GRAPHVIZ_TAB = '\t';
 	private static final char GRAPHVIZ_NEW_LINE = '\n';
+	private static final String GRAPHVIZ_STYLE_ARROW = " -> ";
+	private static final String GRAPHVIZ_STYLE_LABEL = "label=";
+	private static final String GRAPHVIZ_STYLE_SHAPE = "shape=";
+	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = GRAPHVIZ_STYLE_BEGIN + "style=dashed, color=gray, constraint=false" + GRAPHVIZ_STYLE_END;
+	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "circle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "doublecircle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY;
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
 
 
 	@AllArgsConstructor
@@ -768,9 +774,12 @@ System.out.println(generateGraphvizRepresentation(false));
 			.append(parent.hashCode())
 			.append(GRAPHVIZ_STYLE_ARROW)
 			.append(node.hashCode())
-			.append(" [label=")
+			.append(GRAPHVIZ_STYLE_BEGIN)
+			.append(GRAPHVIZ_STYLE_LABEL)
+			.append(GRAPHVIZ_STYLE_STRING_BOUNDARY)
 			.append(node.getKey())
-			.append(", weight=100, style=bold];")
+			.append(GRAPHVIZ_STYLE_STRING_BOUNDARY)
+			.append(GRAPHVIZ_STYLE_END)
 			.append(GRAPHVIZ_NEW_LINE);
 	}
 
