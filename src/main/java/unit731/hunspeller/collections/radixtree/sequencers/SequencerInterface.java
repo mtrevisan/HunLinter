@@ -33,7 +33,7 @@ public interface SequencerInterface<S>{
 	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
 	 */
 	default S subSequence(S sequence, int beginIndex){
-		return subSequence(sequence, beginIndex, length(sequence));
+		return (beginIndex > 0? subSequence(sequence, beginIndex, length(sequence)): sequence);
 	}
 
 	/**

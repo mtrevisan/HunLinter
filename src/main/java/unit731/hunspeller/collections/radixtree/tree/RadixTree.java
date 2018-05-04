@@ -36,7 +36,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
  * @see <a href="http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf">Biosequence Algorithms, Spring 2005 - Lecture 4: Set Matching and Aho-Corasick Algorithm</a>
- * @see <a href="http://docplayer.net/storage/63/50019668/1524237578/_U5NLg4tdVIt5CYrnzIXoA/50019668.pdf">Aho-Corasik Algorithm in Pattern Matching</a>
+ * @see <a href="http://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2014-2015/Makalah2015/Makalah_IF221_Strategi_Algoritma_2015_032.pdf">Aho-Corasick Algorithm in Pattern Matching</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
@@ -133,13 +133,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					S stateKey = state.getKey();
 					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
 					if(lcpLength > 0){
+System.out.println(generateGraphvizRepresentation(false));
 						int nodeKeyLength = sequencer.length(stateKey);
 						if(lcpLength < nodeKeyLength)
 							//split fail
 							state.split(lcpLength, sequencer);
 						if(lcpLength < keySize)
 							//split node
-							node.split(lcpLength, sequencer);
+							node = node.split(lcpLength, sequencer);
 
 						//link fail to node
 						node.setFailNode(state);
@@ -154,7 +155,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				if(node.getFailNode() == null)
 					node.setFailNode(root);
 
-prepared = true;
 System.out.println(generateGraphvizRepresentation(false));
 			}
 
@@ -745,10 +745,10 @@ System.out.println(generateGraphvizRepresentation(false));
 		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphvizAppendForwardTransition(sb, node, parent);
 		traverseBFS(traverserForward);
 
-		if(prepared){
+//		if(prepared){
 			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
 			traverseBFS(traverserFailure);
-		}
+//		}
 
 		RadixTreeTraverser<S, V> traverserNode = (wholeKey, node, parent) -> graphvizAppendNode(sb, node);
 		graphvizAppendNode(sb, root);
