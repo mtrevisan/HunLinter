@@ -353,6 +353,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return root.isEmpty();
 	}
 
+	
 	@Override
 	public int size(){
 		RadixTreeVisitor<S, V, Integer> visitor = new RadixTreeVisitor<S, V, Integer>(0){
