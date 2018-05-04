@@ -48,7 +48,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = " [style=dashed, color=gray, constraint=false];";
 	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = " [shape=circle, label=\"\"];";
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT = " [shape=doublecircle, label=\"\"];";
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = " [shape=doublecircle, label=\"";
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = "\"];";
 	private static final String GRAPHVIZ_STYLE_ARROW = " -> ";
 	private static final char GRAPHVIZ_TAB = '\t';
 	private static final char GRAPHVIZ_NEW_LINE = '\n';
@@ -731,6 +732,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				graphvizAppendNode(sb, node);
 			}
 		};
+		graphvizAppendNode(sb, root);
 		traverseBFS(traverserNode);
 
 		sb.append("}");
@@ -761,8 +763,22 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	private void graphvizAppendNode(StringBuilder sb, RadixTreeNode<S, V> node){
 		sb.append(GRAPHVIZ_TAB)
 			.append(node.hashCode())
-			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT: GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
+			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL + node.getValue() + GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL: GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
 			.append(GRAPHVIZ_NEW_LINE);
+	}
+
+	public static void main(String[] args){
+		RadixTree<String, Integer> tree = RadixTree.createTree(new unit731.hunspeller.collections.radixtree.sequencers.StringSequencer());
+
+		tree.put("he", 1);
+		tree.put("she", 2);
+		tree.put("his", 3);
+		tree.put("hers", 4);
+		tree.prepare();
+
+		String representation = tree.generateGraphvizRepresentation(false);
+		//http://www.webgraphviz.com/
+		System.out.println(representation);
 	}
 
 }
