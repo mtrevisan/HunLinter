@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -221,28 +222,55 @@ System.out.println(generateGraphvizRepresentation(false));
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
-//	/**
-//	 * Perform a search and return all the entries that are contained into the given text.
-//	 * 
-//	 * @param text	The text to search into
-//	 * @return	The iterator of all the entries found inside the given text
-//	 */
-//	public Iterator<RadixTreeNode<S, V>> search(S text){
-//		Objects.requireNonNull(text);
-//
-//		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
-//			@Override
-//			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-//				if(sequencer.equals(wholeKey, keyToCheck))
-//					result = node;
-//
-//				return (result != null);
-//			}
-//		};
-//		visitPrefixedBy(visitor, keyToCheck);
-//
-//		return visitor.getResult();
-//	}
+	/**
+	 * Perform a search and return all the entries that are contained into the given text.
+	 * 
+	 * @param text	The text to search into
+	 * @return	The iterator of all the entries found inside the given text
+	 */
+	public Iterator<RadixTreeNode<S, V>> search(S text){
+		Objects.requireNonNull(text);
+
+		if(!prepared)
+			throw new IllegalStateException("Cannot perform search until prepare() is called");
+
+		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
+
+			private RadixTreeNode<S, V> lastMatchedNode = root;
+			private int currentIndex = 0;
+
+
+			@Override
+			public boolean hasNext(){
+				for(int i = currentIndex; i < sequencer.length(text); i ++){
+					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
+					if(nextNode.hasValue())
+						return true;
+				}
+				return false;
+			}
+
+			@Override
+			public RadixTreeNode<S, V> next(){
+				for(int i = currentIndex; i < sequencer.length(text); i ++){
+					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
+					if(nextNode.hasValue()){
+						lastMatchedNode = nextNode;
+						currentIndex = i + 1;
+						return nextNode;
+					}
+				}
+
+				throw new NoSuchElementException();
+			}
+
+			@Override
+			public void remove(){
+				throw new UnsupportedOperationException();
+			}
+		};
+		return itr;
+	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
