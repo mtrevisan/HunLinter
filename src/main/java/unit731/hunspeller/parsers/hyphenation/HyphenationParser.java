@@ -412,7 +412,7 @@ public class HyphenationParser{
 			}
 		};
 		
-		patterns.get(level).visit(visitor);
+		patterns.get(level).visitPrefixedBy(visitor);
 
 		//sort values
 		content.values()

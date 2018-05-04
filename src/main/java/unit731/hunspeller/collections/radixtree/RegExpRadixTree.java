@@ -38,7 +38,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public RadixTreeNode<String[], V> find(String keyToCheck){
-		return find(RegExpSequencer.splitSequence(keyToCheck));
+		return findPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
 	public List<Map.Entry<String[], V>> getEntriesPrefixedBy(String prefix){

@@ -67,7 +67,7 @@ public class StringRadixTreeTest{
 //		tree.put("rest", 4);
 //		tree.prepare();
 //
-//		Assert.assertEquals(4, tree.size());
+//		Assert.assertEquals(5, tree.size());
 //		Assert.assertEquals(1, tree.get("test").intValue());
 //		Assert.assertEquals(2, tree.get("tent").intValue());
 //		Assert.assertEquals(3, tree.get("tank").intValue());
@@ -436,11 +436,11 @@ public class StringRadixTreeTest{
 		tree.put("bath", "bath");
 		tree.put("banana", "banana");
 
-		Assert.assertEquals(new RadixTreeNode("ple", "apple"), tree.find("apple"));
-		Assert.assertEquals(new RadixTreeNode("t", "bat"), tree.find("bat"));
-		Assert.assertEquals(new RadixTreeNode("e", "ape"), tree.find("ape"));
-		Assert.assertEquals(new RadixTreeNode("h", "bath"), tree.find("bath"));
-		Assert.assertEquals(new RadixTreeNode("nana", "banana"), tree.find("banana"));
+		Assert.assertEquals(new RadixTreeNode("ple", "apple"), tree.findPrefixedBy("apple"));
+		Assert.assertEquals(new RadixTreeNode("t", "bat"), tree.findPrefixedBy("bat"));
+		Assert.assertEquals(new RadixTreeNode("e", "ape"), tree.findPrefixedBy("ape"));
+		Assert.assertEquals(new RadixTreeNode("h", "bath"), tree.findPrefixedBy("bath"));
+		Assert.assertEquals(new RadixTreeNode("nana", "banana"), tree.findPrefixedBy("banana"));
 	}
 
 	@Test
@@ -604,7 +604,7 @@ public class StringRadixTreeTest{
 	public void testCantFindRootNode(){
 		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
 
-		Assert.assertNull(tree.find(""));
+		Assert.assertNull(tree.findPrefixedBy(""));
 	}
 
 	@Test
@@ -613,7 +613,7 @@ public class StringRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assert.assertNotNull(tree.find("apple"));
+		Assert.assertNotNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
@@ -634,8 +634,8 @@ public class StringRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assert.assertNotNull(tree.find("appletree"));
-		Assert.assertNotNull(tree.find("appleshackcream"));
+		Assert.assertNotNull(tree.findPrefixedBy("appletree"));
+		Assert.assertNotNull(tree.findPrefixedBy("appleshackcream"));
 		Assert.assertNotNull(tree.containsKey("ape"));
 	}
 
@@ -679,7 +679,7 @@ public class StringRadixTreeTest{
 	public void testCantFindNonexistantNode(){
 		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
 
-		Assert.assertNull(tree.find("apple"));
+		Assert.assertNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
@@ -696,7 +696,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assert.assertNull(tree.find("ap"));
+		Assert.assertNull(tree.findPrefixedBy("ap"));
 	}
 
 	@Test

@@ -178,7 +178,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public boolean containsKey(Object keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
-		RadixTreeNode<S, V> foundNode = find((S)keyToCheck);
+		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (foundNode != null);
 	}
 
@@ -195,7 +195,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				return result;
 			}
 		};
-		visit(visitor);
+		visitPrefixedBy(visitor);
 
 		return visitor.getResult();
 	}
@@ -204,11 +204,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public V get(Object keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
-		RadixTreeNode<S, V> foundNode = find((S)keyToCheck);
+		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
-	public RadixTreeNode<S, V> find(S keyToCheck){
+	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
 		Objects.requireNonNull(keyToCheck);
 
 		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
@@ -220,7 +220,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				return (result != null);
 			}
 		};
-		visit(visitor, keyToCheck);
+		visitPrefixedBy(visitor, keyToCheck);
 
 		return visitor.getResult();
 	}
@@ -245,7 +245,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				return false;
 			}
 		};
-		visit(visitor, prefix);
+		visitPrefixedBy(visitor, prefix);
 
 		return visitor.getResult();
 	}
@@ -293,7 +293,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				return false;
 			}
 		};
-		visit(visitor);
+		visitPrefixedBy(visitor);
 
 		return visitor.getResult();
 	}
@@ -485,7 +485,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			}
 		};
 
-		visit(visitor, (S)key);
+		visitPrefixedBy(visitor, (S)key);
 
 		return visitor.getResult();
 	}
@@ -518,8 +518,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 *
 	 * @param visitor	The visitor
 	 */
-	public void visit(RadixTreeVisitor<S, V, ?> visitor){
-		visit(visitor, sequencer.getEmptySequence());
+	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor){
+		visitPrefixedBy(visitor, sequencer.getEmptySequence());
 	}
 
 	/**
@@ -529,7 +529,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param visitor	The visitor
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
-	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
+	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefixAllowed);
 
@@ -549,7 +549,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			int prefixLen = sequencer.length(prefix);
 			for(RadixTreeNode<S, V> child : node){
 				S newPrefix = sequencer.concat(prefix, child.getKey());
-				if(prefixLen >= sequencer.length(prefixAllowed) || prefixLen >= sequencer.length(newPrefix) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
+				if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
 					stack.push(new VisitElement(child, node, newPrefix));
 			}
 		}
