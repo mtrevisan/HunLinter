@@ -216,7 +216,7 @@ public class StringRadixTreeTest{
 		tree.put("cd", 4);
 		tree.put("abc", 5);
 
-		List<Integer> prefixes = tree.getValuesPrefixedBy("abcd");
+		List<Integer> prefixes = tree.getValues("abcd");
 		Integer[] datas = prefixes.stream()
 			.sorted()
 			.toArray(Integer[]::new);
@@ -258,12 +258,12 @@ public class StringRadixTreeTest{
 		tree.put("java.lang.Boolean", Boolean.FALSE);
 
 		Assert.assertFalse(tree.isEmpty());
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("java.lang.Integer").size());
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("java.lang.Long").size());
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("java.lang.Boolean").size());
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("java.io.InputStream").size());
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("java.util.ArrayList").size());
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("java.util.concurrent.ConcurrentHashMap").size());
+		Assert.assertEquals(1, tree.getValues("java.lang.Integer").size());
+		Assert.assertEquals(1, tree.getValues("java.lang.Long").size());
+		Assert.assertEquals(2, tree.getValues("java.lang.Boolean").size());
+		Assert.assertEquals(2, tree.getValues("java.io.InputStream").size());
+		Assert.assertEquals(1, tree.getValues("java.util.ArrayList").size());
+		Assert.assertEquals(2, tree.getValues("java.util.concurrent.ConcurrentHashMap").size());
 	}
 
 	@Test
@@ -273,7 +273,7 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("wowzacowza").size());
+		Assert.assertEquals(1, tree.getValues("wowzacowza").size());
 	}
 
 	@Test
@@ -293,8 +293,8 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("wowzacowza").size());
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("bookshelfmania").size());
+		Assert.assertEquals(1, tree.getValues("wowzacowza").size());
+		Assert.assertEquals(1, tree.getValues("bookshelfmania").size());
 	}
 
 	@Test
@@ -650,15 +650,15 @@ public class StringRadixTreeTest{
 		tree.put("hat", "hat");
 		tree.put("cat", "cat");
 
-		Assert.assertFalse(tree.getValuesPrefixedBy("helloworld").isEmpty());
-		Assert.assertTrue(tree.getValuesPrefixedBy("helloworld").contains("h"));
-		Assert.assertTrue(tree.getValuesPrefixedBy("helloworld").contains("hell"));
-		Assert.assertTrue(tree.getValuesPrefixedBy("helloworld").contains("hello"));
-		Assert.assertTrue(!tree.getValuesPrefixedBy("helloworld").contains("he"));
-		Assert.assertTrue(!tree.getValuesPrefixedBy("helloworld").contains("hat"));
-		Assert.assertTrue(!tree.getValuesPrefixedBy("helloworld").contains("cat"));
-		Assert.assertTrue(!tree.getValuesPrefixedBy("helloworld").contains("hey"));
-		Assert.assertTrue(tree.getValuesPrefixedBy("animal").isEmpty());
+		Assert.assertFalse(tree.getValues("helloworld").isEmpty());
+		Assert.assertTrue(tree.getValues("helloworld").contains("h"));
+		Assert.assertTrue(tree.getValues("helloworld").contains("hell"));
+		Assert.assertTrue(tree.getValues("helloworld").contains("hello"));
+		Assert.assertTrue(!tree.getValues("helloworld").contains("he"));
+		Assert.assertTrue(!tree.getValues("helloworld").contains("hat"));
+		Assert.assertTrue(!tree.getValues("helloworld").contains("cat"));
+		Assert.assertTrue(!tree.getValues("helloworld").contains("hey"));
+		Assert.assertTrue(tree.getValues("animal").isEmpty());
 	}
 
 	@Test

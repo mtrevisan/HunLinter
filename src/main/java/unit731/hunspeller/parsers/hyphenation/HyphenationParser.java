@@ -593,7 +593,7 @@ public class HyphenationParser{
 		//FIXME using the Aho-Corasick tree will reduce the number of for-each to two
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.get(level).getValuesPrefixedBy(w.substring(i));
+			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
 			for(String rule : prefixes){
 				int j = -1;
 				//remove non-standard part

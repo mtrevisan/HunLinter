@@ -278,6 +278,76 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			.collect(Collectors.toList());
 	}
 
+	public RadixTreeNode<S, V> find(S keyToCheck){
+		Objects.requireNonNull(keyToCheck);
+
+		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(sequencer.equals(wholeKey, keyToCheck))
+					result = node;
+
+				return (result != null);
+			}
+		};
+		visit(visitor, keyToCheck);
+
+		return visitor.getResult();
+	}
+
+	/**
+	 * Gets a list of entries whose associated keys are a prefix of the given prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @return	The list of values
+	 * @throws NullPointerException	If prefix is <code>null</code>
+	 */
+	public List<Map.Entry<S, V>> getEntries(S prefix){
+		Objects.requireNonNull(prefix);
+
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+				result.add(entry);
+
+				return false;
+			}
+		};
+		visit(visitor, prefix);
+
+		return visitor.getResult();
+	}
+
+	/**
+	 * Gets a list of values whose associated keys are a prefix of the given prefix, or are contained into the prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @return	The list of values
+	 * @throws NullPointerException	If the prefix is <code>null</code>
+	 */
+	public List<V> getValues(S prefix){
+		List<Map.Entry<S, V>> entries = getEntries(prefix);
+		return entries.stream()
+			.map(Map.Entry::getValue)
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets a list of keys that are a prefix of the given prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @return	The list of prefixes
+	 * @throws NullPointerException	If prefix is <code>null</code>
+	 */
+	public List<S> getKeys(S prefix){
+		List<Map.Entry<S, V>> entries = getEntries(prefix);
+		return entries.stream()
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
+	}
+
 	@Override
 	public boolean isEmpty(){
 		return root.isEmpty();
@@ -519,8 +589,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param visitor	The visitor
 	 */
 	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor){
-		BiFunction<S, S, Boolean> condition = (prefix, prefixAllowed) -> (sequencer.startsWith(prefix, prefixAllowed) || sequencer.startsWith(prefixAllowed, prefix));
-		visit(visitor, sequencer.getEmptySequence(), condition);
+		visitPrefixedBy(visitor, sequencer.getEmptySequence());
 	}
 
 	/**
@@ -531,7 +600,29 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
 	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
-		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> (sequencer.startsWith(prefix, preAllowed) || sequencer.startsWith(preAllowed, prefix));
+		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(prefix, preAllowed);
+		visit(visitor, prefixAllowed, condition);
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 */
+	public void visit(RadixTreeVisitor<S, V, ?> visitor){
+		visit(visitor, sequencer.getEmptySequence());
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor and starting at the given prefix.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 * @param prefixAllowed	The prefix used to restrict visitation
+	 */
+	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
+		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(preAllowed, prefix);
 		visit(visitor, prefixAllowed, condition);
 	}
 
