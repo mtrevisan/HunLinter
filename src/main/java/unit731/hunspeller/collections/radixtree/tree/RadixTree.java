@@ -133,14 +133,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					S stateKey = state.getKey();
 					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
 					if(lcpLength > 0){
-System.out.println(generateGraphvizRepresentation(false));
 						int nodeKeyLength = sequencer.length(stateKey);
 						if(lcpLength < nodeKeyLength)
 							//split fail
 							state.split(lcpLength, sequencer);
-						if(lcpLength < keySize)
+						if(lcpLength + i < keySize)
 							//split node
-							node = node.split(lcpLength, sequencer);
+							node.split(lcpLength + i, sequencer);
 
 						//link fail to node
 						node.setFailNode(state);
@@ -154,8 +153,6 @@ System.out.println(generateGraphvizRepresentation(false));
 
 				if(node.getFailNode() == null)
 					node.setFailNode(root);
-
-System.out.println(generateGraphvizRepresentation(false));
 			}
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
@@ -742,17 +739,17 @@ System.out.println(generateGraphvizRepresentation(false));
 			.append("graph [rankdir=LR];")
 			.append(GRAPHVIZ_NEW_LINE);
 
-		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphvizAppendForwardTransition(sb, node, parent);
-		traverseBFS(traverserForward);
-
-//		if(prepared){
-			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
-			traverseBFS(traverserFailure);
-//		}
-
 		RadixTreeTraverser<S, V> traverserNode = (wholeKey, node, parent) -> graphvizAppendNode(sb, node);
 		graphvizAppendNode(sb, root);
 		traverseBFS(traverserNode);
+
+		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphvizAppendForwardTransition(sb, node, parent);
+		traverseBFS(traverserForward);
+
+		if(prepared){
+			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
+			traverseBFS(traverserFailure);
+		}
 
 		sb.append("}");
 		return sb.toString();
@@ -760,9 +757,9 @@ System.out.println(generateGraphvizRepresentation(false));
 
 	private void graphvizAppendForwardTransition(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 		sb.append(GRAPHVIZ_TAB)
-			.append(parent.hashCode())
+			.append(System.identityHashCode(parent))
 			.append(GRAPHVIZ_STYLE_ARROW)
-			.append(node.hashCode())
+			.append(System.identityHashCode(node))
 			.append(GRAPHVIZ_STYLE_BEGIN)
 			.append(GRAPHVIZ_STYLE_LABEL)
 			.append(node.getKey())
@@ -771,35 +768,20 @@ System.out.println(generateGraphvizRepresentation(false));
 	}
 
 	private void graphvizAppendFailureTransitions(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, boolean displayEdgesToInitialState){
-if(node.getFailNode() != null)
 		if(displayEdgesToInitialState || node.getFailNode() != root || node == root)
 			sb.append(GRAPHVIZ_TAB)
-				.append(node.hashCode())
+				.append(System.identityHashCode(node))
 				.append(GRAPHVIZ_STYLE_ARROW)
-				.append(node.getFailNode().hashCode())
+				.append(System.identityHashCode(node.getFailNode()))
 				.append(GRAPHVIZ_STYLE_FAILURE_TRANSITION)
 				.append(GRAPHVIZ_NEW_LINE);
 	}
 
 	private void graphvizAppendNode(StringBuilder sb, RadixTreeNode<S, V> node){
 		sb.append(GRAPHVIZ_TAB)
-			.append(node.hashCode())
+			.append(System.identityHashCode(node))
 			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL + node.getValue() + GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL: GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
 			.append(GRAPHVIZ_NEW_LINE);
 	}
-
-public static void main(String[] args){
-	RadixTree<String, Integer> tree = RadixTree.createTree(new unit731.hunspeller.collections.radixtree.sequencers.StringSequencer());
-
-	tree.put("he", 1);
-	tree.put("she", 2);
-	tree.put("his", 3);
-	tree.put("hers", 4);
-	tree.prepare();
-
-	String representation = tree.generateGraphvizRepresentation(false);
-	//http://www.webgraphviz.com/
-	System.out.println(representation);
-}
 
 }

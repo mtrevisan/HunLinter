@@ -65,11 +65,6 @@ public class StringRadixTreeTest{
 		tree.put("tentest", 21);
 		tree.put("tank", 3);
 		tree.put("rest", 4);
-
-		String representation = tree.generateGraphvizRepresentation(false);
-		System.out.println(representation);
-		Assert.assertEquals("digraph automaton{\n\tgraph [rankdir=LR];\n\t3524 -> 10368 [label=t];\n\t3524 -> 206321529 [label=rest];\n\t10368 -> 5710790 [label=ank];\n\t10368 -> 9483 [label=e];\n\t9483 -> 220661 [label=st];\n\t9483 -> 211517 [label=nt];\n\t211517 -> 5947280 [label=est];\n\t3524 [shape=circle, label=\"\"];\n\t10368 [shape=circle, label=\"\"];\n\t206321529 [shape=doublecircle, label=4];\n\t5710790 [shape=doublecircle, label=3];\n\t9483 [shape=circle, label=\"\"];\n\t220661 [shape=doublecircle, label=1];\n\t211517 [shape=doublecircle, label=2];\n\t5947280 [shape=doublecircle, label=21];\n}", representation);
-
 		tree.prepare();
 
 		Assert.assertEquals(5, tree.size());
@@ -77,13 +72,6 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(2, tree.get("tent").intValue());
 		Assert.assertEquals(3, tree.get("tank").intValue());
 		Assert.assertEquals(4, tree.get("rest").intValue());
-
-		representation = tree.generateGraphvizRepresentation(true);
-		System.out.println(representation);
-//		Assert.assertEquals("digraph automaton{\n\tgraph [rankdir=LR];\n\t3524 -> 10368 [label=t];\n\t3524 -> 206321529 [label=rest];\n\t10368 -> 5710790 [label=ank];\n\t10368 -> 9483 [label=e];\n\t9483 -> 10309 [label=s];\n\t9483 -> 10014 [label=n];\n\t10309 -> 10326 [label=t];\n\t10014 -> 10327 [label=t];\n\t10327 -> 9483 [label=e];\n\t9483 -> 220681 [label=st];\n\t10368 -> 3524 [style=dashed, color=gray, constraint=false];\n\t206321529 -> 3524 [style=dashed, color=gray, constraint=false];\n\t5710790 -> 3524 [style=dashed, color=gray, constraint=false];\n\t9483 -> 3524 [style=dashed, color=gray, constraint=false];\n\t10309 -> 10368 [style=dashed, color=gray, constraint=false];\n\t10014 -> 10368 [style=dashed, color=gray, constraint=false];\n\t10326 -> 3524 [style=dashed, color=gray, constraint=false];\n\t10327 -> 3524 [style=dashed, color=gray, constraint=false];\n\t9483 -> 10368 [style=dashed, color=gray, constraint=false];\n\t220681 -> 3524 [style=dashed, color=gray, constraint=false];\n\t3524 [shape=circle, label=\"\"];\n\t10368 [shape=circle, label=\"\"];\n\t206321529 [shape=doublecircle, label=\"\"];\n\t5710790 [shape=doublecircle, label=\"\"];\n\t9483 [shape=circle, label=\"\"];\n\t10309 [shape=circle, label=\"\"];\n\t10014 [shape=circle, label=\"\"];\n\t10326 [shape=doublecircle, label=\"\"];\n\t10327 [shape=doublecircle, label=\"\"];\n\t9483 [shape=circle, label=\"\"];\n\t220681 [shape=doublecircle, label=\"\"];\n}", representation);
-		representation = tree.generateGraphvizRepresentation(false);
-		System.out.println(representation);
-//		Assert.assertEquals("digraph automaton{\n\tgraph [rankdir=LR];\n\t3524 -> 10368 [label=t];\n\t3524 -> 206321529 [label=rest];\n\t10368 -> 5710790 [label=ank];\n\t10368 -> 9483 [label=e];\n\t9483 -> 10309 [label=s];\n\t9483 -> 10014 [label=n];\n\t10309 -> 10326 [label=t];\n\t10014 -> 10327 [label=t];\n\t10327 -> 9483 [label=e];\n\t9483 -> 220681 [label=st];\n\t10309 -> 10368 [style=dashed, color=gray, constraint=false];\n\t10014 -> 10368 [style=dashed, color=gray, constraint=false];\n\t9483 -> 10368 [style=dashed, color=gray, constraint=false];\n\t3524 [shape=circle, label=\"\"];\n\t10368 [shape=circle, label=\"\"];\n\t206321529 [shape=doublecircle, label=\"\"];\n\t5710790 [shape=doublecircle, label=\"\"];\n\t9483 [shape=circle, label=\"\"];\n\t10309 [shape=circle, label=\"\"];\n\t10014 [shape=circle, label=\"\"];\n\t10326 [shape=doublecircle, label=\"\"];\n\t10327 [shape=doublecircle, label=\"\"];\n\t9483 [shape=circle, label=\"\"];\n\t220681 [shape=doublecircle, label=\"\"];\n}", representation);
 	}
 
 	@Test
