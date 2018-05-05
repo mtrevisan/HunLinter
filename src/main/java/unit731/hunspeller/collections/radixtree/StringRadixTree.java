@@ -9,6 +9,9 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 
 public class StringRadixTree<V extends Serializable> extends RadixTree<String, V>{
 
+	private static final long serialVersionUID = -3154806793061942802L;
+
+
 	public static <T extends Serializable> StringRadixTree<T> createTree(){
 		return new StringRadixTree<>();
 	}

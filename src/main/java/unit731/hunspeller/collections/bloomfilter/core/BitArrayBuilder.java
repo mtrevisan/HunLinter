@@ -12,6 +12,7 @@ public class BitArrayBuilder{
 	public static enum Type{FAST, JAVA, MEMORY_MAPPED_FILE};
 
 
+	@SuppressWarnings("fallthrough")
 	public static BitArray getBitArray(Type type, int bits){
 		Objects.nonNull(type);
 

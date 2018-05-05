@@ -12,6 +12,9 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{
 
+	private static final long serialVersionUID = 6333302915924099038L;
+
+
 	public static <T extends Serializable> RegExpRadixTree<T> createTree(){
 		return new RegExpRadixTree<>();
 	}
