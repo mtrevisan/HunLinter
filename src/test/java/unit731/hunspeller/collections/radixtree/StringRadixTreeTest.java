@@ -74,10 +74,10 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(3, tree.get("tank").intValue());
 		Assert.assertEquals(4, tree.get("rest").intValue());
 
-		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the tent");
+		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the test");
 		Assert.assertTrue(itr.hasNext());
 		Assert.assertEquals(4, itr.next().getValue().intValue());
-		Assert.assertEquals(2, itr.next().getValue().intValue());
+		Assert.assertEquals(21, itr.next().getValue().intValue());
 		Assert.assertFalse(itr.hasNext());
 	}
 

@@ -238,7 +238,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
 
 			private RadixTreeNode<S, V> lastMatchedNode = root;
-			private RadixTreeNode<S, V> lastMatchedNodeParent = null;
 			private int currentIndex = 0;
 
 
@@ -257,7 +256,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
 					if(nextNode.hasValue()){
-						lastMatchedNodeParent = lastMatchedNode;
 						lastMatchedNode = nextNode;
 						currentIndex = i + 1;
 						return nextNode;
@@ -269,7 +267,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 			@Override
 			public void remove(){
-				removeNode(lastMatchedNode, lastMatchedNodeParent);
+				throw new UnsupportedOperationException();
 			}
 		};
 		return itr;
