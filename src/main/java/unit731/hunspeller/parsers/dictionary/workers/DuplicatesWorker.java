@@ -94,11 +94,10 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					try{
 						List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 
-						for(RuleProductionEntry production : productions){
-							String text = production.toStringWithSignificantDataFields();
-							if(!bloomFilter.add(text))
-								duplicatesBloomFilter.add(text);
-						}
+						productions.stream()
+							.map(RuleProductionEntry::toStringWithSignificantDataFields)
+							.filter(text -> !bloomFilter.add(text))
+							.forEachOrdered(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
 						publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());

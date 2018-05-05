@@ -94,19 +94,11 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public boolean hasProductionRule(String ruleFlag){
-		if(appliedRules != null)
-			for(AffixEntry appliedRule : appliedRules)
-				if(appliedRule.getFlag().equals(ruleFlag))
-					return true;
-		return false;
+		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(ruleFlag)));
 	}
 
 	public boolean hasProductionRule(AffixEntry.TYPE type){
-		if(appliedRules != null)
-			for(AffixEntry appliedRule : appliedRules)
-				if(appliedRule.getType() == type)
-					return true;
-		return false;
+		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 	}
 
 	public boolean hasDoublefoldAffixRule(){
@@ -125,8 +117,9 @@ public class RuleProductionEntry implements Productable{
 	public String getRulesSequence(){
 		StringJoiner sj = new StringJoiner(" > ");
 		if(appliedRules != null)
-			for(AffixEntry appliedRule : appliedRules)
-				sj.add(appliedRule.getFlag());
+			appliedRules.stream()
+				.map(AffixEntry::getFlag)
+				.forEach(sj::add);
 		return sj.toString();
 	}
 

@@ -218,11 +218,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				for(String meaning : means)
 					for(ThesaurusEntry synonym : synonyms)
 						if(synonym.getSynonym().equals(meaning)){
-							long countSamePartOfSpeech = 0;
 							List<MeaningEntry> meanings = synonym.getMeanings();
-							for(MeaningEntry m : meanings)
-								if(m.getPartOfSpeech().equals(partOfSpeech))
-									countSamePartOfSpeech ++;
+							long countSamePartOfSpeech = meanings.stream()
+								.map(MeaningEntry::getPartOfSpeech)
+								.filter(pos -> pos.equals(partOfSpeech))
+								.map(m -> 1)
+								.reduce(0, (accumulator, m) -> accumulator + 1);
 							if(countSamePartOfSpeech > 0l)
 								throw new IllegalArgumentException("Duplicate detected for " + meaning);
 						}

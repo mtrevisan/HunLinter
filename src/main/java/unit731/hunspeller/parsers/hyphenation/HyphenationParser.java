@@ -106,9 +106,9 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
-	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap(Level.class);
+	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private HyphenationOptions options;
-	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap(Level.class);
+	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 
 
 	public HyphenationParser(String language){

@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.strategies;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -29,7 +30,7 @@ public class DoubleCharParsingStrategy implements FlagParsingStrategy{
 			return StringUtils.EMPTY;
 		for(String flag : textFlags)
 			if(flag == null || flag.length() != 2)
-				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + textFlags);
+				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);
 	}

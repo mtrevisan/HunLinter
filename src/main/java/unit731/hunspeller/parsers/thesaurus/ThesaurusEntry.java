@@ -56,8 +56,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public String toString(){
 		StringJoiner sj = new StringJoiner(": ");
 		sj.add(synonym);
-		for(MeaningEntry meaning : meanings)
-			sj.add(StringUtils.join(meaning, ", "));
+		meanings.forEach(meaning -> sj.add(StringUtils.join(meaning, ", ")));
 		return sj.toString();
 	}
 

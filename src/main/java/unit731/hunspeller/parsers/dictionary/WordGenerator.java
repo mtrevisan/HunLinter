@@ -54,8 +54,9 @@ public class WordGenerator{
 		List<RuleProductionEntry> firstfoldProductions = getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes));
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : firstfoldProductions)
-			twofoldProductions.addAll(getTwofoldProductions(production, complexPrefixes));
+		firstfoldProductions.stream()
+			.map(production -> getTwofoldProductions(production, complexPrefixes))
+			.forEach(twofoldProductions::addAll);
 
 		checkTwofoldViolation(twofoldProductions);
 
@@ -66,8 +67,9 @@ public class WordGenerator{
 		productions.addAll(firstfoldProductions);
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions)
-			lastfoldProductions.addAll(getLastfoldProductions(production, (complexPrefixes? suffixes: prefixes)));
+		productions.stream()
+			.map(production -> getLastfoldProductions(production, (complexPrefixes? suffixes: prefixes)))
+			.forEach(lastfoldProductions::addAll);
 		productions.addAll(lastfoldProductions);
 
 		checkTwofoldViolation(lastfoldProductions);

@@ -56,8 +56,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 						try{
 							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 
-							for(RuleProductionEntry production : productions)
-								dicParser.checkProduction(production, strategy);
+							productions.forEach(production -> dicParser.checkProduction(production, strategy));
 						}
 						catch(IllegalArgumentException e){
 							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
