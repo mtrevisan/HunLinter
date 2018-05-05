@@ -234,6 +234,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		if(!prepared)
 			throw new IllegalStateException("Cannot perform search until prepare() is called");
 
+		//FIXME
 		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
 
 			private RadixTreeNode<S, V> lastMatchedNode = root;
@@ -587,6 +588,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public V remove(Object key){
 		Objects.requireNonNull(key);
 
+		boolean wasPrepared = prepared;
+		if(prepared)
+			clearFailTransitions();
+
 		RadixTreeVisitor<S, V, V> visitor = new RadixTreeVisitor<S, V, V>(null){
 			@Override
 			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
@@ -621,8 +626,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		};
 		visitPrefixedBy(visitor, (S)key);
 
+		if(wasPrepared)
+			prepare();
+
 		return visitor.getResult();
 	}
+
 
 	/**
 	 * Performa a BFS traversal on the tree, calling the traverser for each node found
