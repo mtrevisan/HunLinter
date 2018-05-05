@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
@@ -72,6 +73,12 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(2, tree.get("tent").intValue());
 		Assert.assertEquals(3, tree.get("tank").intValue());
 		Assert.assertEquals(4, tree.get("rest").intValue());
+
+		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the tent");
+		Assert.assertTrue(itr.hasNext());
+		Assert.assertEquals(4, itr.next().getValue().intValue());
+		Assert.assertEquals(2, itr.next().getValue().intValue());
+		Assert.assertFalse(itr.hasNext());
 	}
 
 	@Test

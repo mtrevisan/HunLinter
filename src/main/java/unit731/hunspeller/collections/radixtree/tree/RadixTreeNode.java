@@ -64,8 +64,10 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		RadixTreeNode<S, V> response = null;
 		if(children != null)
 			for(RadixTreeNode<S, V> child : children)
-				if(sequencer.equalsAtIndex(child.key, key, 0))
+				if(sequencer.equalsAtIndex(child.key, key, 0)){
 					response = child;
+					break;
+				}
 		return response;
 	}
 
