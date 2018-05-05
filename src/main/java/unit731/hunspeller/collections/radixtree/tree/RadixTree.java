@@ -238,6 +238,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
 
 			private RadixTreeNode<S, V> lastMatchedNode = root;
+			private RadixTreeNode<S, V> lastMatchedNodeParent = null;
 			private int currentIndex = 0;
 
 
@@ -256,6 +257,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
 					if(nextNode.hasValue()){
+						lastMatchedNodeParent = lastMatchedNode;
 						lastMatchedNode = nextNode;
 						currentIndex = i + 1;
 						return nextNode;
@@ -267,7 +269,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 			@Override
 			public void remove(){
-				throw new UnsupportedOperationException();
+				removeNode(lastMatchedNode, lastMatchedNodeParent);
 			}
 		};
 		return itr;
@@ -597,28 +599,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 				if(sequencer.equals(wholeKey, (S)key)){
 					result = node.getValue();
-					Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
-					//if there is no children of the node we need to delete it from the its parent children list
-					if(children == null || children.isEmpty()){
-						S key = node.getKey();
-						Iterator<RadixTreeNode<S, V>> itr = parent.iterator();
-						while(itr.hasNext())
-							if(sequencer.equals(itr.next().getKey(), key)){
-								itr.remove();
-								break;
-							}
-
-						//if parent is not real node and has only one child then they need to be merged.
-						Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
-						if(parentChildren != null && parentChildren.size() == 1 && !parent.hasValue() && parent != root)
-							parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
-					}
-					else if(children.size() == 1)
-						//we need to merge the only child of this node with itself
-						children.iterator().next().mergeWithAncestor(node, sequencer);
-					else
-						node.setValue(null);
+					removeNode(node, parent);
 				}
 
 				return (result != null);
@@ -630,6 +612,31 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			prepare();
 
 		return visitor.getResult();
+	}
+
+	private void removeNode(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+		Collection<RadixTreeNode<S, V>> children = node.getChildren();
+
+		//if there is no children of the node we need to delete it from the its parent children list
+		if(children == null || children.isEmpty()){
+			S key = node.getKey();
+			Iterator<RadixTreeNode<S, V>> itr = parent.iterator();
+			while(itr.hasNext())
+				if(sequencer.equals(itr.next().getKey(), key)){
+					itr.remove();
+					break;
+				}
+
+			//if parent is not real node and has only one child then they need to be merged.
+			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
+			if(parentChildren != null && parentChildren.size() == 1 && !parent.hasValue() && parent != root)
+				parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
+		}
+		else if(children.size() == 1)
+			//we need to merge the only child of this node with itself
+			children.iterator().next().mergeWithAncestor(node, sequencer);
+		else
+			node.setValue(null);
 	}
 
 
