@@ -242,11 +242,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 			@Override
 			public boolean hasNext(){
-				for(int i = currentIndex; i < sequencer.length(text); i ++){
-					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
-					if(nextNode.hasValue())
-						return true;
+				try{
+					for(int i = currentIndex; i < sequencer.length(text); i ++){
+						RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(sequencer.subSequence(text, i), sequencer);
+						if(nextNode.hasValue())
+							return true;
+					}
 				}
+				catch(NoSuchElementException e){}
 				return false;
 			}
 
