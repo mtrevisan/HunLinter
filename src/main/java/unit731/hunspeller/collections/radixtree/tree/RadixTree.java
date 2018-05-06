@@ -90,7 +90,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	protected boolean noDuplicatesAllowed;
 
 	private boolean prepared;
-	private boolean putAll;
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
@@ -455,37 +454,38 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			.collect(Collectors.toSet());
 	}
 
+	/**
+	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
+	 * 
+	 * @param map	Map of key-value pair to add to the tree
+	 */
 	@Override
 	public void putAll(Map<? extends S, ? extends V> map){
 		Objects.requireNonNull(map);
 
-		putAll = true;
-		boolean wasPrepared = prepared;
 		if(prepared)
 			clearFailTransitions();
 
 		map.entrySet()
 			.forEach(entry -> put(entry.getKey(), entry.getValue()));
-
-		putAll = false;
-		if(wasPrepared)
-			prepare();
 	}
 
+	/**
+	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
+	 * 
+	 * @param key	The key to add to the tree
+	 * @param value	The value associated to the key
+	 */
 	@Override
 	public V put(S key, V value){
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
-		boolean wasPrepared = prepared;
-		if(!putAll && prepared)
+		if(prepared)
 			clearFailTransitions();
 
 		try{
 			V previousValue = put(key, value, root);
-
-			if(!putAll && wasPrepared)
-				prepare();
 
 			return previousValue;
 		}
@@ -583,12 +583,16 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		return len;
 	}
 
+	/**
+	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
+	 * 
+	 * @param key	The key to remove from the tree
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public V remove(Object key){
 		Objects.requireNonNull(key);
 
-		boolean wasPrepared = prepared;
 		if(prepared)
 			clearFailTransitions();
 
@@ -605,9 +609,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			}
 		};
 		visitPrefixedBy(visitor, (S)key);
-
-		if(wasPrepared)
-			prepare();
 
 		return visitor.getResult();
 	}
