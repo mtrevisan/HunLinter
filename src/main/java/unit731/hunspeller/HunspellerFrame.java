@@ -112,7 +112,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
 
-	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
+	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
 
 	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+?>");
 
@@ -1654,7 +1654,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static void hyphenateAddRule(HunspellerFrame frame){
 		try{
 			String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
-			String addedRule = frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT);
+			String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 			String addedRuleCount = null;
 			if(StringUtils.isNotBlank(addedRule)){
@@ -1663,7 +1663,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				boolean hyphenationChanged = false;
 				boolean correctHyphenation = false;
 				if(!alreadyHasRule){
-					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS));
+					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 					if(ruleMatchesText){
 						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);

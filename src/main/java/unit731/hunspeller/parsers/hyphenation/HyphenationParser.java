@@ -400,12 +400,11 @@ public class HyphenationParser{
 
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
 		//extract (compound) data from the radix tree
-		Map<Integer, List<String>> content = new HashMap<>();
-		RadixTreeVisitor<String, String, Boolean> visitor = new RadixTreeVisitor<String, String, Boolean>(false){
+		RadixTreeVisitor<String, String, Map<Integer, List<String>>> visitor = new RadixTreeVisitor<String, String, Map<Integer, List<String>>>(new HashMap<>()){
 			@Override
 			public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
 				String value = node.getValue();
-				content.computeIfAbsent(value.length(), k -> new ArrayList<>())
+				result.computeIfAbsent(value.length(), k -> new ArrayList<>())
 					.add(value);
 				
 				return false;
@@ -415,9 +414,9 @@ public class HyphenationParser{
 		patterns.get(level).visit(visitor);
 
 		//sort values
-		content.values()
+		visitor.getResult().values()
 			.forEach(v -> Collections.sort(v, comparator::compare));
-		List<String> rules = content.values().stream()
+		List<String> rules = visitor.getResult().values().stream()
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
 		for(String rule : rules)
@@ -488,7 +487,7 @@ public class HyphenationParser{
 
 		try{
 			String key = getKeyFromData(rule);
-			return patterns.get(level).containsKey(key);
+			return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key));
 		}
 		finally{
 			LOCK_SAVING.unlock();
