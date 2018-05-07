@@ -63,9 +63,10 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	public RadixTreeNode<S, V> getNextNode(int index, S sequence, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> currentNode = this;
 		RadixTreeNode<S, V> newCurrentState = null;
-		while(currentNode != null && newCurrentState == null){
+		while(currentNode != null && (newCurrentState == null || !newCurrentState.hasValue())){
 			newCurrentState = currentNode.getChild(index, sequence, sequencer);
-			currentNode = currentNode.getFailNode();
+			if(newCurrentState.hasValue())
+				currentNode = currentNode.getFailNode();
 		}
 		return newCurrentState;
 	}
