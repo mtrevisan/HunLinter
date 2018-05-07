@@ -226,6 +226,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * 
 	 * @param text	The text to search into
 	 * @return	The iterator of all the entries found inside the given text
+	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
 	public Iterator<RadixTreeNode<S, V>> search(S text){
 		Objects.requireNonNull(text);
@@ -297,7 +298,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 *
 	 * @param prefix	The prefix to look for
 	 * @return	The list of values
-	 * @throws NullPointerException	If prefix is <code>null</code>
+	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
 	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
@@ -367,7 +368,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 *
 	 * @param prefix	The prefix to look for
 	 * @return	The list of values
-	 * @throws NullPointerException	If prefix is <code>null</code>
+	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
 	public List<Map.Entry<S, V>> getEntries(S prefix){
 		Objects.requireNonNull(prefix);
@@ -461,6 +462,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
 	 * 
 	 * @param map	Map of key-value pair to add to the tree
+	 * @throws NullPointerException	If the given map is <code>null</code>
 	 */
 	@Override
 	public void putAll(Map<? extends S, ? extends V> map){
@@ -478,6 +480,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * 
 	 * @param key	The key to add to the tree
 	 * @param value	The value associated to the key
+	 * @throws NullPointerException	If the given key or value is <code>null</code>
 	 */
 	@Override
 	public V put(S key, V value){
@@ -590,6 +593,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
 	 * 
 	 * @param key	The key to remove from the tree
+	 * @throws NullPointerException	If the given key is <code>null</code>
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -715,6 +719,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param visitor	The visitor
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 * @param condition	Condition that has to be verified in order to match
+	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
 	private void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed, BiFunction<S, S, Boolean> condition){
 		Objects.requireNonNull(visitor);
