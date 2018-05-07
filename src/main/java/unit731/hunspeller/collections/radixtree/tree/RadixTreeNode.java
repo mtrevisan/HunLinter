@@ -60,25 +60,33 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		return (children == null || children.isEmpty());
 	}
 
-	public RadixTreeNode<S, V> getChild(S key, SequencerInterface<S> sequencer){
-		RadixTreeNode<S, V> response = null;
-		if(children != null)
-			for(RadixTreeNode<S, V> child : children)
-				if(sequencer.equalsAtIndex(child.key, key, 0)){
-					response = child;
-					break;
-				}
-		return response;
-	}
-
-	public RadixTreeNode<S, V> getNextNode(S sequence, SequencerInterface<S> sequencer){
+	public RadixTreeNode<S, V> getNextNode(int index, S sequence, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> currentNode = this;
 		RadixTreeNode<S, V> newCurrentState = null;
 		while(currentNode != null && newCurrentState == null){
-			newCurrentState = currentNode.getChild(sequence, sequencer);
+			newCurrentState = currentNode.getChild(index, sequence, sequencer);
 			currentNode = currentNode.getFailNode();
 		}
 		return newCurrentState;
+	}
+
+	public RadixTreeNode<S, V> getChild(int index, S key, SequencerInterface<S> sequencer){
+		RadixTreeNode<S, V> response = null;
+		if(children != null)
+			for(RadixTreeNode<S, V> child : children){
+				boolean found = true;
+				int size = sequencer.length(child.key);
+				for(int i = 0; i < size; i ++)
+					if(!sequencer.equalsAtIndex(child.key, key, i, index + i)){
+						found = false;
+						break;
+					}
+				if(found){
+					response = child;
+					break;
+				}
+			}
+		return response;
 	}
 
 	public void addChild(RadixTreeNode<S, V> child){

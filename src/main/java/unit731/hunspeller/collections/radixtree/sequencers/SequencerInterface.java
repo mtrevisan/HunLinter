@@ -20,7 +20,11 @@ public interface SequencerInterface<S>{
 
 	boolean equals(S sequenceA, S sequenceB);
 
-	boolean equalsAtIndex(S sequenceA, S sequenceB, int index);
+	default boolean equalsAtIndex(S sequenceA, S sequenceB, int index){
+		return equalsAtIndex(sequenceA, sequenceB, index, index);
+	}
+
+	boolean equalsAtIndex(S sequenceA, S sequenceB, int indexA, int indexB);
 
 	/**
 	 * Returns a sequence that is a subsequence of this sequence.

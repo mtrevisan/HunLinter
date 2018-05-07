@@ -21,8 +21,8 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
-	public boolean equalsAtIndex(String sequenceA, String sequenceB, int index){
-		return (sequenceA.charAt(index) == sequenceB.charAt(index));
+	public boolean equalsAtIndex(String sequenceA, String sequenceB, int indexA, int indexB){
+		return (sequenceA.charAt(indexA) == sequenceB.charAt(indexB));
 	}
 
 	@Override

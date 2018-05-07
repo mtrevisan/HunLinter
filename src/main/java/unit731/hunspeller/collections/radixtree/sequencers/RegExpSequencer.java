@@ -56,8 +56,8 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	}
 
 	@Override
-	public boolean equalsAtIndex(String[] sequenceA, String[] sequenceB, int index){
-		return matches(sequenceA[index], sequenceB[index]);
+	public boolean equalsAtIndex(String[] sequenceA, String[] sequenceB, int indexA, int indexB){
+		return matches(sequenceA[indexA], sequenceB[indexB]);
 	}
 
 	@Override
