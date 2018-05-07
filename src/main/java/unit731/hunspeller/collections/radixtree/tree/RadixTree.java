@@ -481,6 +481,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param key	The key to add to the tree
 	 * @param value	The value associated to the key
 	 * @throws NullPointerException	If the given key or value is <code>null</code>
+	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
 	@Override
 	public V put(S key, V value){
@@ -507,6 +508,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param value	The value
 	 * @param node	The node to start searching from
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
+	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
 	private V put(S key, V value, RadixTreeNode<S, V> node){
 		V ret = null;
