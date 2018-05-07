@@ -463,6 +463,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * 
 	 * @param map	Map of key-value pair to add to the tree
 	 * @throws NullPointerException	If the given map is <code>null</code>
+	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
 	@Override
 	public void putAll(Map<? extends S, ? extends V> map){
