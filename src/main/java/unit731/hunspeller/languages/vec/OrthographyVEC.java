@@ -75,8 +75,8 @@ public class OrthographyVEC extends Orthography{
 		word = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
-		word = PatternService.replaceFirst(word, REGEX_J_INTO_I, "i");
-		word = PatternService.replaceFirst(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
+		word = PatternService.replaceAll(word, REGEX_J_INTO_I, "i");
+		word = PatternService.replaceAll(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
 		boolean iInsideIntoJFalsePositive = false;
 		for(Matcher m : REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES)
 			if(PatternService.find(word, m)){
@@ -86,7 +86,7 @@ public class OrthographyVEC extends Orthography{
 		if(!iInsideIntoJFalsePositive)
 			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = PatternService.replaceFirst(word, REGEX_LH_INITIAL_INTO_L, "l");
+		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, "l");
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
 		//correct fh occurrences into f not before vowel
 		word = PatternService.replaceAll(word, REGEX_FH_INTO_F, "f");

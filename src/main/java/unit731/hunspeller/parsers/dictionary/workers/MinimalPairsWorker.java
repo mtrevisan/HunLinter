@@ -158,8 +158,9 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				int index = 0;
 				int size = minimalPairs.size();
-				for(String key : minimalPairs.keySet()){
-					List<String> values = minimalPairs.get(key);
+				for(Map.Entry<String, List<String>> entry : minimalPairs.entrySet()){
+					String key = entry.getKey();
+					List<String> values = entry.getValue();
 
 					destinationWriter.write(key + ": " + values.stream().collect(Collectors.joining(", ")));
 					destinationWriter.newLine();

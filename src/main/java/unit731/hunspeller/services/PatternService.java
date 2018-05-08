@@ -34,10 +34,6 @@ public class PatternService{
 		return matcher.reset(text).find();
 	}
 
-	public static String replaceFirst(String text, Matcher matcher, String replacement){
-		return matcher.reset(text).replaceFirst(replacement);
-	}
-
 	public static String replaceAll(String text, Matcher matcher, String replacement){
 		return matcher.reset(text).replaceAll(replacement);
 	}
