@@ -3,6 +3,7 @@ package org.arabidopsis.ahocorasick;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
+import lombok.Getter;
 
 
 /**
@@ -32,6 +33,7 @@ import java.util.Queue;
  */
 public class AhoCorasick{
 
+	@Getter
 	private final State root;
 	private boolean prepared;
 
@@ -64,26 +66,22 @@ public class AhoCorasick{
 	}
 
 	/**
-	 * Starts a new search, and returns an Iterator of SearchResults.
-	 */
-	public Iterator<SearchResult> search(char[] chars){
-		return new Searcher(this, this.startSearch(chars));
-	}
-
-	/**
-	 * DANGER DANGER: dense algorithm code ahead. Very order dependent. Initializes the fail
-	 * transitions of all states except for the root.
+	 * Initializes the fail transitions of all states except for the root.
 	 */
 	private void prepareFailTransitions(){
 		Queue<State> q = new ArrayDeque<>();
 
-		for(int i = 0; i < 256; i ++)
+		for(int i = 0; i < 256; i ++){
 			if(root.get((char)i) != null){
 				root.get((char)i).setFail(root);
+
 				q.add(root.get((char)i));
 			}
+			else
+				//sets all the out transitions of the root to itself, if no transition yet exists at this point
+				root.put((char)i, root);
+		}
 
-		this.prepareRoot();
 		while(!q.isEmpty()){
 			State node = q.remove();
 
@@ -105,20 +103,10 @@ public class AhoCorasick{
 	}
 
 	/**
-	 * Sets all the out transitions of the root to itself, if no
-	 * transition yet exists at this point.
+	 * Starts a new search, and returns an Iterator of SearchResults.
 	 */
-	private void prepareRoot(){
-		for(int i = 0; i < 256; i ++)
-			if(this.root.get((char)i) == null)
-				this.root.put((char)i, this.root);
-	}
-
-	/**
-	 * Returns the root of the tree.
-	 */
-	State getRoot(){
-		return this.root;
+	public Iterator<SearchResult> search(char[] chars){
+		return new Searcher(this, this.startSearch(chars));
 	}
 
 	/**

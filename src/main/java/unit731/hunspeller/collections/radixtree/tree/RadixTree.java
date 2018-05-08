@@ -145,6 +145,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 						//TODO
 						//out(u) += out(f(u))
+						//node.addValues(state.getValues());
 
 						break;
 					}
