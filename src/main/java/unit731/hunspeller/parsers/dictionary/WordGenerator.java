@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -88,11 +89,20 @@ public class WordGenerator{
 	private List<RuleProductionEntry> getTwofoldProductions(RuleProductionEntry production, boolean complexPrefixes) throws IllegalArgumentException{
 		Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
 		Set<String> affixes = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
-		return getLastfoldProductions(production, affixes);
+
+		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
+
+		//add parent derivations
+		List<AffixEntry> appliedRules = production.getAppliedRules();
+		if(appliedRules != null)
+			productions.forEach(prod -> prod.getAppliedRules().addAll(0, appliedRules));
+
+		return productions;
 	}
 
 	private List<RuleProductionEntry> getLastfoldProductions(RuleProductionEntry production, Set<String> affixes){
-		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
+		List<RuleProductionEntry> productions = (!production.hasProductionRules() || production.isCombineable()?
+			applyAffixRules(production, affixes): Collections.<RuleProductionEntry>emptyList());
 
 		//add parent derivations
 		List<AffixEntry> appliedRules = production.getAppliedRules();
