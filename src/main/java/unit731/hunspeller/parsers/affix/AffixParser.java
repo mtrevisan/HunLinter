@@ -30,6 +30,9 @@ import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 
 
+/**
+ * Options managed: SET, FLAG, COMPLEXPREFIXES, LANG, PFX, SFX, FULLSTRIP, KEEPCASE
+ */
 public class AffixParser{
 
 	public static final String FLAG_TYPE_UTF_8 = "UTF-8";
@@ -80,7 +83,8 @@ public class AffixParser{
 	private final Map<String, Object> data = new HashMap<>();
 	private Set<String> rawFlags;
 	private Charset charset;
-	@Getter private FlagParsingStrategy strategy;
+	@Getter
+	private FlagParsingStrategy strategy;
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
