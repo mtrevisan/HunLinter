@@ -31,7 +31,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Options managed: SET, FLAG, COMPLEXPREFIXES, LANG, PFX, SFX, FULLSTRIP, KEEPCASE
+ * Options managed: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE
  */
 public class AffixParser{
 
@@ -63,8 +63,27 @@ public class AffixParser{
 
 	//Options for compounding
 	private static final String TAG_COMPOUND_RULE = "COMPOUNDRULE";
+	/** Minimum length of words in compound words */
 	private static final String TAG_COMPOUND_MIN = "COMPOUNDMIN";
+	/** Words may be in compound words (except when word shorter than COMPOUNDMIN), affixes with this flag also permits compounding of affixed words */
+	private static final String TAG_COMPOUND_FLAG = "COMPOUNDFLAG";
+	/** Words signed with this flag (or with a signed affix) may be first elements in compound words */
+	private static final String TAG_COMPOUND_BEGIN = "COMPOUNDBEGIN";
+	/** Words signed with this flag (or with a signed affix) may be middle elements in compound words */
+	private static final String TAG_COMPOUND_MIDDLE = "COMPOUNDMIDDLE";
+	/** Words signed with this flag (or with a signed affix) may be last elements in compound words */
+	private static final String TAG_COMPOUND_LAST = "COMPOUNDLAST";
+	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	private static final String TAG_ONLY_IN_COMPOUND = "ONLYINCOMPOUND";
+	/**
+	 * Prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds by default.
+	 * Affixes with this flag may be inside of compounds.
+	 */
+	private static final String COMPOUND_PERMIT_FLAG = "COMPOUNDPERMITFLAG";
+	/** Suffixes with this flag forbid compounding of the affixed word */
+	private static final String COMPOUND_FORBID_FLAG = "COMPOUNDFORBIDFLAG";
+	/** Set maximum word count in a compound word (default is unlimited) */
+	private static final String COMPOUND_WORD_MAX = "COMPOUNDWORDMAX";
 
 	//Options for affix creation
 	private static final String TAG_PREFIX = AffixEntry.TYPE.PREFIX.getFlag();
@@ -89,6 +108,9 @@ public class AffixParser{
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
 		addData(context.getRuleType(), context.getAllButFirstParameter());
+	};
+	private final Consumer<ParsingContext> FUN_COPY_OVER_AS_NUMBER = context -> {
+		addData(context.getRuleType(), Integer.valueOf(context.getAllButFirstParameter()));
 	};
 	private final Consumer<ParsingContext> FUN_COMPOUND_RULE = context -> {
 		try{
@@ -236,8 +258,15 @@ public class AffixParser{
 		//default break table contains: "-", "^-", and "-$"
 //		RULE_FUNCTION.put("BREAK", FUN_DO_NOTHING);
 		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
-		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
+		RULE_FUNCTION.put(TAG_COMPOUND_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_BEGIN, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_MIDDLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_LAST, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
+		RULE_FUNCTION.put(COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
 		//Options for affix creation
 		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);
 		RULE_FUNCTION.put(TAG_SUFFIX, FUN_AFFIX);
@@ -281,6 +310,8 @@ public class AffixParser{
 			}
 		}
 
+		if(!containsData(TAG_COMPOUND_MIN))
+			addData(TAG_COMPOUND_MIN, 3);
 		//apply default charset
 		if(!containsData(TAG_CHARACTER_SET))
 			addData(TAG_CHARACTER_SET, charset);
