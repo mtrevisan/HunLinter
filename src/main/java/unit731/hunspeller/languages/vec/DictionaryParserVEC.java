@@ -208,7 +208,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			String derivedWord = production.getWord();
 
 			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
-			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
+			if(production.hasRemainingRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
 				northernPluralCheck(production, derivedWordWithoutDataFields);
@@ -313,7 +313,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
 		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && false//!production.hasProductionRule(AffixEntry.TYPE.PREFIX)
+		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && false//!production.hasProductionRule(AffixEntry.Type.PREFIX)
 				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
 				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
 				&& !word.contains(VANISHING_EL)

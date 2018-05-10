@@ -6,18 +6,17 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 public interface Productable{
 
 	String getWord();
-	String[] getRuleFlags();
+	String[] getRemainingRuleFlags();
 	String[] getDataFields();
 
-	boolean containsRuleFlag(String ruleFlag);
 	boolean containsDataField(String dataField);
 	boolean isCombineable();
 
-	default String getDataField(String type){
+	default String getDataFieldPrefixedBy(String typePrefix){
 		String[] dataFields = getDataFields();
 		if(dataFields != null)
 			for(String field : dataFields)
-				if(field.startsWith(type))
+				if(field.startsWith(typePrefix))
 					return field;
 		return null;
 	}

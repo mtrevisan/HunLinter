@@ -25,7 +25,7 @@ public class DictionaryEntry implements Productable{
 
 
 	private final String word;
-	private final String[] ruleFlags;
+	private final String[] remainingRuleFlags;
 	private final String[] dataFields;
 	private final boolean combineable;
 
@@ -42,7 +42,7 @@ public class DictionaryEntry implements Productable{
 
 		word = m.group("word");
 		String dicFlags = m.group("flags");
-		ruleFlags = strategy.parseRuleFlags(dicFlags);
+		remainingRuleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
 		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
 		combineable = true;
@@ -56,7 +56,7 @@ public class DictionaryEntry implements Productable{
 		Objects.requireNonNull(strategy);
 
 		word = productable.getWord();
-		ruleFlags = strategy.parseRuleFlags(ruleFlag);
+		remainingRuleFlags = strategy.parseRuleFlags(ruleFlag);
 		dataFields = productable.getDataFields();
 		combineable = productable.isCombineable();
 
@@ -64,20 +64,12 @@ public class DictionaryEntry implements Productable{
 	}
 
 	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
-		return Arrays.stream(ruleFlags)
+		return Arrays.stream(remainingRuleFlags)
 			.filter(rf -> {
 				RuleEntry r = ruleEntryExtractor.apply(rf);
 				return (r != null && !r.isSuffix());
 			})
 			.collect(Collectors.toList());
-	}
-
-	@Override
-	public boolean containsRuleFlag(String ruleFlag){
-		for(String flag : ruleFlags)
-			if(flag.equals(ruleFlag))
-				return true;
-		return false;
 	}
 
 	@Override
@@ -92,7 +84,7 @@ public class DictionaryEntry implements Productable{
 	public String toString(){
 		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
 			.add(word)
-			.add(strategy.joinRuleFlags(ruleFlags));
+			.add(strategy.joinRuleFlags(remainingRuleFlags));
 		if(dataFields != null && dataFields.length > 0)
 			sj.add(TAB)
 				.add(String.join(StringUtils.EMPTY, dataFields));
@@ -102,7 +94,7 @@ public class DictionaryEntry implements Productable{
 	public String toWordAndFlagString(){
 		return (new StringJoiner(StringUtils.EMPTY))
 			.add(word)
-			.add(strategy.joinRuleFlags(ruleFlags))
+			.add(strategy.joinRuleFlags(remainingRuleFlags))
 			.toString();
 	}
 
