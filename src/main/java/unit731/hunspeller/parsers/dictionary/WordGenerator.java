@@ -75,13 +75,13 @@ public class WordGenerator{
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 				lastfoldProductions.addAll(prods);
 
-				//FIXME
+				//TODO
 				//NOTE: this is because a suffix can have a prefix rule
-				for(RuleProductionEntry prod : prods){
-					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
-
-					lastfoldProductions.addAll(applyAffixRules(prod, applyAffixes));
-				}
+//				for(RuleProductionEntry prod : prods){
+//					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
+//
+//					lastfoldProductions.addAll(applyAffixRules(prod, applyAffixes));
+//				}
 			}
 		productions.addAll(lastfoldProductions);
 
