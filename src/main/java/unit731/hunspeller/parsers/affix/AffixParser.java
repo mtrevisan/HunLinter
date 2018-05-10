@@ -79,11 +79,23 @@ public class AffixParser{
 	 * Prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds by default.
 	 * Affixes with this flag may be inside of compounds.
 	 */
-	private static final String COMPOUND_PERMIT_FLAG = "COMPOUNDPERMITFLAG";
+	private static final String TAG_COMPOUND_PERMIT_FLAG = "COMPOUNDPERMITFLAG";
 	/** Suffixes with this flag forbid compounding of the affixed word */
-	private static final String COMPOUND_FORBID_FLAG = "COMPOUNDFORBIDFLAG";
+	private static final String TAG_COMPOUND_FORBID_FLAG = "COMPOUNDFORBIDFLAG";
 	/** Set maximum word count in a compound word (default is unlimited) */
-	private static final String COMPOUND_WORD_MAX = "COMPOUNDWORDMAX";
+	private static final String TAG_COMPOUND_WORD_MAX = "COMPOUNDWORDMAX";
+	/** Forbid word duplication in compounds */
+	private static final String TAG_CHECK_COMPOUND_DUPLICATION = "CHECKCOMPOUNDDUP";
+	/** Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with 'compound friendly' orthography) */
+	private static final String TAG_CHECK_COMPOUND_REP = "CHECKCOMPOUNDREP";
+	/** Forbid upper case characters at word bound in compounds */
+	private static final String TAG_CHECK_COMPOUND_CASE = "CHECKCOMPOUNDCASE";
+	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
+	private static final String TAG_CHECK_COMPOUND_TRIPLE = "CHECKCOMPOUNDTRIPLE";
+	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
+	private static final String TAG_SIMPLIFIED_TRIPLE = "SIMPLIFIEDTRIPLE";
+	/** Affixes signed with this flag may be on a word when this word also has a prefix with this flag and vice versa */
+	private static final String TAG_CIRCUMFIX = "CIRCUMFIX";
 
 	//Options for affix creation
 	private static final String TAG_PREFIX = AffixEntry.Type.PREFIX.getFlag();
@@ -264,9 +276,15 @@ public class AffixParser{
 		RULE_FUNCTION.put(TAG_COMPOUND_MIDDLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_COMPOUND_LAST, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
-		RULE_FUNCTION.put(COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
+		RULE_FUNCTION.put(TAG_COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
+		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_REP, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_CASE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CIRCUMFIX, FUN_COPY_OVER);
 		//Options for affix creation
 		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);
 		RULE_FUNCTION.put(TAG_SUFFIX, FUN_AFFIX);
