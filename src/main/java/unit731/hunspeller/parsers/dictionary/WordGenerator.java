@@ -48,10 +48,7 @@ public class WordGenerator{
 
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException{
 		boolean complexPrefixes = affParser.isComplexPrefixes();
-		Affixes affixes = separateAffixes(dicEntry.getRuleFlags());
-		List<Set<String>> applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-		if(!complexPrefixes)
-			Collections.reverse(applyAffixes);
+		List<Set<String>> applyAffixes = getProductiveAffixes(dicEntry, complexPrefixes);
 
 		RuleProductionEntry baseProduction = new RuleProductionEntry(dicEntry);
 
@@ -59,10 +56,7 @@ public class WordGenerator{
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : firstfoldProductions){
-			affixes = separateAffixes(production.getRuleFlags());
-			applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-			if(!complexPrefixes)
-				Collections.reverse(applyAffixes);
+			applyAffixes = getProductiveAffixes(production, complexPrefixes);
 
 			twofoldProductions.addAll(applyAffixRules(production, applyAffixes));
 		}
@@ -74,10 +68,7 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
-				affixes = separateAffixes(production.getRuleFlags());
-				applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-				if(!complexPrefixes)
-					Collections.reverse(applyAffixes);
+				applyAffixes = getProductiveAffixes(production, complexPrefixes);
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
 
@@ -87,10 +78,7 @@ public class WordGenerator{
 
 		List<RuleProductionEntry> threefoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : lastfoldProductions){
-			affixes = separateAffixes(production.getRuleFlags());
-			applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-			if(!complexPrefixes)
-				Collections.reverse(applyAffixes);
+			applyAffixes = getProductiveAffixes(production, complexPrefixes);
 
 			threefoldProductions.addAll(applyAffixRules(production, applyAffixes));
 		}
@@ -104,13 +92,21 @@ public class WordGenerator{
 		return productions;
 	}
 
+	private List<Set<String>> getProductiveAffixes(Productable productable, boolean complexPrefixes){
+		Affixes affixes = separateAffixes(productable.getRuleFlags());
+		List<Set<String>> applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
+		if(!complexPrefixes)
+			Collections.reverse(applyAffixes);
+		return applyAffixes;
+	}
+
 	/**
 	 * Separate the prefixes from the suffixes
 	 * 
 	 * @param ruleFlags	List of flags
 	 * @return	An object with separated flags, one for each group
 	 */
-	public Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
+	private Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
