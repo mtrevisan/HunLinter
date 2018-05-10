@@ -208,7 +208,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			String derivedWord = production.getWord();
 
 			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
-			if(production.hasRemainingRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
+			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
 				northernPluralCheck(production, derivedWordWithoutDataFields);

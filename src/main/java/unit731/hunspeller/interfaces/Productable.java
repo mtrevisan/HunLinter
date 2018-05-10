@@ -6,9 +6,10 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 public interface Productable{
 
 	String getWord();
-	String[] getRemainingRuleFlags();
+	String[] getRuleFlags();
 	String[] getDataFields();
 
+	boolean containsRuleFlag(String ruleFlag);
 	boolean containsDataField(String dataField);
 	boolean isCombineable();
 

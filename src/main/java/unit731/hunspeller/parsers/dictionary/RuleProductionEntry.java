@@ -2,8 +2,10 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
@@ -13,11 +15,11 @@ import unit731.hunspeller.interfaces.Productable;
 
 
 @Getter
-@EqualsAndHashCode(of = {"word", "remainingRuleFlags", "dataFields"})
+@EqualsAndHashCode(of = {"word", "ruleFlags", "dataFields"})
 public class RuleProductionEntry implements Productable{
 
 	private final String word;
-	private final String[] remainingRuleFlags;
+	private final String[] ruleFlags;
 	private final String[] dataFields;
 	private List<AffixEntry> appliedRules;
 	private final boolean combineable;
@@ -27,21 +29,30 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(productable);
 
 		word = productable.getWord();
-		remainingRuleFlags = productable.getRemainingRuleFlags();
+		ruleFlags = productable.getRuleFlags();
 		dataFields = productable.getDataFields();
 		combineable = true;
 	}
 
-	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry appliedEntry, boolean combineable){
+	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry appliedEntry, Set<String> remainingRuleFlags, boolean combineable){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(appliedEntry);
 
 		this.word = word;
-		remainingRuleFlags = appliedEntry.getRuleFlags();
+		ruleFlags = combineRuleFlags(appliedEntry.getRuleFlags(), remainingRuleFlags);
 		this.dataFields = combineDataFields(originalDataFields, appliedEntry.getDataFields());
 		appliedRules = new ArrayList<>();
 		appliedRules.add(appliedEntry);
 		this.combineable = combineable;
+	}
+
+	private String[] combineRuleFlags(String[] ruleFlags1, Set<String> ruleFlags2){
+		Set<String> flags = new HashSet<>();
+		if(ruleFlags1 != null)
+			flags.addAll(Arrays.asList(ruleFlags1));
+		if(ruleFlags2 != null && !ruleFlags2.isEmpty())
+			flags.addAll(ruleFlags2);
+		return flags.toArray(new String[flags.size()]);
 	}
 
 	private String[] combineDataFields(String[] dataFields, String[] affixEntryDataFields){
@@ -63,8 +74,17 @@ public class RuleProductionEntry implements Productable{
 		return newDataFields.toArray(new String[0]);
 	}
 
-	public boolean hasRemainingRuleFlags(){
-		return (remainingRuleFlags != null && remainingRuleFlags.length > 0);
+	public boolean hasRuleFlags(){
+		return (ruleFlags != null && ruleFlags.length > 0);
+	}
+
+	@Override
+	public boolean containsRuleFlag(String ruleFlag){
+		if(ruleFlags != null)
+			for(String flag : ruleFlags)
+				if(flag.equals(ruleFlag))
+					return true;
+		return false;
 	}
 
 	public boolean hasDataFields(){
