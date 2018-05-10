@@ -72,7 +72,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	}
 
 	public RadixTreeNode<S, V> getChild(int index, S key, SequencerInterface<S> sequencer){
-		RadixTreeNode<S, V> response = null;
+		RadixTreeNode<S, V> response = failNode;
 		if(children != null)
 			for(RadixTreeNode<S, V> child : children){
 				boolean found = true;
