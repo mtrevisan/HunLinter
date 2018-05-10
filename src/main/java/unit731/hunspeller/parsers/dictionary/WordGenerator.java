@@ -72,149 +72,37 @@ public class WordGenerator{
 		productions.addAll(firstfoldProductions);
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
+		for(RuleProductionEntry production : productions)
+			if(production.isCombineable()){
+				affixes = separateAffixes(production.getRuleFlags());
+				applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
+				if(!complexPrefixes)
+					Collections.reverse(applyAffixes);
+				//swap prefixes with suffixes
+				Collections.reverse(applyAffixes);
+
+				lastfoldProductions.addAll(applyAffixRules(production, applyAffixes));
+			}
+		productions.addAll(lastfoldProductions);
+
+		List<RuleProductionEntry> threefoldProductions = new ArrayList<>();
+		for(RuleProductionEntry production : lastfoldProductions){
 			affixes = separateAffixes(production.getRuleFlags());
 			applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
 			if(!complexPrefixes)
 				Collections.reverse(applyAffixes);
-			//swap prefixes with suffixes
-			Collections.reverse(applyAffixes);
 
-			lastfoldProductions.addAll(applyAffixRules(production, applyAffixes));
+			threefoldProductions.addAll(applyAffixRules(production, applyAffixes));
 		}
-		productions.addAll(lastfoldProductions);
+		productions.addAll(threefoldProductions);
 
-/*
-#case 1
-SFX TA Y 1
-SFX TA 0 e .
-
-#case 2
-SFX TB Y 1
-SFX TB 0 e/TG .
-SFX TG Y 1
-SFX TG 0 a .
-
-#case 3
-SFX TC Y 1
-SFX TC 0 e/TH .
-PFX TH Y 1
-PFX TH 0 a .
-
-#case 4
-SFX TD Y 1
-SFX TD 0 e/TI .
-PFX TI Y 1
-PFX TI 0 a/D0 .
-
-#case 5
-SFX TE N 1
-SFX TE 0 e/TJ .
-PFX TJ Y 1
-PFX TJ 0 a .
-
-#case 6
-SFX TF N 1
-SFX TF 0 e/TK .
-PFX TK Y 1
-PFX TK 0 a/D0 .
-*/
-
-/*		checkTwofoldViolation(twofoldProductions);
-
-		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
-*/
-/*		List<RuleProductionEntry> productions = new ArrayList<>();
-		productions.add(baseProduction);
-		productions.addAll(firstfoldProductions);
-		productions.addAll(twofoldProductions);
-		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
-			Affixes twofoldAffixes = separateAffixes(production.getRemainingRuleFlags());
-			Set<String> affxs = (complexPrefixes? twofoldAffixes.getSuffixes(): twofoldAffixes.getPrefixes());
-
-			lastfoldProductions.addAll(getLastfoldProductions(production, affxs));
-		}
-		productions.addAll(lastfoldProductions);
-
-		checkTwofoldViolation(lastfoldProductions);
-*/
-//		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
-
-		return productions;
-	}
-/*
-	public List<RuleProductionEntry> applyRules2(DictionaryEntry dicEntry) throws IllegalArgumentException{
-		boolean complexPrefixes = affParser.isComplexPrefixes();
-		Affixes affixes = separateAffixes(dicEntry.getRemainingRuleFlags());
-		Set<String> prefixes = affixes.getPrefixes();
-		Set<String> suffixes = affixes.getSuffixes();
-
-		List<RuleProductionEntry> firstfoldProductions = getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes));
-
-		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : firstfoldProductions){
-			Affixes twofoldAffixes = separateAffixes(production.getRemainingRuleFlags());
-			Set<String> affxs = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
-
-			twofoldProductions.addAll(getTwofoldProductions(production, affxs));
-		}
-
-		checkTwofoldViolation(twofoldProductions);
-
-		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
-
-		List<RuleProductionEntry> productions = new ArrayList<>();
-		productions.add(baseProduction);
-		productions.addAll(firstfoldProductions);
-		productions.addAll(twofoldProductions);
-		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions){
-			Affixes twofoldAffixes = separateAffixes(production.getRemainingRuleFlags());
-			Set<String> affxs = (complexPrefixes? twofoldAffixes.getSuffixes(): twofoldAffixes.getPrefixes());
-
-			lastfoldProductions.addAll(getLastfoldProductions(production, affxs));
-		}
-		productions.addAll(lastfoldProductions);
-
-		checkTwofoldViolation(lastfoldProductions);
+//		checkTwofoldViolation(productions);
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
 		return productions;
 	}
 
-	private RuleProductionEntry getBaseProduction(DictionaryEntry dicEntry){
-		return new RuleProductionEntry(dicEntry);
-	}
-
-	private List<RuleProductionEntry> getFirstfoldProductions(DictionaryEntry dicEntry, List<Set<String>> applyAffixes){
-		return applyAffixRules(dicEntry, applyAffixes);
-	}
-
-	private List<RuleProductionEntry> getTwofoldProductions(RuleProductionEntry production, Set<String> affixes) throws IllegalArgumentException{
-		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
-
-		//add parent derivations
-		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(appliedRules != null)
-			productions.forEach(prod -> prod.getAppliedRules().addAll(0, appliedRules));
-
-		return productions;
-	}
-
-	private List<RuleProductionEntry> getLastfoldProductions(RuleProductionEntry production, Set<String> affixes){
-		List<RuleProductionEntry> productions = (!production.hasProductionRules() || production.isCombineable()?
-			applyAffixRules(production, affixes): Collections.<RuleProductionEntry>emptyList());
-
-		//add parent derivations
-		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(appliedRules != null)
-			productions.forEach(prod -> prod.getAppliedRules().addAll(0, appliedRules));
-
-		return productions;
-	}
-*/
 	/**
 	 * Separate the prefixes from the suffixes
 	 * 
@@ -247,13 +135,16 @@ PFX TK 0 a/D0 .
 	}
 
 	private List<RuleProductionEntry> applyAffixRules(Productable productable, List<Set<String>> applyAffixes){
+		Set<String> appliedAffixes = applyAffixes.get(0);
+		Set<String> postponedAffixes = applyAffixes.get(1);
+
 		List<RuleProductionEntry> productions = new ArrayList<>();
-		if(!applyAffixes.get(0).isEmpty()){
+		if(!appliedAffixes.isEmpty()){
 			String word = productable.getWord();
 			String[] ruleFlags = productable.getRuleFlags();
 			String[] dataFields = productable.getDataFields();
 
-			for(String affix : applyAffixes.get(0)){
+			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
 				if(rule == null)
 					throw new IllegalArgumentException(affix);
@@ -298,7 +189,7 @@ PFX TK 0 a/D0 .
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
 					boolean combineable = (productable.isCombineable() && rule.isCombineable());
-					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, applyAffixes.get(1), combineable);
+					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, postponedAffixes, combineable);
 
 					productions.add(production);
 				}
