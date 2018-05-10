@@ -55,8 +55,11 @@ public class WordGenerator{
 		List<RuleProductionEntry> firstfoldProductions = getFirstfoldProductions(dicEntry, (complexPrefixes? prefixes: suffixes));
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : firstfoldProductions)
-			twofoldProductions.addAll(getTwofoldProductions(production, complexPrefixes));
+		for(RuleProductionEntry production : firstfoldProductions){
+			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
+			Set<String> affxs = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
+			twofoldProductions.addAll(getTwofoldProductions(production, affxs));
+		}
 
 		checkTwofoldViolation(twofoldProductions);
 
@@ -67,8 +70,14 @@ public class WordGenerator{
 		productions.addAll(firstfoldProductions);
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions)
-			lastfoldProductions.addAll(getLastfoldProductions(production, (complexPrefixes? suffixes: prefixes)));
+		for(RuleProductionEntry production : productions){
+			//add firstfold rules to the list of original rules
+			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
+			Set<String> affxs = new HashSet<>(complexPrefixes? suffixes: prefixes);
+			affxs.addAll(complexPrefixes? twofoldAffixes.getSuffixes(): twofoldAffixes.getPrefixes());
+
+			lastfoldProductions.addAll(getLastfoldProductions(production, affxs));
+		}
 		productions.addAll(lastfoldProductions);
 
 		checkTwofoldViolation(lastfoldProductions);
@@ -86,10 +95,7 @@ public class WordGenerator{
 		return applyAffixRules(dicEntry, affixes);
 	}
 
-	private List<RuleProductionEntry> getTwofoldProductions(RuleProductionEntry production, boolean complexPrefixes) throws IllegalArgumentException{
-		Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
-		Set<String> affixes = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
-
+	private List<RuleProductionEntry> getTwofoldProductions(RuleProductionEntry production, Set<String> affixes) throws IllegalArgumentException{
 		List<RuleProductionEntry> productions = applyAffixRules(production, affixes);
 
 		//add parent derivations
@@ -194,7 +200,8 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, rule.isCombineable());
+					boolean combineable = (productable.isCombineable() && rule.isCombineable());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, combineable);
 
 					productions.add(production);
 				}

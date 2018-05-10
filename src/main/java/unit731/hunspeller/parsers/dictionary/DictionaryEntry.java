@@ -27,6 +27,7 @@ public class DictionaryEntry implements Productable{
 	private final String word;
 	private final String[] ruleFlags;
 	private final String[] dataFields;
+	private final boolean combineable;
 
 	private final FlagParsingStrategy strategy;
 
@@ -44,6 +45,7 @@ public class DictionaryEntry implements Productable{
 		ruleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
 		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
+		combineable = true;
 
 		this.strategy = strategy;
 	}
@@ -56,6 +58,7 @@ public class DictionaryEntry implements Productable{
 		word = productable.getWord();
 		ruleFlags = strategy.parseRuleFlags(ruleFlag);
 		dataFields = productable.getDataFields();
+		combineable = productable.isCombineable();
 
 		this.strategy = strategy;
 	}

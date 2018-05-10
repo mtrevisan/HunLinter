@@ -11,6 +11,7 @@ public interface Productable{
 
 	boolean containsRuleFlag(String ruleFlag);
 	boolean containsDataField(String dataField);
+	boolean isCombineable();
 
 	default String getDataField(String type){
 		String[] dataFields = getDataFields();

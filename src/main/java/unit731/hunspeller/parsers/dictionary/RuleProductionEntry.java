@@ -29,7 +29,7 @@ public class RuleProductionEntry implements Productable{
 		word = productable.getWord();
 		ruleFlags = productable.getRuleFlags();
 		dataFields = productable.getDataFields();
-		combineable = false;
+		combineable = true;
 	}
 
 	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry entry, boolean combineable){
