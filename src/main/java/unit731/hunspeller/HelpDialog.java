@@ -55,7 +55,7 @@ public class HelpDialog extends JDialog{
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);
 		lblReleaseDateOut.setText(buildTimestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US)));
-		lblCopyrightOut.setText("Copyright © 2017 Mauro Trevisan");
+		lblCopyrightOut.setText("Copyright © " + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy", Locale.US)) + " Mauro Trevisan");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
