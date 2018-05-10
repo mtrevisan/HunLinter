@@ -72,10 +72,12 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		}
 		catch(IOException | IllegalArgumentException e){
 			publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			publish("Stopped reading Dictionary file");
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
 			publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
+			publish("Stopped reading Dictionary file");
 		}
 		return null;
 	}

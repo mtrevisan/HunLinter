@@ -96,10 +96,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": "
 					+ e.getMessage());
+				publish("Stopped reading Thesaurus file");
 			}
 			catch(Exception e){
 				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
+				publish("Stopped reading Thesaurus file");
 			}
 			finally{
 				LOCK_SAVING.unlock();

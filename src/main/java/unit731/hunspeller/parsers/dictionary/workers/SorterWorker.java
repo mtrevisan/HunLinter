@@ -77,10 +77,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		}
 		catch(IOException | IllegalArgumentException e){
 			publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			publish("Stopped reading Dictionary file");
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
 			publish(e.getClass().getSimpleName() + ": " + message);
+			publish("Stopped reading Dictionary file");
 		}
 		return null;
 	}
