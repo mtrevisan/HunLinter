@@ -96,6 +96,7 @@ public class WordGenerator{
 		}
 		productions.addAll(threefoldProductions);
 
+		//FIXME
 //		checkTwofoldViolation(productions);
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
