@@ -87,7 +87,7 @@ public class AffixParser{
 	/** Forbid word duplication in compounds */
 	private static final String TAG_CHECK_COMPOUND_DUPLICATION = "CHECKCOMPOUNDDUP";
 	/** Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with 'compound friendly' orthography) */
-	private static final String TAG_CHECK_COMPOUND_REP = "CHECKCOMPOUNDREP";
+	private static final String TAG_CHECK_COMPOUND_REPLACEMENT = "CHECKCOMPOUNDREP";
 	/** Forbid upper case characters at word bound in compounds */
 	private static final String TAG_CHECK_COMPOUND_CASE = "CHECKCOMPOUNDCASE";
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
@@ -280,7 +280,7 @@ public class AffixParser{
 		RULE_FUNCTION.put(TAG_COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
 		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_REP, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_CASE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
