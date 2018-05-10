@@ -28,20 +28,20 @@ public class AffixEntry{
 
 
 	@Getter
-	public static enum TYPE{
+	public static enum Type{
 		SUFFIX("SFX"),
 		PREFIX("PFX");
 
 
 		private final String flag;
 
-		TYPE(String flag){
+		Type(String flag){
 			this.flag = flag;
 		}
 
-		public static TYPE toEnum(String flag){
-			TYPE[] types = TYPE.values();
-			for(TYPE type : types)
+		public static Type toEnum(String flag){
+			Type[] types = Type.values();
+			for(Type type : types)
 				if(type.getFlag().equals(flag))
 					return type;
 			return null;
@@ -49,7 +49,7 @@ public class AffixEntry{
 	};
 
 
-	@Getter private final TYPE type;
+	@Getter private final Type type;
 	//ID used to represent the affix
 	@Getter private final String flag;
 	@Getter private final String[] ruleFlags;
@@ -76,7 +76,7 @@ public class AffixEntry{
 		String regexToMatch = lineParts[4];
 		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
-		type = TYPE.toEnum(ruleType);
+		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
 		ruleFlags = (classes.length > 0? classes: null);
 		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
@@ -91,7 +91,7 @@ public class AffixEntry{
 	}
 
 	public final boolean isSuffix(){
-		return (type == TYPE.SUFFIX);
+		return (type == Type.SUFFIX);
 	}
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{

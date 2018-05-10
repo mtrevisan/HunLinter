@@ -97,7 +97,7 @@ public class RuleProductionEntry implements Productable{
 		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(ruleFlag)));
 	}
 
-	public boolean hasProductionRule(AffixEntry.TYPE type){
+	public boolean hasProductionRule(AffixEntry.Type type){
 		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 	}
 
@@ -106,7 +106,7 @@ public class RuleProductionEntry implements Productable{
 		int suffixRules = 0;
 		if(appliedRules != null && appliedRules.size() > 1)
 			for(AffixEntry appliedRule : appliedRules){
-				if(appliedRule.getType() == AffixEntry.TYPE.PREFIX)
+				if(appliedRule.getType() == AffixEntry.Type.PREFIX)
 					prefixRules ++;
 				else
 					suffixRules ++;

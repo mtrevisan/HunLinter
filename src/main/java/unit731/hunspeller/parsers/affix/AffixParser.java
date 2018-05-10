@@ -86,8 +86,8 @@ public class AffixParser{
 	private static final String COMPOUND_WORD_MAX = "COMPOUNDWORDMAX";
 
 	//Options for affix creation
-	private static final String TAG_PREFIX = AffixEntry.TYPE.PREFIX.getFlag();
-	private static final String TAG_SUFFIX = AffixEntry.TYPE.SUFFIX.getFlag();
+	private static final String TAG_PREFIX = AffixEntry.Type.PREFIX.getFlag();
+	private static final String TAG_SUFFIX = AffixEntry.Type.SUFFIX.getFlag();
 
 	//Other options
 	/** With this flag the affix rules can strip full words, not only one less characters */
@@ -150,7 +150,7 @@ public class AffixParser{
 	};
 	private final Consumer<ParsingContext> FUN_AFFIX = context -> {
 		try{
-			AffixEntry.TYPE ruleType = AffixEntry.TYPE.toEnum(context.getRuleType());
+			AffixEntry.Type ruleType = AffixEntry.Type.toEnum(context.getRuleType());
 			BufferedReader br = context.getReader();
 			boolean isSuffix = context.isSuffix();
 			String ruleFlag = context.getFirstParameter();
