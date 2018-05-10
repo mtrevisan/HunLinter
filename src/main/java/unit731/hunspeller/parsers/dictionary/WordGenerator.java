@@ -72,17 +72,18 @@ public class WordGenerator{
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
 
-				lastfoldProductions.addAll(applyAffixRules(production, applyAffixes));
+				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
+				lastfoldProductions.addAll(prods);
+
+				//FIXME
+				//NOTE: this is because a suffix can have a prefix rule
+				for(RuleProductionEntry prod : prods){
+					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
+
+					lastfoldProductions.addAll(applyAffixRules(prod, applyAffixes));
+				}
 			}
 		productions.addAll(lastfoldProductions);
-
-		List<RuleProductionEntry> threefoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : lastfoldProductions){
-			applyAffixes = getProductiveAffixes(production, complexPrefixes);
-
-			threefoldProductions.addAll(applyAffixRules(production, applyAffixes));
-		}
-		productions.addAll(threefoldProductions);
 
 		//FIXME
 //		checkTwofoldViolation(productions);
