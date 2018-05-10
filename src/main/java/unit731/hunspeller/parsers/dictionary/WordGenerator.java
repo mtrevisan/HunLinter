@@ -58,6 +58,7 @@ public class WordGenerator{
 		for(RuleProductionEntry production : firstfoldProductions){
 			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
 			Set<String> affxs = (complexPrefixes? twofoldAffixes.getPrefixes(): twofoldAffixes.getSuffixes());
+
 			twofoldProductions.addAll(getTwofoldProductions(production, affxs));
 		}
 
@@ -72,8 +73,8 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions){
 			//add firstfold rules to the list of original rules
-			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
 			Set<String> affxs = new HashSet<>(complexPrefixes? suffixes: prefixes);
+			Affixes twofoldAffixes = separateAffixes(production.getRuleFlags());
 			affxs.addAll(complexPrefixes? twofoldAffixes.getSuffixes(): twofoldAffixes.getPrefixes());
 
 			lastfoldProductions.addAll(getLastfoldProductions(production, affxs));

@@ -227,7 +227,6 @@ public class HyphenationParser{
 			catch(IOException | IllegalArgumentException e){
 				publish(e instanceof ClosedChannelException? "Hyphenation parser thread interrupted": e.getClass().getSimpleName() + ": "
 					+ e.getMessage());
-				publish("Stopped reading Hyphenation file");
 			}
 			catch(Exception e){
 				String message = ExceptionService.getMessage(e, getClass());

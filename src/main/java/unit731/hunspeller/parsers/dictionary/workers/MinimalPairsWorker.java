@@ -190,7 +190,6 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 		}
 		catch(IOException | IllegalArgumentException e){
 			publish(e instanceof ClosedChannelException? "Minimal pairs thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-			publish("Stopped reading Dictionary file");
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
