@@ -108,6 +108,7 @@ public class WordGenerator{
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
+				List<RuleProductionEntry> lastlastfoldProductions = new ArrayList<>();
 				for(RuleProductionEntry prod : prods){
 					//add parent derivations
 					prod.prependAppliedRules(appliedRules);
@@ -117,7 +118,25 @@ public class WordGenerator{
 					if(!applyAffixes.get(1).isEmpty())
 						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
 							+ (complexPrefixes? "suffix": "prefix") + " rules " + applyAffixes.get(1).stream().collect(Collectors.joining(", ")) + ")");
+					if(!applyAffixes.get(0).isEmpty() && prod.getAppliedRules().size() < 2){
+						List<RuleProductionEntry> prods2 = applyAffixRules(prod, applyAffixes);
+						List<AffixEntry> appliedRules2 = prod.getAppliedRules();
+						for(RuleProductionEntry prod2 : prods2){
+							//add parent derivations
+							prod2.prependAppliedRules(appliedRules2);
+							prod2.prependAppliedRules(appliedRules);
+
+							//check correctness
+							List<Set<String>> applyAffixes2 = getProductiveAffixes(prod2, complexPrefixes);
+							if(!applyAffixes2.get(0).isEmpty())
+								throw new IllegalArgumentException("Twofold rule violated (" + prod2.getRulesSequence() + " still has "
+									+ (complexPrefixes? "prefix": "suffix") + " rules " + applyAffixes2.get(0).stream().collect(Collectors.joining(", ")) + ")");
+						}
+
+						lastlastfoldProductions.addAll(prods2);
+					}
 				}
+				prods.addAll(lastlastfoldProductions);
 
 				//TODO
 				//NOTE: this is because a suffix can have a prefix rule
