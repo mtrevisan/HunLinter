@@ -101,8 +101,8 @@ public class WordGenerator{
 		productions.add(baseProduction);
 		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);
-//		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
-//		productions.addAll(lastfoldProductions);
+		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
+		productions.addAll(lastfoldProductions);
 
 		//FIXME
 //		checkTwofoldViolation(productions);
@@ -126,11 +126,17 @@ public class WordGenerator{
 		for(RuleProductionEntry production : onefoldProductions){
 			List<RuleProductionEntry> productions = getOnefoldProductions(production, complexPrefixes);
 
-			//add parent derivations
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(RuleProductionEntry prod : productions)
-				prod.getAppliedRules()
-					.addAll(0, appliedRules);
+			for(RuleProductionEntry prod : productions){
+				//add parent derivations
+				prod.prependAppliedRules(appliedRules);
+
+				//check correctness
+				List<Set<String>> applyAffixes = getProductiveAffixes(prod, complexPrefixes);
+				if(!applyAffixes.get(0).isEmpty())
+					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
+						+ (complexPrefixes? "prefix": "suffix") + " rules " + applyAffixes.get(0).stream().collect(Collectors.joining(", ")) + ")");
+			}
 
 			twofoldProductions.addAll(productions);
 		}

@@ -10,6 +10,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 
@@ -98,6 +99,11 @@ public class RuleProductionEntry implements Productable{
 				if(field.equals(dataField))
 					return true;
 		return false;
+	}
+
+	public void prependAppliedRules(List<AffixEntry> appliedRules){
+		this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>());
+		this.appliedRules.addAll(0, appliedRules);
 	}
 
 	public boolean hasProductionRules(){
