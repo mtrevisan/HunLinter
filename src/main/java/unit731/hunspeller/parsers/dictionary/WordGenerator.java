@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -46,29 +47,74 @@ public class WordGenerator{
 		return affParser.getFlagParsingStrategy();
 	}
 
+	@AllArgsConstructor
+	private class Pro{
+		private final Productable productable;
+		private String ruleFlag;
+		private Pro parent;
+
+		Pro(Productable productable){
+			this.productable = productable;
+		}
+
+		Pro(Productable productable, String ruleFlag){
+			this.productable = productable;
+			this.ruleFlag = ruleFlag;
+		}
+	}
+
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException{
+//		Set<String> appliedAffixes = applyAffixes.get(0);
+//		Set<String> postponedAffixes = applyAffixes.get(1);
+//
+//		Stack<Pro> stack = new Stack<>();
+//		stack.add(new Pro(dicEntry));
+//		for(String appliedAffix : appliedAffixes){
+//			//onefold
+//			Pro parent = new Pro(dicEntry, appliedAffix);
+//			stack.add(parent);
+//
+//			for(String postponedAffix : postponedAffixes){
+//				//twofold
+//				stack.add(new Pro(dicEntry, postponedAffix, parent));
+//
+//				//if postponedAffix have a prefix/suffix, add it
+//				RuleEntry rule = affParser.getData(postponedAffix);
+//				if(rule == null)
+//					throw new IllegalArgumentException(postponedAffix);
+//				else{
+//					List<Set<String>> applyTwofoldAffixes = getProductiveAffixes(dicEntry, complexPrefixes);
+//				}
+//			}
+//		}
+
+
+		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
+
 		boolean complexPrefixes = affParser.isComplexPrefixes();
-		List<Set<String>> applyAffixes = getProductiveAffixes(dicEntry, complexPrefixes);
-
-		RuleProductionEntry baseProduction = new RuleProductionEntry(dicEntry);
-
-		List<RuleProductionEntry> firstfoldProductions = applyAffixRules(dicEntry, applyAffixes);
+		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry, complexPrefixes);
 
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : firstfoldProductions){
-			applyAffixes = getProductiveAffixes(production, complexPrefixes);
+		for(RuleProductionEntry production : onefoldProductions){
+			List<RuleProductionEntry> productions = getOnefoldProductions(production, complexPrefixes);
 
-			twofoldProductions.addAll(applyAffixRules(production, applyAffixes));
+			//add parent derivations
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			for(RuleProductionEntry prod : productions)
+				prod.getAppliedRules()
+					.addAll(0, appliedRules);
+
+			twofoldProductions.addAll(productions);
 		}
 
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		productions.add(baseProduction);
-		productions.addAll(firstfoldProductions);
+		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
-				applyAffixes = getProductiveAffixes(production, complexPrefixes);
+				List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
 
@@ -91,6 +137,15 @@ public class WordGenerator{
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
 		return productions;
+	}
+
+	private RuleProductionEntry getBaseProduction(Productable productable){
+		return new RuleProductionEntry(productable);
+	}
+
+	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes){
+		List<Set<String>> applyAffixes = getProductiveAffixes(productable, complexPrefixes);
+		return applyAffixRules(productable, applyAffixes);
 	}
 
 	private List<Set<String>> getProductiveAffixes(Productable productable, boolean complexPrefixes){
