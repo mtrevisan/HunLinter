@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,11 +107,9 @@ public class AffixParser{
 	private static final String TAG_KEEP_CASE = "KEEPCASE";
 
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|^\\s*#.*$");
-	private static final Matcher REGEX_COMPOUND_RULES_OPERATORS = PatternService.matcher("[*?()]");
 
 
 	private final Map<String, Object> data = new HashMap<>();
-	private Set<String> rawFlags;
 	private Charset charset;
 	@Getter
 	private FlagParsingStrategy strategy;
@@ -385,28 +382,6 @@ public class AffixParser{
 
 	public Charset getCharset(){
 		return Charset.forName(getData(TAG_CHARACTER_SET));
-	}
-
-	public boolean isProductiveFlag(String ruleFlag){
-		if(rawFlags == null){
-			rawFlags = new HashSet<>();
-			rawFlags.add(getData(TAG_KEEP_CASE));
-			rawFlags.add(getData(TAG_NO_SUGGEST));
-			rawFlags.add(getData(TAG_ONLY_IN_COMPOUND));
-
-			Set<String> compoundRules = getData(TAG_COMPOUND_RULE);
-			if(compoundRules != null){
-				StringJoiner sj = new StringJoiner(StringUtils.EMPTY);
-				for(String compoundRule : compoundRules)
-					sj.add(PatternService.clear(compoundRule, REGEX_COMPOUND_RULES_OPERATORS));
-				String rawRules = sj.toString();
-				String[] parsedRules = strategy.parseRuleFlags(rawRules);
-				rawFlags.addAll(Arrays.asList(parsedRules));
-			}
-
-			rawFlags.remove(null);
-		}
-		return rawFlags.contains(ruleFlag);
 	}
 
 	public boolean isFullstrip(){

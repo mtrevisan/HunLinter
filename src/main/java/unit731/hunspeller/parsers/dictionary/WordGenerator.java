@@ -89,47 +89,20 @@ public class WordGenerator{
 //		}
 
 
+		boolean complexPrefixes = affParser.isComplexPrefixes();
+
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
 
-		boolean complexPrefixes = affParser.isComplexPrefixes();
 		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry, complexPrefixes);
 
-		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : onefoldProductions){
-			List<RuleProductionEntry> productions = getOnefoldProductions(production, complexPrefixes);
-
-			//add parent derivations
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(RuleProductionEntry prod : productions)
-				prod.getAppliedRules()
-					.addAll(0, appliedRules);
-
-			twofoldProductions.addAll(productions);
-		}
+		List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions, complexPrefixes);
 
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		productions.add(baseProduction);
 		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);
-		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
-		for(RuleProductionEntry production : productions)
-			if(production.isCombineable()){
-				List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
-				//swap prefixes with suffixes
-				Collections.reverse(applyAffixes);
-
-				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
-				lastfoldProductions.addAll(prods);
-
-				//TODO
-				//NOTE: this is because a suffix can have a prefix rule
-//				for(RuleProductionEntry prod : prods){
-//					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
-//
-//					lastfoldProductions.addAll(applyAffixRules(prod, applyAffixes));
-//				}
-			}
-		productions.addAll(lastfoldProductions);
+//		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
+//		productions.addAll(lastfoldProductions);
 
 		//FIXME
 //		checkTwofoldViolation(productions);
@@ -146,6 +119,50 @@ public class WordGenerator{
 	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes){
 		List<Set<String>> applyAffixes = getProductiveAffixes(productable, complexPrefixes);
 		return applyAffixRules(productable, applyAffixes);
+	}
+
+	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions, boolean complexPrefixes){
+		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
+		for(RuleProductionEntry production : onefoldProductions){
+			List<RuleProductionEntry> productions = getOnefoldProductions(production, complexPrefixes);
+
+			//add parent derivations
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			for(RuleProductionEntry prod : productions)
+				prod.getAppliedRules()
+					.addAll(0, appliedRules);
+
+			twofoldProductions.addAll(productions);
+		}
+		return twofoldProductions;
+	}
+
+	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions, boolean complexPrefixes){
+		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
+		for(RuleProductionEntry production : productions)
+			if(production.isCombineable()){
+				List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
+				//swap prefixes with suffixes
+				Collections.reverse(applyAffixes);
+				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
+
+				//add parent derivations
+				List<AffixEntry> appliedRules = production.getAppliedRules();
+				for(RuleProductionEntry prod : prods)
+					prod.getAppliedRules()
+						.addAll(0, appliedRules);
+
+				//TODO
+				//NOTE: this is because a suffix can have a prefix rule
+//				for(RuleProductionEntry prod : prods){
+//					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
+//
+//					lastfoldProductions.addAll(applyAffixRules(prod, applyAffixes));
+//				}
+
+				lastfoldProductions.addAll(prods);
+			}
+		return lastfoldProductions;
 	}
 
 	private List<Set<String>> getProductiveAffixes(Productable productable, boolean complexPrefixes){
@@ -168,20 +185,18 @@ public class WordGenerator{
 		Set<String> suffixes = new HashSet<>();
 		if(ruleFlags != null)
 			for(String ruleFlag : ruleFlags){
-				//always keep these flags
-				if(affParser.isProductiveFlag(ruleFlag)){
-					terminalAffixes.add(ruleFlag);
-					continue;
-				}
-
-				RuleEntry rule = affParser.getData(ruleFlag);
+				Object rule = affParser.getData(ruleFlag);
 				if(rule == null)
 					throw new IllegalArgumentException("Non-existent rule " + ruleFlag + " found");
 
-				if(rule.isSuffix())
-					suffixes.add(ruleFlag);
+				if(rule instanceof RuleEntry){
+					if(((RuleEntry)rule).isSuffix())
+						suffixes.add(ruleFlag);
+					else
+						prefixes.add(ruleFlag);
+				}
 				else
-					prefixes.add(ruleFlag);
+					terminalAffixes.add(ruleFlag);
 			}
 
 		return new Affixes(terminalAffixes, prefixes, suffixes);
