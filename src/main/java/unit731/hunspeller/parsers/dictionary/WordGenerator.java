@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -47,48 +46,7 @@ public class WordGenerator{
 		return affParser.getFlagParsingStrategy();
 	}
 
-//	@AllArgsConstructor
-//	private class Pro{
-//		private final Productable productable;
-//		private String ruleFlag;
-//		private Pro parent;
-//
-//		Pro(Productable productable){
-//			this.productable = productable;
-//		}
-//
-//		Pro(Productable productable, String ruleFlag){
-//			this.productable = productable;
-//			this.ruleFlag = ruleFlag;
-//		}
-//	}
-
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException{
-//		Set<String> appliedAffixes = applyAffixes.get(0);
-//		Set<String> postponedAffixes = applyAffixes.get(1);
-//
-//		Stack<Pro> stack = new Stack<>();
-//		stack.add(new Pro(dicEntry));
-//		for(String appliedAffix : appliedAffixes){
-//			//onefold
-//			Pro parent = new Pro(dicEntry, appliedAffix);
-//			stack.add(parent);
-//
-//			for(String postponedAffix : postponedAffixes){
-//				//twofold
-//				stack.add(new Pro(dicEntry, postponedAffix, parent));
-//
-//				//if postponedAffix have a prefix/suffix, add it
-//				RuleEntry rule = affParser.getData(postponedAffix);
-//				if(rule == null)
-//					throw new IllegalArgumentException(postponedAffix);
-//				else{
-//					List<Set<String>> applyTwofoldAffixes = getProductiveAffixes(dicEntry, complexPrefixes);
-//				}
-//			}
-//		}
-
-
 		boolean complexPrefixes = affParser.isComplexPrefixes();
 
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
