@@ -118,6 +118,8 @@ public class WordGenerator{
 					if(!applyAffixes.get(1).isEmpty())
 						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
 							+ (complexPrefixes? "suffix": "prefix") + " rules " + applyAffixes.get(1).stream().collect(Collectors.joining(", ")) + ")");
+
+					//FIXME refactor!
 					if(!applyAffixes.get(0).isEmpty() && prod.getAppliedRules().size() < 2){
 						List<RuleProductionEntry> prods2 = applyAffixRules(prod, applyAffixes);
 						List<AffixEntry> appliedRules2 = prod.getAppliedRules();
