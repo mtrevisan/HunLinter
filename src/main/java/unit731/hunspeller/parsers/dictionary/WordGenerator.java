@@ -149,10 +149,17 @@ public class WordGenerator{
 				Collections.reverse(applyAffixes);
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
-				//add parent derivations
 				List<AffixEntry> appliedRules = production.getAppliedRules();
-				for(RuleProductionEntry prod : prods)
+				for(RuleProductionEntry prod : prods){
+					//add parent derivations
 					prod.prependAppliedRules(appliedRules);
+
+					//check correctness
+					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
+					if(!applyAffixes.get(1).isEmpty())
+						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
+							+ (complexPrefixes? "suffix": "prefix") + " rules " + applyAffixes.get(1).stream().collect(Collectors.joining(", ")) + ")");
+				}
 
 				//TODO
 				//NOTE: this is because a suffix can have a prefix rule
@@ -285,12 +292,5 @@ public class WordGenerator{
 		}
 		return applicableAffixes;
 	}
-
-	private void checkTwofoldViolation(List<RuleProductionEntry> productions) throws IllegalArgumentException{
-		for(RuleProductionEntry production : productions)
-			if(production.hasRuleFlags())
-				throw new IllegalArgumentException("Twofold rule violated (" + production.getRulesSequence() + " still has rules "
-					+ Arrays.stream(production.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
-		}
 
 }
