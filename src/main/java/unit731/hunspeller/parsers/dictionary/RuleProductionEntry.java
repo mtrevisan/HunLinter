@@ -102,8 +102,10 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
-		this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>());
-		this.appliedRules.addAll(0, appliedRules);
+		if(appliedRules != null){
+			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>());
+			this.appliedRules.addAll(0, appliedRules);
+		}
 	}
 
 	public boolean hasProductionRules(){

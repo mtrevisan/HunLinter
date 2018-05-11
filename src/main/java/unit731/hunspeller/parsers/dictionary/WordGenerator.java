@@ -47,21 +47,21 @@ public class WordGenerator{
 		return affParser.getFlagParsingStrategy();
 	}
 
-	@AllArgsConstructor
-	private class Pro{
-		private final Productable productable;
-		private String ruleFlag;
-		private Pro parent;
-
-		Pro(Productable productable){
-			this.productable = productable;
-		}
-
-		Pro(Productable productable, String ruleFlag){
-			this.productable = productable;
-			this.ruleFlag = ruleFlag;
-		}
-	}
+//	@AllArgsConstructor
+//	private class Pro{
+//		private final Productable productable;
+//		private String ruleFlag;
+//		private Pro parent;
+//
+//		Pro(Productable productable){
+//			this.productable = productable;
+//		}
+//
+//		Pro(Productable productable, String ruleFlag){
+//			this.productable = productable;
+//			this.ruleFlag = ruleFlag;
+//		}
+//	}
 
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException{
 //		Set<String> appliedAffixes = applyAffixes.get(0);
@@ -103,9 +103,6 @@ public class WordGenerator{
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
 		productions.addAll(lastfoldProductions);
-
-		//FIXME
-//		checkTwofoldViolation(productions);
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
 
@@ -155,8 +152,7 @@ public class WordGenerator{
 				//add parent derivations
 				List<AffixEntry> appliedRules = production.getAppliedRules();
 				for(RuleProductionEntry prod : prods)
-					prod.getAppliedRules()
-						.addAll(0, appliedRules);
+					prod.prependAppliedRules(appliedRules);
 
 				//TODO
 				//NOTE: this is because a suffix can have a prefix rule
