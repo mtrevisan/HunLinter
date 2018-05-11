@@ -185,8 +185,12 @@ public class WordGenerator{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
-		if(ruleFlags != null)
+		if(ruleFlags != null){
+			String keepCaseFlag = affParser.getKeepCaseFlag();
 			for(String ruleFlag : ruleFlags){
+				if(ruleFlag.equals(keepCaseFlag))
+					continue;
+
 				Object rule = affParser.getData(ruleFlag);
 				if(rule == null)
 					throw new IllegalArgumentException("Non-existent rule " + ruleFlag + " found");
@@ -200,6 +204,7 @@ public class WordGenerator{
 				else
 					terminalAffixes.add(ruleFlag);
 			}
+		}
 
 		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
