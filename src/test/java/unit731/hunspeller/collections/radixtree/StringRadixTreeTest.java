@@ -57,29 +57,29 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(4, tree.get("rest").intValue());
 	}
 
-//	@Test
-//	public void testPrepare(){
-//		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
-//
-//		tree.put("test", 1);
-//		tree.put("tent", 2);
-//		tree.put("tentest", 21);
-//		tree.put("tank", 3);
-//		tree.put("rest", 4);
-//		tree.prepare();
-//
-//		Assert.assertEquals(5, tree.size());
-//		Assert.assertEquals(1, tree.get("test").intValue());
-//		Assert.assertEquals(2, tree.get("tent").intValue());
-//		Assert.assertEquals(3, tree.get("tank").intValue());
-//		Assert.assertEquals(4, tree.get("rest").intValue());
-//
-//		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the test");
-//		Assert.assertTrue(itr.hasNext());
-//		Assert.assertEquals(4, itr.next().getValue().intValue());
-//		Assert.assertEquals(21, itr.next().getValue().intValue());
-//		Assert.assertFalse(itr.hasNext());
-//	}
+	@Test
+	public void testPrepare(){
+		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+
+		tree.put("test", 1);
+		tree.put("tent", 2);
+		tree.put("tentest", 21);
+		tree.put("tank", 3);
+		tree.put("rest", 4);
+		tree.prepare();
+
+		Assert.assertEquals(5, tree.size());
+		Assert.assertEquals(1, tree.get("test").intValue());
+		Assert.assertEquals(2, tree.get("tent").intValue());
+		Assert.assertEquals(3, tree.get("tank").intValue());
+		Assert.assertEquals(4, tree.get("rest").intValue());
+
+		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the test");
+		Assert.assertTrue(itr.hasNext());
+		Assert.assertEquals(4, itr.next().getValue().intValue());
+		Assert.assertEquals(1, itr.next().getValue().intValue());
+		Assert.assertFalse(itr.hasNext());
+	}
 
 	@Test
 	public void testMultipleInsertionOfTheSameKey(){
