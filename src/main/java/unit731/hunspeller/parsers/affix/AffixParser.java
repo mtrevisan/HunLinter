@@ -213,6 +213,7 @@ public class AffixParser{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
+
 	/** Determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file */
 	private static FlagParsingStrategy createFlagParsingStrategy(String flag){
 		FlagParsingStrategy stategy = null;
@@ -237,6 +238,7 @@ public class AffixParser{
 			}
 		return stategy;
 	}
+
 	private static boolean containsUnique(String[] list){
 		if(list == null)
 			return true;
@@ -245,6 +247,7 @@ public class AffixParser{
 		return Arrays.stream(list)
 			.allMatch(set::add);
 	}
+
 	private final Map<String, Consumer<ParsingContext>> RULE_FUNCTION = new HashMap<>();
 
 

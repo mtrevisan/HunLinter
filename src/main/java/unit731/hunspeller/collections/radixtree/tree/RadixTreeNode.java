@@ -22,7 +22,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @param <V>	The type of values stored in the tree
  */
 @Getter
-@EqualsAndHashCode(of = {"key", "value"})
+@EqualsAndHashCode(of = {"key", "value", "additionalValues"})
 public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixTreeNode<S, V>>, Serializable{
 
 	private static final long serialVersionUID = -627223674493970063L;
