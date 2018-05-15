@@ -174,6 +174,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		prepared = true;
 	}
 
+	public boolean isAhoCorasickTree(){
+		return prepared;
+	}
+
 	@Override
 	public void clear(){
 		root.clearChildren();
