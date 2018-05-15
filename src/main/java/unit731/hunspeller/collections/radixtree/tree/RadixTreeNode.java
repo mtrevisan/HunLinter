@@ -1,10 +1,12 @@
 package unit731.hunspeller.collections.radixtree.tree;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,6 +35,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	/** The value stored at this node, <code>null</code> if an internal node */
 	@Setter
 	private V value;
+	private List<V> additionalValues;
 
 	/** The children for this node. */
 	private Collection<RadixTreeNode<S, V>> children;
@@ -122,6 +125,22 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	 */
 	public boolean hasValue(){
 		return (value != null);
+	}
+
+	public void addAdditionalValues(RadixTreeNode<S, V> node){
+		V nodeValue = node.getValue();
+		List<V> nodeAdditionalValues = node.getAdditionalValues();
+		if(nodeValue != null || nodeAdditionalValues != null){
+			additionalValues = ObjectUtils.defaultIfNull(additionalValues, new ArrayList<>());
+			if(nodeValue != null)
+				additionalValues.add(node.getValue());
+			if(nodeAdditionalValues != null)
+				additionalValues.addAll(nodeAdditionalValues);
+		}
+	}
+
+	public void clearAdditionalValues(){
+		additionalValues = null;
 	}
 
 	/**

@@ -145,7 +145,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 						//TODO
 						//out(u) += out(f(u))
-						//node.addValues(state.getValues());
+						node.addAdditionalValues(state);
 
 						break;
 					}
@@ -180,7 +180,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	public void clearFailTransitions(){
-		RadixTreeTraverser<S, V> traverser = (wholeKey, node, parent) -> node.setFailNode(null);
+		RadixTreeTraverser<S, V> traverser = (wholeKey, node, parent) -> {
+			node.setFailNode(null);
+			node.clearAdditionalValues();
+		};
 		traverseBFS(traverser);
 
 		prepared = false;
