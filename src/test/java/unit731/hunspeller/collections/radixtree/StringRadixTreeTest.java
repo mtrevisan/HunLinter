@@ -79,6 +79,9 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(4, itr.next().getValue().intValue());
 		Assert.assertEquals(1, itr.next().getValue().intValue());
 		Assert.assertFalse(itr.hasNext());
+
+		itr = tree.search("blah");
+		Assert.assertFalse(itr.hasNext());
 	}
 
 	@Test

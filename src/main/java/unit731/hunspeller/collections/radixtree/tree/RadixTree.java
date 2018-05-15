@@ -235,7 +235,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		if(!prepared)
 			throw new IllegalStateException("Cannot perform search until prepare() is called");
 
-		//FIXME
 		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
 
 			private RadixTreeNode<S, V> lastMatchedNode = root;
