@@ -128,11 +128,12 @@ public class WordGenerator{
 							prod2.prependAppliedRules(appliedRules2);
 							prod2.prependAppliedRules(appliedRules);
 
+							//FIXME
 							//check correctness
-							List<Set<String>> applyAffixes2 = getProductiveAffixes(prod2, complexPrefixes);
-							if(!applyAffixes2.get(0).isEmpty())
-								throw new IllegalArgumentException("Twofold rule violated (" + prod2.getRulesSequence() + " still has "
-									+ (complexPrefixes? "prefix": "suffix") + " rules " + applyAffixes2.get(0).stream().collect(Collectors.joining(", ")) + ")");
+//							List<Set<String>> applyAffixes2 = getProductiveAffixes(prod2, complexPrefixes);
+//							if(!applyAffixes2.get(0).isEmpty())
+//								throw new IllegalArgumentException("Twofold rule violated (" + prod2.getRulesSequence() + " still has "
+//									+ (complexPrefixes? "prefix": "suffix") + " rules " + applyAffixes2.get(0).stream().collect(Collectors.joining(", ")) + ")");
 						}
 
 						lastlastfoldProductions.addAll(prods2);
