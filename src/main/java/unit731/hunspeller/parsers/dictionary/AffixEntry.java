@@ -73,7 +73,7 @@ public class AffixEntry{
 		String regexToRemove = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
-		String regexToMatch = lineParts[4];
+		String regexToMatch = (lineParts.length > 4? lineParts[4]: POINT);
 		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
 		type = Type.toEnum(ruleType);
