@@ -49,7 +49,36 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new RuleProductionEntry("ab", "AAEEFFGGHH", strategy), stems.get(2));
 		Assert.assertEquals(new RuleProductionEntry("ac", "EEFFGGHH", strategy), stems.get(3));
 		Assert.assertEquals(new RuleProductionEntry("ad", "AAEEFFGGHH", strategy), stems.get(4));
-		//FIXME
+		Assert.assertEquals(new RuleProductionEntry("aba", "EEFFGGHH", strategy), stems.get(5));
+		Assert.assertEquals(new RuleProductionEntry("ada", "EEFFGGHH", strategy), stems.get(6));
+		Assert.assertEquals(new RuleProductionEntry("ea", "AABBCCDD", strategy), stems.get(7));
+		Assert.assertEquals(new RuleProductionEntry("fa", "AABBCCDD", strategy), stems.get(8));
+		Assert.assertEquals(new RuleProductionEntry("fa", "EEAABBCCDD", strategy), stems.get(9));
+		Assert.assertEquals(new RuleProductionEntry("ha", "AAEEBBCCDD", strategy), stems.get(10));
+		Assert.assertEquals(new RuleProductionEntry("eaa", "", strategy), stems.get(11));
+		Assert.assertEquals(new RuleProductionEntry("faa", "AA", strategy), stems.get(12));
+		Assert.assertEquals(new RuleProductionEntry("faa", "EE", strategy), stems.get(13));
+		Assert.assertEquals(new RuleProductionEntry("haa", "AAEE", strategy), stems.get(14));
+		Assert.assertEquals(new RuleProductionEntry("eab", "AA", strategy), stems.get(15));
+		Assert.assertEquals(new RuleProductionEntry("fab", "AA", strategy), stems.get(16));
+		Assert.assertEquals(new RuleProductionEntry("fab", "EEAA", strategy), stems.get(17));
+		Assert.assertEquals(new RuleProductionEntry("hab", "AAEE", strategy), stems.get(18));
+		Assert.assertEquals(new RuleProductionEntry("eac", "", strategy), stems.get(19));
+		Assert.assertEquals(new RuleProductionEntry("fac", "AA", strategy), stems.get(20));
+		Assert.assertEquals(new RuleProductionEntry("fac", "EE", strategy), stems.get(21));
+		Assert.assertEquals(new RuleProductionEntry("hac", "AAEE", strategy), stems.get(22));
+		Assert.assertEquals(new RuleProductionEntry("ead", "AA", strategy), stems.get(23));
+		Assert.assertEquals(new RuleProductionEntry("fad", "AA", strategy), stems.get(24));
+		Assert.assertEquals(new RuleProductionEntry("fad", "EEAA", strategy), stems.get(25));
+		Assert.assertEquals(new RuleProductionEntry("had", "AAEE", strategy), stems.get(26));
+		Assert.assertEquals(new RuleProductionEntry("eaba", "", strategy), stems.get(27));
+		Assert.assertEquals(new RuleProductionEntry("faba", "AA", strategy), stems.get(28));
+		Assert.assertEquals(new RuleProductionEntry("faba", "EE", strategy), stems.get(29));
+		Assert.assertEquals(new RuleProductionEntry("haba", "AAEE", strategy), stems.get(30));
+		Assert.assertEquals(new RuleProductionEntry("eada", "", strategy), stems.get(31));
+		Assert.assertEquals(new RuleProductionEntry("fada", "AA", strategy), stems.get(32));
+		Assert.assertEquals(new RuleProductionEntry("fada", "EE", strategy), stems.get(33));
+		Assert.assertEquals(new RuleProductionEntry("hada", "AAEE", strategy), stems.get(34));
 	}
 
 }
