@@ -205,35 +205,39 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
 	}
 
-//	@Test
-//	public void augmentedBase(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		addRule(patterns, "c1k/k=k");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(1)
-//			.rightMin(1)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("de", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("Zucker");
-//
-//		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
-//	}
-//
-//	@Test
-//	public void competingRules(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		addRule(patterns, "ab1c");
-//		addRule(patterns, "2c");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(1)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("abc");
-//
-//		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
-//	}
+	@Test
+	public void augmentedBase(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "c1k/k=k");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("Zucker");
+
+		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
+	}
+
+	@Test
+	public void competingRules(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "ab1c");
+		addRule(patternsLevelCompound, "2c");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+	}
 
 
 	private void addRule(RadixTree<String, String> patterns, String rule){
