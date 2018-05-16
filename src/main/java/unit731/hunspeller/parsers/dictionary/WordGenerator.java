@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -95,10 +96,9 @@ public class WordGenerator{
 				prod.prependAppliedRules(appliedRules);
 
 				//check correctness
-//				List<Set<String>> applyAffixes = getProductiveAffixes(prod, complexPrefixes);
-//				if(!applyAffixes.get(0).isEmpty())
-//					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
-//						+ (complexPrefixes? "prefix": "suffix") + " rules " + applyAffixes.get(0).stream().collect(Collectors.joining(", ")) + ")");
+				if(prod.hasRuleFlags())
+					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
+						+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
 			}
 
 			twofoldProductions.addAll(productions);
@@ -125,9 +125,9 @@ public class WordGenerator{
 
 					//check correctness
 //					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
-//					if(!applyAffixes.get(1).isEmpty())
-//						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has "
-//							+ (complexPrefixes? "suffix": "prefix") + " rules " + applyAffixes.get(1).stream().collect(Collectors.joining(", ")) + ")");
+//					if(prod.hasRuleFlags())
+//						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
+//							+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
 
 					//FIXME refactor!
 //					if(!applyAffixes.get(0).isEmpty() && prod.getAppliedRules().size() < 2){
