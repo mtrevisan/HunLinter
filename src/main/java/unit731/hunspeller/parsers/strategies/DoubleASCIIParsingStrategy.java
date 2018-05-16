@@ -10,7 +10,7 @@ import unit731.hunspeller.services.PatternService;
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded as two ASCII characters whose codes
  * must be combined into a single character.
  */
-public class DoubleCharParsingStrategy implements FlagParsingStrategy{
+public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	private static final Pattern REGEX_PATTERN_DOUBLE = PatternService.pattern("(?<=\\G.{2})");
 

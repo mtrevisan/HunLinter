@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.affix;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.strategies.NumericalParsingStrategy;
 import unit731.hunspeller.parsers.strategies.UTF8ParsingStrategy;
-import unit731.hunspeller.parsers.strategies.DoubleCharParsingStrategy;
+import unit731.hunspeller.parsers.strategies.DoubleASCIIParsingStrategy;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -130,7 +130,7 @@ public class AffixParser{
 					+ ": Bad number of entries, it must be a positive integer");
 
 			String flag = getFlag();
-			strategy = createFlagParsingStrategy(flag);
+			strategy = getFlagParsingStrategy(flag);
 
 			Set<String> compoundRules = new HashSet<>();
 			for(int i = 0; i < numEntries; i ++){
@@ -170,7 +170,7 @@ public class AffixParser{
 					+ ": Bad number of entries, it must be a positive integer");
 
 			String flag = getFlag();
-			strategy = createFlagParsingStrategy(flag);
+			strategy = getFlagParsingStrategy(flag);
 
 //List<AffixEntry> prefixEntries = new ArrayList<>();
 //List<AffixEntry> suffixEntries = new ArrayList<>();
@@ -215,7 +215,7 @@ public class AffixParser{
 	};
 
 	/** Determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file */
-	private static FlagParsingStrategy createFlagParsingStrategy(String flag){
+	private static FlagParsingStrategy getFlagParsingStrategy(String flag){
 		FlagParsingStrategy stategy = null;
 		if(flag == null)
 			stategy = new ASCIIParsingStrategy();
@@ -226,7 +226,7 @@ public class AffixParser{
 					break;
 
 				case FLAG_TYPE_DOUBLE_CHAR:
-					stategy = new DoubleCharParsingStrategy();
+					stategy = new DoubleASCIIParsingStrategy();
 					break;
 
 				case FLAG_TYPE_NUMERIC:

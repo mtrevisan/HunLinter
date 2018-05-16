@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class DoubleCharParsingStrategyTest{
 
-	private final FlagParsingStrategy strategy = new DoubleCharParsingStrategy();
+	private final FlagParsingStrategy strategy = new DoubleASCIIParsingStrategy();
 
 
 	@Test

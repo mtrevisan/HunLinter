@@ -49,16 +49,22 @@ public class AffixEntry{
 	};
 
 
-	@Getter private final Type type;
-	//ID used to represent the affix
-	@Getter private final String flag;
-	@Getter private final String[] ruleFlags;
-	@Getter private final Matcher match;
-	//string to strip
+	@Getter
+	private final Type type;
+	/** ID used to represent the affix */
+	@Getter
+	private final String flag;
+	@Getter
+	private final String[] ruleFlags;
+	/** condition that must be met before the affix can be applied */
+	@Getter
+	private final Matcher match;
+	/** string to strip */
 	private final int removeLength;
-	//string to append
+	/** string to append */
 	private final String add;
-	@Getter private final String[] dataFields;
+	@Getter
+	private final String[] dataFields;
 
 	private final String entry;
 
