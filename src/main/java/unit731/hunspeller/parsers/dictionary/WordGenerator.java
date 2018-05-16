@@ -84,7 +84,10 @@ public class WordGenerator{
 	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions, boolean complexPrefixes){
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
-			List<RuleProductionEntry> productions = getOnefoldProductions(production, complexPrefixes);
+			List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
+			//FIXME is it correct?
+			applyAffixes.set(1, null);
+			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			for(RuleProductionEntry prod : productions){
@@ -110,6 +113,8 @@ public class WordGenerator{
 				List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
+				//FIXME is it correct?
+				applyAffixes.set(1, null);
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
