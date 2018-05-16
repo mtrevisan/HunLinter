@@ -303,6 +303,7 @@ public class AffixParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
+		boolean encodingRead = false;
 		charset = FileService.determineCharset(affFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
 			String line;
@@ -320,6 +321,11 @@ public class AffixParser{
 				if(fun != null){
 					try{
 						fun.accept(context);
+
+						if(!encodingRead && getCharset() == null)
+							throw new IllegalArgumentException("The first non-comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+						else
+							encodingRead = true;
 					}
 					catch(RuntimeException e){
 						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
