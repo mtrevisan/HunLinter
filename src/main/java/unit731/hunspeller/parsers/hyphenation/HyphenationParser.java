@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
@@ -107,15 +106,12 @@ public class HyphenationParser{
 	private final Orthography orthography;
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
-	private HyphenationOptions options;
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
+	private HyphenationOptions options;
 
 
 	public HyphenationParser(String language){
 		Objects.requireNonNull(language);
-
-		language = Optional.ofNullable(language)
-			.orElse(StringUtils.EMPTY);
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
@@ -127,6 +123,26 @@ public class HyphenationParser{
 			patterns.put(level, RadixTree.createTree(new StringSequencer()));
 			customHyphenations.put(level, new HashMap<>());
 		}
+		options = HyphenationOptions.createEmpty();
+	}
+
+	public HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
+		this(language);
+
+		if(patterns != null)
+			for(Level level : Level.values()){
+				RadixTree<String, String> p = patterns.get(level);
+				if(p != null)
+					this.patterns.put(level, p);
+			}
+		if(customHyphenations != null)
+			for(Level level : Level.values()){
+				Map<String, String> ch = customHyphenations.get(level);
+				if(ch != null)
+					this.customHyphenations.put(level, ch);
+			}
+		if(options != null)
+			this.options = options;
 	}
 
 	@AllArgsConstructor
@@ -159,7 +175,6 @@ public class HyphenationParser{
 					Level level = Level.COMPOUND;
 					REDUCED_PATTERNS.get(level).clear();
 
-					hypParser.options = HyphenationOptions.createEmpty();
 					while((line = br.readLine()) != null){
 						readSoFar += line.length();
 

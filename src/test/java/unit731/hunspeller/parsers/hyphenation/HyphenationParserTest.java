@@ -1,12 +1,15 @@
 package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.trie.Trie;
-import unit731.hunspeller.collections.trie.sequencers.StringTrieSequencer;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -15,21 +18,23 @@ public class HyphenationParserTest{
 	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
 
 
-//	@Test
-//	public void noHyphenationDueToLeftMin(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		patterns.put("abc", "a1bc");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(2)
-//			.rightMin(0)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("abc");
-//
-//		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
-//	}
-//
+	@Test
+	public void noHyphenationDueToLeftMin(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		patternsLevelCompound.put("abc", "a1bc");
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(2)
+			.rightMin(0)
+			.build();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+	}
+
 //	@Test
 //	public void noHyphenationDueToRightMin(){
 //		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
