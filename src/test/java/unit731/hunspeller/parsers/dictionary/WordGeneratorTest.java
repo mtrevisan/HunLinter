@@ -36,21 +36,18 @@ public class WordGeneratorTest{
 		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
 
 		Assert.assertEquals(9, stems.size());
-		Assert.assertEquals(new RuleProductionEntry("a", "ABCDEFGH", strategy), stems.get(0));
-		Assert.assertEquals(new RuleProductionEntry("aa", "EFGH", strategy), stems.get(1));
-		//left out A
-		Assert.assertEquals(new RuleProductionEntry("ab", "AEFGH", strategy), stems.get(2));
-		//left out E
-		Assert.assertEquals(new RuleProductionEntry("ac", "EFGH", strategy), stems.get(3));
-		//left out AE
-		Assert.assertEquals(new RuleProductionEntry("ad", "AEFGH", strategy), stems.get(4));
-		Assert.assertEquals(new RuleProductionEntry("eaa", "", strategy), stems.get(11));
-		//left out A
-		Assert.assertEquals(new RuleProductionEntry("eab", "A", strategy), stems.get(15));
-		//left out E
-		Assert.assertEquals(new RuleProductionEntry("eac", "", strategy), stems.get(19));
-		//left out AE
-		Assert.assertEquals(new RuleProductionEntry("ead", "A", strategy), stems.get(23));
+		Assert.assertEquals(new RuleProductionEntry("a", "ABCDE", strategy), stems.get(0));
+		Assert.assertEquals(new RuleProductionEntry("aa", "E", strategy), stems.get(1));
+		Assert.assertEquals(new RuleProductionEntry("ab", "AE", strategy), stems.get(2));
+		Assert.assertEquals(new RuleProductionEntry("ac", "E", strategy), stems.get(3));
+		Assert.assertEquals(new RuleProductionEntry("ad", "AE", strategy), stems.get(4));
+		Assert.assertEquals(new RuleProductionEntry("ea", "", strategy), stems.get(5));
+		Assert.assertEquals(new RuleProductionEntry("eaa", "", strategy), stems.get(6));
+		Assert.assertEquals(new RuleProductionEntry("aba", "", strategy), stems.get(7));
+		Assert.assertEquals(new RuleProductionEntry("eab", "", strategy), stems.get(8));
+		Assert.assertEquals(new RuleProductionEntry("eac", "", strategy), stems.get(9));
+		Assert.assertEquals(new RuleProductionEntry("ada", "", strategy), stems.get(10));
+		Assert.assertEquals(new RuleProductionEntry("ead", "", strategy), stems.get(11));
 	}
 
 }
