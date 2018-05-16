@@ -68,36 +68,40 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("a", "bc"), hyphenation.getSyllabes());
 	}
 
-//	@Test
-//	public void hyphenationOkRightMin(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		addRule(patterns, "ab1c");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(0)
-//			.rightMin(1)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("abc");
-//
-//		Assert.assertEquals(Arrays.asList("ab", "c"), hyphenation.getSyllabes());
-//	}
-//
-//	@Test
-//	public void augmentedWithRemovalBeforeHyphen(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		addRule(patterns, "aa1tje/=,2,1");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(1)
-//			.rightMin(1)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("du", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("omaatje");
-//
-//		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
-//	}
-//
+	@Test
+	public void hyphenationOkRightMin(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "ab1c");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(0)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("ab", "c"), hyphenation.getSyllabes());
+	}
+
+	@Test
+	public void augmentedWithRemovalBeforeHyphen(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "aa1tje/=,2,1");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("du", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("omaatje");
+
+		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+	}
+
 //	@Test
 //	public void augmentedWithIndexes(){
 //		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
