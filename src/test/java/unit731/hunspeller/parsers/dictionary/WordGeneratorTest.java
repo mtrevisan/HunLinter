@@ -35,15 +35,15 @@ public class WordGeneratorTest{
 
 		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
 
-		Assert.assertEquals(9, stems.size());
 		Assert.assertEquals(new RuleProductionEntry("a", "ABCDE", strategy), stems.get(0));
 		Assert.assertEquals(new RuleProductionEntry("aa", "E", strategy), stems.get(1));
 		Assert.assertEquals(new RuleProductionEntry("ab", "AE", strategy), stems.get(2));
 		Assert.assertEquals(new RuleProductionEntry("ac", "E", strategy), stems.get(3));
 		Assert.assertEquals(new RuleProductionEntry("ad", "AE", strategy), stems.get(4));
-		Assert.assertEquals(new RuleProductionEntry("ea", "", strategy), stems.get(5));
-		Assert.assertEquals(new RuleProductionEntry("eaa", "", strategy), stems.get(6));
-		Assert.assertEquals(new RuleProductionEntry("aba", "", strategy), stems.get(7));
+		Assert.assertEquals(new RuleProductionEntry("aba", "", strategy), stems.get(5));
+		Assert.assertEquals(9, stems.size());
+		Assert.assertEquals(new RuleProductionEntry("ea", "", strategy), stems.get(6));
+		Assert.assertEquals(new RuleProductionEntry("eaa", "", strategy), stems.get(7));
 		Assert.assertEquals(new RuleProductionEntry("eab", "", strategy), stems.get(8));
 		Assert.assertEquals(new RuleProductionEntry("eac", "", strategy), stems.get(9));
 		Assert.assertEquals(new RuleProductionEntry("ada", "", strategy), stems.get(10));
