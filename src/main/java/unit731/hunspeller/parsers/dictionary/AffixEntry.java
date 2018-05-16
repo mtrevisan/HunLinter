@@ -55,7 +55,7 @@ public class AffixEntry{
 	@Getter private final String[] ruleFlags;
 	@Getter private final Matcher match;
 	//string to strip
-	private final Matcher remove;
+	private final int removeLength;
 	//string to append
 	private final String add;
 	@Getter private final String[] dataFields;
@@ -70,7 +70,7 @@ public class AffixEntry{
 		String[] lineParts = PatternService.split(line, PATTERN_SEPARATOR, 6);
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
-		String regexToRemove = lineParts[2];
+		String removal = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
 		String regexToMatch = (lineParts.length > 4? lineParts[4]: POINT);
@@ -81,11 +81,23 @@ public class AffixEntry{
 		ruleFlags = (classes.length > 0? classes: null);
 		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
 		match = (!POINT.equals(regexToMatch)? PatternService.matcher(String.format(conditionPattern, regexToMatch)): null);
-		remove = (!ZERO.equals(regexToRemove)? PatternService.matcher(String.format(conditionPattern, regexToRemove)): null);
-		add = (ZERO.equals(addition)? StringUtils.EMPTY: addition);
+		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
+		add = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
-		if(isSuffix() && StringUtils.isNotBlank(regexToRemove) && addition.length() > 1 && regexToRemove.charAt(0) == addition.charAt(0))
-			log.warn("This line has characters in common between removed and added part: " + line);
+		if(removeLength > 0){
+			if(isSuffix()){
+				if(!regexToMatch.endsWith(removal))
+					log.warn("This line has the condition part that not ends with the removal part: " + line);
+				if(add.length() > 1 && removal.charAt(0) == add.charAt(0))
+					log.warn("This line has characters in common between removed and added part: " + line);
+			}
+			else{
+				if(!regexToMatch.startsWith(removal))
+					log.warn("This line has the condition part that not starts with the removal part: " + line);
+				if(add.length() > 1 && removal.charAt(removal.length() - 1) == add.charAt(add.length() - 1))
+					log.warn("This line has characters in common between removed and added part: " + line);
+			}
+		}
 
 		entry = PatternService.clear(line, REGEX_ENTRY);
 	}
@@ -95,13 +107,10 @@ public class AffixEntry{
 	}
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
-		if(remove != null){
-			word = PatternService.clear(word, remove);
-			if(word.isEmpty() && !isFullstrip)
-				throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
-		}
+		if(!isFullstrip && removeLength > 0 && word.length() == removeLength)
+			throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
 
-		return (isSuffix()? word + add: add + word);
+		return (isSuffix()? word.substring(0, word.length() - removeLength) + add: add + word.substring(removeLength));
 	}
 
 	@Override
