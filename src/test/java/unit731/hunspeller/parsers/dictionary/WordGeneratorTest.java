@@ -27,14 +27,12 @@ public class WordGeneratorTest{
 			.add("SFX D 0 d/AE")
 			.add("PFX E Y 1")
 			.add("PFX E 0 e")
-			.add("PFX F Y 1")
-			.add("PFX F 0 f/A")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		AffixParser parser = new AffixParser();
 		parser.parse(affFile);
 		WordGenerator generator = new WordGenerator(parser);
-		String line = "a/ABCDEF";
+		String line = "a/ABCDE";
 		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
@@ -138,14 +136,12 @@ public class WordGeneratorTest{
 			.add("PFX D 0 d/AE")
 			.add("SFX E Y 1")
 			.add("SFX E 0 e")
-			.add("PFX F Y 1")
-			.add("PFX F 0 f/A")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		AffixParser parser = new AffixParser();
 		parser.parse(affFile);
 		WordGenerator generator = new WordGenerator(parser);
-		String line = "a/ABCDEF";
+		String line = "a/ABCDE";
 		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
