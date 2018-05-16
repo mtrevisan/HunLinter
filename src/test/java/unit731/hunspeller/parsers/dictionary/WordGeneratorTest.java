@@ -6,6 +6,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
 
 
@@ -36,13 +37,18 @@ public class WordGeneratorTest{
 		AffixParser parser = new AffixParser();
 		parser.parse(affFile);
 		WordGenerator generator = new WordGenerator(parser);
-		String line = "a/AABBCCDDEE";
-		DictionaryEntry dicEntry = new DictionaryEntry(line, parser.getFlagParsingStrategy());
+		String line = "a/AABBCCDDEEFFGGHH";
+		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
 		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
 
-		Assert.assertEquals(14, stems.size());
-
+		Assert.assertEquals(35, stems.size());
+		Assert.assertEquals(new RuleProductionEntry("a", "AABBCCDDEEFFGGHH", strategy), stems.get(0));
+		Assert.assertEquals(new RuleProductionEntry("aa", "EEFFGGHH", strategy), stems.get(1));
+		Assert.assertEquals(new RuleProductionEntry("ab", "AAEEFFGGHH", strategy), stems.get(2));
+		Assert.assertEquals(new RuleProductionEntry("ac", "EEFFGGHH", strategy), stems.get(3));
+		Assert.assertEquals(new RuleProductionEntry("ad", "AAEEFFGGHH", strategy), stems.get(4));
 		//FIXME
 	}
 

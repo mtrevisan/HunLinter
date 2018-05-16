@@ -13,6 +13,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 
 @Getter
@@ -45,6 +46,14 @@ public class RuleProductionEntry implements Productable{
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
 		this.combineable = combineable;
+	}
+
+	/** NOTE: used for testing purposes */
+	RuleProductionEntry(String word, String ruleFlags, FlagParsingStrategy strategy){
+		this.word = word;
+		this.ruleFlags = strategy.parseRuleFlags(ruleFlags);
+		dataFields = new String[0];
+		combineable = false;
 	}
 
 	private String[] combineRuleFlags(String[] ruleFlags1, Set<String> ruleFlags2){
