@@ -316,16 +316,16 @@ public class AffixParser{
 				if(line.isEmpty())
 					continue;
 
+				if(!encodingRead && !line.startsWith(TAG_CHARACTER_SET + StringUtils.SPACE))
+					throw new IllegalArgumentException("The first non-comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+				else
+					encodingRead = true;
+
 				ParsingContext context = new ParsingContext(line, br);
 				Consumer<ParsingContext> fun = RULE_FUNCTION.get(context.getRuleType());
 				if(fun != null){
 					try{
 						fun.accept(context);
-
-						if(!encodingRead && getCharset() == null)
-							throw new IllegalArgumentException("The first non-comment line in the affix file must be a 'SET charset', was: '" + line + "'");
-						else
-							encodingRead = true;
 					}
 					catch(RuntimeException e){
 						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
