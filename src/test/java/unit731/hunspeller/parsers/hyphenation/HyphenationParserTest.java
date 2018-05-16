@@ -15,19 +15,19 @@ import unit731.hunspeller.services.PatternService;
 
 public class HyphenationParserTest{
 
-	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
+//	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
 
 
 	@Test
 	public void noHyphenationDueToLeftMin(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
 		patternsLevelCompound.put("abc", "a1bc");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
 			.rightMin(0)
 			.build();
-		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
@@ -35,21 +35,23 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
-//	@Test
-//	public void noHyphenationDueToRightMin(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		patterns.put("abc", "ab1c");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(0)
-//			.rightMin(2)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("abc");
-//
-//		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
-//	}
-//
+	@Test
+	public void noHyphenationDueToRightMin(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		patternsLevelCompound.put("abc", "ab1c");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(0)
+			.rightMin(2)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+	}
+
 //	@Test
 //	public void hyphenationOkLeftMin(){
 //		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
@@ -217,12 +219,12 @@ public class HyphenationParserTest{
 //	}
 
 
-	private void addRule(Trie<String, Integer, String> patterns, String rule){
-		patterns.put(getKeyFromData(rule), rule);
-	}
-
-	private String getKeyFromData(String rule){
-		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
-	}
+//	private void addRule(Trie<String, Integer, String> patterns, String rule){
+//		patterns.put(getKeyFromData(rule), rule);
+//	}
+//
+//	private String getKeyFromData(String rule){
+//		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
+//	}
 
 }
