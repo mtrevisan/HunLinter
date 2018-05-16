@@ -125,9 +125,9 @@ public class WordGenerator{
 
 					//check correctness
 //					applyAffixes = getProductiveAffixes(prod, complexPrefixes);
-//					if(prod.hasRuleFlags())
-//						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
-//							+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
+					if(prod.hasRuleFlags())
+						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
+							+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
 
 					//FIXME refactor!
 //					if(!applyAffixes.get(0).isEmpty() && prod.getAppliedRules().size() < 2){

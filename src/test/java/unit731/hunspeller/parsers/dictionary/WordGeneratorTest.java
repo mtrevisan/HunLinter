@@ -53,7 +53,7 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new RuleProductionEntry("ead", "", strategy), stems.get(11));
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold() throws IOException{
 		String content = "SET UTF-8\n"
 			+ "SFX A Y 1\n"
