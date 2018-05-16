@@ -1,8 +1,10 @@
 package unit731.hunspeller.services;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -49,6 +51,18 @@ public class FileService{
 
 		throw new IllegalArgumentException("The file is not in an ammissible charset ("
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
+	}
+
+	public static File getTemporaryUTF8File(String content){
+		try{
+			File tmpFile = File.createTempFile("test", ".tmp");
+			Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
+			tmpFile.deleteOnExit();
+			return tmpFile;
+		}
+		catch(IOException e){
+			throw new RuntimeException("Failed creating temporary file for content '" + content + "'", e);
+		}
 	}
 
 }
