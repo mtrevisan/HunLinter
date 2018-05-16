@@ -9,13 +9,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.trie.Trie;
 import unit731.hunspeller.services.PatternService;
 
 
 public class HyphenationParserTest{
 
-//	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
+	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
 
 
 	@Test
@@ -52,21 +51,23 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
-//	@Test
-//	public void hyphenationOkLeftMin(){
-//		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
-//		addRule(patterns, "a1bc");
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(1)
-//			.rightMin(0)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", patterns, options);
-//
-//		Hyphenation hyphenation = parser.hyphenate("abc");
-//
-//		Assert.assertEquals(Arrays.asList("a", "bc"), hyphenation.getSyllabes());
-//	}
-//
+	@Test
+	public void hyphenationOkLeftMin(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "a1bc");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(0)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("abc");
+
+		Assert.assertEquals(Arrays.asList("a", "bc"), hyphenation.getSyllabes());
+	}
+
 //	@Test
 //	public void hyphenationOkRightMin(){
 //		Trie<String, Integer, String> patterns = new Trie<>(new StringTrieSequencer());
@@ -219,12 +220,12 @@ public class HyphenationParserTest{
 //	}
 
 
-//	private void addRule(Trie<String, Integer, String> patterns, String rule){
-//		patterns.put(getKeyFromData(rule), rule);
-//	}
-//
-//	private String getKeyFromData(String rule){
-//		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
-//	}
+	private void addRule(RadixTree<String, String> patterns, String rule){
+		patterns.put(getKeyFromData(rule), rule);
+	}
+
+	private String getKeyFromData(String rule){
+		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
+	}
 
 }
