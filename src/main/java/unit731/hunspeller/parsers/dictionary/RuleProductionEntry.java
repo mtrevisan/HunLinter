@@ -42,7 +42,7 @@ public class RuleProductionEntry implements Productable{
 		this.word = word;
 		ruleFlags = combineRuleFlags(appliedEntry.getRuleFlags(), remainingRuleFlags);
 		this.dataFields = combineDataFields(originalDataFields, appliedEntry.getDataFields());
-		appliedRules = new ArrayList<>();
+		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
 		this.combineable = combineable;
 	}
@@ -103,7 +103,7 @@ public class RuleProductionEntry implements Productable{
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
 		if(appliedRules != null){
-			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>());
+			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>(3));
 			this.appliedRules.addAll(0, appliedRules);
 		}
 	}
