@@ -109,69 +109,69 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
-//		//process children of the root
-//		root.forEachChildren(child -> child.setFailNode(root));
-//
-//		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
-//			@Override
-//			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-//				if(parent == root)
-//					return;
-//
-//				S currentKey = node.getKey();
-//				int keySize = sequencer.length(currentKey);
-//				for(int i = 0; i < keySize; i ++){
-//					S subkey = sequencer.subSequence(currentKey, i);
-//
-//					//find the deepest node labeled by a proper suffix of the current child
-//					RadixTreeNode<S, V> state;
-//					RadixTreeNode<S, V> fail = parent.getFailNode();
-//					while((state = transit(fail, subkey)) == null)
-//						fail = fail.getFailNode();
-//
-//					S stateKey = state.getKey();
-//					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
-//					if(lcpLength > 0){
-//						int nodeKeyLength = sequencer.length(stateKey);
-//						if(lcpLength < nodeKeyLength)
-//							//split fail
-//							state.split(lcpLength, sequencer);
-//						if(lcpLength + i < keySize)
-//							//split node
-//							node.split(lcpLength + i, sequencer);
-//
-//						//link fail to node
-//						node.setFailNode(state);
-//
-//						//TODO
-//						//out(u) += out(f(u))
-//						node.addAdditionalValues(state);
-//
-//						break;
-//					}
-//				}
-//
-//				if(node.getFailNode() == null)
-//					node.setFailNode(root);
-//			}
-//
-//			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
-//				RadixTreeNode<S, V> result = root;
-//				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
-//				while(itr.hasNext()){
-//					RadixTreeNode<S, V> child = itr.next();
-//					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
-//					if(lcpLength > 0){
-//						result = child;
-//						break;
-//					}
-//				}
-//				return result;
-//			}
-//		};
-//		traverseBFS(traverser);
-//
-//		prepared = true;
+		//process children of the root
+		root.forEachChildren(child -> child.setFailNode(root));
+
+		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
+			@Override
+			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				if(parent == root)
+					return;
+
+				S currentKey = node.getKey();
+				int keySize = sequencer.length(currentKey);
+				for(int i = 0; i < keySize; i ++){
+					S subkey = sequencer.subSequence(currentKey, i);
+
+					//find the deepest node labeled by a proper suffix of the current child
+					RadixTreeNode<S, V> state;
+					RadixTreeNode<S, V> fail = parent.getFailNode();
+					while((state = transit(fail, subkey)) == null)
+						fail = fail.getFailNode();
+
+					S stateKey = state.getKey();
+					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
+					if(lcpLength > 0){
+						int nodeKeyLength = sequencer.length(stateKey);
+						if(lcpLength < nodeKeyLength)
+							//split fail
+							state.split(lcpLength, sequencer);
+						if(lcpLength + i < keySize)
+							//split node
+							node.split(lcpLength + i, sequencer);
+
+						//link fail to node
+						node.setFailNode(state);
+
+						//TODO
+						//out(u) += out(f(u))
+						node.addAdditionalValues(state);
+
+						break;
+					}
+				}
+
+				if(node.getFailNode() == null)
+					node.setFailNode(root);
+			}
+
+			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
+				RadixTreeNode<S, V> result = root;
+				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
+				while(itr.hasNext()){
+					RadixTreeNode<S, V> child = itr.next();
+					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
+					if(lcpLength > 0){
+						result = child;
+						break;
+					}
+				}
+				return result;
+			}
+		};
+		traverseBFS(traverser);
+
+		prepared = true;
 	}
 
 	public boolean isAhoCorasickTree(){

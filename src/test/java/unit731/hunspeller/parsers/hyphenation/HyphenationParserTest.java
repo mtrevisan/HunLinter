@@ -251,6 +251,43 @@ public class HyphenationParserTest{
 		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
+	@Test
+	public void ahoCorasick(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, ".s2");
+		addRule(patternsLevelCompound, "1v");
+		addRule(patternsLevelCompound, "2nd");
+		addRule(patternsLevelCompound, "1d");
+		addRule(patternsLevelCompound, "2lm");
+		addRule(patternsLevelCompound, "1m");
+		addRule(patternsLevelCompound, "2nt");
+		addRule(patternsLevelCompound, "1t");
+		addRule(patternsLevelCompound, "1n");
+		addRule(patternsLevelCompound, "1d");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		String word = "savéndolmento";
+		Hyphenation hyphenation = parser.hyphenate(word);
+
+//savéndolmento	.s2 1v 2nd 1d 2lm 1m 2nt 1t
+//						.s2 1n 2nd 1l 2lm 1n 2nt
+		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+
+		patternsLevelCompound.prepare();
+		hyphenation = parser.hyphenate(word);
+
+		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+
+		hyphenation = parser.hyphenate2(word);
+
+		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+	}
+
 
 	private void addRule(RadixTree<String, String> patterns, String rule){
 		patterns.put(getKeyFromData(rule), rule);

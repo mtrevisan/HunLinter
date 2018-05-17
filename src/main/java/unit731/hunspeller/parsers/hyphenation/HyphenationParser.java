@@ -598,7 +598,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int size = w.length() - 1;
@@ -639,7 +639,50 @@ public class HyphenationParser{
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+
+	Hyphenation hyphenate2(String word){
+		boolean[] uppercases = extractUppercases(word);
+
+		//clear already present hyphens
+		word = PatternService.replaceAll(word, MATCHER_HYPHENS, SOFT_HYPHEN);
+		//clear already present word boundaries' characters
+		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
+
+		List<String> hyphenatedWord;
+		List<String> rules;
+		boolean[] errors;
+
+		//FIXME manage second level
+		Level level = Level.COMPOUND;
+
+		String customHyphenation = customHyphenations.get(level).get(word);
+		if(customHyphenation != null){
+			//hyphenation is custom
+			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
+
+			rules = hyphenatedWord;
+		}
+		else if(word.length() <= options.getLeftMin() + options.getRightMin()){
+			//ignore short words (early out)
+			hyphenatedWord = Arrays.asList(word);
+
+			rules = hyphenatedWord;
+		}
+		else{
+			HyphenationBreak hyphBreak = calculateBreakpoints2(word, patterns, level);
+
+			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
+
+			rules = Arrays.asList(hyphBreak.getRules());
+		}
+		errors = orthography.getSyllabationErrors(hyphenatedWord);
+
+		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
+
+		return new Hyphenation(hyphenatedWord, rules, errors);
+	}
+
+	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int wordSize = word.length();
