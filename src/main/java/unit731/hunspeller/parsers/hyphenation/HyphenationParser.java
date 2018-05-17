@@ -601,6 +601,50 @@ public class HyphenationParser{
 	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
+		int size = w.length() - 1;
+		int wordSize = word.length();
+		//stores the (maximum) break numbers
+		int[] indexes = new int[wordSize];
+		//the rules applied to the word
+		String[] rules = new String[wordSize];
+		//stores the augmented patterns
+		String[] augmentedPatternData = new String[wordSize];
+		for(int i = 0; i < size; i ++){
+			//find all the prefixes of w.substring(i)
+			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
+			for(String rule : prefixes){
+				Iterator<SearchResult<String, String>> itr = patterns.get(level).search(w);
+				while(itr.hasNext()){
+					int j = -1;
+					//remove non-standard part
+					String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
+					int ruleSize = reducedData.length();
+					//cycle the pattern's characters searching for numbers
+					for(int k = 0; k < ruleSize; k ++){
+						int idx = i + j;
+						char chr = reducedData.charAt(k);
+						if(!Character.isDigit(chr))
+							j ++;
+						//check if a break point should be skipped based on left and right min options
+						else if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+							int dd = Character.digit(chr, 10);
+							//check if the break number is great than the one stored so far
+							if(dd > indexes[idx]){
+								indexes[idx] = dd;
+								rules[idx] = rule;
+								augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
+							}
+						}
+					}
+				}
+			}
+		}
+		return new HyphenationBreak(indexes, rules, augmentedPatternData);
+	}
+
+	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
+
 		int wordSize = word.length();
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
