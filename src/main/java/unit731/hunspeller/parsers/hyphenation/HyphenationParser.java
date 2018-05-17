@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,6 +32,7 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
+import unit731.hunspeller.collections.radixtree.tree.SearchResult;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -213,7 +215,7 @@ public class HyphenationParser{
 								}
 							}
 						}
-//						hypParser.patterns.prepare();
+						hypParser.patterns.get(level).prepare();
 
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
@@ -597,7 +599,7 @@ public class HyphenationParser{
 	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
-		int size = w.length() - 1;
+//		int size = w.length() - 1;
 		int wordSize = word.length();
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
@@ -606,10 +608,16 @@ public class HyphenationParser{
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
 		//FIXME using the Aho-Corasick tree will reduce the number of for-each to two
-		for(int i = 0; i < size; i ++){
-			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
-			for(String rule : prefixes){
+//		for(int i = 0; i < size; i ++){
+		//find all the prefixes of w.substring(i)
+//			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
+//			for(String rule : prefixes){
+			Iterator<SearchResult<String, String>> itr = patterns.get(level).search(w);
+			while(itr.hasNext()){
+				SearchResult<String, String> r = itr.next();
+				int i = r.getIndex();
+				String rule = r.getNode().getValue();
+
 				int j = -1;
 				//remove non-standard part
 				String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
@@ -632,7 +640,7 @@ public class HyphenationParser{
 					}
 				}
 			}
-		}
+//		}
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 

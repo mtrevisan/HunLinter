@@ -236,13 +236,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The iterator of all the entries found inside the given text
 	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
-	public Iterator<RadixTreeNode<S, V>> search(S text){
+	public Iterator<SearchResult<S, V>> search(S text){
 		Objects.requireNonNull(text);
 
 		if(!prepared)
 			throw new IllegalStateException("Cannot perform search until prepare() is called");
 
-		Iterator<RadixTreeNode<S, V>> itr = new Iterator<RadixTreeNode<S, V>>(){
+		Iterator<SearchResult<S, V>> itr = new Iterator<SearchResult<S, V>>(){
 
 			private RadixTreeNode<S, V> lastMatchedNode = root;
 			private int currentIndex = 0;
@@ -262,13 +262,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			}
 
 			@Override
-			public RadixTreeNode<S, V> next(){
+			public SearchResult<S, V> next(){
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(i, text, sequencer);
 					lastMatchedNode = (nextNode != null? nextNode: root);
 					if(nextNode != null && nextNode.hasValue()){
 						currentIndex = i + sequencer.length(nextNode.getKey()) + 1;
-						return nextNode;
+						return new SearchResult(i, nextNode);
 					}
 				}
 

@@ -14,6 +14,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
+import unit731.hunspeller.collections.radixtree.tree.SearchResult;
 
 
 public class StringRadixTreeTest{
@@ -74,10 +75,13 @@ public class StringRadixTreeTest{
 		Assert.assertEquals(3, tree.get("tank").intValue());
 		Assert.assertEquals(4, tree.get("rest").intValue());
 
-		Iterator<RadixTreeNode<String, Integer>> itr = tree.search("resting in the test");
-		Assert.assertTrue(itr.hasNext());
-		Assert.assertEquals(4, itr.next().getValue().intValue());
-		Assert.assertEquals(1, itr.next().getValue().intValue());
+		Iterator<SearchResult<String, Integer>> itr = tree.search("resting in the test");
+		SearchResult<String, Integer> search = itr.next();
+		Assert.assertEquals(0, search.getIndex());
+		Assert.assertEquals(4, search.getNode().getValue().intValue());
+		search = itr.next();
+		Assert.assertEquals(17, search.getIndex());
+		Assert.assertEquals(1, search.getNode().getValue().intValue());
 		Assert.assertFalse(itr.hasNext());
 
 		itr = tree.search("blah");
