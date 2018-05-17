@@ -613,8 +613,8 @@ public class HyphenationParser{
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
 			for(String rule : prefixes){
-				Iterator<SearchResult<String, String>> itr = patterns.get(level).search(w);
-				while(itr.hasNext()){
+//				Iterator<SearchResult<String, String>> itr = patterns.get(level).search(w);
+//				while(itr.hasNext()){
 					int j = -1;
 					//remove non-standard part
 					String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
@@ -636,7 +636,7 @@ public class HyphenationParser{
 							}
 						}
 					}
-				}
+//				}
 			}
 		}
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
