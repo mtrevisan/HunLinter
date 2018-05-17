@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 public class SearchResult<S, V extends Serializable>{
 
-	/** the beginning index, inclusive */
-	private final int index;
-
 	/** the node found */
 	private final RadixTreeNode<S, V> node;
+
+	/** the beginning index, inclusive */
+	private final int index;
 
 }

@@ -270,7 +270,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					lastMatchedNode = (nextNode != null? nextNode: root);
 					if(nextNode != null && nextNode.hasValue()){
 						currentIndex = i + sequencer.length(nextNode.getKey());
-						return new SearchResult(i, nextNode);
+						return new SearchResult(nextNode, i);
 					}
 				}
 
@@ -782,7 +782,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		traverseBFS(traverserForward);
 
 		if(prepared){
-			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, parent, displayEdgesToInitialState);
+			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, displayEdgesToInitialState);
 			traverseBFS(traverserFailure);
 		}
 
@@ -802,7 +802,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			.append(GRAPHVIZ_NEW_LINE);
 	}
 
-	private void graphvizAppendFailureTransitions(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, boolean displayEdgesToInitialState){
+	private void graphvizAppendFailureTransitions(StringBuilder sb, RadixTreeNode<S, V> node, boolean displayEdgesToInitialState){
 		if(displayEdgesToInitialState || node.getFailNode() != root || node == root)
 			sb.append(GRAPHVIZ_TAB)
 				.append(System.identityHashCode(node))

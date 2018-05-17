@@ -271,21 +271,21 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		String word = "savéndolmento";
+		String word = "savendolmento";
 		Hyphenation hyphenation = parser.hyphenate(word);
 
 //savéndolmento	.s2 1v 2nd 1d 2lm 1m 2nt 1t
 //						.s2 1n 2nd 1l 2lm 1n 2nt
-		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 
 		patternsLevelCompound.prepare();
 		hyphenation = parser.hyphenate(word);
 
-		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 
 		hyphenation = parser.hyphenate2(word);
 
-		Assert.assertEquals(Arrays.asList("sa", "vén", "dol", "men", "to"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 	}
 
 

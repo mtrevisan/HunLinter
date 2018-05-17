@@ -683,8 +683,6 @@ public class HyphenationParser{
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
-		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
-
 		int wordSize = word.length();
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
@@ -692,11 +690,12 @@ public class HyphenationParser{
 		String[] rules = new String[wordSize];
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
-		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(w);
+		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(WORD_BOUNDARY + word + WORD_BOUNDARY);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
-			int i = r.getIndex();
 			String rule = r.getNode().getValue();
+			int i = r.getIndex();
+System.out.println(rule);
 
 			int j = -1;
 			//remove non-standard part
@@ -704,18 +703,20 @@ public class HyphenationParser{
 			int ruleSize = reducedData.length();
 			//cycle the pattern's characters searching for numbers
 			for(int k = 0; k < ruleSize; k ++){
-				int idx = i + j;
 				char chr = reducedData.charAt(k);
 				if(!Character.isDigit(chr))
 					j ++;
 				//check if a break point should be skipped based on left and right min options
-				else if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
-					int dd = Character.digit(chr, 10);
-					//check if the break number is great than the one stored so far
-					if(dd > indexes[idx]){
-						indexes[idx] = dd;
-						rules[idx] = rule;
-						augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
+				else{
+					int idx = i + j;
+					if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+						int dd = Character.digit(chr, 10);
+						//check if the break number is great than the one stored so far
+						if(dd > indexes[idx]){
+							indexes[idx] = dd;
+							rules[idx] = rule;
+							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
+						}
 					}
 				}
 			}

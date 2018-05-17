@@ -81,7 +81,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		if(children != null)
 			for(RadixTreeNode<S, V> child : children){
 				boolean found = true;
-				int size = sequencer.length(child.key);
+				int size = Math.min(sequencer.length(child.key), sequencer.length(key) - index);
 				for(int i = 0; i < size; i ++)
 					if(!sequencer.equalsAtIndex(child.key, key, i, index + i)){
 						found = false;
