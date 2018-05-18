@@ -724,6 +724,10 @@ System.out.println(rule);
 			List<String> rls = r.getNode().getAdditionalValues();
 			if(rls != null)
 				for(String rl : rls){
+					//remove non-standard part
+					reducedData = PatternService.clear(rl, MATCHER_REDUCE);
+					ruleSize = reducedData.length();
+					//cycle the pattern's characters searching for numbers
 					j = -1;
 					//cycle the pattern's characters searching for numbers
 					for(int k = 0; k < ruleSize; k ++){
