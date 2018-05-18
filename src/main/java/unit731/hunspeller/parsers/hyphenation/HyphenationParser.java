@@ -713,7 +713,9 @@ System.out.println(rule);
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
-							indexes[idx] = dd;
+//indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
+//				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
+							indexes[idx] = dd;//1,2,4,4,5,7,8,10,10,11
 							rules[idx] = rule;
 							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
 						}
@@ -741,6 +743,8 @@ System.out.println(rule);
 								int dd = Character.digit(chr, 10);
 								//check if the break number is great than the one stored so far
 								if(dd > indexes[idx]){
+//indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
+//				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
 									indexes[idx] = dd;
 									rules[idx] = rl;
 									augmentedPatternData[idx] = (rl.contains(AUGMENTED_RULE)? rl: null);
