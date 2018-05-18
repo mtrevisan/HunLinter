@@ -253,9 +253,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				try{
 					RadixTreeNode<S, V> node = lastMatchedNode;
 					for(int i = currentIndex; i < sequencer.length(text); i ++){
-						RadixTreeNode<S, V> nextNode = node.getNextNode(i, text, sequencer);
-						node = (nextNode != null? nextNode: root);
-						if(nextNode != null && nextNode.hasValue())
+						node = node.getNextNode(i, text, sequencer);
+						if(node == null)
+							node = root;
+						else if(node.hasValue())
 							return true;
 					}
 				}
@@ -266,11 +267,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			@Override
 			public SearchResult<S, V> next(){
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
-					RadixTreeNode<S, V> nextNode = lastMatchedNode.getNextNode(i, text, sequencer);
-					lastMatchedNode = (nextNode != null? nextNode: root);
-					if(nextNode != null && nextNode.hasValue()){
-						currentIndex = i + sequencer.length(nextNode.getKey());
-						return new SearchResult(nextNode, i);
+					lastMatchedNode = lastMatchedNode.getNextNode(i, text, sequencer);
+					if(lastMatchedNode == null)
+						lastMatchedNode = root;
+					else if(lastMatchedNode.hasValue()){
+						currentIndex = i + sequencer.length(lastMatchedNode.getKey());
+						return new SearchResult(lastMatchedNode, i);
 					}
 				}
 

@@ -274,17 +274,18 @@ public class HyphenationParserTest{
 		String word = "savendolmento";
 		Hyphenation hyphenation = parser.hyphenate(word);
 
-//savéndolmento	.s2 1v 2nd 1d 2lm 1m 2nt 1t
-//						.s2 1n 2nd 1l 2lm 1n 2nt
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 
 		patternsLevelCompound.prepare();
 		hyphenation = parser.hyphenate(word);
 
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 
 		hyphenation = parser.hyphenate2(word);
 
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 	}
 

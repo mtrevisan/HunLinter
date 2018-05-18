@@ -697,11 +697,11 @@ public class HyphenationParser{
 			int i = r.getIndex();
 System.out.println(rule);
 
-			int j = -1;
 			//remove non-standard part
 			String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
 			int ruleSize = reducedData.length();
 			//cycle the pattern's characters searching for numbers
+			int j = -1;
 			for(int k = 0; k < ruleSize; k ++){
 				char chr = reducedData.charAt(k);
 				if(!Character.isDigit(chr))
@@ -720,6 +720,31 @@ System.out.println(rule);
 					}
 				}
 			}
+
+			List<String> rls = r.getNode().getAdditionalValues();
+			if(rls != null)
+				for(String rl : rls){
+					j = -1;
+					//cycle the pattern's characters searching for numbers
+					for(int k = 0; k < ruleSize; k ++){
+						char chr = reducedData.charAt(k);
+						if(!Character.isDigit(chr))
+							j ++;
+						//check if a break point should be skipped based on left and right min options
+						else{
+							int idx = i + j;
+							if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+								int dd = Character.digit(chr, 10);
+								//check if the break number is great than the one stored so far
+								if(dd > indexes[idx]){
+									indexes[idx] = dd;
+									rules[idx] = rl;
+									augmentedPatternData[idx] = (rl.contains(AUGMENTED_RULE)? rl: null);
+								}
+							}
+						}
+					}
+				}
 		}
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
