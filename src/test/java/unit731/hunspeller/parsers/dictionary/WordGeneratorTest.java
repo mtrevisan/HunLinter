@@ -11,6 +11,7 @@ import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
 
 
+//https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > morph.aff upward
 public class WordGeneratorTest{
 
 	@Test
