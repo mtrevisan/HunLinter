@@ -27,6 +27,7 @@ import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
@@ -49,8 +50,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private final ThesaurusDictionary dictionary = new ThesaurusDictionary();
 
 	private final Undoable undoable;
-	private final ThesaurusCaretaker undoCaretaker = new ThesaurusCaretaker();
-	private final ThesaurusCaretaker redoCaretaker = new ThesaurusCaretaker();
+	private final CaretakerInterface<Memento> undoCaretaker = new ThesaurusCaretaker();
+	private final CaretakerInterface<Memento> redoCaretaker = new ThesaurusCaretaker();
 
 
 	public ThesaurusParser(Undoable undoable){
