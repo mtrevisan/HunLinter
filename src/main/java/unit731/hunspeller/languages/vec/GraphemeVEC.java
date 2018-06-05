@@ -10,7 +10,9 @@ import unit731.hunspeller.services.PatternService;
 public class GraphemeVEC{
 
 	public static final String JJH_PHONEME = "ʝ";
+	public static final String FH_PHONEME = "\uA799";
 	public static final String I_UMLAUT_PHONEME = "ï";
+	private static final String FH_GRAPHEME = "fh";
 	private static final String J_GRAPHEME = "j";
 	private static final String I_GRAPHEME = "i";
 	private static final String W_GRAPHEME = "w";
@@ -53,9 +55,10 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
+		word = StringUtils.replace(word, FH_GRAPHEME, FH_PHONEME);
+
 		//this step is mandatory before eterophonic sequence VjV
-		if(word.contains(J_GRAPHEME))
-			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
+		word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
 		if(word.contains(I_GRAPHEME))
 			for(Matcher m : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
 				word = PatternService.replaceAll(word, m, "$1" + I_UMLAUT_PHONEME + "$2");
@@ -76,6 +79,7 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String rollbackJHJWIUmlautPhonemes(String word){
+		word = StringUtils.replace(word, FH_GRAPHEME, FH_GRAPHEME);
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, J_GRAPHEME, I_GRAPHEME);
 		word = StringUtils.replace(word, I_UMLAUT_PHONEME, I_GRAPHEME);
