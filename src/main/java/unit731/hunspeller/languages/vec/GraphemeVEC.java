@@ -82,7 +82,7 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String rollbackJHJWIUmlautPhonemes(String word){
-		word = StringUtils.replace(word, FH_GRAPHEME, FH_GRAPHEME);
+		word = StringUtils.replace(word, FH_PHONEME, FH_GRAPHEME);
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, J_GRAPHEME, I_GRAPHEME);
 		word = StringUtils.replace(word, I_UMLAUT_PHONEME, I_GRAPHEME);
