@@ -68,7 +68,7 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
 		productions.addAll(lastfoldProductions);
 
-//		productions.forEach(production -> log.trace(Level.INFO, "Produced word {0}", production));
+//		productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
 
 		return productions;
 	}

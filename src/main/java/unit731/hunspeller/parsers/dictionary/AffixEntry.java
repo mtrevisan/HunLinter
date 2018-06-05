@@ -93,15 +93,15 @@ public class AffixEntry{
 		if(removeLength > 0){
 			if(isSuffix()){
 				if(!regexToMatch.endsWith(removal))
-					log.warn("This line has the condition part that not ends with the removal part: " + line);
+					log.warn("This line has the condition part that not ends with the removal part: {}", line);
 				if(add.length() > 1 && removal.charAt(0) == add.charAt(0))
-					log.warn("This line has characters in common between removed and added part: " + line);
+					log.warn("This line has characters in common between removed and added part: {}", line);
 			}
 			else{
 				if(!regexToMatch.startsWith(removal))
-					log.warn("This line has the condition part that not starts with the removal part: " + line);
+					log.warn("This line has the condition part that not starts with the removal part: {}", line);
 				if(add.length() > 1 && removal.charAt(removal.length() - 1) == add.charAt(add.length() - 1))
-					log.warn("This line has characters in common between removed and added part: " + line);
+					log.warn("This line has characters in common between removed and added part: {}", line);
 			}
 		}
 

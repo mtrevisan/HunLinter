@@ -204,7 +204,7 @@ public class DictionaryParser{
 			process.waitFor();
 		}
 		else
-			log.warn("Cannot open file " + file.getName() + ", OS not recognized (" + SystemUtils.OS_NAME + ")");
+			log.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 	}
 
 }

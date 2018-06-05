@@ -95,7 +95,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 		addFilePatterns(listener, patterns);
 
-		log.info("Watching files under " + dirPath + " for changes");
+		log.info("Watching files under {} for changes", dirPath);
 	}
 
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){

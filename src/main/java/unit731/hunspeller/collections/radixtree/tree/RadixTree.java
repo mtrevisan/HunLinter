@@ -769,7 +769,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @return	The GraphVIZ representation of this tree
 	 */
 	public String generateGraphvizRepresentation(boolean displayEdgesToInitialState){
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder(40);
 		sb.append("digraph automaton{")
 			.append(GRAPHVIZ_NEW_LINE)
 			.append(GRAPHVIZ_TAB)
