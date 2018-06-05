@@ -23,9 +23,6 @@ public class WordVEC{
 	private static final char COMBINING_GRAVE_ACCENT = '\u0300';
 	private static final char COMBINING_ACUTE_ACCENT = '\u0301';
 
-	private static final String A = "a";
-	private static final String A_COMBINING_GRAVE_ACCENT = A + COMBINING_GRAVE_ACCENT;
-
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -110,33 +107,22 @@ public class WordVEC{
 
 	private static int countAccents(String word){
 		String normalizedWord = normalize(word);
-		int count = 0;
-		for(int i = 0; i < normalizedWord.length(); i ++){
-			char chr = normalizedWord.charAt(i);
-			//collect number of acute and grave accents
-			if(chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT)
-				count ++;
-		}
-		return count;
+		return StringUtils.countMatches(normalizedWord, COMBINING_GRAVE_ACCENT) + StringUtils.countMatches(normalizedWord, COMBINING_ACUTE_ACCENT);
 	}
 
 	//[àèéíòóú]
 	private static int getIndexOfStress(String word){
-		int otherCombinigMarks = 0;
+		int otherCombiningMarks = 0;
 		String normalizedWord = normalize(word);
 		for(int i = 0; i < normalizedWord.length(); i ++){
 			char chr = normalizedWord.charAt(i);
 			//collect number of acute and grave accents
 			if(chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT)
-				return i - otherCombinigMarks - 1;
+				return i - otherCombiningMarks - 1;
 			else if(chr >= 0x0300 && chr <= 0x036F)
-				otherCombinigMarks ++;
+				otherCombiningMarks ++;
 		}
 		return -1;
-	}
-
-	private static String normalize(String word){
-		return Normalizer.normalize(word, Normalizer.Form.NFD);
 	}
 
 /*	var isStressAcute = function(chr){
@@ -163,14 +149,13 @@ public class WordVEC{
 
 	private static String suppressDefaultStress(String word){
 		String normalizedWord = normalize(word);
-		normalizedWord = StringUtils.replace(normalizedWord, A_COMBINING_GRAVE_ACCENT, A);
-		normalizedWord = StringUtils.replace(normalizedWord, String.valueOf(COMBINING_ACUTE_ACCENT), StringUtils.EMPTY);
+		String searchChars = String.valueOf(COMBINING_GRAVE_ACCENT) + String.valueOf(COMBINING_ACUTE_ACCENT);
+		normalizedWord = StringUtils.replaceChars(normalizedWord, searchChars, null);
 		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
 	}
 
-	private static char addStressAcute(char chr){
-		String c = String.valueOf(chr);
-		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
+	private static String normalize(String word){
+		return Normalizer.normalize(word, Normalizer.Form.NFD);
 	}
 
 	/*private static char addStressGrave(char chr){
@@ -205,7 +190,23 @@ public class WordVEC{
 	}
 
 	private static String setAcuteStressAtIndex(String word, int idx){
-		return (idx >= 0? word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1): word);
+		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
+	}
+
+	//NOTE: is seems faster the current method
+//	private static String setAcuteStressAtIndex(String word, int idx){
+//		return replaceCharAt(word, idx, addStressAcute(word.charAt(idx)));
+//	}
+//
+//	private static String replaceCharAt(String text, int idx, char chr){
+//		StringBuilder sb = new StringBuilder(text);
+//		sb.setCharAt(idx, chr);
+//		return sb.toString();
+//	}
+
+	private static char addStressAcute(char chr){
+		String c = String.valueOf(chr);
+		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
 	public static String unmarkDefaultStress(String word){
