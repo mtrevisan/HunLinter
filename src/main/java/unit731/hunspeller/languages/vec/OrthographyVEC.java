@@ -33,9 +33,9 @@ public class OrthographyVEC extends Orthography{
 	);
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
-	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher("fh(?=[^aeiouàèéíòóú])");
-	private static final Matcher REGEX_X_INTO_S = PatternService.matcher("x(?=[cfkpt])");
-	private static final Matcher REGEX_S_INTO_X = PatternService.matcher("s(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
+	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher(GraphemeVEC.FH_GRAPHEME + "(?=[^aeiouàèéíòóú])");
+	private static final Matcher REGEX_X_INTO_S = PatternService.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
+	private static final Matcher REGEX_S_INTO_X = PatternService.matcher(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
 
 	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([c" + GraphemeVEC.JJH_PHONEME + "ñ])i([aeiou])");
 
@@ -54,6 +54,9 @@ public class OrthographyVEC extends Orthography{
 	public String correctOrthography(String word){
 		//correct stress
 		word = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+
+		//correct fh occurrences into f not before vowel
+		word = PatternService.replaceAll(word, REGEX_FH_INTO_F, GraphemeVEC.F_GRAPHEME);
 
 		//correct h occurrences after d, j, l, n, t
 		word = StringUtils.replaceEach(word, EXTENDED_CHARS, TRUE_CHARS);
@@ -77,12 +80,10 @@ public class OrthographyVEC extends Orthography{
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, "l");
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
-		//correct fh occurrences into f not before vowel
-		word = PatternService.replaceAll(word, REGEX_FH_INTO_F, "f");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
-		word = PatternService.replaceAll(word, REGEX_X_INTO_S, "s");
-		word = PatternService.replaceAll(word, REGEX_S_INTO_X, "x");
+		word = PatternService.replaceAll(word, REGEX_X_INTO_S, GraphemeVEC.S_GRAPHEME);
+		word = PatternService.replaceAll(word, REGEX_S_INTO_X, GraphemeVEC.X_GRAPHEME);
 
 		//correct morphological errors
 		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
