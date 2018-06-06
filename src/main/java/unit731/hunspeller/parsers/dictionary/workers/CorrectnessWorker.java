@@ -60,7 +60,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 							productions.forEach(production -> dicParser.checkProduction(production, strategy));
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic(dictionaryWord.getStrategy()));
+							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic());
 						}
 					}
 

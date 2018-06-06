@@ -321,16 +321,18 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
-		boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-		if(!hasMetaphonesisFlag){
-			FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
-			DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
-			try{
-				List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
-				if(productions.size() > 1)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+		if(!production.isPartOfSpeech(POS_PROPER_NOUN)){
+			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
+			if(!hasMetaphonesisFlag){
+				FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
+				DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
+				try{
+					List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
+					if(productions.size() > 1)
+						throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+				}
+				catch(NoApplicableRuleException e){}
 			}
-			catch(NoApplicableRuleException e){}
 		}
 //		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
 //			//FIXME

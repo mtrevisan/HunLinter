@@ -100,7 +100,7 @@ public class DictionaryEntry implements Productable{
 	}
 
 	@Override
-	public String toStringBasic(FlagParsingStrategy strategy){
+	public String toStringBasic(){
 		return word + strategy.joinRuleFlags(ruleFlags);
 	}
 

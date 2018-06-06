@@ -28,17 +28,21 @@ public class RuleProductionEntry implements Productable{
 	private List<AffixEntry> appliedRules;
 	private final boolean combineable;
 
+	private FlagParsingStrategy strategy;
 
-	public RuleProductionEntry(Productable productable){
+
+	public RuleProductionEntry(Productable productable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(productable);
 
 		word = productable.getWord();
 		ruleFlags = productable.getRuleFlags();
 		dataFields = productable.getDataFields();
 		combineable = true;
+
+		this.strategy = strategy;
 	}
 
-	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry appliedEntry, Set<String> remainingRuleFlags, boolean combineable){
+	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry appliedEntry, Set<String> remainingRuleFlags, boolean combineable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(appliedEntry);
 
@@ -48,6 +52,8 @@ public class RuleProductionEntry implements Productable{
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
 		this.combineable = combineable;
+
+		this.strategy = strategy;
 	}
 
 	/** NOTE: used for testing purposes */
@@ -185,7 +191,7 @@ public class RuleProductionEntry implements Productable{
 //	}
 
 	@Override
-	public String toStringBasic(FlagParsingStrategy strategy){
+	public String toStringBasic(){
 		return word + strategy.joinRuleFlags(ruleFlags);
 	}
 

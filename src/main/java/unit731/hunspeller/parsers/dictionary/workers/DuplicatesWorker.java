@@ -102,7 +102,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic(dictionaryWord.getStrategy()));
+						publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic());
 					}
 				}
 

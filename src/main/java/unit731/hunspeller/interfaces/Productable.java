@@ -2,7 +2,6 @@ package unit731.hunspeller.interfaces;
 
 import java.util.Objects;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 
 public interface Productable{
@@ -14,7 +13,7 @@ public interface Productable{
 	boolean containsRuleFlag(String ruleFlag);
 	boolean containsDataField(String dataField);
 	boolean isCombineable();
-	String toStringBasic(FlagParsingStrategy strategy);
+	String toStringBasic();
 
 	default String getDataFieldPrefixedBy(String typePrefix){
 		String[] dataFields = getDataFields();

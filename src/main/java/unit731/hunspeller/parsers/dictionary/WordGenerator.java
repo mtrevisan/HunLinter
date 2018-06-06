@@ -57,7 +57,7 @@ public class WordGenerator{
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
 		boolean complexPrefixes = affParser.isComplexPrefixes();
 
-		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
+		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
 		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry, complexPrefixes);
 
@@ -75,8 +75,8 @@ public class WordGenerator{
 		return productions;
 	}
 
-	private RuleProductionEntry getBaseProduction(Productable productable){
-		return new RuleProductionEntry(productable);
+	private RuleProductionEntry getBaseProduction(Productable productable, FlagParsingStrategy strategy){
+		return new RuleProductionEntry(productable, strategy);
 	}
 
 	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes) throws NoApplicableRuleException{
@@ -193,7 +193,7 @@ public class WordGenerator{
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toStringBasic(affParser.getStrategy()));
+					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toStringBasic());
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
@@ -229,7 +229,7 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, postponedAffixes, rule.isCombineable());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
 
 					productions.add(production);
 				}

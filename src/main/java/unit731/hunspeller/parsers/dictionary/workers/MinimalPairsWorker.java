@@ -77,7 +77,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic(dictionaryWord.getStrategy()));
+							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic());
 						}
 					}
 
