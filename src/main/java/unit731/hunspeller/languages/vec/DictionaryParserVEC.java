@@ -341,13 +341,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 			//FIXME
 			boolean canHaveMetaphonesis = canHaveMetaphonesis(production);
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
-				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-				if(canHaveMetaphonesis && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
-				else if(!canHaveMetaphonesis && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
-			}
+			if(canHaveMetaphonesis && !hasMetaphonesisFlag)
+				throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+			else if(!canHaveMetaphonesis && hasMetaphonesisFlag)
+				throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+//			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
+//				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+//				if(canHaveMetaphonesis && hasPluralFlag)
+//					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+//				else if(!canHaveMetaphonesis && !hasPluralFlag)
+//					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+//			}
 		}
 	}
 
