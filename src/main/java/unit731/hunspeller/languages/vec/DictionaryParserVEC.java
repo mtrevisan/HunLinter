@@ -69,61 +69,65 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ[^/]*[^a]" + START_TAGS;
 
 	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("([eo]([dđkƚñstŧxv]o|nt[eo]|[lnr])|o[lr][kd]o|orse|exe)$");
-	private static final Matcher HAS_PLURAL = PatternService.matcher("[^i]" + START_TAGS + "T0|[^aie]" + START_TAGS + "B0|[^ieo]" + START_TAGS
-		+ "C0|[^aio]" + START_TAGS + ADJECTIVE_THIRD_CLASS_RULE);
+	private static final Matcher HAS_PLURAL = PatternService.matcher(
+		"[^i]" + START_TAGS + "T0"
+		+ "|[^aie]" + START_TAGS+ "B0"
+		+ "|[^ieo]" + START_TAGS + "C0"
+		+ "|[^aio]" + START_TAGS + ADJECTIVE_THIRD_CLASS_RULE);
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
 	private static final Map<Matcher, String> MISMATCH_CHECKS = new HashMap<>();
-	private static final String CANNOT_USE_RULE_WITH_VANISHING_EL = "Cannot use {0} rule with vanishing el, use {1}";
-	private static final String CANNOT_USE_RULE_WITH_NON_VANISHING_EL = "Cannot use {0} rule with non-vanishing el, use {1}";
+	private static final String CANNOT_USE_RULE_WITH_LH = "Cannot use {0} rule with vanishing el, use {1}";
+	private static final String CANNOT_USE_RULE_WITH_NON_LH = "Cannot use {0} rule with non-vanishing el, use {1}";
+	private static final String CANNOT_USE_RULE_WITH_TH_OR_DH = "Cannot use {0} rule with đ or ŧ, use {1}";
 	static{
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "r0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "r0", "r1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "r0", "r1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "r1", "r0"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "r1", "r0"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "s1", "s2"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "s1", "s2"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "s2", "s1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "s2", "s1"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "W0", "W1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "W0", "W1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "W1", "W0"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "W1", "W0"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "&0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&0", "&1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "&0", "&1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "&1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&1", "&0"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "&1", "&0"));
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "&2"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&2", "&3"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "&2", "&3"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "&3"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&3", "&2"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "&3", "&2"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "[0", "[1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "[0", "[1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "[1", "[0"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "[1", "[0"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(0", "(1"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "(0", "(1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(1", "(0"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "(1", "(0"));
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(2"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(2", "(3"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "(2", "(3"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(3"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(3", "(2"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "(3", "(2"));
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(4"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(4", "(5"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "(4", "(5"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(5"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(5", "(4"));
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_LH, "(5", "(4"));
 
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "<0", "<1"));
-
-		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"), "Cannot use <1 rule with đ or ŧ, use <0");
+			MessageFormat.format(CANNOT_USE_RULE_WITH_LH, "<0", "<1"));
+		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_TH_OR_DH, "<1", "<0"));
 	}
 
 	private static final Set<List<String>> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
