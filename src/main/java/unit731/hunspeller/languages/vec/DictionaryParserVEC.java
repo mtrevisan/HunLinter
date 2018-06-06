@@ -82,32 +82,47 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "r0", "r1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "r1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "r1", "r0"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "s1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "s1", "s2"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "s2"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "s2", "s1"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "W0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "W0", "W1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "W1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "W1", "W0"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "&0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&0", "&1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "&1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&1", "&0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L + "&2"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "&2", "&3"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L + "&3"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "&3", "&2"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\[0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "[0", "[1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "[1", "[0"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(0", "(1"));
 		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(1", "(0"));
-		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\)0"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, ")0", ")1"));
-		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\)1"),
-			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, ")1", ")0"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(2"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(2", "(3"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(3"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(3", "(2"));
+		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "\\(4"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "(4", "(5"));
+		MISMATCH_CHECKS.put(PatternService.matcher(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(5"),
+			MessageFormat.format(CANNOT_USE_RULE_WITH_NON_VANISHING_EL, "(5", "(4"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher(VANISHING_L_NOT_ENDING_IN_A + "<0"),
 			MessageFormat.format(CANNOT_USE_RULE_WITH_VANISHING_EL, "<0", "<1"));
+
 		MISMATCH_CHECKS.put(PatternService.matcher("[đŧ][^/]*[^a]" + START_TAGS + "<1"), "Cannot use <1 rule with đ or ŧ, use <0");
 	}
 
