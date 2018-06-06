@@ -44,7 +44,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group("flags");
 		ruleFlags = strategy.parseRuleFlags(dicFlags);
 		String dicDataFields = m.group("dataFields");
-		dataFields = (dicDataFields != null? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
+		dataFields = (Objects.nonNull(dicDataFields)? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
 		combineable = true;
 
 		this.strategy = strategy;
@@ -67,7 +67,7 @@ public class DictionaryEntry implements Productable{
 		return Arrays.stream(ruleFlags)
 			.filter(rf -> {
 				RuleEntry r = ruleEntryExtractor.apply(rf);
-				return (r != null && !r.isSuffix());
+				return (Objects.nonNull(r) && !r.isSuffix());
 			})
 			.collect(Collectors.toList());
 	}
@@ -93,7 +93,7 @@ public class DictionaryEntry implements Productable{
 		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
 			.add(word)
 			.add(strategy.joinRuleFlags(ruleFlags));
-		if(dataFields != null && dataFields.length > 0)
+		if(Objects.nonNull(dataFields) && dataFields.length > 0)
 			sj.add(TAB)
 				.add(String.join(StringUtils.EMPTY, dataFields));
 		return sj.toString();

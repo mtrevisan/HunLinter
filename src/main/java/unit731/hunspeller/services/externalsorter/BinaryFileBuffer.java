@@ -27,7 +27,7 @@ public class BinaryFileBuffer{
 	}
 
 	public boolean empty(){
-		return (cache == null);
+		return Objects.isNull(cache);
 	}
 
 	public String peek(){

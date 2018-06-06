@@ -60,9 +60,9 @@ public class RuleProductionEntry implements Productable{
 
 	private String[] combineRuleFlags(String[] ruleFlags1, Set<String> ruleFlags2){
 		Set<String> flags = new HashSet<>();
-		if(ruleFlags1 != null)
+		if(Objects.nonNull(ruleFlags1))
 			flags.addAll(Arrays.asList(ruleFlags1));
-		if(ruleFlags2 != null && !ruleFlags2.isEmpty())
+		if(Objects.nonNull(ruleFlags2) && !ruleFlags2.isEmpty())
 			flags.addAll(ruleFlags2);
 		return flags.toArray(new String[flags.size()]);
 	}
@@ -73,26 +73,26 @@ public class RuleProductionEntry implements Productable{
 		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 		//	removed by splitting rules
-		if(dataFields != null)
+		if(Objects.nonNull(dataFields))
 			for(String dataField : dataFields)
 				if(!dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
-						&& (!dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || affixEntryDataFields == null
+						&& (!dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || Objects.isNull(affixEntryDataFields)
 							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
-						&& (!dataField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryDataFields == null
+						&& (!dataField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || Objects.isNull(affixEntryDataFields)
 							|| !Arrays.stream(affixEntryDataFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
 					newDataFields.add(dataField);
-		if(affixEntryDataFields != null)
+		if(Objects.nonNull(affixEntryDataFields))
 			newDataFields.addAll(Arrays.asList(affixEntryDataFields));
 		return newDataFields.toArray(new String[0]);
 	}
 
 	public boolean hasRuleFlags(){
-		return (ruleFlags != null && ruleFlags.length > 0);
+		return (Objects.nonNull(ruleFlags) && ruleFlags.length > 0);
 	}
 
 	@Override
 	public boolean containsRuleFlag(String ruleFlag){
-		if(ruleFlags != null)
+		if(Objects.nonNull(ruleFlags))
 			for(String flag : ruleFlags)
 				if(flag.equals(ruleFlag))
 					return true;
@@ -100,12 +100,12 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public boolean hasDataFields(){
-		return (dataFields != null && dataFields.length > 0);
+		return (Objects.nonNull(dataFields) && dataFields.length > 0);
 	}
 
 	@Override
 	public boolean containsDataField(String dataField){
-		if(dataFields != null)
+		if(Objects.nonNull(dataFields))
 			for(String field : dataFields)
 				if(field.equals(dataField))
 					return true;
@@ -113,28 +113,28 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
-		if(appliedRules != null){
+		if(Objects.nonNull(appliedRules)){
 			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>(3));
 			this.appliedRules.addAll(0, appliedRules);
 		}
 	}
 
 	public boolean hasProductionRules(){
-		return (appliedRules != null && !appliedRules.isEmpty());
+		return (Objects.nonNull(appliedRules) && !appliedRules.isEmpty());
 	}
 
 	public boolean hasProductionRule(String ruleFlag){
-		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(ruleFlag)));
+		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(ruleFlag)));
 	}
 
 	public boolean hasProductionRule(AffixEntry.Type type){
-		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
+		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 	}
 
 	public boolean hasDoublefoldAffixRule(){
 		int prefixRules = 0;
 		int suffixRules = 0;
-		if(appliedRules != null && appliedRules.size() > 1)
+		if(Objects.nonNull(appliedRules) && appliedRules.size() > 1)
 			for(AffixEntry appliedRule : appliedRules){
 				if(appliedRule.getType() == AffixEntry.Type.PREFIX)
 					prefixRules ++;
@@ -146,7 +146,7 @@ public class RuleProductionEntry implements Productable{
 
 	public String getRulesSequence(){
 		StringJoiner sj = new StringJoiner(" > ");
-		if(appliedRules != null)
+		if(Objects.nonNull(appliedRules))
 			appliedRules.stream()
 				.map(AffixEntry::getFlag)
 				.forEach(sj::add);
@@ -156,7 +156,7 @@ public class RuleProductionEntry implements Productable{
 //	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
 	public String[] getSignificantDataFields(){
 //		List<String> significant = new ArrayList<>();
-//		if(dataFields != null)
+//		if(Objects.nonNull(dataFields))
 //			for(String dataField : dataFields)
 //				if(!dataField.startsWith(WordGenerator.TAG_PHONETIC) && !dataField.startsWith(WordGenerator.TAG_STEM)
 //						&& !dataField.startsWith(WordGenerator.TAG_ALLOMORPH))
@@ -175,10 +175,10 @@ public class RuleProductionEntry implements Productable{
 //		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
 //			.add(word)
 //			.add(AffixEntry.joinRuleFlags(ruleFlags, flag));
-//		if(dataFields != null && dataFields.length > 0)
+//		if(Objects.nonNull(dataFields) && dataFields.length > 0)
 //			sj.add("\t")
 //				.add(String.join(StringUtils.SPACE, dataFields));
-//		if(rules != null && rules.size() > 0)
+//		if(Objects.nonNull(rules) && rules.size() > 0)
 //			sj.add(" from ")
 //				.add(String.join(" > ", rules));
 //		return sj.toString();

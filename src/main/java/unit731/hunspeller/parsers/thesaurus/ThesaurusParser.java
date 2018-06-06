@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
 					String line = br.readLine();
 
-					while((line = br.readLine()) != null){
+					while(Objects.nonNull(line = br.readLine())){
 						readSoFar += line.length();
 						if(!line.isEmpty())
 							theParser.dictionary.add(new ThesaurusEntry(line, br));
@@ -119,7 +120,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		@Override
 		protected void done(){
-			if(postExecution != null)
+			if(Objects.nonNull(postExecution))
 				postExecution.run();
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
@@ -190,7 +191,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				try{
 					undoCaretaker.pushMemento(createMemento());
 
-					if(undoable != null)
+					if(Objects.nonNull(undoable))
 						undoable.onUndoChange(true);
 				}
 				catch(IOException ex){
@@ -252,7 +253,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 			dictionary.setMeanings(index, meanings, text);
 
-			if(undoable != null)
+			if(Objects.nonNull(undoable))
 				undoable.onUndoChange(true);
 		}
 		catch(IOException e){
@@ -289,7 +290,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				try{
 					undoCaretaker.pushMemento(createMemento());
 
-					if(undoable != null)
+					if(Objects.nonNull(undoable))
 						undoable.onUndoChange(true);
 				}
 				catch(IOException ex){
@@ -398,7 +399,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			redoCaretaker.pushMemento(createMemento());
 
 			Memento memento = undoCaretaker.popMemento();
-			if(undoable != null){
+			if(Objects.nonNull(undoable)){
 				undoable.onUndoChange(canUndo());
 				undoable.onRedoChange(true);
 			}
@@ -416,7 +417,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			undoCaretaker.pushMemento(createMemento());
 
 			Memento memento = redoCaretaker.popMemento();
-			if(undoable != null){
+			if(Objects.nonNull(undoable)){
 				undoable.onUndoChange(true);
 				undoable.onRedoChange(canRedo());
 			}

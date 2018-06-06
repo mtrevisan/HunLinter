@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -151,14 +152,14 @@ public class WordGenerator{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
-		if(ruleFlags != null){
+		if(Objects.nonNull(ruleFlags)){
 			String keepCaseFlag = affParser.getKeepCaseFlag();
 			for(String ruleFlag : ruleFlags){
 				if(ruleFlag.equals(keepCaseFlag))
 					continue;
 
 				Object rule = affParser.getData(ruleFlag);
-				if(rule == null)
+				if(Objects.isNull(rule))
 					throw new IllegalArgumentException("Non-existent rule " + ruleFlag + " found");
 
 				if(rule instanceof RuleEntry){
@@ -187,7 +188,7 @@ public class WordGenerator{
 
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
-				if(rule == null)
+				if(Objects.isNull(rule))
 					throw new IllegalArgumentException(affix);
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
@@ -204,7 +205,7 @@ public class WordGenerator{
 //	for(AffixEntry entry : rule.getSuffixEntries()){
 //		Matcher match = entry.getMatch();
 //		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
+//		if(Objects.isNull(match) || PatternService.find(arr, match))
 //			en1.add(entry);
 //	}
 //}
@@ -212,7 +213,7 @@ public class WordGenerator{
 //	for(AffixEntry entry : rule.getPrefixEntries()){
 //		Matcher match = entry.getMatch();
 //		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
+//		if(Objects.isNull(match) || PatternService.find(arr, match))
 //			en1.add(entry);
 //	}
 //}
@@ -245,7 +246,7 @@ public class WordGenerator{
 		for(AffixEntry entry : entries){
 			Matcher match = entry.getMatch();
 			//... only if it matches the given word...
-			if(match == null || PatternService.find(word, match))
+			if(Objects.isNull(match) || PatternService.find(word, match))
 				applicableAffixes.add(entry);
 		}
 		return applicableAffixes;

@@ -131,19 +131,19 @@ public class HyphenationParser{
 	public HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
 		this(language);
 
-		if(patterns != null)
+		if(Objects.nonNull(patterns))
 			for(Level level : Level.values()){
 				RadixTree<String, String> p = patterns.get(level);
-				if(p != null)
+				if(Objects.nonNull(p))
 					this.patterns.put(level, p);
 			}
-		if(customHyphenations != null)
+		if(Objects.nonNull(customHyphenations))
 			for(Level level : Level.values()){
 				Map<String, String> ch = customHyphenations.get(level);
-				if(ch != null)
+				if(Objects.nonNull(ch))
 					this.customHyphenations.put(level, ch);
 			}
-		if(options != null)
+		if(Objects.nonNull(options))
 			this.options = options;
 	}
 
@@ -177,7 +177,7 @@ public class HyphenationParser{
 					Level level = Level.COMPOUND;
 					REDUCED_PATTERNS.get(level).clear();
 
-					while((line = br.readLine()) != null){
+					while(Objects.nonNull(line = br.readLine())){
 						readSoFar += line.length();
 
 						line = removeComment(line);
@@ -261,7 +261,7 @@ public class HyphenationParser{
 		private boolean isRuleDuplicated(String key, String line, Level level){
 			boolean duplicatedRule = false;
 			String foundNodeValue = hypParser.patterns.get(level).get(key);
-			if(foundNodeValue != null){
+			if(Objects.nonNull(foundNodeValue)){
 				String clearedLine = PatternService.clear(line, MATCHER_REDUCE);
 				String clearedFoundNodeValue = PatternService.clear(foundNodeValue, MATCHER_REDUCE);
 				duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
@@ -289,7 +289,7 @@ public class HyphenationParser{
 
 		@Override
 		protected void done(){
-			if(postExecution != null)
+			if(Objects.nonNull(postExecution))
 				postExecution.run();
 		}
 	};
@@ -302,7 +302,7 @@ public class HyphenationParser{
 				.forEach(RadixTree::clear);
 			customHyphenations.values()
 				.forEach(Map::clear);
-			if(options != null)
+			if(Objects.nonNull(options))
 				options.clear();
 		}
 		finally{
@@ -330,7 +330,7 @@ public class HyphenationParser{
 
 			String key = getKeyFromData(rule);
 			String newRule = patterns.get(level).get(key);
-			if(newRule == null)
+			if(Objects.isNull(newRule))
 				patterns.get(level).put(key, rule);
 
 			return newRule;
@@ -368,8 +368,8 @@ public class HyphenationParser{
 				m.find();
 				int index = m.start();
 
-				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
-				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
+				int startIndex = (Objects.nonNull(parts[1])? Integer.parseInt(parts[1]) - 1: -1);
+				int length = (parts.length > 2 && Objects.nonNull(parts[2])? Integer.parseInt(parts[2]): 0);
 				if(startIndex < 0 || startIndex >= index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
 				if(length < 0 || startIndex + length < index)
@@ -389,7 +389,7 @@ public class HyphenationParser{
 				alreadyPresentRule = pattern;
 				break;
 			}
-		if(alreadyPresentRule != null)
+		if(Objects.nonNull(alreadyPresentRule))
 			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
 
 		reducedPatterns.add(cleanedRule);
@@ -543,7 +543,7 @@ public class HyphenationParser{
 		Level level = Level.COMPOUND;
 
 		String customHyphenation = customHyphenations.get(level).get(word);
-		if(customHyphenation != null){
+		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
 			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
 
@@ -656,7 +656,7 @@ public class HyphenationParser{
 		Level level = Level.COMPOUND;
 
 		String customHyphenation = customHyphenations.get(level).get(word);
-		if(customHyphenation != null){
+		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
 			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
 
@@ -724,7 +724,7 @@ System.out.println(rule);
 			}
 
 			List<String> rls = r.getNode().getAdditionalValues();
-			if(rls != null)
+			if(Objects.nonNull(rls))
 				for(String rl : rls){
 					//remove non-standard part
 					reducedData = PatternService.clear(rl, MATCHER_REDUCE);
@@ -777,7 +777,7 @@ System.out.println(rule);
 
 				//manage augmented patterns:
 				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
-				if(augmentedPatternData != null){
+				if(Objects.nonNull(augmentedPatternData)){
 					Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 					m.find();
 					int index = m.start();
@@ -788,7 +788,7 @@ System.out.println(rule);
 					addAfter = m.group("addAfter");
 					String start = m.group("start");
 					String cut = m.group("cut");
-					if(start == null){
+					if(Objects.isNull(start)){
 						String rule = m.group("rule");
 						start = Integer.toString(1);
 						cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());

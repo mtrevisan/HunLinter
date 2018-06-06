@@ -1,5 +1,6 @@
 package unit731.hunspeller.interfaces;
 
+import java.util.Objects;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 
 
@@ -15,7 +16,7 @@ public interface Productable{
 
 	default String getDataFieldPrefixedBy(String typePrefix){
 		String[] dataFields = getDataFields();
-		if(dataFields != null)
+		if(Objects.nonNull(dataFields))
 			for(String field : dataFields)
 				if(field.startsWith(typePrefix))
 					return field;

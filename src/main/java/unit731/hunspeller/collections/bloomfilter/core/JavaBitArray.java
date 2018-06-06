@@ -1,6 +1,7 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
 import java.util.BitSet;
+import java.util.Objects;
 
 
 /**
@@ -19,7 +20,7 @@ public class JavaBitArray implements BitArray{
 	}
 
 	public JavaBitArray(long[] data){
-		if(data == null || data.length == 0)
+		if(Objects.isNull(data) || data.length == 0)
 			throw new IllegalArgumentException("Data must be valued");
 
 		int size = data.length;

@@ -30,10 +30,10 @@ public class Debouncer<T>{
 		TimerTask prev;
 		do{
 			prev = delayedMap.putIfAbsent(key, task);
-			if(prev == null)
+			if(Objects.isNull(prev))
 				sched.schedule(task, interval, TimeUnit.MILLISECONDS);
 		//exit only if new task was added to map, or existing task was extended successfully
-		}while(prev != null && !prev.extend());
+		}while(Objects.nonNull(prev) && !prev.extend());
 	}
 
 	public void terminate(){

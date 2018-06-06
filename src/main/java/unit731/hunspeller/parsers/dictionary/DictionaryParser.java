@@ -126,7 +126,7 @@ public class DictionaryParser{
 				int startSection = -1;
 				boolean needSorting = false;
 				Comparator<String> comparator = ComparatorBuilder.getComparator(language);
-				while((line = br.readLine()) != null){
+				while(Objects.nonNull(line = br.readLine())){
 					if(isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){
 							//filter out single word that doesn't need to be sorted
@@ -169,7 +169,7 @@ public class DictionaryParser{
 	}
 
 	public final void clear(){
-		if(boundaries != null)
+		if(Objects.nonNull(boundaries))
 			boundaries.clear();
 	}
 
@@ -197,7 +197,7 @@ public class DictionaryParser{
 		else if(SystemUtils.IS_OS_MAC)
 			builder = new ProcessBuilder("open", file.getAbsolutePath());
 
-		if(builder != null){
+		if(Objects.nonNull(builder)){
 			builder.redirectErrorStream();
 			builder.redirectOutput();
 			Process process = builder.start();

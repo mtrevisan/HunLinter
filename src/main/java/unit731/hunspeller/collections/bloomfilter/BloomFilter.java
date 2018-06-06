@@ -232,7 +232,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	private byte[] decomposeValue(T value){
 		ByteSink sink = new ByteSink();
-		if(decomposer != null)
+		if(Objects.nonNull(decomposer))
 			decomposer.decompose(value, sink, currentCharset);
 		else
 			DEFAULT_DECOMPOSER.decompose(value, sink, currentCharset);
@@ -242,17 +242,17 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	//Overridden helper functions follow
 	@Override
 	public boolean add(T value){
-		return (value != null && add(decomposeValue(value)));
+		return (Objects.nonNull(value) && add(decomposeValue(value)));
 	}
 
 	@Override
 	public List<Integer> indexes(T value){
-		return (value != null? indexes(decomposeValue(value)): Collections.<Integer>emptyList());
+		return (Objects.nonNull(value)? indexes(decomposeValue(value)): Collections.<Integer>emptyList());
 	}
 
 	@Override
 	public boolean contains(T value){
-		return (value != null && contains(value.toString().getBytes(currentCharset)));
+		return (Objects.nonNull(value) && contains(value.toString().getBytes(currentCharset)));
 	}
 
 	@Override

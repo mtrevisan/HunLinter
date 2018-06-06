@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 
 				long readSoFar = line.length();
 				long totalSize = dicParser.getDicFile().length();
-				while((line = br.readLine()) != null){
+				while(Objects.nonNull(line = br.readLine())){
 					lineIndex ++;
 					readSoFar += line.length();
 					line = dicParser.cleanLine(line);

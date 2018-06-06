@@ -1,6 +1,7 @@
 package unit731.hunspeller.collections.bloomfilter.decompose;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 
 /**
@@ -16,7 +17,7 @@ public class DefaultDecomposer implements Decomposer<Object>{
 	 */
 	@Override
 	public void decompose(Object object, ByteSink sink, Charset charset){
-		if(object != null){
+		if(Objects.nonNull(object)){
 			byte[] bytes;
 			if(String.class.isAssignableFrom(object.getClass()))
 				bytes = ((String)object).getBytes(charset);

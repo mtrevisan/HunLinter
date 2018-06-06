@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -818,7 +819,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
 
-			if(textToCopy != null){
+			if(Objects.nonNull(textToCopy)){
 				textToCopy = removeHTMLCode(textToCopy);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -895,7 +896,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		Path parentPath = affFile.toPath().getParent();
 		while(true){
 			File[] files = parentPath.toFile().listFiles();
-			if(files == null)
+			if(Objects.isNull(files))
 				break;
 
 			found = Arrays.stream(files)
@@ -962,7 +963,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static void calculateProductions(HunspellerFrame frame){
 		String inputText = frame.dicInputTextField.getText();
 		inputText = StringUtils.strip(inputText);
-		if(formerInputText != null && formerInputText.equals(inputText))
+		if(Objects.nonNull(formerInputText) && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
 
@@ -1091,14 +1092,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
 		String text = theMeaningsTextField.getText();
-		theAddButton.setEnabled(text != null && !text.isEmpty());
+		theAddButton.setEnabled(Objects.nonNull(text) && !text.isEmpty());
 
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
 	private static void filterThesaurus(HunspellerFrame frame){
 		String text = StringUtils.strip(frame.theMeaningsTextField.getText());
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
+		if(Objects.nonNull(formerFilterThesaurusText) && formerFilterThesaurusText.equals(text))
 			return;
 		formerFilterThesaurusText = text;
 
@@ -1189,12 +1190,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String newRule = hypAddRuleTextField.getText();
 		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT), level);
-		if(foundRule == null){
+		if(Objects.isNull(foundRule)){
 			try{
 				File hypFile = getHyphenationFile();
 				hypParser.save(hypFile);
 
-				if(hypWordTextField.getText() != null){
+				if(Objects.nonNull(hypWordTextField.getText())){
 					formerHyphenationText = null;
 					hyphenate(this);
 				}
@@ -1222,7 +1223,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
 		else{
-			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(Objects.nonNull(dicCorrectnessWorker) && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options ={"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1237,7 +1238,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(Objects.nonNull(dicDuplicatesWorker) && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options ={"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1252,7 +1253,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(dicWordlistWorker != null && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(Objects.nonNull(dicWordlistWorker) && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options ={"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1357,7 +1358,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
 			dicDialog.setCellRenderer(dicCellRenderer);
 			dicDialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
+				if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
 					int selectedRow = dicDialog.getSelectedIndex();
 					try{
 						if(dicParser.isInBoundary(selectedRow)){
@@ -1416,13 +1417,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		fileCreatePackageMenuItem.setEnabled(false);
 
 		affParser.clear();
-		if(dicParser != null)
+		if(Objects.nonNull(dicParser))
 			dicParser.clear();
 	}
 
 
 	private void checkDictionaryCorrectness(AffixParser affParser){
-		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
+		if(Objects.isNull(dicCorrectnessWorker) || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 			mainProgressBar.setValue(0);
@@ -1434,7 +1435,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void extractDictionaryDuplicates(AffixParser affParser){
-		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
+		if(Objects.isNull(dicDuplicatesWorker) || dicDuplicatesWorker.isDone()){
 			dicExtractDuplicatesMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -1455,7 +1456,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void extractDictionaryWordlist(){
-		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
+		if(Objects.isNull(dicWordlistWorker) || dicWordlistWorker.isDone()){
 			dicExtractWordlistMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -1476,7 +1477,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void extractMinimalPairs(){
-		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
+		if(Objects.isNull(dicMinimalPairsWorker) || dicMinimalPairsWorker.isDone()){
 			dicExtractMinimalPairsMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -1546,13 +1547,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
 	private void openThesaurusFile(){
-		if(theParserWorker == null || theParserWorker.isDone()){
+		if(Objects.isNull(theParserWorker) || theParserWorker.isDone()){
 			clearThesaurusFile();
 
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
 				Runnable postExecution = () -> {
-					if(dicParser != null)
+					if(Objects.nonNull(dicParser))
 						dicParser.setHyphenationParser(hypParser);
 
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
@@ -1592,7 +1593,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
 	private void openHyphenationFile(){
-		if(hypParserWorker == null || hypParserWorker.isDone()){
+		if(Objects.isNull(hypParserWorker) || hypParserWorker.isDone()){
 			clearHyphenationFile();
 
 			File hypFile = getHyphenationFile();
@@ -1615,7 +1616,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private static void hyphenate(HunspellerFrame frame){
 		String text = frame.hypWordTextField.getText();
-		if(formerHyphenationText != null && formerHyphenationText.equals(text))
+		if(Objects.nonNull(formerHyphenationText) && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
 
@@ -1766,7 +1767,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
 					Runnable menuItemEnabler = enableMenuItemFromWorker.get(evt.getSource().getClass());
-					if(menuItemEnabler != null)
+					if(Objects.nonNull(menuItemEnabler))
 						menuItemEnabler.run();
 				}
 				break;

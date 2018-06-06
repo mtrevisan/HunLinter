@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
@@ -56,7 +57,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	}
 
 	private byte[] compress(byte[] bytes) throws IOException{
-		if(bytes == null || bytes.length== 0)
+		if(Objects.isNull(bytes) || bytes.length== 0)
 			return new byte[0];
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -71,7 +72,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	}
 
 	private byte[] decompress(byte[] bytes) throws IOException{
-		if(bytes == null || bytes.length == 0)
+		if(Objects.isNull(bytes) || bytes.length == 0)
 			return new byte[0];
 
 		try(GZIPInputStream is = new GZIPInputStream(new ByteArrayInputStream(bytes))){

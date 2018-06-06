@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
@@ -67,11 +68,11 @@ public class ExternalSorter{
 			List<String> temporaryList = new ArrayList<>();
 			String line = StringUtils.EMPTY;
 			int headerLinesCounter = 0;
-			while(line != null){
+			while(Objects.nonNull(line)){
 				//[B]
 				long currentBlockSize = 0l;
 				//as long as there is enough memory
-				while(currentBlockSize < blockSize && (line = fbr.readLine()) != null){
+				while(currentBlockSize < blockSize && Objects.nonNull(line = fbr.readLine())){
 					if(headerLinesCounter < options.getSkipHeaderLines()){
 						headers.add(line);
 

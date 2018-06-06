@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -238,7 +239,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void dataFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] dataFields = production.getDataFields();
-		if(dataFields != null)
+		if(Objects.nonNull(dataFields))
 			for(String dataField : dataFields){
 				if(dataField.length() < 4)
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid Data Field prefix: " + dataField);
@@ -248,7 +249,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field prefix: " + dataField);
 
 				Set<String> dataFieldTypes = DATA_FIELDS.get(dataFieldPrefix);
-				if(dataFieldTypes != null && !dataFieldTypes.contains(dataField.substring(3)))
+				if(Objects.nonNull(dataFieldTypes) && !dataFieldTypes.contains(dataField.substring(3)))
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field value: " + dataField);
 			}
 	}
@@ -312,7 +313,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
 		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(word.length() > 2 && (appliedRules == null || appliedRules.size() < 2) && false//!production.hasProductionRule(AffixEntry.Type.PREFIX)
+		if(word.length() > 2 && (Objects.isNull(appliedRules) || appliedRules.size() < 2) && false//!production.hasProductionRule(AffixEntry.Type.PREFIX)
 				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
 				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
 				&& !word.contains(VANISHING_EL)
@@ -346,7 +347,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(acents == 1 && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null)
+			if(Objects.nonNull(appliedRules))
 				for(AffixEntry appliedRule : appliedRules)
 					if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
 						elBetweenVowelsRemoval = true;
@@ -374,7 +375,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 			}
 
-			if(hyphenationParser != null && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
+			if(Objects.nonNull(hyphenationParser) && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
 					&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 					&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
 					&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){

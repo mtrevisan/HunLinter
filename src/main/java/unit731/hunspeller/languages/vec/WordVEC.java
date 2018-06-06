@@ -210,9 +210,6 @@ public class WordVEC{
 	}
 
 	public static String unmarkDefaultStress(String word){
-		if(word == null)
-			return null;
-
 		int idx = getIndexOfStress(word);
 		if(idx >= 0 && !isStressedLastGrapheme(word)){
 			String subword = word.substring(idx, idx + 2);

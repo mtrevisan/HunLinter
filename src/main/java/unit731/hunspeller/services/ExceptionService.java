@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -7,7 +8,7 @@ public class ExceptionService{
 
 	public static String getMessage(Exception e, Class<?> cl){
 		String message = e.getMessage();
-		if(message == null){
+		if(Objects.isNull(message)){
 			StackTraceElement[] stackTrace = e.getStackTrace();
 			StackTraceElement stackTrace0 = e.getStackTrace()[0];
 			String classPackage = cl.getName();

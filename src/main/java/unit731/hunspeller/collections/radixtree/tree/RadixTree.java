@@ -126,7 +126,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					//find the deepest node labeled by a proper suffix of the current child
 					RadixTreeNode<S, V> state;
 					RadixTreeNode<S, V> fail = parent.getFailNode();
-					while((state = transit(fail, subkey)) == null)
+					while(Objects.isNull(state = transit(fail, subkey)))
 						fail = fail.getFailNode();
 
 					S stateKey = state.getKey();
@@ -151,7 +151,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					}
 				}
 
-				if(node.getFailNode() == null)
+				if(Objects.isNull(node.getFailNode()))
 					node.setFailNode(root);
 			}
 
@@ -199,7 +199,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
-		return (foundNode != null);
+		return Objects.nonNull(foundNode);
 	}
 
 	@Override
@@ -226,7 +226,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
-		return (foundNode != null? foundNode.getValue(): null);
+		return (Objects.nonNull(foundNode)? foundNode.getValue(): null);
 	}
 
 	/**
@@ -254,7 +254,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					RadixTreeNode<S, V> node = lastMatchedNode;
 					for(int i = currentIndex; i < sequencer.length(text); i ++){
 						node = node.getNextNode(i, text, sequencer);
-						if(node == null)
+						if(Objects.isNull(node))
 							node = root;
 						else if(node.hasValue())
 							return true;
@@ -268,7 +268,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			public SearchResult<S, V> next(){
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					lastMatchedNode = lastMatchedNode.getNextNode(i, text, sequencer);
-					if(lastMatchedNode == null)
+					if(Objects.isNull(lastMatchedNode))
 						lastMatchedNode = root;
 					else if(lastMatchedNode.hasValue()){
 						currentIndex = i + sequencer.length(lastMatchedNode.getKey());
@@ -296,7 +296,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				if(sequencer.equals(wholeKey, keyToCheck))
 					result = node;
 
-				return (result != null);
+				return Objects.nonNull(result);
 			}
 		};
 		visitPrefixedBy(visitor, keyToCheck);
@@ -366,7 +366,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				if(sequencer.equals(wholeKey, keyToCheck))
 					result = node;
 
-				return (result != null);
+				return Objects.nonNull(result);
 			}
 		};
 		visit(visitor, keyToCheck);
@@ -532,7 +532,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		if(lcpLength == nodeKeyLength && lcpLength == keyLength){
 			//found a node with an exact match
 			ret = node.getValue();
-			if(noDuplicatesAllowed && ret != null)
+			if(noDuplicatesAllowed && Objects.nonNull(ret))
 				throw new DuplicateKeyException();
 
 			node.setValue(value);
@@ -626,7 +626,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 					removeNode(node, parent);
 				}
 
-				return (result != null);
+				return Objects.nonNull(result);
 			}
 		};
 		visitPrefixedBy(visitor, (S)key);
@@ -638,7 +638,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 		Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
 		//if there is no children of the node we need to delete it from the its parent children list
-		if(children == null || children.isEmpty()){
+		if(Objects.isNull(children) || children.isEmpty()){
 			S key = node.getKey();
 			Iterator<RadixTreeNode<S, V>> itr = parent.iterator();
 			while(itr.hasNext())
@@ -649,7 +649,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 			//if parent is not real node and has only one child then they need to be merged.
 			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
-			if(parentChildren != null && parentChildren.size() == 1 && !parent.hasValue() && parent != root)
+			if(Objects.nonNull(parentChildren) && parentChildren.size() == 1 && !parent.hasValue() && parent != root)
 				parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
 		}
 		else if(children.size() == 1)

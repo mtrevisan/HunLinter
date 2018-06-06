@@ -1,6 +1,7 @@
 package unit731.hunspeller.gui;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.table.AbstractTableModel;
@@ -36,7 +37,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public int getRowCount(){
-		return (synonyms != null? synonyms.size(): 0);
+		return (Objects.nonNull(synonyms)? synonyms.size(): 0);
 	}
 
 	@Override
@@ -46,7 +47,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex){
-		if(synonyms == null || synonyms.size() <= rowIndex)
+		if(Objects.isNull(synonyms) || synonyms.size() <= rowIndex)
 			return null;
 
 		ThesaurusEntry thesaurus = synonyms.get(rowIndex);

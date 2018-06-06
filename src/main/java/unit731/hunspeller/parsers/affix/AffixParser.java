@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -194,7 +195,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 
 				entries.add(entry);
-//String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
+//String regexToMatch = (Objects.nonNull(entry.getMatch())? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
 //List<AffixEntry> lst = new ArrayList<>();
 //lst.add(entry);
@@ -217,7 +218,7 @@ public class AffixParser{
 	/** Determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file */
 	private static FlagParsingStrategy getFlagParsingStrategy(String flag){
 		FlagParsingStrategy stategy = null;
-		if(flag == null)
+		if(Objects.isNull(flag))
 			stategy = new ASCIIParsingStrategy();
 		else
 			switch(flag){
@@ -240,7 +241,7 @@ public class AffixParser{
 	}
 
 	private static boolean containsUnique(String[] list){
-		if(list == null)
+		if(Objects.isNull(list))
 			return true;
 
 		Set<String> set = new HashSet<>();
@@ -307,7 +308,7 @@ public class AffixParser{
 		charset = FileService.determineCharset(affFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
 			String line;
-			while((line = br.readLine()) != null){
+			while(Objects.nonNull(line = br.readLine())){
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1 && line.startsWith(FileService.BOM_MARKER))
 					line = line.substring(1);
@@ -323,7 +324,7 @@ public class AffixParser{
 
 				ParsingContext context = new ParsingContext(line, br);
 				Consumer<ParsingContext> fun = RULE_FUNCTION.get(context.getRuleType());
-				if(fun != null){
+				if(Objects.nonNull(fun)){
 					try{
 						fun.accept(context);
 					}
@@ -409,7 +410,7 @@ public class AffixParser{
 	public Boolean isSuffix(String affixCode){
 		Boolean isSuffix = null;
 		Object affix = getData(affixCode);
-		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
+		if(Objects.nonNull(affix) && RuleEntry.class.isAssignableFrom(affix.getClass()))
 			isSuffix = ((RuleEntry)affix).isSuffix();
 		return isSuffix;
 	}

@@ -1,5 +1,8 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
+import java.util.Objects;
+
+
 
 /**
  * A fast bit-set implementation that allows direct access to data property so that it can be easily serialized.
@@ -23,7 +26,7 @@ public class FastBitArray implements BitArray{
 	}
 
 	public FastBitArray(long[] data){
-		if(data == null || data.length == 0)
+		if(Objects.isNull(data) || data.length == 0)
 			throw new IllegalArgumentException("Data must be valued");
 
 		this.data = data;

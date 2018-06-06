@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -16,7 +17,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseRuleFlags(String textFlags){
-		if(textFlags == null)
+		if(Objects.isNull(textFlags))
 			return new String[0];
 
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
@@ -31,10 +32,11 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String joinRuleFlags(String[] textFlags){
-		if(textFlags == null || textFlags.length == 0)
+		if(Objects.isNull(textFlags) || textFlags.length == 0)
 			return StringUtils.EMPTY;
+
 		for(String flag : textFlags){
-			if(flag == null || flag.length() != 1)
+			if(Objects.isNull(flag) || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
 			if(!StandardCharsets.UTF_8.newEncoder().canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
