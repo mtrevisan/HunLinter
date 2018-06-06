@@ -140,7 +140,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH, "<1", "<0"));
 	}
 
-	private static final Matcher CAN_HAVE_METAPHONESIS = PatternService.matcher("([eo]([dđkƚñstŧxv]o|nt[eo]|[lnr])|o[lr][kd]o|orse|exe)$");
 	private static final Matcher HAS_PLURAL = PatternService.matcher(
 		"[^i]" + START_TAGS + "T0"
 		+ "|[^aie]" + START_TAGS+ "B0"
@@ -324,14 +323,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN)){
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			if(!hasMetaphonesisFlag){
-				FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
-				DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
-				try{
-					List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
-					if(productions.size() > 1)
-						throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+				if(hasPluralFlag){
+					FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
+					DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
+					try{
+						List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
+						if(productions.size() > 1)
+							throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+					}
+					catch(NoApplicableRuleException e){}
 				}
-				catch(NoApplicableRuleException e){}
 			}
 		}
 //		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
