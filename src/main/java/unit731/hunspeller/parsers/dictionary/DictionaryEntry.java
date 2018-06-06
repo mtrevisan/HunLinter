@@ -99,11 +99,9 @@ public class DictionaryEntry implements Productable{
 		return sj.toString();
 	}
 
-	public String toWordAndFlagString(){
-		return (new StringJoiner(StringUtils.EMPTY))
-			.add(word)
-			.add(strategy.joinRuleFlags(ruleFlags))
-			.toString();
+	@Override
+	public String toStringBasic(FlagParsingStrategy strategy){
+		return word + strategy.joinRuleFlags(ruleFlags);
 	}
 
 }

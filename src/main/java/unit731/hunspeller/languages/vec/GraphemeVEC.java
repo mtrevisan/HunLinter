@@ -12,15 +12,18 @@ public class GraphemeVEC{
 	public static final String JJH_PHONEME = "ʝ";
 	public static final String FH_PHONEME = "\uA799";
 	public static final String I_UMLAUT_PHONEME = "ï";
+	public static final String D_STROKE_GRAPHEME = "đ";
 	private static final String F_GRAPHEME = "f";
 	public static final String H_GRAPHEME = "h";
 	private static final String FH_GRAPHEME = F_GRAPHEME + H_GRAPHEME;
 	private static final String J_GRAPHEME = "j";
 	public static final String I_GRAPHEME = "i";
 	public static final String L_GRAPHEME = "l";
+	public static final String L_STROKE_GRAPHEME = "ƚ";
 	private static final String W_GRAPHEME = "w";
 	private static final String U_GRAPHEME = "u";
 	public static final String S_GRAPHEME = "s";
+	public static final String T_STROKE_GRAPHEME = "ŧ";
 	public static final String X_GRAPHEME = "x";
 
 	private static final Matcher DIPHTONG = PatternService.matcher("[iu][íú]|[àèéòó][iu]");

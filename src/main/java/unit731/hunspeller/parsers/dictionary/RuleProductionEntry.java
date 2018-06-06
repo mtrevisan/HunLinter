@@ -184,6 +184,11 @@ public class RuleProductionEntry implements Productable{
 //		return sj.toString();
 //	}
 
+	@Override
+	public String toStringBasic(FlagParsingStrategy strategy){
+		return word + strategy.joinRuleFlags(ruleFlags);
+	}
+
 	public String toStringWithSignificantDataFields(){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);

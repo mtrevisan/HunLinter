@@ -65,7 +65,7 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toWordAndFlagString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toStringBasic(dictionaryWord.getStrategy()));
 						}
 					}
 

@@ -52,8 +52,9 @@ public class WordGenerator{
 	 * 
 	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the stems for
 	 * @return	The list of stems for the given word
+	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException{
+	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
 		boolean complexPrefixes = affParser.isComplexPrefixes();
 
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry);
@@ -78,12 +79,12 @@ public class WordGenerator{
 		return new RuleProductionEntry(productable);
 	}
 
-	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes){
+	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes) throws NoApplicableRuleException{
 		List<Set<String>> applyAffixes = getProductiveAffixes(productable, complexPrefixes);
 		return applyAffixRules(productable, applyAffixes);
 	}
 
-	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions, boolean complexPrefixes){
+	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions, boolean complexPrefixes) throws NoApplicableRuleException{
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
 			List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
@@ -107,7 +108,7 @@ public class WordGenerator{
 		return twofoldProductions;
 	}
 
-	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions, boolean complexPrefixes){
+	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions, boolean complexPrefixes) throws NoApplicableRuleException{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
@@ -176,25 +177,23 @@ public class WordGenerator{
 		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
 
-	private List<RuleProductionEntry> applyAffixRules(Productable productable, List<Set<String>> applyAffixes){
+	private List<RuleProductionEntry> applyAffixRules(Productable productable, List<Set<String>> applyAffixes) throws NoApplicableRuleException{
 		Set<String> appliedAffixes = applyAffixes.get(0);
 		Set<String> postponedAffixes = applyAffixes.get(1);
 
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		if(!appliedAffixes.isEmpty()){
 			String word = productable.getWord();
-			String[] ruleFlags = productable.getRuleFlags();
 			String[] dataFields = productable.getDataFields();
 
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
 				if(Objects.isNull(rule))
-					throw new IllegalArgumentException(affix);
+					throw new IllegalArgumentException("Non-existent rule " + affix + " found");
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new IllegalArgumentException("Word has no applicable rules for " + affix + " from " + word
-						+ affParser.getStrategy().joinRuleFlags(ruleFlags));
+					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toStringBasic(affParser.getStrategy()));
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
