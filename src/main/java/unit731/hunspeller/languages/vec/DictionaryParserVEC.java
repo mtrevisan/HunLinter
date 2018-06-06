@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
@@ -320,34 +321,46 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_PROPER_NOUN)){
-			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-			if(!hasMetaphonesisFlag){
-				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-				if(hasPluralFlag){
-					FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
-					DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
-					try{
-						List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
-						if(productions.size() > 1)
-							throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
-					}
-					catch(NoApplicableRuleException e){}
-				}
-			}
-		}
-//		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
-//			//FIXME
-//			boolean canHaveMetaphonesis = PatternService.find(production.getWord(), CAN_HAVE_METAPHONESIS);
+//		if(!production.isPartOfSpeech(POS_PROPER_NOUN)){
 //			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-//			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
+//			if(!hasMetaphonesisFlag){
 //				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
-//				if(canHaveMetaphonesis && hasPluralFlag)
-//					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
-//				else if(!canHaveMetaphonesis && !hasPluralFlag)
-//					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+//				if(hasPluralFlag){
+//					FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
+//					DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
+//					try{
+//						List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
+//						if(productions.size() > 1)
+//							throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+//					}
+//					catch(NoApplicableRuleException e){}
+//				}
 //			}
 //		}
+		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
+			//FIXME
+			boolean canHaveMetaphonesis = canHaveMetaphonesis(production);
+			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
+			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
+				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+				if(canHaveMetaphonesis && hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+				else if(!canHaveMetaphonesis && !hasPluralFlag)
+					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+			}
+		}
+	}
+
+	private boolean canHaveMetaphonesis(Productable production){
+		boolean canHaveMetaphonesis = false;
+		FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(production, METAPHONESIS_RULE, strategy);
+		try{
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(dicEntry);
+			canHaveMetaphonesis = (productions.size() > 1);
+		}
+		catch(NoApplicableRuleException e){}
+		return canHaveMetaphonesis;
 	}
 
 	private void northernPluralCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
