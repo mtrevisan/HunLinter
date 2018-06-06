@@ -339,10 +339,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
-//		if(WordVEC.hasMultipleAccents(subword))
-//			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
+		int acents = WordVEC.countAccents(subword);
+		if(acents > 1)
+			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
-		if(WordVEC.isStressed(subword) && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
+		if(acents == 1 && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			if(appliedRules != null)

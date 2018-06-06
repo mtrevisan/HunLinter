@@ -90,7 +90,7 @@ public class WordVEC{
 
 	//[àèéíòóú]
 	public static boolean isStressed(String word){
-		return (countAccents(word) > 0);
+		return (countAccents(word) == 1);
 	}
 
 	//[àèéíòóú]$
@@ -105,7 +105,7 @@ public class WordVEC{
 		return (countAccents(word) > 1);
 	}
 
-	private static int countAccents(String word){
+	public static int countAccents(String word){
 		String normalizedWord = normalize(word);
 		return StringUtils.countMatches(normalizedWord, COMBINING_GRAVE_ACCENT) + StringUtils.countMatches(normalizedWord, COMBINING_ACUTE_ACCENT);
 	}
