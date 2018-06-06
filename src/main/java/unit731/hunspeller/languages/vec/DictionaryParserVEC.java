@@ -304,10 +304,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void mismatchCheck(String line) throws IllegalArgumentException{
-		Set<Matcher> keys = MISMATCH_CHECKS.keySet();
-		for(Matcher key : keys)
-			if(PatternService.find(line, key))
-				throw new IllegalArgumentException(MISMATCH_CHECKS.get(key) + " for word " + line);
+		for(Map.Entry<Matcher, String> entry : MISMATCH_CHECKS.entrySet())
+			if(PatternService.find(line, entry.getKey()))
+				throw new IllegalArgumentException(entry.getValue() + " for word " + line);
 	}
 
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{

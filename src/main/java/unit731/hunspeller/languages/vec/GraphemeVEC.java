@@ -12,10 +12,12 @@ public class GraphemeVEC{
 	public static final String JJH_PHONEME = "ʝ";
 	public static final String FH_PHONEME = "\uA799";
 	public static final String I_UMLAUT_PHONEME = "ï";
-	public static final String F_GRAPHEME = "f";
-	public static final String FH_GRAPHEME = "fh";
+	private static final String F_GRAPHEME = "f";
+	public static final String H_GRAPHEME = "h";
+	private static final String FH_GRAPHEME = F_GRAPHEME + H_GRAPHEME;
 	private static final String J_GRAPHEME = "j";
-	private static final String I_GRAPHEME = "i";
+	public static final String I_GRAPHEME = "i";
+	public static final String L_GRAPHEME = "l";
 	private static final String W_GRAPHEME = "w";
 	private static final String U_GRAPHEME = "u";
 	public static final String S_GRAPHEME = "s";
@@ -25,6 +27,7 @@ public class GraphemeVEC{
 	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
 //	private static final Matcher HYATUS = PatternService.matcher("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
 
+	private static final Matcher ASPIRATED_F = PatternService.matcher(FH_GRAPHEME + "(?=[^aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
@@ -58,7 +61,8 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
-		word = StringUtils.replace(word, FH_GRAPHEME, FH_PHONEME);
+		//correct fh occurrences into f not before vowel
+		word = PatternService.replaceAll(word, ASPIRATED_F, F_GRAPHEME);
 
 		//this step is mandatory before eterophonic sequence VjV
 		word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);

@@ -14,7 +14,7 @@ import unit731.hunspeller.services.PatternService;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrthographyVEC extends Orthography{
 
-	private static final String APOSTROPHE2 = "'";
+	private static final String APEX = "'";
 
 	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "o/", "u/", "u\\", "ù"};
 	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ó", "ú", "ú", "ú"};
@@ -33,7 +33,6 @@ public class OrthographyVEC extends Orthography{
 	);
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
-	private static final Matcher REGEX_FH_INTO_F = PatternService.matcher(GraphemeVEC.FH_GRAPHEME + "(?=[^aeiouàèéíòóú])");
 	private static final Matcher REGEX_X_INTO_S = PatternService.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
 	private static final Matcher REGEX_S_INTO_X = PatternService.matcher(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
 
@@ -55,11 +54,11 @@ public class OrthographyVEC extends Orthography{
 		//correct stress
 		word = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
 
-		//correct fh occurrences into f not before vowel
-		word = PatternService.replaceAll(word, REGEX_FH_INTO_F, GraphemeVEC.F_GRAPHEME);
-
 		//correct h occurrences after d, j, l, n, t
 		word = StringUtils.replaceEach(word, EXTENDED_CHARS, TRUE_CHARS);
+
+		//remove other occurrences of h
+		word = StringUtils.replace(word, GraphemeVEC.H_GRAPHEME, null);
 
 		//correct mb/mp occurrences into nb/np
 		word = StringUtils.replaceEach(word, MB_MP, NB_NP);
@@ -67,7 +66,7 @@ public class OrthographyVEC extends Orthography{
 		word = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
-		word = PatternService.replaceAll(word, REGEX_J_INTO_I, "i");
+		word = PatternService.replaceAll(word, REGEX_J_INTO_I, GraphemeVEC.I_GRAPHEME);
 		word = PatternService.replaceAll(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
 		boolean iInsideIntoJFalsePositive = false;
 		for(Matcher m : REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES)
@@ -78,7 +77,7 @@ public class OrthographyVEC extends Orthography{
 		if(!iInsideIntoJFalsePositive)
 			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, "l");
+		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, GraphemeVEC.L_GRAPHEME);
 		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
@@ -90,27 +89,10 @@ public class OrthographyVEC extends Orthography{
 
 		word = GraphemeVEC.rollbackJHJWIUmlautPhonemes(word);
 
-		word = eliminateConsonantGeminates(word);
+		//eliminate consonant geminates
+		word = PatternService.replaceAll(word, REGEX_CONSONANT_GEMINATES, "$1");
 
 		word = correctApostrophes(word);
-
-		return word;
-	}
-
-	private String eliminateConsonantGeminates(String word){
-		String prefix = null;
-		boolean prefixRemoved = false;
-		if(word.startsWith("dexskon")){
-			word = word.substring(3);
-
-			prefix = "dex";
-			prefixRemoved = true;
-		}
-
-		word = PatternService.replaceAll(word, REGEX_CONSONANT_GEMINATES, "$1");
-		
-		if(prefixRemoved)
-			word = prefix + word;
 
 		return word;
 	}
@@ -121,7 +103,7 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APOSTROPHE2) && !HyphenationParser.HYPHEN.equals(syllabe)
+			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APEX) && !HyphenationParser.HYPHEN.equals(syllabe)
 				&& WordVEC.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;
