@@ -22,6 +22,7 @@ public class WordVEC{
 
 	private static final char COMBINING_GRAVE_ACCENT = '\u0300';
 	private static final char COMBINING_ACUTE_ACCENT = '\u0301';
+	private static final String COMBINING_GRAVE_AND_ACUTE_ACCENTS = String.valueOf(COMBINING_GRAVE_ACCENT) + String.valueOf(COMBINING_ACUTE_ACCENT);
 
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
@@ -149,13 +150,16 @@ public class WordVEC{
 
 	private static String suppressDefaultStress(String word){
 		String normalizedWord = normalize(word);
-		String searchChars = String.valueOf(COMBINING_GRAVE_ACCENT) + String.valueOf(COMBINING_ACUTE_ACCENT);
-		normalizedWord = StringUtils.replaceChars(normalizedWord, searchChars, null);
-		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
+		normalizedWord = StringUtils.replaceChars(normalizedWord, COMBINING_GRAVE_AND_ACUTE_ACCENTS, null);
+		return denormalize(normalizedWord);
 	}
 
 	private static String normalize(String word){
 		return Normalizer.normalize(word, Normalizer.Form.NFD);
+	}
+
+	private static String denormalize(String word){
+		return Normalizer.normalize(word, Normalizer.Form.NFC);
 	}
 
 	/*private static char addStressGrave(char chr){
