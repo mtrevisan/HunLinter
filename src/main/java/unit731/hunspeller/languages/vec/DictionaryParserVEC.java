@@ -323,7 +323,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
-				boolean hasPluralFlag = PatternService.find(line, HAS_PLURAL);
+				boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
 				if(canHaveMetaphonesis && hasPluralFlag)
 					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
 				else if(!canHaveMetaphonesis && !hasPluralFlag)

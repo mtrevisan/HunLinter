@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
@@ -73,9 +74,9 @@ public class DictionaryEntry implements Productable{
 	}
 
 	@Override
-	public boolean containsRuleFlag(String ruleFlag){
-		for(String flag : ruleFlags)
-			if(flag.equals(ruleFlag))
+	public boolean containsRuleFlag(String ... ruleFlags){
+		for(String flag : this.ruleFlags)
+			if(ArrayUtils.contains(ruleFlags, flag))
 				return true;
 		return false;
 	}

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
@@ -97,10 +98,10 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	@Override
-	public boolean containsRuleFlag(String ruleFlag){
-		if(Objects.nonNull(ruleFlags))
-			for(String flag : ruleFlags)
-				if(flag.equals(ruleFlag))
+	public boolean containsRuleFlag(String ... ruleFlags){
+		if(Objects.nonNull(this.ruleFlags))
+			for(String flag : this.ruleFlags)
+				if(ArrayUtils.contains(ruleFlags, flag))
 					return true;
 		return false;
 	}

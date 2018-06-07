@@ -10,7 +10,7 @@ public interface Productable{
 	String[] getRuleFlags();
 	String[] getDataFields();
 
-	boolean containsRuleFlag(String ruleFlag);
+	boolean containsRuleFlag(String ... ruleFlags);
 	boolean containsDataField(String dataField);
 	boolean isCombineable();
 	String toStringBasic();
