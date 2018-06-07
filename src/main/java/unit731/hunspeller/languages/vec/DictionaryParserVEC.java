@@ -320,14 +320,18 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
-			boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-			if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
-				boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
-				if(canHaveMetaphonesis && hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
-				else if(!canHaveMetaphonesis && !hasPluralFlag)
-					throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
+			if(hasMetaphonesisFlag && !hasPluralFlag)
+				throw new IllegalArgumentException("Metaphonesis not needed for word " + line + " (missing plural flag), remove mf");
+			else{
+				boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
+				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
+					if(canHaveMetaphonesis && hasPluralFlag)
+						throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+					else if(!canHaveMetaphonesis && !hasPluralFlag)
+						throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+				}
 			}
 		}
 	}
