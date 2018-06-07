@@ -1,6 +1,5 @@
 package unit731.hunspeller.languages.vec;
 
-import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +14,7 @@ public class WordVEC{
 
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
+	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
 	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
@@ -145,11 +145,8 @@ public class WordVEC{
 		return word.replaceAll("\\p{M}", StringUtils.EMPTY);
 	};*/
 
-//FIXME optimize! (remove normalize)
-	private static String suppressDefaultStress(String word){
-		String normalizedWord = Normalizer.normalize(word, Normalizer.Form.NFD);
-		normalizedWord = StringUtils.replaceChars(normalizedWord, COMBINING_GRAVE_AND_ACUTE_ACCENTS, null);
-		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
+	private static String suppressStress(String word){
+		return StringUtils.replaceChars(word, VOWELS_STRESSED, VOWELS_UNSTRESSED);
 	}
 
 	/*private static char addStressGrave(char chr){
@@ -209,7 +206,7 @@ public class WordVEC{
 		if(idx >= 0 && !isStressedLastGrapheme(word)){
 			String subword = word.substring(idx, idx + 2);
 			String tmp = (!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
-				suppressDefaultStress(word): word);
+				suppressStress(word): word);
 			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 				word = tmp;
 		}
