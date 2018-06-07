@@ -482,49 +482,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
-//		List<String> appliedRules = Optional.ofNullable(production.getAppliedRules())
-//			.map(AffixEntry::getFlag)
-//			.collect(Collectors.toSet());
-//FIXME
-		List<AffixEntry> appliedRules = production.getAppliedRules();
-		if(false && !production.isPartOfSpeech(POS_VERB) && (Objects.isNull(appliedRules) || appliedRules.size() < 2)){
-			boolean hasFinalSonorizationFlag = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
-			boolean canHaveFinalSonorization = wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE);
-			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
-				if(canHaveFinalSonorization)
-					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
-				else if(!canHaveFinalSonorization)
-					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
-			}
-		}
-
-
-
-//		String word = production.getWord();
-//		List<AffixEntry> appliedRules = production.getAppliedRules();
-//		if(true || word.length() > 2 && (Objects.isNull(appliedRules) || appliedRules.size() < 2) && !production.hasProductionRule(AffixEntry.Type.PREFIX)
-//				&& !production.hasProductionRule("G0") && !production.hasProductionRule("E0")
-//				&& !production.hasProductionRule("G1") && !production.hasProductionRule("E1")
-//				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME)
-//				&& !production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_VERB)
-//				&& !production.hasProductionRule(ADJECTIVE_FIRST_CLASS_RULE)&& !production.hasProductionRule(PLURAL_NOUN_MASCULINE_RULE)
-//				&& !production.hasProductionRule(ADJECTIVE_THIRD_CLASS_RULE) && !production.hasProductionRule(ADJECTIVE_SECOND_CLASS_RULE)
-//				&& !production.hasProductionRule(VARIANT_TRANSFORMATIONS_RULE)){
-//			DictionaryEntry entry = new DictionaryEntry(production, FINAL_SONORIZATION_RULE, wordGenerator.getFlagParsingStrategy());
-//			List<RuleProductionEntry> productions = Collections.<RuleProductionEntry>emptyList();
-//			try{
-//				productions = wordGenerator.applyRules(entry);
+//		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
+//			boolean hasFinalSonorizationFlag = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
+//			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
+//			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
+//				if(canHaveFinalSonorization)
+//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
+//				else if(!canHaveFinalSonorization)
+//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
 //			}
-//			catch(IllegalArgumentException e){
-//				//no productions result from the application of the rule
-//			}
-//			int numberOfProductions = productions.size();
-//
-//			boolean hasRule = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
-//			if(hasRule && numberOfProductions == 0)
-//				throw new IllegalArgumentException("Superfluous rule for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
-//			else if(!hasRule && numberOfProductions > 1)
-//				throw new IllegalArgumentException("Missing rule for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
 //		}
 	}
 
