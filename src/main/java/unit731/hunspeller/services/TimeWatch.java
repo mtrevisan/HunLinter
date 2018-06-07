@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 public class TimeWatch{
 
 	private long start;
+	private long end;
 
 
 	private TimeWatch(){
@@ -18,12 +19,17 @@ public class TimeWatch{
 
 	public TimeWatch reset(){
 		start = System.nanoTime();
+		end = 0l;
+		return this;
+	}
+
+	public TimeWatch stop(){
+		end = System.nanoTime();
 		return this;
 	}
 
 	public long time(){
-		long ends = System.nanoTime();
-		return ends - start;
+		return (end > 0l? end - start: 0l);
 	}
 
 	public long time(TimeUnit unit){
@@ -31,7 +37,8 @@ public class TimeWatch{
 	}
 
 	public String toStringMinuteSeconds(){
-		return String.format("%d min %d sec", time(TimeUnit.MINUTES), time(TimeUnit.SECONDS) - time(TimeUnit.MINUTES));
+		long mins = time(TimeUnit.MINUTES);
+		return String.format("%d min %d sec", mins, time(TimeUnit.SECONDS) - mins * 60);
 	}
 
 }

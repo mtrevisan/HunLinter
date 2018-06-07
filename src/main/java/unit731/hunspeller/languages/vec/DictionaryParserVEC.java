@@ -56,9 +56,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
-//	private static final Matcher D_BETWEEN_VOWELS = PatternService.matcher("d[ou]ra? [ou]ra?\\/[^ ]+ \\[aei\\]d[ou]ra?$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
-//	private static final Matcher CIUI = PatternService.matcher("ciuí$");
 
 	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
 
@@ -84,7 +82,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 		public void match(String word) throws IllegalArgumentException{
 			if(PatternService.find(word, matcher))
-				throw new IllegalArgumentException(error + " for word " + word);
+				throw new IllegalArgumentException(error + " for " + word);
 		}
 	}
 	private static final Set<MatcherEntry> MISMATCH_CHECKS_MUST_CONTAINS_LH = new HashSet<>();
@@ -139,11 +137,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH, "<1", "<0"));
 	}
 
-	private static final Matcher HAS_PLURAL = PatternService.matcher(
-		"[^i]" + START_TAGS + "T0"
-		+ "|[^aie]" + START_TAGS+ "B0"
-		+ "|[^ieo]" + START_TAGS + "C0"
-		+ "|[^aio]" + START_TAGS + ADJECTIVE_THIRD_CLASS_RULE);
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
@@ -314,7 +307,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				int size = key.size() - 1;
 				for(int i = 0; i < size; i ++)
 					if(production.containsRuleFlag(key.get(i)))
-						throw new IllegalArgumentException(key.get(size) + " for word " + production.getWord());
+						throw new IllegalArgumentException(key.get(size) + " for " + production.getWord());
 			}
 	}
 
@@ -323,14 +316,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis not needed for word " + line + " (missing plural flag), remove mf");
+				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), remove mf");
 			else{
 				boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 					if(canHaveMetaphonesis && hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis missing for word " + line + ", add mf");
+						throw new IllegalArgumentException("Metaphonesis missing for " + line + ", add mf");
 					else if(!canHaveMetaphonesis && !hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis not needed for word " + line + ", remove mf");
+						throw new IllegalArgumentException("Metaphonesis not needed for " + line + ", remove mf");
 				}
 			}
 		}
@@ -340,7 +333,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN)
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-			throw new IllegalArgumentException("Plural missing after n or l for word " + line + ", add "
+			throw new IllegalArgumentException("Plural missing after n or l for " + line + ", add "
 				+ (WordVEC.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
 	}
 
@@ -380,9 +373,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			boolean hasRule = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
 			if(hasRule && numberOfProductions == 0)
-				throw new IllegalArgumentException("Superfluous rule for word " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
+				throw new IllegalArgumentException("Superfluous rule for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
 			else if(!hasRule && numberOfProductions > 1)
-				throw new IllegalArgumentException("Missing rule for word " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
+				throw new IllegalArgumentException("Missing rule for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
 		}
 	}
 

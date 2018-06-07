@@ -18,6 +18,7 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
@@ -33,6 +34,8 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		int lineIndex = 1;
 		try{
 			publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
+
+			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
@@ -69,7 +72,9 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 			}
 			setProgress(100);
 
-			publish("Finished reading Dictionary file");
+			watch.stop();
+
+			publish("Finished processing Dictionary file (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
 		catch(IOException | IllegalArgumentException e){
 			publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -77,7 +82,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
 			publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
-			publish("Stopped reading Dictionary file");
+			publish("Stopped processing Dictionary file");
 		}
 		return null;
 	}
