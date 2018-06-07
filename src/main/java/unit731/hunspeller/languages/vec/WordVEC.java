@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
@@ -13,7 +14,9 @@ import unit731.hunspeller.services.PatternService;
 public class WordVEC{
 
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
-	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + "àÀéÉèÈíÍóÓòÒúÚ";
+	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
+	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
+	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
 	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
 	private static final String SORTING_ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
@@ -96,9 +99,7 @@ public class WordVEC{
 
 	//[àèéíòóú]$
 	public static boolean isStressedLastGrapheme(String word){
-		String normalizedWord = normalize(word);
-		char chr = normalizedWord.charAt(normalizedWord.length() - 1);
-		return (chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT);
+		return ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(word.length() - 1));
 	}
 
 	//([^àèéíòóú]*[àèéíòóú]){2,}
@@ -107,22 +108,18 @@ public class WordVEC{
 	}
 
 	public static int countAccents(String word){
-		String normalizedWord = normalize(word);
-		return StringUtils.countMatches(normalizedWord, COMBINING_GRAVE_ACCENT) + StringUtils.countMatches(normalizedWord, COMBINING_ACUTE_ACCENT);
+		int count = 0;
+		for(int i = 0; i < word.length(); i ++)
+			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
+				count ++;
+		return count;
 	}
 
 	//[àèéíòóú]
 	private static int getIndexOfStress(String word){
-		int otherCombiningMarks = 0;
-		String normalizedWord = normalize(word);
-		for(int i = 0; i < normalizedWord.length(); i ++){
-			char chr = normalizedWord.charAt(i);
-			//collect number of acute and grave accents
-			if(chr == COMBINING_GRAVE_ACCENT || chr == COMBINING_ACUTE_ACCENT)
-				return i - otherCombiningMarks - 1;
-			else if(chr >= 0x0300 && chr <= 0x036F)
-				otherCombiningMarks ++;
-		}
+		for(int i = 0; i < word.length(); i ++)
+			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
+				return i;
 		return -1;
 	}
 
@@ -148,6 +145,7 @@ public class WordVEC{
 		return word.replaceAll("\\p{M}", StringUtils.EMPTY);
 	};*/
 
+//FIXME optimize! (remove normalize)
 	private static String suppressDefaultStress(String word){
 		String normalizedWord = normalize(word);
 		normalizedWord = StringUtils.replaceChars(normalizedWord, COMBINING_GRAVE_AND_ACUTE_ACCENTS, null);

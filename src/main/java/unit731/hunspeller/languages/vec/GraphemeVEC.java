@@ -65,10 +65,12 @@ public class GraphemeVEC{
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
 		//correct fh occurrences into f not before vowel
-		word = PatternService.replaceAll(word, ASPIRATED_F, F_GRAPHEME);
+		if(word.contains(FH_GRAPHEME))
+			word = PatternService.replaceAll(word, ASPIRATED_F, F_GRAPHEME);
 
 		//this step is mandatory before eterophonic sequence VjV
-		word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
+		if(word.contains(J_GRAPHEME))
+			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
 		if(word.contains(I_GRAPHEME))
 			for(Matcher m : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
 				word = PatternService.replaceAll(word, m, "$1" + I_UMLAUT_PHONEME + "$2");

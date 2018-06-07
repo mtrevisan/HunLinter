@@ -38,7 +38,12 @@ public class TimeWatch{
 
 	public String toStringMinuteSeconds(){
 		long mins = time(TimeUnit.MINUTES);
-		return String.format("%d min %d sec", mins, time(TimeUnit.SECONDS) - mins * 60);
+		String text;
+		if(mins > 0)
+			text = String.format("%d min %d sec", mins, time(TimeUnit.SECONDS) - mins * 60);
+		else
+			text = String.format("%d sec", time(TimeUnit.SECONDS));
+		return text;
 	}
 
 }
