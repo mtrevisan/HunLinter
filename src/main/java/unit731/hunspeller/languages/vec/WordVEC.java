@@ -147,17 +147,9 @@ public class WordVEC{
 
 //FIXME optimize! (remove normalize)
 	private static String suppressDefaultStress(String word){
-		String normalizedWord = normalize(word);
+		String normalizedWord = Normalizer.normalize(word, Normalizer.Form.NFD);
 		normalizedWord = StringUtils.replaceChars(normalizedWord, COMBINING_GRAVE_AND_ACUTE_ACCENTS, null);
-		return denormalize(normalizedWord);
-	}
-
-	private static String normalize(String word){
-		return Normalizer.normalize(word, Normalizer.Form.NFD);
-	}
-
-	private static String denormalize(String word){
-		return Normalizer.normalize(word, Normalizer.Form.NFC);
+		return Normalizer.normalize(normalizedWord, Normalizer.Form.NFC);
 	}
 
 	/*private static char addStressGrave(char chr){
