@@ -475,6 +475,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		else{
 			for(MatcherEntry check : MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH)
 				check.match(line);
+
 			if(line.contains(GraphemeVEC.D_STROKE_GRAPHEME) || line.contains(GraphemeVEC.T_STROKE_GRAPHEME))
 				for(MatcherEntry check : MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH)
 					check.match(line);

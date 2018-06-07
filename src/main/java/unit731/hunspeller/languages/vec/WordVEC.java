@@ -213,6 +213,7 @@ public class WordVEC{
 		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
+	//FIXME speed-up?
 	public static String unmarkDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx >= 0 && !isStressedLastGrapheme(word)){
