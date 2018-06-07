@@ -38,16 +38,19 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
 	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
-	private static final String DIMINUTIVE_EL_RULE_NON_VANISHING_EL = "[0";
-	private static final String DIMINUTIVE_EL_RULE_VANISHING_EL = "[1";
+	private static final String DIMINUTIVE_EL_RULE_NON_VANISHING_EL = "&2";
+	private static final String DIMINUTIVE_EL_RULE_VANISHING_EL = "&3";
 	private static final String AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL = "(0";
 	private static final String AUGMENTATIVE_OTO_RULE_VANISHING_EL = "(1";
-	private static final String AUGMENTATIVE_ON_RULE_NON_VANISHING_EL = ")0";
-	private static final String AUGMENTATIVE_ON_RULE_VANISHING_EL = ")1";
+	private static final String AUGMENTATIVE_ON_RULE_NON_VANISHING_EL = "(2";
+	private static final String AUGMENTATIVE_ON_RULE_VANISHING_EL = "(3";
+	private static final String AUGMENTATIVE_ONA_RULE_NON_VANISHING_EL = "(4";
+	private static final String AUGMENTATIVE_ONA_RULE_VANISHING_EL = "(5";
 	private static final String PEJORATIVE_ATO_RULE = "§0";
 	private static final String PEJORATIVE_ATHO_RULE_NON_VANISHING_EL = "<0";
 	private static final String PEJORATIVE_ATHO_RULE_VANISHING_EL = "<1";
-	private static final String NORTHERN_PLURAL_ACCENTED_RULE = "U0";
+	private static final String NORTHERN_PLURAL_RULE = "U0";
+	private static final String NORTHERN_PLURAL_STRESSED_RULE = "u0";
 	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
 	private static final String FINAL_SONORIZATION_RULE = "I0";
 
@@ -104,37 +107,32 @@ public class DictionaryParserVEC extends DictionaryParser{
 		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + "W1",
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "W1", "W0"));
 
-		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L + "&0",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "&0", "&1"));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + "&1",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "&1", "&0"));
-		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L + "&2",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "&2", "&3"));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + "&3",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "&3", "&2"));
-
-		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + "\\[0",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "[0", "[1"));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L_NOT_ENDING_IN_A + "\\[1",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "[1", "[0"));
+		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L + DIMINUTIVE_ETO_RULE_NON_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL));
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DIMINUTIVE_ETO_RULE_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, DIMINUTIVE_ETO_RULE_VANISHING_EL, DIMINUTIVE_ETO_RULE_NON_VANISHING_EL));
+		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L + DIMINUTIVE_EL_RULE_NON_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL));
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DIMINUTIVE_EL_RULE_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, DIMINUTIVE_EL_RULE_VANISHING_EL, DIMINUTIVE_EL_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + "\\(0",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "(0", "(1"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(1",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "(1", "(0"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, AUGMENTATIVE_OTO_RULE_VANISHING_EL, AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + "\\(2",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "(2", "(3"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(3",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "(3", "(2"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, AUGMENTATIVE_ON_RULE_VANISHING_EL, AUGMENTATIVE_ON_RULE_NON_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + "\\(4",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "(4", "(5"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, AUGMENTATIVE_ONA_RULE_NON_VANISHING_EL, AUGMENTATIVE_ONA_RULE_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L_NOT_ENDING_IN_A + "\\(5",
-			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, "(5", "(4"));
+			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH, AUGMENTATIVE_ONA_RULE_VANISHING_EL, AUGMENTATIVE_ONA_RULE_NON_VANISHING_EL));
 
-		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + "<0",
-			MatcherEntry.CANNOT_USE_RULE_WITH_LH, "<0", "<1"));
-		MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH.add(new MatcherEntry("[đŧ].*[^a]" + START_TAGS + "<1",
-			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH, "<1", "<0"));
+		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(VANISHING_L_NOT_ENDING_IN_A + PEJORATIVE_ATHO_RULE_NON_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_LH, PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL));
+		MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH.add(new MatcherEntry("[đŧ].*[^a]" + START_TAGS + PEJORATIVE_ATHO_RULE_VANISHING_EL,
+			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH, PEJORATIVE_ATHO_RULE_VANISHING_EL, PEJORATIVE_ATHO_RULE_NON_VANISHING_EL));
 	}
 
 	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
@@ -144,19 +142,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1}";
 	static{
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "&0 or &1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", DIMINUTIVE_ETO_RULE_NON_VANISHING_EL + " or " + DIMINUTIVE_ETO_RULE_VANISHING_EL)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "[0 or [1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", DIMINUTIVE_EL_RULE_NON_VANISHING_EL + " or " + DIMINUTIVE_EL_RULE_VANISHING_EL)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "(0 or (1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL + " or " + AUGMENTATIVE_OTO_RULE_VANISHING_EL)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", ")0 or )1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", AUGMENTATIVE_ON_RULE_NON_VANISHING_EL + " or " + AUGMENTATIVE_ON_RULE_VANISHING_EL)));
+		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ONA_RULE_NON_VANISHING_EL, AUGMENTATIVE_ONA_RULE_VANISHING_EL,
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", AUGMENTATIVE_ONA_RULE_NON_VANISHING_EL + " or " + AUGMENTATIVE_ONA_RULE_VANISHING_EL)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATO_RULE,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "§0")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", PEJORATIVE_ATO_RULE)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(COLLECTIVE_NOUNS_RULE,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "Y0")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", COLLECTIVE_NOUNS_RULE)));
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL, PEJORATIVE_ATHO_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", "<0 or <1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "B0", PEJORATIVE_ATHO_RULE_NON_VANISHING_EL + " or " + PEJORATIVE_ATHO_RULE_VANISHING_EL)));
 	}
 
 	//also V0/)0 - &0/&1
@@ -169,9 +169,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList("T1",
 			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "T1")));
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", "&0 or &1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", DIMINUTIVE_ETO_RULE_NON_VANISHING_EL + " or " + DIMINUTIVE_ETO_RULE_VANISHING_EL)));
 		VARIANT_TRANSFORMATION_MISMATCH_CHECKS.add(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL,
-			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", ")0 or )1")));
+			MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE, "T2", AUGMENTATIVE_ON_RULE_NON_VANISHING_EL + " or " + AUGMENTATIVE_ON_RULE_VANISHING_EL)));
 	}
 
 	public static final String POS_PROPER_NOUN = "proper_noun";
@@ -271,28 +271,29 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(Objects.nonNull(dataFields))
 			for(String dataField : dataFields){
 				if(dataField.length() < 4)
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid Data Field prefix: " + dataField);
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid data field prefix: " + dataField);
 
 				String dataFieldPrefix = dataField.substring(0, 3);
 				if(!DATA_FIELDS.containsKey(dataFieldPrefix))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field prefix: " + dataField);
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown data field prefix: " + dataField);
 
 				Set<String> dataFieldTypes = DATA_FIELDS.get(dataFieldPrefix);
 				if(Objects.nonNull(dataFieldTypes) && !dataFieldTypes.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown Data Field value: " + dataField);
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown data field value: " + dataField);
 			}
 	}
 
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternService.find(derivedWord, NON_VANISHING_EL))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain non vanishing el, " + derivedWord);
+			throw new IllegalArgumentException("Word with ƚ cannot contain non-ƚ, " + derivedWord);
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain characters from another variant, " + derivedWord);
+			throw new IllegalArgumentException("Word with ƚ cannot contain characters from another variant, " + derivedWord);
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
-			throw new IllegalArgumentException("Word with a vanishing el near a consonant, " + derivedWord);
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsRuleFlag(NORTHERN_PLURAL_ACCENTED_RULE))
-			throw new IllegalArgumentException("Word with a vanishing el cannot contain rule U0, " + derivedWord);
+			throw new IllegalArgumentException("Word with ƚ near a consonant, " + derivedWord);
+		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsRuleFlag(NORTHERN_PLURAL_RULE))
+			throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
+				+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
 	}
 
 	private void incompatibilityCheck(RuleProductionEntry production) throws IllegalArgumentException{
@@ -316,14 +317,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
 			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), remove mf");
+				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
 			else{
 				boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 					if(canHaveMetaphonesis && hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis missing for " + line + ", add mf");
+						throw new IllegalArgumentException("Metaphonesis missing for " + line + ", add " + METAPHONESIS_RULE);
 					else if(!canHaveMetaphonesis && !hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis not needed for " + line + ", remove mf");
+						throw new IllegalArgumentException("Metaphonesis not needed for " + line + ", remove " + METAPHONESIS_RULE);
 				}
 			}
 		}
@@ -334,7 +335,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				&& !PatternService.find(line, ENDS_IN_MAN)
 				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
 			throw new IllegalArgumentException("Plural missing after n or l for " + line + ", add "
-				+ (WordVEC.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? "u0": "U0"));
+				+ (WordVEC.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? NORTHERN_PLURAL_STRESSED_RULE: NORTHERN_PLURAL_RULE));
 	}
 
 	private void mismatchCheck(String line) throws IllegalArgumentException{
