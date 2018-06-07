@@ -55,19 +55,17 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
-		boolean complexPrefixes = affParser.isComplexPrefixes();
-
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
-		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry, complexPrefixes);
+		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
 
-		List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions, complexPrefixes);
+		List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
 
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		productions.add(baseProduction);
 		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);
-		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions, complexPrefixes);
+		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 		productions.addAll(lastfoldProductions);
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
@@ -79,15 +77,15 @@ public class WordGenerator{
 		return new RuleProductionEntry(productable, strategy);
 	}
 
-	private List<RuleProductionEntry> getOnefoldProductions(Productable productable, boolean complexPrefixes) throws NoApplicableRuleException{
-		List<Set<String>> applyAffixes = getProductiveAffixes(productable, complexPrefixes);
+	private List<RuleProductionEntry> getOnefoldProductions(Productable productable) throws NoApplicableRuleException{
+		List<Set<String>> applyAffixes = extractAffixes(productable);
 		return applyAffixRules(productable, applyAffixes);
 	}
 
-	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions, boolean complexPrefixes) throws NoApplicableRuleException{
+	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions) throws NoApplicableRuleException{
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
-			List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
+			List<Set<String>> applyAffixes = extractAffixes(production);
 			//FIXME is it correct?
 			applyAffixes.set(1, null);
 			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
@@ -108,11 +106,11 @@ public class WordGenerator{
 		return twofoldProductions;
 	}
 
-	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions, boolean complexPrefixes) throws NoApplicableRuleException{
+	private List<RuleProductionEntry> getLastfoldProductions(List<RuleProductionEntry> productions) throws NoApplicableRuleException{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
-				List<Set<String>> applyAffixes = getProductiveAffixes(production, complexPrefixes);
+				List<Set<String>> applyAffixes = extractAffixes(production);
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
 				//FIXME is it correct?
@@ -135,12 +133,22 @@ public class WordGenerator{
 		return lastfoldProductions;
 	}
 
-	private List<Set<String>> getProductiveAffixes(Productable productable, boolean complexPrefixes){
+	private List<Set<String>> extractAffixes(Productable productable){
 		Affixes affixes = separateAffixes(productable.getRuleFlags());
 		List<Set<String>> applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-		if(!complexPrefixes)
+		if(!affParser.isComplexPrefixes())
 			Collections.reverse(applyAffixes);
 		return applyAffixes;
+	}
+
+	public boolean isAffixProductive(String word, String affix){
+		boolean productive = false;
+		RuleEntry rule = affParser.getData(affix);
+		if(Objects.nonNull(rule)){
+			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+			productive = !applicableAffixes.isEmpty();
+		}
+		return productive;
 	}
 
 	/**
