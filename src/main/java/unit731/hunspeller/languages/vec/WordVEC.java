@@ -23,10 +23,6 @@ public class WordVEC{
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
-	private static final char COMBINING_GRAVE_ACCENT = '\u0300';
-	private static final char COMBINING_ACUTE_ACCENT = '\u0301';
-	private static final String COMBINING_GRAVE_AND_ACUTE_ACCENTS = String.valueOf(COMBINING_GRAVE_ACCENT) + String.valueOf(COMBINING_ACUTE_ACCENT);
-
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -73,13 +69,6 @@ public class WordVEC{
 		return (m.find()? m.start(): -1);
 	}
 
-	/*public static int getLastVowelIndex(String word, int idx){
-		if(idx < 0)
-			throw new IllegalArgumentException("The index should be non-negative, having " + idx);
-
-		return getLastVowelIndex(word.substring(0, idx));
-	}*/
-
 	//[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$
 	private static int getLastUnstressedVowelIndex(String word, int idx){
 		int i = (idx >= 0? idx: word.length());
@@ -123,40 +112,9 @@ public class WordVEC{
 		return -1;
 	}
 
-/*	var isStressAcute = function(chr){
-		return (chr && chr.match(/^[éíóú]$/));
-	};
-
-	var isStressGrave = function(chr){
-		return (chr && chr.match(/^[àèò]$/));
-	};
-
-	var getStressType = function(chr){
-		if(isStressAcute(chr))
-			return 'acute';
-		if(isStressGrave(chr))
-			return 'grave';
-		return undefined;
-	};
-
-	//NOTE: duplicated in Grapheme
-	var suppressStress = function(word){
-		word = normalize(word);
-		return word.replaceAll("\\p{M}", StringUtils.EMPTY);
-	};*/
-
 	private static String suppressStress(String word){
 		return StringUtils.replaceChars(word, VOWELS_STRESSED, VOWELS_UNSTRESSED);
 	}
-
-	/*private static char addStressGrave(char chr){
-		return replaceCharacter(chr, "aeiou", "àèíòú");
-	}*/
-
-	/** Replaces a char in the 'from' string to the corresponding char in the 'to' string, returning the char itself if not in 'from'. * /
-	private static char replaceCharacter(char chr, String from, String to){
-		return (chr + to).charAt(from.indexOf(chr) + 1);
-	};*/
 
 
 	private static String markDefaultStress(String word){
@@ -184,7 +142,7 @@ public class WordVEC{
 		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
 	}
 
-	//NOTE: is seems faster the current method
+	//NOTE: is seems faster the current method (above)
 //	private static String setAcuteStressAtIndex(String word, int idx){
 //		return replaceCharAt(word, idx, addStressAcute(word.charAt(idx)));
 //	}
