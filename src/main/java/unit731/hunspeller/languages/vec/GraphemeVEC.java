@@ -3,10 +3,13 @@ package unit731.hunspeller.languages.vec;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GraphemeVEC{
 
 	public static final String JJH_PHONEME = "ʝ";

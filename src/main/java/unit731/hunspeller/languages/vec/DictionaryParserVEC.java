@@ -546,7 +546,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	@Override
 	public boolean isConsonant(char chr){
-		return (WordVEC.CONSONANTS.indexOf(chr) >= 0);
+		return WordVEC.isConsonant(chr);
 	}
 
 	@Override

@@ -7,15 +7,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class WordVEC{
 
@@ -26,7 +27,7 @@ public class WordVEC{
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
-	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
+	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
 	private static Collator COLLATOR;
 	static{
@@ -72,6 +73,9 @@ public class WordVEC{
 		ACUTE_STRESSES.put("u", "ú");
 	}
 
+	public static boolean isConsonant(char chr){
+		return (CONSONANTS.indexOf(chr) >= 0);
+	}
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$
 	private static boolean endsInVowel(String word){
