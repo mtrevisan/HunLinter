@@ -25,10 +25,9 @@ public class Hyphenation{
 			.collect(Collectors.toList());
 	}
 
-	public long countSyllabes(){
+	public int countSyllabes(){
 		return subwordHyphenations.stream()
-			.map(SubwordHyphenation::getSyllabes)
-			.mapToInt(List::size)
+			.mapToInt(SubwordHyphenation::countSyllabes)
 			.sum();
 	}
 
@@ -40,11 +39,13 @@ public class Hyphenation{
 	}
 
 	public boolean hasErrors(){
+		boolean result = false;
 		for(SubwordHyphenation hyph : subwordHyphenations)
-			for(boolean error : hyph.getErrors())
-				if(error)
-					return true;
-		return false;
+			if(hyph.hasErrors()){
+				result = true;
+				break;
+			}
+		return result;
 	}
 
 	public String formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
@@ -52,11 +53,7 @@ public class Hyphenation{
 		while(itr.hasNext()){
 			SubwordHyphenation hyph = itr.next();
 
-			int size = hyph.getSyllabes().size();
-			for(int i = 0; i < size; i ++){
-				Function<String, String> fun = (hyph.getErrors()[i]? errorFormatter: Function.identity());
-				sj.add(fun.apply(hyph.getSyllabes().get(i)));
-			}
+			sj.add(hyph.formatHyphenation(sj, errorFormatter));
 
 			if(itr.hasNext())
 				sj.add(HyphenationParser.HYPHEN);

@@ -32,7 +32,7 @@ public class OrthographyVEC extends Orthography{
 		PatternService.matcher("b[ae]roi[aeèi]r")
 	);
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
-	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
+	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú–])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Matcher REGEX_X_INTO_S = PatternService.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
 	private static final Matcher REGEX_S_INTO_X = PatternService.matcher(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
 

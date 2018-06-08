@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -44,6 +46,10 @@ public class SubwordHyphenation{
 		return syllabes.get(getSyllabeIndex(idx));
 	}
 
+	public int countSyllabes(){
+		return syllabes.size();
+	}
+
 	/**
 	 * @param idx	Index of syllabe to extract, if negative then it's relative to the last syllabe
 	 * @return the syllabe at the given (relative) index
@@ -54,6 +60,25 @@ public class SubwordHyphenation{
 
 	private int restoreRelativeIndex(int idx){
 		return (idx + syllabes.size()) % syllabes.size();
+	}
+
+	public boolean hasErrors(){
+		boolean result = false;
+		for(boolean error : errors)
+			if(error){
+				result = true;
+				break;
+			}
+		return result;
+	}
+
+	public String formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
+		int size = syllabes.size();
+		for(int i = 0; i < size; i ++){
+			Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
+			sj.add(fun.apply(syllabes.get(i)));
+		}
+		return sj.toString();
 	}
 
 }
