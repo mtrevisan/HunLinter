@@ -78,7 +78,7 @@ public class HyphenationParser{
 
 	private static final Pattern PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
-	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + EN_DASH + SOFT_HYPHEN) + "]");
+	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + EN_DASH) + "]");
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -659,7 +659,7 @@ public class HyphenationParser{
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
+			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, MATCHER_HYPHENS.pattern()));
 
 			rules = hyphenatedWord;
 		}
