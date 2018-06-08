@@ -25,6 +25,8 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.HYPHEN;
+import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.HYPHEN_MINUS;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -97,13 +99,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String FINAL_SONORIZATION_RULE = "I0";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
-	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
+	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–]|$)");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern(HyphenationParser.HYPHEN_MINUS);
+	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern("[" + Pattern.quote(HyphenationParser.HYPHEN + HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.SOFT_HYPHEN) + "]");
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*" + START_TAGS;
 	private static final String NON_VANISHING_L_NOT_ENDING_IN_A = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*[^a]" + START_TAGS;
@@ -114,7 +116,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 		private static final String CANNOT_USE_RULE_WITH_LH = "Cannot use {0} rule with ƚ";
 		private static final String CANNOT_USE_RULE_WITH_LH_USE_INSTEAD = "Cannot use {0} rule with ƚ, use {1}";
-		private static final String CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD = "Cannot use {0} rule with non-ƚ, use {1}";
+		private static final String CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD = "Cannot use {0} rule with non–ƚ, use {1}";
 		private static final String CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD = "Cannot use {0} rule with đ or ŧ, use {1}";
 
 		private final Matcher matcher;
@@ -417,7 +419,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternService.find(derivedWord, NON_VANISHING_EL))
-			throw new IllegalArgumentException("Word with ƚ cannot contain non-ƚ, " + derivedWord);
+			throw new IllegalArgumentException("Word with ƚ cannot contain non–ƚ, " + derivedWord);
 		if(PatternService.find(derivedWord, MISMATCHED_VARIANTS))
 			throw new IllegalArgumentException("Word with ƚ cannot contain characters from another variant, " + derivedWord);
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))

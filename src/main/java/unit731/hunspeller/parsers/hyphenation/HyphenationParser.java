@@ -43,11 +43,11 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non-standard hyphenation extension.
+ * Implements Franklin Mark Liang's hyphenation algorithm with Petr Soijka's non–standard hyphenation extension.
  * 
  * @see <a href="https://tug.org/docs/liang/liang-thesis.pdf">Liang's thesis</a>
  * @see <a href="http://hunspell.sourceforge.net/tb87nemeth.pdf">László Németh's paper</a>
- * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non-standard readme</a>
+ * @see <a href="https://android.googlesource.com/platform/external/hyphenation/+/ics-mr0">László Németh's non–standard readme</a>
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
@@ -59,8 +59,8 @@ public class HyphenationParser{
 	public static final String HYPHEN = "\u2010";
 	public static final String HYPHEN_MINUS = "\u002D";
 	private static final String HYPHEN_EQUALS = "=";
-	private static final String SOFT_HYPHEN = "\u00AD";
-	private static final String EN_DASH = "\u2013";
+	public static final String SOFT_HYPHEN = "\u00AD";
+	public static final String EN_DASH = "\u2013";
 	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static final String ONE = "1";
@@ -78,7 +78,7 @@ public class HyphenationParser{
 
 	private static final Pattern PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
-	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN + EN_DASH) + "]");
+	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + EN_DASH + SOFT_HYPHEN) + "]");
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -191,7 +191,7 @@ public class HyphenationParser{
 									if(level == Level.NON_COMPOUND)
 										throw new IllegalArgumentException("Cannot have more than two levels");
 
-									//start with non-compound level
+									//start with non–compound level
 									level = Level.NON_COMPOUND;
 									REDUCED_PATTERNS.get(level).clear();
 								}
@@ -380,7 +380,7 @@ public class HyphenationParser{
 		}
 
 
-		//a standard and a non-standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+		//a standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
 		//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
 		String alreadyPresentRule = null;
 		Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
@@ -615,7 +615,7 @@ public class HyphenationParser{
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
 			for(String rule : prefixes){
 				int j = -1;
-				//remove non-standard part
+				//remove non–standard part
 				String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
 				int ruleSize = reducedData.length();
 				//cycle the pattern's characters searching for numbers
@@ -698,7 +698,7 @@ public class HyphenationParser{
 			int i = r.getIndex();
 System.out.println(rule);
 
-			//remove non-standard part
+			//remove non–standard part
 			String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
 			int ruleSize = reducedData.length();
 			//cycle the pattern's characters searching for numbers
@@ -727,7 +727,7 @@ System.out.println(rule);
 			List<String> rls = r.getNode().getAdditionalValues();
 			if(Objects.nonNull(rls))
 				for(String rl : rls){
-					//remove non-standard part
+					//remove non–standard part
 					reducedData = PatternService.clear(rl, MATCHER_REDUCE);
 					ruleSize = reducedData.length();
 					//cycle the pattern's characters searching for numbers

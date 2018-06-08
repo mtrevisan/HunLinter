@@ -61,7 +61,7 @@ public class GraphemeVEC{
 	/**
 	 * Handle /j/ and /w/ phonemes.
 	 *
-	 * NOTE: Use mostly IPA standard, non-standard IPA character is used to mark /d͡ʒ/-affine grapheme.
+	 * NOTE: Use mostly IPA standard, non–standard IPA character is used to mark /d͡ʒ/-affine grapheme.
 	 * 
 	 * @param word	The word to be converted
 	 * @return	The converted word

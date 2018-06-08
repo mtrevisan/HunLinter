@@ -17,7 +17,7 @@ import unit731.hunspeller.collections.bloomfilter.decompose.Decomposer;
  * During the creation of bloom filter expected number of entries must be specified. If the number
  * of insertions exceed the specified initial number of entries then false positive probability will
  * increase accordingly.
- * Internally, this implementation of bloom filter uses Murmur3 fast non-cryptographic hash
+ * Internally, this implementation of bloom filter uses Murmur3 fast non–cryptographic hash
  * algorithm. Although Murmur2 is slightly faster than Murmur3 in Java, it suffers from hash
  * collisions for specific sequence of repeating bytes. Check the following link for more info
  * https://code.google.com/p/smhasher/wiki/MurmurHash2Flaw

@@ -318,7 +318,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(TAG_CHARACTER_SET + StringUtils.SPACE))
-					throw new IllegalArgumentException("The first non-comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+					throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
 				else
 					encodingRead = true;
 

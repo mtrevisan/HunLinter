@@ -169,7 +169,7 @@ public class WordGenerator{
 
 				Object rule = affParser.getData(ruleFlag);
 				if(Objects.isNull(rule))
-					throw new IllegalArgumentException("Non-existent rule " + ruleFlag + " found");
+					throw new IllegalArgumentException("Non–existent rule " + ruleFlag + " found");
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry)rule).isSuffix())
@@ -197,7 +197,7 @@ public class WordGenerator{
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
 				if(Objects.isNull(rule))
-					throw new IllegalArgumentException("Non-existent rule " + affix + " found");
+					throw new IllegalArgumentException("Non–existent rule " + affix + " found");
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())

@@ -510,7 +510,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
          }
       });
 
-      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Compound Level", "Non-compound Level" }));
+      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Compound Level", "Non–compound Level" }));
       hypAddRuleLevelComboBox.setEnabled(false);
 
       hypAddRuleButton.setMnemonic('A');
