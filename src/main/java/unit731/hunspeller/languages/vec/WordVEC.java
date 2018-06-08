@@ -24,11 +24,10 @@ public class WordVEC{
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
 	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
-//	private static final String SORTING_ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
 	private static Collator COLLATOR;
 	static{
-		String rules = ", -–ʼ''''/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
 		try{
+			String rules = ", -–ʼ''''/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
 			COLLATOR = new RuleBasedCollator(rules);
 		}
 		catch(ParseException ex){
@@ -177,21 +176,6 @@ public class WordVEC{
 
 	public static Comparator<String> sorterComparator(){
 		return COLLATOR::compare;
-//		return (str1, str2) -> {
-//			int result = 0;
-//			int len1 = str1.length();
-//			int len2 = str2.length();
-//			int size = Math.min(len1, len2);
-//			len1 -= len2;
-//			for(int i = 0; i < size; i ++){
-//				result = SORTING_ALPHABET.indexOf(str1.charAt(i)) - SORTING_ALPHABET.indexOf(str2.charAt(i));
-//				if(result != 0)
-//					break;
-//			}
-//			if(result == 0 && len1 != 0)
-//				result = len1;
-//			return result;
-//		};
 	}
 
 }
