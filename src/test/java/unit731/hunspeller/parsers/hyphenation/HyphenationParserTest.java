@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;

@@ -48,17 +48,20 @@ public class Hyphenation{
 		return result;
 	}
 
-	public String formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
+	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
 		Iterator<SubwordHyphenation> itr = subwordHyphenations.iterator();
 		while(itr.hasNext()){
 			SubwordHyphenation hyph = itr.next();
 
-			sj.add(hyph.formatHyphenation(sj, errorFormatter));
-
-			if(itr.hasNext())
-				sj.add(HyphenationParser.HYPHEN);
+			hyph.formatHyphenation(sj, errorFormatter);
 		}
-		return sj.toString();
+		return sj;
+	}
+
+	@Override
+	public String toString(){
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
+			.toString();
 	}
 
 }

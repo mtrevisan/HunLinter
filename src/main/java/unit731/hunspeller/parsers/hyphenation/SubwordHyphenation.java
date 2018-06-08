@@ -72,13 +72,19 @@ public class SubwordHyphenation{
 		return result;
 	}
 
-	public String formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
+	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
 		int size = syllabes.size();
 		for(int i = 0; i < size; i ++){
 			Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
 			sj.add(fun.apply(syllabes.get(i)));
 		}
-		return sj.toString();
+		return sj;
+	}
+
+	@Override
+	public String toString(){
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
+			.toString();
 	}
 
 }
