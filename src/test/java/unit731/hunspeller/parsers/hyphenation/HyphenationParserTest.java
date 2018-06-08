@@ -31,9 +31,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("abc");
+		Hyphenation hyphenation = parser.hyphenate("abc");
 
-		Assert.assertEquals(Arrays.asList("abc"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -49,9 +49,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("abc");
+		Hyphenation hyphenation = parser.hyphenate("abc");
 
-		Assert.assertEquals(Arrays.asList("abc"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -67,9 +67,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("abc");
+		Hyphenation hyphenation = parser.hyphenate("abc");
 
-		Assert.assertEquals(Arrays.asList("a", "bc"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("a", "bc"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -85,9 +85,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("abc");
+		Hyphenation hyphenation = parser.hyphenate("abc");
 
-		Assert.assertEquals(Arrays.asList("ab", "c"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("ab", "c"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -103,9 +103,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("du", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("omaatje");
+		Hyphenation hyphenation = parser.hyphenate("omaatje");
 
-		Assert.assertEquals(Arrays.asList("oma", "tje"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -121,9 +121,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab-cd");
 
-		Assert.assertEquals(Arrays.asList("ab-", "-cd"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -139,9 +139,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab-cd");
 
-		Assert.assertEquals(Arrays.asList("ab-", "-cd"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -157,9 +157,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab-cd");
 
-		Assert.assertEquals(Arrays.asList("ab-", "-cd"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -176,9 +176,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("kuko-fu");
+		Hyphenation hyphenation = parser.hyphenate("kuko-fu");
 
-		Assert.assertEquals(Arrays.asList("ku", "ko-", "-fu"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("ku", "ko", "fu"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -194,9 +194,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("eighteen");
+		Hyphenation hyphenation = parser.hyphenate("eighteen");
 
-		Assert.assertEquals(Arrays.asList("eight", "teen"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("eight", "teen"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -212,9 +212,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("schiffahrt");
+		Hyphenation hyphenation = parser.hyphenate("schiffahrt");
 
-		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -230,9 +230,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("Zucker");
+		Hyphenation hyphenation = parser.hyphenate("Zucker");
 
-		Assert.assertEquals(Arrays.asList("Zuk", "ker"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
 	}
 
 	@Test
@@ -247,9 +247,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		List<Hyphenation> hyphenation = parser.hyphenate("abc");
+		Hyphenation hyphenation = parser.hyphenate("abc");
 
-		Assert.assertEquals(Arrays.asList("abc"), Hyphenation.getSyllabes(hyphenation));
+		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
 	}
 
 //	@Test
@@ -273,21 +273,21 @@ public class HyphenationParserTest{
 //		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 //
 //		String word = "savendolmento";
-//		List<Hyphenation> hyphenation = parser.hyphenate(word);
+//		Hyphenation hyphenation = parser.hyphenate(word);
 //
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), Hyphenation.getRules(hyphenation));
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), Hyphenation.getSyllabes(hyphenation));
+//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 //
 //		patternsLevelCompound.prepare();
 //		hyphenation = parser.hyphenate(word);
 //
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), Hyphenation.getRules(hyphenation));
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), Hyphenation.getSyllabes(hyphenation));
+//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 //
 //		hyphenation = parser.hyphenate2(word);
 //
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), Hyphenation.getRules(hyphenation));
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), Hyphenation.getSyllabes(hyphenation));
+//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 //	}
 
 

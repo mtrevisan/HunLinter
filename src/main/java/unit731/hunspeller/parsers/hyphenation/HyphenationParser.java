@@ -462,19 +462,19 @@ public class HyphenationParser{
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object(s)
 	 */
-	public List<Hyphenation> hyphenate(String word){
+	public Hyphenation hyphenate(String word){
 		//clear already present hyphens
 		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 
-		List<Hyphenation> hyphs = new ArrayList<>();
+		List<SubwordHyphenation> hyphs = new ArrayList<>();
 		String[] subwords = PatternService.split(word, PATTERN_HYPHEN_SPLITTER);
 		for(String subword : subwords){
-			Hyphenation subhyph = hyphenate(subword, patterns);
+			SubwordHyphenation subhyph = hyphenate(subword, patterns);
 
 			//add subword hyphenation to global hyphenation
 			hyphs.add(subhyph);
 		}
-		return hyphs;
+		return new Hyphenation(hyphs);
 	}
 
 	/**
@@ -487,26 +487,26 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
-	public List<Hyphenation> hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
+	public Hyphenation hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
 		LOCK_SAVING.lock();
 
 		try{
 			String key = getKeyFromData(addedRule);
-			List<Hyphenation> hyphs = new ArrayList<>();
+			List<SubwordHyphenation> hyphs = new ArrayList<>();
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
 
 				//clear already present hyphens
 				word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 
-				Hyphenation subhyph = hyphenate(word, patterns);
+				SubwordHyphenation subhyph = hyphenate(word, patterns);
 
 				//add subword hyphenation to global hyphenation
 				hyphs.add(subhyph);
 
 				patterns.get(level).remove(key);
 			}
-			return hyphs;
+			return new Hyphenation(hyphs);
 		}
 		finally{
 			LOCK_SAVING.unlock();
@@ -545,7 +545,7 @@ public class HyphenationParser{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
+	private SubwordHyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -581,7 +581,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors);
+		return new SubwordHyphenation(hyphenatedWord, rules, errors);
 	}
 
 	private boolean[] extractUppercases(String word){
@@ -655,7 +655,7 @@ public class HyphenationParser{
 	}
 
 
-	Hyphenation hyphenate2(String word){
+	SubwordHyphenation hyphenate2(String word){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
@@ -694,7 +694,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors);
+		return new SubwordHyphenation(hyphenatedWord, rules, errors);
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
