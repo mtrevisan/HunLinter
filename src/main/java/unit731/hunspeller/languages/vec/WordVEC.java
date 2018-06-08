@@ -31,7 +31,7 @@ public class WordVEC{
 	private static final String NO_STRESS_SAVER = "^(p?re|stra)?(sà|sav?arà)([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(re)?v[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final Matcher NO_STRESS;
+	private static final Matcher PREVENT_UNMARK_STRESS;
 	static{
 		StringJoiner sj = (new StringJoiner("|"))
 			.add(NO_STRESS_AVER)
@@ -40,7 +40,7 @@ public class WordVEC{
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER);
-		NO_STRESS = PatternService.matcher(sj.toString());
+		PREVENT_UNMARK_STRESS = PatternService.matcher(sj.toString());
 	}
 
 	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
@@ -84,11 +84,6 @@ public class WordVEC{
 	//[àèéíòóú]
 	public static boolean isStressed(String word){
 		return (countAccents(word) == 1);
-	}
-
-	//[àèéíòóú]$
-	public static boolean isStressedLastGrapheme(String word){
-		return ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(word.length() - 1));
 	}
 
 	//([^àèéíòóú]*[àèéíòóú]){2,}
@@ -158,17 +153,18 @@ public class WordVEC{
 		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
-	//FIXME speed-up?
 	public static String unmarkDefaultStress(String word){
 		int idx = getIndexOfStress(word);
-		if(idx >= 0 && !isStressedLastGrapheme(word)){
+		//check if the word have a stress and this is not on the last letter
+		if(idx >= 0 && idx < word.length() - 1){
 			String subword = word.substring(idx, idx + 2);
-			String tmp = (!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, NO_STRESS)?
-				suppressStress(word): word);
-			if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
-				word = tmp;
+			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, PREVENT_UNMARK_STRESS)){
+//FIXME speed-up?
+				String tmp = suppressStress(word);
+				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
+					word = tmp;
+			}
 		}
-
 		return word;
 	}
 
