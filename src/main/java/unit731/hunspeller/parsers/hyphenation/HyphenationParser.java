@@ -78,7 +78,8 @@ public class HyphenationParser{
 
 	private static final Pattern PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
-	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(HYPHEN + HYPHEN_MINUS + EN_DASH) + "]");
+	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH) + "]");
+	private static final Pattern PATTERN_HYPHEN_SPLITTER = PatternService.pattern(HYPHEN);
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -459,10 +460,21 @@ public class HyphenationParser{
 	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
-	 * @return the hyphenation object
+	 * @return the hyphenation object(s)
 	 */
-	public Hyphenation hyphenate(String word){
-		return hyphenate(word, patterns);
+	public List<Hyphenation> hyphenate(String word){
+		//clear already present hyphens
+		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
+
+		List<Hyphenation> hyphs = new ArrayList<>();
+		String[] subwords = PatternService.split(word, PATTERN_HYPHEN_SPLITTER);
+		for(String subword : subwords){
+			Hyphenation subhyph = hyphenate(subword, patterns);
+
+			//add subword hyphenation to global hyphenation
+			hyphs.add(subhyph);
+		}
+		return hyphs;
 	}
 
 	/**
@@ -475,20 +487,26 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
-	public Hyphenation hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
+	public List<Hyphenation> hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
 		LOCK_SAVING.lock();
 
 		try{
 			String key = getKeyFromData(addedRule);
-			Hyphenation hyph = null;
+			List<Hyphenation> hyphs = new ArrayList<>();
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
 
-				hyph = hyphenate(word, patterns);
+				//clear already present hyphens
+				word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
+
+				Hyphenation subhyph = hyphenate(word, patterns);
+
+				//add subword hyphenation to global hyphenation
+				hyphs.add(subhyph);
 
 				patterns.get(level).remove(key);
 			}
-			return hyph;
+			return hyphs;
 		}
 		finally{
 			LOCK_SAVING.unlock();
@@ -530,19 +548,15 @@ public class HyphenationParser{
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
-		//clear already present hyphens
-		word = PatternService.replaceAll(word, MATCHER_HYPHENS, SOFT_HYPHEN);
-
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
-
-		List<String> hyphenatedWord;
-		List<String> rules;
-		boolean[] errors;
 
 		//FIXME manage second level
 		Level level = Level.COMPOUND;
 
+		List<String> hyphenatedWord;
+		List<String> rules;
+		boolean[] errors;
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
@@ -645,7 +659,7 @@ public class HyphenationParser{
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
-		word = PatternService.replaceAll(word, MATCHER_HYPHENS, SOFT_HYPHEN);
+		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
 

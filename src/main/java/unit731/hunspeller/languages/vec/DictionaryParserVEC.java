@@ -537,9 +537,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 					&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 					&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
 					&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){
-				Hyphenation hyphenation = hyphenationParser.hyphenate(derivedWord);
-				if(hyphenation.hasErrors())
-					throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
+				List<Hyphenation> hyphenation = hyphenationParser.hyphenate(derivedWord);
+				if(Hyphenation.hasErrors(hyphenation))
+					throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, Hyphenation.getSyllabes(hyphenation))
 						+ " is not syllabable");
 			}
 		}

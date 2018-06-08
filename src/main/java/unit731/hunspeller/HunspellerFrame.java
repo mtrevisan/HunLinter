@@ -1624,12 +1624,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
 			text = frame.hypParser.correctOrthography(text);
-			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
+			List<Hyphenation> hyphenation = frame.hypParser.hyphenate(text);
 
-			text = hyphenation.formatHyphenation(new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>"),
+			text = Hyphenation.formatHyphenation(hyphenation, new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>"),
 				syllabe -> "<b style=\"color:red\">" + syllabe + "</b>");
-			count = Long.toString(hyphenation.countSyllabes());
-			rules = hyphenation.getRules();
+			count = Long.toString(Hyphenation.countSyllabes(hyphenation));
+			rules = Hyphenation.getRules(hyphenation);
 
 			frame.hypAddRuleTextField.setEnabled(true);
 		}
@@ -1667,17 +1667,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 					if(ruleMatchesText){
-						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
-						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
+						List<Hyphenation> hyphenation = frame.hypParser.hyphenate(addedRuleText);
+						List<Hyphenation> addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
 
-						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.HYPHEN, "<html>", "</html>");
+						Supplier<StringJoiner> baseStringJoiner = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-						String text = hyphenation.formatHyphenation(baseStringJoiner.get(), errorFormatter);
-						addedRuleText = addedRuleHyphenation.formatHyphenation(baseStringJoiner.get(), errorFormatter);
-						addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
+						String text = Hyphenation.formatHyphenation(hyphenation, baseStringJoiner.get(), errorFormatter);
+						addedRuleText = Hyphenation.formatHyphenation(addedRuleHyphenation, baseStringJoiner.get(), errorFormatter);
+						addedRuleCount = Long.toString(Hyphenation.countSyllabes(addedRuleHyphenation));
 
 						hyphenationChanged = !text.equals(addedRuleText);
-						correctHyphenation = !addedRuleHyphenation.hasErrors();
+						correctHyphenation = !Hyphenation.hasErrors(addedRuleHyphenation);
 					}
 				}
 
