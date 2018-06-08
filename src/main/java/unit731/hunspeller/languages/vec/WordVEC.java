@@ -1,9 +1,14 @@
 package unit731.hunspeller.languages.vec;
 
+import java.text.Collator;
+import java.text.ParseException;
+import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +24,17 @@ public class WordVEC{
 	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
 	public static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
-	private static final String SORTING_ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
+//	private static final String SORTING_ALPHABET = "-/.0123456789aAàÀbBcCdDđĐeEéÉèÈfFgGhHiIíÍjJɉɈkKlLƚȽmMnNñÑoOóÓòÒpPrRsStTŧŦuUúÚvVxXʼ'";
+	private static Collator COLLATOR;
+	static{
+		String rules = ", -–ʼ''''/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
+		try{
+			COLLATOR = new RuleBasedCollator(rules);
+		}
+		catch(ParseException ex){
+			Logger.getLogger(WordVEC.class.getName()).log(Level.SEVERE, null, ex);
+		}
+	}
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
@@ -54,7 +69,7 @@ public class WordVEC{
 
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$
-	public static boolean endsInVowel(String word){
+	private static boolean endsInVowel(String word){
 		int i = word.length();
 		while((-- i) >= 0){
 			char chr = word.charAt(i);
@@ -69,7 +84,7 @@ public class WordVEC{
 		return (m.find()? m.start(): -1);
 	}
 
-	//[aeiou][^aeiou]*[^aàbcdđeéèfghiíjɉklƚmnñoóòprstŧuúvx]*$
+	//[aeiou][^aeiou]*$
 	private static int getLastUnstressedVowelIndex(String word, int idx){
 		int i = (idx >= 0? idx: word.length());
 		while((-- i) >= 0){
@@ -86,11 +101,6 @@ public class WordVEC{
 		return (countAccents(word) == 1);
 	}
 
-	//([^àèéíòóú]*[àèéíòóú]){2,}
-	public static boolean hasMultipleAccents(String word){
-		return (countAccents(word) > 1);
-	}
-
 	public static int countAccents(String word){
 		int count = 0;
 		for(int i = 0; i < word.length(); i ++)
@@ -99,39 +109,10 @@ public class WordVEC{
 		return count;
 	}
 
-	private static int getIndexOfStress(String word){
-		for(int i = 0; i < word.length(); i ++)
-			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
-				return i;
-		return -1;
-	}
-
 	private static String suppressStress(String word){
 		return StringUtils.replaceChars(word, VOWELS_STRESSED, VOWELS_UNSTRESSED);
 	}
 
-
-//FIXME speed-up?
-	private static String markDefaultStress(String word){
-		int idx = getIndexOfStress(word);
-		if(idx < 0){
-			String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
-			int lastChar = getLastUnstressedVowelIndex(phones, -1);
-
-			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
-			if(endsInVowel(phones))
-				idx = getLastUnstressedVowelIndex(phones, lastChar);
-			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
-				idx --;
-			if(idx < 0)
-				idx = lastChar;
-
-			if(idx >= 0)
-				word = setAcuteStressAtIndex(word, idx);
-		}
-
-		return word;
-	}
 
 	private static String setAcuteStressAtIndex(String word, int idx){
 		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
@@ -153,6 +134,26 @@ public class WordVEC{
 		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
+	public static String markDefaultStress(String word){
+		int idx = getIndexOfStress(word);
+		if(idx < 0){
+			String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
+			int lastChar = getLastUnstressedVowelIndex(phones, -1);
+
+			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
+			if(endsInVowel(phones))
+				idx = getLastUnstressedVowelIndex(phones, lastChar);
+			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
+				idx --;
+			if(idx < 0)
+				idx = lastChar;
+
+			if(idx >= 0)
+				word = setAcuteStressAtIndex(word, idx);
+		}
+		return word;
+	}
+
 	public static String unmarkDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		//check if the word have a stress and this is not on the last letter
@@ -167,22 +168,30 @@ public class WordVEC{
 		return word;
 	}
 
+	private static int getIndexOfStress(String word){
+		for(int i = 0; i < word.length(); i ++)
+			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
+				return i;
+		return -1;
+	}
+
 	public static Comparator<String> sorterComparator(){
-		return (str1, str2) -> {
-			int result = 0;
-			int len1 = str1.length();
-			int len2 = str2.length();
-			int size = Math.min(len1, len2);
-			len1 -= len2;
-			for(int i = 0; i < size; i ++){
-				result = SORTING_ALPHABET.indexOf(str1.charAt(i)) - SORTING_ALPHABET.indexOf(str2.charAt(i));
-				if(result != 0)
-					break;
-			}
-			if(result == 0 && len1 != 0)
-				result = len1;
-			return result;
-		};
+		return COLLATOR::compare;
+//		return (str1, str2) -> {
+//			int result = 0;
+//			int len1 = str1.length();
+//			int len2 = str2.length();
+//			int size = Math.min(len1, len2);
+//			len1 -= len2;
+//			for(int i = 0; i < size; i ++){
+//				result = SORTING_ALPHABET.indexOf(str1.charAt(i)) - SORTING_ALPHABET.indexOf(str2.charAt(i));
+//				if(result != 0)
+//					break;
+//			}
+//			if(result == 0 && len1 != 0)
+//				result = len1;
+//			return result;
+//		};
 	}
 
 }
