@@ -39,8 +39,7 @@ public class GraphemeVEC{
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
 	private static final List<Matcher> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(
 		PatternService.matcher("^(c)i(uí)$"),
-		PatternService.matcher("^(teñ)i([ou]r)"),
-		PatternService.matcher("^(ko[" + JJH_PHONEME + "ɉñ])i([ou]r)"),
+		PatternService.matcher("^(teñ|ko[" + JJH_PHONEME + "ɉñ])i([ou]r)"),
 		PatternService.matcher("^([d" + JJH_PHONEME + "ɉ])i(aspr)")
 	);
 
@@ -67,6 +66,7 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
+//FIXME is there a way to optimize this PatternService.replaceAll?
 		//correct fh occurrences into f not before vowel
 		if(word.contains(FH_GRAPHEME))
 			word = PatternService.replaceAll(word, ASPIRATED_F, F_GRAPHEME);
