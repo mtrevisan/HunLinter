@@ -179,7 +179,7 @@ public class ExternalSorter{
 				while(itr.hasNext()){
 					String r = itr.next();
 					//skip duplicated lines
-					if(options.getComparator().compare(r, lastLine) != 0){
+					if(!r.equals(lastLine)){
 						writer.write(r);
 						writer.newLine();
 						lastLine = r;
@@ -256,7 +256,7 @@ public class ExternalSorter{
 					BinaryFileBuffer bfb = queue.poll();
 					String line = bfb.pop();
 					//skip duplicated lines
-					if(options.getComparator().compare(line, lastLine) != 0){
+					if(!line.equals(lastLine)){
 						writer.write(line);
 						writer.newLine();
 						lastLine = line;
