@@ -3,6 +3,7 @@ package unit731.hunspeller.languages.vec;
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,10 +26,18 @@ public class WordVEC{
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
-	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
-	private static final String VOWELS_EXTENDED = VOWELS_PLAIN + VOWELS_STRESSED;
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
-	private static final String ALPHABET = CONSONANTS + VOWELS_EXTENDED;
+
+	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
+	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
+	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
+	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
+	static{
+		Arrays.sort(VOWELS_PLAIN_ARRAY);
+		Arrays.sort(VOWELS_STRESSED_ARRAY);
+		Arrays.sort(VOWELS_EXTENDED_ARRAY);
+		Arrays.sort(CONSONANTS_ARRAY);
+	}
 	private static Collator COLLATOR;
 	static{
 		try{
@@ -74,7 +83,7 @@ public class WordVEC{
 	}
 
 	public static boolean isConsonant(char chr){
-		return (CONSONANTS.indexOf(chr) >= 0);
+		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
 	}
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$
@@ -82,8 +91,8 @@ public class WordVEC{
 		int i = word.length();
 		while((-- i) >= 0){
 			char chr = word.charAt(i);
-			if(ALPHABET.indexOf(chr) != -1)
-				return (VOWELS_EXTENDED.indexOf(chr) != -1);
+			if(chr != 'ʼ' && chr != '\'')
+				return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
 		}
 		return false;
 	}
@@ -98,7 +107,7 @@ public class WordVEC{
 		int i = (idx >= 0? idx: word.length());
 		while((-- i) >= 0){
 			char chr = word.charAt(i);
-			if(VOWELS_PLAIN.indexOf(chr) != -1)
+			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
 				return i;
 		}
 		return -1;
@@ -113,7 +122,7 @@ public class WordVEC{
 	public static int countAccents(String word){
 		int count = 0;
 		for(int i = 0; i < word.length(); i ++)
-			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
+			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
 				count ++;
 		return count;
 	}
