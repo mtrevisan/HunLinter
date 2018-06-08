@@ -99,7 +99,6 @@ public class WordVEC{
 		return count;
 	}
 
-	//[àèéíòóú]
 	private static int getIndexOfStress(String word){
 		for(int i = 0; i < word.length(); i ++)
 			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
@@ -112,6 +111,7 @@ public class WordVEC{
 	}
 
 
+//FIXME speed-up?
 	private static String markDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx < 0){
@@ -159,7 +159,6 @@ public class WordVEC{
 		if(idx >= 0 && idx < word.length() - 1){
 			String subword = word.substring(idx, idx + 2);
 			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, PREVENT_UNMARK_STRESS)){
-//FIXME speed-up?
 				String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 					word = tmp;
