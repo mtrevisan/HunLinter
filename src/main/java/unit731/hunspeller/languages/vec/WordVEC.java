@@ -10,11 +10,13 @@ import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
+@Slf4j
 public class WordVEC{
 
 	private static final String SLASH_TAB = "/\t";
@@ -32,8 +34,9 @@ public class WordVEC{
 			String rules = ", ʼ=''' , '-'='–' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < '/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
 			COLLATOR = new RuleBasedCollator(rules);
 		}
-		catch(ParseException ex){
-			Logger.getLogger(WordVEC.class.getName()).log(Level.SEVERE, null, ex);
+		catch(ParseException e){
+			//cannot happen
+			log.error(e.getMessage());
 		}
 	}
 	private static final Matcher REGEX_REMOVE_RULE_FLAGS = PatternService.matcher("(/[^\t]+)?\t");
