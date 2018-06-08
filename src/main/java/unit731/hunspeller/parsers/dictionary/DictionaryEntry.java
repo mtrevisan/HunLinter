@@ -83,10 +83,7 @@ public class DictionaryEntry implements Productable{
 
 	@Override
 	public boolean containsDataField(String dataField){
-		for(String field : dataFields)
-			if(field.equals(dataField))
-				return true;
-		return false;
+		return ArrayUtils.contains(dataFields, dataField);
 	}
 
 	@Override

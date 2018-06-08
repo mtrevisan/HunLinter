@@ -100,8 +100,8 @@ public class RuleProductionEntry implements Productable{
 	@Override
 	public boolean containsRuleFlag(String ... ruleFlags){
 		if(Objects.nonNull(this.ruleFlags))
-			for(String flag : this.ruleFlags)
-				if(ArrayUtils.contains(ruleFlags, flag))
+			for(String flag : ruleFlags)
+				if(ArrayUtils.contains(this.ruleFlags, flag))
 					return true;
 		return false;
 	}
@@ -112,11 +112,7 @@ public class RuleProductionEntry implements Productable{
 
 	@Override
 	public boolean containsDataField(String dataField){
-		if(Objects.nonNull(dataFields))
-			for(String field : dataFields)
-				if(field.equals(dataField))
-					return true;
-		return false;
+		return (Objects.nonNull(dataFields) && ArrayUtils.contains(dataFields, dataField));
 	}
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
