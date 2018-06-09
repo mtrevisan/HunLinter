@@ -61,6 +61,7 @@ public class HyphenationParser{
 	private static final String HYPHEN_EQUALS = "=";
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
+	public static final String EM_DASH = "\u2014";
 	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static final String ONE = "1";
@@ -195,7 +196,7 @@ public class HyphenationParser{
 									level = Level.NON_COMPOUND;
 									REDUCED_PATTERNS.get(level).clear();
 								}
-								else if(line.contains(HYPHEN_MINUS) || line.contains(HYPHEN_EQUALS)){
+								else if(!isAugmentedRule(line) && (line.contains(HYPHEN_MINUS) || line.contains(HYPHEN_EQUALS))){
 									String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
 									if(hypParser.customHyphenations.get(level).containsKey(key))
 										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
@@ -462,9 +463,6 @@ public class HyphenationParser{
 	 * @return the hyphenation object(s)
 	 */
 	public Hyphenation hyphenate(String word){
-		//clear already present hyphens
-//		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
-
 		return hyphenate(word, patterns);
 	}
 
@@ -486,9 +484,6 @@ public class HyphenationParser{
 			Hyphenation hyph = null;
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
-
-				//clear already present hyphens
-//				word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 
 				hyph = hyphenate(word, patterns);
 
@@ -633,7 +628,7 @@ public class HyphenationParser{
 						if(dd > indexes[idx]){
 							indexes[idx] = dd;
 							rules[idx] = rule;
-							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
+							augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
 						}
 					}
 				}
@@ -646,8 +641,6 @@ public class HyphenationParser{
 	Hyphenation hyphenate2(String word){
 		boolean[] uppercases = extractUppercases(word);
 
-		//clear already present hyphens
-//		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
 
@@ -720,7 +713,7 @@ System.out.println(rule);
 //				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
 							indexes[idx] = dd;//1,2,4,4,5,7,8,10,10,11
 							rules[idx] = rule;
-							augmentedPatternData[idx] = (rule.contains(AUGMENTED_RULE)? rule: null);
+							augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
 						}
 					}
 				}
@@ -760,26 +753,30 @@ System.out.println(rule);
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
+	private static boolean isAugmentedRule(String line){
+		return line.contains(AUGMENTED_RULE);
+	}
+
 	private List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
 		List<String> result = new ArrayList<>();
 
 		int startIndex = 0;
-		int endIndex = 0;
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
-		for(int i = 0; i < size; i ++, endIndex ++)
-			if(hyphBreak.getIndexes()[i] % 2 != 0){
+		for(int endIndex = 0; endIndex < size; endIndex ++)
+			if(hyphBreak.getIndexes()[endIndex] % 2 != 0){
 				String subword = word.substring(startIndex, endIndex);
 
 				if(StringUtils.isNotBlank(addAfter)){
 					//append first characters to next subword
-					subword = addAfter + subword.substring(Math.min(after, subword.length()));
+					subword = addAfter + subword.substring(after);
+					after = 0;
 					addAfter = null;
 				}
 
 				//manage augmented patterns:
-				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[i];
+				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[endIndex];
 				if(Objects.nonNull(augmentedPatternData)){
 					Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 					m.find();
@@ -802,7 +799,7 @@ System.out.println(rule);
 					//syll
 					//sylaa-b
 					int end = subword.length() - index + Integer.parseInt(start) - 1;
-					after = end + Integer.parseInt(cut) - endIndex;
+					after = Integer.parseInt(cut) - 1;
 					subword = subword.substring(0, end) + addBefore;
 				}
 
