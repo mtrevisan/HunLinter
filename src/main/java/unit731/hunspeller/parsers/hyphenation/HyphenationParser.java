@@ -79,7 +79,6 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
 	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH) + "]");
-	private static final Pattern PATTERN_HYPHEN_SPLITTER = PatternService.pattern(HYPHEN);
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -464,17 +463,9 @@ public class HyphenationParser{
 	 */
 	public Hyphenation hyphenate(String word){
 		//clear already present hyphens
-		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
+//		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 
-		List<SubwordHyphenation> hyphs = new ArrayList<>();
-		String[] subwords = PatternService.split(word, PATTERN_HYPHEN_SPLITTER);
-		for(String subword : subwords){
-			SubwordHyphenation subhyph = hyphenate(subword, patterns);
-
-			//add subword hyphenation to global hyphenation
-			hyphs.add(subhyph);
-		}
-		return new Hyphenation(hyphs);
+		return hyphenate(word, patterns);
 	}
 
 	/**
@@ -492,21 +483,18 @@ public class HyphenationParser{
 
 		try{
 			String key = getKeyFromData(addedRule);
-			List<SubwordHyphenation> hyphs = new ArrayList<>();
+			Hyphenation hyph = null;
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
 
 				//clear already present hyphens
-				word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
+//				word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 
-				SubwordHyphenation subhyph = hyphenate(word, patterns);
-
-				//add subword hyphenation to global hyphenation
-				hyphs.add(subhyph);
+				hyph = hyphenate(word, patterns);
 
 				patterns.get(level).remove(key);
 			}
-			return new Hyphenation(hyphs);
+			return hyph;
 		}
 		finally{
 			LOCK_SAVING.unlock();
@@ -545,7 +533,7 @@ public class HyphenationParser{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private SubwordHyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
+	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -581,7 +569,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new SubwordHyphenation(hyphenatedWord, rules, errors);
+		return new Hyphenation(hyphenatedWord, rules, errors);
 	}
 
 	private boolean[] extractUppercases(String word){
@@ -655,11 +643,11 @@ public class HyphenationParser{
 	}
 
 
-	SubwordHyphenation hyphenate2(String word){
+	Hyphenation hyphenate2(String word){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present hyphens
-		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
+//		word = PatternService.replaceAll(word, MATCHER_HYPHENS, HYPHEN);
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
 
@@ -694,7 +682,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new SubwordHyphenation(hyphenatedWord, rules, errors);
+		return new Hyphenation(hyphenatedWord, rules, errors);
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){

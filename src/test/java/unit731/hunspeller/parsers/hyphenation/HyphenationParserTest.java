@@ -110,7 +110,7 @@ public class HyphenationParserTest{
 	@Test
 	public void augmentedWithIndexes(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "1-/-=,1,1");
+		addRule(patternsLevelCompound, "1–/–=,1,1");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
@@ -120,15 +120,15 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		Hyphenation hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
-		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
 	public void augmentedWithoutIndexes(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "1-/-=");
+		addRule(patternsLevelCompound, "1–/–=");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
@@ -138,15 +138,15 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		Hyphenation hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
-		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
 	public void augmentedAfterBreak(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "-1/-=-");
+		addRule(patternsLevelCompound, "–1/–=–");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
@@ -156,16 +156,16 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		Hyphenation hyphenation = parser.hyphenate("ab-cd");
+		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
-		Assert.assertEquals(Arrays.asList("ab", "cd"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
 	}
 
 	@Test
 	public void augmentedAfterBreak2(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
 		addRule(patternsLevelCompound, "1k");
-		addRule(patternsLevelCompound, "-1/-=-");
+		addRule(patternsLevelCompound, "–1/–=–");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
@@ -175,9 +175,9 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
-		Hyphenation hyphenation = parser.hyphenate("kuko-fu");
+		Hyphenation hyphenation = parser.hyphenate("kuko–fu");
 
-		Assert.assertEquals(Arrays.asList("ku", "ko", "fu"), hyphenation.getSyllabes());
+		Assert.assertEquals(Arrays.asList("ku", "ko–", "–fu"), hyphenation.getSyllabes());
 	}
 
 	@Test
