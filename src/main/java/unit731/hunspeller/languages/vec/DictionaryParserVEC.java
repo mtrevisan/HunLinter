@@ -25,8 +25,6 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.HYPHEN;
-import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.HYPHEN_MINUS;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -99,18 +97,20 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String FINAL_SONORIZATION_RULE = "I0";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
-	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
+	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-]|$)");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ]");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern("[" + Pattern.quote(HyphenationParser.HYPHEN + HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.SOFT_HYPHEN) + "]");
+	private static final Pattern REGEX_PATTERN_HYPHEN_MINUS = PatternService.pattern("[" + Pattern.quote(HyphenationParser.HYPHEN_MINUS
+		+ HyphenationParser.EN_DASH + HyphenationParser.EM_DASH + HyphenationParser.SOFT_HYPHEN) + "]");
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*" + START_TAGS;
 	private static final String NON_VANISHING_L_NOT_ENDING_IN_A = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ/]*[^a]" + START_TAGS;
 	private static final String VANISHING_L = "ƚ.+?" + START_TAGS;
 	private static final String VANISHING_L_NOT_ENDING_IN_A = "ƚ.*[^a]" + START_TAGS;
+
 
 	private static final class MatcherEntry{
 
@@ -124,13 +124,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 		private final String error;
 
 
-		public MatcherEntry(String matcher, String pattern, Object ... arguments){
+		MatcherEntry(String matcher, String pattern, Object ... arguments){
 			this.matcher = PatternService.matcher(matcher);
 			ruleFlags = null;
 			this.error = MessageFormat.format(pattern, arguments);
 		}
 
-		public MatcherEntry(List<String> ruleFlags, String pattern, Object ... arguments){
+		MatcherEntry(List<String> ruleFlags, String pattern, Object ... arguments){
 			matcher = null;
 			this.ruleFlags = ruleFlags;
 			//take last argument as the concatenation of the ruleFlags
@@ -368,9 +368,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			incompatibilityCheck(production);
 
-			String derivedWord = production.getWord();
-
-			String derivedWordWithoutDataFields = derivedWord + strategy.joinRuleFlags(production.getRuleFlags());
+			String derivedWordWithoutDataFields = production.toString();
 			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutDataFields);
 
@@ -381,6 +379,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			finalSonorizationCheck(production);
 
+			String derivedWord = production.getWord();
 			String[] splittedWords = PatternService.split(derivedWord, REGEX_PATTERN_HYPHEN_MINUS);
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
@@ -447,7 +446,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
 			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
+			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
+				ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
 			else{
@@ -533,7 +533,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 			}
 
-			if(Objects.nonNull(hyphenationParser) && derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.HYPHEN_MINUS)
+			//FIXME manage en dash
+			if(derivedWord.length() > 1 && !derivedWord.contains(HyphenationParser.EN_DASH)
 					&& !production.isPartOfSpeech(POS_NUMERAL_LATIN)
 					&& !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
 					&& (!production.isPartOfSpeech(POS_INTERJECTION) || !UNSYLLABABLE_INTERJECTIONS.contains(derivedWord))){
