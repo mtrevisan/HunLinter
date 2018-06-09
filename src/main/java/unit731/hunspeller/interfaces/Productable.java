@@ -13,7 +13,6 @@ public interface Productable{
 	boolean containsRuleFlag(String ... ruleFlags);
 	boolean containsDataField(String dataField);
 	boolean isCombineable();
-	String toStringBasic();
 
 	default String getDataFieldPrefixedBy(String typePrefix){
 		String[] dataFields = getDataFields();

@@ -10,7 +10,6 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +19,6 @@ import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 @Getter
 @EqualsAndHashCode(of = {"word", "ruleFlags", "dataFields"})
-@ToString(of = {"word", "ruleFlags", "dataFields"})
 public class RuleProductionEntry implements Productable{
 
 	private final String word;
@@ -188,7 +186,7 @@ public class RuleProductionEntry implements Productable{
 //	}
 
 	@Override
-	public String toStringBasic(){
+	public String toString(){
 		return word + strategy.joinRuleFlags(ruleFlags);
 	}
 

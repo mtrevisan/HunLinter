@@ -201,7 +201,7 @@ public class WordGenerator{
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toStringBasic());
+					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toString());
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();

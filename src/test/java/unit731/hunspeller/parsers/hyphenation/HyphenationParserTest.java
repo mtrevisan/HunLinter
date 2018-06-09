@@ -162,6 +162,25 @@ public class HyphenationParserTest{
 	}
 
 	@Test
+	public void augmentedAfterBreakWithRuleOverlap(){
+		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
+		addRule(patternsLevelCompound, "–3/–=–");
+		addRule(patternsLevelCompound, "1c");
+		patternsLevelCompound.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		Hyphenation hyphenation = parser.hyphenate("ab–cd");
+
+		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
+	}
+
+	@Test
 	public void augmentedAfterBreak2(){
 		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
 		addRule(patternsLevelCompound, "1k");

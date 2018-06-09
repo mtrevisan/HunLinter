@@ -3,14 +3,12 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
@@ -88,17 +86,6 @@ public class DictionaryEntry implements Productable{
 
 	@Override
 	public String toString(){
-		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
-			.add(word)
-			.add(strategy.joinRuleFlags(ruleFlags));
-		if(Objects.nonNull(dataFields) && dataFields.length > 0)
-			sj.add(TAB)
-				.add(String.join(StringUtils.EMPTY, dataFields));
-		return sj.toString();
-	}
-
-	@Override
-	public String toStringBasic(){
 		return word + strategy.joinRuleFlags(ruleFlags);
 	}
 
