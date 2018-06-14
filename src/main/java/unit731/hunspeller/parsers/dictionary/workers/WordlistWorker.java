@@ -19,6 +19,7 @@ import static unit731.hunspeller.parsers.dictionary.DictionaryParser.openFileWit
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
@@ -34,6 +35,8 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		try{
 			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
+
+			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
@@ -73,11 +76,12 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 				}
 			}
 
+			watch.stop();
+
 			setProgress(100);
 
 			publish("File written: " + outputFile.getAbsolutePath());
-
-			publish("Wordlist extracted successfully");
+			publish("Wordlist extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			openFileWithChoosenEditor(outputFile);
 		}

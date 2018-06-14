@@ -28,6 +28,7 @@ import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.HammingDistance;
+import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -44,10 +45,12 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		try{
 			publish("Opening Dictionary file for minimal pairs extraction: " + affParser.getLanguage() + ".dic (pass 1/3)");
-			setProgress(0);
+
+			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
+			setProgress(0);
 			try(
 					BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset());
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
@@ -183,9 +186,12 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 				.build();
 			dicParser.getSorter().sort(outputFile, options, outputFile);
 
+			watch.stop();
+
 			setProgress(100);
 
-			publish("Minimal pairs extracted successfully: " + outputFile.getAbsolutePath());
+			publish("File written: " + outputFile.getAbsolutePath());
+			publish("Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			openFileWithChoosenEditor(outputFile);
 		}

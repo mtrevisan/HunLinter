@@ -29,6 +29,7 @@ import unit731.hunspeller.parsers.dictionary.Duplicate;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
@@ -45,13 +46,17 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		try{
 			publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic (pass 1/3)");
 
+			TimeWatch watch = TimeWatch.start();
+
 			BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
 			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
 			writeDuplicates(duplicates);
 
-			publish("Duplicates extracted successfully");
+			watch.stop();
+
+			publish("Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			if(!duplicates.isEmpty())
 				DictionaryParser.openFileWithChoosenEditor(outputFile);

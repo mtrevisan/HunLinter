@@ -70,9 +70,10 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 					setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 				}
 			}
-			setProgress(100);
 
 			watch.stop();
+
+			setProgress(100);
 
 			publish("Finished processing Dictionary file (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
