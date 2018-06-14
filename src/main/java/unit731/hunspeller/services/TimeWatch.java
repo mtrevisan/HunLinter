@@ -1,6 +1,8 @@
 package unit731.hunspeller.services;
 
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class TimeWatch{
@@ -37,13 +39,14 @@ public class TimeWatch{
 	}
 
 	public String toStringMinuteSeconds(){
+		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		long mins = time(TimeUnit.MINUTES);
-		String text;
 		if(mins > 0)
-			text = String.format("%d min %d sec", mins, time(TimeUnit.SECONDS) - mins * 60);
-		else
-			text = String.format("%d sec", time(TimeUnit.SECONDS));
-		return text;
+			sj.add(String.format("%d min", mins));
+		long secs = time(TimeUnit.SECONDS) - mins * 60;
+		if(secs > 0)
+			sj.add(String.format("%d sec", secs));
+		return sj.toString();
 	}
 
 }
