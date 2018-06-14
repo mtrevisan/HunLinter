@@ -44,7 +44,7 @@ public class TimeWatch{
 		if(mins > 0)
 			sj.add(String.format("%d min", mins));
 		long secs = time(TimeUnit.SECONDS) - mins * 60;
-		if(secs > 0)
+		if(mins == 0 || secs > 0)
 			sj.add(String.format("%d sec", secs));
 		return sj.toString();
 	}
