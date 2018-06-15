@@ -55,15 +55,15 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 					readSoFar += line.length();
 					line = dicParser.cleanLine(line);
 					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-
 						try{
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
+
 							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 
 							productions.forEach(production -> dicParser.checkProduction(production, strategy));
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 
@@ -79,6 +79,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		}
 		catch(IOException | IllegalArgumentException e){
 			publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			publish("Stopped processing Dictionary file");
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
