@@ -161,6 +161,7 @@ public class HyphenationParser{
 		protected Void doInBackground() throws Exception{
 			LOCK_SAVING.lock();
 
+			boolean stopped = false;
 			try{
 				publish("Opening Hyphenation file for parsing: " + hypFile.getName());
 				setProgress(0);
@@ -245,18 +246,23 @@ public class HyphenationParser{
 				publish("Finished reading Hyphenation file");
 			}
 			catch(IOException | IllegalArgumentException e){
+				stopped = true;
+
 				publish(e instanceof ClosedChannelException? "Hyphenation parser thread interrupted": e.getClass().getSimpleName() + ": "
 					+ e.getMessage());
-				publish("Stopped reading Hyphenation file");
 			}
 			catch(Exception e){
+				stopped = true;
+
 				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
-				publish("Stopped reading Hyphenation file");
 			}
 			finally{
 				LOCK_SAVING.unlock();
 			}
+			if(stopped)
+				publish("Stopped reading Hyphenation file");
+
 			return null;
 		}
 

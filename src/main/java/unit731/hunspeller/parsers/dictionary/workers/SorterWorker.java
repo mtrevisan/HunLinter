@@ -31,6 +31,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected Void doInBackground() throws Exception{
+		boolean stopped = false;
 		try{
 			publish("Sorting file " + dicParser.getDicFile().getName());
 			setProgress(0);
@@ -77,14 +78,19 @@ public class SorterWorker extends SwingWorker<Void, String>{
 			setProgress(100);
 		}
 		catch(IOException | IllegalArgumentException e){
+			stopped = true;
+
 			publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-			publish("Stopped reading Dictionary file");
 		}
 		catch(Exception e){
+			stopped = true;
+
 			String message = ExceptionService.getMessage(e, getClass());
 			publish(e.getClass().getSimpleName() + ": " + message);
-			publish("Stopped reading Dictionary file");
 		}
+		if(stopped)
+			publish("Stopped reading Dictionary file");
+
 		return null;
 	}
 

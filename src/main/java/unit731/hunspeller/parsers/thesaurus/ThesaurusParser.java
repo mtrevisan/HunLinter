@@ -72,6 +72,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		protected List<ThesaurusEntry> doInBackground() throws Exception{
 			LOCK_SAVING.lock();
 
+			boolean stopped = false;
 			try{
 				publish("Opening Thesaurus file for parsing: " + theFile.getName());
 				setProgress(0);
@@ -96,20 +97,24 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				publish("Finished reading Thesaurus file");
 			}
 			catch(IOException | IllegalArgumentException e){
+				stopped = true;
+
 				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": "
 					+ e.getMessage());
-				publish("Stopped reading Thesaurus file");
 			}
 			catch(Exception e){
+				stopped = true;
+
 				String message = ExceptionService.getMessage(e, getClass());
 				publish(e.getClass().getSimpleName() + ": " + message);
-				publish("Stopped reading Thesaurus file");
 			}
 			finally{
+				theParser.dictionary.resetModified();
+
 				LOCK_SAVING.unlock();
 			}
-
-			theParser.dictionary.resetModified();
+			if(stopped)
+				publish("Stopped reading Thesaurus file");
 
 			return theParser.getSynonymsDictionary();
 		}

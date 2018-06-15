@@ -32,6 +32,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 	@Override
 	protected Void doInBackground() throws Exception{
 		int lineIndex = 1;
+		boolean stopped = false;
 		try{
 			publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
 
@@ -78,14 +79,19 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 			publish("Finished processing Dictionary file (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
 		catch(IOException | IllegalArgumentException e){
+			stopped = true;
+
 			publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-			publish("Stopped processing Dictionary file");
 		}
 		catch(Exception e){
+			stopped = true;
+
 			String message = ExceptionService.getMessage(e, getClass());
 			publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
-			publish("Stopped processing Dictionary file");
 		}
+		if(stopped)
+			publish("Stopped processing Dictionary file");
+
 		return null;
 	}
 
