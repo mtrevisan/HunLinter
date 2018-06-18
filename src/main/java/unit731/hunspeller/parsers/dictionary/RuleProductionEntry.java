@@ -155,7 +155,7 @@ public class RuleProductionEntry implements Productable{
 	}
 
 //	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
-	public String[] getSignificantDataFields(){
+	public List<String> getSignificantDataFields(){
 //		List<String> significant = new ArrayList<>();
 //		if(Objects.nonNull(dataFields))
 //			for(String dataField : dataFields)
@@ -167,8 +167,7 @@ public class RuleProductionEntry implements Productable{
 		return Arrays.stream(dataFields)
 			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
 			.sorted()
-			.collect(Collectors.toList())
-			.toArray(new String[0]);
+			.collect(Collectors.toList());
 	}
 
 //	@Override
@@ -193,8 +192,8 @@ public class RuleProductionEntry implements Productable{
 	public String toStringWithSignificantDataFields(){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		String[] significantDataFields = getSignificantDataFields();
-		if(significantDataFields.length > 0)
+		List<String> significantDataFields = getSignificantDataFields();
+		if(!significantDataFields.isEmpty())
 			sj.add(String.join(StringUtils.SPACE, significantDataFields));
 		return sj.toString();
 	}
