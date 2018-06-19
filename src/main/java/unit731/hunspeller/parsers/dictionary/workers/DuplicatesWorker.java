@@ -83,11 +83,10 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 1_000_000, 0.000_000_2, 2.);
-		duplicatesBloomFilter.setCharset(dicParser.getCharset());
-
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 40_000_000, 0.000_000_01, 1.3);
 		bloomFilter.setCharset(dicParser.getCharset());
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 1_000_000, 0.000_000_2, 2.);
+		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);
 		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
