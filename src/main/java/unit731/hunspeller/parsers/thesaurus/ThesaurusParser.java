@@ -178,14 +178,22 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		try{
 			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_POS_MEANS, 2);
+			if(partOfSpeechAndMeanings.length != 2)
+				throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
+
 			String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
-				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
+			StringBuilder sb = new StringBuilder();
+			if(!partOfSpeech.startsWith("("))
+				sb.append('(');
+			sb.append(partOfSpeech);
+			if(!partOfSpeech.endsWith("("))
+				sb.append(')');
+			partOfSpeech = sb.toString();
 
 			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_MEANS);
 			List<String> meanings = Arrays.stream(means)
-				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
+				.map(String::trim)
 				.distinct()
 				.collect(Collectors.toList());
 			if(meanings.size() < 1)
