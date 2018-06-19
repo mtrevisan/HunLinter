@@ -104,7 +104,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			publish("Support file sorted");
 
 
-			publish("Start extracting minimal pairs (pass 2/3)");
+			publish("Extracting minimal pairs (pass 2/3)");
 			setProgress(0);
 
 			int totalPairs = 0;
