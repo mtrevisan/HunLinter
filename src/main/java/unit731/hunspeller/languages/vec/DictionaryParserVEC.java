@@ -64,9 +64,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String ADJECTIVE_SECOND_CLASS_RULE = "A2";
 	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
+	private static final String PLURAL_NOUN_MASCULINE_IO_RULE = "M1";
 	private static final String VARIANT_TRANSFORMATIONS_RULE_1 = "T0";
 	private static final String VARIANT_TRANSFORMATIONS_RULE_2 = "T1";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_4 = "TV";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_4 = "TB";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
 	private static final String PLANTS_AND_CRAFTS_RULE_VANISHING_EL = "V1";
@@ -265,7 +266,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD, PEJORATIVE_ATO_RULE_VANISHING_EL, PEJORATIVE_ATO_RULE_NON_VANISHING_EL));
 	}
 
-	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^ZUu\\t]+\\t");
+	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^U\\t]+\\t");
 	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
 
 	private static final Set<MatcherEntry> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
@@ -287,14 +288,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 			WORD_WITH_RULE_CANNOT_HAVE, ADJECTIVE_FIRST_CLASS_RULE));
 	}
 
-	//also V0/)0 - &0/&1
 	private static final Set<MatcherEntry> VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS = new HashSet<>();
 	static{
-		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("V0"),
-			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
-		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("v0"),
-			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
-		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("M1"),
+//		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("V0"),
+//			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
+//		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("v0"),
+//			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
+		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(PLURAL_NOUN_MASCULINE_IO_RULE),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
 		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
