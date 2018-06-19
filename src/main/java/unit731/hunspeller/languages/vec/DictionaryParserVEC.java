@@ -72,11 +72,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String PLANTS_AND_CRAFTS_RULE_VANISHING_EL = "V1";
 	private static final String DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL = "r0";
 	private static final String DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL = "r1";
-	private static final String DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL = "s0";
-	private static final String DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL = "s1";
-	private static final String DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL = "s2";
-	private static final String DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL = "S0";
-	private static final String DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL = "S1";
+	private static final String DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL = "r2";
+	private static final String DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL = "r3";
+	private static final String DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL = "r4";
+	private static final String DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL = "s0";
+	private static final String DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL = "s1";
 	private static final String ADVERB_MENTE_RULE_NON_VANISHING_EL = "W0";
 	private static final String ADVERB_MENTE_RULE_VANISHING_EL = "W1";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
@@ -95,7 +95,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String NORTHERN_PLURAL_RULE = "U0";
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
-	private static final String FINAL_SONORIZATION_RULE = "S0";
+	private static final String FINAL_SONORIZATION_RULE = "FS";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-]|$)");
