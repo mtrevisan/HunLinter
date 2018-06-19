@@ -916,7 +916,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				String outputFilename = parentPath.toString() + File.separator + parentPath.getName(parentPath.getNameCount() - 1) + ".zip";
 				ZIPPER.zipDirectory(parentPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
-				printResultLine("Compression done");
+				printResultLine("Package created");
 
 				//open directory
 				if(Desktop.isDesktopSupported())
@@ -925,7 +925,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			catch(IOException e){
 				log.error("Something very bad happend while creating package", e);
 
-				printResultLine("Compression error: " + e.getMessage());
+				printResultLine("Package error: " + e.getMessage());
 			}
 		}
    }//GEN-LAST:event_fileCreatePackageMenuItemActionPerformed

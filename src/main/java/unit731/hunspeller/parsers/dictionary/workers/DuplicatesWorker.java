@@ -139,7 +139,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			publish("Start extracting duplicates (pass 2/3)");
+			publish("Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
