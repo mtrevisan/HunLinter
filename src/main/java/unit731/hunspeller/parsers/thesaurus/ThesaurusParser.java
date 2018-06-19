@@ -177,12 +177,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		LOCK_SAVING.lock();
 
 		try{
-			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE, 2);
+			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_POS_MEANS, 2);
 			String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_ESCAPED_PIPE);
+			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_MEANS);
 			List<String> meanings = Arrays.stream(means)
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
