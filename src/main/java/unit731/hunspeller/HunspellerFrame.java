@@ -1101,13 +1101,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String text = StringUtils.strip(frame.theMeaningsTextField.getText());
 		if(Objects.nonNull(formerFilterThesaurusText) && formerFilterThesaurusText.equals(text))
 			return;
+
+		//remove part of speech and format the search string
+		text = text.substring(text.indexOf(')') + 1);
+		text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
+
 		formerFilterThesaurusText = text;
 
 		@SuppressWarnings("unchecked")
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.dicParser.prepareTextForFilter(text);
+				String filterText = frame.dicParser.prepareTextForFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
