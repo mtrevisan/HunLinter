@@ -65,8 +65,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
 	private static final String PLURAL_NOUN_MASCULINE_IO_RULE = "M1";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_1 = "T0";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_2 = "T1";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_1 = "TE";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_2 = "TF";
 	private static final String VARIANT_TRANSFORMATIONS_RULE_4 = "TB";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
