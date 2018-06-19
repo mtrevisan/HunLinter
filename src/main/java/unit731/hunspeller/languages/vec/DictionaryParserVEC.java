@@ -36,37 +36,37 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
 	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
+	private static final String VERB_DAR_RULE_NON_VANISHING_EL = "a4";
+	private static final String VERB_DAR_RULE_VANISHING_EL = "a5";
 	private static final String VERB_2ND_RULE_NON_VANISHING_EL = "b1";
 	private static final String VERB_2ND_RULE_VANISHING_EL = "b2";
-	private static final String VERB_3RD_IS_RULE_NON_VANISHING_EL = "c1";
-	private static final String VERB_3RD_IS_RULE_VANISHING_EL = "c2";
-	private static final String VERB_3RD_NO_IS_RULE_NON_VANISHING_EL = "d1";
-	private static final String VERB_3RD_NO_IS_RULE_VANISHING_EL = "d2";
-	private static final String VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL = "e1";
-	private static final String VERB_3RD_BOTH_IS_RULE_VANISHING_EL = "e2";
-	private static final String VERB_DAR_RULE_NON_VANISHING_EL = "f1";
-	private static final String VERB_DAR_RULE_VANISHING_EL = "f2";
-	private static final String VERB_TOLER_RULE_NON_VANISHING_EL = "k1";
-	private static final String VERB_TOLER_RULE_VANISHING_EL = "k2";
-	private static final String VERB_DIXER_RULE_NON_VANISHING_EL = "n1";
-	private static final String VERB_DIXER_RULE_VANISHING_EL = "n2";
-	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL = "E1";
-	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL = "E2";
-	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL = "G1";
-	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL = "G2";
-	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL = "F1";
-	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL = "F2";
-	private static final String INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL = "P1";
-	private static final String INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL = "P2";
-	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL = "Q1";
-	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL = "Q2";
-	private static final String ADJECTIVE_FIRST_CLASS_RULE = "B0";
-	private static final String ADJECTIVE_SECOND_CLASS_RULE = "C0";
-	private static final String ADJECTIVE_THIRD_CLASS_RULE = "D0";
-	private static final String PLURAL_NOUN_MASCULINE_RULE = "T0";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_1 = "T2";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_2 = "T3";
-	private static final String VARIANT_TRANSFORMATIONS_RULE_4 = "T4";
+	private static final String VERB_DIXER_RULE_NON_VANISHING_EL = "b6";
+	private static final String VERB_DIXER_RULE_VANISHING_EL = "b7";
+	private static final String VERB_TOLER_RULE_NON_VANISHING_EL = "c3";
+	private static final String VERB_TOLER_RULE_VANISHING_EL = "c4";
+	private static final String VERB_3RD_IS_RULE_NON_VANISHING_EL = "d1";
+	private static final String VERB_3RD_IS_RULE_VANISHING_EL = "d2";
+	private static final String VERB_3RD_NO_IS_RULE_NON_VANISHING_EL = "e1";
+	private static final String VERB_3RD_NO_IS_RULE_VANISHING_EL = "e2";
+	private static final String VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL = "f1";
+	private static final String VERB_3RD_BOTH_IS_RULE_VANISHING_EL = "f2";
+	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL = "P1";
+	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL = "P2";
+	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL = "P4";
+	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL = "P4";
+	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL = "P7";
+	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL = "P8";
+	private static final String INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL = "I6";
+	private static final String INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL = "I7";
+	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL = "I8";
+	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL = "I9";
+	private static final String ADJECTIVE_FIRST_CLASS_RULE = "A1";
+	private static final String ADJECTIVE_SECOND_CLASS_RULE = "A2";
+	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
+	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_1 = "T0";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_2 = "T1";
+	private static final String VARIANT_TRANSFORMATIONS_RULE_4 = "TV";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
 	private static final String PLANTS_AND_CRAFTS_RULE_VANISHING_EL = "V1";
@@ -93,9 +93,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String PEJORATIVE_ASO_RULE_VANISHING_EL = "<1";
 	private static final String PEJORATIVE_ASO_RULE_NON_VANISHING_EL = "<2";
 	private static final String NORTHERN_PLURAL_RULE = "U0";
-	private static final String NORTHERN_PLURAL_STRESSED_RULE = "u0";
+	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
-	private static final String FINAL_SONORIZATION_RULE = "I0";
+	private static final String FINAL_SONORIZATION_RULE = "S0";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-]|$)");
@@ -294,7 +294,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
 		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("v0"),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
-		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("T1"),
+		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList("M1"),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
 		VARIANT_TRANSFORMATION_1_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_RULE_1));
