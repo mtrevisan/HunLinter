@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -339,7 +340,7 @@ public class AffixParser{
 			addData(TAG_COMPOUND_MIN, 3);
 		//apply default charset
 		if(!containsData(TAG_CHARACTER_SET))
-			addData(TAG_CHARACTER_SET, charset);
+			addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
 		if(!containsData(TAG_LANGUAGE))
 			//try to infer language from filename
 			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
