@@ -1103,7 +1103,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			return;
 
 		//remove part of speech and format the search string
-		text = text.substring(text.indexOf(')') + 1);
+		text = text.substring(text.indexOf(')') + 1)
+			.substring(text.indexOf(':') + 1);
 		text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
 
 		formerFilterThesaurusText = text;
