@@ -97,6 +97,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
 	private static final String FINAL_SONORIZATION_RULE = "FS";
+	private static final String GUA_TO_VA_RULE = "gv";
 
 	private static final Matcher MISMATCHED_VARIANTS = PatternService.matcher("ƚ[^ŧđ]*[ŧđ]|[ŧđ][^ƚ]*ƚ");
 	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ–-]|$)");
@@ -302,6 +303,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_FEMININE_RULE));
 	}
 
+	private static final Set<MatcherEntry> GUA_TO_VA_CHECKS = new HashSet<>();
+	static{
+		GUA_TO_VA_CHECKS.add(new MatcherEntry(Arrays.asList(":0", "@0", ",0", ".0", "*0", "-0", "+0", "^6", "^5", "^4", "^3", "^2", "^1", "^0", VARIANT_TRANSFORMATIONS_BEGIN_RULE),
+			WORD_WITH_RULE_CANNOT_HAVE, GUA_TO_VA_RULE));
+	}
+
+
 	public static final String POS_PROPER_NOUN = "proper_noun";
 	public static final String POS_NOUN = "noun";
 	public static final String POS_ADJECTIVE = "adjective";
@@ -427,6 +435,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		commonIncompatibilityCheck(production, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS);
 		commonIncompatibilityCheck(production, VARIANT_TRANSFORMATIONS_END_RULE, VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS);
 		commonIncompatibilityCheck(production, VARIANT_TRANSFORMATIONS_FEMININE_RULE, VARIANT_TRANSFORMATION_FEMININE_MISMATCH_CHECKS);
+		commonIncompatibilityCheck(production, GUA_TO_VA_RULE, GUA_TO_VA_CHECKS);
 	}
 
 	private void commonIncompatibilityCheck(RuleProductionEntry production, String ruleFlag, Set<MatcherEntry> checks)
