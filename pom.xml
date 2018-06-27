@@ -9,6 +9,16 @@
 	<packaging>jar</packaging>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>version.properties</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
 		<plugins>
 			<!-- Maven Source Plugin -->
 			<plugin>
@@ -125,7 +135,9 @@
 								<exclude>LICENSE</exclude>
 								<exclude>changelog.txt</exclude>
 								<exclude>latestchanges.html</exclude>
-								<exclude>changelog.txt</exclude>
+								<exclude>release-timestamp.txt</exclude>
+								<exclude>module-info.SCL.lombok</exclude>
+								<exclude>.netbeans_automatic_build</exclude>
 								<exclude>META-INF/LICENSE</exclude>
 								<exclude>META-INF/LICENSE.txt</exclude>
 								<exclude>META-INF/NOTICE</exclude>

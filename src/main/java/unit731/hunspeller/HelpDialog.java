@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -19,11 +21,11 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
-import unit731.hunspeller.services.POMData;
 
 
 /**
  * @see <a href="https://pixabay.com/en/tree-kahl-winter-aesthetic-530324/">Tree logo</a>
+ * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version informations into your apps with maven</a>
  */
 @Slf4j
 public class HelpDialog extends JDialog{
@@ -31,6 +33,7 @@ public class HelpDialog extends JDialog{
 	private static final long serialVersionUID = -9151942201399886892L;
 
 
+	@SuppressWarnings("null")
 	public HelpDialog(Frame parent){
 		super(parent, "About", true);
 
@@ -48,9 +51,19 @@ public class HelpDialog extends JDialog{
 		}
 		catch(IOException e){}
 
-		String artifactID = POMData.getArtifactID();
-		String version = POMData.getVersion();
-		LocalDate buildTimestamp = POMData.getBuildTimestamp();
+		String artifactID = null;
+		String version = null;
+		LocalDate buildTimestamp = null;
+		InputStream versionInfoStream = getClass().getResourceAsStream("/version.properties");
+		Properties prop = new Properties();
+		try{
+			prop.load(versionInfoStream);
+
+			artifactID = prop.getProperty("artifactId");
+			version = prop.getProperty("version");
+			buildTimestamp = LocalDate.parse(prop.getProperty("buildTimestamp"));
+		}
+		catch(IOException e){}
 
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);
