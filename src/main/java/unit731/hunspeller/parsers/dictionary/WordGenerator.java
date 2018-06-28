@@ -247,13 +247,76 @@ public class WordGenerator{
 		return productions;
 	}
 
+//	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+//		//extract the list of applicable affixes...
+//		List<AffixEntry> applicableAffixes = new ArrayList<>();
+//		for(AffixEntry entry : entries){
+//			Matcher match = entry.getMatch();
+//			//... only if it matches the given word...
+//			if(Objects.isNull(match) || PatternService.find(word, match))
+//				applicableAffixes.add(entry);
+//		}
+//		return applicableAffixes;
+//	}
+
 	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
 		//extract the list of applicable affixes...
 		List<AffixEntry> applicableAffixes = new ArrayList<>();
 		for(AffixEntry entry : entries){
-			Matcher match = entry.getMatch();
-			//... only if it matches the given word...
-			if(Objects.isNull(match) || PatternService.find(word, match))
+			boolean match = true;
+
+			int idxWord = 0;
+			int size = word.length();
+			boolean insideGroup = false;
+			boolean negatedGroup = false;
+			boolean foundInsideGroup = false;
+			String condition = entry.getCondition();
+			for(char chr : condition.toCharArray()){
+				if(idxWord >= size){
+//					match = false;
+					break;
+				}
+
+				switch(chr){
+					case '[':
+						insideGroup = true;
+						negatedGroup = false;
+						break;
+
+					case '^':
+						if(insideGroup)
+							negatedGroup = true;
+						else
+							throw new IllegalArgumentException("Wrong position of ^ character inside condition: " + condition);
+						break;
+
+					case ']':
+						if(!foundInsideGroup ^ negatedGroup){
+							match = false;
+							break;
+						}
+
+						insideGroup = false;
+						negatedGroup = false;
+						break;
+
+					case '.':
+						idxWord ++;
+						break;
+
+					default:
+						if(insideGroup){
+							if(word.charAt(idxWord) == chr)
+								foundInsideGroup = true;
+						}
+						else if(word.charAt(idxWord ++) != chr){
+							match = false;
+							break;
+						}
+				}
+			}
+
+			if(match && size >= idxWord)
 				applicableAffixes.add(entry);
 		}
 		return applicableAffixes;

@@ -27,7 +27,7 @@ public class RuleProductionEntry implements Productable{
 	private List<AffixEntry> appliedRules;
 	private final boolean combineable;
 
-	private FlagParsingStrategy strategy;
+	private final FlagParsingStrategy strategy;
 
 
 	public RuleProductionEntry(Productable productable, FlagParsingStrategy strategy){
@@ -61,6 +61,8 @@ public class RuleProductionEntry implements Productable{
 		this.ruleFlags = strategy.parseRuleFlags(ruleFlags);
 		dataFields = new String[0];
 		combineable = false;
+
+		this.strategy = strategy;
 	}
 
 	private String[] combineRuleFlags(String[] ruleFlags1, Set<String> ruleFlags2){

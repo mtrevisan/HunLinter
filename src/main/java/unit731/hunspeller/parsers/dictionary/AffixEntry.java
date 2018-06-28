@@ -23,8 +23,8 @@ public class AffixEntry{
 	private static final String POINT = ".";
 	private static final String ZERO = "0";
 
-	private static final String REGEX_CONDITION_SUFFIX = "%s$";
-	private static final String REGEX_CONDITION_PREFIX = "^%s";
+//	private static final String REGEX_CONDITION_SUFFIX = "%s$";
+//	private static final String REGEX_CONDITION_PREFIX = "^%s";
 
 
 	@Getter
@@ -58,7 +58,9 @@ public class AffixEntry{
 	private final String[] ruleFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
-	private final Matcher match;
+	private final String condition;
+//	@Getter
+//	private final Matcher match;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
@@ -85,8 +87,10 @@ public class AffixEntry{
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
 		ruleFlags = (classes.length > 0? classes: null);
-		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
-		match = (!POINT.equals(regexToMatch)? PatternService.matcher(String.format(conditionPattern, regexToMatch)): null);
+		condition = (isSuffix()? regexToMatch: "^" + regexToMatch);
+//		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
+//		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
+//		match = (!POINT.equals(regexToMatch)? PatternService.matcher(condition): null);
 		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
 		add = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 

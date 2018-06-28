@@ -15,6 +15,39 @@ import unit731.hunspeller.services.FileService;
 public class WordGeneratorTest{
 
 	@Test
+	public void conditions() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 5")
+			.add("SFX A 0 a .")
+			.add("SFX A 0 b b")
+			.add("SFX A 0 c [ab]")
+			.add("SFX A 0 d [^ab]")
+			.add("SFX A 0 e a[^ab]b")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		AffixParser parser = new AffixParser();
+		parser.parse(affFile);
+		WordGenerator generator = new WordGenerator(parser);
+		String line = "a/A";
+		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+
+		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+
+		Assert.assertEquals(4, stems.size());
+		//base production
+		Assert.assertEquals(new RuleProductionEntry("a", "A", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new RuleProductionEntry("aa", "", strategy), stems.get(1));
+		Assert.assertEquals(new RuleProductionEntry("ac", "", strategy), stems.get(3));
+		Assert.assertEquals(new RuleProductionEntry("ad", "A", strategy), stems.get(4));
+		//twofold productions
+		Assert.assertEquals(new RuleProductionEntry("aba", "", strategy), stems.get(5));
+		Assert.assertEquals(new RuleProductionEntry("ada", "", strategy), stems.get(6));
+	}
+
+	@Test
 	public void stems() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
