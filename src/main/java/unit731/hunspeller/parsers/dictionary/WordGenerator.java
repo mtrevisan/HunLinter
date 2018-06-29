@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
-import unit731.hunspeller.services.PatternService;
 
 
 @AllArgsConstructor
