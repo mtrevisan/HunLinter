@@ -35,16 +35,12 @@ public class WordGeneratorTest{
 
 		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
 
-		Assert.assertEquals(4, stems.size());
+		Assert.assertEquals(3, stems.size());
 		//base production
 		Assert.assertEquals(new RuleProductionEntry("a", "A", strategy), stems.get(0));
 		//onefold productions
 		Assert.assertEquals(new RuleProductionEntry("aa", "", strategy), stems.get(1));
-		Assert.assertEquals(new RuleProductionEntry("ac", "", strategy), stems.get(3));
-		Assert.assertEquals(new RuleProductionEntry("ad", "A", strategy), stems.get(4));
-		//twofold productions
-		Assert.assertEquals(new RuleProductionEntry("aba", "", strategy), stems.get(5));
-		Assert.assertEquals(new RuleProductionEntry("ada", "", strategy), stems.get(6));
+		Assert.assertEquals(new RuleProductionEntry("ac", "", strategy), stems.get(2));
 	}
 
 	@Test

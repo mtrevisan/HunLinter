@@ -265,15 +265,16 @@ public class WordGenerator{
 		for(AffixEntry entry : entries){
 			boolean match = true;
 
-			int idxWord = 0;
 			int size = word.length();
 			boolean insideGroup = false;
 			boolean negatedGroup = false;
 			boolean foundInsideGroup = false;
+			AffixEntry.Type type = entry.getType();
+			int idxWord = (type == AffixEntry.Type.PREFIX? 0: size - 1);
 			String condition = entry.getCondition();
 			for(char chr : condition.toCharArray()){
-				if(idxWord >= size){
-//					match = false;
+				if(idxWord < 0 || idxWord >= size){
+					match = false;
 					break;
 				}
 
@@ -301,7 +302,7 @@ public class WordGenerator{
 						break;
 
 					case '.':
-						idxWord ++;
+						idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
 						break;
 
 					default:
@@ -309,14 +310,17 @@ public class WordGenerator{
 							if(word.charAt(idxWord) == chr)
 								foundInsideGroup = true;
 						}
-						else if(word.charAt(idxWord ++) != chr){
-							match = false;
-							break;
+						else{
+							if(word.charAt(idxWord) != chr){
+								match = false;
+								break;
+							}
+							idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
 						}
 				}
 			}
 
-			if(match && size >= idxWord)
+			if(match && (idxWord < 0 || size >= idxWord))
 				applicableAffixes.add(entry);
 		}
 		return applicableAffixes;

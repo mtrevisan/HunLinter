@@ -23,9 +23,6 @@ public class AffixEntry{
 	private static final String POINT = ".";
 	private static final String ZERO = "0";
 
-//	private static final String REGEX_CONDITION_SUFFIX = "%s$";
-//	private static final String REGEX_CONDITION_PREFIX = "^%s";
-
 
 	@Getter
 	public static enum Type{
@@ -59,8 +56,6 @@ public class AffixEntry{
 	/** condition that must be met before the affix can be applied */
 	@Getter
 	private final String condition;
-//	@Getter
-//	private final Matcher match;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
@@ -81,28 +76,24 @@ public class AffixEntry{
 		String removal = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
-		String regexToMatch = (lineParts.length > 4? lineParts[4]: POINT);
+		condition = (lineParts.length > 4? lineParts[4]: POINT);
 		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
 		ruleFlags = (classes.length > 0? classes: null);
-		condition = (isSuffix()? regexToMatch: "^" + regexToMatch);
-//		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
-//		String conditionPattern = (isSuffix()? REGEX_CONDITION_SUFFIX: REGEX_CONDITION_PREFIX);
-//		match = (!POINT.equals(regexToMatch)? PatternService.matcher(condition): null);
 		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
 		add = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
 		if(removeLength > 0){
 			if(isSuffix()){
-				if(!regexToMatch.endsWith(removal))
+				if(!condition.endsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not ends with the removal part: " + line);
 				if(add.length() > 1 && removal.charAt(0) == add.charAt(0))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
 			else{
-				if(!regexToMatch.startsWith(removal))
+				if(!condition.startsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not starts with the removal part: " + line);
 				if(add.length() > 1 && removal.charAt(removal.length() - 1) == add.charAt(add.length() - 1))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
