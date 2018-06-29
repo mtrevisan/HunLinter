@@ -533,9 +533,8 @@ public class AffixParser{
 
 	public String applyConversionTable(String word, ConversionTableType type){
 		Map<String, String> table = getData(type == ConversionTableType.INPUT? TAG_INPUT_CONVERSION_TABLE: TAG_OUTPUT_CONVERSION_TABLE);
-		//TODO
-
-		return word;
+		int size = table.size();
+		return StringUtils.replaceEachRepeatedly(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
 	}
 
 }
