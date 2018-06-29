@@ -17,14 +17,12 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
-	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
-
 	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 	private static final Pattern PATTERN_SLASH = PatternService.pattern("/");
-
 	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
-	private static final String POINT = ".";
+	private static final String DOT = ".";
 	private static final String ZERO = "0";
 
 
@@ -80,7 +78,7 @@ public class AffixEntry{
 		String removal = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
-		String cond = (lineParts.length > 4? lineParts[4]: POINT);
+		String cond = (lineParts.length > 4? lineParts[4]: DOT);
 		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
 		type = Type.toEnum(ruleType);

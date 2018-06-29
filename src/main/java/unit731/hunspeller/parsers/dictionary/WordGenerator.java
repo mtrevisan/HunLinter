@@ -248,18 +248,6 @@ public class WordGenerator{
 		return productions;
 	}
 
-//	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
-//		//extract the list of applicable affixes...
-//		List<AffixEntry> applicableAffixes = new ArrayList<>();
-//		for(AffixEntry entry : entries){
-//			Matcher match = entry.getMatch();
-//			//... only if it matches the given word...
-//			if(Objects.isNull(match) || PatternService.find(word, match))
-//				applicableAffixes.add(entry);
-//		}
-//		return applicableAffixes;
-//	}
-
 	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
 		//extract the list of applicable affixes...
 		List<AffixEntry> applicableAffixes = new ArrayList<>();
@@ -285,6 +273,7 @@ public class WordGenerator{
 					}
 					else
 						match = (word.charAt(idxWord) == firstChar);
+
 					if(!match)
 						break;
 				}
@@ -297,5 +286,17 @@ public class WordGenerator{
 		}
 		return applicableAffixes;
 	}
+
+//	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+//		//extract the list of applicable affixes...
+//		List<AffixEntry> applicableAffixes = new ArrayList<>();
+//		for(AffixEntry entry : entries){
+//			Matcher match = entry.getMatch();
+//			//... only if it matches the given word...
+//			if(Objects.isNull(match) || PatternService.find(word, match))
+//				applicableAffixes.add(entry);
+//		}
+//		return applicableAffixes;
+//	}
 
 }
