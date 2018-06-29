@@ -18,12 +18,13 @@ public class WordGeneratorTest{
 	public void conditions() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 5")
+			.add("SFX A Y 6")
 			.add("SFX A 0 a .")
 			.add("SFX A 0 b b")
 			.add("SFX A 0 c [ab]")
 			.add("SFX A 0 d [^ab]")
-			.add("SFX A 0 e a[^ab]b")
+			.add("SFX A 0 e [^c]")
+			.add("SFX A 0 f a[^ab]b")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		AffixParser parser = new AffixParser();
@@ -35,12 +36,13 @@ public class WordGeneratorTest{
 
 		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
 
-		Assert.assertEquals(3, stems.size());
+		Assert.assertEquals(4, stems.size());
 		//base production
 		Assert.assertEquals(new RuleProductionEntry("a", "A", strategy), stems.get(0));
 		//onefold productions
 		Assert.assertEquals(new RuleProductionEntry("aa", "", strategy), stems.get(1));
 		Assert.assertEquals(new RuleProductionEntry("ac", "", strategy), stems.get(2));
+		Assert.assertEquals(new RuleProductionEntry("ae", "", strategy), stems.get(3));
 	}
 
 	@Test

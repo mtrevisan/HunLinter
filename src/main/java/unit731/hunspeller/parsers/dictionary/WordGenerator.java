@@ -282,28 +282,27 @@ public class WordGenerator{
 					case '[':
 						insideGroup = true;
 						negatedGroup = false;
-						break;
-
-					case '^':
-						if(insideGroup)
-							negatedGroup = true;
-						else
-							throw new IllegalArgumentException("Wrong position of ^ character inside condition: " + condition);
+						foundInsideGroup = false;
 						break;
 
 					case ']':
-						if(!foundInsideGroup ^ negatedGroup){
-							match = false;
-							break;
+						if(insideGroup){
+							idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
+
+							if(!foundInsideGroup ^ negatedGroup){
+								match = false;
+								break;
+							}
 						}
 
 						insideGroup = false;
-						negatedGroup = false;
 						break;
 
-					case '.':
-						idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
-						break;
+					case '^':
+						if(insideGroup){
+							negatedGroup = true;
+							break;
+						}
 
 					default:
 						if(insideGroup){
@@ -311,7 +310,7 @@ public class WordGenerator{
 								foundInsideGroup = true;
 						}
 						else{
-							if(word.charAt(idxWord) != chr){
+							if(chr != '.' && word.charAt(idxWord) != chr){
 								match = false;
 								break;
 							}
@@ -320,7 +319,7 @@ public class WordGenerator{
 				}
 			}
 
-			if(match && (idxWord < 0 || size >= idxWord))
+			if(match)
 				applicableAffixes.add(entry);
 		}
 		return applicableAffixes;

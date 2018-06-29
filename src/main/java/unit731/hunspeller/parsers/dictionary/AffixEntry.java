@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,10 +17,12 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
-	private static final Matcher REGEX_ENTRY = PatternService.matcher("\t.*$");
+	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
 	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 	private static final Pattern PATTERN_SLASH = PatternService.pattern("/");
+
+	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String POINT = ".";
 	private static final String ZERO = "0";
@@ -55,7 +59,7 @@ public class AffixEntry{
 	private final String[] ruleFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
-	private final String condition;
+	private String condition;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
@@ -100,7 +104,15 @@ public class AffixEntry{
 			}
 		}
 
-		entry = PatternService.clear(line, REGEX_ENTRY);
+
+		if(type == AffixEntry.Type.SUFFIX){
+			//invert condition
+			String[] cond = PatternService.split(condition, PATTERN_CONDITION_SPLITTER);
+			Collections.reverse(Arrays.asList(cond));
+			condition = String.join(StringUtils.EMPTY, cond);
+		}
+
+		entry = PatternService.clear(line, MATCHER_ENTRY);
 	}
 
 	public final boolean isSuffix(){
