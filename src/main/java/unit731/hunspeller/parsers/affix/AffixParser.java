@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +61,8 @@ public class AffixParser{
 	private static final String TAG_LANGUAGE = "LANG";
 	/** Sets characters to ignore in dictionary words, affixes and input words */
 	private static final String TAG_IGNORE = "IGNORE";
+	/** Search and suggest words with one different character replaced by a neighbor character */
+	private static final String TAG_KEY = "KEY";
 
 	//Options for suggestions
 	/** Words signed with this flag are not suggested (but still accepted when typed correctly) */
@@ -335,7 +338,7 @@ public class AffixParser{
 		RULE_FUNCTION.put(TAG_LANGUAGE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_IGNORE, FUN_COPY_OVER);
 		//Options for suggestions
-//		RULE_FUNCTION.put("KEY", FUN_COPY_OVER);
+//		RULE_FUNCTION.put(TAG_KEY, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("TRY", FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_NO_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_NO_NGRAM_SUGGEST, FUN_COPY_OVER);
@@ -421,7 +424,7 @@ public class AffixParser{
 //			addData(TAG_COMPOUND_MIN, 1);
 		//apply default charset
 		if(!containsData(TAG_CHARACTER_SET))
-			addData(TAG_CHARACTER_SET, charset);
+			addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
 		if(!containsData(TAG_LANGUAGE))
 			//try to infer language from filename
 			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
@@ -439,6 +442,8 @@ public class AffixParser{
 //			addData(TAG_PREFIX, suffixes);
 //			addData(TAG_SUFFIX, prefixes);
 //		}
+//		if(!containsData(TAG_KEY))
+//			addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B

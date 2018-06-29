@@ -48,6 +48,7 @@ public class WordGenerator{
 
 	/**
 	 * Generates a list of stems for the provided word
+	 * TODO: manage AffixParser.TAG_NEED_AFFIX, AffixParser.TAG_CIRCUMFIX, AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
 	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the stems for
 	 * @return	The list of stems for the given word
@@ -92,7 +93,6 @@ public class WordGenerator{
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
 			List<Set<String>> applyAffixes = extractAffixes(production);
-			//FIXME is it correct?
 			applyAffixes.set(1, null);
 			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
 
@@ -119,7 +119,6 @@ public class WordGenerator{
 				List<Set<String>> applyAffixes = extractAffixes(production);
 				//swap prefixes with suffixes
 				Collections.reverse(applyAffixes);
-				//FIXME is it correct?
 				applyAffixes.set(1, null);
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
