@@ -256,15 +256,20 @@ public class WordGenerator{
 	}
 
 	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+		int size = word.length();
+
 		//extract the list of applicable affixes...
 		List<AffixEntry> applicableAffixes = new ArrayList<>();
 		for(AffixEntry entry : entries){
+			String[] condition = entry.getCondition();
+			if(condition.length > size)
+				//if the length of the condition is greater than the length of the word then the rule cannot be applied
+				continue;
+
 			boolean match = true;
 
-			int size = word.length();
 			AffixEntry.Type type = entry.getType();
 			int idxWord = (type == AffixEntry.Type.PREFIX? 0: size - 1);
-			String[] condition = entry.getCondition();
 			for(String conditionPart : condition){
 				if(idxWord < 0 || idxWord >= size){
 					match = false;
