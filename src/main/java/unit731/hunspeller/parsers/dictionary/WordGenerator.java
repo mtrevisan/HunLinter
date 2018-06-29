@@ -54,6 +54,10 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
+		//convert using input table
+//		String word = affParser.applyConversionTable(dicEntry.getWord(), AffixParser.ConversionTableType.INPUT);
+//		dicEntry.setWord(word);
+
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
 		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
@@ -66,6 +70,9 @@ public class WordGenerator{
 		productions.addAll(twofoldProductions);
 		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 		productions.addAll(lastfoldProductions);
+
+		//convert using output table
+//		productions.forEach(production -> production.setWord(affParser.applyConversionTable(production.getWord(), AffixParser.ConversionTableType.OUTPUT))));
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
 
@@ -141,6 +148,8 @@ public class WordGenerator{
 	}
 
 	public boolean isAffixProductive(String word, String affix){
+		//TODO convert input
+
 		boolean productive = false;
 		RuleEntry rule = affParser.getData(affix);
 		if(Objects.nonNull(rule)){

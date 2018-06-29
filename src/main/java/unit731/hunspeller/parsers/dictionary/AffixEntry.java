@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,17 +27,14 @@ public class AffixEntry{
 	private static final String ZERO = "0";
 
 
-	@Getter
+	@AllArgsConstructor
 	public static enum Type{
 		SUFFIX("SFX"),
 		PREFIX("PFX");
 
 
+		@Getter
 		private final String flag;
-
-		Type(String flag){
-			this.flag = flag;
-		}
 
 		public static Type toEnum(String flag){
 			Type[] types = Type.values();
