@@ -7,6 +7,7 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 public interface Productable{
 
 	String getWord();
+	void setWord(String word);
 	String[] getRuleFlags();
 	String[] getDataFields();
 

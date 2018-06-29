@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
@@ -20,10 +21,9 @@ public class DictionaryEntry implements Productable{
 	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<dataFields>.+))?$");
 	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
-	private static final String TAB = "\t";
 
-
-	private final String word;
+	@Setter
+	private String word;
 	private final String[] ruleFlags;
 	private final String[] dataFields;
 	private final boolean combineable;

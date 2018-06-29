@@ -10,6 +10,7 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,8 @@ import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 @EqualsAndHashCode(of = {"word", "ruleFlags", "dataFields"})
 public class RuleProductionEntry implements Productable{
 
-	private final String word;
+	@Setter
+	private String word;
 	private final String[] ruleFlags;
 	private final String[] dataFields;
 	private List<AffixEntry> appliedRules;

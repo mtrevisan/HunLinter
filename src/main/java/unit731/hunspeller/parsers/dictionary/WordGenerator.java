@@ -55,8 +55,7 @@ public class WordGenerator{
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
 		//convert using input table
-		//TODO
-		String word = affParser.applyConversionTable(dicEntry.getWord(), AffixParser.ConversionTableType.INPUT);
+		String word = affParser.applyInputConversionTable(dicEntry.getWord());
 		dicEntry.setWord(word);
 
 		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
@@ -73,8 +72,7 @@ public class WordGenerator{
 		productions.addAll(lastfoldProductions);
 
 		//convert using output table
-		//TODO
-		productions.forEach(production -> production.setWord(affParser.applyConversionTable(production.getWord(), AffixParser.ConversionTableType.OUTPUT))));
+		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
 //		productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
 

@@ -137,7 +137,7 @@ public class AffixParser{
 
 
 	@AllArgsConstructor
-	public static enum ConversionTableType{
+	private static enum ConversionTableType{
 		INPUT(TAG_INPUT_CONVERSION_TABLE),
 		OUTPUT(TAG_OUTPUT_CONVERSION_TABLE);
 
@@ -531,10 +531,20 @@ public class AffixParser{
 		return strategy;
 	}
 
-	public String applyConversionTable(String word, ConversionTableType type){
-		Map<String, String> table = getData(type == ConversionTableType.INPUT? TAG_INPUT_CONVERSION_TABLE: TAG_OUTPUT_CONVERSION_TABLE);
-		int size = table.size();
-		return StringUtils.replaceEachRepeatedly(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+	public String applyInputConversionTable(String word){
+		return applyConversionTable(word, getData(TAG_INPUT_CONVERSION_TABLE));
+	}
+
+	public String applyOutputConversionTable(String word){
+		return applyConversionTable(word, getData(TAG_OUTPUT_CONVERSION_TABLE));
+	}
+
+	private String applyConversionTable(String word, Map<String, String> table){
+		if(table != null){
+			int size = table.size();
+			word = StringUtils.replaceEachRepeatedly(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+		}
+		return word;
 	}
 
 }
