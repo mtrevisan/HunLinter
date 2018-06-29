@@ -59,7 +59,7 @@ public class AffixEntry{
 	private final String[] ruleFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
-	private String condition;
+	private final String[] condition;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
@@ -80,36 +80,33 @@ public class AffixEntry{
 		String removal = lineParts[2];
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
-		condition = (lineParts.length > 4? lineParts[4]: POINT);
+		String cond = (lineParts.length > 4? lineParts[4]: POINT);
 		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
 		ruleFlags = (classes.length > 0? classes: null);
+		condition = PatternService.split(cond, PATTERN_CONDITION_SPLITTER);
+		if(type == AffixEntry.Type.SUFFIX){
+			//invert condition
+			Collections.reverse(Arrays.asList(condition));
+		}
 		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
 		add = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
 		if(removeLength > 0){
 			if(isSuffix()){
-				if(!condition.endsWith(removal))
+				if(!cond.endsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not ends with the removal part: " + line);
 				if(add.length() > 1 && removal.charAt(0) == add.charAt(0))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
 			else{
-				if(!condition.startsWith(removal))
+				if(!cond.startsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not starts with the removal part: " + line);
 				if(add.length() > 1 && removal.charAt(removal.length() - 1) == add.charAt(add.length() - 1))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
-		}
-
-
-		if(type == AffixEntry.Type.SUFFIX){
-			//invert condition
-			String[] cond = PatternService.split(condition, PATTERN_CONDITION_SPLITTER);
-			Collections.reverse(Arrays.asList(cond));
-			condition = String.join(StringUtils.EMPTY, cond);
 		}
 
 		entry = PatternService.clear(line, MATCHER_ENTRY);

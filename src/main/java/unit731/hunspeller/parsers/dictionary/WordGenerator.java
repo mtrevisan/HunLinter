@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -266,57 +267,29 @@ public class WordGenerator{
 			boolean match = true;
 
 			int size = word.length();
-			boolean insideGroup = false;
-			boolean negatedGroup = false;
-			boolean foundInsideGroup = false;
 			AffixEntry.Type type = entry.getType();
 			int idxWord = (type == AffixEntry.Type.PREFIX? 0: size - 1);
-			String condition = entry.getCondition();
-			for(char chr : condition.toCharArray()){
+			String[] condition = entry.getCondition();
+			for(String conditionPart : condition){
 				if(idxWord < 0 || idxWord >= size){
 					match = false;
 					break;
 				}
 
-				switch(chr){
-					case '[':
-						insideGroup = true;
-						negatedGroup = false;
-						foundInsideGroup = false;
+				char firstChar = conditionPart.charAt(0);
+				if(firstChar != '.'){
+					if(firstChar == '['){
+						boolean negatedGroup = (conditionPart.charAt(1) == '^');
+						conditionPart = conditionPart.substring(1 + (negatedGroup? 1: 0), conditionPart.length() - 1);
+						match = (negatedGroup ^ StringUtils.contains(conditionPart, word.charAt(idxWord)));
+					}
+					else
+						match = (word.charAt(idxWord) == firstChar);
+					if(!match)
 						break;
-
-					case ']':
-						if(insideGroup){
-							idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
-
-							if(!foundInsideGroup ^ negatedGroup){
-								match = false;
-								break;
-							}
-						}
-
-						insideGroup = false;
-						break;
-
-					case '^':
-						if(insideGroup){
-							negatedGroup = true;
-							break;
-						}
-
-					default:
-						if(insideGroup){
-							if(word.charAt(idxWord) == chr)
-								foundInsideGroup = true;
-						}
-						else{
-							if(chr != '.' && word.charAt(idxWord) != chr){
-								match = false;
-								break;
-							}
-							idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
-						}
 				}
+
+				idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
 			}
 
 			if(match)
