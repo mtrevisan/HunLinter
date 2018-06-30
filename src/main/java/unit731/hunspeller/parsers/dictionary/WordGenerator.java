@@ -255,46 +255,11 @@ public class WordGenerator{
 	}
 
 	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
-		int size = word.length();
-
 		//extract the list of applicable affixes...
 		List<AffixEntry> applicableAffixes = new ArrayList<>();
-		for(AffixEntry entry : entries){
-			String[] condition = entry.getCondition();
-			if(condition.length > size)
-				//if the length of the condition is greater than the length of the word then the rule cannot be applied
-				continue;
-
-			boolean match = true;
-
-			AffixEntry.Type type = entry.getType();
-			int idxWord = (type == AffixEntry.Type.PREFIX? 0: size - 1);
-			for(String conditionPart : condition){
-				if(idxWord < 0 || idxWord >= size){
-					match = false;
-					break;
-				}
-
-				char firstChar = conditionPart.charAt(0);
-				if(firstChar != '.'){
-					if(firstChar == '['){
-						boolean negatedGroup = (conditionPart.charAt(1) == '^');
-						conditionPart = conditionPart.substring(1 + (negatedGroup? 1: 0), conditionPart.length() - 1);
-						match = (negatedGroup ^ StringUtils.contains(conditionPart, word.charAt(idxWord)));
-					}
-					else
-						match = (word.charAt(idxWord) == firstChar);
-
-					if(!match)
-						break;
-				}
-
-				idxWord += (type == AffixEntry.Type.PREFIX? 1: -1);
-			}
-
-			if(match)
+		for(AffixEntry entry : entries)
+			if(entry.match(word))
 				applicableAffixes.add(entry);
-		}
 		return applicableAffixes;
 	}
 

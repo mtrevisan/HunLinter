@@ -20,7 +20,6 @@ public class AffixEntry{
 
 	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 	private static final Pattern PATTERN_SLASH = PatternService.pattern("/");
-	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
 	private static final String DOT = ".";
@@ -55,7 +54,7 @@ public class AffixEntry{
 	private final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
-	private final String[] condition;
+	private final AffixCondition condition;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
@@ -82,7 +81,7 @@ public class AffixEntry{
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));
 		continuationFlags = (classes.length > 0? classes: null);
-		condition = PatternService.split(cond, PATTERN_CONDITION_SPLITTER);
+		condition = new AffixCondition(cond);
 		if(type == AffixEntry.Type.SUFFIX){
 			//invert condition
 			Collections.reverse(Arrays.asList(condition));
@@ -110,6 +109,10 @@ public class AffixEntry{
 
 	public final boolean isSuffix(){
 		return (type == Type.SUFFIX);
+	}
+
+	boolean match(String word){
+		return condition.match(word, type);
 	}
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
