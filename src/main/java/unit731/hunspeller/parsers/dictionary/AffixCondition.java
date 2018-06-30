@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -13,8 +15,12 @@ public class AffixCondition{
 	private final String[] condition;
 
 
-	public AffixCondition(String condition){
+	public AffixCondition(String condition, AffixEntry.Type affixType){
 		this.condition = PatternService.split(condition, PATTERN_CONDITION_SPLITTER);
+
+		if(affixType == AffixEntry.Type.SUFFIX)
+			//invert condition
+			Collections.reverse(Arrays.asList(this.condition));
 	}
 
 	public boolean match(String word, AffixEntry.Type type){

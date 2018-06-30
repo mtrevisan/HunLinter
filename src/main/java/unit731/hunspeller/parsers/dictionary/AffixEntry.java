@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,6 +54,7 @@ public class AffixEntry{
 	@Getter
 	private final AffixCondition condition;
 	/** string to strip */
+//	private final String removing;
 	private final int removeLength;
 	/** string to append */
 	private final String appending;
@@ -81,12 +80,9 @@ public class AffixEntry{
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));
 		continuationFlags = (classes.length > 0? classes: null);
-		condition = new AffixCondition(cond);
-		if(type == AffixEntry.Type.SUFFIX){
-			//invert condition
-			Collections.reverse(Arrays.asList(condition));
-		}
+		condition = new AffixCondition(cond, type);
 		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
+//		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
 		if(removeLength > 0){
@@ -121,6 +117,11 @@ public class AffixEntry{
 
 		return (isSuffix()? word.substring(0, word.length() - removeLength) + appending: appending + word.substring(removeLength));
 	}
+
+//	public String undoRule(String word) throws IllegalArgumentException{
+//		int stripLength = appending.length();
+//		return (isSuffix()? word.substring(0, word.length() - stripLength) + removing: removing + word.substring(stripLength));
+//	}
 
 	@Override
 	public String toString(){
