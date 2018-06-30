@@ -21,7 +21,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 
 	@Override
-	public String[] parseRuleFlags(String textFlags){
+	public String[] parseFlags(String textFlags){
 		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_COMMA)):
 			new String[0]);
 		for(String flag : flags){
@@ -38,7 +38,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 	}
 
 	@Override
-	public String joinRuleFlags(String[] textFlags){
+	public String joinFlags(String[] textFlags){
 		if(Objects.isNull(textFlags) || textFlags.length == 0)
 			return StringUtils.EMPTY;
 

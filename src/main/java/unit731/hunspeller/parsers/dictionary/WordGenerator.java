@@ -102,9 +102,9 @@ public class WordGenerator{
 				prod.prependAppliedRules(appliedRules);
 
 				//check correctness
-				if(prod.hasRuleFlags())
+				if(prod.hasContinuationFlags())
 					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
-						+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
+						+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 			}
 
 			twofoldProductions.addAll(productions);
@@ -128,9 +128,9 @@ public class WordGenerator{
 					prod.prependAppliedRules(appliedRules);
 
 					//check correctness
-					if(prod.hasRuleFlags())
+					if(prod.hasContinuationFlags())
 						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
-							+ Arrays.stream(prod.getRuleFlags()).collect(Collectors.joining(", ")) + ")");
+							+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 				}
 
 				lastfoldProductions.addAll(prods);
@@ -139,7 +139,7 @@ public class WordGenerator{
 	}
 
 	private List<Set<String>> extractAffixes(Productable productable){
-		Affixes affixes = separateAffixes(productable.getRuleFlags());
+		Affixes affixes = separateAffixes(productable.getContinuationFlags());
 		List<Set<String>> applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
 		if(!affParser.isComplexPrefixes())
 			Collections.reverse(applyAffixes);
@@ -161,31 +161,31 @@ public class WordGenerator{
 	/**
 	 * Separate the prefixes from the suffixes
 	 * 
-	 * @param ruleFlags	List of flags
+	 * @param continuationFlags	List of flags
 	 * @return	An object with separated flags, one for each group
 	 */
-	private Affixes separateAffixes(String[] ruleFlags) throws IllegalArgumentException{
+	private Affixes separateAffixes(String[] continuationFlags) throws IllegalArgumentException{
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
-		if(Objects.nonNull(ruleFlags)){
+		if(Objects.nonNull(continuationFlags)){
 			String keepCaseFlag = affParser.getKeepCaseFlag();
-			for(String ruleFlag : ruleFlags){
-				if(ruleFlag.equals(keepCaseFlag))
+			for(String continuationFlag : continuationFlags){
+				if(continuationFlag.equals(keepCaseFlag))
 					continue;
 
-				Object rule = affParser.getData(ruleFlag);
+				Object rule = affParser.getData(continuationFlag);
 				if(Objects.isNull(rule))
-					throw new IllegalArgumentException("Non–existent rule " + ruleFlag + " found");
+					throw new IllegalArgumentException("Non–existent rule " + continuationFlag + " found");
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry)rule).isSuffix())
-						suffixes.add(ruleFlag);
+						suffixes.add(continuationFlag);
 					else
-						prefixes.add(ruleFlag);
+						prefixes.add(continuationFlag);
 				}
 				else
-					terminalAffixes.add(ruleFlag);
+					terminalAffixes.add(continuationFlag);
 			}
 		}
 
@@ -199,7 +199,7 @@ public class WordGenerator{
 		List<RuleProductionEntry> productions = new ArrayList<>();
 		if(!appliedAffixes.isEmpty()){
 			String word = productable.getWord();
-			String[] dataFields = productable.getDataFields();
+			String[] morphologicalFields = productable.getMorphologicalFields();
 
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
@@ -244,7 +244,7 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					RuleProductionEntry production = new RuleProductionEntry(newWord, dataFields, entry, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, morphologicalFields, entry, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
 
 					productions.add(production);
 				}

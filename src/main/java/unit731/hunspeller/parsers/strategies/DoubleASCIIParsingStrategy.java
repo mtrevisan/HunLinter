@@ -17,7 +17,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 
 	@Override
-	public String[] parseRuleFlags(String textFlags){
+	public String[] parseFlags(String textFlags){
 		if(Objects.nonNull(textFlags) && textFlags.length() % 2 != 0)
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
@@ -26,7 +26,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 	@Override
-	public String joinRuleFlags(String[] textFlags){
+	public String joinFlags(String[] textFlags){
 		if(Objects.isNull(textFlags) || textFlags.length == 0)
 			return StringUtils.EMPTY;
 		for(String flag : textFlags)

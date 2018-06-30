@@ -19,13 +19,13 @@ import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 
 @Getter
-@EqualsAndHashCode(of = {"word", "ruleFlags", "dataFields"})
+@EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class RuleProductionEntry implements Productable{
 
 	@Setter
 	private String word;
-	private final String[] ruleFlags;
-	private final String[] dataFields;
+	private final String[] continuationFlags;
+	private final String[] morphologicalFields;
 	private List<AffixEntry> appliedRules;
 	private final boolean combineable;
 
@@ -36,20 +36,21 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(productable);
 
 		word = productable.getWord();
-		ruleFlags = productable.getRuleFlags();
-		dataFields = productable.getDataFields();
+		continuationFlags = productable.getContinuationFlags();
+		morphologicalFields = productable.getMorphologicalFields();
 		combineable = true;
 
 		this.strategy = strategy;
 	}
 
-	public RuleProductionEntry(String word, String[] originalDataFields, AffixEntry appliedEntry, Set<String> remainingRuleFlags, boolean combineable, FlagParsingStrategy strategy){
+	public RuleProductionEntry(String word, String[] originalMorphologicalFields, AffixEntry appliedEntry, Set<String> remainingContinuationFlags,
+			boolean combineable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(appliedEntry);
 
 		this.word = word;
-		ruleFlags = combineRuleFlags(appliedEntry.getRuleFlags(), remainingRuleFlags);
-		this.dataFields = combineDataFields(originalDataFields, appliedEntry.getDataFields());
+		continuationFlags = combineContinuationFlags(appliedEntry.getContinuationFlags(), remainingContinuationFlags);
+		this.morphologicalFields = combineMorphologicalFields(originalMorphologicalFields, appliedEntry.getMorphologicalFields());
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
 		this.combineable = combineable;
@@ -58,63 +59,63 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	/** NOTE: used for testing purposes */
-	RuleProductionEntry(String word, String ruleFlags, FlagParsingStrategy strategy){
+	RuleProductionEntry(String word, String continuationFlags, FlagParsingStrategy strategy){
 		this.word = word;
-		this.ruleFlags = strategy.parseRuleFlags(ruleFlags);
-		dataFields = new String[0];
+		this.continuationFlags = strategy.parseFlags(continuationFlags);
+		morphologicalFields = new String[0];
 		combineable = false;
 
 		this.strategy = strategy;
 	}
 
-	private String[] combineRuleFlags(String[] ruleFlags1, Set<String> ruleFlags2){
+	private String[] combineContinuationFlags(String[] continuationFlags1, Set<String> continuationFlags2){
 		Set<String> flags = new HashSet<>();
-		if(Objects.nonNull(ruleFlags1))
-			flags.addAll(Arrays.asList(ruleFlags1));
-		if(Objects.nonNull(ruleFlags2) && !ruleFlags2.isEmpty())
-			flags.addAll(ruleFlags2);
+		if(Objects.nonNull(continuationFlags1))
+			flags.addAll(Arrays.asList(continuationFlags1));
+		if(Objects.nonNull(continuationFlags2) && !continuationFlags2.isEmpty())
+			flags.addAll(continuationFlags2);
 		return flags.toArray(new String[flags.size()]);
 	}
 
-	private String[] combineDataFields(String[] dataFields, String[] affixEntryDataFields){
-		List<String> newDataFields = new ArrayList<>();
+	private String[] combineMorphologicalFields(String[] morphologicalFields, String[] affixEntryMorphologicalFields){
+		List<String> newMorphologicalFields = new ArrayList<>();
 		//Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 		//	removed by splitting rules
-		if(Objects.nonNull(dataFields))
-			for(String dataField : dataFields)
-				if(!dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !dataField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
-						&& (!dataField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || Objects.isNull(affixEntryDataFields)
-							|| !Arrays.stream(affixEntryDataFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
-						&& (!dataField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || Objects.isNull(affixEntryDataFields)
-							|| !Arrays.stream(affixEntryDataFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
-					newDataFields.add(dataField);
-		if(Objects.nonNull(affixEntryDataFields))
-			newDataFields.addAll(Arrays.asList(affixEntryDataFields));
-		return newDataFields.toArray(new String[0]);
+		if(Objects.nonNull(morphologicalFields))
+			for(String morphologicalField : morphologicalFields)
+				if(!morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
+						&& (!morphologicalField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || Objects.isNull(affixEntryMorphologicalFields)
+							|| !Arrays.stream(affixEntryMorphologicalFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
+						&& (!morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || Objects.isNull(affixEntryMorphologicalFields)
+							|| !Arrays.stream(affixEntryMorphologicalFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
+					newMorphologicalFields.add(morphologicalField);
+		if(Objects.nonNull(affixEntryMorphologicalFields))
+			newMorphologicalFields.addAll(Arrays.asList(affixEntryMorphologicalFields));
+		return newMorphologicalFields.toArray(new String[0]);
 	}
 
-	public boolean hasRuleFlags(){
-		return (Objects.nonNull(ruleFlags) && ruleFlags.length > 0);
+	public boolean hasContinuationFlags(){
+		return (Objects.nonNull(continuationFlags) && continuationFlags.length > 0);
 	}
 
 	@Override
-	public boolean containsRuleFlag(String ... ruleFlags){
-		if(Objects.nonNull(this.ruleFlags))
-			for(String flag : ruleFlags)
-				if(ArrayUtils.contains(this.ruleFlags, flag))
+	public boolean containsContinuationFlag(String ... continuationFlags){
+		if(Objects.nonNull(this.continuationFlags))
+			for(String flag : continuationFlags)
+				if(ArrayUtils.contains(this.continuationFlags, flag))
 					return true;
 		return false;
 	}
 
-	public boolean hasDataFields(){
-		return (Objects.nonNull(dataFields) && dataFields.length > 0);
+	public boolean hasMorphologicalFields(){
+		return (Objects.nonNull(morphologicalFields) && morphologicalFields.length > 0);
 	}
 
 	@Override
-	public boolean containsDataField(String dataField){
-		return (Objects.nonNull(dataFields) && ArrayUtils.contains(dataFields, dataField));
+	public boolean containsMorphologicalField(String morphologicalField){
+		return (Objects.nonNull(morphologicalFields) && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
@@ -128,8 +129,8 @@ public class RuleProductionEntry implements Productable{
 		return (Objects.nonNull(appliedRules) && !appliedRules.isEmpty());
 	}
 
-	public boolean hasProductionRule(String ruleFlag){
-		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(ruleFlag)));
+	public boolean hasProductionRule(String continuationFlag){
+		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
 	}
 
 	public boolean hasProductionRule(AffixEntry.Type type){
@@ -159,16 +160,16 @@ public class RuleProductionEntry implements Productable{
 	}
 
 //	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
-	public List<String> getSignificantDataFields(){
+	public List<String> getSignificantMorphologicalFields(){
 //		List<String> significant = new ArrayList<>();
-//		if(Objects.nonNull(dataFields))
-//			for(String dataField : dataFields)
-//				if(!dataField.startsWith(WordGenerator.TAG_PHONETIC) && !dataField.startsWith(WordGenerator.TAG_STEM)
-//						&& !dataField.startsWith(WordGenerator.TAG_ALLOMORPH))
-//					significant.add(dataField);
+//		if(Objects.nonNull(morphologicalFields))
+//			for(String morphologicalField : morphologicalFields)
+//				if(!morphologicalField.startsWith(WordGenerator.TAG_PHONETIC) && !morphologicalField.startsWith(WordGenerator.TAG_STEM)
+//						&& !morphologicalField.startsWith(WordGenerator.TAG_ALLOMORPH))
+//					significant.add(morphologicalField);
 //		Collections.sort(significant, comparator);
 //		return significant.toArray(new String[0]);
-		return Arrays.stream(dataFields)
+		return Arrays.stream(morphologicalFields)
 			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
 			.sorted()
 			.collect(Collectors.toList());
@@ -178,10 +179,10 @@ public class RuleProductionEntry implements Productable{
 //	public String toString(){
 //		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
 //			.add(word)
-//			.add(AffixEntry.joinRuleFlags(ruleFlags, flag));
-//		if(Objects.nonNull(dataFields) && dataFields.length > 0)
+//			.add(AffixEntry.joinFlags(continuationFlags, flag));
+//		if(Objects.nonNull(morphologicalFields) && morphologicalFields.length > 0)
 //			sj.add("\t")
-//				.add(String.join(StringUtils.SPACE, dataFields));
+//				.add(String.join(StringUtils.SPACE, morphologicalFields));
 //		if(Objects.nonNull(rules) && rules.size() > 0)
 //			sj.add(" from ")
 //				.add(String.join(" > ", rules));
@@ -190,15 +191,15 @@ public class RuleProductionEntry implements Productable{
 
 	@Override
 	public String toString(){
-		return word + strategy.joinRuleFlags(ruleFlags);
+		return word + strategy.joinFlags(continuationFlags);
 	}
 
-	public String toStringWithSignificantDataFields(){
+	public String toStringWithSignificantMorphologicalFields(){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		List<String> significantDataFields = getSignificantDataFields();
-		if(!significantDataFields.isEmpty())
-			sj.add(String.join(StringUtils.SPACE, significantDataFields));
+		List<String> significantMorphologicalFields = getSignificantMorphologicalFields();
+		if(!significantMorphologicalFields.isEmpty())
+			sj.add(String.join(StringUtils.SPACE, significantMorphologicalFields));
 		return sj.toString();
 	}
 

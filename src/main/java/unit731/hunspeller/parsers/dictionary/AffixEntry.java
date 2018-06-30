@@ -52,16 +52,16 @@ public class AffixEntry{
 	@Getter
 	private final String flag;
 	@Getter
-	private final String[] ruleFlags;
+	private final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
 	private final String[] condition;
 	/** string to strip */
 	private final int removeLength;
 	/** string to append */
-	private final String add;
+	private final String appending;
 	@Getter
-	private final String[] dataFields;
+	private final String[] morphologicalFields;
 
 	private final String entry;
 
@@ -77,30 +77,30 @@ public class AffixEntry{
 		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
 		String addition = additionParts[0];
 		String cond = (lineParts.length > 4? lineParts[4]: DOT);
-		dataFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
+		morphologicalFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
 
 		type = Type.toEnum(ruleType);
-		String[] classes = strategy.parseRuleFlags((additionParts.length > 1? additionParts[1]: null));
-		ruleFlags = (classes.length > 0? classes: null);
+		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));
+		continuationFlags = (classes.length > 0? classes: null);
 		condition = PatternService.split(cond, PATTERN_CONDITION_SPLITTER);
 		if(type == AffixEntry.Type.SUFFIX){
 			//invert condition
 			Collections.reverse(Arrays.asList(condition));
 		}
 		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
-		add = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
+		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 
 		if(removeLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not ends with the removal part: " + line);
-				if(add.length() > 1 && removal.charAt(0) == add.charAt(0))
+				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
 			else{
 				if(!cond.startsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not starts with the removal part: " + line);
-				if(add.length() > 1 && removal.charAt(removal.length() - 1) == add.charAt(add.length() - 1))
+				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
 		}
@@ -113,10 +113,10 @@ public class AffixEntry{
 	}
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
-		if(!isFullstrip && removeLength > 0 && word.length() == removeLength)
+		if(!isFullstrip && word.length() == removeLength)
 			throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
 
-		return (isSuffix()? word.substring(0, word.length() - removeLength) + add: add + word.substring(removeLength));
+		return (isSuffix()? word.substring(0, word.length() - removeLength) + appending: appending + word.substring(removeLength));
 	}
 
 	@Override

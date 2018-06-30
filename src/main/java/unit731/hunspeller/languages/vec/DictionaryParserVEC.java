@@ -121,23 +121,23 @@ public class DictionaryParserVEC extends DictionaryParser{
 		private static final String CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD = "Cannot use {0} rule with đ or ŧ, use {1}";
 
 		private final Matcher matcher;
-		private final List<String> ruleFlags;
+		private final List<String> continuationFlags;
 		private final String error;
 
 
 		MatcherEntry(String matcher, String pattern, Object ... arguments){
 			this.matcher = PatternService.matcher(matcher);
-			ruleFlags = null;
+			continuationFlags = null;
 			this.error = MessageFormat.format(pattern, arguments);
 		}
 
-		MatcherEntry(List<String> ruleFlags, String pattern, Object ... arguments){
+		MatcherEntry(List<String> continuationFlags, String pattern, Object ... arguments){
 			matcher = null;
-			this.ruleFlags = ruleFlags;
-			//take last argument as the concatenation of the ruleFlags
+			this.continuationFlags = continuationFlags;
+			//take last argument as the concatenation of the continuationFlags
 			List<Object> args = new ArrayList<>(arguments.length + 1);
 			args.addAll(Arrays.asList(arguments));
-			args.add(String.join(" or ", ruleFlags));
+			args.add(String.join(" or ", continuationFlags));
 			this.error = MessageFormat.format(pattern, args.toArray(new Object[args.size()]));
 		}
 
@@ -362,23 +362,23 @@ public class DictionaryParserVEC extends DictionaryParser{
 	@Override
 	public void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		try{
-			if(!production.hasDataFields())
-				throw new IllegalArgumentException("Line does not contains any data fields");
+			if(!production.hasMorphologicalFields())
+				throw new IllegalArgumentException("Line does not contains any morphological fields");
 
-			dataFieldCheck(production);
+			morphologicalFieldCheck(production);
 
 			vanishingElCheck(production);
 
 			incompatibilityCheck(production);
 
-			String derivedWordWithoutDataFields = production.toString();
-			if(production.hasRuleFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
-				metaphonesisCheck(production, derivedWordWithoutDataFields);
+			String derivedWordWithoutMorphologicalFields = production.toString();
+			if(production.hasContinuationFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
+				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
-				northernPluralCheck(production, derivedWordWithoutDataFields);
+				northernPluralCheck(production, derivedWordWithoutMorphologicalFields);
 			}
 
-			mismatchCheck(derivedWordWithoutDataFields);
+			mismatchCheck(derivedWordWithoutMorphologicalFields);
 
 			finalSonorizationCheck(production);
 
@@ -401,20 +401,20 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void dataFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		String[] dataFields = production.getDataFields();
-		if(Objects.nonNull(dataFields))
-			for(String dataField : dataFields){
-				if(dataField.length() < 4)
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid data field prefix: " + dataField);
+	private void morphologicalFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		String[] morphologicalFields = production.getMorphologicalFields();
+		if(Objects.nonNull(morphologicalFields))
+			for(String morphologicalField : morphologicalFields){
+				if(morphologicalField.length() < 4)
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
 
-				String dataFieldPrefix = dataField.substring(0, 3);
-				if(!DATA_FIELDS.containsKey(dataFieldPrefix))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown data field prefix: " + dataField);
+				String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
+				if(!DATA_FIELDS.containsKey(morphologicalFieldPrefix))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
 
-				Set<String> dataFieldTypes = DATA_FIELDS.get(dataFieldPrefix);
-				if(Objects.nonNull(dataFieldTypes) && !dataFieldTypes.contains(dataField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown data field value: " + dataField);
+				Set<String> morphologicalFieldTypes = DATA_FIELDS.get(morphologicalFieldPrefix);
+				if(Objects.nonNull(morphologicalFieldTypes) && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
 			}
 	}
 
@@ -426,7 +426,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throw new IllegalArgumentException("Word with ƚ cannot contain characters from another variant, " + derivedWord);
 		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
 			throw new IllegalArgumentException("Word with ƚ near a consonant, " + derivedWord);
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsRuleFlag(NORTHERN_PLURAL_RULE))
+		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsContinuationFlag(NORTHERN_PLURAL_RULE))
 			throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
 				+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
 	}
@@ -438,19 +438,19 @@ public class DictionaryParserVEC extends DictionaryParser{
 		commonIncompatibilityCheck(production, GUA_TO_VA_RULE, GUA_TO_VA_CHECKS);
 	}
 
-	private void commonIncompatibilityCheck(RuleProductionEntry production, String ruleFlag, Set<MatcherEntry> checks)
+	private void commonIncompatibilityCheck(RuleProductionEntry production, String continuationFlag, Set<MatcherEntry> checks)
 			throws IllegalArgumentException{
-		if(production.containsRuleFlag(ruleFlag))
+		if(production.containsContinuationFlag(continuationFlag))
 			for(MatcherEntry entry : checks)
-				for(String flag : entry.ruleFlags)
-					if(production.containsRuleFlag(flag))
+				for(String flag : entry.continuationFlags)
+					if(production.containsContinuationFlag(flag))
 						throw new IllegalArgumentException(entry.error + " for " + production.getWord());
 	}
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
-			boolean hasMetaphonesisFlag = production.containsRuleFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = production.containsRuleFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
+			boolean hasMetaphonesisFlag = production.containsContinuationFlag(METAPHONESIS_RULE);
+			boolean hasPluralFlag = production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
 				ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
@@ -490,7 +490,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 //		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
-//			boolean hasFinalSonorizationFlag = production.containsRuleFlag(FINAL_SONORIZATION_RULE);
+//			boolean hasFinalSonorizationFlag = production.containsContinuationFlag(FINAL_SONORIZATION_RULE);
 //			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)
@@ -562,17 +562,17 @@ public class DictionaryParserVEC extends DictionaryParser{
 		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 			&& word.indexOf('ƚ') < 0
 			&& word.indexOf('ɉ') < 0
-			&& (production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_NOUN)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_POSSESSIVE)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_DEMONSTRATIVE)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_IDENTIFICATIVE)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_INTERROGATIVE)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_QUANTIFIER)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_PREPOSITION)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)
-			|| production.containsDataField(WordGenerator.TAG_PART_OF_SPEECH + POS_CONJUNCTION)));
+			&& (production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_NOUN)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_POSSESSIVE)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_DEMONSTRATIVE)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_IDENTIFICATIVE)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_INTERROGATIVE)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_QUANTIFIER)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_PREPOSITION)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)
+			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_CONJUNCTION)));
 	}
 
 	@Override

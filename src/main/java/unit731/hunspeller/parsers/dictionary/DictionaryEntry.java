@@ -18,14 +18,14 @@ import unit731.hunspeller.services.PatternService;
 @Getter
 public class DictionaryEntry implements Productable{
 
-	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<dataFields>.+))?$");
+	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
 	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
 
 	@Setter
 	private String word;
-	private final String[] ruleFlags;
-	private final String[] dataFields;
+	private final String[] continuationFlags;
+	private final String[] morphologicalFields;
 	private final boolean combineable;
 
 	private final FlagParsingStrategy strategy;
@@ -41,29 +41,29 @@ public class DictionaryEntry implements Productable{
 
 		word = m.group("word");
 		String dicFlags = m.group("flags");
-		ruleFlags = strategy.parseRuleFlags(dicFlags);
-		String dicDataFields = m.group("dataFields");
-		dataFields = (Objects.nonNull(dicDataFields)? PatternService.split(dicDataFields, REGEX_PATTERN_SEPARATOR): new String[0]);
+		continuationFlags = strategy.parseFlags(dicFlags);
+		String dicMorphologicalFields = m.group("morphologicalFields");
+		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? PatternService.split(dicMorphologicalFields, REGEX_PATTERN_SEPARATOR): new String[0]);
 		combineable = true;
 
 		this.strategy = strategy;
 	}
 
-	public DictionaryEntry(Productable productable, String ruleFlag, FlagParsingStrategy strategy){
+	public DictionaryEntry(Productable productable, String continuationFlags, FlagParsingStrategy strategy){
 		Objects.requireNonNull(productable);
-		Objects.requireNonNull(ruleFlag);
+		Objects.requireNonNull(continuationFlags);
 		Objects.requireNonNull(strategy);
 
 		word = productable.getWord();
-		ruleFlags = strategy.parseRuleFlags(ruleFlag);
-		dataFields = productable.getDataFields();
+		this.continuationFlags = strategy.parseFlags(continuationFlags);
+		morphologicalFields = productable.getMorphologicalFields();
 		combineable = productable.isCombineable();
 
 		this.strategy = strategy;
 	}
 
 	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
-		return Arrays.stream(ruleFlags)
+		return Arrays.stream(continuationFlags)
 			.filter(rf -> {
 				RuleEntry r = ruleEntryExtractor.apply(rf);
 				return (Objects.nonNull(r) && !r.isSuffix());
@@ -72,21 +72,21 @@ public class DictionaryEntry implements Productable{
 	}
 
 	@Override
-	public boolean containsRuleFlag(String ... ruleFlags){
-		for(String flag : this.ruleFlags)
-			if(ArrayUtils.contains(ruleFlags, flag))
+	public boolean containsContinuationFlag(String ... continuationFlags){
+		for(String flag : this.continuationFlags)
+			if(ArrayUtils.contains(continuationFlags, flag))
 				return true;
 		return false;
 	}
 
 	@Override
-	public boolean containsDataField(String dataField){
-		return ArrayUtils.contains(dataFields, dataField);
+	public boolean containsMorphologicalField(String morphologicalField){
+		return ArrayUtils.contains(morphologicalFields, morphologicalField);
 	}
 
 	@Override
 	public String toString(){
-		return word + strategy.joinRuleFlags(ruleFlags);
+		return word + strategy.joinFlags(continuationFlags);
 	}
 
 }

@@ -108,7 +108,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 						List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 
 						productions.stream()
-							.map(RuleProductionEntry::toStringWithSignificantDataFields)
+							.map(RuleProductionEntry::toStringWithSignificantMorphologicalFields)
 							.filter(text -> !bloomFilter.add(text))
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
@@ -159,7 +159,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 							for(RuleProductionEntry production : productions){
-								String text = production.toStringWithSignificantDataFields();
+								String text = production.toStringWithSignificantMorphologicalFields();
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, dictionaryWord, lineIndex));
 							}

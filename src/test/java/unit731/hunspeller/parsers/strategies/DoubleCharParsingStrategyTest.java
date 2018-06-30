@@ -12,26 +12,26 @@ public class DoubleCharParsingStrategyTest{
 
 	@Test
 	public void ok(){
-		String[] flags = strategy.parseRuleFlags("abcd");
+		String[] flags = strategy.parseFlags("abcd");
 
 		Assert.assertEquals(Arrays.asList("ab", "cd"), Arrays.asList(flags));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void notOk(){
-		strategy.parseRuleFlags("abc");
+		strategy.parseFlags("abc");
 	}
 
 	@Test
 	public void empty(){
-		String[] flags = strategy.parseRuleFlags("");
+		String[] flags = strategy.parseFlags("");
 
 		Assert.assertEquals(0, flags.length);
 	}
 
 	@Test
 	public void nullFlags(){
-		String[] flags = strategy.parseRuleFlags(null);
+		String[] flags = strategy.parseFlags(null);
 
 		Assert.assertEquals(0, flags.length);
 	}
@@ -39,42 +39,42 @@ public class DoubleCharParsingStrategyTest{
 	@Test
 	public void joinFlags(){
 		String[] flags = new String[]{"ab", "cd"};
-		String ruleFlags = strategy.joinRuleFlags(flags);
+		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/abcd", ruleFlags);
+		Assert.assertEquals("/abcd", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithError(){
 		String[] flags = new String[]{"ab", "c"};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithEmpty(){
 	String[] flags = new String[]{"ab", ""};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithNull(){
 		String[] flags = new String[]{"ab", null};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test
 	public void joinEmptyFlags(){
 		String[] flags = new String[]{};
-		String ruleFlags = strategy.joinRuleFlags(flags);
+		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertTrue(ruleFlags.isEmpty());
+		Assert.assertTrue(continuationFlags.isEmpty());
 	}
 
 	@Test
 	public void joinNullFlags(){
-		String ruleFlags = strategy.joinRuleFlags(null);
+		String continuationFlags = strategy.joinFlags(null);
 
-		Assert.assertTrue(ruleFlags.isEmpty());
+		Assert.assertTrue(continuationFlags.isEmpty());
 	}
 	
 }

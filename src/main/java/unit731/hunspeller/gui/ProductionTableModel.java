@@ -12,7 +12,7 @@ public class ProductionTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
-	private static final String[] COLUMN_NAMES = new String[]{"Production", "Data fields", "Rule 1", "Rule 2", "Rule 3"};
+	private static final String[] COLUMN_NAMES = new String[]{"Production", "Morphological fields", "Rule 1", "Rule 2", "Rule 3"};
 
 
 	private List<RuleProductionEntry> productions;
@@ -47,8 +47,8 @@ public class ProductionTableModel extends AbstractTableModel{
 				return production.getWord();
 
 			case 1:
-				String[] dataFields = production.getDataFields();
-				return (Objects.nonNull(dataFields)? String.join(StringUtils.SPACE, dataFields): StringUtils.EMPTY);
+				String[] morphologicalFields = production.getMorphologicalFields();
+				return (Objects.nonNull(morphologicalFields)? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 
 			case 2:
 				return (rulesSize > 0? rules.get(0): null);

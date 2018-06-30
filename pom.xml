@@ -9,16 +9,6 @@
 	<packaging>jar</packaging>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<includes>
-					<include>version.properties</include>
-				</includes>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-
 		<plugins>
 			<!-- Maven Source Plugin -->
 			<plugin>

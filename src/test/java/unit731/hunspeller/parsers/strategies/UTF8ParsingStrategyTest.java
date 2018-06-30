@@ -12,21 +12,21 @@ public class UTF8ParsingStrategyTest{
 
 	@Test
 	public void ok(){
-		String[] flags = strategy.parseRuleFlags("èŧ");
+		String[] flags = strategy.parseFlags("èŧ");
 
 		Assert.assertEquals(Arrays.asList("ŧ", "è"), Arrays.asList(flags));
 	}
 
 	@Test
 	public void empty(){
-		String[] flags = strategy.parseRuleFlags("");
+		String[] flags = strategy.parseFlags("");
 
 		Assert.assertEquals(0, flags.length);
 	}
 
 	@Test
 	public void nullFlags(){
-		String[] flags = strategy.parseRuleFlags(null);
+		String[] flags = strategy.parseFlags(null);
 
 		Assert.assertEquals(0, flags.length);
 	}
@@ -34,48 +34,48 @@ public class UTF8ParsingStrategyTest{
 	@Test
 	public void joinFlags(){
 		String[] flags = new String[]{"è", "ŧ"};
-		String ruleFlags = strategy.joinRuleFlags(flags);
+		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/èŧ", ruleFlags);
+		Assert.assertEquals("/èŧ", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithError(){
 		String[] flags = new String[]{"è", "aŧ"};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithNoUTF8(){
 		String[] flags = new String[]{"\\x{FFFD}"};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithEmpty(){
 		String[] flags = new String[]{"è", ""};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void joinFlagsWithNull(){
 		String[] flags = new String[]{"ŧ", null};
-		strategy.joinRuleFlags(flags);
+		strategy.joinFlags(flags);
 	}
 
 	@Test
 	public void joinEmptyFlags(){
 		String[] flags = new String[]{};
-		String ruleFlags = strategy.joinRuleFlags(flags);
+		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertTrue(ruleFlags.isEmpty());
+		Assert.assertTrue(continuationFlags.isEmpty());
 	}
 
 	@Test
 	public void joinNullFlags(){
-		String ruleFlags = strategy.joinRuleFlags(null);
+		String continuationFlags = strategy.joinFlags(null);
 
-		Assert.assertTrue(ruleFlags.isEmpty());
+		Assert.assertTrue(continuationFlags.isEmpty());
 	}
 	
 }

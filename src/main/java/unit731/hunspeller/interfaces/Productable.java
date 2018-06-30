@@ -8,24 +8,24 @@ public interface Productable{
 
 	String getWord();
 	void setWord(String word);
-	String[] getRuleFlags();
-	String[] getDataFields();
+	String[] getContinuationFlags();
+	String[] getMorphologicalFields();
 
-	boolean containsRuleFlag(String ... ruleFlags);
-	boolean containsDataField(String dataField);
+	boolean containsContinuationFlag(String ... continuationFlags);
+	boolean containsMorphologicalField(String morphologicalField);
 	boolean isCombineable();
 
-	default String getDataFieldPrefixedBy(String typePrefix){
-		String[] dataFields = getDataFields();
-		if(Objects.nonNull(dataFields))
-			for(String field : dataFields)
+	default String getMorphologicalFieldPrefixedBy(String typePrefix){
+		String[] morphologicalFields = getMorphologicalFields();
+		if(Objects.nonNull(morphologicalFields))
+			for(String field : morphologicalFields)
 				if(field.startsWith(typePrefix))
 					return field;
 		return null;
 	}
 
 	default boolean isPartOfSpeech(String partOfSpeech){
-		return containsDataField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
+		return containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
 	}
 
 }

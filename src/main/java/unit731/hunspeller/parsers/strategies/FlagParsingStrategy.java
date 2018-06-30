@@ -16,7 +16,7 @@ public interface FlagParsingStrategy{
 	 * @param textFlags	String to parse into flags
 	 * @return Parsed flags
 	 */
-	String[] parseRuleFlags(String textFlags);
+	String[] parseFlags(String textFlags);
 
 
 	/**
@@ -25,10 +25,10 @@ public interface FlagParsingStrategy{
 	 * @param textFlags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	String joinRuleFlags(String[] textFlags);
+	String joinFlags(String[] textFlags);
 
-	default String[] removeDuplicates(String[] ruleFlags){
-		return (new HashSet<>(Arrays.asList(ruleFlags))).toArray(new String[0]);
+	default String[] removeDuplicates(String[] continuationFlags){
+		return (new HashSet<>(Arrays.asList(continuationFlags))).toArray(new String[0]);
 	}
 
 }

@@ -272,7 +272,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 						lastMatchedNode = root;
 					else if(lastMatchedNode.hasValue()){
 						currentIndex = i + sequencer.length(lastMatchedNode.getKey());
-						return new SearchResult(lastMatchedNode, i);
+						return new SearchResult<>(lastMatchedNode, i);
 					}
 				}
 
