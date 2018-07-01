@@ -2,13 +2,10 @@ package unit731.hunspeller.gui;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
-import unit731.hunspeller.services.PatternService;
 
 
 public class ThesaurusTableModel extends AbstractTableModel{
@@ -17,13 +14,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String[] COLUMN_NAMES = new String[]{"Synonym", "Meanings"};
 
-	private static final String START_TAG = "<html>";
-	private static final String END_TAG = "</html>";
-	public static final String NEW_LINE_TAG = "<br>";
-
-	private static final Matcher REPLACE = PatternService.matcher("^" + START_TAG + "|" + END_TAG + "$");
-
-	private static final Pattern PATTERN_NEW_LINE = PatternService.pattern(NEW_LINE_TAG);
+	private static final String TAG_START = "<html>";
+	private static final String TAG_END = "</html>";
+	static final String TAG_NEW_LINE = "<br>";
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -57,7 +50,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				return thesaurus.getSynonym();
 
 			case 1:
-				return START_TAG + StringUtils.join(meanings, NEW_LINE_TAG) + END_TAG;
+				return TAG_START + StringUtils.join(meanings, TAG_NEW_LINE) + TAG_END;
 
 			default:
 				return null;
@@ -70,14 +63,15 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex){
+	public void setValueAt(Object value, int rowIndex, int columnIndex){
 		try{
-			String text = PatternService.clear((String)aValue, REPLACE);
+			String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
+			text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
 
 			List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
 			meanings.clear();
 
-			String[] lines = PatternService.split(text, PATTERN_NEW_LINE);
+			String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));
 		}

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
@@ -19,7 +19,6 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryEntry implements Productable{
 
 	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
-	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
 
 	@Setter
@@ -43,7 +42,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group("flags");
 		continuationFlags = strategy.parseFlags(dicFlags);
 		String dicMorphologicalFields = m.group("morphologicalFields");
-		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? PatternService.split(dicMorphologicalFields, PATTERN_SEPARATOR): new String[0]);
+		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? StringUtils.split(dicMorphologicalFields): new String[0]);
 		combineable = true;
 
 		this.strategy = strategy;

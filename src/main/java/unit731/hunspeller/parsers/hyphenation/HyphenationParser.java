@@ -68,7 +68,7 @@ public class HyphenationParser{
 	private static final String WORD_BOUNDARY = ".";
 	private static final String AUGMENTED_RULE = "/";
 
-	private static final Pattern PATTERN_COMMA = PatternService.pattern(",");
+	private static final String COMMA = ",";
 
 	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("^\\.?[^.]+\\.?$");
 	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
@@ -77,9 +77,8 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
-	private static final Pattern PATTERN_HYPHEN_MINUS = PatternService.pattern(HYPHEN_MINUS);
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
-	private static final Matcher MATCHER_HYPHENS = PatternService.matcher("[" + Pattern.quote(SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH) + "]");
+	private static final String HYPHENS = SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH;
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -370,7 +369,7 @@ public class HyphenationParser{
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
-			String[] parts = PatternService.split(rule, PATTERN_COMMA);
+			String[] parts = StringUtils.split(rule, COMMA);
 			if(parts.length > 1){
 				Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
 				m.find();
@@ -550,7 +549,7 @@ public class HyphenationParser{
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, PATTERN_HYPHEN_MINUS));
+			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHEN_MINUS));
 
 			rules = hyphenatedWord;
 		}
@@ -661,7 +660,7 @@ public class HyphenationParser{
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(PatternService.split(customHyphenation, MATCHER_HYPHENS.pattern()));
+			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHENS));
 
 			rules = hyphenatedWord;
 		}

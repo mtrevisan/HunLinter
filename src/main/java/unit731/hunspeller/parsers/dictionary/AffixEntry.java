@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,8 +15,7 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
-	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
-	private static final Pattern PATTERN_SLASH = PatternService.pattern("/");
+	private static final String SLASH = "/";
 	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
 	private static final String DOT = ".";
@@ -68,14 +66,14 @@ public class AffixEntry{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		String[] lineParts = PatternService.split(line, PATTERN_SEPARATOR, 6);
+		String[] lineParts = StringUtils.split(line, null, 6);
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		String removal = lineParts[2];
-		String[] additionParts = PatternService.split(lineParts[3], PATTERN_SLASH);
+		String[] additionParts = StringUtils.split(lineParts[3], SLASH);
 		String addition = additionParts[0];
 		String cond = (lineParts.length > 4? lineParts[4]: DOT);
-		morphologicalFields = (lineParts.length > 5? PatternService.split(lineParts[5], PATTERN_SEPARATOR): new String[0]);
+		morphologicalFields = (lineParts.length > 5? StringUtils.split(lineParts[5]): new String[0]);
 
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));

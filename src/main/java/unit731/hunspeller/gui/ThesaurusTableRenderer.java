@@ -17,7 +17,7 @@ public class ThesaurusTableRenderer extends JLabel implements TableCellRenderer{
 		String text = String.valueOf(value);
 		setText(text);
 
-		int lines = StringUtils.countMatches(text, ThesaurusTableModel.NEW_LINE_TAG);
+		int lines = StringUtils.countMatches(text, ThesaurusTableModel.TAG_NEW_LINE);
 		int height = getPreferredSize().height * Math.max(lines, 1) + 4;
 		try{
 			table.setRowHeight(row, height);

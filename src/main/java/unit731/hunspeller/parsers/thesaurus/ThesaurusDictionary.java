@@ -20,7 +20,6 @@ import unit731.hunspeller.services.PatternService;
 @Getter
 public class ThesaurusDictionary{
 
-	private static final Pattern LINE_FEED = PatternService.pattern(StringUtils.LF);
 	private static final Matcher PART_OF_SPEECH = PatternService.matcher("\\([^)]+\\)");
 
 
@@ -100,7 +99,7 @@ public class ThesaurusDictionary{
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		if(StringUtils.isNotBlank(text)){
-			String[] lines = PatternService.split(text, LINE_FEED);
+			String[] lines = StringUtils.split(text, StringUtils.LF);
 			meanings.clear();
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));

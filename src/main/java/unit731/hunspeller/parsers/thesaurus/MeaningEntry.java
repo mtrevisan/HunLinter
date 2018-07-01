@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import unit731.hunspeller.services.PatternService;
 
 
 @AllArgsConstructor
@@ -30,13 +29,13 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		Objects.requireNonNull(synonymAndMeanings);
 
 		try{
-			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.PATTERN_POS_MEANS, 2);
+			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
 
 			partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-			this.meanings = Arrays.stream(PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.PATTERN_POS_MEANS))
+			this.meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.POS_MEANS))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
 				.distinct()

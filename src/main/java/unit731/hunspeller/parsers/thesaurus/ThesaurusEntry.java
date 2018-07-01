@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +15,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -25,9 +23,8 @@ import unit731.hunspeller.services.PatternService;
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
-
-	public static final Pattern PATTERN_POS_MEANS = PatternService.pattern("[" + PIPE + ":]");
-	public static final Pattern PATTERN_MEANS = PatternService.pattern("[" + PIPE + ",]");
+	public static final String POS_MEANS = PIPE + ":";
+	public static final String MEANS = PIPE + ",";
 
 
 	@NonNull
@@ -43,7 +40,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 
-		String[] data = PatternService.split(line, PATTERN_POS_MEANS);
+		String[] data = StringUtils.split(line, POS_MEANS);
 
 		synonym = data[0];
 		int numEntries = Integer.parseInt(data[1]);

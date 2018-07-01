@@ -4,16 +4,11 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
 
 
 public class ParsingContext{
-
-	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
-
 
 	private final String line;
 	private final String[] definitionParts;
@@ -26,7 +21,7 @@ public class ParsingContext{
 		Objects.requireNonNull(br);
 
 		this.line = line;
-		definitionParts = PatternService.split(line, PATTERN_SEPARATOR);
+		definitionParts = StringUtils.split(line);
 		reader = br;
 	}
 

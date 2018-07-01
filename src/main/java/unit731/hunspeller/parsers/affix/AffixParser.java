@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -40,8 +39,6 @@ public class AffixParser{
 	public static final String FLAG_TYPE_UTF_8 = "UTF-8";
 	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
 	public static final String FLAG_TYPE_NUMERIC = "num";
-
-	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
 	//General options
 	/**
@@ -185,7 +182,7 @@ public class AffixParser{
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
-				String[] lineParts = PatternService.split(line, REGEX_PATTERN_SEPARATOR);
+				String[] lineParts = StringUtils.split(line);
 				String tag = lineParts[0];
 				if(!TAG_COMPOUND_RULE.equals(tag))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
@@ -275,7 +272,7 @@ public class AffixParser{
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
-				String[] parts = PatternService.split(line, REGEX_PATTERN_SEPARATOR);
+				String[] parts = StringUtils.split(line);
 				if(parts.length != 3)
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
