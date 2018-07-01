@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -43,7 +42,7 @@ public class AffixCondition{
 					if(firstChar == '['){
 						boolean negatedGroup = (conditionPart.charAt(1) == '^');
 						conditionPart = conditionPart.substring(1 + (negatedGroup? 1: 0), conditionPart.length() - 1);
-						match = (negatedGroup ^ StringUtils.contains(conditionPart, word.charAt(idxWord)));
+						match = (negatedGroup ^ conditionPart.indexOf(word.charAt(idxWord)) >= 0);
 					}
 					else
 						match = (word.charAt(idxWord) == firstChar);
