@@ -12,7 +12,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_EMPTY = PatternService.pattern(StringUtils.EMPTY);
+	private static final Pattern PATTERN = PatternService.pattern(StringUtils.EMPTY);
 
 
 	@Override
@@ -23,7 +23,7 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);
 
-		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_EMPTY)): new String[0]);
+		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)): new String[0]);
 		for(String flag : flags)
 			if(StringUtils.isBlank(flag))
 				throw new IllegalArgumentException("Flag must be a valid ASCII character: " + flag + " from " + textFlags);

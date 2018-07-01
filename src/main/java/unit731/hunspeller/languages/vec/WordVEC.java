@@ -50,7 +50,7 @@ public class WordVEC{
 			log.error(e.getMessage());
 		}
 	}
-	private static final Matcher REGEX_REMOVE_RULE_FLAGS = PatternService.matcher("(/[^\t]+)?\t");
+	private static final Matcher REMOVE_RULE_FLAGS = PatternService.matcher("(/[^\t]+)?\t");
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
@@ -197,8 +197,8 @@ public class WordVEC{
 
 	public static Comparator<String> sorterComparator(){
 		return (str1, str2) -> {
-			str1 = PatternService.replaceAll(str1, REGEX_REMOVE_RULE_FLAGS, SLASH_TAB);
-			str2 = PatternService.replaceAll(str2, REGEX_REMOVE_RULE_FLAGS, SLASH_TAB);
+			str1 = PatternService.replaceAll(str1, REMOVE_RULE_FLAGS, SLASH_TAB);
+			str2 = PatternService.replaceAll(str2, REMOVE_RULE_FLAGS, SLASH_TAB);
 			return COLLATOR.compare(str1, str2);
 		};
 	}

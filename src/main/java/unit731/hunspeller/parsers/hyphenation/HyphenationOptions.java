@@ -32,8 +32,8 @@ public class HyphenationOptions{
 
 	private static final String NO_HYPHEN_SEPARATOR = ",";
 
-	private static final Pattern REGEX_PATTERN_SPACE = PatternService.pattern("\\s+");
-	private static final Pattern REGEX_PATTERN_NO_HYPHEN_SEPARATOR = PatternService.pattern(NO_HYPHEN_SEPARATOR);
+	private static final Pattern PATTERN_SPACE = PatternService.pattern("\\s+");
+	private static final Pattern PATTERN_NO_HYPHEN_SEPARATOR = PatternService.pattern(NO_HYPHEN_SEPARATOR);
 
 
 	@Builder.Default private int leftMin = 2;
@@ -83,14 +83,14 @@ public class HyphenationOptions{
 			managed = true;
 		}
 		else if(line.startsWith(NO_HYPHEN)){
-			noHyphen.addAll(Arrays.asList(PatternService.split(extractValue(line), REGEX_PATTERN_NO_HYPHEN_SEPARATOR)));
+			noHyphen.addAll(Arrays.asList(PatternService.split(extractValue(line), PATTERN_NO_HYPHEN_SEPARATOR)));
 			managed = true;
 		}
 		return managed;
 	}
 
 	private String extractValue(String line){
-		String[] components = PatternService.split(line, REGEX_PATTERN_SPACE);
+		String[] components = PatternService.split(line, PATTERN_SPACE);
 		return StringUtils.strip(components[1]);
 	}
 

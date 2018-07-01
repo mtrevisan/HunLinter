@@ -10,7 +10,7 @@ import unit731.hunspeller.services.PatternService;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	private static final Matcher REGEX_APOSTROPHE = PatternService.matcher("['‘’]");
+	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘’]");
 
 	protected static final String APOSTROPHE = "ʼ";
 
@@ -29,7 +29,7 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternService.replaceAll(word, REGEX_APOSTROPHE, APOSTROPHE);
+		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

@@ -177,7 +177,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		LOCK_SAVING.lock();
 
 		try{
-			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_POS_MEANS, 2);
+			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.PATTERN_POS_MEANS, 2);
 			if(partOfSpeechAndMeanings.length != 2)
 				throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
 
@@ -190,7 +190,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				sb.append(')');
 			partOfSpeech = sb.toString();
 
-			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_MEANS);
+			String[] means = PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.PATTERN_MEANS);
 			List<String> meanings = Arrays.stream(means)
 				.filter(StringUtils::isNotBlank)
 				.map(String::trim)

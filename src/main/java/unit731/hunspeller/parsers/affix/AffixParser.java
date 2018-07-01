@@ -136,7 +136,7 @@ public class AffixParser{
 	/** Define output conversion table */
 	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
 
-	private static final Matcher REGEX_COMMENT = PatternService.matcher("^$|^\\s*#.*$");
+	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
 
 	@AllArgsConstructor
@@ -461,7 +461,7 @@ public class AffixParser{
 	 */
 	private String removeComment(String line){
 		//remove comments
-		line = PatternService.clear(line, REGEX_COMMENT);
+		line = PatternService.clear(line, COMMENT);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}

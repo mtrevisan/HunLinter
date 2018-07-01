@@ -17,12 +17,12 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Pattern REGEX_PATTERN_COMMA = PatternService.pattern(COMMA);
+	private static final Pattern PATTERN = PatternService.pattern(COMMA);
 
 
 	@Override
 	public String[] parseFlags(String textFlags){
-		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_COMMA)):
+		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)):
 			new String[0]);
 		for(String flag : flags){
 			try{

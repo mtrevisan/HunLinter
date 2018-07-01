@@ -13,7 +13,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_DOUBLE = PatternService.pattern("(?<=\\G.{2})");
+	private static final Pattern PATTERN = PatternService.pattern("(?<=\\G.{2})");
 
 
 	@Override
@@ -21,7 +21,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		if(Objects.nonNull(textFlags) && textFlags.length() % 2 != 0)
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
-		return (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_DOUBLE)):
+		return (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)):
 			new String[0]);
 	}
 

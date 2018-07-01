@@ -26,8 +26,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
 
-	public static final Pattern REGEX_PATTERN_POS_MEANS = PatternService.pattern("[" + PIPE + ":]");
-	public static final Pattern REGEX_PATTERN_MEANS = PatternService.pattern("[" + PIPE + ",]");
+	public static final Pattern PATTERN_POS_MEANS = PatternService.pattern("[" + PIPE + ":]");
+	public static final Pattern PATTERN_MEANS = PatternService.pattern("[" + PIPE + ",]");
 
 
 	@NonNull
@@ -42,7 +42,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 
-		String[] data = PatternService.split(line, REGEX_PATTERN_POS_MEANS);
+		String[] data = PatternService.split(line, PATTERN_POS_MEANS);
 
 		synonym = data[0];
 		int numEntries = Integer.parseInt(data[1]);

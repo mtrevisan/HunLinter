@@ -12,7 +12,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern REGEX_PATTERN_EMPTY = PatternService.pattern(StringUtils.EMPTY);
+	private static final Pattern PATTERN = PatternService.pattern(StringUtils.EMPTY);
 
 
 	@Override
@@ -23,7 +23,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
 
-		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, REGEX_PATTERN_EMPTY)): new String[0]);
+		String[] flags = (!textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)): new String[0]);
 		for(String flag : flags)
 			if(StringUtils.isBlank(flag))
 				throw new IllegalArgumentException("Flag must be a valid UTF-8 character: " + flag + " from " + textFlags);

@@ -21,9 +21,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String END_TAG = "</html>";
 	public static final String NEW_LINE_TAG = "<br>";
 
-	private static final Matcher REGEX_REPLACE = PatternService.matcher("^" + START_TAG + "|" + END_TAG + "$");
+	private static final Matcher REPLACE = PatternService.matcher("^" + START_TAG + "|" + END_TAG + "$");
 
-	private static final Pattern REGEX_PATTERN_NEW_LINE = PatternService.pattern(NEW_LINE_TAG);
+	private static final Pattern PATTERN_NEW_LINE = PatternService.pattern(NEW_LINE_TAG);
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -72,12 +72,12 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex){
 		try{
-			String text = PatternService.clear((String)aValue, REGEX_REPLACE);
+			String text = PatternService.clear((String)aValue, REPLACE);
 
 			List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
 			meanings.clear();
 
-			String[] lines = PatternService.split(text, REGEX_PATTERN_NEW_LINE);
+			String[] lines = PatternService.split(text, PATTERN_NEW_LINE);
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));
 		}

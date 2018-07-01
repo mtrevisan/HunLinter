@@ -20,8 +20,8 @@ import unit731.hunspeller.services.PatternService;
 @Getter
 public class ThesaurusDictionary{
 
-	private static final Pattern REGEX_LF = PatternService.pattern(StringUtils.LF);
-	private static final Matcher REGEX_POS = PatternService.matcher("\\([^)]+\\)");
+	private static final Pattern LINE_FEED = PatternService.pattern(StringUtils.LF);
+	private static final Matcher PART_OF_SPEECH = PatternService.matcher("\\([^)]+\\)");
 
 
 	@JsonProperty
@@ -41,7 +41,7 @@ public class ThesaurusDictionary{
 				.forEachOrdered(sj::add);
 			String mm = sj.toString();
 
-			String mean = PatternService.replaceAll(meaning, REGEX_POS, StringUtils.EMPTY);
+			String mean = PatternService.replaceAll(meaning, PART_OF_SPEECH, StringUtils.EMPTY);
 			ThesaurusEntry foundSynonym = findByMeaning(mean);
 
 			MeaningEntry entry = new MeaningEntry(mm);
@@ -100,7 +100,7 @@ public class ThesaurusDictionary{
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		if(StringUtils.isNotBlank(text)){
-			String[] lines = PatternService.split(text, REGEX_LF);
+			String[] lines = PatternService.split(text, LINE_FEED);
 			meanings.clear();
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));

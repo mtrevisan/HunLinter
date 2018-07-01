@@ -9,13 +9,13 @@ import unit731.hunspeller.services.PatternService;
 
 public class RegExpTrieSequencer implements TrieSequencerInterface<String[], String>{
 
-	private static final Pattern REGEX_PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String NEGATED_CLASS_START = "[^";
 
 
 	public static String[] extractCharacters(String sequence){
-		return PatternService.split(sequence, REGEX_PATTERN);
+		return PatternService.split(sequence, PATTERN);
 	}
 
 	@Override

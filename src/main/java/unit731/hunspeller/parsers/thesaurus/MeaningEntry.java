@@ -30,13 +30,13 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		Objects.requireNonNull(synonymAndMeanings);
 
 		try{
-			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.REGEX_PATTERN_POS_MEANS, 2);
+			String[] partOfSpeechAndMeanings = PatternService.split(synonymAndMeanings, ThesaurusEntry.PATTERN_POS_MEANS, 2);
 
 			partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
 				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
 
-			this.meanings = Arrays.stream(PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.REGEX_PATTERN_POS_MEANS))
+			this.meanings = Arrays.stream(PatternService.split(partOfSpeechAndMeanings[1], ThesaurusEntry.PATTERN_POS_MEANS))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
 				.distinct()

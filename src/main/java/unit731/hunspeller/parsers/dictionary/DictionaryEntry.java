@@ -19,7 +19,7 @@ import unit731.hunspeller.services.PatternService;
 public class DictionaryEntry implements Productable{
 
 	private static final Matcher ENTRY_PATTERN = PatternService.matcher("^(?<word>[^\\t\\s\\/]+)(\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
-	private static final Pattern REGEX_PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
+	private static final Pattern PATTERN_SEPARATOR = PatternService.pattern("[\\s\\t]+");
 
 
 	@Setter
@@ -43,7 +43,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group("flags");
 		continuationFlags = strategy.parseFlags(dicFlags);
 		String dicMorphologicalFields = m.group("morphologicalFields");
-		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? PatternService.split(dicMorphologicalFields, REGEX_PATTERN_SEPARATOR): new String[0]);
+		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? PatternService.split(dicMorphologicalFields, PATTERN_SEPARATOR): new String[0]);
 		combineable = true;
 
 		this.strategy = strategy;
