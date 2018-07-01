@@ -23,11 +23,15 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 @EqualsAndHashCode(of = {"sequence", "startIndex", "endIndex"})
 public class TrieNode<S, H, V>{
 
-	@Getter @Setter private S sequence;
-	@Getter private int startIndex;
-	@Getter private int endIndex;
+	@Getter @Setter
+	private S sequence;
+	@Getter
+	private int startIndex;
+	@Getter
+	private int endIndex;
 
-	@Getter private V value;
+	@Getter
+	private V value;
 	private Map<H, TrieNode<S, H, V>> children;
 
 

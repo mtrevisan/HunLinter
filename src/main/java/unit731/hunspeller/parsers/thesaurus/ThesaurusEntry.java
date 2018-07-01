@@ -35,7 +35,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	private String synonym;
 	@NonNull
 	@JsonProperty
-	@Setter private List<MeaningEntry> meanings;
+	@Setter
+	private List<MeaningEntry> meanings;
 
 
 	public ThesaurusEntry(String line, BufferedReader br) throws IOException{

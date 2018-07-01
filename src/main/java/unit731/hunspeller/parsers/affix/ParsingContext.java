@@ -17,7 +17,8 @@ public class ParsingContext{
 
 	private final String line;
 	private final String[] definitionParts;
-	@Getter private final BufferedReader reader;
+	@Getter
+	private final BufferedReader reader;
 
 
 	public ParsingContext(String line, BufferedReader br){

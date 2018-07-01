@@ -61,12 +61,14 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
 	protected int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	@Getter protected double falsePositiveProbability;
+	@Getter
+	protected double falsePositiveProbability;
 	/** Number of bits required for the bloom filter */
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter */
-	@Getter protected int addedElements;
+	@Getter
+	protected int addedElements;
 
 
 	/**

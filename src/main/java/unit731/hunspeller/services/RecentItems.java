@@ -22,7 +22,8 @@ public class RecentItems{
 	private final int maxItems;
 	private final Preferences preferenceNode;
 
-	@Getter private final List<String> items;
+	@Getter
+	private final List<String> items;
 	private final List<RecentItemsObserver> observers = new ArrayList<>();
 
 
