@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
@@ -28,7 +29,8 @@ public interface FlagParsingStrategy{
 	String joinFlags(String[] textFlags);
 
 	default String[] removeDuplicates(String[] continuationFlags){
-		return (new HashSet<>(Arrays.asList(continuationFlags))).toArray(new String[0]);
+		Set<String> set = new HashSet<>(Arrays.asList(continuationFlags));
+		return set.toArray(new String[set.size()]);
 	}
 
 }

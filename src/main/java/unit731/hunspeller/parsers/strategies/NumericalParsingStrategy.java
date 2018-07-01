@@ -2,9 +2,7 @@ package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
 
 
 /**
@@ -17,12 +15,10 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Pattern PATTERN = PatternService.pattern(COMMA);
-
 
 	@Override
 	public String[] parseFlags(String textFlags){
-		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)):
+		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(StringUtils.split(textFlags, COMMA)):
 			new String[0]);
 		for(String flag : flags){
 			try{
