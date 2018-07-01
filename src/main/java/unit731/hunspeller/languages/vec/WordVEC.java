@@ -83,16 +83,32 @@ public class WordVEC{
 		ACUTE_STRESSES.put("u", "ú");
 	}
 
+	public static boolean isApostrophe(char chr){
+		return (chr == 'ʼ' || chr == '\'');
+	}
+
+	public static boolean isVowel(char chr){
+		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
+	}
+
 	public static boolean isConsonant(char chr){
 		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
 	}
 
-	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*$
-	private static boolean endsInVowel(String word){
+	//^ʼ?[aeiouàèéíòóú]
+	public static boolean startsWithVowel(String word){
+		char chr = word.charAt(0);
+		if(isApostrophe(chr))
+			chr = word.charAt(1);
+		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
+	}
+
+	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
+	public static boolean endsWithVowel(String word){
 		int i = word.length();
 		while((-- i) >= 0){
 			char chr = word.charAt(i);
-			if(chr != 'ʼ' && chr != '\'')
+			if(!isApostrophe(chr))
 				return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
 		}
 		return false;
@@ -160,7 +176,7 @@ public class WordVEC{
 			int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
-			if(endsInVowel(phones))
+			if(endsWithVowel(phones))
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
 			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
 				idx --;
