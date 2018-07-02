@@ -361,7 +361,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		DATA_FIELDS.put(WordGenerator.TAG_ALLOMORPH, null);
 	}
 
-	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ehh", "mh", "ohh", "ssh", "iu");
+	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "mm", "mmm", "ss", "sss", "iu");
+	private static final List<String> MULTIPLE_ACCENTED_INTERJECTIONS = Arrays.asList("àà", "ààà", "èè", "èèè", "íí", "ííí", "òò", "òòò");
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
@@ -552,7 +553,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
 		int acents = WordVEC.countAccents(subword);
-		if(acents > 1)
+		if(acents > 1 && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(subword))
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
 		if(acents == 1 && !subword.equals(WordVEC.unmarkDefaultStress(subword))){

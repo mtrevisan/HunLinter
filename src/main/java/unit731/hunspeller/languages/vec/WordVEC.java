@@ -21,8 +21,6 @@ import unit731.hunspeller.services.PatternService;
 @Slf4j
 public class WordVEC{
 
-	private static final String SLASH_TAB = "/\t";
-
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
@@ -50,7 +48,6 @@ public class WordVEC{
 			log.error(e.getMessage());
 		}
 	}
-	private static final Matcher REMOVE_RULE_FLAGS = PatternService.matcher("(/[^\t]+)?\t");
 
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
@@ -212,11 +209,7 @@ public class WordVEC{
 	}
 
 	public static Comparator<String> sorterComparator(){
-		return (str1, str2) -> {
-			str1 = PatternService.replaceAll(str1, REMOVE_RULE_FLAGS, SLASH_TAB);
-			str2 = PatternService.replaceAll(str2, REMOVE_RULE_FLAGS, SLASH_TAB);
-			return COLLATOR.compare(str1, str2);
-		};
+		return (str1, str2) -> COLLATOR.compare(str1, str2);
 	}
 
 }

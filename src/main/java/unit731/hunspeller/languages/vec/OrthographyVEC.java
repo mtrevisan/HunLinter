@@ -25,6 +25,8 @@ public class OrthographyVEC extends Orthography{
 	private static final String[] MB_MP = new String[]{"mb", "mp"};
 	private static final String[] NB_NP = new String[]{"nb", "np"};
 
+	private static final Matcher REGEX_REMOVE_H_FROM_NOT_FH = PatternService.matcher("(?<!f)h(?!aeeioouàéèíóòú)");
+
 	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéí" + GraphemeVEC.I_UMLAUT_PHONEME + "òóúh])");
 	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternService.matcher("^i(?=[aeiouàèéíòóú])");
 	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternService.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
@@ -57,8 +59,9 @@ public class OrthographyVEC extends Orthography{
 		//correct h occurrences after d, j, l, n, t
 		word = StringUtils.replaceEach(word, EXTENDED_CHARS, TRUE_CHARS);
 
-		//remove other occurrences of h
-		word = StringUtils.replace(word, GraphemeVEC.H_GRAPHEME, null);
+		//remove other occurrences of h not into fhV
+		if(!GraphemeVEC.H_GRAPHEME.equals(word))
+			word = PatternService.replaceAll(word, REGEX_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
 		word = StringUtils.replaceEach(word, MB_MP, NB_NP);

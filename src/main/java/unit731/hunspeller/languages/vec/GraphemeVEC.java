@@ -33,7 +33,6 @@ public class GraphemeVEC{
 	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
 //	private static final Matcher HYATUS = PatternService.matcher("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
 
-	private static final Matcher ASPIRATED_F = PatternService.matcher(FH_GRAPHEME + "(?=[aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
 	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
 	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
@@ -66,12 +65,12 @@ public class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
-//FIXME is there a way to optimize this PatternService.replaceAll?
-		//correct fh occurrences into f not before vowel
+		//correct fh occurrences
 		if(word.contains(FH_GRAPHEME))
-			word = PatternService.replaceAll(word, ASPIRATED_F, F_GRAPHEME);
+			word = StringUtils.replace(word, FH_GRAPHEME, F_GRAPHEME);
 
 		//this step is mandatory before eterophonic sequence VjV
+//FIXME is there a way to optimize this PatternService.replaceAll?
 		if(word.contains(J_GRAPHEME))
 			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
 		if(word.contains(I_GRAPHEME))
