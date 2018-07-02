@@ -135,7 +135,8 @@ public class WordVEC{
 
 	public static int countAccents(String word){
 		int count = 0;
-		for(int i = 0; i < word.length(); i ++)
+		int size = word.length();
+		for(int i = 0; i < size; i ++)
 			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
 				count ++;
 		return count;
