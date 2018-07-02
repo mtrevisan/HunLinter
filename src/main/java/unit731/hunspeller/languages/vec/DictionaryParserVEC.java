@@ -361,7 +361,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		DATA_FIELDS.put(WordGenerator.TAG_ALLOMORPH, null);
 	}
 
-	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "mm", "mmm", "ss", "sss", "iu");
+	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ii", "iii", "mm", "mmm", "ss", "sss", "iu");
 	private static final List<String> MULTIPLE_ACCENTED_INTERJECTIONS = Arrays.asList("àà", "ààà", "èè", "èèè", "íí", "ííí", "òò", "òòò");
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
@@ -581,7 +581,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
-			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord)){
+			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(derivedWord)){
 				String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
 				if(!correctedDerivedWord.equals(derivedWord))
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
