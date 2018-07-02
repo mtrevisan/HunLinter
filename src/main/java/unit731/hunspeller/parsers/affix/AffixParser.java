@@ -336,7 +336,7 @@ public class AffixParser{
 //		RULE_FUNCTION.put(TAG_NO_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_NO_NGRAM_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("REP", FUN_COPY_OVER);
-//		RULE_FUNCTION.put("MAP", FUN_COPY_OVER);
+//		RULE_FUNCTION.put("MAP", FUN_MAP);
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
 //		RULE_FUNCTION.put(TAG_BREAK, FUN_COPY_OVER);
