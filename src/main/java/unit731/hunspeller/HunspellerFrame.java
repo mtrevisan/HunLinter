@@ -882,7 +882,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			openThesaurusFile();
 
-			hypParser = new HyphenationParser(affParser.getLanguage());
+			hypParser = new HyphenationParser(affParser.getLanguage(), affParser.getWordBreakCharacters());
 
 			openHyphenationFile();
 		}
@@ -1290,7 +1290,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		openThesaurusFile();
 
-		hypParser = new HyphenationParser(affParser.getLanguage());
+		hypParser = new HyphenationParser(affParser.getLanguage(), affParser.getWordBreakCharacters());
 
 		openHyphenationFile();
 	}

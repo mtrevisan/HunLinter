@@ -26,6 +26,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
@@ -129,6 +130,8 @@ public class AffixParser{
 	/** Define output conversion table */
 	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
 
+	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.HYPHEN_MINUS + HyphenationParser.HYPHEN_MINUS;
+
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
 
@@ -174,7 +177,7 @@ public class AffixParser{
 			String flag = getFlag();
 			strategy = getFlagParsingStrategy(flag);
 
-			Set<String> compoundRules = new HashSet<>();
+			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
@@ -187,10 +190,9 @@ public class AffixParser{
 				if(StringUtils.isBlank(rule))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": rule type cannot be empty");
 
-				if(compoundRules.contains(rule))
+				boolean inserted = compoundRules.add(rule);
+				if(!inserted)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
-
-				compoundRules.add(rule);
 			}
 
 			addData(TAG_COMPOUND_RULE, compoundRules);
@@ -216,7 +218,7 @@ public class AffixParser{
 
 //List<AffixEntry> prefixEntries = new ArrayList<>();
 //List<AffixEntry> suffixEntries = new ArrayList<>();
-			List<AffixEntry> entries = new ArrayList<>();
+			List<AffixEntry> entries = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
@@ -232,10 +234,9 @@ public class AffixParser{
 				if(!containsUnique(entry.getContinuationFlags()))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": multiple rule flags");
 
-				if(entries.contains(entry))
+				boolean inserted = entries.add(entry);
+				if(!inserted)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
-
-				entries.add(entry);
 //String regexToMatch = (Objects.nonNull(entry.getMatch())? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
 //List<AffixEntry> lst = new ArrayList<>();
@@ -255,6 +256,40 @@ public class AffixParser{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
+	private final Consumer<ParsingContext> FUN_WORD_BREAK_TABLE = context -> {
+		try{
+			BufferedReader br = context.getReader();
+			int numEntries = Integer.parseInt(context.getFirstParameter());
+			if(numEntries <= 0)
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ ": Bad number of entries, it must be a positive integer");
+
+			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
+			for(int i = 0; i < numEntries; i ++){
+				String line = br.readLine();
+
+				String[] lineParts = StringUtils.split(line);
+				String tag = lineParts[0];
+				if(!TAG_BREAK.equals(tag))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
+						+ TAG_BREAK + ")");
+				String breakCharacter = lineParts[1];
+				if(StringUtils.isBlank(breakCharacter))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
+				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
+					breakCharacter = HyphenationParser.EN_DASH;
+
+				boolean inserted = wordBreakCharacters.add(breakCharacter);
+				if(!inserted)
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+			}
+
+			addData(TAG_BREAK, wordBreakCharacters);
+		}
+		catch(IOException e){
+			throw new RuntimeException(e.getMessage());
+		}
+	};
 	private final Consumer<ParsingContext> FUN_CONVERSION_TABLE = context -> {
 		try{
 			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
@@ -264,7 +299,7 @@ public class AffixParser{
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
 					+ ": Bad number of entries, it must be a positive integer");
 
-			Map<String, String> conversionTable = new HashMap<>();
+			Map<String, String> conversionTable = new HashMap<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 
@@ -339,7 +374,7 @@ public class AffixParser{
 //		RULE_FUNCTION.put("MAP", FUN_MAP);
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
-//		RULE_FUNCTION.put(TAG_BREAK, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_BREAK, FUN_WORD_BREAK_TABLE);
 //		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
 //		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_FLAG, FUN_COPY_OVER);
@@ -421,9 +456,13 @@ public class AffixParser{
 		if(!containsData(TAG_LANGUAGE))
 			//try to infer language from filename
 			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
-//		if(!containsData(TAG_BREAK)){
-//			//FIXME add "-", "^", and "-$"
-//		}
+		if(!containsData(TAG_BREAK)){
+			Set<String> wordBreakCharacters = new HashSet<>(3);
+			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS);
+			wordBreakCharacters.add("^" + HyphenationParser.HYPHEN_MINUS);
+			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS + "$");
+			addData(TAG_BREAK, wordBreakCharacters);
+		}
 //		if(isComplexPrefixes()){
 //			String compoundBegin = getData(TAG_COMPOUND_BEGIN);
 //			String compoundEnd = getData(TAG_COMPOUND_END);
@@ -543,6 +582,10 @@ public class AffixParser{
 			word = StringUtils.replaceEachRepeatedly(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
 		}
 		return word;
+	}
+
+	public Set<String> getWordBreakCharacters(){
+		return getData(TAG_BREAK);
 	}
 
 }

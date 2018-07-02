@@ -106,17 +106,19 @@ public class HyphenationParser{
 
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
+	private final Set<String> wordBreakCharacters;
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private HyphenationOptions options;
 
 
-	public HyphenationParser(String language){
+	public HyphenationParser(String language, Set<String> wordBreakCharacters){
 		Objects.requireNonNull(language);
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
+		this.wordBreakCharacters = wordBreakCharacters;
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -128,8 +130,8 @@ public class HyphenationParser{
 		options = HyphenationOptions.createEmpty();
 	}
 
-	public HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
-		this(language);
+	public HyphenationParser(String language, Set<String> wordBreakCharacters, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
+		this(language, wordBreakCharacters);
 
 		if(Objects.nonNull(patterns))
 			for(Level level : Level.values()){

@@ -28,7 +28,7 @@ public class HyphenationParserTest{
 			.leftMin(2)
 			.rightMin(0)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
 
@@ -46,7 +46,7 @@ public class HyphenationParserTest{
 			.leftMin(0)
 			.rightMin(2)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
 
@@ -64,7 +64,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(0)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
 
@@ -82,7 +82,7 @@ public class HyphenationParserTest{
 			.leftMin(0)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
 
@@ -100,7 +100,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("du", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("du", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("omaatje");
 
@@ -118,7 +118,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
@@ -136,7 +136,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
@@ -154,7 +154,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
@@ -173,7 +173,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("ab–cd");
 
@@ -192,7 +192,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("kuko–fu");
 
@@ -210,7 +210,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("en", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("eighteen");
 
@@ -228,7 +228,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("schiffahrt");
 
@@ -246,7 +246,7 @@ public class HyphenationParserTest{
 			.leftMin(1)
 			.rightMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("Zucker");
 
@@ -263,7 +263,7 @@ public class HyphenationParserTest{
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
 		Hyphenation hyphenation = parser.hyphenate("abc");
 
