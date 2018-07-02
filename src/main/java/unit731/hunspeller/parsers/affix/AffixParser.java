@@ -74,8 +74,6 @@ public class AffixParser{
 	private static final String TAG_COMPOUND_RULE = "COMPOUNDRULE";
 	/** Minimum length of words in compound words */
 	private static final String TAG_COMPOUND_MIN = "COMPOUNDMIN";
-	/** Words may be in compound words (except when word shorter than COMPOUNDMIN), affixes with this flag also permits compounding of affixed words */
-	private static final String TAG_COMPOUND_FLAG = "COMPOUNDFLAG";
 	/** Words signed with this flag (or with a signed affix) may be first elements in compound words */
 	private static final String TAG_COMPOUND_BEGIN = "COMPOUNDBEGIN";
 	/** Words signed with this flag (or with a signed affix) may be middle elements in compound words */
@@ -107,8 +105,6 @@ public class AffixParser{
 	private static final String TAG_CHECK_COMPOUND_TRIPLE = "CHECKCOMPOUNDTRIPLE";
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
 	private static final String TAG_SIMPLIFIED_TRIPLE = "SIMPLIFIEDTRIPLE";
-	/** Affixes signed with this flag may be on a word when this word also has a prefix with this flag and vice versa */
-	private static final String TAG_CIRCUMFIX = "CIRCUMFIX";
 	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from set of the accepted affixed and compound words) */
 	private static final String TAG_FORBIDDEN_WORD = "FORBIDDENWORD";
 

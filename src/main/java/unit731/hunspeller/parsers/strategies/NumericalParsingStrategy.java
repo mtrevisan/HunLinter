@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class NumericalParsingStrategy implements FlagParsingStrategy{
 
-	private static final int MAX_NUMERICAL_FLAG = 65000;
+	private static final int MAX_NUMERICAL_FLAG = 65_000;
 
 	private static final String COMMA = ",";
 
