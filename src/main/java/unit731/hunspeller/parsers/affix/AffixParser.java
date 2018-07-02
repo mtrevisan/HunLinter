@@ -32,7 +32,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Options managed: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE
+ * Options managed: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV
  */
 public class AffixParser{
 
