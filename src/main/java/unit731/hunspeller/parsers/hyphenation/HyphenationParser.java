@@ -8,6 +8,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +66,7 @@ public class HyphenationParser{
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
 	public static final String EM_DASH = "\u2014";
+	private static final String APOSTROPHE = "'";
 	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static final String ONE = "1";
@@ -181,14 +183,16 @@ public class HyphenationParser{
 				long readSoFar = 0l;
 				long totalSize = hypFile.length();
 
-				Charset charset = FileService.determineCharset(hypFile.toPath());
-				try(BufferedReader br = Files.newBufferedReader(hypFile.toPath(), charset)){
+				//start with compound level
+				Level level = Level.COMPOUND;
+
+				Path hypPath = hypFile.toPath();
+				Charset charset = FileService.determineCharset(hypPath);
+				try(BufferedReader br = Files.newBufferedReader(hypPath, charset)){
 					String line = br.readLine();
 					if(Charset.forName(line) != charset)
 						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-					//start with compound level
-					Level level = Level.COMPOUND;
 					REDUCED_PATTERNS.get(level).clear();
 
 					while(Objects.nonNull(line = br.readLine())){
@@ -233,17 +237,19 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					if(level == Level.COMPOUND && charset == StandardCharsets.UTF_8){
-						//en-dash and right single quotation mark added by default (retro-compatibility)
-						hypParser.options.getNoHyphen().addAll(Arrays.asList(EN_DASH, RIGHT_SINGLE_QUOTATION_MARK));
+					if(level == Level.NON_COMPOUND){
+						//dash and apostrophe are added by default (retro-compatibility)
+						List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
+						if(charset == StandardCharsets.UTF_8)
+							addedNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
-						line = ONE + EN_DASH + ONE;
-						if(!isRuleDuplicated(EN_DASH, line, level))
-							hypParser.patterns.get(level).put(EN_DASH, line);
+						hypParser.options.getNoHyphen().addAll(addedNoHyphen);
 
-						line = ONE + RIGHT_SINGLE_QUOTATION_MARK + ONE;
-						if(!isRuleDuplicated(RIGHT_SINGLE_QUOTATION_MARK, line, level))
-							hypParser.patterns.get(level).put(RIGHT_SINGLE_QUOTATION_MARK, line);
+						for(String noHyphen : addedNoHyphen){
+							line = ONE + noHyphen + ONE;
+							if(!isRuleDuplicated(noHyphen, line, level))
+								hypParser.patterns.get(level).put(noHyphen, line);
+						}
 					}
 
 					hypParser.patterns.get(Level.COMPOUND).prepare();
@@ -545,6 +551,14 @@ public class HyphenationParser{
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		Hyphenation response = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
 
+/*Recursive compound level hyphenation
+
+The algorithm is recursive: every word parts of a successful 
+first (compound) level hyphenation will be rehyphenated
+by the same (first) pattern set.
+
+Finally, when first level hyphenation is not possible, Hyphen uses
+the second level hyphenation for the word or the word parts.*/
 //		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
 //			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
 //				: StringUtils.split(word, wordBreakCharacters));
@@ -552,7 +566,7 @@ public class HyphenationParser{
 //			int size = compounds.length;
 //			if(size > 1){
 //				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
-//					.map(subword -> hyphenate(subword, patterns, Level.NON_COMPOUND, breakCharacter))
+//					.map(subword -> hyphenate(subword, patterns, Level.COMPOUND, breakCharacter))
 //					.collect(Collectors.toList());
 //
 //				//TODO manage missing breaking character
@@ -564,6 +578,7 @@ public class HyphenationParser{
 //			}
 //		}
 
+//if not hyphenation is possible, redo all with Level.NON_COMPOUND
 		return response;
 	}
 
