@@ -543,35 +543,28 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
-		Hyphenation compoundHyphenation = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
+		Hyphenation response = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
 
-		Set<Hyphenation> response = new HashSet<>();
-		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
-			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
-				: StringUtils.split(word, wordBreakCharacters));
+//		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
+//			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
+//				: StringUtils.split(word, wordBreakCharacters));
+//
+//			int size = compounds.length;
+//			if(size > 1){
+//				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
+//					.map(subword -> hyphenate(subword, patterns, Level.NON_COMPOUND, breakCharacter))
+//					.collect(Collectors.toList());
+//
+//				//TODO manage missing breaking character
+//
+//				Hyphenation nonCompoundHyphenation = Hyphenation.merge(subHyphenations, breakCharacter);
+//System.out.println(nonCompoundHyphenation.toString());
+//				if(nonCompoundHyphenation.countSyllabes() > size)
+//					response = nonCompoundHyphenation;
+//			}
+//		}
 
-			int size = compounds.length;
-			if(size > 1){
-				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
-					.map(subword -> hyphenate(subword, patterns, Level.NON_COMPOUND, breakCharacter))
-					.collect(Collectors.toList());
-
-				//TODO manage missing breaking character
-
-				Hyphenation nonCompoundHyphenation = Hyphenation.merge(subHyphenations, breakCharacter);
-System.out.println(nonCompoundHyphenation.toString());
-				response.add(nonCompoundHyphenation);
-			}
-		}
-		response.add(compoundHyphenation);
-
-		if(response.size() != 1){
-			String hyphenations = response.stream().map(Hyphenation::toString).collect(Collectors.joining(", "));
-			log.warn("No or multiple hyphenations found: " + hyphenations);
-
-			throw new IllegalArgumentException("Cannot hyphenate word " + word + ", no or multiple hyphenations found (" + hyphenations + ")");
-		}
-		return response.iterator().next();
+		return response;
 	}
 
 	private List<String> getTokensWithDelimiters(String str, String delimiters){
