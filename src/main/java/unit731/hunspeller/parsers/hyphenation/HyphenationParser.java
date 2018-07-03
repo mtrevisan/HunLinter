@@ -319,13 +319,8 @@ public class HyphenationParser{
 		}
 	}
 
-	public String correctOrthography(String text){
-		text = text.toLowerCase(Locale.ROOT);
-		return orthography.correctOrthography(text);
-	}
-
 	/**
-	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to add
 	 * @param level	Level to add the rule to
@@ -465,7 +460,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link Orthography.#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object(s)
@@ -476,7 +471,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation including an additional rule
-	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
@@ -505,7 +500,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to be checked
 	 * @param level	The level to check the rule for
@@ -530,7 +525,7 @@ public class HyphenationParser{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link #correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The radix tree containing the patterns

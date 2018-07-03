@@ -1629,7 +1629,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			text = frame.hypParser.correctOrthography(text);
+			text = frame.dicParser.correctOrthography(text);
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
@@ -1662,8 +1662,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
 		try{
-			String addedRuleText = frame.hypParser.correctOrthography(frame.hypWordTextField.getText());
-			String addedRule = frame.hypParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+			String addedRuleText = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
+			String addedRule = frame.dicParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 			String addedRuleCount = null;
 			if(StringUtils.isNotBlank(addedRule)){

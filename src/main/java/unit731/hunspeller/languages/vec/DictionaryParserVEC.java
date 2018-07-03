@@ -582,7 +582,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(!production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
 			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(derivedWord)){
-				String correctedDerivedWord = hyphenationParser.correctOrthography(derivedWord);
+				String correctedDerivedWord = correctOrthography(derivedWord);
 				if(!correctedDerivedWord.equals(derivedWord))
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 			}
@@ -629,6 +629,12 @@ public class DictionaryParserVEC extends DictionaryParser{
 	public String prepareTextForFilter(String text){
 		text = super.prepareTextForFilter(text);
 
+		return correctOrthography(text);
+	}
+
+	@Override
+	public String correctOrthography(String text){
+		text = text.toLowerCase(Locale.ROOT);
 		return orthography.correctOrthography(text);
 	}
 

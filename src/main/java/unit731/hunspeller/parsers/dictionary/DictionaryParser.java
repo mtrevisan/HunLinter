@@ -168,6 +168,10 @@ public class DictionaryParser{
 		return "(?iu)(" + text + ")";
 	}
 
+	public String correctOrthography(String text){
+		return text;
+	}
+
 	public final void clear(){
 		if(Objects.nonNull(boundaries))
 			boundaries.clear();
