@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
@@ -51,6 +52,7 @@ import unit731.hunspeller.services.PatternService;
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
+@Slf4j
 public class HyphenationParser{
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
@@ -79,7 +81,7 @@ public class HyphenationParser{
 
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
 	private static final String HYPHENS = SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH;
-	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher("[" + Pattern.quote(WORD_BOUNDARY) + "]");
+	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(WORD_BOUNDARY));
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
@@ -532,13 +534,61 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
+		Hyphenation compoundHyphenation = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
+
+		Set<Hyphenation> response = new HashSet<>();
+		if(wordBreakCharacters != null){
+			for(String wordBreak : wordBreakCharacters){
+				String[] compounds;
+				String breakCharacter = wordBreak;
+				boolean startingWith = (wordBreak.charAt(0) == '^');
+				boolean endingWith = (wordBreak.charAt(wordBreak.length() - 1) == '$');
+				if(startingWith || endingWith){
+					if(startingWith)
+						breakCharacter = wordBreak.substring(1);
+					if(endingWith)
+						breakCharacter = wordBreak.substring(0, wordBreak.length() - 1);
+
+					Pattern pattern = PatternService.pattern(wordBreak);
+					compounds = PatternService.split(word, pattern);
+				}
+				else
+					compounds = StringUtils.splitByWholeSeparator(word, wordBreak);
+
+				if(compounds.length > 1){
+					Hyphenation nonCompoundHyphenation = hyphenate(word, patterns, Level.NON_COMPOUND, breakCharacter);
+
+					response.add(nonCompoundHyphenation);
+					//TODO
+System.out.println(nonCompoundHyphenation.toString());
+				}
+			}
+		}
+		response.add(compoundHyphenation);
+
+		if(response.size() != 1){
+			String hyphenations = response.stream().map(Hyphenation::toString).collect(Collectors.joining(", "));
+			log.warn("No or multiple hyphenations found: " + hyphenations);
+
+			throw new IllegalArgumentException("Cannot hyphenate word " + word + ", no or multiple hyphenations found (" + hyphenations + ")");
+		}
+		return response.iterator().next();
+	}
+
+	/**
+	 * Performs hyphenation
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 *
+	 * @param word	String to hyphenate
+	 * @param patterns	The radix tree containing the patterns
+	 * @param level	Level at which to hyphenate
+	 * @return the hyphenation object
+	 */
+	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
-
-		//FIXME manage second level
-		Level level = Level.COMPOUND;
 
 		List<String> hyphenatedWord;
 		List<String> rules;
@@ -567,7 +617,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors);
+		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
 	private boolean[] extractUppercases(String word){
@@ -678,7 +728,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors);
+		return new Hyphenation(hyphenatedWord, rules, errors, HyphenationParser.SOFT_HYPHEN);
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
