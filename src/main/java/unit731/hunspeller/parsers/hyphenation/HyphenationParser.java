@@ -700,6 +700,10 @@ by the same (first) pattern set.*/
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
+
+			//enforce NOHYPHENS
+//TODO
+
 			for(String rule : prefixes){
 				int j = -1;
 				//remove non–standard part
