@@ -44,11 +44,6 @@ public class Hyphenation implements HyphenationInterface{
 		return new Hyphenation(syllabes, rules, ArrayUtils.toPrimitive(errors), breakCharacter);
 	}
 
-	@Override
-	public boolean isCompounded(){
-		return false;
-	}
-
 	/**
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the (relative) index of the syllabe at the given (global) index

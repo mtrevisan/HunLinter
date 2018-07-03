@@ -7,8 +7,6 @@ import java.util.function.Function;
 
 public interface HyphenationInterface{
 
-	boolean isCompounded();
-
 	boolean isHyphenated();
 
 	boolean hasErrors();

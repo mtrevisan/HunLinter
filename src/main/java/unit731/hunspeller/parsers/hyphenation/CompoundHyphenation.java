@@ -29,11 +29,6 @@ public class CompoundHyphenation implements HyphenationInterface{
 	}
 
 	@Override
-	public boolean isCompounded(){
-		return (lastSubHyphenation != null);
-	}
-
-	@Override
 	public boolean isHyphenated(){
 		return (firstSubHyphenation.isHyphenated() || isCompounded() && lastSubHyphenation.isHyphenated());
 	}
@@ -75,6 +70,10 @@ public class CompoundHyphenation implements HyphenationInterface{
 			sj = lastSubHyphenation.formatHyphenation(sj, errorFormatter);
 		}
 		return sj;
+	}
+
+	private boolean isCompounded(){
+		return (lastSubHyphenation != null);
 	}
 
 }
