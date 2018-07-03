@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PatternService{
 
+	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
+
+
 	public static Pattern pattern(String pattern){
 		return Pattern.compile(pattern);
 	}
@@ -20,6 +23,10 @@ public class PatternService{
 
 	public static Matcher matcher(String pattern, String text){
 		return pattern(pattern).matcher(text);
+	}
+
+	public static Pattern splitterWithDelimiters(String delimitersRegex){
+		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
 	}
 
 	public static String[] split(String text, Pattern pattern){

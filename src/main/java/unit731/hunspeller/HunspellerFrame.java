@@ -88,7 +88,7 @@ import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
-import unit731.hunspeller.parsers.hyphenation.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
 import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.Debouncer;
@@ -1629,7 +1629,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
+			HyphenationInterface hyphenation = frame.hypParser.hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
@@ -1674,8 +1674,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 					if(ruleMatchesText){
-						Hyphenation hyphenation = frame.hypParser.hyphenate(addedRuleText);
-						Hyphenation addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
+						HyphenationInterface hyphenation = frame.hypParser.hyphenate(addedRuleText);
+						HyphenationInterface addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
 
 						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";

@@ -15,7 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode(of = {"syllabes", "breakCharacter"})
-public class Hyphenation{
+public class Hyphenation implements HyphenationInterface{
 
 	@NonNull
 	private final List<String> syllabes;
@@ -44,13 +44,18 @@ public class Hyphenation{
 		return new Hyphenation(syllabes, rules, ArrayUtils.toPrimitive(errors), breakCharacter);
 	}
 
+	@Override
+	public boolean isCompounded(){
+		return false;
+	}
+
 	/**
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the (relative) index of the syllabe at the given (global) index
 	 */
 	public int getSyllabeIndex(int idx){
 		int k = -1;
-		int size = syllabes.size();
+		int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
 			idx -= syllabe.length();
@@ -70,6 +75,7 @@ public class Hyphenation{
 		return syllabes.get(getSyllabeIndex(idx));
 	}
 
+	@Override
 	public int countSyllabes(){
 		return syllabes.size();
 	}
@@ -83,13 +89,15 @@ public class Hyphenation{
 	}
 
 	private int restoreRelativeIndex(int idx){
-		return (idx + syllabes.size()) % syllabes.size();
+		return (idx + countSyllabes()) % countSyllabes();
 	}
 
+	@Override
 	public boolean isHyphenated(){
 		return !rules.isEmpty();
 	}
 
+	@Override
 	public boolean hasErrors(){
 		boolean result = false;
 		for(boolean error : errors)
@@ -100,8 +108,9 @@ public class Hyphenation{
 		return result;
 	}
 
+	@Override
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
-		int size = syllabes.size();
+		int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
 			Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
 			sj.add(fun.apply(syllabes.get(i)));

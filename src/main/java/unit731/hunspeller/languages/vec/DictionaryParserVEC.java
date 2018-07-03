@@ -21,6 +21,7 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
@@ -591,7 +592,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					&& !production.isPartOfSpeech(POS_INTERJECTION)){
 				String[] subDerivedWords = StringUtils.split(derivedWord, HyphenationParser.EN_DASH);
 				for(String subDerivedWord : subDerivedWords){
-					Hyphenation hyphenation = hyphenationParser.hyphenate(subDerivedWord);
+					HyphenationInterface hyphenation = hyphenationParser.hyphenate(subDerivedWord);
 					if(hyphenation.hasErrors())
 						throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
 							+ " is not syllabable");

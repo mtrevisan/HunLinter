@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,6 +73,9 @@ public class HyphenationParser{
 	private static final String AUGMENTED_RULE = "/";
 
 	private static final String COMMA = ",";
+	private static final String PIPE = "|";
+	private static final String LEFT_PARENTHESIS = "(";
+	private static final String RIGHT_PARENTHESIS = ")";
 
 	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("^\\.?[^.]+\\.?$");
 	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
@@ -93,6 +95,7 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*%.*$");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
+
 	public static enum Level{
 		//defines the rules to be used at compound word boundaries
 		COMPOUND,
@@ -111,8 +114,7 @@ public class HyphenationParser{
 
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
-	private Pattern wordBreakCharactersRegex;
-	private String wordBreakCharacters;
+	private Pattern wordBreakCharacters;
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
@@ -125,12 +127,9 @@ public class HyphenationParser{
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
 		if(wordBreakCharacters != null){
-			boolean needRegex = wordBreakCharacters.stream()
-				.anyMatch(wordBreak -> wordBreak.charAt(0) == '^' || wordBreak.charAt(wordBreak.length() - 1) == '$');
-			if(needRegex)
-				wordBreakCharactersRegex = PatternService.pattern(StringUtils.join(wordBreakCharacters, '|'));
-			else
-				this.wordBreakCharacters = StringUtils.join(wordBreakCharacters);
+			String wordBreakPattern = wordBreakCharacters.stream()
+				.collect(Collectors.joining(PIPE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS));
+			this.wordBreakCharacters = PatternService.splitterWithDelimiters(wordBreakPattern);
 		}
 
 		Objects.requireNonNull(comparator);
@@ -482,7 +481,7 @@ public class HyphenationParser{
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object(s)
 	 */
-	public Hyphenation hyphenate(String word){
+	public HyphenationInterface hyphenate(String word){
 		LOCK_SAVING.lock();
 
 		try{
@@ -503,12 +502,12 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
-	public Hyphenation hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
+	public HyphenationInterface hyphenate(String word, String addedRule, Level level) throws CloneNotSupportedException{
 		LOCK_SAVING.lock();
 
 		try{
 			String key = getKeyFromData(addedRule);
-			Hyphenation hyph = null;
+			HyphenationInterface hyph = null;
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
 
@@ -555,9 +554,9 @@ public class HyphenationParser{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
+	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		Hyphenation result = hyphenate(word, patterns, Level.COMPOUND);
+		HyphenationInterface result = hyphenate(word, patterns, Level.COMPOUND);
 
 		if(!result.isHyphenated())
 			//when first level hyphenation is not possible, use the second level hyphenation for the word or the word parts
@@ -575,8 +574,8 @@ public class HyphenationParser{
 	 * @param level	Level at which to hyphenate
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
-		Hyphenation response = hyphenate(word, patterns, level, HyphenationParser.SOFT_HYPHEN);
+	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+		HyphenationInterface response = hyphenate(word, patterns, level, SOFT_HYPHEN);
 
 //TODO
 /*The algorithm is recursive: every word parts of a successful
@@ -584,12 +583,17 @@ first (compound) level hyphenation will be rehyphenated
 by the same (first) pattern set.*/
 
 //retrieve list of breaking characters, and re-add them after hyphenation
-//		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
-//			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
-//				: StringUtils.split(word, wordBreakCharacters));
-//
-//			int size = compounds.length;
-//			if(size > 1){
+		if(wordBreakCharacters != null){
+			String[] compounds = PatternService.split(word, wordBreakCharacters);
+
+			int size = compounds.length;
+			if(size > 1){
+				List<HyphenationInterface> subHyphenations = new ArrayList<>();
+				boolean startsWithDelimiter = wordBreakCharacters.matcher(compounds[0]).matches();
+				for(int i = (startsWithDelimiter? 1: 0); i < size; i += 2){
+					String subword = compounds[i];
+					subHyphenations.add(hyphenate(subword, patterns, Level.COMPOUND, SOFT_HYPHEN));
+				}
 //				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
 //					.map(subword -> hyphenate(subword, patterns, Level.COMPOUND, breakCharacter))
 //					.collect(Collectors.toList());
@@ -600,16 +604,10 @@ by the same (first) pattern set.*/
 //System.out.println(nonCompoundHyphenation.toString());
 //				if(nonCompoundHyphenation.countSyllabes() > size)
 //					response = nonCompoundHyphenation;
-//			}
-//		}
+			}
+		}
 
 		return response;
-	}
-
-	private List<String> getTokensWithDelimiters(String str, String delimiters){
-		return Collections.list(new StringTokenizer(str, delimiters, true)).stream()
-			.map(token -> (String)token)
-			.collect(Collectors.toList());
 	}
 
 	/**
@@ -621,7 +619,7 @@ by the same (first) pattern set.*/
 	 * @param level	Level at which to hyphenate
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter){
+	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -732,7 +730,7 @@ by the same (first) pattern set.*/
 	}
 
 
-	Hyphenation hyphenate2(String word){
+	HyphenationInterface hyphenate2(String word){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -769,7 +767,7 @@ by the same (first) pattern set.*/
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors, HyphenationParser.SOFT_HYPHEN);
+		return new Hyphenation(hyphenatedWord, rules, errors, SOFT_HYPHEN);
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
