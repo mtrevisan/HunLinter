@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,7 +109,8 @@ public class HyphenationParser{
 
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
-	private final Set<String> wordBreakCharacters;
+	private Pattern wordBreakCharactersRegex;
+	private String wordBreakCharacters;
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
@@ -120,7 +122,14 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		this.wordBreakCharacters = wordBreakCharacters;
+		if(wordBreakCharacters != null){
+			boolean needRegex = wordBreakCharacters.stream()
+				.anyMatch(wordBreak -> wordBreak.charAt(0) == '^' || wordBreak.charAt(wordBreak.length() - 1) == '$');
+			if(needRegex)
+				wordBreakCharactersRegex = PatternService.pattern(StringUtils.join(wordBreakCharacters, '|'));
+			else
+				this.wordBreakCharacters = StringUtils.join(wordBreakCharacters);
+		}
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -537,31 +546,21 @@ public class HyphenationParser{
 		Hyphenation compoundHyphenation = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
 
 		Set<Hyphenation> response = new HashSet<>();
-		if(wordBreakCharacters != null){
-			for(String wordBreak : wordBreakCharacters){
-				String[] compounds;
-				String breakCharacter = wordBreak;
-				boolean startingWith = (wordBreak.charAt(0) == '^');
-				boolean endingWith = (wordBreak.charAt(wordBreak.length() - 1) == '$');
-				if(startingWith || endingWith){
-					if(startingWith)
-						breakCharacter = wordBreak.substring(1);
-					if(endingWith)
-						breakCharacter = wordBreak.substring(0, wordBreak.length() - 1);
+		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
+			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
+				: StringUtils.split(word, wordBreakCharacters));
 
-					Pattern pattern = PatternService.pattern(wordBreak);
-					compounds = PatternService.split(word, pattern);
-				}
-				else
-					compounds = StringUtils.splitByWholeSeparator(word, wordBreak);
+			int size = compounds.length;
+			if(size > 1){
+				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
+					.map(subword -> hyphenate(subword, patterns, Level.NON_COMPOUND, breakCharacter))
+					.collect(Collectors.toList());
 
-				if(compounds.length > 1){
-					Hyphenation nonCompoundHyphenation = hyphenate(word, patterns, Level.NON_COMPOUND, breakCharacter);
+				//TODO manage missing breaking character
 
-					response.add(nonCompoundHyphenation);
-					//TODO
+				Hyphenation nonCompoundHyphenation = Hyphenation.merge(subHyphenations, breakCharacter);
 System.out.println(nonCompoundHyphenation.toString());
-				}
+				response.add(nonCompoundHyphenation);
 			}
 		}
 		response.add(compoundHyphenation);
@@ -573,6 +572,12 @@ System.out.println(nonCompoundHyphenation.toString());
 			throw new IllegalArgumentException("Cannot hyphenate word " + word + ", no or multiple hyphenations found (" + hyphenations + ")");
 		}
 		return response.iterator().next();
+	}
+
+	private List<String> getTokensWithDelimiters(String str, String delimiters){
+		return Collections.list(new StringTokenizer(str, delimiters, true)).stream()
+			.map(token -> (String)token)
+			.collect(Collectors.toList());
 	}
 
 	/**
