@@ -483,7 +483,14 @@ public class HyphenationParser{
 	 * @return the hyphenation object(s)
 	 */
 	public Hyphenation hyphenate(String word){
-		return hyphenate(word, patterns);
+		LOCK_SAVING.lock();
+
+		try{
+			return hyphenate(word, patterns);
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	/**
@@ -549,16 +556,32 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
-		Hyphenation response = hyphenate(word, patterns, Level.COMPOUND, HyphenationParser.SOFT_HYPHEN);
+		//apply first level hyphenation
+		Hyphenation result = hyphenate(word, patterns, Level.COMPOUND);
 
-/*Recursive compound level hyphenation
+		if(!result.isHyphenated())
+			//when first level hyphenation is not possible, use the second level hyphenation for the word or the word parts
+			result = hyphenate(word, patterns, Level.NON_COMPOUND);
 
-The algorithm is recursive: every word parts of a successful 
+		return result;
+	}
+
+	/**
+	 * Performs hyphenation
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 *
+	 * @param word	String to hyphenate
+	 * @param patterns	The radix tree containing the patterns
+	 * @param level	Level at which to hyphenate
+	 * @return the hyphenation object
+	 */
+	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+		Hyphenation response = hyphenate(word, patterns, level, HyphenationParser.SOFT_HYPHEN);
+
+/*The algorithm is recursive: every word parts of a successful 
 first (compound) level hyphenation will be rehyphenated
-by the same (first) pattern set.
-
-Finally, when first level hyphenation is not possible, Hyphen uses
-the second level hyphenation for the word or the word parts.*/
+by the same (first) pattern set.*/
+//retrieve list of breaking characters, and re-add them after hyphenation
 //		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
 //			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
 //				: StringUtils.split(word, wordBreakCharacters));
@@ -578,7 +601,6 @@ the second level hyphenation for the word or the word parts.*/
 //			}
 //		}
 
-//if not hyphenation is possible, redo all with Level.NON_COMPOUND
 		return response;
 	}
 

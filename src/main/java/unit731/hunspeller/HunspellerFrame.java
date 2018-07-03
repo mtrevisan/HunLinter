@@ -1621,7 +1621,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.hypWordTextField.getText();
+		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
 		if(Objects.nonNull(formerHyphenationText) && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -1629,7 +1629,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			text = frame.dicParser.correctOrthography(text);
 			Hyphenation hyphenation = frame.hypParser.hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");

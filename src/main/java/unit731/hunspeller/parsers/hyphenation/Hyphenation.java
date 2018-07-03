@@ -86,6 +86,10 @@ public class Hyphenation{
 		return (idx + syllabes.size()) % syllabes.size();
 	}
 
+	public boolean isHyphenated(){
+		return !rules.isEmpty();
+	}
+
 	public boolean hasErrors(){
 		boolean result = false;
 		for(boolean error : errors)
