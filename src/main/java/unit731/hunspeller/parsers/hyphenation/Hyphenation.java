@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(of = {"syllabes", "breakCharacter"})
 public class Hyphenation{
 
 	@NonNull
@@ -18,6 +20,8 @@ public class Hyphenation{
 	private final List<String> rules;
 	@NonNull
 	private final boolean[] errors;
+	@NonNull
+	private final String breakCharacter;
 
 
 	/**
@@ -83,7 +87,7 @@ public class Hyphenation{
 
 	@Override
 	public String toString(){
-		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
+		return formatHyphenation(new StringJoiner(breakCharacter), Function.identity())
 			.toString();
 	}
 
