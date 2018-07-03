@@ -578,9 +578,11 @@ public class HyphenationParser{
 	private Hyphenation hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		Hyphenation response = hyphenate(word, patterns, level, HyphenationParser.SOFT_HYPHEN);
 
-/*The algorithm is recursive: every word parts of a successful 
+//TODO
+/*The algorithm is recursive: every word parts of a successful
 first (compound) level hyphenation will be rehyphenated
 by the same (first) pattern set.*/
+
 //retrieve list of breaking characters, and re-add them after hyphenation
 //		if(wordBreakCharactersRegex != null || wordBreakCharacters != null){
 //			String[] compounds = (wordBreakCharactersRegex != null? PatternService.split(word, wordBreakCharactersRegex)
