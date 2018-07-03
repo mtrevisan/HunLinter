@@ -582,18 +582,23 @@ public class HyphenationParser{
 first (compound) level hyphenation will be rehyphenated
 by the same (first) pattern set.*/
 
-//retrieve list of breaking characters, and re-add them after hyphenation
 		if(wordBreakCharacters != null){
 			String[] compounds = PatternService.split(word, wordBreakCharacters);
 
 			int size = compounds.length;
 			if(size > 1){
 				List<HyphenationInterface> subHyphenations = new ArrayList<>();
+				List<String> breakCharacters = new ArrayList<>();
 				boolean startsWithDelimiter = wordBreakCharacters.matcher(compounds[0]).matches();
-				for(int i = (startsWithDelimiter? 1: 0); i < size; i += 2){
+				if(startsWithDelimiter)
+					breakCharacters.add(compounds[0]);
+				for(int i = (startsWithDelimiter? 1: 0); i < size; i ++){
 					String subword = compounds[i];
 					subHyphenations.add(hyphenate(subword, patterns, Level.COMPOUND, SOFT_HYPHEN));
+					if(i < size)
+						breakCharacters.add(compounds[++ i]);
 				}
+				response = new CompoundHyphenation(subHyphenations, breakCharacters, startsWithDelimiter);
 //				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
 //					.map(subword -> hyphenate(subword, patterns, Level.COMPOUND, breakCharacter))
 //					.collect(Collectors.toList());

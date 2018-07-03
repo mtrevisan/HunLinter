@@ -3,10 +3,10 @@ package unit731.hunspeller.parsers.hyphenation;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 
 
 @AllArgsConstructor
@@ -14,66 +14,58 @@ import lombok.NonNull;
 @EqualsAndHashCode
 public class CompoundHyphenation implements HyphenationInterface{
 
-	@NonNull
-	private final Hyphenation firstSubHyphenation;
-	@NonNull
-	private final String breakCharacter;
-	@NonNull
-	private final Hyphenation lastSubHyphenation;
+	private final List<HyphenationInterface> subHyphenations;
+	private final List<String> breakCharacters;
+	private final boolean startsWithBreak;
 
-
-	public CompoundHyphenation(Hyphenation hyphenation){
-		firstSubHyphenation = hyphenation;
-		breakCharacter = null;
-		lastSubHyphenation = null;
-	}
 
 	@Override
 	public boolean isHyphenated(){
-		return (firstSubHyphenation.isHyphenated() || isCompounded() && lastSubHyphenation.isHyphenated());
+		return subHyphenations.stream()
+			.anyMatch(Hyphenation::isHyphenated);
 	}
 
 	@Override
 	public boolean hasErrors(){
-		return (firstSubHyphenation.hasErrors() || isCompounded() && lastSubHyphenation.hasErrors());
+		return subHyphenations.stream()
+			.anyMatch(Hyphenation::hasErrors);
 	}
 
 	@Override
 	public List<String> getSyllabes(){
-		List<String> syllabes = firstSubHyphenation.getSyllabes();
-		if(isCompounded())
-			syllabes.addAll(lastSubHyphenation.getSyllabes());
-		return syllabes;
+		return subHyphenations.stream()
+			.map(Hyphenation::getSyllabes)
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public int countSyllabes(){
-		int syllabes = firstSubHyphenation.countSyllabes();
-		if(isCompounded())
-			syllabes += lastSubHyphenation.countSyllabes();
-		return syllabes;
+		return subHyphenations.stream()
+			.mapToInt(Hyphenation::countSyllabes)
+			.sum();
 	}
 
 	@Override
 	public List<String> getRules(){
-		List<String> rules = firstSubHyphenation.getRules();
-		if(isCompounded())
-			rules.addAll(lastSubHyphenation.getRules());
-		return rules;
+		return subHyphenations.stream()
+			.map(Hyphenation::getRules)
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
-		sj = firstSubHyphenation.formatHyphenation(sj, errorFormatter);
-		if(isCompounded()){
-			sj.add(breakCharacter);
-			sj = lastSubHyphenation.formatHyphenation(sj, errorFormatter);
+		int j = 0;
+		if(startsWithBreak)
+			sj.add(breakCharacters.get(j ++));
+		int breaks = breakCharacters.size();
+		for(HyphenationInterface sub : subHyphenations){
+			sj = sub.formatHyphenation(sj, errorFormatter);
+			if(j < breaks)
+				sj.add(breakCharacters.get(j ++));
 		}
 		return sj;
-	}
-
-	private boolean isCompounded(){
-		return (lastSubHyphenation != null);
 	}
 
 }
