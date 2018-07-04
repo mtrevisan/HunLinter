@@ -582,8 +582,8 @@ public class HyphenationParser{
 
 			int size = compounds.length;
 			if(size > 1){
-				List<HyphenationInterface> subHyphenations = new ArrayList<>();
-				List<String> breakCharacters = new ArrayList<>();
+				List<HyphenationInterface> subHyphenations = new ArrayList<>((size >> 1) + (size % 2));
+				List<String> breakCharacters = new ArrayList<>(size >> 1);
 				boolean startsWithDelimiter = wordBreakCharacters.matcher(compounds[0]).matches();
 				if(startsWithDelimiter)
 					breakCharacters.add(compounds[0]);
@@ -718,6 +718,7 @@ public class HyphenationParser{
 		}
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
+
 
 
 	HyphenationInterface hyphenate2(String word){
