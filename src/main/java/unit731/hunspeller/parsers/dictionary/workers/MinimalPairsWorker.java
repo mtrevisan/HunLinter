@@ -35,6 +35,8 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 @AllArgsConstructor
 public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
+	private static final String SLASH = "/";
+
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
@@ -132,8 +134,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								char left = difference.getLeft();
 								char right = difference.getRight();
 								if(dicParser.isConsonant(left) && dicParser.isConsonant(right)){
-									String key = left + "/" + right;
-									String value = sourceLine + "/" + line2;
+									String key = left + SLASH + right;
+									String value = sourceLine + SLASH + line2;
 									minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
 										.add(value);
 

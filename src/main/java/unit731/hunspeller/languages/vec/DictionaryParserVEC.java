@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -101,10 +102,13 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final String HYPHEN_SLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
+	private static final String HYPHEN_SPLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
 		+ HyphenationParser.SOFT_HYPHEN;
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
+
+	private static final String SLASH = "/";
+	private static final String ASTERISK = "*";
 
 
 	private static final class MatcherEntry{
@@ -398,7 +402,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			finalSonorizationCheck(production);
 
 			String derivedWord = production.getWord();
-			String[] splittedWords = StringUtils.split(derivedWord, HYPHEN_SLITTER);
+			String[] splittedWords = StringUtils.split(derivedWord, HYPHEN_SPLITTER);
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
@@ -589,8 +593,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 				if(derivedWord.length() > 1){
 					HyphenationInterface hyphenation = hyphenationParser.hyphenate(derivedWord);
 					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
-							+ " is not syllabable");
+						throw new IllegalArgumentException("Word " + derivedWord + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
+							+ ") is not syllabable");
 				}
 			}
 		}
