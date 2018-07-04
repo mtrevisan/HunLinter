@@ -20,7 +20,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.hyphenation.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
@@ -588,13 +587,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 
 				if(derivedWord.length() > 1){
-					String[] subDerivedWords = StringUtils.split(derivedWord, HyphenationParser.EN_DASH);
-					for(String subDerivedWord : subDerivedWords){
-						HyphenationInterface hyphenation = hyphenationParser.hyphenate(subDerivedWord);
-						if(hyphenation.hasErrors())
-							throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
-								+ " is not syllabable");
-					}
+					HyphenationInterface hyphenation = hyphenationParser.hyphenate(derivedWord);
+					if(hyphenation.hasErrors())
+						throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
+							+ " is not syllabable");
 				}
 			}
 		}
