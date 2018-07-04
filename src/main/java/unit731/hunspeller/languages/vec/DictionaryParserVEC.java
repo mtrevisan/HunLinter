@@ -586,16 +586,15 @@ public class DictionaryParserVEC extends DictionaryParser{
 				String correctedDerivedWord = correctOrthography(derivedWord);
 				if(!correctedDerivedWord.equals(derivedWord))
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
-			}
 
-			if(derivedWord.length() > 1 && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)
-					&& !production.isPartOfSpeech(POS_INTERJECTION)){
-				String[] subDerivedWords = StringUtils.split(derivedWord, HyphenationParser.EN_DASH);
-				for(String subDerivedWord : subDerivedWords){
-					HyphenationInterface hyphenation = hyphenationParser.hyphenate(subDerivedWord);
-					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
-							+ " is not syllabable");
+				if(derivedWord.length() > 1){
+					String[] subDerivedWords = StringUtils.split(derivedWord, HyphenationParser.EN_DASH);
+					for(String subDerivedWord : subDerivedWords){
+						HyphenationInterface hyphenation = hyphenationParser.hyphenate(subDerivedWord);
+						if(hyphenation.hasErrors())
+							throw new IllegalArgumentException("Word " + String.join(HyphenationParser.HYPHEN, hyphenation.getSyllabes())
+								+ " is not syllabable");
+					}
 				}
 			}
 		}
