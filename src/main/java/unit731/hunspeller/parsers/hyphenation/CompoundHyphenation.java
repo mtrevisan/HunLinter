@@ -22,19 +22,19 @@ public class CompoundHyphenation implements HyphenationInterface{
 	@Override
 	public boolean isHyphenated(){
 		return subHyphenations.stream()
-			.anyMatch(Hyphenation::isHyphenated);
+			.anyMatch(HyphenationInterface::isHyphenated);
 	}
 
 	@Override
 	public boolean hasErrors(){
 		return subHyphenations.stream()
-			.anyMatch(Hyphenation::hasErrors);
+			.anyMatch(HyphenationInterface::hasErrors);
 	}
 
 	@Override
 	public List<String> getSyllabes(){
 		return subHyphenations.stream()
-			.map(Hyphenation::getSyllabes)
+			.map(HyphenationInterface::getSyllabes)
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
 	}
@@ -42,14 +42,14 @@ public class CompoundHyphenation implements HyphenationInterface{
 	@Override
 	public int countSyllabes(){
 		return subHyphenations.stream()
-			.mapToInt(Hyphenation::countSyllabes)
+			.mapToInt(HyphenationInterface::countSyllabes)
 			.sum();
 	}
 
 	@Override
 	public List<String> getRules(){
 		return subHyphenations.stream()
-			.map(Hyphenation::getRules)
+			.map(HyphenationInterface::getRules)
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
 	}

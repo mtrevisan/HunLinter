@@ -151,7 +151,7 @@ public class AffixParser{
 					return type;
 			return null;
 		}
-	};
+	}
 
 
 	private final Map<String, Object> data = new HashMap<>();

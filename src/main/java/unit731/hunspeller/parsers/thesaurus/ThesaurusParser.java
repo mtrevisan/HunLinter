@@ -131,7 +131,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 		}
-	};
+	}
 
 	public int getSynonymsCounter(){
 		LOCK_SAVING.lock();

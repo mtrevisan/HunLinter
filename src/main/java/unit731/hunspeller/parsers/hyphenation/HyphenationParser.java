@@ -101,7 +101,7 @@ public class HyphenationParser{
 		COMPOUND,
 		//defines the rules to be used within words or word parts
 		NON_COMPOUND
-	};
+	}
 
 	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
@@ -317,7 +317,7 @@ public class HyphenationParser{
 			if(Objects.nonNull(postExecution))
 				postExecution.run();
 		}
-	};
+	}
 
 	public void clear(){
 		LOCK_SAVING.lock();
@@ -577,11 +577,6 @@ public class HyphenationParser{
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		HyphenationInterface response = hyphenate(word, patterns, level, SOFT_HYPHEN);
 
-//TODO
-/*The algorithm is recursive: every word parts of a successful
-first (compound) level hyphenation will be rehyphenated
-by the same (first) pattern set.*/
-
 		if(wordBreakCharacters != null){
 			String[] compounds = PatternService.split(word, wordBreakCharacters);
 
@@ -594,21 +589,11 @@ by the same (first) pattern set.*/
 					breakCharacters.add(compounds[0]);
 				for(int i = (startsWithDelimiter? 1: 0); i < size; i ++){
 					String subword = compounds[i];
-					subHyphenations.add(hyphenate(subword, patterns, Level.COMPOUND, SOFT_HYPHEN));
-					if(i < size)
-						breakCharacters.add(compounds[++ i]);
+					subHyphenations.add(hyphenate(subword, patterns, level, SOFT_HYPHEN));
+					if(++ i < size)
+						breakCharacters.add(compounds[i]);
 				}
 				response = new CompoundHyphenation(subHyphenations, breakCharacters, startsWithDelimiter);
-//				List<Hyphenation> subHyphenations = Arrays.stream(compounds)
-//					.map(subword -> hyphenate(subword, patterns, Level.COMPOUND, breakCharacter))
-//					.collect(Collectors.toList());
-//
-//				//TODO manage missing breaking character
-//
-//				Hyphenation nonCompoundHyphenation = Hyphenation.merge(subHyphenations, breakCharacter);
-//System.out.println(nonCompoundHyphenation.toString());
-//				if(nonCompoundHyphenation.countSyllabes() > size)
-//					response = nonCompoundHyphenation;
 			}
 		}
 

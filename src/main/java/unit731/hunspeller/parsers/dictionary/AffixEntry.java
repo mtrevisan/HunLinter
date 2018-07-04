@@ -38,7 +38,7 @@ public class AffixEntry{
 					return type;
 			return null;
 		}
-	};
+	}
 
 
 	@Getter

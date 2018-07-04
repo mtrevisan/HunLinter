@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BitArrayBuilder{
 
-	public static enum Type{FAST, JAVA, MEMORY_MAPPED_FILE};
+	public static enum Type{FAST, JAVA, MEMORY_MAPPED_FILE}
 
 
 	@SuppressWarnings("fallthrough")

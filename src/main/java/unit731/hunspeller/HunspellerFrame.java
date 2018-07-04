@@ -1230,7 +1230,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			removeSelectedRowsFromThesaurus();
 		else{
 			if(Objects.nonNull(dicCorrectnessWorker) && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
-				Object[] options ={"Abort", "Cancel"};
+				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
@@ -1245,7 +1245,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
 			if(Objects.nonNull(dicDuplicatesWorker) && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
-				Object[] options ={"Abort", "Cancel"};
+				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
@@ -1260,7 +1260,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
 			if(Objects.nonNull(dicWordlistWorker) && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
-				Object[] options ={"Abort", "Cancel"};
+				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
