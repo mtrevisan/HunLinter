@@ -212,7 +212,7 @@ public class HyphenationParser{
 									level = Level.NON_COMPOUND;
 									REDUCED_PATTERNS.get(level).clear();
 								}
-								else if(!isAugmentedRule(line) && (line.contains(HYPHEN_MINUS) || line.contains(HYPHEN_EQUALS))){
+								else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
 									String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
 									if(hypParser.customHyphenations.get(level).containsKey(key))
 										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
