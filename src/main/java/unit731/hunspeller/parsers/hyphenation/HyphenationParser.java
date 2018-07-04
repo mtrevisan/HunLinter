@@ -92,7 +92,7 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
 
 	private static final Matcher MATCHER_REDUCE = PatternService.matcher("/.+$");
-	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*%.*$");
+	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
 
