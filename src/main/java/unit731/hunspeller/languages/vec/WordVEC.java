@@ -59,6 +59,7 @@ public class WordVEC{
 	private static final String NO_STRESS_SAVER = "^(p?re|stra)?(sà|sav?arà)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(re)?v[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_WORDS = "^(síngui|spiràkui|títui|triàngui|vínkui)$";
 	private static final Matcher PREVENT_UNMARK_STRESS;
 	static{
 		StringJoiner sj = (new StringJoiner("|"))
@@ -67,7 +68,8 @@ public class WordVEC{
 			.add(NO_STRESS_DAR_FAR_STAR)
 			.add(NO_STRESS_SAVER)
 			.add(NO_STRESS_ANDAR)
-			.add(NO_STRESS_TRAER);
+			.add(NO_STRESS_TRAER)
+			.add(NO_STRESS_WORDS);
 		PREVENT_UNMARK_STRESS = PatternService.matcher(sj.toString());
 	}
 

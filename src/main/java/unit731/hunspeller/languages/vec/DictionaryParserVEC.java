@@ -281,8 +281,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD, PEJORATIVE_ASO_RULE_VANISHING_EL, PEJORATIVE_ASO_RULE_NON_VANISHING_EL));
 	}
 
-	private static final Matcher MISSING_PLURAL_AFTER_N_OR_L = PatternService.matcher("^[^ƚ]*[eaouèàòéóú][ln]\\/[^U\\t]+\\t");
-	private static final Matcher ENDS_IN_MAN = PatternService.matcher("man\\/");
+	private static final Matcher MATCHER_NORTHERN_PLURAL = PatternService.matcher("[èò][ln]$");
+	private static final String MAN = "man";
 
 	private static final Set<MatcherEntry> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
 	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1}";
@@ -380,6 +380,9 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	@Override
 	public void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
+		if(!ENABLE_VERB_CHECK && production.isPartOfSpeech(POS_VERB))
+			return;
+
 		try{
 			if(!production.hasMorphologicalFields())
 				throw new IllegalArgumentException("Line does not contains any morphological fields");
@@ -394,7 +397,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(production.hasContinuationFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
-				northernPluralCheck(production, derivedWordWithoutMorphologicalFields);
+				northernPluralCheck(production);
 			}
 
 			mismatchCheck(derivedWordWithoutMorphologicalFields);
@@ -529,12 +532,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void northernPluralCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN)
-				&& !PatternService.find(line, ENDS_IN_MAN)
-				&& PatternService.find(line, MISSING_PLURAL_AFTER_N_OR_L))
-			throw new IllegalArgumentException("Plural missing after n or l for " + line + ", add "
-				+ (WordVEC.isStressed(PatternService.clear(line, PatternService.matcher(START_TAGS)))? NORTHERN_PLURAL_STRESSED_RULE: NORTHERN_PLURAL_RULE));
+	private void northernPluralCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		String word = production.getWord();
+		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
+				&& hyphenationParser.hyphenate(word).countSyllabes() > 1){
+			String rule = (!WordVEC.isStressed(word) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
+			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
+				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && wordGenerator.isAffixProductive(word, rule));
+			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
+				if(canHaveNorthernPlural)
+					throw new IllegalArgumentException("Northern plural missing for " + word + ", add " + rule);
+				else if(!canHaveNorthernPlural)
+					throw new IllegalArgumentException("Northern plural not needed for " + word + ", remove " + NORTHERN_PLURAL_RULE + " or " + NORTHERN_PLURAL_STRESSED_RULE);
+			}
+		}
 	}
 
 	private void mismatchCheck(String line) throws IllegalArgumentException{
