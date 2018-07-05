@@ -68,7 +68,7 @@ public class OrthographyVEC extends Orthography{
 
 		word = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
 
-//		word = correctIJOccurrences(word);
+		word = correctIJOccurrences(word);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, GraphemeVEC.L_GRAPHEME);
@@ -101,7 +101,7 @@ public class OrthographyVEC extends Orthography{
 				iInsideIntoJFalsePositive = true;
 				break;
 			}
-		if(!iInsideIntoJFalsePositive)
+		if(!iInsideIntoJFalsePositive && (word.endsWith("io") /*|| word.endsWith("nte") || word.endsWith("nti")*/))
 			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		return word;
 	}
