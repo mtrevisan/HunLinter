@@ -583,7 +583,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
-		if((!ENABLE_VERB_CHECK || !production.isPartOfSpeech(POS_VERB)) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if((ENABLE_VERB_CHECK || !production.isPartOfSpeech(POS_VERB)) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
 			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(derivedWord)){
 				String correctedDerivedWord = correctOrthography(derivedWord);
