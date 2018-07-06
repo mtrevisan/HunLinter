@@ -677,8 +677,8 @@ public class HyphenationParser{
 	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
-		int size = w.length() - 1;
 		int wordSize = word.length();
+		int size = wordSize + WORD_BOUNDARY.length() * 2;
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
 		//the rules applied to the word
@@ -688,9 +688,6 @@ public class HyphenationParser{
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
-
-			//enforce NOHYPHENS
-//TODO
 
 			for(String rule : prefixes){
 				int j = -1;
@@ -716,9 +713,46 @@ public class HyphenationParser{
 				}
 			}
 		}
+
+//		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
+
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
+	//FIXME to be tested!
+	private void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
+		int size = word.length() + WORD_BOUNDARY.length() * 2;
+
+		Set<String> noHyphen = options.getNoHyphen();
+		for(String nohyp : noHyphen){
+			int nohypLength = nohyp.length();
+			if(nohyp.charAt(0) == '^'){
+				if(word.startsWith(nohyp)){
+					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
+					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength);
+				}
+			}
+			else if(nohyp.charAt(nohypLength - 1) == '$'){
+				if(word.endsWith(nohyp)){
+					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength + 1);
+					resetBreakpoint(indexes, rules, augmentedPatternData, size);
+				}
+			}
+			else{
+				int idx = -1;
+				while((idx = word.indexOf(nohyp, idx + 1)) >= 0){
+					resetBreakpoint(indexes, rules, augmentedPatternData, idx);
+					resetBreakpoint(indexes, rules, augmentedPatternData, idx + nohypLength);
+				}
+			}
+		}
+	}
+
+	private void resetBreakpoint(int[] indexes, String[] rules, String[] augmentedPatternData, int index){
+		indexes[index] = 0;
+		rules[index] = null;
+		augmentedPatternData[index] = null;
+	}
 
 
 	HyphenationInterface hyphenate2(String word){
@@ -835,6 +869,7 @@ System.out.println(rule);
 		}
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
+
 
 	private static boolean isAugmentedRule(String line){
 		return line.contains(AUGMENTED_RULE);
