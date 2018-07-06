@@ -33,6 +33,7 @@ public class OrthographyVEC extends Orthography{
 	private static final List<Matcher> REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
 		PatternService.matcher("b[ae]roi[aeèi]r")
 	);
+	private static final Matcher REGEX_I_INSIDE_INTO_J_EXCLUSIONS = PatternService.matcher("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
 	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Matcher REGEX_X_INTO_S = PatternService.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
@@ -101,7 +102,7 @@ public class OrthographyVEC extends Orthography{
 				iInsideIntoJFalsePositive = true;
 				break;
 			}
-		if(!iInsideIntoJFalsePositive && (word.endsWith("io") /*|| word.endsWith("nte") || word.endsWith("nti")*/))
+		if(!iInsideIntoJFalsePositive && !PatternService.find(word, REGEX_I_INSIDE_INTO_J_EXCLUSIONS))
 			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		return word;
 	}
