@@ -96,12 +96,7 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
 
-	public static enum Level{
-		//defines the rules to be used at compound word boundaries
-		COMPOUND,
-		//defines the rules to be used within words or word parts
-		NON_COMPOUND
-	}
+	public static enum Level{FIRST, SECOND}
 
 	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
@@ -182,8 +177,7 @@ public class HyphenationParser{
 				long readSoFar = 0l;
 				long totalSize = hypFile.length();
 
-				//start with compound level
-				Level level = Level.COMPOUND;
+				Level level = Level.FIRST;
 
 				Path hypPath = hypFile.toPath();
 				Charset charset = FileService.determineCharset(hypPath);
@@ -205,11 +199,11 @@ public class HyphenationParser{
 							boolean parsedLine = hypParser.options.parseLine(line);
 							if(!parsedLine){
 								if(line.startsWith(NEXT_LEVEL)){
-									if(level == Level.NON_COMPOUND)
+									if(level == Level.SECOND)
 										throw new IllegalArgumentException("Cannot have more than two levels");
 
 									//start with non–compound level
-									level = Level.NON_COMPOUND;
+									level = Level.SECOND;
 									REDUCED_PATTERNS.get(level).clear();
 								}
 								else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
@@ -236,7 +230,7 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					if(level == Level.NON_COMPOUND){
+					if(level == Level.SECOND){
 						//dash and apostrophe are added by default (retro-compatibility)
 						List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
 						if(charset == StandardCharsets.UTF_8)
@@ -251,8 +245,8 @@ public class HyphenationParser{
 						}
 					}
 
-					hypParser.patterns.get(Level.COMPOUND).prepare();
-					hypParser.patterns.get(Level.NON_COMPOUND).prepare();
+					hypParser.patterns.get(Level.FIRST).prepare();
+					hypParser.patterns.get(Level.SECOND).prepare();
 
 					setProgress(100);
 				}
@@ -426,11 +420,11 @@ public class HyphenationParser{
 				//save options
 				options.write(writer);
 
-				savePatternsByLevel(writer, Level.COMPOUND);
+				savePatternsByLevel(writer, Level.FIRST);
 
 				writeln(writer, NEXT_LEVEL);
 
-				savePatternsByLevel(writer, Level.NON_COMPOUND);
+				savePatternsByLevel(writer, Level.SECOND);
 			}
 		}
 		finally{
@@ -556,11 +550,11 @@ public class HyphenationParser{
 	 */
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		HyphenationInterface result = hyphenate(word, patterns, Level.COMPOUND);
+		HyphenationInterface result = hyphenate(word, patterns, Level.FIRST);
 
 		if(!result.isHyphenated())
 			//when first level hyphenation is not possible, use the second level hyphenation for the word or the word parts
-			result = hyphenate(word, patterns, Level.NON_COMPOUND);
+			result = hyphenate(word, patterns, Level.SECOND);
 
 		return result;
 	}
@@ -575,7 +569,7 @@ public class HyphenationParser{
 	 * @return the hyphenation object
 	 */
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
-		HyphenationInterface response = hyphenate(word, patterns, level, SOFT_HYPHEN);
+		HyphenationInterface response = hyphenate(word, patterns, level, SOFT_HYPHEN, false);
 
 		if(wordBreakCharacters != null){
 			String[] compounds = PatternService.split(word, wordBreakCharacters);
@@ -589,7 +583,7 @@ public class HyphenationParser{
 					breakCharacters.add(compounds[0]);
 				for(int i = (startsWithDelimiter? 1: 0); i < size; i ++){
 					String subword = compounds[i];
-					subHyphenations.add(hyphenate(subword, patterns, level, SOFT_HYPHEN));
+					subHyphenations.add(hyphenate(subword, patterns, level, SOFT_HYPHEN, true));
 					if(++ i < size)
 						breakCharacters.add(compounds[i]);
 				}
@@ -607,9 +601,11 @@ public class HyphenationParser{
 	 * @param word	String to hyphenate
 	 * @param patterns	The radix tree containing the patterns
 	 * @param level	Level at which to hyphenate
+	 * @param isCompound	Whether the word is part of a compounded word
 	 * @return the hyphenation object
 	 */
-	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter){
+	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter,
+			boolean isCompound){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -632,7 +628,7 @@ public class HyphenationParser{
 			rules = hyphenatedWord;
 		}
 		else{
-			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level);
+			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 
@@ -674,7 +670,7 @@ public class HyphenationParser{
 		return hyphenatedWord;
 	}
 
-	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level, boolean isCompound){
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int wordSize = word.length();
@@ -685,6 +681,8 @@ public class HyphenationParser{
 		String[] rules = new String[wordSize];
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
+		int leftMin = (isCompound? options.getLeftCompoundMin(): options.getLeftMin());
+		int rightMin = (isCompound? options.getRightCompoundMin(): options.getRightMin());
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
@@ -701,7 +699,7 @@ public class HyphenationParser{
 					if(!Character.isDigit(chr))
 						j ++;
 					//check if a break point should be skipped based on left and right min options
-					else if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+					else if(leftMin <= idx && idx <= wordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
@@ -766,7 +764,7 @@ public class HyphenationParser{
 		boolean[] errors;
 
 		//FIXME manage second level
-		Level level = Level.COMPOUND;
+		Level level = Level.FIRST;
 
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){

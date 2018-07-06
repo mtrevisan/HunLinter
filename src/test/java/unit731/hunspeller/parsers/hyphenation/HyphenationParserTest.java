@@ -23,7 +23,7 @@ public class HyphenationParserTest{
 		patternsLevelCompound.put("abc", "a1bc");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
 			.rightMin(0)
@@ -41,7 +41,7 @@ public class HyphenationParserTest{
 		patternsLevelCompound.put("abc", "ab1c");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
 			.rightMin(2)
@@ -59,7 +59,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "a1bc");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(0)
@@ -77,7 +77,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "ab1c");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
 			.rightMin(1)
@@ -95,7 +95,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "aa1tje/=,2,1");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -113,7 +113,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "1–/–=,1,1");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -131,7 +131,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "1–/–=");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -149,7 +149,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "–1/–=–");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -168,7 +168,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "1c");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -187,7 +187,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "–1/–=–");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -205,7 +205,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "eigh1teen/ht=t,4,2");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -223,7 +223,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, ".schif1fahrt/ff=f,5,2");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -241,7 +241,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "c1k/k=k");
 		patternsLevelCompound.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -259,7 +259,7 @@ public class HyphenationParserTest{
 		addRule(patternsLevelCompound, "ab1c");
 		addRule(patternsLevelCompound, "2c");
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
