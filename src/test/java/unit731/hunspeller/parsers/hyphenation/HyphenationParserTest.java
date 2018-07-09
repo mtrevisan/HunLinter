@@ -30,9 +30,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("abc");
-
-		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+		check(parser, "abc", "abc");
 	}
 
 	@Test
@@ -48,9 +46,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("abc");
-
-		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+		check(parser, "abc", "abc");
 	}
 
 	@Test
@@ -66,9 +62,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("abc");
-
-		Assert.assertEquals(Arrays.asList("a", "bc"), hyphenation.getSyllabes());
+		check(parser, "abc", "a", "bc");
 	}
 
 	@Test
@@ -84,9 +78,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("abc");
-
-		Assert.assertEquals(Arrays.asList("ab", "c"), hyphenation.getSyllabes());
+		check(parser, "abc", "ab", "c");
 	}
 
 	@Test
@@ -102,9 +94,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("du", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("omaatje");
-
-		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+		check(parser, "omaatje", "oma", "tje");
 	}
 
 	@Test
@@ -120,9 +110,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("ab–cd");
-
-		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
+		check(parser, "ab–cd", "ab–", "–cd");
 	}
 
 	@Test
@@ -138,9 +126,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("ab–cd");
-
-		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
+		check(parser, "ab–cd", "ab–", "–cd");
 	}
 
 	@Test
@@ -156,9 +142,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("ab–cd");
-
-		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
+		check(parser, "ab–cd", "ab–", "–cd");
 	}
 
 	@Test
@@ -175,9 +159,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("ab–cd");
-
-		Assert.assertEquals(Arrays.asList("ab–", "–cd"), hyphenation.getSyllabes());
+		check(parser, "ab–cd", "ab–", "–cd");
 	}
 
 	@Test
@@ -194,9 +176,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("kuko–fu");
-
-		Assert.assertEquals(Arrays.asList("ku", "ko–", "–fu"), hyphenation.getSyllabes());
+		check(parser, "kuko–fu", "ku", "ko–", "–fu");
 	}
 
 	@Test
@@ -212,9 +192,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("en", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("eighteen");
-
-		Assert.assertEquals(Arrays.asList("eight", "teen"), hyphenation.getSyllabes());
+		check(parser, "eighteen", "eight", "teen");
 	}
 
 	@Test
@@ -230,9 +208,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("schiffahrt");
-
-		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
+		check(parser, "schiffahrt", "schiff", "fahrt");
 	}
 
 	@Test
@@ -248,9 +224,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("Zucker");
-
-		Assert.assertEquals(Arrays.asList("Zuk", "ker"), hyphenation.getSyllabes());
+		check(parser, "Zucker", "Zuk", "ker");
 	}
 
 	@Test
@@ -265,9 +239,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("vec", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("abc");
-
-		Assert.assertEquals(Arrays.asList("abc"), hyphenation.getSyllabes());
+		check(parser, "abc", "abc");
 	}
 
 //	@Test
@@ -322,17 +294,9 @@ public class HyphenationParserTest{
 		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("schiffen");
-
-		Assert.assertEquals(Arrays.asList("schif", "fen"), hyphenation.getSyllabes());
-
-		hyphenation = parser.hyphenate("schiffahrt");
-
-		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
-
-		hyphenation = parser.hyphenate("teneriffa");
-
-		Assert.assertEquals(Arrays.asList("tenerif", "fa"), hyphenation.getSyllabes());
+		check(parser, "schiffen", "schif", "fen");
+		check(parser, "schiffahrt", "schiff", "fahrt");
+		check(parser, "teneriffa", "tenerif", "fa");
 	}
 
 	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
@@ -347,9 +311,7 @@ public class HyphenationParserTest{
 		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationParser parser = new HyphenationParser("hu", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("asszonnyal");
-
-		Assert.assertEquals(Arrays.asList("asz", "szony", "nyal"), hyphenation.getSyllabes());
+		check(parser, "asszonnyal", "asz", "szony", "nyal");
 	}
 
 	/** Dutch: omaatje -> oma-tje */
@@ -363,9 +325,7 @@ public class HyphenationParserTest{
 		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationParser parser = new HyphenationParser("nl", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("omaatje");
-
-		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+		check(parser, "omaatje", "oma", "tje");
 	}
 
 	/** Dutch: omaatje -> oma-tje */
@@ -379,9 +339,49 @@ public class HyphenationParserTest{
 		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationParser parser = new HyphenationParser("nl", null, allPatterns, null, options);
 
-		HyphenationInterface hyphenation = parser.hyphenate("omaatje");
+		check(parser, "omaatje", "oma", "tje");
+	}
 
-		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+	@Test
+	public void french(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "xé1ém/á=a,2,2");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("fr", null, allPatterns, null, options);
+
+		check(parser, "exéémple", "exá", "ample");
+		check(parser, "exéémplxééme", "exá", "amplxá", "ame");
+	}
+
+	@Test
+	public void baseAlt(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "l·1l/l=l,1,3");
+		addRule(patterns1stLevel, "a1atje./a=t,1,3");
+		addRule(patterns1stLevel, "e1etje./é=tje,1,5");
+		addRule(patterns1stLevel, ".schif1fahrt/ff=f,5,2");
+		addRule(patterns1stLevel, "c1k/k=k,1,2");
+		addRule(patterns1stLevel, "d1dzsel./dzs=dzs,1,4");
+		addRule(patterns1stLevel, ".as3szon/sz=sz,2,3");
+		addRule(patterns1stLevel, "n1nyal./ny=ny,1,3");
+		addRule(patterns1stLevel, ".til1lata./ll=l,3,2");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("xx", null, allPatterns, null, options);
+
+		check(parser, "paral·lel", "paral", "lel");
+		check(parser, "omaatje", "oma", "tje");
+		check(parser, "cafeetje", "café", "tje");
+		check(parser, "schiffahrt", "schiff", "fahrt");
+		check(parser, "drucker", "druk", "ker");
+		check(parser, "briddzsel", "bridzs", "dzsel");
+		check(parser, "asszonnyal", "asz", "szony", "nyal");
+		check(parser, "tillata", "till", "lata");
 	}
 
 
@@ -391,6 +391,12 @@ public class HyphenationParserTest{
 
 	private String getKeyFromData(String rule){
 		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
+	}
+
+	private void check(HyphenationParser parser, String word, String ... hyphs){
+		HyphenationInterface hyphenation = parser.hyphenate(word);
+
+		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
 	}
 
 }
