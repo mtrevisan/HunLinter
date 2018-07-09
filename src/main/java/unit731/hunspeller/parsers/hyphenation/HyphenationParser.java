@@ -92,6 +92,15 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
+	private static final char LIGATURE_FF = '\uFB00';
+	private static final char LIGATURE_FI = '\uFB01';
+	private static final char LIGATURE_FL = '\uFB02';
+	private static final char LIGATURE_FFI = '\uFB03';
+	private static final char LIGATURE_FFL = '\uFB04';
+	private static final char LIGATURE_FT = '\uFB05';
+	private static final char LIGATURE_ST = '\uFB06';
+	private static final Set<Character> LIGATURES = new HashSet<>(Arrays.asList(LIGATURE_FF, LIGATURE_FI, LIGATURE_FL, LIGATURE_FFI, LIGATURE_FFL, LIGATURE_FT, LIGATURE_ST));
+
 
 	public static enum Level{FIRST, SECOND}
 
@@ -568,7 +577,6 @@ public class HyphenationParser{
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter,
 			boolean isCompound){
 		boolean[] uppercases = extractUppercases(word);
-		boolean[] ligatures = extractLigatures(word);
 
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
@@ -598,7 +606,6 @@ public class HyphenationParser{
 		}
 		errors = orthography.getSyllabationErrors(hyphenatedWord);
 
-		hyphenatedWord = restoreLigatures(hyphenatedWord, ligatures);
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
 		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
@@ -617,45 +624,6 @@ public class HyphenationParser{
 		int size = uppercases.length;
 		for(int i = 0; i < size; i ++)
 			if(uppercases[i]){
-				int j = i;
-				int indexSoFar = 0;
-				String syll = hyphenatedWord.get(indexSoFar);
-				while(j > syll.length()){
-					j -= syll.length();
-					indexSoFar ++;
-					syll = hyphenatedWord.get(indexSoFar);
-				}
-				StringBuilder syllabe = new StringBuilder(syll);
-				String chr = Character.valueOf(syllabe.charAt(j)).toString();
-				syllabe.setCharAt(j, chr.toUpperCase(Locale.ROOT).charAt(0));
-				hyphenatedWord.set(indexSoFar, syllabe.toString());
-			}
-		return hyphenatedWord;
-	}
-
-	private static final String LIGATURE_FF = "\uFB00";
-	private static final String LIGATURE_FI = "\uFB01";
-	private static final String LIGATURE_FL = "\uFB02";
-	private static final String LIGATURE_FFI = "\uFB03";
-	private static final String LIGATURE_FFL = "\uFB04";
-	private static final String LIGATURE_FT = "\uFB05";
-	private static final String LIGATURE_ST = "\uFB06";
-	//manage ligatures (these are two or three characters long!):
-	private boolean[] extractLigatures(String word){
-		//TODO
-		int size = word.length();
-		boolean[] ligatures = new boolean[size];
-		for(int i = 0; i < size; i ++)
-			if(Character.isUpperCase(word.charAt(i)))
-				ligatures[i] = true;
-		return ligatures;
-	}
-
-	private List<String> restoreLigatures(List<String> hyphenatedWord, boolean[] ligatures){
-		//TODO
-		int size = ligatures.length;
-		for(int i = 0; i < size; i ++)
-			if(ligatures[i]){
 				int j = i;
 				int indexSoFar = 0;
 				String syll = hyphenatedWord.get(indexSoFar);
