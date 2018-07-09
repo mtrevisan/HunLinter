@@ -549,9 +549,9 @@ public class HyphenationParser{
 			List<String> compounds = result.getSyllabes();
 			int size = compounds.size();
 			if(size > 1){
-				List<HyphenationInterface> subHyphenations = new ArrayList<>(size);
-				for(int i = 0; i < size; i ++)
-					subHyphenations.add(hyphenate(compounds.get(i), patterns, Level.SECOND, SOFT_HYPHEN, true));
+				List<HyphenationInterface> subHyphenations = compounds.stream()
+					.map(compound -> hyphenate(compound, patterns, Level.SECOND, SOFT_HYPHEN, true))
+					.collect(Collectors.toList());
 				result = CompoundHyphenation.build(subHyphenations);
 			}
 		}

@@ -420,14 +420,34 @@ public class HyphenationParserTest{
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
-		HyphenationOptions options = HyphenationOptions.builder()
-			.leftCompoundMin(2)
-			.rightCompoundMin(3)
-			.build();
+		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationParser parser = new HyphenationParser("hu", allPatterns, null, options);
 
 		check(parser, "főnökasszony", "fő", "nök", "asz", "szony");
 		check(parser, "asszonyfőnök", "asz", "szony", "fő", "nök");
+	}
+
+	/**
+	 * Norwegian: non-standard hyphenation at compound boundary (kilowattime -> kilowatt-time)
+	 * and recursive compound hyphenation (kilowatt->kilo-watt)
+	 */
+	@Test
+	public void compound3(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "wat1time/tt=t,3,2");
+		addRule(patterns1stLevel, ".kilo1watt");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, ".ki1lo.");
+		addRule(patterns2ndLevel, ".ti1me.");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("no", allPatterns, null, options);
+
+		check(parser, "kilowattime", "ki", "lo", "watt", "ti", "me");
 	}
 
 
