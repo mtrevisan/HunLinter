@@ -73,9 +73,6 @@ public class HyphenationParser{
 	private static final String AUGMENTED_RULE = "/";
 
 	private static final String COMMA = ",";
-	private static final String PIPE = "|";
-	private static final String LEFT_PARENTHESIS = "(";
-	private static final String RIGHT_PARENTHESIS = ")";
 
 	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("^\\.?[^.]+\\.?$");
 	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
@@ -109,23 +106,17 @@ public class HyphenationParser{
 
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
-	private Pattern wordBreakCharacters;
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private HyphenationOptions options;
 
 
-	public HyphenationParser(String language, Set<String> wordBreakCharacters){
+	public HyphenationParser(String language){
 		Objects.requireNonNull(language);
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		if(wordBreakCharacters != null){
-			String wordBreakPattern = wordBreakCharacters.stream()
-				.collect(Collectors.joining(PIPE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS));
-			this.wordBreakCharacters = PatternService.splitterWithDelimiters(wordBreakPattern);
-		}
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -137,8 +128,8 @@ public class HyphenationParser{
 		options = HyphenationOptions.createEmpty();
 	}
 
-	public HyphenationParser(String language, Set<String> wordBreakCharacters, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
-		this(language, wordBreakCharacters);
+	public HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
+		this(language);
 
 		if(Objects.nonNull(patterns))
 			for(Level level : Level.values()){
@@ -550,48 +541,22 @@ public class HyphenationParser{
 	 */
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		HyphenationInterface result = hyphenate(word, patterns, Level.FIRST);
+		HyphenationInterface result = hyphenate(word, patterns, Level.FIRST, SOFT_HYPHEN, false);
 
-		if(!result.isHyphenated())
-			//when first level hyphenation is not possible, use the second level hyphenation for the word or the word parts
-			result = hyphenate(word, patterns, Level.SECOND);
-
-		return result;
-	}
-
-	/**
-	 * Performs hyphenation
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
-	 *
-	 * @param word	String to hyphenate
-	 * @param patterns	The radix tree containing the patterns
-	 * @param level	Level at which to hyphenate
-	 * @return the hyphenation object
-	 */
-	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
-		HyphenationInterface response = hyphenate(word, patterns, level, SOFT_HYPHEN, false);
-
-		if(wordBreakCharacters != null){
-			String[] compounds = PatternService.split(word, wordBreakCharacters);
-
-			int size = compounds.length;
+		//if there is a second level
+		if(!patterns.get(Level.SECOND).isEmpty()){
+			//apply second level hyphenation for the word parts
+			List<String> compounds = result.getSyllabes();
+			int size = compounds.size();
 			if(size > 1){
-				List<HyphenationInterface> subHyphenations = new ArrayList<>((size >> 1) + (size % 2));
-				List<String> breakCharacters = new ArrayList<>(size >> 1);
-				boolean startsWithDelimiter = wordBreakCharacters.matcher(compounds[0]).matches();
-				if(startsWithDelimiter)
-					breakCharacters.add(compounds[0]);
-				for(int i = (startsWithDelimiter? 1: 0); i < size; i ++){
-					String subword = compounds[i];
-					subHyphenations.add(hyphenate(subword, patterns, level, SOFT_HYPHEN, true));
-					if(++ i < size)
-						breakCharacters.add(compounds[i]);
-				}
-				response = new CompoundHyphenation(subHyphenations, breakCharacters, startsWithDelimiter);
+				List<HyphenationInterface> subHyphenations = new ArrayList<>(size);
+				for(int i = 0; i < size; i ++)
+					subHyphenations.add(hyphenate(compounds.get(i), patterns, Level.SECOND, SOFT_HYPHEN, true));
+				result = CompoundHyphenation.build(subHyphenations);
 			}
 		}
 
-		return response;
+		return result;
 	}
 
 	/**
@@ -621,7 +586,7 @@ public class HyphenationParser{
 
 			rules = hyphenatedWord;
 		}
-		else if(word.length() <= (isCompound? options.getMinimumCompoundLength(): options.getMinimumLength())){
+		else if(word.length() < (isCompound? options.getMinimumCompoundLength(): options.getMinimumLength())){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 

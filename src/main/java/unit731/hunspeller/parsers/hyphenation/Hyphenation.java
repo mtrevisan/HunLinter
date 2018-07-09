@@ -115,7 +115,7 @@ public class Hyphenation implements HyphenationInterface{
 
 	@Override
 	public String toString(){
-		return formatHyphenation(new StringJoiner(breakCharacter), Function.identity())
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
 			.toString();
 	}
 

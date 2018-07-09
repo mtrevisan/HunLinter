@@ -9,14 +9,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "build")
 @Getter
 @EqualsAndHashCode
 public class CompoundHyphenation implements HyphenationInterface{
 
 	private final List<HyphenationInterface> subHyphenations;
-	private final List<String> breakCharacters;
-	private final boolean startsWithBreak;
 
 
 	@Override
@@ -56,16 +54,15 @@ public class CompoundHyphenation implements HyphenationInterface{
 
 	@Override
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
-		int j = 0;
-		if(startsWithBreak)
-			sj.add(breakCharacters.get(j ++));
-		int breaks = breakCharacters.size();
-		for(HyphenationInterface sub : subHyphenations){
+		for(HyphenationInterface sub : subHyphenations)
 			sj = sub.formatHyphenation(sj, errorFormatter);
-			if(j < breaks)
-				sj.add(breakCharacters.get(j ++));
-		}
 		return sj;
+	}
+
+	@Override
+	public String toString(){
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
+			.toString();
 	}
 
 }
