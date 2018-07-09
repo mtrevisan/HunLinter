@@ -230,7 +230,7 @@ public class HyphenationParser{
 						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
 
-					if(level == Level.SECOND){
+					if(level == Level.FIRST){
 						//dash and apostrophe are added by default (retro-compatibility)
 						List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
 						if(charset == StandardCharsets.UTF_8)
@@ -621,7 +621,7 @@ public class HyphenationParser{
 
 			rules = hyphenatedWord;
 		}
-		else if(word.length() <= options.getLeftMin() + options.getRightMin()){
+		else if(word.length() <= (isCompound? options.getMinimumCompoundLength(): options.getMinimumLength())){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 
@@ -712,7 +712,7 @@ public class HyphenationParser{
 			}
 		}
 
-//		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
+		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
 
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
@@ -773,7 +773,7 @@ public class HyphenationParser{
 
 			rules = hyphenatedWord;
 		}
-		else if(word.length() <= options.getLeftMin() + options.getRightMin()){
+		else if(word.length() <= options.getMinimumLength()){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 

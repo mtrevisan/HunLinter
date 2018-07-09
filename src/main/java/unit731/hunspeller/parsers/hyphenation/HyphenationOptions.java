@@ -51,6 +51,14 @@ public class HyphenationOptions{
 		noHyphen.clear();
 	}
 
+	public int getMinimumLength(){
+		return leftMin + rightMin;
+	}
+
+	public int getMinimumCompoundLength(){
+		return leftCompoundMin + rightCompoundMin;
+	}
+
 	public boolean parseLine(String line){
 		boolean managed = false;
 		if(line.startsWith(MIN_LEFT_HYPHENATION)){
