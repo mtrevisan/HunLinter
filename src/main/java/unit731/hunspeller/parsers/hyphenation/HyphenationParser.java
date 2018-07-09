@@ -717,7 +717,6 @@ public class HyphenationParser{
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
-	//FIXME to be tested!
 	private void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
 		int size = word.length() + WORD_BOUNDARY.length() * 2;
 
