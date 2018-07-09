@@ -555,6 +555,7 @@ public class HyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
 		check(parser, "maﬃa", "maf", "ﬁa");
+		check(parser, "maﬃaﬃa", "maf", "ﬁaf", "ﬁa");
 	}
 
 		@Test

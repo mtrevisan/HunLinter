@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -591,7 +592,8 @@ public class HyphenationParser{
 
 			rules = hyphenatedWord;
 		}
-		else if(word.length() < (isCompound? options.getMinimumCompoundLength(): options.getMinimumLength())){
+		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < (isCompound? options.getMinimumCompoundLength():
+				options.getMinimumLength())){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 
@@ -644,6 +646,7 @@ public class HyphenationParser{
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int wordSize = word.length();
+		int normalizedWordSize = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 		int size = wordSize + WORD_BOUNDARY.length() * 2;
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
@@ -669,7 +672,8 @@ public class HyphenationParser{
 					if(!Character.isDigit(chr))
 						j ++;
 					//check if a break point should be skipped based on left and right min options
-					else if(leftMin <= idx && idx <= wordSize - rightMin){
+					else if(leftMin <= Normalizer.normalize(word.substring(0, idx), Normalizer.Form.NFKC).length()
+							&& idx <= normalizedWordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
