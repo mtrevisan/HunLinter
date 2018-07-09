@@ -544,18 +544,18 @@ public class HyphenationParserTest{
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
-//	@Test
-//	public void ligature(){
-//		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
-//		addRule(patterns1stLevel, "ﬃ1/f=ﬁ,1,1");
-//		patterns1stLevel.prepare();
-//		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-//		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
-//		HyphenationOptions options = HyphenationOptions.createEmpty();
-//		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
-//
-//		check(parser, "maﬃa", "maf", "ﬁa");
-//	}
+	@Test
+	public void ligature(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "ﬃ1/f=ﬁ,1,1");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "maﬃa", "maf", "ﬁa");
+	}
 
 		@Test
 	public void settings(){
