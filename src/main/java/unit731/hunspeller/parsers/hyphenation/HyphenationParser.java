@@ -725,15 +725,17 @@ public class HyphenationParser{
 		for(String nohyp : noHyphen){
 			int nohypLength = nohyp.length();
 			if(nohyp.charAt(0) == '^'){
+				nohyp = nohyp.substring(1);
 				if(word.startsWith(nohyp)){
 					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
-					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength);
+					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength - 1);
 				}
 			}
 			else if(nohyp.charAt(nohypLength - 1) == '$'){
+				nohyp = nohyp.substring(0, nohypLength - 1);
 				if(word.endsWith(nohyp)){
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength + 1);
-					resetBreakpoint(indexes, rules, augmentedPatternData, size);
+					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength - 1);
+					resetBreakpoint(indexes, rules, augmentedPatternData, size - 2);
 				}
 			}
 			else{
@@ -747,9 +749,11 @@ public class HyphenationParser{
 	}
 
 	private void resetBreakpoint(int[] indexes, String[] rules, String[] augmentedPatternData, int index){
-		indexes[index] = 0;
-		rules[index] = null;
-		augmentedPatternData[index] = null;
+		if(index < indexes.length){
+			indexes[index] = 0;
+			rules[index] = null;
+			augmentedPatternData[index] = null;
+		}
 	}
 
 
