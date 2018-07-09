@@ -544,21 +544,71 @@ public class HyphenationParserTest{
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
-	@Test
-	public void ligature(){
+//	@Test
+//	public void ligature(){
+//		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+//		addRule(patterns1stLevel, "ﬃ1/f=ﬁ,1,1");
+//		patterns1stLevel.prepare();
+//		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+//		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+//		HyphenationOptions options = HyphenationOptions.createEmpty();
+//		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+//
+//		check(parser, "maﬃa", "maf", "ﬁa");
+//	}
+
+		@Test
+	public void settings(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
-		addRule(patterns1stLevel, "ﬃ1/f=ﬁ,1,1");
+		addRule(patterns1stLevel, "ő1");
 		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
-//		HyphenationOptions options = HyphenationOptions.createEmpty();
 		HyphenationOptions options = HyphenationOptions.builder()
-			.leftMin(1)
-			.rightMin(1)
+			.leftMin(2)
+			.rightMin(2)
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "maﬃa", "maf", "ﬁa");
+		check(parser, "őőőőőőő", "őő", "ő", "ő", "ő", "őő");
+	}
+
+	@Test
+	public void unicode(){
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, "l·1l/l=l,1,3");
+		addRule(patterns2ndLevel, "e1ë/e=e,1,2");
+		addRule(patterns2ndLevel, "a1atje./a=t,1,3");
+		addRule(patterns2ndLevel, "e1etje./é=tje,1,5");
+		addRule(patterns2ndLevel, "eigh1teen/t=t,5,1");
+		addRule(patterns2ndLevel, ".schif1fahrt/ff=f,5,2");
+		addRule(patterns2ndLevel, "c1k/k=k,1,2");
+		addRule(patterns2ndLevel, "1ΐ/=ί,1,1");
+		addRule(patterns2ndLevel, "d1dzsel./dzs=dzs,1,4");
+		addRule(patterns2ndLevel, ".as3szon/sz=sz,2,3");
+		addRule(patterns2ndLevel, "n1nyal./ny=ny,1,3");
+		addRule(patterns2ndLevel, "bus1s/ss=s,3,2");
+		addRule(patterns2ndLevel, "7-/=-,1,1");
+		addRule(patterns2ndLevel, ".til1låta./ll=l,3,2");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "paral·lel", "paral", "lel");
+		check(parser, "reëel", "re", "eel");
+		check(parser, "omaatje", "oma", "tje");
+		check(parser, "cafeetje", "café", "tje");
+		check(parser, "eighteen", "eight", "teen");
+		check(parser, "drucker", "druk", "ker");
+		check(parser, "schiffahrt", "schiff", "fahrt");
+		check(parser, "Μαΐου", "Μα", "ίου");
+		check(parser, "asszonnyal", "asz", "szony", "nyal");
+		check(parser, "briddzsel", "bridzs", "dzsel");
+		check(parser, "bussjåfør", "buss", "sjåfør");
+		check(parser, "100-sekundowy", "100", "-sekundowy");
+		check(parser, "tillåta", "till", "låta");
 	}
 
 

@@ -546,14 +546,10 @@ public class HyphenationParser{
 		//if there is a second level
 		if(!patterns.get(Level.SECOND).isEmpty()){
 			//apply second level hyphenation for the word parts
-			List<String> compounds = result.getSyllabes();
-			int size = compounds.size();
-			if(size > 1){
-				List<HyphenationInterface> subHyphenations = compounds.stream()
-					.map(compound -> hyphenate(compound, patterns, Level.SECOND, SOFT_HYPHEN, true))
-					.collect(Collectors.toList());
-				result = CompoundHyphenation.build(subHyphenations);
-			}
+			List<HyphenationInterface> subHyphenations = result.getSyllabes().stream()
+				.map(compound -> hyphenate(compound, patterns, Level.SECOND, SOFT_HYPHEN, true))
+				.collect(Collectors.toList());
+			result = CompoundHyphenation.build(subHyphenations);
 		}
 
 		return result;
