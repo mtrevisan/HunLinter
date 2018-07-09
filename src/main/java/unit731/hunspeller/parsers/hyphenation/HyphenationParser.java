@@ -572,6 +572,9 @@ public class HyphenationParser{
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter,
 			boolean isCompound){
 		boolean[] uppercases = extractUppercases(word);
+		
+		//TODO manage ligatures (these are two or three characters long!):
+		//0xEFAC80 (ff), 0xEFAC81 (fi), 0xEFAC82 (fl), 0xEFAC83 (ffi), 0xEFAC84 (ffl), 0xEFAC85 (long st), 0xEFAC86 (st)
 
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);

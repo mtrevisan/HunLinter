@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
@@ -385,7 +386,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void compound1(){
+	public void englishCompound1(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
 		addRule(patterns1stLevel, "motor1cycle");
 		patterns1stLevel.prepare();
@@ -405,6 +406,29 @@ public class HyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, options);
 
 		check(parser, "motorcycle", "mo", "tor", "cy", "cle");
+	}
+
+	@Test
+	public void englishCompound2(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "motor1cycle");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, ".mo1tor.");
+		addRule(patterns2ndLevel, ".cy1cle.");
+		//check independency of the 1st and 2nd hyphenation levels
+		addRule(patterns2ndLevel, ".motor2cycle.");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftCompoundMin(3)
+			.rightCompoundMin(4)
+			.build();
+		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, options);
+
+		check(parser, "motorcycle", "motor", "cycle");
 	}
 
 	@Test
@@ -448,6 +472,93 @@ public class HyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("no", allPatterns, null, options);
 
 		check(parser, "kilowattime", "ki", "lo", "watt", "ti", "me");
+	}
+
+	@Test
+	public void compound5(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, ".post1");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, "e1");
+		addRule(patterns2ndLevel, "a1");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.leftCompoundMin(1)
+			.rightCompoundMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "postea", "post", "e", "a");
+	}
+
+	@Test
+	public void compound6(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1que.");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, "e1");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.leftCompoundMin(1)
+			.rightCompoundMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "meaque", "me", "a", "que");
+	}
+
+	@Test
+	public void hyphen(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1-1");
+		addRule(patterns1stLevel, "1'1");
+		addRule(patterns1stLevel, "1’1");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.leftCompoundMin(1)
+			.rightCompoundMin(1)
+			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "’")))
+			.build();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "foobar'foobar-foobar’foobar", "foobar'foobar-foobar’foobar");
+	}
+
+	/** Unicode ligature hyphenation (ffi -> f=fi) */
+	@Test
+	public void ligature(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "ﬃ1/f=ﬁ,1,1");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+//		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.rightMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
+
+		check(parser, "maﬃa", "maf", "ﬁa");
 	}
 
 
