@@ -161,10 +161,10 @@
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
 
 		<!-- Lombok -->
-		<org.projectlombok.version>1.16.20</org.projectlombok.version>
+		<org.projectlombok.version>1.18.0</org.projectlombok.version>
 
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.9.5</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
 		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>

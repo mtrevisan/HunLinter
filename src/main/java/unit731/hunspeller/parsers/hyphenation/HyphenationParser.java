@@ -884,7 +884,7 @@ System.out.println(rule);
 		int after = 0;
 		String addAfter = null;
 		for(int endIndex = 0; endIndex < size; endIndex ++)
-			if(hyphBreak.getIndexes()[endIndex] % 2 != 0){
+			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
 
 				if(StringUtils.isNotBlank(addAfter)){
@@ -895,7 +895,7 @@ System.out.println(rule);
 				}
 
 				//manage augmented patterns:
-				String augmentedPatternData = hyphBreak.getAugmentedPatternData()[endIndex];
+				String augmentedPatternData = hyphBreak.getAugmentedPatternData(endIndex);
 				if(Objects.nonNull(augmentedPatternData)){
 					Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 					m.find();
@@ -915,10 +915,11 @@ System.out.println(rule);
 
 					//remove last characters from subword
 					//  ll3a/aa=b,2,2
-					//syll
-					//sylaa-b
-					int end = subword.length() - index + Integer.parseInt(start) - 1;
-					after = Integer.parseInt(cut) - 1;
+					//syll able
+					//sylaa-bble
+					int delta = index - Integer.parseInt(start) + 1;
+					int end = subword.length() - delta;
+					after = Integer.parseInt(cut) - delta;
 					subword = subword.substring(0, end) + addBefore;
 				}
 
