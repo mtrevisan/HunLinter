@@ -19,11 +19,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToLeftMin(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		patternsLevelCompound.put("abc", "a1bc");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		patterns1stLevel.put("abc", "a1bc");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(2)
 			.rightMin(0)
@@ -37,11 +37,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToRightMin(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		patternsLevelCompound.put("abc", "ab1c");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		patterns1stLevel.put("abc", "ab1c");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
 			.rightMin(2)
@@ -55,11 +55,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkLeftMin(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "a1bc");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "a1bc");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(0)
@@ -73,11 +73,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkRightMin(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "ab1c");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "ab1c");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(0)
 			.rightMin(1)
@@ -91,11 +91,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithRemovalBeforeHyphen(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "aa1tje/=,2,1");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "aa1tje/=,2,1");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -109,11 +109,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithIndexes(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "1–/–=,1,1");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1–/–=,1,1");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -127,11 +127,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithoutIndexes(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "1–/–=");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1–/–=");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -145,11 +145,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "–1/–=–");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "–1/–=–");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -163,12 +163,12 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreakWithRuleOverlap(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "–3/–=–");
-		addRule(patternsLevelCompound, "1c");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "–3/–=–");
+		addRule(patterns1stLevel, "1c");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -182,12 +182,12 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak2(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "1k");
-		addRule(patternsLevelCompound, "–1/–=–");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1k");
+		addRule(patterns1stLevel, "–1/–=–");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -201,11 +201,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedNonWordInitial(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "eigh1teen/ht=t,4,2");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "eigh1teen/ht=t,4,2");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -219,11 +219,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWordInitial(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, ".schif1fahrt/ff=f,5,2");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, ".schif1fahrt/ff=f,5,2");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -237,11 +237,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedBase(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "c1k/k=k");
-		patternsLevelCompound.prepare();
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "c1k/k=k");
+		patterns1stLevel.prepare();
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.rightMin(1)
@@ -255,11 +255,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void competingRules(){
-		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-		addRule(patternsLevelCompound, "ab1c");
-		addRule(patternsLevelCompound, "2c");
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "ab1c");
+		addRule(patterns1stLevel, "2c");
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-		allPatterns.put(HyphenationParser.Level.FIRST, patternsLevelCompound);
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
 		HyphenationOptions options = HyphenationOptions.builder()
 			.leftMin(1)
 			.build();
@@ -272,19 +272,19 @@ public class HyphenationParserTest{
 
 //	@Test
 //	public void ahoCorasick(){
-//		RadixTree<String, String> patternsLevelCompound = RadixTree.createTree(new StringSequencer());
-//		addRule(patternsLevelCompound, ".s2");
-//		addRule(patternsLevelCompound, "1v");
-//		addRule(patternsLevelCompound, "2nd");
-//		addRule(patternsLevelCompound, "1d");
-//		addRule(patternsLevelCompound, "2lm");
-//		addRule(patternsLevelCompound, "1m");
-//		addRule(patternsLevelCompound, "2nt");
-//		addRule(patternsLevelCompound, "1t");
-//		addRule(patternsLevelCompound, "1n");
-//		addRule(patternsLevelCompound, "1d");
+//		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+//		addRule(patterns1stLevel, ".s2");
+//		addRule(patterns1stLevel, "1v");
+//		addRule(patterns1stLevel, "2nd");
+//		addRule(patterns1stLevel, "1d");
+//		addRule(patterns1stLevel, "2lm");
+//		addRule(patterns1stLevel, "1m");
+//		addRule(patterns1stLevel, "2nt");
+//		addRule(patterns1stLevel, "1t");
+//		addRule(patterns1stLevel, "1n");
+//		addRule(patterns1stLevel, "1d");
 //		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-//		allPatterns.put(HyphenationParser.Level.COMPOUND, patternsLevelCompound);
+//		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns1stLevel);
 //		HyphenationOptions options = HyphenationOptions.builder()
 //			.leftMin(1)
 //			.build();
@@ -296,7 +296,7 @@ public class HyphenationParserTest{
 //		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 //		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 //
-//		patternsLevelCompound.prepare();
+//		patterns1stLevel.prepare();
 //		hyphenation = parser.hyphenate(word);
 //
 //		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
@@ -307,6 +307,82 @@ public class HyphenationParserTest{
 //		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 //		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 //	}
+
+
+	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
+	@Test
+	public void germanPreReform(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "f1f");
+		addRule(patterns1stLevel, "if3fa/ff=f,2,2");
+		addRule(patterns1stLevel, "tenerif5fa");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("de", null, allPatterns, null, options);
+
+		HyphenationInterface hyphenation = parser.hyphenate("schiffen");
+
+		Assert.assertEquals(Arrays.asList("schif", "fen"), hyphenation.getSyllabes());
+
+		hyphenation = parser.hyphenate("schiffahrt");
+
+		Assert.assertEquals(Arrays.asList("schiff", "fahrt"), hyphenation.getSyllabes());
+
+		hyphenation = parser.hyphenate("teneriffa");
+
+		Assert.assertEquals(Arrays.asList("tenerif", "fa"), hyphenation.getSyllabes());
+	}
+
+	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
+	@Test
+	public void hungarianSimplifiedDoubleConsonants(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "s1sz/sz=sz,1,3");
+		addRule(patterns1stLevel, "n1ny/ny=ny,1,3");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("hu", null, allPatterns, null, options);
+
+		HyphenationInterface hyphenation = parser.hyphenate("asszonnyal");
+
+		Assert.assertEquals(Arrays.asList("asz", "szony", "nyal"), hyphenation.getSyllabes());
+	}
+
+	/** Dutch: omaatje -> oma-tje */
+	@Test
+	public void dutch1(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "aa1tje./=,2,1");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("nl", null, allPatterns, null, options);
+
+		HyphenationInterface hyphenation = parser.hyphenate("omaatje");
+
+		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+	}
+
+	/** Dutch: omaatje -> oma-tje */
+	@Test
+	public void dutch2(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "aa1tje./a=tje,1,5");
+		patterns1stLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("nl", null, allPatterns, null, options);
+
+		HyphenationInterface hyphenation = parser.hyphenate("omaatje");
+
+		Assert.assertEquals(Arrays.asList("oma", "tje"), hyphenation.getSyllabes());
+	}
 
 
 	private void addRule(RadixTree<String, String> patterns, String rule){
