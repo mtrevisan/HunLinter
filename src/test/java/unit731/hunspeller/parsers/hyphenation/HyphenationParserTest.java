@@ -385,7 +385,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void compound(){
+	public void compound1(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
 		addRule(patterns1stLevel, "motor1cycle");
 		patterns1stLevel.prepare();
@@ -405,6 +405,29 @@ public class HyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, options);
 
 		check(parser, "motorcycle", "mo", "tor", "cy", "cle");
+	}
+
+	@Test
+	public void compound2(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "szony1fő");
+		addRule(patterns1stLevel, "ök1assz");
+		patterns1stLevel.prepare();
+		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns2ndLevel, ".as1szony./sz=,2,1");
+		addRule(patterns2ndLevel, ".fő1nök.");
+		patterns2ndLevel.prepare();
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		allPatterns.put(HyphenationParser.Level.SECOND, patterns2ndLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftCompoundMin(2)
+			.rightCompoundMin(3)
+			.build();
+		HyphenationParser parser = new HyphenationParser("hu", allPatterns, null, options);
+
+		check(parser, "főnökasszony", "fő", "nök", "asz", "szony");
+		check(parser, "asszonyfőnök", "asz", "szony", "fő", "nök");
 	}
 
 
