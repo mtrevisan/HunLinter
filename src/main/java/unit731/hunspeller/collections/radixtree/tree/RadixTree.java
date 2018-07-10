@@ -37,6 +37,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
  * @see <a href="http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf">Biosequence Algorithms, Spring 2005 - Lecture 4: Set Matching and Aho-Corasick Algorithm</a>
  * @see <a href="http://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2014-2015/Makalah2015/Makalah_IF221_Strategi_Algoritma_2015_032.pdf">Aho-Corasick Algorithm in Pattern Matching</a>
+ * @see <a href="http://www.webgraphviz.com/">WebGraphviz online</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
@@ -58,8 +59,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	private static final String GRAPHVIZ_STYLE_SHAPE = "shape=";
 	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = GRAPHVIZ_STYLE_BEGIN + "style=dashed, color=gray, constraint=false" + GRAPHVIZ_STYLE_END;
 	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "circle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "doublecircle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL;
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_END;
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "doublecircle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY;
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
 
 
 	@AllArgsConstructor
@@ -798,7 +799,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			.append(System.identityHashCode(node))
 			.append(GRAPHVIZ_STYLE_BEGIN)
 			.append(GRAPHVIZ_STYLE_LABEL)
+			.append(GRAPHVIZ_STYLE_STRING_BOUNDARY)
 			.append(node.getKey())
+			.append(GRAPHVIZ_STYLE_STRING_BOUNDARY)
 			.append(GRAPHVIZ_STYLE_END)
 			.append(GRAPHVIZ_NEW_LINE);
 	}
