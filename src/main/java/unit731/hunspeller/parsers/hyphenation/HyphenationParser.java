@@ -92,15 +92,6 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
-	private static final char LIGATURE_FF = '\uFB00';
-	private static final char LIGATURE_FI = '\uFB01';
-	private static final char LIGATURE_FL = '\uFB02';
-	private static final char LIGATURE_FFI = '\uFB03';
-	private static final char LIGATURE_FFL = '\uFB04';
-	private static final char LIGATURE_FT = '\uFB05';
-	private static final char LIGATURE_ST = '\uFB06';
-	private static final Set<Character> LIGATURES = new HashSet<>(Arrays.asList(LIGATURE_FF, LIGATURE_FI, LIGATURE_FL, LIGATURE_FFI, LIGATURE_FFL, LIGATURE_FT, LIGATURE_ST));
-
 
 	public static enum Level{FIRST, SECOND}
 
