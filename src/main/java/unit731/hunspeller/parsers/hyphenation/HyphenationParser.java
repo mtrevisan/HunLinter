@@ -668,7 +668,6 @@ public class HyphenationParser{
 							int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far
 							if(dd > indexes[idx]){
-System.out.println(rule + ", " + idx);
 								indexes[idx] = dd;
 								rules[idx] = rule;
 								augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
@@ -774,7 +773,6 @@ String breakCharacter = SOFT_HYPHEN;
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level, boolean isCompound){
-System.out.println("---");
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		//stores the (maximum) break numbers
@@ -790,7 +788,7 @@ System.out.println("---");
 			SearchResult<String, String> r = itr.next();
 			String rule = r.getNode().getValue();
 			int i = r.getIndex();
-			i -= getKeyFromData(rule).length() - r.getNode().getKey().length();
+			int delta = getKeyFromData(rule).length() - r.getNode().getKey().length();
 
 			//remove non–standard part
 			String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
@@ -803,13 +801,12 @@ System.out.println("---");
 					j ++;
 				//check if a break point should be skipped based on left and right min options
 				else{
-					int idx = i + j;
+					int idx = i + j - delta;
 					int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
 					if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
-System.out.println(rule + ", " + idx);
 							indexes[idx] = dd;
 							rules[idx] = rule;
 							augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
@@ -838,7 +835,6 @@ System.out.println(rule + ", " + idx);
 								int dd = Character.digit(chr, 10);
 								//check if the break number is great than the one stored so far
 								if(dd > indexes[idx]){
-System.out.println(rl + ", " + idx + " *");
 									indexes[idx] = dd;
 									rules[idx] = rl;
 									augmentedPatternData[idx] = (rl.contains(AUGMENTED_RULE)? rl: null);
