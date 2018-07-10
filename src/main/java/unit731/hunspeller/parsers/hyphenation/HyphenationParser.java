@@ -671,15 +671,17 @@ public class HyphenationParser{
 					char chr = reducedData.charAt(k);
 					if(!Character.isDigit(chr))
 						j ++;
-					//check if a break point should be skipped based on left and right min options
-					else if(leftMin <= Normalizer.normalize(word.substring(0, idx), Normalizer.Form.NFKC).length()
-							&& idx <= normalizedWordSize - rightMin){
-						int dd = Character.digit(chr, 10);
-						//check if the break number is great than the one stored so far
-						if(dd > indexes[idx]){
-							indexes[idx] = dd;
-							rules[idx] = rule;
-							augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
+					else{
+						//check if a break point should be skipped based on left and right min options
+						int normalizedIdx = (normalizedWordSize != wordSize? Normalizer.normalize(word.substring(0, idx - 1), Normalizer.Form.NFKC).length() + 1: idx);
+						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
+							int dd = Character.digit(chr, 10);
+							//check if the break number is great than the one stored so far
+							if(dd > indexes[idx]){
+								indexes[idx] = dd;
+								rules[idx] = rule;
+								augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
+							}
 						}
 					}
 				}
