@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
@@ -109,7 +110,7 @@ public class HyphenationParser{
 
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
-	private HyphenationOptions options;
+	private final HyphenationOptions options;
 
 
 	public HyphenationParser(String language){
@@ -128,23 +129,27 @@ public class HyphenationParser{
 		options = HyphenationOptions.createEmpty();
 	}
 
-	public HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
-		this(language);
+	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
+		Objects.requireNonNull(language);
+		Objects.requireNonNull(patterns);
 
-		if(Objects.nonNull(patterns))
-			for(Level level : Level.values()){
-				RadixTree<String, String> p = patterns.get(level);
-				if(Objects.nonNull(p))
-					this.patterns.put(level, p);
-			}
-		if(Objects.nonNull(customHyphenations))
-			for(Level level : Level.values()){
-				Map<String, String> ch = customHyphenations.get(level);
-				if(Objects.nonNull(ch))
-					this.customHyphenations.put(level, ch);
-			}
-		if(Objects.nonNull(options))
-			this.options = options;
+		comparator = ComparatorBuilder.getComparator(language);
+		orthography = OrthographyBuilder.getOrthography(language);
+
+		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(orthography);
+
+		for(Level level : Level.values()){
+			RadixTree<String, String> p = patterns.getOrDefault(level, RadixTree.createTree(new StringSequencer()));
+			p.prepare();
+			this.patterns.put(level, p);
+		}
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.<Level, Map<String, String>>emptyMap());
+		for(Level level : Level.values()){
+			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
+			this.customHyphenations.put(level, ch);
+		}
+		this.options = (Objects.nonNull(options)? options: HyphenationOptions.createEmpty());
 	}
 
 	@AllArgsConstructor
@@ -236,8 +241,9 @@ public class HyphenationParser{
 						}
 					}
 
-					hypParser.patterns.get(Level.FIRST).prepare();
-					hypParser.patterns.get(Level.SECOND).prepare();
+//TODO decomment once hyphenate2 works
+//					hypParser.patterns.get(Level.FIRST).prepare();
+//					hypParser.patterns.get(Level.SECOND).prepare();
 
 					setProgress(100);
 				}
@@ -731,6 +737,11 @@ public class HyphenationParser{
 
 
 	HyphenationInterface hyphenate2(String word){
+		return hyphenate2(word, patterns, Level.FIRST, SOFT_HYPHEN, false);
+	}
+
+	private HyphenationInterface hyphenate2(String word, Map<Level, RadixTree<String, String>> patterns, Level level, String breakCharacter,
+			boolean isCompound){
 		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
@@ -739,11 +750,6 @@ public class HyphenationParser{
 		List<String> hyphenatedWord;
 		List<String> rules;
 		boolean[] errors;
-
-Level level = Level.FIRST;
-boolean isCompound = false;
-String breakCharacter = SOFT_HYPHEN;
-
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
@@ -844,6 +850,9 @@ String breakCharacter = SOFT_HYPHEN;
 					}
 				}
 		}
+
+		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
+
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
 
