@@ -11,6 +11,7 @@ import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.TimeWatch;
 
 
 public class HyphenationParserTest{
@@ -264,13 +265,17 @@ public class HyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
 
 		String word = "savendolmento";
+//		TimeWatch watch = TimeWatch.start();
 		HyphenationInterface hyphenation = parser.hyphenate(word);
+//		watch.stop(); System.out.println(watch.time());
 
 		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
 
 		patterns1stLevel.prepare();
+//		watch.reset();
 		hyphenation = parser.hyphenate(word);
+//		watch.stop(); System.out.println(watch.time());
 
 		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());

@@ -83,7 +83,6 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
 	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
-	private static final String HYPHENS = SOFT_HYPHEN + HYPHEN_MINUS + EN_DASH;
 	private static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(WORD_BOUNDARY));
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
@@ -588,7 +587,7 @@ public class HyphenationParser{
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHEN_MINUS));
+			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHEN_EQUALS));
 
 			rules = hyphenatedWord;
 		}
@@ -750,17 +749,19 @@ public class HyphenationParser{
 		List<String> rules;
 		boolean[] errors;
 
-		//FIXME manage second level
 		Level level = Level.FIRST;
+		boolean isCompound = false;
+		String breakCharacter = SOFT_HYPHEN;
 
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHENS));
+			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HYPHEN_EQUALS));
 
 			rules = hyphenatedWord;
 		}
-		else if(word.length() <= options.getMinimumLength()){
+		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < (isCompound? options.getMinimumCompoundLength():
+				options.getMinimumLength())){
 			//ignore short words (early out)
 			hyphenatedWord = Arrays.asList(word);
 
@@ -777,7 +778,7 @@ public class HyphenationParser{
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors, SOFT_HYPHEN);
+		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
 	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
