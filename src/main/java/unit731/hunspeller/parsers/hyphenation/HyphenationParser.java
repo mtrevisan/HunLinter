@@ -809,8 +809,6 @@ System.out.println("---");
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
-//indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
-//				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
 System.out.println(rule + ", " + idx);
 							indexes[idx] = dd;
 							rules[idx] = rule;
@@ -840,8 +838,6 @@ System.out.println(rule + ", " + idx);
 								int dd = Character.digit(chr, 10);
 								//check if the break number is great than the one stored so far
 								if(dd > indexes[idx]){
-//indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
-//				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
 System.out.println(rl + ", " + idx + " *");
 									indexes[idx] = dd;
 									rules[idx] = rl;
