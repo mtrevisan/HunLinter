@@ -143,7 +143,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 						//link fail to node
 						node.setFailNode(state);
 
-						//TODO
 						//out(u) += out(f(u))
 						node.addAdditionalValues(state);
 

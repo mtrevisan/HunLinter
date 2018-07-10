@@ -243,43 +243,43 @@ public class HyphenationParserTest{
 		check(parser, "abc", "abc");
 	}
 
-//	@Test
-//	public void ahoCorasick(){
-//		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
-//		addRule(patterns1stLevel, ".s2");
-//		addRule(patterns1stLevel, "1v");
-//		addRule(patterns1stLevel, "2nd");
-//		addRule(patterns1stLevel, "1d");
-//		addRule(patterns1stLevel, "2lm");
-//		addRule(patterns1stLevel, "1m");
-//		addRule(patterns1stLevel, "2nt");
-//		addRule(patterns1stLevel, "1t");
-//		addRule(patterns1stLevel, "1n");
-//		addRule(patterns1stLevel, "1d");
-//		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
-//		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns1stLevel);
-//		HyphenationOptions options = HyphenationOptions.builder()
-//			.leftMin(1)
-//			.build();
-//		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
-//
-//		String word = "savendolmento";
-//		HyphenationInterface hyphenation = parser.hyphenate(word);
-//
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
-//
-//		patterns1stLevel.prepare();
-//		hyphenation = parser.hyphenate(word);
-//
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
-//
-//		hyphenation = parser.hyphenate2(word);
-//
-//		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
-//		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
-//	}
+	@Test
+	public void ahoCorasick(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, ".s2");
+		addRule(patterns1stLevel, "1v");
+		addRule(patterns1stLevel, "2nd");
+		addRule(patterns1stLevel, "1d");
+		addRule(patterns1stLevel, "2lm");
+		addRule(patterns1stLevel, "1m");
+		addRule(patterns1stLevel, "2nt");
+		addRule(patterns1stLevel, "1t");
+		addRule(patterns1stLevel, "1n");
+		addRule(patterns1stLevel, "1d");
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		HyphenationOptions options = HyphenationOptions.builder()
+			.leftMin(1)
+			.build();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, options);
+
+		String word = "savendolmento";
+		HyphenationInterface hyphenation = parser.hyphenate(word);
+
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
+
+		patterns1stLevel.prepare();
+		hyphenation = parser.hyphenate(word);
+
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
+
+		hyphenation = parser.hyphenate2(word);
+
+		Assert.assertEquals(Arrays.asList(null, ".s2", "1v", null, "2nd", "1d", null, "2lm", "1m", null, "2nt", "1t", null), hyphenation.getRules());
+		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
+	}
 
 
 	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
