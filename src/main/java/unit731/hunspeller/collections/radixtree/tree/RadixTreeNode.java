@@ -64,11 +64,11 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		return (Objects.isNull(children) || children.isEmpty());
 	}
 
-	public RadixTreeNode<S, V> getNextNode(int index, S sequence, SequencerInterface<S> sequencer){
+	public RadixTreeNode<S, V> getNextNode(S sequence, int index, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> newNode = null;
 		RadixTreeNode<S, V> currentNode = this;
 		while(Objects.nonNull(currentNode)){
-			newNode = currentNode.getChild(index, sequence, sequencer);
+			newNode = currentNode.getChild(sequence, index, sequencer);
 			if(Objects.nonNull(newNode))
 				break;
 
@@ -77,7 +77,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		return newNode;
 	}
 
-	public RadixTreeNode<S, V> getChild(int index, S key, SequencerInterface<S> sequencer){
+	public RadixTreeNode<S, V> getChild(S key, int index, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> response = null;
 		if(Objects.nonNull(children))
 			for(RadixTreeNode<S, V> child : children){

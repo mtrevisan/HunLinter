@@ -668,6 +668,7 @@ public class HyphenationParser{
 							int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far
 							if(dd > indexes[idx]){
+System.out.println(rule + ", " + idx);
 								indexes[idx] = dd;
 								rules[idx] = rule;
 								augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
@@ -740,9 +741,9 @@ public class HyphenationParser{
 		List<String> rules;
 		boolean[] errors;
 
-		Level level = Level.FIRST;
-		boolean isCompound = false;
-		String breakCharacter = SOFT_HYPHEN;
+Level level = Level.FIRST;
+boolean isCompound = false;
+String breakCharacter = SOFT_HYPHEN;
 
 		String customHyphenation = customHyphenations.get(level).get(word);
 		if(Objects.nonNull(customHyphenation)){
@@ -759,7 +760,7 @@ public class HyphenationParser{
 			rules = hyphenatedWord;
 		}
 		else{
-			HyphenationBreak hyphBreak = calculateBreakpoints2(word, patterns, level);
+			HyphenationBreak hyphBreak = calculateBreakpoints2(word, patterns, level, isCompound);
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 
@@ -772,20 +773,24 @@ public class HyphenationParser{
 		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
-	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level){
+	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level, boolean isCompound){
+System.out.println("---");
 		int wordSize = word.length();
+		int normalizedWordSize = getNormalizedLength(word);
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
 		//the rules applied to the word
 		String[] rules = new String[wordSize];
 		//stores the augmented patterns
 		String[] augmentedPatternData = new String[wordSize];
+		int leftMin = (isCompound? options.getLeftCompoundMin(): options.getLeftMin());
+		int rightMin = (isCompound? options.getRightCompoundMin(): options.getRightMin());
 		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(WORD_BOUNDARY + word + WORD_BOUNDARY);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
 			String rule = r.getNode().getValue();
 			int i = r.getIndex();
-System.out.println(rule);
+			i -= getKeyFromData(rule).length() - r.getNode().getKey().length();
 
 			//remove non–standard part
 			String reducedData = PatternService.clear(rule, MATCHER_REDUCE);
@@ -799,13 +804,15 @@ System.out.println(rule);
 				//check if a break point should be skipped based on left and right min options
 				else{
 					int idx = i + j;
-					if(options.getLeftMin() <= idx && idx <= wordSize - options.getRightMin()){
+					int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
+					if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
 						if(dd > indexes[idx]){
 //indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
 //				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
-							indexes[idx] = dd;//1,2,4,4,5,7,8,10,10,11
+System.out.println(rule + ", " + idx);
+							indexes[idx] = dd;
 							rules[idx] = rule;
 							augmentedPatternData[idx] = (isAugmentedRule(rule)? rule: null);
 						}
@@ -835,6 +842,7 @@ System.out.println(rule);
 								if(dd > indexes[idx]){
 //indexes = [0, 2, 1, 0, 2, 1, 0, 2, 1, 0, 2, 0, 0] ok
 //				[0, 2, 1, 0, 1, 2, 0, 2, 0, 0, 1, 2, 0] not ok
+System.out.println(rl + ", " + idx + " *");
 									indexes[idx] = dd;
 									rules[idx] = rl;
 									augmentedPatternData[idx] = (rl.contains(AUGMENTED_RULE)? rl: null);

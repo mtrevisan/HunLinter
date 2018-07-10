@@ -253,7 +253,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 				try{
 					RadixTreeNode<S, V> node = lastMatchedNode;
 					for(int i = currentIndex; i < sequencer.length(text); i ++){
-						node = node.getNextNode(i, text, sequencer);
+						node = node.getNextNode(text, i, sequencer);
 						if(Objects.isNull(node))
 							node = root;
 						else if(node.hasValue())
@@ -267,11 +267,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 			@Override
 			public SearchResult<S, V> next(){
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
-					lastMatchedNode = lastMatchedNode.getNextNode(i, text, sequencer);
+					lastMatchedNode = lastMatchedNode.getNextNode(text, i, sequencer);
 					if(Objects.isNull(lastMatchedNode))
 						lastMatchedNode = root;
 					else if(lastMatchedNode.hasValue()){
-						currentIndex = i + sequencer.length(lastMatchedNode.getKey());
+						currentIndex = i + 1;
 						return new SearchResult<>(lastMatchedNode, i);
 					}
 				}
