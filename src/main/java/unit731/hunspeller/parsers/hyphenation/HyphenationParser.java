@@ -646,7 +646,7 @@ public class HyphenationParser{
 		String w = WORD_BOUNDARY + word + WORD_BOUNDARY;
 
 		int wordSize = word.length();
-		int normalizedWordSize = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
+		int normalizedWordSize = getNormalizedLength(word);
 		int size = wordSize + WORD_BOUNDARY.length() * 2;
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
@@ -673,7 +673,7 @@ public class HyphenationParser{
 						j ++;
 					else{
 						//check if a break point should be skipped based on left and right min options
-						int normalizedIdx = (normalizedWordSize != wordSize? Normalizer.normalize(word.substring(0, idx - 1), Normalizer.Form.NFKC).length() + 1: idx);
+						int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
 						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 							int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far
@@ -691,6 +691,14 @@ public class HyphenationParser{
 		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
 
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
+	}
+
+	private int getNormalizedLength(String word){
+		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
+	}
+
+	private int getNormalizedLength(String word, int index){
+		return Normalizer.normalize(word.substring(0, index - 1), Normalizer.Form.NFKC).length() + 1;
 	}
 
 	private void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
