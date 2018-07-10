@@ -258,6 +258,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 							node = root;
 						else if(node.hasValue())
 							return true;
+						else
+							i += sequencer.length(node.getKey()) - 1;
 					}
 				}
 				catch(NoSuchElementException e){}
@@ -274,6 +276,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 						currentIndex = i + 1;
 						return new SearchResult<>(lastMatchedNode, i);
 					}
+					else
+						i += sequencer.length(lastMatchedNode.getKey()) - 1;
 				}
 
 				throw new NoSuchElementException();

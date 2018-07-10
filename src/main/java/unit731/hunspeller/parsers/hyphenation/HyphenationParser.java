@@ -242,8 +242,8 @@ public class HyphenationParser{
 					}
 
 //TODO decomment once hyphenate2 works
-//					hypParser.patterns.get(Level.FIRST).prepare();
-//					hypParser.patterns.get(Level.SECOND).prepare();
+					hypParser.patterns.get(Level.FIRST).prepare();
+					hypParser.patterns.get(Level.SECOND).prepare();
 
 					setProgress(100);
 				}
@@ -547,13 +547,13 @@ public class HyphenationParser{
 	 */
 	private HyphenationInterface hyphenate(String word, Map<Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		HyphenationInterface result = hyphenate(word, patterns, Level.FIRST, SOFT_HYPHEN, false);
+		HyphenationInterface result = hyphenate2(word, patterns, Level.FIRST, SOFT_HYPHEN, false);
 
 		//if there is a second level
 		if(!patterns.get(Level.SECOND).isEmpty()){
 			//apply second level hyphenation for the word parts
 			List<HyphenationInterface> subHyphenations = result.getSyllabes().stream()
-				.map(compound -> hyphenate(compound, patterns, Level.SECOND, SOFT_HYPHEN, true))
+				.map(compound -> hyphenate2(compound, patterns, Level.SECOND, SOFT_HYPHEN, true))
 				.collect(Collectors.toList());
 			result = CompoundHyphenation.build(subHyphenations);
 		}
