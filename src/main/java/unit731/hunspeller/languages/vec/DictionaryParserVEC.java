@@ -524,17 +524,19 @@ public class DictionaryParserVEC extends DictionaryParser{
 		int size = word.length();
 		if(size > 1){
 			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
-			char chr = word.charAt(index);
-			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
-			while(!result){
-				index = WordVEC.getFirstVowelIndex(word, index);
-				if(index < 0 || index + 2 >= size)
-					break;
+			if(index + 1 < size){
+				char chr = word.charAt(index);
+				result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
+				while(!result){
+					index = WordVEC.getFirstVowelIndex(word, index);
+					if(index < 0 || index + 2 >= size)
+						break;
 
-				if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
-					result = true;
+					if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
+						result = true;
 
-				index ++;
+					index ++;
+				}
 			}
 		}
 		return result;
