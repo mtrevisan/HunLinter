@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -47,19 +46,20 @@ public class DictionaryParser{
 	protected final WordGenerator wordGenerator;
 	private final Charset charset;
 	private final String language;
-	@Setter
-	protected AbstractHyphenator hyphenator;
+	protected final AbstractHyphenator hyphenator;
 	private final ExternalSorter sorter = new ExternalSorter();
 
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, WordGenerator wordGenerator, Charset charset){
+	public DictionaryParser(File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
 		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
+		this.hyphenator = hyphenator;
 		this.wordGenerator = wordGenerator;
 		this.charset = charset;
 		String filename = dicFile.getName();

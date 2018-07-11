@@ -59,29 +59,36 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
-		//convert using input table
-		String word = affParser.applyInputConversionTable(dicEntry.getWord());
-		dicEntry.setWord(word);
+		affParser.acquireLock();
 
-		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
+		try{
+			//convert using input table
+			String word = affParser.applyInputConversionTable(dicEntry.getWord());
+			dicEntry.setWord(word);
 
-		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
+			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
-		List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
+			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
 
-		List<RuleProductionEntry> productions = new ArrayList<>();
-		productions.add(baseProduction);
-		productions.addAll(onefoldProductions);
-		productions.addAll(twofoldProductions);
-		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
-		productions.addAll(lastfoldProductions);
+			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
 
-		//convert using output table
-		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+			List<RuleProductionEntry> productions = new ArrayList<>();
+			productions.add(baseProduction);
+			productions.addAll(onefoldProductions);
+			productions.addAll(twofoldProductions);
+			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
+			productions.addAll(lastfoldProductions);
 
-//		productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
+			//convert using output table
+			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
-		return productions;
+//			productions.forEach(production -> log.trace(Level.INFO, "Produced word {}", production));
+
+			return productions;
+		}
+		finally{
+			affParser.releaseLock();
+		}
 	}
 
 	private RuleProductionEntry getBaseProduction(Productable productable, FlagParsingStrategy strategy){

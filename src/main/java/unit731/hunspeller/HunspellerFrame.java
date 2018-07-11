@@ -84,15 +84,13 @@ import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenator;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
-import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
+import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.Hyphenator;
-import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
@@ -143,7 +141,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private DictionaryParser dicParser;
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
-	private AbstractHyphenator hyphenator;
 
 	private final WordGenerator wordGenerator;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, 400);
@@ -158,7 +155,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private SwingWorker<List<ThesaurusEntry>, String> theParserWorker;
-	private SwingWorker<Void, String> hypParserWorker;
 	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
 
 	private static RecentItems recentItems;
@@ -1281,6 +1277,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void loadFile(String filePath){
+		flm.stop();
+
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		affFile = new File(filePath);
@@ -1289,13 +1287,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		openAffixFile();
 
+		openHyphenationFile();
+
+		prepareDictionaryFile();
+
 		openAidFile();
 
 		openThesaurusFile();
 
-		hypParser = new HyphenationParser(affParser.getLanguage());
 
-		openHyphenationFile();
+		try{
+			flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
+			flm.start();
+		}
+		catch(IOException e){
+			printResultLine("Unable to register file change listener");
+		}
 	}
 
 	public void clearOutputTable(){
@@ -1328,8 +1335,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			openHyphenationFile();
 
 			//clear hyphenation
-			formerHyphenationText = null;
-			clearHyphenation();
+			clearHyphenationFields();
 		}
 	}
 
@@ -1349,61 +1355,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void openAffixFile(){
 		try{
-			flm.stop();
-
 			clearAffixFile();
 
 			printResultLine("Opening Affix file for parsing: " + affFile.getName());
+
 			affParser.parse(affFile);
 
 			printResultLine("Finished reading Affix file");
-
-			String language = affParser.getLanguage();
-			File dicFile = getFile(language + EXTENSION_DIC);
-			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
-
-			dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
-			dicDialog.setLocationRelativeTo(this);
-			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
-			dicDialog.setCellRenderer(dicCellRenderer);
-			dicDialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
-					int selectedRow = dicDialog.getSelectedIndex();
-					try{
-						if(dicParser.isInBoundary(selectedRow)){
-							dicDialog.setVisible(false);
-
-							dicSortDictionaryMenuItem.setEnabled(false);
-							mainProgressBar.setValue(0);
-
-
-							dicSorterWorker = new SorterWorker(dicParser, selectedRow, this);
-							dicSorterWorker.addPropertyChangeListener(this);
-							dicSorterWorker.execute();
-						}
-					}
-					catch(IOException exc){
-						log.error(null, exc);
-					}
-				}
-			});
-
-			mainTabbedPane.setSelectedIndex(0);
-			mainTabbedPane.setEnabledAt(0, true);
-			dicInputTextField.requestFocusInWindow();
-
-
-			//enable menu
-			dicMenu.setEnabled(true);
-			fileCreatePackageMenuItem.setEnabled(true);
-
-			try{
-				flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
-				flm.start();
-			}
-			catch(IOException e){
-				printResultLine("Unable to register file change listener");
-			}
 		}
 		catch(IOException | IllegalArgumentException e){
 			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1415,21 +1373,216 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void clearAffixFile(){
-		clearOutputTable();
+		affParser.clear();
+		
+		clearDictionaryFile();
+	}
 
-		formerInputText = null;
-		dicInputTextField.setText(null);
+
+	private void openHyphenationFile(){
+		try{
+			clearHyphenationFile();
+
+			File hypFile = getHyphenationFile();
+			if(hypFile.exists()){
+				printResultLine("Opening Hyphenation file for parsing: " + hypFile.getName());
+
+				hypParser = new HyphenationParser(affParser.getLanguage());
+				hypParser.parse(hypFile);
+
+				mainTabbedPane.setEnabledAt(2, true);
+
+				printResultLine("Finished reading Hyphenation file");
+			}
+		}
+		catch(IOException | IllegalArgumentException e){
+			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
+		}
+		catch(Exception e){
+			String message = ExceptionService.getMessage(e, getClass());
+			printResultLine(e.getClass().getSimpleName() + ": " + message);
+		}
+	}
+
+	private void clearHyphenationFile(){
+		if(Objects.nonNull(hypParser))
+			hypParser.clear();
+		
+		clearHyphenationFields();
+
+		mainTabbedPane.setEnabledAt(2, false);
+	}
+
+	private void clearHyphenationFields(){
+		formerHyphenationText = null;
+
+		hypWordTextField.setText(null);
+		hypSyllabationOutputLabel.setText(null);
+		hypSyllabesCountOutputLabel.setText(null);
+		hypRulesOutputLabel.setText(null);
+		hypAddRuleTextField.setText(null);
+		hypAddRuleLevelComboBox.setEnabled(false);
+		hypAddRuleButton.setEnabled(false);
+		hypAddRuleSyllabationOutputLabel.setText(null);
+		hypAddRuleSyllabesCountOutputLabel.setText(null);
+	}
+
+	private static void hyphenate(HunspellerFrame frame){
+		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
+		if(Objects.nonNull(formerHyphenationText) && formerHyphenationText.equals(text))
+			return;
+		formerHyphenationText = text;
+
+		String count = null;
+		List<String> rules = Collections.<String>emptyList();
+		if(StringUtils.isNotBlank(text)){
+			HyphenationInterface hyphenation = frame.hypParser.getHyphenator().hyphenate(text);
+
+			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+			text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
+				.toString();
+			count = Long.toString(hyphenation.countSyllabes());
+			rules = hyphenation.getRules();
+
+			frame.hypAddRuleTextField.setEnabled(true);
+		}
+		else{
+			text = null;
+
+			frame.hypAddRuleTextField.setEnabled(false);
+		}
+
+		frame.hypSyllabationOutputLabel.setText(text);
+		frame.hypSyllabesCountOutputLabel.setText(count);
+		frame.hypRulesOutputLabel.setText(rules.stream()
+			.filter(StringUtils::isNotBlank)
+			.collect(Collectors.joining(StringUtils.SPACE)));
+
+		frame.hypAddRuleTextField.setText(null);
+		frame.hypAddRuleLevelComboBox.setEnabled(false);
+		frame.hypAddRuleButton.setEnabled(false);
+		frame.hypAddRuleSyllabationOutputLabel.setText(null);
+		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
+	}
+
+	private static void hyphenateAddRule(HunspellerFrame frame){
+		try{
+			String addedRuleText = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
+			String addedRule = frame.dicParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
+			String addedRuleCount = null;
+			if(StringUtils.isNotBlank(addedRule)){
+				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule, level);
+				boolean ruleMatchesText = false;
+				boolean hyphenationChanged = false;
+				boolean correctHyphenation = false;
+				if(!alreadyHasRule){
+					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
+
+					if(ruleMatchesText){
+						HyphenationInterface hyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText);
+						HyphenationInterface addedRuleHyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText, addedRule, level);
+
+						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+						String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
+							.toString();
+						addedRuleText = addedRuleHyphenation.formatHyphenation(sj.get(), errorFormatter)
+							.toString();
+						addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
+
+						hyphenationChanged = !text.equals(addedRuleText);
+						correctHyphenation = !addedRuleHyphenation.hasErrors();
+					}
+				}
+
+				if(alreadyHasRule || !ruleMatchesText)
+					addedRuleText = null;
+				boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
+				frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
+				frame.hypAddRuleButton.setEnabled(enableAddRule);
+			}
+			else{
+				addedRuleText = null;
+
+				frame.hypAddRuleTextField.setText(null);
+				frame.hypAddRuleLevelComboBox.setEnabled(false);
+				frame.hypAddRuleButton.setEnabled(false);
+				frame.hypAddRuleSyllabationOutputLabel.setText(null);
+				frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
+			}
+
+			frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
+			frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
+		}
+		catch(CloneNotSupportedException e){
+			log.error("Unexpected exception", e);
+		}
+	}
+
+
+
+	private void prepareDictionaryFile(){
+		String language = affParser.getLanguage();
+		File dicFile = getFile(language + EXTENSION_DIC);
+		dicParser = DictionaryParserBuilder.getParser(language, dicFile, hypParser.getHyphenator(), wordGenerator, affParser.getCharset());
+
+		dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
+		dicDialog.setLocationRelativeTo(this);
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
+		dicDialog.setCellRenderer(dicCellRenderer);
+		dicDialog.addListSelectionListener(e -> {
+			if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
+				int selectedRow = dicDialog.getSelectedIndex();
+				try{
+					if(dicParser.isInBoundary(selectedRow)){
+						dicDialog.setVisible(false);
+
+						dicSortDictionaryMenuItem.setEnabled(false);
+						mainProgressBar.setValue(0);
+
+
+						dicSorterWorker = new SorterWorker(dicParser, selectedRow, this);
+						dicSorterWorker.addPropertyChangeListener(this);
+						dicSorterWorker.execute();
+					}
+				}
+				catch(IOException exc){
+					log.error(null, exc);
+				}
+			}
+		});
+
+		mainTabbedPane.setSelectedIndex(0);
+		mainTabbedPane.setEnabledAt(0, true);
+		dicInputTextField.requestFocusInWindow();
+
+
+		//enable menu
+		dicMenu.setEnabled(true);
+		fileCreatePackageMenuItem.setEnabled(true);
+	}
+
+	private void clearDictionaryFile(){
+		if(Objects.nonNull(dicParser))
+			dicParser.clear();
+
+		clearDictionaryFields();
+
 		mainTabbedPane.setEnabledAt(0, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
 		fileCreatePackageMenuItem.setEnabled(false);
-
-		affParser.clear();
-		if(Objects.nonNull(dicParser))
-			dicParser.clear();
 	}
 
+	private void clearDictionaryFields(){
+		clearOutputTable();
+
+		formerInputText = null;
+		dicInputTextField.setText(null);
+	}
 
 	private void checkDictionaryCorrectness(AffixParser affParser){
 		if(Objects.isNull(dicCorrectnessWorker) || dicCorrectnessWorker.isDone()){
@@ -1562,11 +1715,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
 				Runnable postExecution = () -> {
-					if(Objects.nonNull(dicParser)){
-						hyphenator = new Hyphenator(hypParser);
-						dicParser.setHyphenator(hyphenator);
-					}
-
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 					dm.setSynonyms(theParser.getSynonymsDictionary());
 
@@ -1600,135 +1748,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void updateSynonymsCounter(){
 		theSynonymsRecordedOutputLabel.setText(COUNTER_FORMATTER.format(theParser.getSynonymsCounter()));
-	}
-
-
-	private void openHyphenationFile(){
-		if(Objects.isNull(hypParserWorker) || hypParserWorker.isDone()){
-			clearHyphenationFile();
-
-			File hypFile = getHyphenationFile();
-			if(hypFile.exists()){
-				hypParserWorker = new HyphenationParser.ParserWorker(hypFile, hypParser, () -> mainTabbedPane.setEnabledAt(2, true), this);
-				hypParserWorker.addPropertyChangeListener(this);
-
-				hypParserWorker.execute();
-			}
-		}
-	}
-
-	private void clearHyphenationFile(){
-		hypParser.clear();
-		
-		clearHyphenation();
-
-		mainTabbedPane.setEnabledAt(2, false);
-	}
-
-	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
-		if(Objects.nonNull(formerHyphenationText) && formerHyphenationText.equals(text))
-			return;
-		formerHyphenationText = text;
-
-		String count = null;
-		List<String> rules = Collections.<String>emptyList();
-		if(StringUtils.isNotBlank(text)){
-			HyphenationInterface hyphenation = frame.hyphenator.hyphenate(text);
-
-			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
-			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-			text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
-				.toString();
-			count = Long.toString(hyphenation.countSyllabes());
-			rules = hyphenation.getRules();
-
-			frame.hypAddRuleTextField.setEnabled(true);
-		}
-		else{
-			text = null;
-
-			frame.hypAddRuleTextField.setEnabled(false);
-		}
-
-		frame.hypSyllabationOutputLabel.setText(text);
-		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(rules.stream()
-			.filter(StringUtils::isNotBlank)
-			.collect(Collectors.joining(StringUtils.SPACE)));
-
-		frame.hypAddRuleTextField.setText(null);
-		frame.hypAddRuleLevelComboBox.setEnabled(false);
-		frame.hypAddRuleButton.setEnabled(false);
-		frame.hypAddRuleSyllabationOutputLabel.setText(null);
-		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
-	}
-
-	private static void hyphenateAddRule(HunspellerFrame frame){
-		try{
-			String addedRuleText = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
-			String addedRule = frame.dicParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
-			String addedRuleCount = null;
-			if(StringUtils.isNotBlank(addedRule)){
-				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule, level);
-				boolean ruleMatchesText = false;
-				boolean hyphenationChanged = false;
-				boolean correctHyphenation = false;
-				if(!alreadyHasRule){
-					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
-
-					if(ruleMatchesText){
-						HyphenationInterface hyphenation = frame.hyphenator.hyphenate(addedRuleText);
-						HyphenationInterface addedRuleHyphenation = frame.hyphenator.hyphenate(addedRuleText, addedRule, level);
-
-						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
-						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-						String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
-							.toString();
-						addedRuleText = addedRuleHyphenation.formatHyphenation(sj.get(), errorFormatter)
-							.toString();
-						addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
-
-						hyphenationChanged = !text.equals(addedRuleText);
-						correctHyphenation = !addedRuleHyphenation.hasErrors();
-					}
-				}
-
-				if(alreadyHasRule || !ruleMatchesText)
-					addedRuleText = null;
-				boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
-				frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
-				frame.hypAddRuleButton.setEnabled(enableAddRule);
-			}
-			else{
-				addedRuleText = null;
-
-				frame.hypAddRuleTextField.setText(null);
-				frame.hypAddRuleLevelComboBox.setEnabled(false);
-				frame.hypAddRuleButton.setEnabled(false);
-				frame.hypAddRuleSyllabationOutputLabel.setText(null);
-				frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
-			}
-
-			frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
-			frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
-		}
-		catch(CloneNotSupportedException e){
-			log.error("Unexpected exception", e);
-		}
-	}
-
-	private void clearHyphenation(){
-		hypWordTextField.setText(null);
-		hypSyllabationOutputLabel.setText(null);
-		hypSyllabesCountOutputLabel.setText(null);
-		hypRulesOutputLabel.setText(null);
-		hypAddRuleTextField.setText(null);
-		hypAddRuleLevelComboBox.setEnabled(false);
-		hypAddRuleButton.setEnabled(false);
-		hypAddRuleSyllabationOutputLabel.setText(null);
-		hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
 

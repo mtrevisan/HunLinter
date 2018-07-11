@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.thesaurus;
+package unit731.hunspeller.parsers.thesaurus.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;

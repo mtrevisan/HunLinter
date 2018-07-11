@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
@@ -134,6 +135,8 @@ public class AffixParser{
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.HYPHEN_MINUS + HyphenationParser.HYPHEN_MINUS;
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
+
+	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 
 	@AllArgsConstructor
@@ -407,6 +410,14 @@ public class AffixParser{
 //		RULE_FUNCTION.put(TAG_WORD_CHARS, FUN_COPY_OVER);
 	}
 
+	public void acquireLock(){
+		LOCK_SAVING.lock();
+	}
+
+	public void releaseLock(){
+		LOCK_SAVING.unlock();
+	}
+
 	/**
 	 * Parse the rules out from a .aff file.
 	 *
@@ -415,68 +426,75 @@ public class AffixParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
-		boolean encodingRead = false;
-		charset = FileService.determineCharset(affFile.toPath());
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
-			String line;
-			while(Objects.nonNull(line = br.readLine())){
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1 && line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+		LOCK_SAVING.lock();
 
-				line = removeComment(line);
-				if(line.isEmpty())
-					continue;
+		try{
+			boolean encodingRead = false;
+			charset = FileService.determineCharset(affFile.toPath());
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
+				String line;
+				while(Objects.nonNull(line = br.readLine())){
+					//ignore any BOM marker on first line
+					if(br.getLineNumber() == 1 && line.startsWith(FileService.BOM_MARKER))
+						line = line.substring(1);
 
-				if(!encodingRead && !line.startsWith(TAG_CHARACTER_SET + StringUtils.SPACE))
-					throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
-				else
-					encodingRead = true;
+					line = removeComment(line);
+					if(line.isEmpty())
+						continue;
 
-				ParsingContext context = new ParsingContext(line, br);
-				Consumer<ParsingContext> fun = RULE_FUNCTION.get(context.getRuleType());
-				if(Objects.nonNull(fun)){
-					try{
-						fun.accept(context);
-					}
-					catch(RuntimeException e){
-						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
+					if(!encodingRead && !line.startsWith(TAG_CHARACTER_SET + StringUtils.SPACE))
+						throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+					else
+						encodingRead = true;
+
+					ParsingContext context = new ParsingContext(line, br);
+					Consumer<ParsingContext> fun = RULE_FUNCTION.get(context.getRuleType());
+					if(Objects.nonNull(fun)){
+						try{
+							fun.accept(context);
+						}
+						catch(RuntimeException e){
+							throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
+						}
 					}
 				}
 			}
-		}
 
-//		if(!containsData(TAG_COMPOUND_MIN))
-//			addData(TAG_COMPOUND_MIN, 3);
-//		Integer compoundMin = getData(TAG_COMPOUND_MIN);
-//		if(compoundMin != null && compoundMin < 1)
-//			addData(TAG_COMPOUND_MIN, 1);
-		//apply default charset
-		if(!containsData(TAG_CHARACTER_SET))
-			addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
-		if(!containsData(TAG_LANGUAGE))
-			//try to infer language from filename
-			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
-		if(!containsData(TAG_BREAK)){
-			Set<String> wordBreakCharacters = new HashSet<>(3);
-			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS);
-			wordBreakCharacters.add("^" + HyphenationParser.HYPHEN_MINUS);
-			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS + "$");
-			addData(TAG_BREAK, wordBreakCharacters);
-		}
-//		if(isComplexPrefixes()){
-//			String compoundBegin = getData(TAG_COMPOUND_BEGIN);
-//			String compoundEnd = getData(TAG_COMPOUND_END);
-//			addData(TAG_COMPOUND_BEGIN, compoundEnd);
-//			addData(TAG_COMPOUND_END, compoundBegin);
+//			if(!containsData(TAG_COMPOUND_MIN))
+//				addData(TAG_COMPOUND_MIN, 3);
+//			Integer compoundMin = getData(TAG_COMPOUND_MIN);
+//			if(compoundMin != null && compoundMin < 1)
+//				addData(TAG_COMPOUND_MIN, 1);
+			//apply default charset
+			if(!containsData(TAG_CHARACTER_SET))
+				addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
+			if(!containsData(TAG_LANGUAGE))
+				//try to infer language from filename
+				addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
+			if(!containsData(TAG_BREAK)){
+				Set<String> wordBreakCharacters = new HashSet<>(3);
+				wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS);
+				wordBreakCharacters.add("^" + HyphenationParser.HYPHEN_MINUS);
+				wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS + "$");
+				addData(TAG_BREAK, wordBreakCharacters);
+			}
+//			if(isComplexPrefixes()){
+//				String compoundBegin = getData(TAG_COMPOUND_BEGIN);
+//				String compoundEnd = getData(TAG_COMPOUND_END);
+//				addData(TAG_COMPOUND_BEGIN, compoundEnd);
+//				addData(TAG_COMPOUND_END, compoundBegin);
 //
-//			RuleEntry prefixes = getData(TAG_PREFIX);
-//			RuleEntry suffixes = getData(TAG_SUFFIX);
-//			addData(TAG_PREFIX, suffixes);
-//			addData(TAG_SUFFIX, prefixes);
-//		}
-//		if(!containsData(TAG_KEY))
-//			addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+//				RuleEntry prefixes = getData(TAG_PREFIX);
+//				RuleEntry suffixes = getData(TAG_SUFFIX);
+//				addData(TAG_PREFIX, suffixes);
+//				addData(TAG_SUFFIX, prefixes);
+//			}
+//			if(!containsData(TAG_KEY))
+//				addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B
@@ -566,7 +584,14 @@ public class AffixParser{
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
-		return strategy;
+		LOCK_SAVING.lock();
+
+		try{
+			return strategy;
+		}
+		finally{
+			LOCK_SAVING.unlock();
+		}
 	}
 
 	public String applyInputConversionTable(String word){

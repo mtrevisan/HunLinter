@@ -1,5 +1,6 @@
-package unit731.hunspeller.parsers.thesaurus;
+package unit731.hunspeller.parsers.thesaurus.dtos;
 
+import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.BufferedReader;
 import java.io.IOException;

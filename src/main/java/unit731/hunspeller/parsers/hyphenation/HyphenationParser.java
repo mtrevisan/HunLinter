@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,8 +28,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +35,6 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
@@ -108,6 +104,8 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	@Getter
 	private final Orthography orthography;
+	@Getter
+	private AbstractHyphenator hyphenator;
 
 	@Getter
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
@@ -122,6 +120,7 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
+		hyphenator = new Hyphenator(this);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -139,6 +138,7 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
+		hyphenator = new Hyphenator(this);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -163,160 +163,120 @@ public class HyphenationParser{
 		LOCK_SAVING.unlock();
 	}
 
-	@AllArgsConstructor
-	public static class ParserWorker extends SwingWorker<Void, String>{
+	/**
+	 * Parse the hyphenation rules out from a .dic file.
+	 *
+	 * @param hypFile	The content of the hyphenation file
+	 * @throws IOException	If an I/O error occurs
+	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
+	 */
+	public void parse(File hypFile) throws IOException, IllegalArgumentException{
+		LOCK_SAVING.lock();
 
-		private final File hypFile;
-		private final HyphenationParser hypParser;
-		private final Runnable postExecution;
-		private final Resultable resultable;
+		try{
+			Level level = Level.FIRST;
 
+			Path hypPath = hypFile.toPath();
+			Charset charset = FileService.determineCharset(hypPath);
+			try(BufferedReader br = Files.newBufferedReader(hypPath, charset)){
+				String line = br.readLine();
+				if(Charset.forName(line) != charset)
+					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
-		@Override
-		protected Void doInBackground() throws Exception{
-			LOCK_SAVING.lock();
+				REDUCED_PATTERNS.get(level).clear();
 
-			boolean stopped = false;
-			try{
-				publish("Opening Hyphenation file for parsing: " + hypFile.getName());
-				setProgress(0);
+				while(Objects.nonNull(line = br.readLine())){
+					line = removeComment(line);
+					if(line.isEmpty())
+						continue;
 
-				long readSoFar = 0l;
-				long totalSize = hypFile.length();
+					if(!line.isEmpty()){
+						boolean parsedLine = options.parseLine(line);
+						if(!parsedLine){
+							if(line.startsWith(NEXT_LEVEL)){
+								if(level == Level.SECOND)
+									throw new IllegalArgumentException("Cannot have more than two levels");
 
-				Level level = Level.FIRST;
+								//start with non–compound level
+								level = Level.SECOND;
+								REDUCED_PATTERNS.get(level).clear();
+							}
+							else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
+								String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
+								if(customHyphenations.get(level).containsKey(key))
+									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-				Path hypPath = hypFile.toPath();
-				Charset charset = FileService.determineCharset(hypPath);
-				try(BufferedReader br = Files.newBufferedReader(hypPath, charset)){
-					String line = br.readLine();
-					if(Charset.forName(line) != charset)
-						throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
+								customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, HYPHEN_MINUS));
+							}
+							else{
+								validateRule(line, level);
 
-					REDUCED_PATTERNS.get(level).clear();
-
-					while(Objects.nonNull(line = br.readLine())){
-						readSoFar += line.length();
-
-						line = removeComment(line);
-						if(line.isEmpty())
-							continue;
-
-						if(!line.isEmpty()){
-							boolean parsedLine = hypParser.options.parseLine(line);
-							if(!parsedLine){
-								if(line.startsWith(NEXT_LEVEL)){
-									if(level == Level.SECOND)
-										throw new IllegalArgumentException("Cannot have more than two levels");
-
-									//start with non–compound level
-									level = Level.SECOND;
-									REDUCED_PATTERNS.get(level).clear();
-								}
-								else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-									String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
-									if(hypParser.customHyphenations.get(level).containsKey(key))
-										throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
-
-									hypParser.customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, HYPHEN_MINUS));
-								}
-								else{
-									validateRule(line, level);
-
-									String key = getKeyFromData(line);
-									boolean duplicatedRule = isRuleDuplicated(key, line, level);
-									if(duplicatedRule)
-										publish("Duplication found: " + line);
-									else
-										//insert current pattern into the radix tree (remove all numbers)
-										hypParser.patterns.get(level).put(key, line);
-								}
+								String key = getKeyFromData(line);
+								boolean duplicatedRule = isRuleDuplicated(key, line, level);
+								if(duplicatedRule)
+									throw new IllegalArgumentException("Duplication found: " + line);
+								else
+									//insert current pattern into the radix tree (remove all numbers)
+									patterns.get(level).put(key, line);
 							}
 						}
-
-						setProgress((int)((readSoFar * 100.) / totalSize));
 					}
-
-					if(level == Level.FIRST){
-						//dash and apostrophe are added by default (retro-compatibility)
-						List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
-						if(charset == StandardCharsets.UTF_8)
-							addedNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
-
-						hypParser.options.getNoHyphen().addAll(addedNoHyphen);
-
-						for(String noHyphen : addedNoHyphen){
-							line = ONE + noHyphen + ONE;
-							if(!isRuleDuplicated(noHyphen, line, level))
-								hypParser.patterns.get(level).put(noHyphen, line);
-						}
-					}
-
-					hypParser.postParsingInitialization();
-
-					setProgress(100);
 				}
+
+				if(level == Level.FIRST){
+					//dash and apostrophe are added by default (retro-compatibility)
+					List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
+					if(charset == StandardCharsets.UTF_8)
+						addedNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
+
+					options.getNoHyphen().addAll(addedNoHyphen);
+
+					for(String noHyphen : addedNoHyphen){
+						line = ONE + noHyphen + ONE;
+						if(!isRuleDuplicated(noHyphen, line, level))
+							patterns.get(level).put(noHyphen, line);
+					}
+				}
+
+				postParsingInitialization();
+
+				hyphenator = new Hyphenator(this);
+			}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
-
-				publish("Finished reading Hyphenation file");
-			}
-			catch(IOException | IllegalArgumentException e){
-				stopped = true;
-
-				publish(e instanceof ClosedChannelException? "Hyphenation parser thread interrupted": e.getClass().getSimpleName() + ": "
-					+ e.getMessage());
-			}
-			catch(Exception e){
-				stopped = true;
-
-				String message = ExceptionService.getMessage(e, getClass());
-				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			finally{
-				LOCK_SAVING.unlock();
-			}
-			if(stopped)
-				publish("Stopped reading Hyphenation file");
-
-			return null;
 		}
-
-		private boolean isRuleDuplicated(String key, String line, Level level){
-			boolean duplicatedRule = false;
-			String foundNodeValue = hypParser.patterns.get(level).get(key);
-			if(Objects.nonNull(foundNodeValue)){
-				String clearedLine = PatternService.clear(line, MATCHER_REDUCE);
-				String clearedFoundNodeValue = PatternService.clear(foundNodeValue, MATCHER_REDUCE);
-				duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
-			}
-			return duplicatedRule;
+		catch(Exception e){
+			String message = ExceptionService.getMessage(e, getClass());
+			throw new IllegalArgumentException(e.getClass().getSimpleName() + ": " + message);
 		}
-
-		/**
-		 * Removes comment lines and then cleans up blank lines and trailing whitespace.
-		 *
-		 * @param {String} data	The data from an affix file.
-		 * @return {String}		The cleaned-up data.
-		 */
-		private String removeComment(String line){
-			//remove comments
-			line = PatternService.clear(line, MATCHER_COMMENT);
-			//trim the entire string
-			return StringUtils.strip(line);
+		finally{
+			LOCK_SAVING.unlock();
 		}
+	}
 
-		@Override
-		protected void process(List<String> chunks){
-			resultable.printResultLine(chunks);
+	private boolean isRuleDuplicated(String key, String line, Level level){
+		boolean duplicatedRule = false;
+		String foundNodeValue = patterns.get(level).get(key);
+		if(Objects.nonNull(foundNodeValue)){
+			String clearedLine = PatternService.clear(line, MATCHER_REDUCE);
+			String clearedFoundNodeValue = PatternService.clear(foundNodeValue, MATCHER_REDUCE);
+			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
+		return duplicatedRule;
+	}
 
-		@Override
-		protected void done(){
-			if(Objects.nonNull(postExecution))
-				postExecution.run();
-		}
+	/**
+	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
+	 *
+	 * @param {String} data	The data from an affix file.
+	 * @return {String}		The cleaned-up data.
+	 */
+	private String removeComment(String line){
+		//remove comments
+		line = PatternService.clear(line, MATCHER_COMMENT);
+		//trim the entire string
+		return StringUtils.strip(line);
 	}
 
 	protected void postParsingInitialization(){}

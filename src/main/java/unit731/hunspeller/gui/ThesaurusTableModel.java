@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
 
 public class ThesaurusTableModel extends AbstractTableModel{

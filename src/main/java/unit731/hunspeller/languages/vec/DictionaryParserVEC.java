@@ -375,8 +375,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, Charset charset){
-		super(dicFile, wordGenerator, charset);
+	public DictionaryParserVEC(File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
+		super(dicFile, hyphenator, wordGenerator, charset);
 	}
 
 	@Override

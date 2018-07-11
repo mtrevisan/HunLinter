@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.thesaurus;
+package unit731.hunspeller.parsers.thesaurus.dtos;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
