@@ -26,7 +26,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleEntry;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
 import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
@@ -130,7 +130,7 @@ public class AffixParser{
 	/** Define output conversion table */
 	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
 
-	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.HYPHEN_MINUS + HyphenationParser.HYPHEN_MINUS;
+	private static final String DOUBLE_MINUS_SIGN = AbstractHyphenationParser.HYPHEN_MINUS + AbstractHyphenationParser.HYPHEN_MINUS;
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
@@ -277,7 +277,7 @@ public class AffixParser{
 				if(StringUtils.isBlank(breakCharacter))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
 				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
-					breakCharacter = HyphenationParser.EN_DASH;
+					breakCharacter = AbstractHyphenationParser.EN_DASH;
 
 				boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)
@@ -458,9 +458,9 @@ public class AffixParser{
 			addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
 		if(!containsData(TAG_BREAK)){
 			Set<String> wordBreakCharacters = new HashSet<>(3);
-			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS);
-			wordBreakCharacters.add("^" + HyphenationParser.HYPHEN_MINUS);
-			wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS + "$");
+			wordBreakCharacters.add(AbstractHyphenationParser.HYPHEN_MINUS);
+			wordBreakCharacters.add("^" + AbstractHyphenationParser.HYPHEN_MINUS);
+			wordBreakCharacters.add(AbstractHyphenationParser.HYPHEN_MINUS + "$");
 			addData(TAG_BREAK, wordBreakCharacters);
 		}
 //		if(isComplexPrefixes()){

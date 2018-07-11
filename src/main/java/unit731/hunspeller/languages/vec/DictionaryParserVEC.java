@@ -22,7 +22,7 @@ import unit731.hunspeller.parsers.dictionary.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -102,8 +102,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final String HYPHEN_SPLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
-		+ HyphenationParser.SOFT_HYPHEN;
+	private static final String HYPHEN_SPLITTER = AbstractHyphenationParser.HYPHEN_MINUS + AbstractHyphenationParser.EN_DASH + AbstractHyphenationParser.EM_DASH
+		+ AbstractHyphenationParser.SOFT_HYPHEN;
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
 
@@ -536,7 +536,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String word = production.getWord();
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenationParser.hyphenate(word).countSyllabes() > 1){
-			String[] subwords = StringUtils.split(word, HyphenationParser.EN_DASH);
+			String[] subwords = StringUtils.split(word, AbstractHyphenationParser.EN_DASH);
 			String rule = (!WordVEC.isStressed(subwords[subwords.length - 1]) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
