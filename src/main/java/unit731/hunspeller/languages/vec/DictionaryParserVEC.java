@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -29,8 +28,6 @@ import unit731.hunspeller.services.PatternService;
 
 
 public class DictionaryParserVEC extends DictionaryParser{
-
-	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
 	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
@@ -106,7 +103,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final String HYPHEN_SPLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
 		+ HyphenationParser.SOFT_HYPHEN;
 
-	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
+//	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
+//	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
 
 	private static final String SLASH = "/";
 	private static final String ASTERISK = "*";
@@ -119,19 +117,11 @@ public class DictionaryParserVEC extends DictionaryParser{
 		private static final String CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD = "Cannot use {0} rule with non–ƚ, use {1}";
 		private static final String CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD = "Cannot use {0} rule with đ or ŧ, use {1}";
 
-		private final Matcher matcher;
 		private final List<String> continuationFlags;
 		private final String error;
 
 
-		MatcherEntry(String matcher, String pattern, Object ... arguments){
-			this.matcher = PatternService.matcher(matcher);
-			continuationFlags = null;
-			this.error = MessageFormat.format(pattern, arguments);
-		}
-
 		MatcherEntry(List<String> continuationFlags, String pattern, Object ... arguments){
-			matcher = null;
 			this.continuationFlags = continuationFlags;
 			//take last argument as the concatenation of the continuationFlags
 			List<Object> args = new ArrayList<>(arguments.length + 1);
@@ -140,9 +130,10 @@ public class DictionaryParserVEC extends DictionaryParser{
 			this.error = MessageFormat.format(pattern, args.toArray(new Object[args.size()]));
 		}
 
-		public void match(String word) throws IllegalArgumentException{
-			if(matcher != null && PatternService.find(word, matcher))
-				throw new IllegalArgumentException(error + " for " + word);
+		public void match(RuleProductionEntry production) throws IllegalArgumentException{
+			for(String flag : continuationFlags)
+				if(production.containsContinuationFlag(flag))
+					throw new IllegalArgumentException(error + " for " + production.getWord());
 		}
 	}
 	private static final boolean ENABLE_VERB_CHECK = false;
@@ -153,55 +144,55 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(ENABLE_VERB_CHECK){
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_1ST_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_1ST_RULE_NON_VANISHING_EL, VERB_1ST_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_1ST_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_1ST_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_1ST_RULE_VANISHING_EL, VERB_1ST_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_2ND_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_2ND_RULE_NON_VANISHING_EL, VERB_2ND_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_2ND_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_2ND_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_2ND_RULE_VANISHING_EL, VERB_2ND_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_IS_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_3RD_IS_RULE_NON_VANISHING_EL, VERB_3RD_IS_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_3RD_IS_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_IS_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_3RD_IS_RULE_VANISHING_EL, VERB_3RD_IS_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_NO_IS_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_3RD_NO_IS_RULE_NON_VANISHING_EL, VERB_3RD_NO_IS_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_3RD_NO_IS_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_NO_IS_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_3RD_NO_IS_RULE_VANISHING_EL, VERB_3RD_NO_IS_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL, VERB_3RD_BOTH_IS_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_3RD_BOTH_IS_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_3RD_BOTH_IS_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_3RD_BOTH_IS_RULE_VANISHING_EL, VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_DAR_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_DAR_RULE_NON_VANISHING_EL, VERB_DAR_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_DAR_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_DAR_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_DAR_RULE_VANISHING_EL, VERB_DAR_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_TOLER_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_TOLER_RULE_NON_VANISHING_EL, VERB_TOLER_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_TOLER_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_TOLER_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_TOLER_RULE_VANISHING_EL, VERB_TOLER_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_DIXER_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_DIXER_RULE_NON_VANISHING_EL, VERB_DIXER_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + VERB_DIXER_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_DIXER_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, VERB_DIXER_RULE_VANISHING_EL, VERB_DIXER_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL, PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL, PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL, PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL, PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL, PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL, PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL, INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL, INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL, INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL));
-			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL,
+			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL, INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL));
 		}
 
@@ -210,45 +201,45 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL, DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL, PLANTS_AND_CRAFTS_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + PLANTS_AND_CRAFTS_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PLANTS_AND_CRAFTS_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, PLANTS_AND_CRAFTS_RULE_VANISHING_EL, PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL, DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(ADVERB_MENTE_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, ADVERB_MENTE_RULE_NON_VANISHING_EL, ADVERB_MENTE_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + ADVERB_MENTE_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(ADVERB_MENTE_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, ADVERB_MENTE_RULE_VANISHING_EL, ADVERB_MENTE_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DIMINUTIVE_ETO_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DIMINUTIVE_ETO_RULE_VANISHING_EL, DIMINUTIVE_ETO_RULE_NON_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_EL_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, DIMINUTIVE_EL_RULE_NON_VANISHING_EL, DIMINUTIVE_EL_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + DIMINUTIVE_EL_RULE_VANISHING_EL,
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_EL_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DIMINUTIVE_EL_RULE_VANISHING_EL, DIMINUTIVE_EL_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL, AUGMENTATIVE_OTO_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + Pattern.quote(AUGMENTATIVE_OTO_RULE_VANISHING_EL),
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_OTO_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, AUGMENTATIVE_OTO_RULE_VANISHING_EL, AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL));
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL));
-		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(NON_VANISHING_L + Pattern.quote(AUGMENTATIVE_ON_RULE_VANISHING_EL),
+		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_RULE_VANISHING_EL),
 			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, AUGMENTATIVE_ON_RULE_VANISHING_EL, AUGMENTATIVE_ON_RULE_NON_VANISHING_EL));
 
 		MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL),
@@ -401,7 +392,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 				northernPluralCheck(production);
 			}
 
-			mismatchCheck(derivedWordWithoutMorphologicalFields);
+			mismatchCheck(production);
 
 			finalSonorizationCheck(production);
 
@@ -422,27 +413,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 				message += " (via " + rulesSequence + ")";
 			throw new IllegalArgumentException(message);
 		}
-	}
-
-	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
-	private static boolean canContainsVanishingEl(String word){
-		boolean result = false;
-		if(word.length() > 1){
-			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
-			char chr = word.charAt(index);
-			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
-			while(!result){
-				index = WordVEC.getFirstVowelIndex(word, index);
-				if(index < 0)
-					break;
-
-				if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
-					result = true;
-
-				index ++;
-			}
-		}
-		return result;
 	}
 
 	private void morphologicalFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
@@ -490,18 +460,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 			throws IllegalArgumentException{
 		if(StringUtils.containsAny(production.getWord(), contains))
 			for(MatcherEntry entry : checks)
-				for(String flag : entry.continuationFlags)
-					if(production.containsContinuationFlag(flag))
-						throw new IllegalArgumentException(entry.error + " for " + production.getWord());
+				entry.match(production);
 	}
 
 	private void continuationFlagIncompatibilityCheck(RuleProductionEntry production, String continuationFlag, Set<MatcherEntry> checks)
 			throws IllegalArgumentException{
 		if(production.containsContinuationFlag(continuationFlag))
 			for(MatcherEntry entry : checks)
-				for(String flag : entry.continuationFlags)
-					if(production.containsContinuationFlag(flag))
-						throw new IllegalArgumentException(entry.error + " for " + production.getWord());
+				entry.match(production);
 	}
 
 	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
@@ -541,9 +507,37 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void mismatchCheck(String line) throws IllegalArgumentException{
-		for(MatcherEntry check : MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH)
-			check.match(line);
+	private void mismatchCheck(RuleProductionEntry production) throws IllegalArgumentException{
+		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
+	}
+
+	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks)
+			throws IllegalArgumentException{
+		if(canContainsVanishingEl(production.getWord()))
+			for(MatcherEntry entry : checks)
+				entry.match(production);
+	}
+
+	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
+	private static boolean canContainsVanishingEl(String word){
+		boolean result = false;
+		int size = word.length();
+		if(size > 1){
+			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
+			char chr = word.charAt(index);
+			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
+			while(!result){
+				index = WordVEC.getFirstVowelIndex(word, index);
+				if(index < 0 || index + 2 >= size)
+					break;
+
+				if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
+					result = true;
+
+				index ++;
+			}
+		}
+		return result;
 	}
 
 	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
