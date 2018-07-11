@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
@@ -52,7 +51,6 @@ import unit731.hunspeller.services.PatternService;
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
-@Slf4j
 public class HyphenationParser{
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";

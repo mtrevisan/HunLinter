@@ -49,6 +49,7 @@ public class WordVEC{
 		}
 	}
 
+	private static final Matcher FIRST_STRESSED_VOWEL = PatternService.matcher("^[aeiouàèéíòóú][^aeiouàèéíòóú]*");
 	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
@@ -94,12 +95,12 @@ public class WordVEC{
 		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
 	}
 
-	//^ʼ?[aeiouàèéíòóú]
+	//^[ʼ']?[aeiouàèéíòóú]
 	public static boolean startsWithVowel(String word){
 		char chr = word.charAt(0);
 		if(isApostrophe(chr))
 			chr = word.charAt(1);
-		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
+		return isVowel(chr);
 	}
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
@@ -108,9 +109,14 @@ public class WordVEC{
 		while((-- i) >= 0){
 			char chr = word.charAt(i);
 			if(!isApostrophe(chr))
-				return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
+				return isVowel(chr);
 		}
 		return false;
+	}
+
+	public static int getFirstVowelIndex(String word, int index){
+		Matcher m = FIRST_STRESSED_VOWEL.reset(word.substring(index));
+		return (m.find()? m.start(): -1);
 	}
 
 	public static int getLastVowelIndex(String word){

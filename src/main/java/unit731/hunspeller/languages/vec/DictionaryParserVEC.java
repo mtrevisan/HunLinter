@@ -424,26 +424,23 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	//(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
+	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
 //	private static boolean notContainsVanishingEl(String word){
-//		int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
-//		boolean result = (word.charAt(index) == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
-//		if(!result){
-//			int size = word.length();
-//			while(true){
-//				index = WordVEC.getFirstVowelIndex(word, index + 1);
-//				if(index >= size - 1)
-//					break;
-//
-//				if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2))){
-//					result = true;
-//					break;
-//				}
-//			}
+//		boolean result = false;
+//		if(word.length() > 1){
+//			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
+//			char chr = word.charAt(index);
+//			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
+//			if(!result)
+//				while((index = WordVEC.getFirstVowelIndex(word, index + 1)) >= 0)
+//					if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2))){
+//						result = true;
+//						break;
+//					}
 //		}
 //		return result;
 //	}
-
+//
 //	public static void main(String[] args){
 //		System.out.println(notContainsVanishingEl("lam"));
 //		System.out.println(notContainsVanishingEl("èlam"));

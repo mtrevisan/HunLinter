@@ -5,13 +5,11 @@ import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
 
-@Slf4j
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 

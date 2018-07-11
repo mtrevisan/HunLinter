@@ -69,7 +69,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 					lineIndex ++;
 					readSoFar += line.length();
 
-					line = dicParser.cleanLine(line);
+					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{

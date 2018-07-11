@@ -54,7 +54,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 				while(Objects.nonNull(line = br.readLine())){
 					lineIndex ++;
 					readSoFar += line.length();
-					line = dicParser.cleanLine(line);
+					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
