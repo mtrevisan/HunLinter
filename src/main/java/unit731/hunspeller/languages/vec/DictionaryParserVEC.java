@@ -425,32 +425,25 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
-//	private static boolean notContainsVanishingEl(String word){
-//		boolean result = false;
-//		if(word.length() > 1){
-//			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
-//			char chr = word.charAt(index);
-//			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
-//			if(!result)
-//				while((index = WordVEC.getFirstVowelIndex(word, index + 1)) >= 0)
-//					if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2))){
-//						result = true;
-//						break;
-//					}
-//		}
-//		return result;
-//	}
-//
-//	public static void main(String[] args){
-//		System.out.println(notContainsVanishingEl("lam"));
-//		System.out.println(notContainsVanishingEl("èlam"));
-//		System.out.println(notContainsVanishingEl("èminalam"));
-//		System.out.println(notContainsVanishingEl("lm"));
-//		System.out.println(notContainsVanishingEl("èlm"));
-//		System.out.println(notContainsVanishingEl("èminalm"));
-//		System.out.println(notContainsVanishingEl("èmlam"));
-//		System.out.println(notContainsVanishingEl("èminamlam"));
-//	}
+	private static boolean canContainsVanishingEl(String word){
+		boolean result = false;
+		if(word.length() > 1){
+			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
+			char chr = word.charAt(index);
+			result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
+			while(!result){
+				index = WordVEC.getFirstVowelIndex(word, index);
+				if(index < 0)
+					break;
+
+				if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
+					result = true;
+
+				index ++;
+			}
+		}
+		return result;
+	}
 
 	private void morphologicalFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] morphologicalFields = production.getMorphologicalFields();
