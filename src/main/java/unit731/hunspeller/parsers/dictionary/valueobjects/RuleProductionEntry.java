@@ -97,8 +97,12 @@ public class RuleProductionEntry implements Productable{
 		return newMorphologicalFields.toArray(new String[0]);
 	}
 
+	public int getContinuationFlagsCount(){
+		return (Objects.nonNull(continuationFlags)? continuationFlags.length: 0);
+	}
+
 	public boolean hasContinuationFlags(){
-		return (Objects.nonNull(continuationFlags) && continuationFlags.length > 0);
+		return (getContinuationFlagsCount() > 0);
 	}
 
 	@Override

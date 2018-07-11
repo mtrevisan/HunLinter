@@ -113,7 +113,7 @@ public class WordGenerator{
 				prod.prependAppliedRules(appliedRules);
 
 				//check correctness
-				if(prod.hasContinuationFlags())
+				if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0) > 0)
 					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
 						+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 			}
@@ -139,7 +139,7 @@ public class WordGenerator{
 					prod.prependAppliedRules(appliedRules);
 
 					//check correctness
-					if(prod.hasContinuationFlags())
+					if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0) > 0)
 						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
 							+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 				}
