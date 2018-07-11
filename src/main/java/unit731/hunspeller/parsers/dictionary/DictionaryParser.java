@@ -184,7 +184,7 @@ public class DictionaryParser{
 	 * @param line	The line to be cleaned
 	 * @return	The cleaned line (withou comments or spaces at the beginning or at the end)
 	 */
-	public final String cleanLine(String line){
+	public static String cleanLine(String line){
 		//remove comments
 		line = PatternService.clear(line, REGEX_COMMENT);
 		//trim the entire string

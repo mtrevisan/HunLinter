@@ -38,7 +38,7 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 @Getter
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
-	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
@@ -72,7 +72,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		@Override
 		protected List<ThesaurusEntry> doInBackground() throws Exception{
-			LOCK_SAVING.lock();
+			theParser.acquireLock();
 
 			boolean stopped = false;
 			try{
@@ -113,7 +113,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			finally{
 				theParser.dictionary.resetModified();
 
-				LOCK_SAVING.unlock();
+				theParser.releaseLock();
 			}
 			if(stopped)
 				publish("Stopped reading Thesaurus file");
@@ -136,36 +136,44 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		}
 	}
 
-	public int getSynonymsCounter(){
+	public void acquireLock(){
 		LOCK_SAVING.lock();
+	}
+
+	public void releaseLock(){
+		LOCK_SAVING.unlock();
+	}
+
+	public int getSynonymsCounter(){
+		acquireLock();
 
 		try{
 			return dictionary.size();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public boolean isDictionaryModified(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			return dictionary.isModified();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			return dictionary.getSynonyms();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
@@ -176,7 +184,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
@@ -220,14 +228,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return duplicationResult;
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
 	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
 			throws IllegalArgumentException{
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			boolean forcedInsertion = false;
@@ -257,12 +265,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return new DuplicationResult(duplicates, forcedInsertion);
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			undoCaretaker.pushMemento(createMemento());
@@ -293,12 +301,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			log.warn("Error while modifying the meanings", e);
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			int count = selectedRowIDs.length;
@@ -318,23 +326,23 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public List<String> extractDuplicates(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			return dictionary.extractDuplicates();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			//sort the synonyms
@@ -386,18 +394,18 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
 	public void clear(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			dictionary.clear();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 

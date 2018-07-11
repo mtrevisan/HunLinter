@@ -136,7 +136,7 @@ public class AffixParser{
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
-	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 
 	@AllArgsConstructor
@@ -426,7 +426,7 @@ public class AffixParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			boolean encodingRead = false;
@@ -493,7 +493,7 @@ public class AffixParser{
 //				addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
@@ -510,7 +510,7 @@ public class AffixParser{
 	 * @param {String} data	The data from an affix file.
 	 * @return {String}		The cleaned-up data.
 	 */
-	private String removeComment(String line){
+	private static String removeComment(String line){
 		//remove comments
 		line = PatternService.clear(line, COMMENT);
 		//trim the entire string
@@ -584,13 +584,13 @@ public class AffixParser{
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			return strategy;
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 

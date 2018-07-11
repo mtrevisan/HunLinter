@@ -92,7 +92,7 @@ public class HyphenationParser{
 
 	public static enum Level{FIRST, SECOND}
 
-	private static final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
@@ -171,7 +171,7 @@ public class HyphenationParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
 	public void parse(File hypFile) throws IOException, IllegalArgumentException{
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			Level level = Level.FIRST;
@@ -238,8 +238,6 @@ public class HyphenationParser{
 					}
 				}
 
-				postParsingInitialization();
-
 				hyphenator = new Hyphenator(this);
 			}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
@@ -251,7 +249,7 @@ public class HyphenationParser{
 			throw new IllegalArgumentException(e.getClass().getSimpleName() + ": " + message);
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
@@ -272,17 +270,15 @@ public class HyphenationParser{
 	 * @param {String} data	The data from an affix file.
 	 * @return {String}		The cleaned-up data.
 	 */
-	private String removeComment(String line){
+	private static String removeComment(String line){
 		//remove comments
 		line = PatternService.clear(line, MATCHER_COMMENT);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}
 
-	protected void postParsingInitialization(){}
-
 	public void clear(){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			patterns.values()
@@ -293,7 +289,7 @@ public class HyphenationParser{
 				options.clear();
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
@@ -305,7 +301,7 @@ public class HyphenationParser{
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule, Level level){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			validateRule(rule, level);
@@ -318,7 +314,7 @@ public class HyphenationParser{
 			return newRule;
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
@@ -378,7 +374,7 @@ public class HyphenationParser{
 	}
 
 	public void save(File hypFile) throws IOException{
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			Charset charset = StandardCharsets.UTF_8;
@@ -396,7 +392,7 @@ public class HyphenationParser{
 			}
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
@@ -444,14 +440,14 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(String rule, Level level){
-		LOCK_SAVING.lock();
+		acquireLock();
 
 		try{
 			String key = getKeyFromData(rule);
 			return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key));
 		}
 		finally{
-			LOCK_SAVING.unlock();
+			releaseLock();
 		}
 	}
 
