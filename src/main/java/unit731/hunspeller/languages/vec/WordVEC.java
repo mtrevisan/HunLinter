@@ -49,8 +49,9 @@ public class WordVEC{
 		}
 	}
 
+	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
 	private static final Matcher FIRST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú].*$");
-	private static final Matcher LAST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
+	private static final Matcher LAST_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
@@ -115,12 +116,13 @@ public class WordVEC{
 	}
 
 	public static int getFirstVowelIndex(String word, int index){
-		Matcher m = FIRST_STRESSED_VOWEL.reset(word.substring(index));
-		return (m.find()? m.start() + index: -1);
+		return StringUtils.indexOf(word, VOWELS_LOWERCASE, index);
+//		Matcher m = FIRST_STRESSED_VOWEL.reset(word.substring(index));
+//		return (m.find()? m.start() + index: -1);
 	}
 
 	public static int getLastVowelIndex(String word){
-		Matcher m = LAST_STRESSED_VOWEL.reset(word);
+		Matcher m = LAST_VOWEL.reset(word);
 		return (m.find()? m.start(): -1);
 	}
 
