@@ -1,5 +1,6 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.dtos;
 
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;

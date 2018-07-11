@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation;
+package unit731.hunspeller.parsers.hyphenation.dtos;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 @AllArgsConstructor(staticName = "build")
@@ -61,7 +62,7 @@ public class CompoundHyphenation implements HyphenationInterface{
 
 	@Override
 	public String toString(){
-		return formatHyphenation(new StringJoiner(AbstractHyphenationParser.SOFT_HYPHEN), Function.identity())
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
 			.toString();
 	}
 

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.dictionary.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
 public class ProductionTableModel extends AbstractTableModel{

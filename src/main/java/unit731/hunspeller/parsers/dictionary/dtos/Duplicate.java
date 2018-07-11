@@ -1,9 +1,11 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.dtos;
 
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
 @AllArgsConstructor

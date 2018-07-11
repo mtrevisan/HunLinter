@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.Arrays;
 import java.util.Collections;

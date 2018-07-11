@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -105,7 +105,7 @@ public class AffixEntry{
 		return (type == Type.SUFFIX);
 	}
 
-	boolean match(String word){
+	public boolean match(String word){
 		return condition.match(word, type);
 	}
 

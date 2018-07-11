@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.Watercolors;
+import unit731.hunspeller.parsers.dictionary.dtos.Watercolors;
 
 
 @AllArgsConstructor

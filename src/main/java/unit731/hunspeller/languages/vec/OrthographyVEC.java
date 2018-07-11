@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -113,7 +113,7 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APEX) && !AbstractHyphenationParser.HYPHEN.equals(syllabe)
+			errors[i] = (!syllabe.contains(APOSTROPHE) && !syllabe.contains(APEX) && !HyphenationParser.HYPHEN.equals(syllabe)
 				&& WordVEC.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;

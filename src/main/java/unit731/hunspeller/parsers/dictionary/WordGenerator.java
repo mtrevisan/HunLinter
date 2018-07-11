@@ -1,5 +1,10 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

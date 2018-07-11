@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 
 
@@ -59,7 +60,7 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	/** NOTE: used for testing purposes */
-	RuleProductionEntry(String word, String continuationFlags, FlagParsingStrategy strategy){
+	public RuleProductionEntry(String word, String continuationFlags, FlagParsingStrategy strategy){
 		this.word = word;
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		morphologicalFields = new String[0];

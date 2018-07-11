@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation;
+package unit731.hunspeller.parsers.hyphenation.dtos;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 @AllArgsConstructor
@@ -115,7 +116,7 @@ public class Hyphenation implements HyphenationInterface{
 
 	@Override
 	public String toString(){
-		return formatHyphenation(new StringJoiner(AbstractHyphenationParser.SOFT_HYPHEN), Function.identity())
+		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
 			.toString();
 	}
 

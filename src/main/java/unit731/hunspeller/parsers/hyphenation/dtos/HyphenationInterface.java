@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation;
+package unit731.hunspeller.parsers.hyphenation.dtos;
 
 import java.util.List;
 import java.util.StringJoiner;

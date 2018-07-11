@@ -75,21 +75,22 @@ import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
-import unit731.hunspeller.parsers.dictionary.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
+import unit731.hunspeller.parsers.hyphenation.AbstractHyphenator;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.DuplicationResult;
-import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.Hyphenator;
 import unit731.hunspeller.parsers.thesaurus.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusEntry;
 import unit731.hunspeller.services.Debouncer;
@@ -141,7 +142,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private final AidParser aidParser;
 	private DictionaryParser dicParser;
 	private final ThesaurusParser theParser;
-	private AbstractHyphenationParser hypParser;
+	private HyphenationParser hypParser;
+	private AbstractHyphenator hyphenator;
 
 	private final WordGenerator wordGenerator;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, 400);
@@ -1195,7 +1197,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		String newRule = hypAddRuleTextField.getText();
-		AbstractHyphenationParser.Level level = AbstractHyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
+		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT), level);
 		if(Objects.isNull(foundRule)){
 			try{
@@ -1560,8 +1562,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
 				Runnable postExecution = () -> {
-					if(Objects.nonNull(dicParser))
-						dicParser.setHyphenationParser(hypParser);
+					if(Objects.nonNull(dicParser)){
+						hyphenator = new Hyphenator(hypParser);
+						dicParser.setHyphenator(hyphenator);
+					}
 
 					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 					dm.setSynonyms(theParser.getSynonymsDictionary());
@@ -1605,7 +1609,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			File hypFile = getHyphenationFile();
 			if(hypFile.exists()){
-				hypParserWorker = new AbstractHyphenationParser.ParserWorker(hypFile, hypParser, () -> mainTabbedPane.setEnabledAt(2, true), this);
+				hypParserWorker = new HyphenationParser.ParserWorker(hypFile, hypParser, () -> mainTabbedPane.setEnabledAt(2, true), this);
 				hypParserWorker.addPropertyChangeListener(this);
 
 				hypParserWorker.execute();
@@ -1630,9 +1634,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			HyphenationInterface hyphenation = frame.hypParser.hyphenate(text);
+			HyphenationInterface hyphenation = frame.hyphenator.hyphenate(text);
 
-			Supplier<StringJoiner> sj = () -> new StringJoiner(AbstractHyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 			text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
 				.toString();
@@ -1664,7 +1668,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		try{
 			String addedRuleText = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
 			String addedRule = frame.dicParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-			AbstractHyphenationParser.Level level = AbstractHyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
+			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 			String addedRuleCount = null;
 			if(StringUtils.isNotBlank(addedRule)){
 				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule, level);
@@ -1675,10 +1679,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 					if(ruleMatchesText){
-						HyphenationInterface hyphenation = frame.hypParser.hyphenate(addedRuleText);
-						HyphenationInterface addedRuleHyphenation = frame.hypParser.hyphenate(addedRuleText, addedRule, level);
+						HyphenationInterface hyphenation = frame.hyphenator.hyphenate(addedRuleText);
+						HyphenationInterface addedRuleHyphenation = frame.hyphenator.hyphenate(addedRuleText, addedRule, level);
 
-						Supplier<StringJoiner> sj = () -> new StringJoiner(AbstractHyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 						String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
 							.toString();

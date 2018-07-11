@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.AbstractHyphenator;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
@@ -47,7 +48,7 @@ public class DictionaryParser{
 	private final Charset charset;
 	private final String language;
 	@Setter
-	protected AbstractHyphenationParser hyphenationParser;
+	protected AbstractHyphenator hyphenator;
 	private final ExternalSorter sorter = new ExternalSorter();
 
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();

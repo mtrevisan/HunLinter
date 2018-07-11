@@ -18,11 +18,12 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.hyphenation.HyphenationInterface;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -102,8 +103,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final String HYPHEN_SPLITTER = AbstractHyphenationParser.HYPHEN_MINUS + AbstractHyphenationParser.EN_DASH + AbstractHyphenationParser.EM_DASH
-		+ AbstractHyphenationParser.SOFT_HYPHEN;
+	private static final String HYPHEN_SPLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
+		+ HyphenationParser.SOFT_HYPHEN;
 
 	private static final String NON_VANISHING_L = "(^l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
 
@@ -535,8 +536,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private void northernPluralCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String word = production.getWord();
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
-				&& hyphenationParser.hyphenate(word).countSyllabes() > 1){
-			String[] subwords = StringUtils.split(word, AbstractHyphenationParser.EN_DASH);
+				&& hyphenator.hyphenate(word).countSyllabes() > 1){
+			String[] subwords = StringUtils.split(word, HyphenationParser.EN_DASH);
 			String rule = (!WordVEC.isStressed(subwords[subwords.length - 1]) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
@@ -604,7 +605,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
 
 				if(derivedWord.length() > 1){
-					HyphenationInterface hyphenation = hyphenationParser.hyphenate(derivedWord);
+					HyphenationInterface hyphenation = hyphenator.hyphenate(derivedWord);
 					if(hyphenation.hasErrors())
 						throw new IllegalArgumentException("Word " + derivedWord + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
 							+ ") is not syllabable");

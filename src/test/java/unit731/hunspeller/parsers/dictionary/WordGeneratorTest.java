@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

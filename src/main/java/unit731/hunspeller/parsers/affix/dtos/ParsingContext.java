@@ -1,6 +1,6 @@
-package unit731.hunspeller.parsers.affix;
+package unit731.hunspeller.parsers.affix.dtos;
 
-import unit731.hunspeller.parsers.dictionary.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
