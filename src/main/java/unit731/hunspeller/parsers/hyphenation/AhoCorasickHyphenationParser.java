@@ -67,7 +67,7 @@ public class AhoCorasickHyphenationParser extends AbstractHyphenationParser{
 			rules = hyphenatedWord;
 		}
 		else{
-			HyphenationBreak hyphBreak = calculateBreakpoints2(word, patterns, level, isCompound);
+			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
 
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 
@@ -80,7 +80,7 @@ public class AhoCorasickHyphenationParser extends AbstractHyphenationParser{
 		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
-	private HyphenationBreak calculateBreakpoints2(String word, Map<Level, RadixTree<String, String>> patterns, Level level, boolean isCompound){
+	private HyphenationBreak calculateBreakpoints(String word, Map<Level, RadixTree<String, String>> patterns, Level level, boolean isCompound){
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		//stores the (maximum) break numbers
