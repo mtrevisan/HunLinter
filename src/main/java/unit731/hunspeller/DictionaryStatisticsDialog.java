@@ -74,7 +74,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       wordLengthsPanel.setLayout(wordLengthsPanelLayout);
       wordLengthsPanelLayout.setHorizontalGroup(
          wordLengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 665, Short.MAX_VALUE)
+         .addGap(0, 655, Short.MAX_VALUE)
       );
       wordLengthsPanelLayout.setVerticalGroup(
          wordLengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -87,7 +87,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       wordSyllabesPanel.setLayout(wordSyllabesPanelLayout);
       wordSyllabesPanelLayout.setHorizontalGroup(
          wordSyllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 665, Short.MAX_VALUE)
+         .addGap(0, 655, Short.MAX_VALUE)
       );
       wordSyllabesPanelLayout.setVerticalGroup(
          wordSyllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -105,12 +105,12 @@ public class DictionaryStatisticsDialog extends JDialog{
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addGroup(layout.createSequentialGroup()
                   .addComponent(totalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(totalProductionsOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)))
-            .addContainerGap(55, Short.MAX_VALUE))
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -147,16 +147,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		addSeriesToChart(wordSyllabesChart, "series", statistics.getSyllabesFrequencies(), statistics.getTotalProductions());
 	}
 
-//	private void createAndAddCharts(){
-//		Thread t = new Thread(() -> {
-//			JPanel wordLengthsPanelWithChart = createPanelWithChart(wordLengthsPanel, statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency");
-//			JPanel wordSyllabesPanelWithChart = createPanelWithChart(wordSyllabesPanel, statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency");
-//
-//			//TODO display chart on parent panel
-//		});
-//		t.start();
-//	}
-
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
 		CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
@@ -166,11 +156,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 			.build();
 
 		CategoryStyler styler = chart.getStyler();
-		styler.setAvailableSpaceFill(0.99);
+		styler.setAvailableSpaceFill(0.98);
 		styler.setOverlapped(true);
 		styler.setLegendVisible(false);
 		styler.setXAxisMin(0.);
 		styler.setYAxisMin(0.);
+		styler.setChartBackgroundColor(getBackground());
 
 		return new XChartPanel<>(chart);
 	}
