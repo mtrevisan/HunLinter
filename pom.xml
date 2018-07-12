@@ -158,6 +158,9 @@
 		<org.apache.commons.math3.version>3.6.1</org.apache.commons.math3.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
 
+		<!-- XChart -->
+		<org.knowm.xchart.version>3.5.2</org.knowm.xchart.version>
+
 		<!-- Murmur3 Hash -->
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
 
@@ -193,6 +196,13 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${org.apache.commons.io.version}</version>
+		</dependency>
+
+		<!-- XChart -->
+		<dependency>
+			<groupId>org.knowm.xchart</groupId>
+			<artifactId>xchart</artifactId>
+			<version>${org.knowm.xchart.version}</version>
 		</dependency>
 
 		<!-- Bloom filter: For computing Murmur hashes -->

@@ -6,11 +6,20 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.swing.SwingWorker;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.math3.stat.Frequency;
+import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.style.CategoryStyler;
+import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -122,9 +131,53 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 	@Override
 	protected void done(){
 		//show statistics window
-		DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
-		dialog.setLocationRelativeTo((Frame)resultable);
-		dialog.setVisible(true);
+//		DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
+//		dialog.setLocationRelativeTo((Frame)resultable);
+//		dialog.setVisible(true);
+
+		Thread t = new Thread(() -> {
+			String wordLengthXAxisTitle = "Word length";
+			CategoryChart wordLengthChart = createChart(dicStatistics.getLengthsFrequencies(), "Word length distribution", wordLengthXAxisTitle, "Frequency", 600, 300);
+			String wordSyllabeXAxisTitle = "Word syllabe";
+			CategoryChart wordSyllabeChart = createChart(dicStatistics.getSyllabesFrequencies(), "Word syllabe distribution", wordSyllabeXAxisTitle, "Frequency", 600, 300);
+			
+			SwingWrapper<CategoryChart> swingWrapper = new SwingWrapper<>(wordLengthChart);
+			swingWrapper.displayChart(wordLengthXAxisTitle);
+
+			swingWrapper = new SwingWrapper<>(wordSyllabeChart);
+			swingWrapper.displayChart(wordSyllabeXAxisTitle);
+		});
+		t.start();
+	}
+
+	private CategoryChart createChart(Frequency freqs, String title, String xAxisTitle, String yAxisTitle, int width, int height){
+		List<Integer> xData = new ArrayList<>();
+		List<Integer> yData = new ArrayList<>();
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
+		while(itr.hasNext()){
+			Map.Entry<Comparable<?>, Long> elem = itr.next();
+			xData.add(((Long)elem.getKey()).intValue());
+			yData.add(elem.getValue().intValue());
+		}
+		return buildChart(xData, yData, title, xAxisTitle, yAxisTitle, width, height);
+	}
+
+	private CategoryChart buildChart(List<Integer> xData, List<Integer> yData, String title, String xAxisTitle, String yAxisTitle, int width, int height){
+		CategoryChart chart = new CategoryChartBuilder().width(width).height(height)
+			.title(title)
+			.xAxisTitle(xAxisTitle)
+			.yAxisTitle(yAxisTitle)
+			.theme(Styler.ChartTheme.Matlab)
+			.build();
+
+		CategoryStyler styler = chart.getStyler();
+		styler.setAvailableSpaceFill(0.99);
+		styler.setOverlapped(true);
+		styler.setLegendVisible(false);
+
+		chart.addSeries("series", xData, yData);
+
+		return chart;
 	}
 
 }

@@ -3,29 +3,49 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.stat.Frequency;
+import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.style.CategoryStyler;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 
 
 @Slf4j
 public class DictionaryStatisticsDialog extends JDialog{
 
-	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent){
+	private final DictionaryStatistics statistics;
+
+
+	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent) throws InterruptedException, InvocationTargetException{
 		super(parent, "Dictionary statistics", true);
 
 		Objects.requireNonNull(statistics);
 		Objects.requireNonNull(parent);
 
+		this.statistics = statistics;
+
 		initComponents();
 
 		addCancelByEscapeKey();
+
+
+		createAndAddCharts();
 	}
 
 	/**
@@ -66,6 +86,56 @@ public class DictionaryStatisticsDialog extends JDialog{
 		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
+	private void createAndAddCharts(){
+//		JDialog myself = this;
+		Thread t = new Thread(() -> {
+			CategoryChart wordLengthChart = createChart(statistics.getLengthsFrequencies(), "Word length distribution", "Word length", "Frequency", 600, 300);
+			CategoryChart worSyllabeChart = createChart(statistics.getSyllabesFrequencies(), "Word syllabe distribution", "Word syllabe", "Frequency", 600, 300);
+
+			SwingWrapper<CategoryChart> swingWrapper = new SwingWrapper<>(wordLengthChart);
+			swingWrapper.displayChart();
+
+			swingWrapper = new SwingWrapper<>(worSyllabeChart);
+			swingWrapper.displayChart();
+			
+//			JPanel wordLengthChartPanel = new XChartPanel(wordLengthChart);
+//			JPanel wordSyllabeChartPanel = new XChartPanel(worSyllabeChart);
+//			myself.add(wordLengthChartPanel);
+//			myself.add(wordSyllabeChartPanel);
+//			myself.pack();
+		});
+		t.start();
+	}
+
+	private CategoryChart createChart(Frequency freqs, String title, String xAxisTitle, String yAxisTitle, int width, int height){
+		List<Integer> xData = new ArrayList<>();
+		List<Integer> yData = new ArrayList<>();
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
+		while(itr.hasNext()){
+			Map.Entry<Comparable<?>, Long> elem = itr.next();
+			xData.add(((Long)elem.getKey()).intValue());
+			yData.add(elem.getValue().intValue());
+		}
+		return buildChart(xData, yData, title, xAxisTitle, yAxisTitle, width, height);
+	}
+
+	private CategoryChart buildChart(List<Integer> xData, List<Integer> yData, String title, String xAxisTitle, String yAxisTitle, int width, int height){
+		CategoryChart chart = new CategoryChartBuilder().width(width).height(height)
+			.title(title)
+			.xAxisTitle(xAxisTitle)
+			.yAxisTitle(yAxisTitle)
+			.build();
+
+		CategoryStyler styler = chart.getStyler();
+		styler.setAvailableSpaceFill(0.99);
+		styler.setOverlapped(true);
+		styler.setLegendVisible(false);
+
+		chart.addSeries("series", xData, yData);
+
+		return chart;
+	}
+
 
 	public static void main(String args[]){
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -96,7 +166,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException ex){
+			catch(IllegalArgumentException | InterruptedException | InvocationTargetException ex){
 				log.error(null, ex);
 			}
 		});
