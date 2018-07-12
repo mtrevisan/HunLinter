@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.stat.Frequency;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
@@ -48,7 +47,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		totalProductionsOutputLabel.setText(Long.toString(statistics.getTotalProductions()));
 
-		createAndAddCharts();
+		addSeriesToCharts();
 	}
 
 	/**
@@ -63,8 +62,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       totalProductionsLabel = new javax.swing.JLabel();
       mainTabbedPane = new javax.swing.JTabbedPane();
-      wordLengthsPanel = new javax.swing.JPanel();
-      wordSyllabesPanel = new javax.swing.JPanel();
+      wordLengthsPanel = createChartPanel("Word length distribution", "Word length", "Frequency");
+      wordSyllabesPanel = createChartPanel("Word syllabe distribution", "Word syllabe", "Frequency");
       totalProductionsOutputLabel = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -140,43 +139,26 @@ public class DictionaryStatisticsDialog extends JDialog{
 		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
-	private void createAndAddCharts(){
-		createAndAddChart(wordLengthsPanel, statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency");
-		createAndAddChart(wordSyllabesPanel, statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency");
+	private void addSeriesToCharts(){
+		CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)wordLengthsPanel).getChart();
+		addSeriesToChart(wordLengthsChart, "series", statistics.getLengthsFrequencies(), statistics.getTotalProductions());
+
+		CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)wordSyllabesPanel).getChart();
+		addSeriesToChart(wordSyllabesChart, "series", statistics.getSyllabesFrequencies(), statistics.getTotalProductions());
 	}
 
-	private void createAndAddChart(JPanel parent, Frequency freqs, long totalCount, String title, String xAxisTitle, String yAxisTitle){
-//		JDialog myself = this;
-		Thread t = new Thread(() -> {
-			int width = parent.getWidth();
-			int height = parent.getHeight();
-			CategoryChart wordLengthChart = createChart(freqs, totalCount, title, xAxisTitle, yAxisTitle, width, height);
+//	private void createAndAddCharts(){
+//		Thread t = new Thread(() -> {
+//			JPanel wordLengthsPanelWithChart = createPanelWithChart(wordLengthsPanel, statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency");
+//			JPanel wordSyllabesPanelWithChart = createPanelWithChart(wordSyllabesPanel, statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency");
+//
+//			//TODO display chart on parent panel
+//		});
+//		t.start();
+//	}
 
-			SwingWrapper<CategoryChart> swingWrapper = new SwingWrapper<>(wordLengthChart);
-			swingWrapper.displayChart();
-
-			//TODO display char on parent
-//			JPanel wordLengthChartPanel = new XChartPanel(wordLengthChart);
-//			myself.add(wordLengthChartPanel);
-//			myself.pack();
-		});
-		t.start();
-	}
-
-	private CategoryChart createChart(Frequency freqs, long totalCount, String title, String xAxisTitle, String yAxisTitle, int width, int height){
-		List<Integer> xData = new ArrayList<>();
-		List<Integer> yData = new ArrayList<>();
-		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
-		while(itr.hasNext()){
-			Map.Entry<Comparable<?>, Long> elem = itr.next();
-			xData.add(((Long)elem.getKey()).intValue());
-			yData.add((int)Math.round((elem.getValue().doubleValue() * 100) / totalCount));
-		}
-		return buildChart(xData, yData, title, xAxisTitle, yAxisTitle, width, height);
-	}
-
-	private CategoryChart buildChart(List<Integer> xData, List<Integer> yData, String title, String xAxisTitle, String yAxisTitle, int width, int height){
-		CategoryChart chart = new CategoryChartBuilder().width(width).height(height)
+	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
+		CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
 			.xAxisTitle(xAxisTitle)
 			.yAxisTitle(yAxisTitle)
@@ -190,9 +172,20 @@ public class DictionaryStatisticsDialog extends JDialog{
 		styler.setXAxisMin(0.);
 		styler.setYAxisMin(0.);
 
-		chart.addSeries("series", xData, yData);
+		return new XChartPanel<>(chart);
+	}
 
-		return chart;
+	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, long totalCount){
+		List<Integer> xData = new ArrayList<>();
+		List<Integer> yData = new ArrayList<>();
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
+		while(itr.hasNext()){
+			Map.Entry<Comparable<?>, Long> elem = itr.next();
+			xData.add(((Long)elem.getKey()).intValue());
+			yData.add((int)Math.round((elem.getValue().doubleValue() * 100) / totalCount));
+		}
+
+		chart.addSeries(seriesName, xData, yData);
 	}
 
 
