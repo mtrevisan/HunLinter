@@ -20,7 +20,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.hyphenation.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
@@ -366,7 +366,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public DictionaryParserVEC(File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
+	public DictionaryParserVEC(File dicFile, HyphenatorInterface hyphenator, WordGenerator wordGenerator, Charset charset){
 		super(dicFile, hyphenator, wordGenerator, charset);
 	}
 

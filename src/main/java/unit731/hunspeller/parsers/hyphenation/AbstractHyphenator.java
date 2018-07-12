@@ -15,7 +15,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 @AllArgsConstructor
-public abstract class AbstractHyphenator{
+public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	protected static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
@@ -31,6 +31,7 @@ public abstract class AbstractHyphenator{
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object(s)
 	 */
+	@Override
 	public HyphenationInterface hyphenate(String word){
 		hypParser.acquireLock();
 
@@ -52,6 +53,7 @@ public abstract class AbstractHyphenator{
 	 * @return the hyphenation object
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
+	@Override
 	public HyphenationInterface hyphenate(String word, String addedRule, HyphenationParser.Level level) throws CloneNotSupportedException{
 		hypParser.acquireLock();
 
@@ -75,13 +77,12 @@ public abstract class AbstractHyphenator{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	public HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
+	private HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
 		HyphenationInterface result = hyphenate(word, patterns, HyphenationParser.Level.FIRST, SOFT_HYPHEN, false);
 
@@ -99,7 +100,6 @@ public abstract class AbstractHyphenator{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param patterns	The radix tree containing the patterns

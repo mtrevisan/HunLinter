@@ -103,7 +103,7 @@ public class HyphenationParser{
 	@Getter
 	private final Orthography orthography;
 	@Getter
-	private AbstractHyphenator hyphenator;
+	private HyphenatorInterface hyphenator;
 
 	@Getter
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
