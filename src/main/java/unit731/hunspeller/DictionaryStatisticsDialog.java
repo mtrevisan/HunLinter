@@ -23,6 +23,7 @@ import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
+import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 
 
@@ -45,6 +46,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 		addCancelByEscapeKey();
 
 
+		totalProductionsOutputLabel.setText(Long.toString(statistics.getTotalProductions()));
+
 		createAndAddCharts();
 	}
 
@@ -58,17 +61,68 @@ public class DictionaryStatisticsDialog extends JDialog{
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
+      totalProductionsLabel = new javax.swing.JLabel();
+      mainTabbedPane = new javax.swing.JTabbedPane();
+      wordLengthsPanel = new javax.swing.JPanel();
+      wordSyllabesPanel = new javax.swing.JPanel();
+      totalProductionsOutputLabel = new javax.swing.JLabel();
+
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+      totalProductionsLabel.setText("Total productions:");
+
+      javax.swing.GroupLayout wordLengthsPanelLayout = new javax.swing.GroupLayout(wordLengthsPanel);
+      wordLengthsPanel.setLayout(wordLengthsPanelLayout);
+      wordLengthsPanelLayout.setHorizontalGroup(
+         wordLengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 665, Short.MAX_VALUE)
+      );
+      wordLengthsPanelLayout.setVerticalGroup(
+         wordLengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 301, Short.MAX_VALUE)
+      );
+
+      mainTabbedPane.addTab("Word lengths", wordLengthsPanel);
+
+      javax.swing.GroupLayout wordSyllabesPanelLayout = new javax.swing.GroupLayout(wordSyllabesPanel);
+      wordSyllabesPanel.setLayout(wordSyllabesPanelLayout);
+      wordSyllabesPanelLayout.setHorizontalGroup(
+         wordSyllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 665, Short.MAX_VALUE)
+      );
+      wordSyllabesPanelLayout.setVerticalGroup(
+         wordSyllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 301, Short.MAX_VALUE)
+      );
+
+      mainTabbedPane.addTab("Word syllabes", wordSyllabesPanel);
+
+      totalProductionsOutputLabel.setText("...");
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 400, Short.MAX_VALUE)
+         .addGroup(layout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 670, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(totalProductionsLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(totalProductionsOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addContainerGap(55, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 300, Short.MAX_VALUE)
+         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(totalProductionsLabel)
+               .addComponent(totalProductionsOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+            .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addContainerGap())
       );
 
       pack();
@@ -89,8 +143,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void createAndAddCharts(){
 //		JDialog myself = this;
 		Thread t = new Thread(() -> {
-			CategoryChart wordLengthChart = createChart(statistics.getLengthsFrequencies(), "Word length distribution", "Word length", "Frequency", 600, 300);
-			CategoryChart worSyllabeChart = createChart(statistics.getSyllabesFrequencies(), "Word syllabe distribution", "Word syllabe", "Frequency", 600, 300);
+			CategoryChart wordLengthChart = createChart(statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency", 600, 300);
+			CategoryChart worSyllabeChart = createChart(statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency", 600, 300);
 
 			SwingWrapper<CategoryChart> swingWrapper = new SwingWrapper<>(wordLengthChart);
 			swingWrapper.displayChart();
@@ -107,14 +161,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 		t.start();
 	}
 
-	private CategoryChart createChart(Frequency freqs, String title, String xAxisTitle, String yAxisTitle, int width, int height){
+	private CategoryChart createChart(Frequency freqs, long totalCount, String title, String xAxisTitle, String yAxisTitle, int width, int height){
 		List<Integer> xData = new ArrayList<>();
 		List<Integer> yData = new ArrayList<>();
 		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
 		while(itr.hasNext()){
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			xData.add(((Long)elem.getKey()).intValue());
-			yData.add(elem.getValue().intValue());
+			yData.add((int)Math.round((elem.getValue().doubleValue() * 100) / totalCount));
 		}
 		return buildChart(xData, yData, title, xAxisTitle, yAxisTitle, width, height);
 	}
@@ -124,12 +178,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 			.title(title)
 			.xAxisTitle(xAxisTitle)
 			.yAxisTitle(yAxisTitle)
+			.theme(Styler.ChartTheme.Matlab)
 			.build();
 
 		CategoryStyler styler = chart.getStyler();
 		styler.setAvailableSpaceFill(0.99);
 		styler.setOverlapped(true);
 		styler.setLegendVisible(false);
+		styler.setXAxisMin(0.);
+		styler.setYAxisMin(0.);
 
 		chart.addSeries("series", xData, yData);
 
@@ -173,5 +230,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JTabbedPane mainTabbedPane;
+   private javax.swing.JLabel totalProductionsLabel;
+   private javax.swing.JLabel totalProductionsOutputLabel;
+   private javax.swing.JPanel wordLengthsPanel;
+   private javax.swing.JPanel wordSyllabesPanel;
    // End of variables declaration//GEN-END:variables
 }
