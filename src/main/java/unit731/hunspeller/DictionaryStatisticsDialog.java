@@ -3,6 +3,8 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,6 +43,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 		this.statistics = statistics;
 
 		initComponents();
+
+		addClearOnClose();
 
 		addCancelByEscapeKey();
 
@@ -156,6 +160,15 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
+	private void addClearOnClose(){
+		addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosing(WindowEvent e){
+				statistics.clear();
+			}
+		});
+	}
+
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
 		AbstractAction cancelAction = new AbstractAction(){
@@ -198,6 +211,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		styler.setXAxisMin(0.);
 		styler.setYAxisMin(0.);
 		styler.setChartBackgroundColor(getBackground());
+		styler.setToolTipsEnabled(true);
 
 		return new XChartPanel<>(chart);
 	}
