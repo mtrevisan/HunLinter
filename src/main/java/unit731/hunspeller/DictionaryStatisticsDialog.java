@@ -141,21 +141,23 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void createAndAddCharts(){
+		createAndAddChart(wordLengthsPanel, statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency");
+		createAndAddChart(wordSyllabesPanel, statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency");
+	}
+
+	private void createAndAddChart(JPanel parent, Frequency freqs, long totalCount, String title, String xAxisTitle, String yAxisTitle){
 //		JDialog myself = this;
 		Thread t = new Thread(() -> {
-			CategoryChart wordLengthChart = createChart(statistics.getLengthsFrequencies(), statistics.getTotalProductions(), "Word length distribution", "Word length", "Frequency", 600, 300);
-			CategoryChart worSyllabeChart = createChart(statistics.getSyllabesFrequencies(), statistics.getTotalProductions(), "Word syllabe distribution", "Word syllabe", "Frequency", 600, 300);
+			int width = parent.getWidth();
+			int height = parent.getHeight();
+			CategoryChart wordLengthChart = createChart(freqs, totalCount, title, xAxisTitle, yAxisTitle, width, height);
 
 			SwingWrapper<CategoryChart> swingWrapper = new SwingWrapper<>(wordLengthChart);
 			swingWrapper.displayChart();
 
-			swingWrapper = new SwingWrapper<>(worSyllabeChart);
-			swingWrapper.displayChart();
-			
+			//TODO display char on parent
 //			JPanel wordLengthChartPanel = new XChartPanel(wordLengthChart);
-//			JPanel wordSyllabeChartPanel = new XChartPanel(worSyllabeChart);
 //			myself.add(wordLengthChartPanel);
-//			myself.add(wordSyllabeChartPanel);
 //			myself.pack();
 		});
 		t.start();
