@@ -1,5 +1,6 @@
-package unit731.hunspeller.parsers.hyphenation;
+package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 
 

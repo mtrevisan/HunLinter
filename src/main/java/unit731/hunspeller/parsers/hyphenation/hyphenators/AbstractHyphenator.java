@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation;
+package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.CompoundHyphenation;
@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.SOFT_HYPHEN;
 import unit731.hunspeller.services.PatternService;
 

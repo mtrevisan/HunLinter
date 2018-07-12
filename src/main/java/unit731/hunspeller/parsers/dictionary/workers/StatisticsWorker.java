@@ -1,11 +1,10 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
@@ -22,11 +21,10 @@ import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
-public class WordlistWorker extends SwingWorker<Void, String>{
+public class StatisticsWorker extends SwingWorker<Void, String>{
 
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
-	private final File outputFile;
 	private final Resultable resultable;
 
 
@@ -34,17 +32,14 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for statistics extraction: " + affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 			setProgress(0);
-			try(
-					BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset());
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
-					){
+			try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 				String line = br.readLine();
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
@@ -63,8 +58,12 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
 
 							for(RuleProductionEntry production : productions){
-								writer.write(production.getWord());
-								writer.newLine();
+								//collect statistics
+								String word = production.getWord();
+								int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
+								int syllabes = dicParser.getHyphenator().hyphenate(word).countSyllabes();
+								//TODO
+//								writer.write(production.getWord());
 							}
 						}
 						catch(IllegalArgumentException e){
@@ -80,15 +79,12 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 			setProgress(100);
 
-			publish("File written: " + outputFile.getAbsolutePath());
-			publish("Wordlist extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
-
-			DictionaryParser.openFileWithChoosenEditor(outputFile);
+			publish("Statistics extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
 		catch(IOException | IllegalArgumentException e){
 			stopped = true;
 
-			publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			publish(e instanceof ClosedChannelException? "Statistics thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		catch(Exception e){
 			stopped = true;

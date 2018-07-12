@@ -97,6 +97,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicSeparator">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dicStatisticsMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Statistics"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicStatisticsMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">

@@ -22,8 +22,6 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import static unit731.hunspeller.parsers.dictionary.DictionaryParser.COUNTER_FORMATTER;
-import static unit731.hunspeller.parsers.dictionary.DictionaryParser.openFileWithChoosenEditor;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
@@ -155,7 +153,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			}
 			setProgress(100);
 
-			publish("Total minimal pairs: " + COUNTER_FORMATTER.format(totalPairs));
+			publish("Total minimal pairs: " + DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
 			publish("Reordering minimal pairs (pass 3/3)");
@@ -196,7 +194,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			publish("File written: " + outputFile.getAbsolutePath());
 			publish("Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
-			openFileWithChoosenEditor(outputFile);
+			DictionaryParser.openFileWithChoosenEditor(outputFile);
 		}
 		catch(IOException | IllegalArgumentException e){
 			stopped = true;

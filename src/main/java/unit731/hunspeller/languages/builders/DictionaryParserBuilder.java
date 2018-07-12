@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import unit731.hunspeller.languages.vec.DictionaryParserVEC;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.hyphenation.HyphenatorInterface;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 
 public class DictionaryParserBuilder{

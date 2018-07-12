@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.hyphenation;
 
+import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import java.util.Arrays;
