@@ -85,7 +85,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 				stats.addLengthAndSyllabes(13, 1);
 				stats.addLengthAndSyllabes(12, 2);
 				stats.addLengthAndSyllabes(5, 3);
-				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, new javax.swing.JFrame());
+				javax.swing.JFrame parent = new javax.swing.JFrame();
+				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
+				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override
 					public void windowClosing(java.awt.event.WindowEvent e){
