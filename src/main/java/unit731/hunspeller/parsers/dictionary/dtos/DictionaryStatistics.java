@@ -66,17 +66,18 @@ public class DictionaryStatistics{
 	/** Returns the p-value */
 	public double chiSquareTest(){
 		//calculate lambda
-		double mean = 0.;
 		long sumY = 0;
+		double mean = 0.;
 		Iterator<Map.Entry<Comparable<?>, Long>> itr = lengthsFrequencies.entrySetIterator();
 		while(itr.hasNext()){
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			long key = (Long)elem.getKey();
-			mean += key * elem.getValue().doubleValue();
-			sumY += key;
+			double value = elem.getValue().doubleValue();
+			sumY += value;
+			mean += key * value;
 		}
 		//check for insufficent data
-		if(sumY <= 5)
+		if(sumY == 0)
 			throw new IllegalArgumentException("Insufficient data");
 
 		mean /= sumY;
@@ -87,16 +88,16 @@ public class DictionaryStatistics{
 		for(int i = 0; i < size; i ++)
 			expected[i] = sumY * poisson.probability(i);
 
-		long[] observed = normalize(lengthsFrequencies);
+		long[] observed = extractFrequencies(lengthsFrequencies);
 		return CST.chiSquareTest(expected, observed);
 	}
 
-	private long[] normalize(Frequency freqs){
+	private long[] extractFrequencies(Frequency freqs){
 		int idx = 0;
 		long[] normalizedValues = new long[freqs.getUniqueCount()];
-		Iterator<Comparable<?>> itr = freqs.valuesIterator();
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
 		while(itr.hasNext())
-			normalizedValues[idx ++] = (Long)itr.next();
+			normalizedValues[idx ++] = (Long)itr.next().getValue();
 		return normalizedValues;
 	}
 
