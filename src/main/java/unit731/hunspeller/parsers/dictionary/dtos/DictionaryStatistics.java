@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.LongStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,28 +44,59 @@ public class DictionaryStatistics{
 		syllabesFrequencies.clear();
 	}
 
+	public static void main(String[] args){
+		double bla = compute(new int[]{0, 1, 2, 3, 4}, new int[]{35, 33, 20, 6, 1});
+		System.out.println(bla);
+
+		DictionaryStatistics stat = new DictionaryStatistics();
+		for(int i = 0; i < 35; i ++)
+			stat.addLengthAndSyllabes(0, 0);
+		for(int i = 0; i < 33; i ++)
+			stat.addLengthAndSyllabes(1, 0);
+		for(int i = 0; i < 20; i ++)
+			stat.addLengthAndSyllabes(2, 0);
+		for(int i = 0; i < 6; i ++)
+			stat.addLengthAndSyllabes(3, 0);
+		for(int i = 0; i < 1; i ++)
+			stat.addLengthAndSyllabes(4, 0);
+		double bla2 = stat.chiSquareTest();
+		System.out.println(bla2);
+	}
+
 	/** Returns the p-value */
 	public double chiSquareTest(){
-		double mean = ((Long)lengthsFrequencies.getMode().get(0)).doubleValue();
+		//calculate lambda
+		double mean = 0.;
+		long sumY = 0;
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = lengthsFrequencies.entrySetIterator();
+		while(itr.hasNext()){
+			Map.Entry<Comparable<?>, Long> elem = itr.next();
+			long key = (Long)elem.getKey();
+			mean += key * elem.getValue().doubleValue();
+			sumY += key;
+		}
+		//check for insufficent data
+		if(sumY <= 5)
+			throw new IllegalArgumentException("Insufficient data");
+
+		mean /= sumY;
 		PoissonDistribution poisson = new PoissonDistribution(mean);
 
 		int size = lengthsFrequencies.getUniqueCount();
 		double[] expected = new double[size];
 		for(int i = 0; i < size; i ++)
-			expected[i] = poisson.probability(i);
+			expected[i] = sumY * poisson.probability(i);
 
 		long[] observed = normalize(lengthsFrequencies);
 		return CST.chiSquareTest(expected, observed);
 	}
 
 	private long[] normalize(Frequency freqs){
-//		long sum = freqs.getSumFreq();
-long sum = 1l;
-		long[] normalizedValues = new long[freqs.getUniqueCount()];
 		int idx = 0;
+		long[] normalizedValues = new long[freqs.getUniqueCount()];
 		Iterator<Comparable<?>> itr = freqs.valuesIterator();
 		while(itr.hasNext())
-			normalizedValues[idx ++] = Math.round(((Long)itr.next()).doubleValue() / sum);
+			normalizedValues[idx ++] = (Long)itr.next();
 		return normalizedValues;
 	}
 
@@ -80,24 +112,25 @@ long sum = 1l;
 
 	}
 
-	private double compute(int[] xval, int[] freq){
+	private static double compute(int[] xval, int[] freq){
 		int ny = freq.length;
 		//check for insufficent data
 		if(ny <= 2)
 			throw new IllegalArgumentException("Insufficient data");
 
-		//calculate lam
+		//calculate lambda
 		long sumY = 0l;
-		double lam = 0.;
+		double lambda = 0.;
 		for(int i = 0; i < xval.length; i ++){
 			sumY += freq[i];
-			lam += xval[i] * freq[i];
+			lambda += xval[i] * freq[i];
 		}
 		//check for insufficent data
 		if(sumY <= 5)
 			throw new IllegalArgumentException("Insufficient data");
 
-		double lamm = lam / sumY;
+		double lamm = lambda / sumY;
+
 		double e_lamm = Math.exp(-lamm);
 		double[] jval = new double[ny];
 		int x = 0;
@@ -107,7 +140,7 @@ long sum = 1l;
 			x ++;
 		}
 		//calculate chi^2 = sum((observed - expected)^2 / expected)
-		int cs = 0;
+		double cs = 0.;
 		for(int j = 0; j < jval.length; j ++){
 			double delta = freq[j] - jval[j];
 			cs += (delta * delta) / jval[j];
@@ -132,7 +165,7 @@ long sum = 1l;
 		return conclusion;
 	}
 
-	private double chiSquare(double x, int n){
+	private static double chiSquare(double x, int n){
 		if(n == 1 & x > 1000)
 			return 0.;
 

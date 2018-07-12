@@ -31,6 +31,9 @@ import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 @Slf4j
 public class DictionaryStatisticsDialog extends JDialog{
 
+	private static final long serialVersionUID = 5762751368059394067l;
+
+
 	private final DictionaryStatistics statistics;
 
 
@@ -172,6 +175,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
 		AbstractAction cancelAction = new AbstractAction(){
+			private static final long serialVersionUID = -5644390861803492172l;
+
 			@Override
 			public void actionPerformed(ActionEvent e){
 				dispose();
