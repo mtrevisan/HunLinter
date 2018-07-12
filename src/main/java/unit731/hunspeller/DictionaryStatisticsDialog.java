@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import java.awt.Color;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -7,6 +8,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +21,12 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.CategorySeries;
+import org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
@@ -195,10 +200,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 		wordsSyllabesModeOutputLabel.setText(((Long)syllabesFrequencies.getMode().get(0)).toString());
 
 		CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)wordLengthsPanel).getChart();
-		addSeriesToChart(wordLengthsChart, "series", lengthsFrequencies, statistics.getTotalProductions());
+		List<Double> equivalentPoissonDistibution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(lengthsFrequencies)));
+		addSeriesToChart(wordLengthsChart, "series", lengthsFrequencies, equivalentPoissonDistibution, statistics.getTotalProductions());
 
 		CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)wordSyllabesPanel).getChart();
-		addSeriesToChart(wordSyllabesChart, "series", syllabesFrequencies, statistics.getTotalProductions());
+		equivalentPoissonDistibution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(syllabesFrequencies)));
+		addSeriesToChart(wordSyllabesChart, "series", syllabesFrequencies, equivalentPoissonDistibution, statistics.getTotalProductions());
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -222,7 +229,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
-	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, long totalCount){
+	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, List<Double> equivalentPoissonDistribution,
+			long totalCount){
+		int index = 0;
 		List<Integer> xData = new ArrayList<>();
 		List<Double> yData = new ArrayList<>();
 		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
@@ -230,9 +239,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			xData.add(((Long)elem.getKey()).intValue());
 			yData.add(elem.getValue().doubleValue() / totalCount);
+			equivalentPoissonDistribution.set(index, equivalentPoissonDistribution.get(index) * 0.01 / totalCount);
 		}
 
 		chart.addSeries(seriesName, xData, yData);
+
+		CategorySeries seriesPoisson = chart.addSeries("poisson", xData, equivalentPoissonDistribution);
+		seriesPoisson.setChartCategorySeriesRenderStyle(CategorySeriesRenderStyle.Line);
+		seriesPoisson.setMarkerColor(Color.red);
+		seriesPoisson.setLineColor(Color.red);
 	}
 
 

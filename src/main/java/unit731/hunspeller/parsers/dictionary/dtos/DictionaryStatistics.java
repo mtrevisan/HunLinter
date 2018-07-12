@@ -1,12 +1,14 @@
 package unit731.hunspeller.parsers.dictionary.dtos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.LongStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.exception.DimensionMismatchException;
@@ -87,16 +89,15 @@ public class DictionaryStatistics{
 			stat.addLengthAndSyllabes(3, 0);
 		for(int i = 0; i < 1; i ++)
 			stat.addLengthAndSyllabes(4, 0);
-		double bla2 = stat.chiSquareTest();
+		double bla2 = chiSquareTest(stat.getLengthsFrequencies());
 		System.out.println(bla2);
 	}
 
-	/** Returns the p-value */
-	public double chiSquareTest(){
+	public static double[] getEquivalentPoissonDistribution(Frequency frequencies){
 		//calculate lambda
 		long sumY = 0;
 		double mean = 0.;
-		Iterator<Map.Entry<Comparable<?>, Long>> itr = lengthsFrequencies.entrySetIterator();
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = frequencies.entrySetIterator();
 		while(itr.hasNext()){
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			long key = (Long)elem.getKey();
@@ -111,20 +112,27 @@ public class DictionaryStatistics{
 		mean /= sumY;
 		PoissonDistribution poisson = new PoissonDistribution(mean);
 
-		int size = lengthsFrequencies.getUniqueCount();
+		int size = frequencies.getUniqueCount();
 		double[] expected = new double[size];
 		for(int i = 0; i < size; i ++)
 			expected[i] = sumY * poisson.probability(i);
-		long[] observed = extractFrequencies(lengthsFrequencies);
+		return expected;
+	}
+
+	/** Returns the p-value */
+	public static double chiSquareTest(Frequency frequencies){
+		double[] expected = getEquivalentPoissonDistribution(frequencies);
+		long[] observed = extractFrequencies(frequencies);
+		int size = frequencies.getUniqueCount();
 		int degreesOfFreedom = size - 2;
 		ChiSquaredDistribution distribution = new ChiSquaredDistribution(null, degreesOfFreedom);
 		return 1. - distribution.cumulativeProbability(CST.chiSquare(expected, observed));
 	}
 
-	private long[] extractFrequencies(Frequency freqs){
+	private static long[] extractFrequencies(Frequency frequencies){
 		int idx = 0;
-		long[] normalizedValues = new long[freqs.getUniqueCount()];
-		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
+		long[] normalizedValues = new long[frequencies.getUniqueCount()];
+		Iterator<Map.Entry<Comparable<?>, Long>> itr = frequencies.entrySetIterator();
 		while(itr.hasNext())
 			normalizedValues[idx ++] = itr.next().getValue();
 		return normalizedValues;
