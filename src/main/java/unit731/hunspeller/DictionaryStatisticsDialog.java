@@ -205,7 +205,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
 			.xAxisTitle(xAxisTitle)
-			.yAxisTitle(yAxisTitle)
+//			.yAxisTitle(yAxisTitle)
 			.theme(Styler.ChartTheme.Matlab)
 			.build();
 
@@ -215,6 +215,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		styler.setLegendVisible(false);
 		styler.setXAxisMin(0.);
 		styler.setYAxisMin(0.);
+		styler.setYAxisDecimalPattern("#%");
 		styler.setChartBackgroundColor(getBackground());
 		styler.setToolTipsEnabled(true);
 
@@ -223,12 +224,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, long totalCount){
 		List<Integer> xData = new ArrayList<>();
-		List<Integer> yData = new ArrayList<>();
+		List<Double> yData = new ArrayList<>();
 		Iterator<Map.Entry<Comparable<?>, Long>> itr = freqs.entrySetIterator();
 		while(itr.hasNext()){
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			xData.add(((Long)elem.getKey()).intValue());
-			yData.add((int)Math.round((elem.getValue().doubleValue() * 100) / totalCount));
+			yData.add(elem.getValue().doubleValue() / totalCount);
 		}
 
 		chart.addSeries(seriesName, xData, yData);
