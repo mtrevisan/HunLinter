@@ -1303,7 +1303,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					dicStatisticsWorker.cancel(true);
 					dicStatisticsWorker = null;
 
-					dicExtractWordlistMenuItem.setEnabled(true);
+					dicStatisticsMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					printResultLine("Statistics extraction aborted");
 				}
@@ -1671,7 +1671,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void extractDictionaryStatistics(){
 		if(Objects.isNull(dicStatisticsWorker) || dicStatisticsWorker.isDone()){
-			dicExtractDuplicatesMenuItem.setEnabled(false);
+			dicStatisticsMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
@@ -1680,7 +1680,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 
-			dicExtractDuplicatesMenuItem.setEnabled(true);
+			dicStatisticsMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		}
 	}
