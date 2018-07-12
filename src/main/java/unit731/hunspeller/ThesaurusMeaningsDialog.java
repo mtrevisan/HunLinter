@@ -35,7 +35,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 	private final List<MeaningEntry> meanings;
 
 
-	public ThesaurusMeaningsDialog(Frame parent, ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Resultable resultable){
+	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Resultable resultable, Frame parent){
 		super(parent, "Change meanings for \"" + synonym.getSynonym() + "\"", true);
 
 		Objects.requireNonNull(parent);
@@ -188,7 +188,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 				));
 				ThesaurusEntry synonym = new ThesaurusEntry("synonym", meanings);
 				javax.swing.JFrame parent = new javax.swing.JFrame();
-				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(parent, synonym, (means, text) -> {}, null);
+				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, (means, text) -> {}, null, parent);
 				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override

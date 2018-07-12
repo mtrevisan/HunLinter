@@ -29,10 +29,10 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 	@NonNull
 	private final DictionaryParser dicParser;
 
-	private final JList<String> list;
+	private final JList<String> list = new JList();
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, Frame parent, String title, String message){
+	public DictionarySortDialog(DictionaryParser dicParser, String title, String message, Frame parent){
 		super(parent, title, true);
 
 		Objects.requireNonNull(dicParser);
@@ -40,7 +40,6 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 		Objects.requireNonNull(message);
 
 		this.dicParser = dicParser;
-		list = new JList<>();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		initComponents();
@@ -192,7 +191,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 		/* Create and display the dialog */
 		java.awt.EventQueue.invokeLater(() -> {
 			javax.swing.JFrame parent = new javax.swing.JFrame();
-			DictionarySortDialog dialog = new DictionarySortDialog(null, parent, "title", "message");
+			DictionarySortDialog dialog = new DictionarySortDialog(null, "title", "message", parent);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setListData(new String[]{"a", "b", "c"});
 			dialog.addWindowListener(new java.awt.event.WindowAdapter(){

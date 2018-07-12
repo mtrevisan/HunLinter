@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -8,25 +9,40 @@ import java.text.Normalizer;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.TimeWatch;
 
 
-@AllArgsConstructor
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
+	@NonNull
 	private final AffixParser affParser;
+	@NonNull
 	private final DictionaryParser dicParser;
+	@NonNull
 	private final Resultable resultable;
 
+	private final DictionaryStatistics dicStatistics = new DictionaryStatistics();
+
+
+	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+		if(!(resultable instanceof Frame))
+			throw new IllegalArgumentException("The resultable should also be a Frame");
+
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.resultable = resultable;
+	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
@@ -62,8 +78,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								String word = production.getWord();
 								int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 								int syllabes = dicParser.getHyphenator().hyphenate(word).countSyllabes();
-								//TODO
-//								writer.write(production.getWord());
+
+								dicStatistics.addLengthAndSyllabes(length, syllabes);
 							}
 						}
 						catch(IllegalArgumentException e){
@@ -101,6 +117,14 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 	@Override
 	protected void process(List<String> chunks){
 		resultable.printResultLine(chunks);
+	}
+
+	@Override
+	protected void done(){
+		//show statistics window
+		DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
+		dialog.setLocationRelativeTo((Frame)resultable);
+		dialog.setVisible(true);
 	}
 
 }

@@ -391,7 +391,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                      }
                   };
                   ThesaurusEntry synonym = theParser.getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(parent, synonym, okButtonAction, (Resultable)parent);
+                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, (Resultable)parent, parent);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
                }
@@ -1075,7 +1075,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(this, theParser.extractDuplicates());
+		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(theParser.extractDuplicates(), this);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
@@ -1580,7 +1580,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		File dicFile = getFile(language + EXTENSION_DIC);
 		dicParser = DictionaryParserBuilder.getParser(language, dicFile, hypParser.getHyphenator(), wordGenerator, affParser.getCharset());
 
-		dicDialog = new DictionarySortDialog(dicParser, this, "Sorter", "Please select a section from the list:");
+		dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
 		dicDialog.setLocationRelativeTo(this);
 		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
 		dicDialog.setCellRenderer(dicCellRenderer);

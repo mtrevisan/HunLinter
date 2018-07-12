@@ -33,7 +33,6 @@ public class HelpDialog extends JDialog{
 	private static final long serialVersionUID = -9151942201399886892L;
 
 
-	@SuppressWarnings("null")
 	public HelpDialog(Frame parent){
 		super(parent, "About", true);
 
@@ -158,6 +157,7 @@ public class HelpDialog extends JDialog{
 		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
+
 
 	public static void main(String args[]){
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
