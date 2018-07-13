@@ -54,14 +54,6 @@ public class CompoundHyphenation implements HyphenationInterface{
 	}
 
 	@Override
-	public List<Integer> getStressIndexFromLast(){
-		return subHyphenations.stream()
-			.map(HyphenationInterface::getStressIndexFromLast)
-			.map(stresses -> stresses.get(0))
-			.collect(Collectors.toList());
-	}
-
-	@Override
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
 		for(HyphenationInterface sub : subHyphenations)
 			sj = sub.formatHyphenation(sj, errorFormatter);

@@ -158,7 +158,7 @@ public class WordGenerator{
 	}
 
 	public boolean isAffixProductive(String word, String affix){
-		//TODO convert input
+		word = affParser.applyInputConversionTable(word);
 
 		boolean productive = false;
 		RuleEntry rule = affParser.getData(affix);

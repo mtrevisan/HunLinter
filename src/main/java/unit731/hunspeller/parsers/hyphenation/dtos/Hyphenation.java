@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
-import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
@@ -87,16 +86,6 @@ public class Hyphenation implements HyphenationInterface{
 
 	private int restoreRelativeIndex(int idx){
 		return (idx + countSyllabes()) % countSyllabes();
-	}
-
-	@Override
-	public List<Integer> getStressIndexFromLast(){
-		int size = syllabes.size() - 1;
-		for(int i = 0; i <= size; i ++)
-//FIXME WordVEC
-			if(WordVEC.isStressed(syllabes.get(size - i)))
-				return Arrays.asList(i);
-		return null;
 	}
 
 	@Override

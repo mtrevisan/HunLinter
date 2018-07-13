@@ -7,10 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.text.Normalizer;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -22,6 +24,8 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.hyphenation.dtos.CompoundHyphenation;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
@@ -86,7 +90,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								word = WordVEC.markDefaultStress(word);
 								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(word);
 								int syllabes = hyph.countSyllabes();
-								List<Integer> stressIndexFromLast = hyph.getStressIndexFromLast();
+								List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
 
 								dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
 								dicStatistics.addSyllabes(hyph.getSyllabes());
@@ -121,6 +125,16 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		if(stopped)
 			publish("Stopped reading Dictionary file");
 
+		return null;
+	}
+
+	private List<Integer> getStressIndexFromLast(HyphenationInterface hyph){
+		List<String> syllabes = hyph.getSyllabes();
+		int size = syllabes.size() - 1;
+		for(int i = 0; i <= size; i ++)
+//FIXME WordVEC
+			if(WordVEC.isStressed(syllabes.get(size - i)))
+				return Arrays.asList(i);
 		return null;
 	}
 
