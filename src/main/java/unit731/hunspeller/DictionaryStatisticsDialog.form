@@ -27,9 +27,9 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="wordsLengthsModeLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="lengthsModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wordsLengthsModeOutputLabel" max="32767" attributes="0"/>
+                      <Component id="lengthsModeOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="totalProductionsLabel" min="-2" max="-2" attributes="0"/>
@@ -37,9 +37,9 @@
                       <Component id="totalProductionsOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="wordsSyllabesModeLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="syllabesModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="wordsSyllabesModeOutputLabel" max="32767" attributes="0"/>
+                      <Component id="syllabesModeOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
@@ -60,13 +60,13 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="wordsLengthsModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="wordsLengthsModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lengthsModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lengthsModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="wordsSyllabesModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="wordsSyllabesModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabesModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabesModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="65" max="32767" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
@@ -85,7 +85,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="wordLengthsPanel">
+        <Container class="javax.swing.JPanel" name="lengthsPanel">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="createChartPanel(&quot;Word length distribution&quot;, &quot;Word length&quot;, &quot;Frequency&quot;)"/>
           </AuxValues>
@@ -110,7 +110,7 @@
             </DimensionLayout>
           </Layout>
         </Container>
-        <Container class="javax.swing.JPanel" name="wordSyllabesPanel">
+        <Container class="javax.swing.JPanel" name="syllabesPanel">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="createChartPanel(&quot;Word syllabe distribution&quot;, &quot;Word syllabe&quot;, &quot;Frequency&quot;)"/>
           </AuxValues>
@@ -142,22 +142,22 @@
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="wordsLengthsModeLabel">
+    <Component class="javax.swing.JLabel" name="lengthsModeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Words&apos; lengths&apos; mode:"/>
+        <Property name="text" type="java.lang.String" value="Words&apos; length&apos;s mode:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="wordsLengthsModeOutputLabel">
+    <Component class="javax.swing.JLabel" name="lengthsModeOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="wordsSyllabesModeLabel">
+    <Component class="javax.swing.JLabel" name="syllabesModeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Words&apos; syllabes&apos; mode:"/>
+        <Property name="text" type="java.lang.String" value="Words&apos; syllabe&apos;s mode:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="wordsSyllabesModeOutputLabel">
+    <Component class="javax.swing.JLabel" name="syllabesModeOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
