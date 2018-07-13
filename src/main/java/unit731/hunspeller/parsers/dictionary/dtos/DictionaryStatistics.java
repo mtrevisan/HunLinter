@@ -10,6 +10,9 @@ import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
 
 
+/**
+ * @see <a href="https://home.ubalt.edu/ntsbarsh/Business-stat/otherapplets/PoissonTest.htm">Goodness-of-Fit for Poisson</a>
+ */
 @Getter
 public class DictionaryStatistics{
 

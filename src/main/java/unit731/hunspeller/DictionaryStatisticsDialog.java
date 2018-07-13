@@ -247,10 +247,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		jLabel2.setText(conclusion.getDescription() + " (" + CHI_SQUARE_FORMATTER.format(syllabesChiSquare) + ")");
 
 		CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)wordLengthsPanel).getChart();
-		addSeriesToChart(wordLengthsChart, "series", lengthsFrequencies, statistics.getTotalProductions());
+		addSeriesToChart(wordLengthsChart, lengthsFrequencies, statistics.getTotalProductions());
 
 		CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)wordSyllabesPanel).getChart();
-		addSeriesToChart(wordSyllabesChart, "series", syllabesFrequencies, statistics.getTotalProductions());
+		addSeriesToChart(wordSyllabesChart, syllabesFrequencies, statistics.getTotalProductions());
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -274,7 +274,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
-	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, long totalCount){
+	private void addSeriesToChart(CategoryChart chart, Frequency freqs, long totalCount){
 		List<Double> equivalentPoissonDistribution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(freqs)));
 
 		int index = 0;
@@ -290,7 +290,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			index ++;
 		}
 
-		chart.addSeries(seriesName, xData, yData);
+		chart.addSeries("series", xData, yData);
 
 		CategorySeries seriesPoisson = chart.addSeries("poisson", xData, equivalentPoissonDistribution);
 		seriesPoisson.setChartCategorySeriesRenderStyle(CategorySeriesRenderStyle.Line);
