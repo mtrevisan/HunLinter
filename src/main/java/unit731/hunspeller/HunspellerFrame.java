@@ -198,6 +198,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableMenuItemFromWorker.put(SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableMenuItemFromWorker.put(StatisticsWorker.class, () -> {
+			dicStatisticsMenuItem.setEnabled(true);
+			dicSortDictionaryMenuItem.setEnabled(true);
+		});
 		enableMenuItemFromWorker.put(WordlistWorker.class, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
@@ -1019,9 +1023,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		checkDictionaryCorrectness();
-
-		dicCheckCorrectnessMenuItem.setEnabled(false);
-		dicSortDictionaryMenuItem.setEnabled(false);
    }//GEN-LAST:event_dicCheckCorrectnessMenuItemActionPerformed
 
    private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
@@ -1640,6 +1641,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		if(Objects.isNull(dicCorrectnessWorker) || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
+
 			mainProgressBar.setValue(0);
 
 			dicCorrectnessWorker = new CorrectnessWorker(affParser, dicParser, this);

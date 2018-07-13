@@ -6,13 +6,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import javax.swing.AbstractAction;
@@ -36,15 +32,6 @@ import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 public class DictionaryStatisticsDialog extends JDialog{
 
 	private static final long serialVersionUID = 5762751368059394067l;
-
-	private static final DecimalFormat CHI_SQUARE_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
-	static{
-		DecimalFormatSymbols symbols = CHI_SQUARE_FORMATTER.getDecimalFormatSymbols();
-		symbols.setGroupingSeparator(' ');
-		CHI_SQUARE_FORMATTER.setDecimalFormatSymbols(symbols);
-		CHI_SQUARE_FORMATTER.setMinimumFractionDigits(4);
-		CHI_SQUARE_FORMATTER.setMaximumFractionDigits(4);
-	}
 
 
 	private final DictionaryStatistics statistics;
