@@ -1650,21 +1650,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void extractDictionaryDuplicates(){
 		if(Objects.isNull(dicDuplicatesWorker) || dicDuplicatesWorker.isDone()){
-			dicExtractDuplicatesMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
-
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+				dicExtractDuplicatesMenuItem.setEnabled(false);
+				dicSortDictionaryMenuItem.setEnabled(false);
+
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(affParser, dicParser, outputFile, this);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
-			}
-			else{
-				dicExtractDuplicatesMenuItem.setEnabled(true);
-				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 		}
 	}
@@ -1679,19 +1675,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicStatisticsWorker = new StatisticsWorker(affParser, dicParser, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
-
-			dicStatisticsMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 		}
 	}
 
 	private void extractDictionaryWordlist(){
 		if(Objects.isNull(dicWordlistWorker) || dicWordlistWorker.isDone()){
-			dicExtractWordlistMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
-
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+				dicExtractWordlistMenuItem.setEnabled(false);
+				dicSortDictionaryMenuItem.setEnabled(false);
+
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
@@ -1699,30 +1692,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
-			else{
-				dicExtractWordlistMenuItem.setEnabled(true);
-				dicSortDictionaryMenuItem.setEnabled(true);
-			}
 		}
 	}
 
 	private void extractMinimalPairs(){
 		if(Objects.isNull(dicMinimalPairsWorker) || dicMinimalPairsWorker.isDone()){
-			dicExtractMinimalPairsMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
-
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+				dicExtractMinimalPairsMenuItem.setEnabled(false);
+				dicSortDictionaryMenuItem.setEnabled(false);
+
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicMinimalPairsWorker = new MinimalPairsWorker(affParser, dicParser, outputFile, this);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
-			}
-			else{
-				dicExtractMinimalPairsMenuItem.setEnabled(true);
-				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 		}
 	}
