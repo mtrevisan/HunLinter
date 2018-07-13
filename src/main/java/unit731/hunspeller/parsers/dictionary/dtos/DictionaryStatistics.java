@@ -54,14 +54,10 @@ public class DictionaryStatistics{
 	}
 
 	public List<String> getMostCommonSyllabes(int size){
-		int i = 0;
 		List<String> response = new ArrayList<>(size);
-		Set<String> values = syllabesFrequencies.getMostCommonValues();
-		for(String value : values){
+		List<String> values = syllabesFrequencies.getMostCommonValues(5);
+		for(String value : values)
 			response.add(value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value) * 100) + "%)");
-			if(++ i == size)
-				break;
-		}
 		return response;
 //		return syllabesFrequencies.getMode().stream()
 //			.limit(size)

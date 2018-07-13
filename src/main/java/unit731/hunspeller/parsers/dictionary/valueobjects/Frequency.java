@@ -1,9 +1,12 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 
 public class Frequency<T>{
@@ -58,8 +61,14 @@ public class Frequency<T>{
 		return frequencies.firstKey();
 	}
 
-	public Set<T> getMostCommonValues(){
-		return frequencies.keySet();
+	public List<T> getMostCommonValues(int limit){
+		List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
+		Collections.sort(sortedEntries, (e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+		return sortedEntries.stream()
+			.limit(limit)
+			.map(Map.Entry::getKey)
+			.collect(Collectors.toList());
 	}
 
 	/**
