@@ -7,22 +7,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.math3.stat.Frequency;
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.style.CategoryStyler;
-import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -30,6 +21,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.TimeWatch;
@@ -89,9 +81,11 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								//collect statistics
 								String word = production.getWord();
 								int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
-								int syllabes = dicParser.getHyphenator().hyphenate(word).countSyllabes();
+								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(word);
+								int syllabes = hyph.countSyllabes();
 
-								dicStatistics.addLengthAndSyllabes(length, syllabes);
+								dicStatistics.addLengthAndSyllabeLength(length, syllabes);
+								dicStatistics.addSyllabes(hyph.getSyllabes());
 							}
 						}
 						catch(IllegalArgumentException e){

@@ -37,13 +37,18 @@
                       <Component id="totalProductionsOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="syllabesModeLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="syllabeLengthsModeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="syllabesModeOutputLabel" max="32767" attributes="0"/>
+                      <Component id="syllabeLengthsModeOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="mostCommonSyllabesLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="mostCommonSyllabesOutputLabel" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -65,10 +70,15 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="syllabesModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="syllabesModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabeLengthsModeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="syllabeLengthsModeOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="65" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="mostCommonSyllabesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="mostCommonSyllabesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="45" max="32767" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -152,12 +162,22 @@
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="syllabesModeLabel">
+    <Component class="javax.swing.JLabel" name="syllabeLengthsModeLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Words&apos; syllabe&apos;s mode:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="syllabesModeOutputLabel">
+    <Component class="javax.swing.JLabel" name="syllabeLengthsModeOutputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="mostCommonSyllabesLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Most common syllabes:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="mostCommonSyllabesOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
