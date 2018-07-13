@@ -69,6 +69,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       mainTabbedPane = new javax.swing.JTabbedPane();
       lengthsPanel = createChartPanel("Word length distribution", "Word length", "Frequency");
       syllabesPanel = createChartPanel("Word syllabe distribution", "Word syllabe", "Frequency");
+      stressesPanel = createChartPanel("Word stress distribution", "Word stressed syllabe index (from last)", "Frequency");
       totalProductionsOutputLabel = new javax.swing.JLabel();
       lengthsModeLabel = new javax.swing.JLabel();
       lengthsModeOutputLabel = new javax.swing.JLabel();
@@ -106,6 +107,19 @@ public class DictionaryStatisticsDialog extends JDialog{
       );
 
       mainTabbedPane.addTab("Word syllabes", syllabesPanel);
+
+      javax.swing.GroupLayout stressesPanelLayout = new javax.swing.GroupLayout(stressesPanel);
+      stressesPanel.setLayout(stressesPanelLayout);
+      stressesPanelLayout.setHorizontalGroup(
+         stressesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 655, Short.MAX_VALUE)
+      );
+      stressesPanelLayout.setVerticalGroup(
+         stressesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGap(0, 301, Short.MAX_VALUE)
+      );
+
+      mainTabbedPane.addTab("Word stresses", stressesPanel);
 
       totalProductionsOutputLabel.setText("...");
 
@@ -202,19 +216,25 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void fillStatisticDatas(){
 		Frequency lengthsFrequencies = statistics.getLengthsFrequencies();
 		Frequency syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+		Frequency stressesFrequencies = statistics.getStressFromLastFrequencies();
 		long totalProductions = statistics.getTotalProductions();
 		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
 
-		totalProductionsOutputLabel.setText(Long.toString(totalProductions));
-		lengthsModeOutputLabel.setText((lengthsFrequencies.getMode()).toString());
-		syllabeLengthsModeOutputLabel.setText((syllabeLengthsFrequencies.getMode()).toString());
-		mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
+		if(totalProductions > 0){
+			totalProductionsOutputLabel.setText(Long.toString(totalProductions));
+			lengthsModeOutputLabel.setText((lengthsFrequencies.getMode()).toString());
+			syllabeLengthsModeOutputLabel.setText((syllabeLengthsFrequencies.getMode()).toString());
+			mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
 
-		CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
-		addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalProductions);
+			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
+			addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalProductions);
 
-		CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
-		addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalProductions);
+			CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
+			addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalProductions);
+
+			CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
+			addSeriesToChart(wordStressesChart, stressesFrequencies, totalProductions);
+		}
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -266,10 +286,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
 				DictionaryStatistics stats = new DictionaryStatistics();
-				stats.addLengthAndSyllabeLength(0, 3);
-				stats.addLengthAndSyllabeLength(1, 1);
-				stats.addLengthAndSyllabeLength(0, 2);
-				stats.addLengthAndSyllabeLength(2, 3);
+				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 3, 1);
+				stats.addLengthAndSyllabeLengthAndStressFromLast(1, 1, 0);
+				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 2, 1);
+				stats.addLengthAndSyllabeLengthAndStressFromLast(2, 3, 1);
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
 				dialog.setLocationRelativeTo(parent);
@@ -294,6 +314,7 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JLabel mostCommonSyllabesLabel;
    private javax.swing.JLabel mostCommonSyllabesOutputLabel;
+   private javax.swing.JPanel stressesPanel;
    private javax.swing.JLabel syllabeLengthsModeLabel;
    private javax.swing.JLabel syllabeLengthsModeOutputLabel;
    private javax.swing.JPanel syllabesPanel;
