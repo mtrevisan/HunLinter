@@ -490,8 +490,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 		String word = production.getWord();
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
-			String[] subwords = StringUtils.split(word, HyphenationParser.EN_DASH);
-			String rule = (!WordVEC.isStressed(subwords[subwords.length - 1]) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+			List<String> subwords = hyphenator.splitIntoCompounds(word);
+			String rule = (!WordVEC.isStressed(subwords.get(subwords.size() - 1)) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && wordGenerator.isAffixProductive(word, rule));

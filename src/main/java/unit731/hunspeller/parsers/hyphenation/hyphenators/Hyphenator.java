@@ -14,7 +14,6 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
 
 
-//TODO manage ligatures!
 public class Hyphenator extends AbstractHyphenator{
 
 	public Hyphenator(HyphenationParser hypParser){

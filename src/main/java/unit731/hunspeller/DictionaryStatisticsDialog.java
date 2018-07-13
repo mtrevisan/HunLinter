@@ -214,16 +214,16 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillStatisticDatas(){
-		Frequency lengthsFrequencies = statistics.getLengthsFrequencies();
-		Frequency syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
-		Frequency stressesFrequencies = statistics.getStressFromLastFrequencies();
+		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
+		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+		Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
 		long totalProductions = statistics.getTotalProductions();
 		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
 
 		if(totalProductions > 0){
 			totalProductionsOutputLabel.setText(Long.toString(totalProductions));
-			lengthsModeOutputLabel.setText((lengthsFrequencies.getMode()).toString());
-			syllabeLengthsModeOutputLabel.setText((syllabeLengthsFrequencies.getMode()).toString());
+			lengthsModeOutputLabel.setText(lengthsFrequencies.getMode().toString());
+			syllabeLengthsModeOutputLabel.setText(syllabeLengthsFrequencies.getMode().toString());
 			mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
 
 			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
@@ -258,7 +258,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
-	private void addSeriesToChart(CategoryChart chart, Frequency freqs, long totalCount){
+	private void addSeriesToChart(CategoryChart chart, Frequency<Integer> freqs, long totalCount){
 		List<Integer> xData = new ArrayList<>();
 		List<Double> yData = new ArrayList<>();
 		Iterator<Map.Entry<Integer, Long>> itr = freqs.entrySetIterator();
