@@ -12,7 +12,7 @@ public class Orthography{
 
 	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘’]");
 
-	protected static final String APOSTROPHE = "ʼ";
+	protected static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
@@ -29,7 +29,7 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, APOSTROPHE);
+		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, RIGHT_SINGLE_QUOTATION_MARK);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

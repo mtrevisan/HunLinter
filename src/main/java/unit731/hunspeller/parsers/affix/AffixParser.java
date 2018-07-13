@@ -132,7 +132,7 @@ public class AffixParser{
 	/** Define output conversion table */
 	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
 
-	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.HYPHEN_MINUS + HyphenationParser.HYPHEN_MINUS;
+	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
@@ -473,9 +473,9 @@ public class AffixParser{
 				addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
 			if(!containsData(TAG_BREAK)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
-				wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS);
-				wordBreakCharacters.add("^" + HyphenationParser.HYPHEN_MINUS);
-				wordBreakCharacters.add(HyphenationParser.HYPHEN_MINUS + "$");
+				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
+				wordBreakCharacters.add("^" + HyphenationParser.MINUS_SIGN);
+				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + "$");
 				addData(TAG_BREAK, wordBreakCharacters);
 			}
 //			if(isComplexPrefixes()){
