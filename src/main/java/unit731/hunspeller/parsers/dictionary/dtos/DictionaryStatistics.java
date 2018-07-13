@@ -1,24 +1,13 @@
 package unit731.hunspeller.parsers.dictionary.dtos;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.LongStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import org.apache.commons.math3.distribution.PoissonDistribution;
-import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.exception.NotPositiveException;
-import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.stat.Frequency;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.inference.ChiSquareTest;
-import org.apache.commons.math3.util.FastMath;
-import org.apache.commons.math3.util.MathArrays;
 
 
 @Getter
@@ -100,10 +89,10 @@ public class DictionaryStatistics{
 		Iterator<Map.Entry<Comparable<?>, Long>> itr = frequencies.entrySetIterator();
 		while(itr.hasNext()){
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
-			long key = (Long)elem.getKey();
-			double value = elem.getValue().doubleValue();
-			sumY += value;
-			mean += key * value;
+			long xval = (Long)elem.getKey();
+			double freq = elem.getValue().doubleValue();
+			sumY += freq;
+			mean += xval * freq;
 		}
 		//check for insufficent data
 		if(sumY == 0)

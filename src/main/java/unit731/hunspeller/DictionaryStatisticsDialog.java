@@ -7,10 +7,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import javax.swing.AbstractAction;
@@ -37,6 +41,15 @@ import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 public class DictionaryStatisticsDialog extends JDialog{
 
 	private static final long serialVersionUID = 5762751368059394067l;
+
+	private static final DecimalFormat CHI_SQUARE_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
+	static{
+		DecimalFormatSymbols symbols = CHI_SQUARE_FORMATTER.getDecimalFormatSymbols();
+		symbols.setGroupingSeparator(' ');
+		CHI_SQUARE_FORMATTER.setDecimalFormatSymbols(symbols);
+		CHI_SQUARE_FORMATTER.setMinimumFractionDigits(4);
+		CHI_SQUARE_FORMATTER.setMaximumFractionDigits(4);
+	}
 
 
 	private final DictionaryStatistics statistics;
@@ -79,6 +92,10 @@ public class DictionaryStatisticsDialog extends JDialog{
       wordsLengthsModeOutputLabel = new javax.swing.JLabel();
       wordsSyllabesModeLabel = new javax.swing.JLabel();
       wordsSyllabesModeOutputLabel = new javax.swing.JLabel();
+      poissonDistributionPValueLabel = new javax.swing.JLabel();
+      poissonDistributionPValueOutputLabel = new javax.swing.JLabel();
+      jLabel1 = new javax.swing.JLabel();
+      jLabel2 = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -120,6 +137,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       wordsSyllabesModeOutputLabel.setText("...");
 
+      poissonDistributionPValueLabel.setText("Fitting to a Poisson distribution:");
+
+      poissonDistributionPValueOutputLabel.setText("...");
+
+      jLabel1.setText("jLabel1");
+
+      jLabel2.setText("jLabel2");
+
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
@@ -135,14 +160,22 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addComponent(totalProductionsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(totalProductionsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                  .addGroup(layout.createSequentialGroup()
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(wordsSyllabesModeLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(wordsSyllabesModeOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(poissonDistributionPValueLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(poissonDistributionPValueOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
-                     .addGap(0, 0, Short.MAX_VALUE))
-                  .addGroup(layout.createSequentialGroup()
-                     .addComponent(wordsSyllabesModeLabel)
-                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                     .addComponent(wordsSyllabesModeOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(31, 31, 31)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 484, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -160,7 +193,15 @@ public class DictionaryStatisticsDialog extends JDialog{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(wordsSyllabesModeLabel)
                .addComponent(wordsSyllabesModeOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(poissonDistributionPValueLabel)
+               .addComponent(poissonDistributionPValueOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(jLabel1)
+               .addComponent(jLabel2))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addContainerGap())
       );
@@ -198,14 +239,18 @@ public class DictionaryStatisticsDialog extends JDialog{
 		totalProductionsOutputLabel.setText(Long.toString(statistics.getTotalProductions()));
 		wordsLengthsModeOutputLabel.setText(((Long)lengthsFrequencies.getMode().get(0)).toString());
 		wordsSyllabesModeOutputLabel.setText(((Long)syllabesFrequencies.getMode().get(0)).toString());
+		double lengthsChiSquare = DictionaryStatistics.chiSquareTest(lengthsFrequencies);
+		DictionaryStatistics.ChiSquareConclusion conclusion = DictionaryStatistics.ChiSquareConclusion.determineConclusion(lengthsChiSquare);
+		poissonDistributionPValueOutputLabel.setText(conclusion.getDescription() + " (" + CHI_SQUARE_FORMATTER.format(lengthsChiSquare) + ")");
+		double syllabesChiSquare = DictionaryStatistics.chiSquareTest(syllabesFrequencies);
+		conclusion = DictionaryStatistics.ChiSquareConclusion.determineConclusion(syllabesChiSquare);
+		jLabel2.setText(conclusion.getDescription() + " (" + CHI_SQUARE_FORMATTER.format(syllabesChiSquare) + ")");
 
 		CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)wordLengthsPanel).getChart();
-		List<Double> equivalentPoissonDistibution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(lengthsFrequencies)));
-		addSeriesToChart(wordLengthsChart, "series", lengthsFrequencies, equivalentPoissonDistibution, statistics.getTotalProductions());
+		addSeriesToChart(wordLengthsChart, "series", lengthsFrequencies, statistics.getTotalProductions());
 
 		CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)wordSyllabesPanel).getChart();
-		equivalentPoissonDistibution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(syllabesFrequencies)));
-		addSeriesToChart(wordSyllabesChart, "series", syllabesFrequencies, equivalentPoissonDistibution, statistics.getTotalProductions());
+		addSeriesToChart(wordSyllabesChart, "series", syllabesFrequencies, statistics.getTotalProductions());
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -229,8 +274,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return new XChartPanel<>(chart);
 	}
 
-	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, List<Double> equivalentPoissonDistribution,
-			long totalCount){
+	private void addSeriesToChart(CategoryChart chart, String seriesName, Frequency freqs, long totalCount){
+		List<Double> equivalentPoissonDistribution = Arrays.asList(ArrayUtils.toObject(DictionaryStatistics.getEquivalentPoissonDistribution(freqs)));
+
 		int index = 0;
 		List<Integer> xData = new ArrayList<>();
 		List<Double> yData = new ArrayList<>();
@@ -239,7 +285,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 			Map.Entry<Comparable<?>, Long> elem = itr.next();
 			xData.add(((Long)elem.getKey()).intValue());
 			yData.add(elem.getValue().doubleValue() / totalCount);
-			equivalentPoissonDistribution.set(index, equivalentPoissonDistribution.get(index) * 0.01 / totalCount);
+
+			equivalentPoissonDistribution.set(index, equivalentPoissonDistribution.get(index) / totalCount);
+			index ++;
 		}
 
 		chart.addSeries(seriesName, xData, yData);
@@ -265,10 +313,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
 				DictionaryStatistics stats = new DictionaryStatistics();
-				stats.addLengthAndSyllabes(12, 3);
-				stats.addLengthAndSyllabes(13, 1);
-				stats.addLengthAndSyllabes(12, 2);
-				stats.addLengthAndSyllabes(5, 3);
+				stats.addLengthAndSyllabes(0, 3);
+				stats.addLengthAndSyllabes(1, 1);
+				stats.addLengthAndSyllabes(0, 2);
+				stats.addLengthAndSyllabes(2, 3);
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
 				dialog.setLocationRelativeTo(parent);
@@ -287,7 +335,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JLabel jLabel1;
+   private javax.swing.JLabel jLabel2;
    private javax.swing.JTabbedPane mainTabbedPane;
+   private javax.swing.JLabel poissonDistributionPValueLabel;
+   private javax.swing.JLabel poissonDistributionPValueOutputLabel;
    private javax.swing.JLabel totalProductionsLabel;
    private javax.swing.JLabel totalProductionsOutputLabel;
    private javax.swing.JPanel wordLengthsPanel;
