@@ -6,7 +6,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import lombok.Getter;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 
@@ -33,14 +32,16 @@ public class DictionaryStatistics{
 	private final Frequency<Integer> lengthsFrequencies = new Frequency();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency();
 	private final Frequency<String> syllabesFrequencies = new Frequency();
+	private final Frequency<Integer> stressFromLastFrequencies = new Frequency();
 
 
-	public void addLengthAndSyllabeLength(int length, int syllabes){
+	public void addLengthAndSyllabeLengthAndStressFromLast(int length, int syllabes, int stress){
 //		lengthsStatistics.addValue(length);
 //		syllabesStatistics.addValue(syllabes);
 
 		lengthsFrequencies.addValue(length);
 		syllabeLengthsFrequencies.addValue(syllabes);
+		stressFromLastFrequencies.addValue(stress);
 		totalProductions ++;
 	}
 

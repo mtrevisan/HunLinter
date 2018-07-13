@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import java.util.Collections;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.CompoundHyphenation;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import static unit731.hunspeller.parsers.hyphenation.HyphenationParser.SOFT_HYPHEN;
@@ -88,7 +90,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		HyphenationInterface result = hyphenate(word, patterns, HyphenationParser.Level.FIRST, SOFT_HYPHEN, false);
 
 		//if there is a second level
-		if(!patterns.get(HyphenationParser.Level.SECOND).isEmpty()){
+		if(hypParser.hasSecondLevel()){
 			//apply second level hyphenation for the word parts
 			List<HyphenationInterface> subHyphenations = result.getSyllabes().stream()
 				.map(compound -> hyphenate(compound, patterns, HyphenationParser.Level.SECOND, SOFT_HYPHEN, true))
@@ -111,5 +113,16 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	protected abstract HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
 		boolean isCompound);
+
+	@Override
+	public List<String> splitIntoCompounds(String word){
+		List<String> response = Collections.<String>emptyList();
+		if(hypParser.hasSecondLevel()){
+			//apply first level hyphenation
+			HyphenationInterface result = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, SOFT_HYPHEN, false);
+			response = result.getSyllabes();
+		}
+		return response;
+	}
 
 }

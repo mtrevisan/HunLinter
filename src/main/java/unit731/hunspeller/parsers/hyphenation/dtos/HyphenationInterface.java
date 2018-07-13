@@ -17,6 +17,8 @@ public interface HyphenationInterface{
 
 	List<String> getRules();
 
+	List<Integer> getStressIndexFromLast();
+
 	StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter);
 
 }

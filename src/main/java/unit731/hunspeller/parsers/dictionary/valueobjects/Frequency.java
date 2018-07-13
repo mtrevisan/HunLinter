@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -10,6 +11,9 @@ import java.util.stream.Collectors;
 
 
 public class Frequency<T>{
+
+	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getPercentInstance();
+
 
 	private final TreeMap<T, Long> frequencies = new TreeMap<>();
 
@@ -107,6 +111,27 @@ public class Frequency<T>{
 		while(iterator.hasNext())
 			result += iterator.next();
 		return result;
+	}
+
+	/**
+	 * Return a string representation of this frequency distribution.
+	 *
+	 * @return a string representation.
+	 */
+	@Override
+	public String toString(){
+		StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
+		Iterator<T> iter = frequencies.keySet().iterator();
+		while(iter.hasNext()){
+			T value = iter.next();
+			sb.append(value)
+				.append('\t')
+				.append(getCount(value))
+				.append('\t')
+				.append(NUMBER_FORMAT.format(getPercentOf(value)))
+				.append('\n');
+		}
+		return sb.toString();
 	}
 
 }

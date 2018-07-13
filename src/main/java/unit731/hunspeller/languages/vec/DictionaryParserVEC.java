@@ -100,9 +100,6 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
 	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
-	private static final String HYPHEN_SPLITTER = HyphenationParser.HYPHEN_MINUS + HyphenationParser.EN_DASH + HyphenationParser.EM_DASH
-		+ HyphenationParser.SOFT_HYPHEN;
-
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 //	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
 
@@ -397,7 +394,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			finalSonorizationCheck(production);
 
 			String derivedWord = production.getWord();
-			String[] splittedWords = StringUtils.split(derivedWord, HYPHEN_SPLITTER);
+			List<String> splittedWords = hyphenator.splitIntoCompounds(derivedWord);
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
