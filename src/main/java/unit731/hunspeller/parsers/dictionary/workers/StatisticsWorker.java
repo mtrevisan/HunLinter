@@ -16,6 +16,7 @@ import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
+import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -81,10 +82,13 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								//collect statistics
 								String word = production.getWord();
 								int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
+//FIXME WordVEC
+								word = WordVEC.markDefaultStress(word);
 								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(word);
 								int syllabes = hyph.countSyllabes();
+								List<Integer> stressIndexFromLast = hyph.getStressIndexFromLast();
 
-								dicStatistics.addLengthAndSyllabeLength(length, syllabes);
+								dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
 								dicStatistics.addSyllabes(hyph.getSyllabes());
 							}
 						}

@@ -59,7 +59,8 @@ public class HyphenationParser{
 
 	//Hyphens from the wikipedia article: https://en.wikipedia.org/wiki/Hyphen#Unicode
 	public static final String HYPHEN = "\u2010";
-	public static final String HYPHEN_MINUS = "\u002D";
+//	public static final String HYPHEN_MINUS = "\u002D";
+	public static final String MINUS_SIGN = "-";
 	public static final String HYPHEN_EQUALS = "=";
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
@@ -80,7 +81,7 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
-	private static final Matcher MATCHER_HYPHEN_MINUS_OR_EQUALS = PatternService.matcher("[" + HYPHEN_MINUS + HYPHEN_EQUALS + "]");
+	private static final Matcher MATCHER_EQUALS = PatternService.matcher(HYPHEN_EQUALS);
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
@@ -107,6 +108,7 @@ public class HyphenationParser{
 	@Getter
 	private HyphenatorInterface hyphenator;
 
+	private boolean secondLevelPresent;
 	@Getter
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	@Getter
@@ -143,6 +145,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
 
+		secondLevelPresent = patterns.containsKey(Level.SECOND);
 		for(Level level : Level.values()){
 			RadixTree<String, String> p = patterns.getOrDefault(level, RadixTree.createTree(new StringSequencer()));
 			this.patterns.put(level, p);
@@ -199,14 +202,15 @@ public class HyphenationParser{
 
 								//start with non–compound level
 								level = Level.SECOND;
+								secondLevelPresent = true;
 								REDUCED_PATTERNS.get(level).clear();
 							}
 							else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-								String key = PatternService.clear(line, MATCHER_HYPHEN_MINUS_OR_EQUALS);
+								String key = PatternService.clear(line, MATCHER_EQUALS);
 								if(customHyphenations.get(level).containsKey(key))
 									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-								customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, HYPHEN_MINUS));
+								customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, MINUS_SIGN));
 							}
 							else{
 								validateRule(line, level);
@@ -225,7 +229,7 @@ public class HyphenationParser{
 
 				if(level == Level.FIRST){
 					//dash and apostrophe are added by default (retro-compatibility)
-					List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, HYPHEN_MINUS));
+					List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 					if(charset == StandardCharsets.UTF_8)
 						addedNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
@@ -243,6 +247,9 @@ public class HyphenationParser{
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e, getClass());
@@ -250,6 +257,9 @@ public class HyphenationParser{
 		}
 		finally{
 			releaseLock();
+
+			for(Level level : Level.values())
+				REDUCED_PATTERNS.get(level).clear();
 		}
 	}
 
@@ -432,6 +442,10 @@ public class HyphenationParser{
 		writer.write(StringUtils.LF);
 	}
 
+	public boolean hasSecondLevel(){
+		return secondLevelPresent;
+	}
+
 	/**
 	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 * 
@@ -493,6 +507,7 @@ public class HyphenationParser{
 		return Normalizer.normalize(word.substring(0, index - 1), Normalizer.Form.NFKC).length() + 1;
 	}
 
+	//TODO to be checked for correctness
 	public void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
 		int size = word.length() + WORD_BOUNDARY.length() * 2;
 
