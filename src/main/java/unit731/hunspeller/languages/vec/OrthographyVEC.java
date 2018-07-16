@@ -113,7 +113,7 @@ public class OrthographyVEC extends Orthography{
 			String syllabe = syllabes.get(i);
 			//FIXME pattern dependent!
 			errors[i] = (!StringUtils.containsAny(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, HyphenationParser.APOSTROPHE)
-				&& !StringUtils.equalsAny(syllabe, HyphenationParser.EN_DASH, HyphenationParser.MINUS_SIGN)
+				&& !StringUtils.equalsAny(syllabe, HyphenationParser.EN_DASH)
 				&& WordVEC.getLastVowelIndex(syllabe) < 0);
 		}
 		return errors;
