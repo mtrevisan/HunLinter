@@ -84,6 +84,15 @@ public class WordVEC{
 		ACUTE_STRESSES.put("u", "ú");
 	}
 
+	public static int countLetters(String word){
+		int count = 0;
+		int size = word.length();
+		for(int i = 0; i < size; i ++)
+			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, word.charAt(i)) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, word.charAt(i)) >= 0)
+				count ++;
+		return count;
+	}
+
 	public static boolean isApostrophe(char chr){
 		return (chr == 'ʼ' || chr == '\'');
 	}

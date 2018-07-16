@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,8 +23,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.hyphenation.dtos.CompoundHyphenation;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
@@ -85,15 +82,17 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 							for(RuleProductionEntry production : productions){
 								//collect statistics
 								String word = production.getWord();
-								int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 //FIXME WordVEC
-								word = WordVEC.markDefaultStress(word);
-								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(word);
-								int syllabes = hyph.countSyllabes();
-								List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
+								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(WordVEC.markDefaultStress(word));
+								if(!hyph.hasErrors()){
+									int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
+									int syllabes = hyph.countSyllabes();
+									List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
 
-								dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
-								dicStatistics.addSyllabes(hyph.getSyllabes());
+									dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
+									dicStatistics.addSyllabes(hyph.getSyllabes());
+									dicStatistics.storeLongestWord(word);
+								}
 							}
 						}
 						catch(IllegalArgumentException e){
