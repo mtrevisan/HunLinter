@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -11,8 +12,6 @@ import unit731.hunspeller.services.PatternService;
 public class Orthography{
 
 	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘’]");
-
-	protected static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
@@ -29,7 +28,7 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, RIGHT_SINGLE_QUOTATION_MARK);
+		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

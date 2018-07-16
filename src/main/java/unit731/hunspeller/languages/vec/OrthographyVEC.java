@@ -14,8 +14,6 @@ import unit731.hunspeller.services.PatternService;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrthographyVEC extends Orthography{
 
-	private static final String APOSTROPHE = "'";
-
 	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "o/", "u/", "u\\", "ù"};
 	private static final String[] TRUE_STRESS = new String[]{"à", "è", "ò", "é", "í", "í", "í", "ó", "ú", "ú", "ú"};
 
@@ -114,7 +112,7 @@ public class OrthographyVEC extends Orthography{
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
 			//FIXME pattern dependent!
-			errors[i] = (!StringUtils.containsAny(syllabe, RIGHT_SINGLE_QUOTATION_MARK, APOSTROPHE)
+			errors[i] = (!StringUtils.containsAny(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, HyphenationParser.APOSTROPHE)
 				&& !StringUtils.equalsAny(syllabe, HyphenationParser.EN_DASH, HyphenationParser.MINUS_SIGN)
 				&& WordVEC.getLastVowelIndex(syllabe) < 0);
 		}

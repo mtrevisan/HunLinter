@@ -65,8 +65,8 @@ public class HyphenationParser{
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
 	public static final String EM_DASH = "\u2014";
-	private static final String APOSTROPHE = "'";
-	private static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
+	public static final String APOSTROPHE = "'";
+	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 
 	private static final String ONE = "1";
 	public static final String WORD_BOUNDARY = ".";
