@@ -276,8 +276,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 			lengthsModeOutputLabel.setText(String.join(", ", lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			syllabeLengthsModeOutputLabel.setText(String.join(", ", syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
-			longestWordCharactersOutputLabel.setText(String.join(", ", longestWordsChars) + " (" + longestWordCharsCount + ")");
-			longestWordSyllabesOutputLabel.setText(String.join(", ", longestSyllabesChars) + " (" + longestWordSyllabesCount + ")");
+			longestWordCharactersOutputLabel.setText("<html>" + String.join(", ", longestWordsChars) + " (" + longestWordCharsCount + ")\"</html>\"");
+			longestWordSyllabesOutputLabel.setText("<html>" + String.join(", ", longestSyllabesChars) + " (" + longestWordSyllabesCount + ")\"</html>\"");
 			uniqueWordsOutputLabel.setText(DictionaryStatistics.PERCENT_FORMATTER.format(uniqueWords));
 
 			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();

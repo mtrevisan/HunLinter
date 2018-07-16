@@ -112,8 +112,16 @@ public class DictionaryStatistics{
 	}
 
 	public void clear(){
+		totalProductions = 0;
 		lengthsFrequencies.clear();
 		syllabeLengthsFrequencies.clear();
+		stressFromLastFrequencies.clear();
+		syllabesFrequencies.clear();
+		longestWordCountByCharacters = 0;
+		longestWordsByCharacters.clear();
+		longestWordCountBySyllabes = 0;
+		longestWordsBySyllabes.clear();
+		bloomFilter.clear();
 	}
 
 }
