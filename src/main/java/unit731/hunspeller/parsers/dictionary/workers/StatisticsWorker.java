@@ -17,7 +17,6 @@ import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
-import unit731.hunspeller.languages.vec.WordVEC;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -48,7 +47,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.resultable = resultable;
-		dicStatistics = new DictionaryStatistics(dicParser.getCharset());
+
+		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), dicParser.getCharset());
 	}
 
 	@Override
@@ -85,8 +85,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								String word = production.getWord();
 								List<String> subwords = dicParser.getHyphenator().splitIntoCompounds(word);
 								for(String subword : subwords){
-//FIXME WordVEC
-									HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(WordVEC.markDefaultStress(subword));
+									HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
 									if(!hyph.hasErrors()){
 										int length = Normalizer.normalize(subword, Normalizer.Form.NFKC).length();
 										int syllabes = hyph.countSyllabes();
@@ -137,8 +136,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		List<String> syllabes = hyph.getSyllabes();
 		int size = syllabes.size() - 1;
 		for(int i = 0; i <= size; i ++)
-//FIXME WordVEC
-			if(WordVEC.isStressed(syllabes.get(size - i)))
+			if(dicStatistics.getOrthography().hasStressedGrapheme(syllabes.get(size - i)))
 				return Arrays.asList(i);
 		return null;
 	}

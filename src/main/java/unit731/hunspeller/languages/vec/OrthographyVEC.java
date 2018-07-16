@@ -121,4 +121,19 @@ public class OrthographyVEC extends Orthography{
 		return errors;
 	}
 
+	@Override
+	public int countGraphemes(String word){
+		return WordVEC.countGraphemes(word);
+	}
+
+	@Override
+	public String markDefaultStress(String word){
+		return WordVEC.markDefaultStress(word);
+	}
+
+	@Override
+	public boolean hasStressedGrapheme(String word){
+		return WordVEC.hasStressedGrapheme(word);
+	}
+
 }

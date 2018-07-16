@@ -50,8 +50,6 @@ public class WordVEC{
 	}
 
 	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
-	private static final Matcher FIRST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú].*$");
-	private static final Matcher LAST_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
 	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
 
@@ -84,7 +82,7 @@ public class WordVEC{
 		ACUTE_STRESSES.put("u", "ú");
 	}
 
-	public static int countLetters(String word){
+	public static int countGraphemes(String word){
 		int count = 0;
 		int size = word.length();
 		for(int i = 0; i < size; i ++)
@@ -126,13 +124,10 @@ public class WordVEC{
 
 	public static int getFirstVowelIndex(String word, int index){
 		return StringUtils.indexOf(word, VOWELS_LOWERCASE, index);
-//		Matcher m = FIRST_STRESSED_VOWEL.reset(word.substring(index));
-//		return (m.find()? m.start() + index: -1);
 	}
 
 	public static int getLastVowelIndex(String word){
-		Matcher m = LAST_VOWEL.reset(word);
-		return (m.find()? m.start(): -1);
+		return StringUtils.lastIndexOf(word, VOWELS_LOWERCASE);
 	}
 
 	//[aeiou][^aeiou]*$
@@ -148,7 +143,7 @@ public class WordVEC{
 
 
 	//[àèéíòóú]
-	public static boolean isStressed(String word){
+	public static boolean hasStressedGrapheme(String word){
 		return (countAccents(word) == 1);
 	}
 

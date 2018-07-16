@@ -7,11 +7,13 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.languages.vec.WordVEC;
+import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 
 
@@ -44,9 +46,13 @@ public class DictionaryStatistics{
 	private final List<String> longestWordsBySyllabes = new ArrayList<>();
 	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
 
+	@Getter
+	private final Orthography orthography;
 
-	public DictionaryStatistics(Charset charset){
+
+	public DictionaryStatistics(String language, Charset charset){
 		bloomFilter.setCharset(charset);
+		orthography = OrthographyBuilder.getOrthography(language);
 	}
 
 	public void addLengthAndSyllabeLengthAndStressFromLast(int length, int syllabes, int stress){
@@ -58,14 +64,12 @@ public class DictionaryStatistics{
 
 	public void addSyllabes(List<String> syllabes){
 		for(String syllabe : syllabes)
-//FIXME WordVEC
-			if(WordVEC.countLetters(syllabe) == syllabe.length())
+			if(orthography.countGraphemes(syllabe) == syllabe.length())
 				syllabesFrequencies.addValue(syllabe);
 	}
 
 	public void storeLongestWord(String word, int syllabes){
-//FIXME WordVEC
-		int letterCount = WordVEC.countLetters(word);
+		int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
 			longestWordsByCharacters.add(word);
@@ -90,11 +94,9 @@ public class DictionaryStatistics{
 	}
 
 	public List<String> getMostCommonSyllabes(int size){
-		List<String> response = new ArrayList<>(size);
-		List<String> values = syllabesFrequencies.getMostCommonValues(5);
-		for(String value : values)
-			response.add(value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value)) + ")");
-		return response;
+		return syllabesFrequencies.getMostCommonValues(5).stream()
+			.map(value -> value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value)) + ")")
+			.collect(Collectors.toList());
 //		return syllabesFrequencies.getMode().stream()
 //			.limit(size)
 //			.map(String.class::cast)

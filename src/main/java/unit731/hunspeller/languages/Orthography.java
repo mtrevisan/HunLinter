@@ -36,4 +36,16 @@ public class Orthography{
 		return new boolean[syllabes.size()];
 	}
 
+	public int countGraphemes(String word){
+		return word.length();
+	}
+
+	public String markDefaultStress(String word){
+		return word;
+	}
+
+	public boolean hasStressedGrapheme(String word){
+		return false;
+	}
+
 }

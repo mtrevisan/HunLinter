@@ -353,7 +353,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				DictionaryStatistics stats = new DictionaryStatistics(StandardCharsets.UTF_8);
+				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 3, 1);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(1, 1, 0);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 2, 1);
