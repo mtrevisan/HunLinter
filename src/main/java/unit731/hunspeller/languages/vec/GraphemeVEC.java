@@ -10,7 +10,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class GraphemeVEC{
+class GraphemeVEC{
 
 	public static final String JJH_PHONEME = "ʝ";
 	public static final String FH_PHONEME = "\uA799";
