@@ -10,6 +10,17 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 
+/**
+ * Maintains a frequency distribution.
+ * <p>
+ * New values added must be comparable to those that have been added, otherwise the add method will throw an IllegalArgumentException.
+ * </p>
+ * <p>
+ * The values are ordered using the default (natural order).
+ * </p>
+ * 
+ * @param <T>	Type of value
+ */
 public class Frequency<T>{
 
 	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getPercentInstance();

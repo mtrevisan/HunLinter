@@ -34,8 +34,6 @@ public class DictionaryStatistics{
 
 
 	private int totalProductions;
-//	private final DescriptiveStatistics lengthsStatistics = new DescriptiveStatistics();
-//	private final DescriptiveStatistics syllabesStatistics = new DescriptiveStatistics();
 	private final Frequency<Integer> lengthsFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
 	private final Frequency<Integer> stressFromLastFrequencies = new Frequency<>();
@@ -52,9 +50,6 @@ public class DictionaryStatistics{
 	}
 
 	public void addLengthAndSyllabeLengthAndStressFromLast(int length, int syllabes, int stress){
-//		lengthsStatistics.addValue(length);
-//		syllabesStatistics.addValue(syllabes);
-
 		lengthsFrequencies.addValue(length);
 		syllabeLengthsFrequencies.addValue(syllabes);
 		stressFromLastFrequencies.addValue(stress);
