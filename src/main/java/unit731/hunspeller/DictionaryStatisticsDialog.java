@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -77,8 +78,12 @@ public class DictionaryStatisticsDialog extends JDialog{
       syllabeLengthsModeOutputLabel = new javax.swing.JLabel();
       mostCommonSyllabesLabel = new javax.swing.JLabel();
       mostCommonSyllabesOutputLabel = new javax.swing.JLabel();
-      longestWordLabel = new javax.swing.JLabel();
-      longestWordOutputLabel = new javax.swing.JLabel();
+      longestWordCharactersLabel = new javax.swing.JLabel();
+      longestWordCharactersOutputLabel = new javax.swing.JLabel();
+      longestWordSyllabesLabel = new javax.swing.JLabel();
+      longestWordSyllabesOutputLabel = new javax.swing.JLabel();
+      uniqueWordsLabel = new javax.swing.JLabel();
+      uniqueWordsOutputLabel = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -125,11 +130,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       totalProductionsOutputLabel.setText("...");
 
-      lengthsModeLabel.setText("Words' length's mode:");
+      lengthsModeLabel.setText("Words' length mode:");
 
       lengthsModeOutputLabel.setText("...");
 
-      syllabeLengthsModeLabel.setText("Words' syllabe's mode:");
+      syllabeLengthsModeLabel.setText("Words' syllabe mode:");
 
       syllabeLengthsModeOutputLabel.setText("...");
 
@@ -137,9 +142,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mostCommonSyllabesOutputLabel.setText("...");
 
-      longestWordLabel.setText("Longest word(s):");
+      longestWordCharactersLabel.setText("Longest word(s) (by characters):");
 
-      longestWordOutputLabel.setText("...");
+      longestWordCharactersOutputLabel.setText("...");
+
+      longestWordSyllabesLabel.setText("Longest word(s) (by syllabes):");
+
+      longestWordSyllabesOutputLabel.setText("...");
+
+      uniqueWordsLabel.setText("Unique words:");
+
+      uniqueWordsOutputLabel.setText("...");
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
@@ -164,14 +177,23 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addComponent(mostCommonSyllabesLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(mostCommonSyllabesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(longestWordSyllabesLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(longestWordSyllabesOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                   .addGroup(layout.createSequentialGroup()
-                     .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
+                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createSequentialGroup()
+                           .addComponent(longestWordCharactersLabel)
+                           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                           .addComponent(longestWordCharactersOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                      .addGap(0, 0, Short.MAX_VALUE))
                   .addGroup(layout.createSequentialGroup()
-                     .addComponent(longestWordLabel)
+                     .addComponent(uniqueWordsLabel)
                      .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                     .addComponent(longestWordOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                     .addComponent(uniqueWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -195,9 +217,17 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addComponent(mostCommonSyllabesOutputLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(longestWordLabel)
-               .addComponent(longestWordOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+               .addComponent(longestWordCharactersLabel)
+               .addComponent(longestWordCharactersOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(longestWordSyllabesLabel)
+               .addComponent(longestWordSyllabesOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(uniqueWordsLabel)
+               .addComponent(uniqueWordsOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addContainerGap())
       );
@@ -234,15 +264,20 @@ public class DictionaryStatisticsDialog extends JDialog{
 		Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
 		long totalProductions = statistics.getTotalProductions();
 		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
-		int longestWordCount = statistics.getLongestWordCount();
-		List<String> longestWords = statistics.getLongestWords();
+		int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
+		List<String> longestWordsChars = statistics.getLongestWordsByCharacters();
+		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
+		List<String> longestSyllabesChars = statistics.getLongestWordsBySyllabes();
+		double uniqueWords = statistics.uniqueWords();
 
 		if(totalProductions > 0){
 			totalProductionsOutputLabel.setText(Long.toString(totalProductions));
 			lengthsModeOutputLabel.setText(lengthsFrequencies.getMode().toString());
 			syllabeLengthsModeOutputLabel.setText(syllabeLengthsFrequencies.getMode().toString());
 			mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
-			longestWordOutputLabel.setText(String.join(", ", longestWords) + " (" + longestWordCount + ")");
+			longestWordCharactersOutputLabel.setText(String.join(", ", longestWordsChars) + " (" + longestWordCharsCount + ")");
+			longestWordSyllabesOutputLabel.setText(String.join(", ", longestSyllabesChars) + " (" + longestWordSyllabesCount + ")");
+			uniqueWordsOutputLabel.setText(DictionaryStatistics.PERCENT_FORMATTER.format(uniqueWords));
 
 			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
 			addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalProductions);
@@ -303,7 +338,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				DictionaryStatistics stats = new DictionaryStatistics();
+				DictionaryStatistics stats = new DictionaryStatistics(StandardCharsets.UTF_8);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 3, 1);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(1, 1, 0);
 				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 2, 1);
@@ -329,8 +364,10 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel lengthsModeLabel;
    private javax.swing.JLabel lengthsModeOutputLabel;
    private javax.swing.JPanel lengthsPanel;
-   private javax.swing.JLabel longestWordLabel;
-   private javax.swing.JLabel longestWordOutputLabel;
+   private javax.swing.JLabel longestWordCharactersLabel;
+   private javax.swing.JLabel longestWordCharactersOutputLabel;
+   private javax.swing.JLabel longestWordSyllabesLabel;
+   private javax.swing.JLabel longestWordSyllabesOutputLabel;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JLabel mostCommonSyllabesLabel;
    private javax.swing.JLabel mostCommonSyllabesOutputLabel;
@@ -340,5 +377,7 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JPanel syllabesPanel;
    private javax.swing.JLabel totalProductionsLabel;
    private javax.swing.JLabel totalProductionsOutputLabel;
+   private javax.swing.JLabel uniqueWordsLabel;
+   private javax.swing.JLabel uniqueWordsOutputLabel;
    // End of variables declaration//GEN-END:variables
 }

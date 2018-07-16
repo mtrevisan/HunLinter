@@ -38,7 +38,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 	@NonNull
 	private final Resultable resultable;
 
-	private final DictionaryStatistics dicStatistics = new DictionaryStatistics();
+	private final DictionaryStatistics dicStatistics;
 
 
 	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
@@ -48,6 +48,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.resultable = resultable;
+		dicStatistics = new DictionaryStatistics(dicParser.getCharset());
 	}
 
 	@Override
@@ -91,7 +92,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 
 									dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
 									dicStatistics.addSyllabes(hyph.getSyllabes());
-									dicStatistics.storeLongestWord(word);
+									dicStatistics.storeLongestWord(word, syllabes);
 								}
 							}
 						}

@@ -46,15 +46,27 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="mostCommonSyllabesOutputLabel" max="32767" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="longestWordSyllabesLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="longestWordSyllabesOutputLabel" max="32767" attributes="0"/>
+                  </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="longestWordCharactersLabel" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="longestWordCharactersOutputLabel" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="longestWordLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="uniqueWordsLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="longestWordOutputLabel" max="32767" attributes="0"/>
+                          <Component id="uniqueWordsOutputLabel" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -87,10 +99,20 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="longestWordLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="longestWordOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="longestWordCharactersLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="longestWordCharactersOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="25" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="longestWordSyllabesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="longestWordSyllabesOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="uniqueWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="uniqueWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="35" max="32767" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -191,7 +213,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lengthsModeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Words&apos; length&apos;s mode:"/>
+        <Property name="text" type="java.lang.String" value="Words&apos; length mode:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lengthsModeOutputLabel">
@@ -201,7 +223,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Words&apos; syllabe&apos;s mode:"/>
+        <Property name="text" type="java.lang.String" value="Words&apos; syllabe mode:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeOutputLabel">
@@ -219,12 +241,32 @@
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="longestWordLabel">
+    <Component class="javax.swing.JLabel" name="longestWordCharactersLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Longest word(s):"/>
+        <Property name="text" type="java.lang.String" value="Longest word(s) (by characters):"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="longestWordOutputLabel">
+    <Component class="javax.swing.JLabel" name="longestWordCharactersOutputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="longestWordSyllabesLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Longest word(s) (by syllabes):"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="longestWordSyllabesOutputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uniqueWordsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Unique words:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="uniqueWordsOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
