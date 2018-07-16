@@ -3,8 +3,6 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -48,8 +46,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		this.statistics = statistics;
 
 		initComponents();
-
-		addClearOnClose();
 
 		addCancelByEscapeKey();
 
@@ -260,15 +256,6 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void addClearOnClose(){
-		addWindowListener(new WindowAdapter(){
-			@Override
-			public void windowClosing(WindowEvent e){
-				statistics.clear();
-			}
-		});
-	}
-
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
 		AbstractAction cancelAction = new AbstractAction(){
@@ -284,18 +271,18 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private void fillStatisticDatas(){
-		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
-		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
-		Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
 		long totalProductions = statistics.getTotalProductions();
-		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
-		int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
-		List<String> longestWordsChars = statistics.getLongestWordsByCharacters();
-		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
-		List<String> longestSyllabesChars = statistics.getLongestWordsBySyllabes();
-		double uniqueWords = statistics.uniqueWords();
-
 		if(totalProductions > 0){
+			Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
+			Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+			Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
+			List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
+			int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
+			List<String> longestWordsChars = statistics.getLongestWordsByCharacters();
+			int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
+			List<String> longestSyllabesChars = statistics.getLongestWordsBySyllabes();
+			double uniqueWords = statistics.uniqueWords();
+
 			totalProductionsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalProductions));
 			lengthsModeOutputLabel.setText(String.join(", ", lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			syllabeLengthsModeOutputLabel.setText(String.join(", ", syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
@@ -314,6 +301,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 			CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
 			addSeriesToChart(wordStressesChart, stressesFrequencies, totalProductions);
 		}
+
+		statistics.clear();
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
