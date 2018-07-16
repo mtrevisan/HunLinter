@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -271,9 +272,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		double uniqueWords = statistics.uniqueWords();
 
 		if(totalProductions > 0){
-			totalProductionsOutputLabel.setText(Long.toString(totalProductions));
-			lengthsModeOutputLabel.setText(lengthsFrequencies.getMode().toString());
-			syllabeLengthsModeOutputLabel.setText(syllabeLengthsFrequencies.getMode().toString());
+			totalProductionsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalProductions));
+			lengthsModeOutputLabel.setText(String.join(", ", lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
+			syllabeLengthsModeOutputLabel.setText(String.join(", ", syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			mostCommonSyllabesOutputLabel.setText(String.join(", ", mostCommonSyllabes));
 			longestWordCharactersOutputLabel.setText(String.join(", ", longestWordsChars) + " (" + longestWordCharsCount + ")");
 			longestWordSyllabesOutputLabel.setText(String.join(", ", longestSyllabesChars) + " (" + longestWordSyllabesCount + ")");

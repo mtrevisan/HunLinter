@@ -119,7 +119,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+?>");
 
 	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-	private static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
+	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
 	static{
 		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
 		symbols.setGroupingSeparator(' ');

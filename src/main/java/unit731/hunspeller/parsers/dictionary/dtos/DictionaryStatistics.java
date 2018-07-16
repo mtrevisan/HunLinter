@@ -63,10 +63,13 @@ public class DictionaryStatistics{
 
 	public void addSyllabes(List<String> syllabes){
 		for(String syllabe : syllabes)
-			syllabesFrequencies.addValue(syllabe);
+//FIXME WordVEC
+			if(WordVEC.countLetters(syllabe) == syllabe.length())
+				syllabesFrequencies.addValue(syllabe);
 	}
 
 	public void storeLongestWord(String word, int syllabes){
+//FIXME WordVEC
 		int letterCount = WordVEC.countLetters(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();

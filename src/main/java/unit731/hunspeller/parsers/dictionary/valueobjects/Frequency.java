@@ -61,8 +61,25 @@ public class Frequency<T>{
 		return frequencies.entrySet().iterator();
 	}
 
-	public T getMode(){
-		return frequencies.firstKey();
+	/**
+	 * Returns the mode value(s) in comparator order.
+	 *
+	 * @return	a list containing the value(s) which appear most often.
+	 */
+	public List<T> getMode(){
+		//get the max count first, so we avoid having to recreate the list each time
+		long mostPopular = 0l;
+		for(Long frequency : frequencies.values())
+			if(frequency > mostPopular)
+				mostPopular = frequency;
+
+		List<T> modeList = new ArrayList<>();
+		for(Map.Entry<T, Long> ent : frequencies.entrySet()){
+			long frequency = ent.getValue();
+			if(frequency == mostPopular)
+				modeList.add(ent.getKey());
+		}
+		return modeList;
 	}
 
 	public List<T> getMostCommonValues(int limit){

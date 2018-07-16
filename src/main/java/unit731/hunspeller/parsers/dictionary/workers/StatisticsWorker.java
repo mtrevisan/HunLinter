@@ -83,16 +83,21 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 							for(RuleProductionEntry production : productions){
 								//collect statistics
 								String word = production.getWord();
+								List<String> subwords = dicParser.getHyphenator().splitIntoCompounds(word);
+								for(String subword : subwords){
 //FIXME WordVEC
-								HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(WordVEC.markDefaultStress(word));
-								if(!hyph.hasErrors()){
-									int length = Normalizer.normalize(word, Normalizer.Form.NFKC).length();
-									int syllabes = hyph.countSyllabes();
-									List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
+									HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(WordVEC.markDefaultStress(subword));
+									if(!hyph.hasErrors()){
+										int length = Normalizer.normalize(subword, Normalizer.Form.NFKC).length();
+										int syllabes = hyph.countSyllabes();
+										List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
 
-									dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
-									dicStatistics.addSyllabes(hyph.getSyllabes());
-									dicStatistics.storeLongestWord(word, syllabes);
+										if(stressIndexFromLast != null){
+											dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
+											dicStatistics.addSyllabes(hyph.getSyllabes());
+											dicStatistics.storeLongestWord(subword, syllabes);
+										}
+									}
 								}
 							}
 						}
