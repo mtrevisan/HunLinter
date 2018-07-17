@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,14 +19,12 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -78,17 +74,14 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
 	private static final Matcher MATCHER_INVALID_RULE_START = PatternService.matcher("^\\.[\\d]");
 	private static final Matcher MATCHER_INVALID_RULE_END = PatternService.matcher("[\\d]\\.$");
-	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
 	private static final Matcher MATCHER_EQUALS = PatternService.matcher(HYPHEN_EQUALS);
-	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
 
 	public static final Matcher MATCHER_REDUCE = PatternService.matcher("/.+$");
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
-	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(WORD_BOUNDARY));
 
 
 	public static enum Level{FIRST, SECOND}
@@ -263,6 +256,10 @@ public class HyphenationParser{
 		}
 	}
 
+	public static boolean isAugmentedRule(String line){
+		return line.contains(AUGMENTED_RULE);
+	}
+
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
 		String foundNodeValue = patterns.get(level).get(key);
@@ -352,9 +349,7 @@ public class HyphenationParser{
 
 			String[] parts = StringUtils.split(rule, COMMA);
 			if(parts.length > 1){
-				Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
-				m.find();
-				int index = m.start();
+				int index = getIndexOfBreakpoint(rule);
 
 				int startIndex = (Objects.nonNull(parts[1])? Integer.parseInt(parts[1]) - 1: -1);
 				int length = (parts.length > 2 && Objects.nonNull(parts[2])? Integer.parseInt(parts[2]): 0);
@@ -381,6 +376,12 @@ public class HyphenationParser{
 			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
 
 		reducedPatterns.add(cleanedRule);
+	}
+
+	public static int getIndexOfBreakpoint(String rule){
+		Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(rule);
+		m.find();
+		return m.start();
 	}
 
 	public void save(File hypFile) throws IOException{
@@ -467,146 +468,6 @@ public class HyphenationParser{
 
 	public static String getKeyFromData(String rule){
 		return PatternService.clear(rule, MATCHER_KEY);
-	}
-
-
-	public static boolean[] extractUppercases(String word){
-		int size = word.length();
-		boolean[] uppercases = new boolean[size];
-		for(int i = 0; i < size; i ++)
-			if(Character.isUpperCase(word.charAt(i)))
-				uppercases[i] = true;
-		return uppercases;
-	}
-
-	public static List<String> restoreUppercases(List<String> hyphenatedWord, boolean[] uppercases){
-		int size = uppercases.length;
-		for(int i = 0; i < size; i ++)
-			if(uppercases[i]){
-				int j = i;
-				int indexSoFar = 0;
-				String syll = hyphenatedWord.get(indexSoFar);
-				while(j > syll.length()){
-					j -= syll.length();
-					indexSoFar ++;
-					syll = hyphenatedWord.get(indexSoFar);
-				}
-				StringBuilder syllabe = new StringBuilder(syll);
-				String chr = Character.valueOf(syllabe.charAt(j)).toString();
-				syllabe.setCharAt(j, chr.toUpperCase(Locale.ROOT).charAt(0));
-				hyphenatedWord.set(indexSoFar, syllabe.toString());
-			}
-		return hyphenatedWord;
-	}
-
-	public static int getNormalizedLength(String word){
-		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
-	}
-
-	public static int getNormalizedLength(String word, int index){
-		return Normalizer.normalize(word.substring(0, index - 1), Normalizer.Form.NFKC).length() + 1;
-	}
-
-	//TODO to be checked for correctness
-	public void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
-		int size = word.length() + WORD_BOUNDARY.length() * 2;
-
-		Set<String> noHyphen = options.getNoHyphen();
-		for(String nohyp : noHyphen){
-			int nohypLength = nohyp.length();
-			if(nohyp.charAt(0) == '^'){
-				nohyp = nohyp.substring(1);
-				if(word.startsWith(nohyp)){
-					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
-					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength - 1);
-				}
-			}
-			else if(nohyp.charAt(nohypLength - 1) == '$'){
-				nohyp = nohyp.substring(0, nohypLength - 1);
-				if(word.endsWith(nohyp)){
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength - 1);
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - 2);
-				}
-			}
-			else{
-				int idx = -1;
-				while((idx = word.indexOf(nohyp, idx + 1)) >= 0){
-					resetBreakpoint(indexes, rules, augmentedPatternData, idx);
-					resetBreakpoint(indexes, rules, augmentedPatternData, idx + nohypLength);
-				}
-			}
-		}
-	}
-
-	private void resetBreakpoint(int[] indexes, String[] rules, String[] augmentedPatternData, int index){
-		if(index < indexes.length){
-			indexes[index] = 0;
-			rules[index] = null;
-			augmentedPatternData[index] = null;
-		}
-	}
-
-	public static boolean isAugmentedRule(String line){
-		return line.contains(AUGMENTED_RULE);
-	}
-
-	public static List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
-		List<String> result = new ArrayList<>();
-
-		int startIndex = 0;
-		int size = word.length();
-		int after = 0;
-		String addAfter = null;
-		for(int endIndex = 0; endIndex < size; endIndex ++)
-			if(hyphBreak.isBreakpoint(endIndex)){
-				String subword = word.substring(startIndex, endIndex);
-
-				if(StringUtils.isNotBlank(addAfter)){
-					//append first characters to next subword
-					subword = addAfter + subword.substring(after);
-					after = 0;
-					addAfter = null;
-				}
-
-				//manage augmented patterns:
-				String augmentedPatternData = hyphBreak.getAugmentedPatternData(endIndex);
-				if(Objects.nonNull(augmentedPatternData)){
-					Matcher m = MATCHER_AUGMENTED_RULE_HYPHEN_INDEX.reset(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
-					m.find();
-					int index = m.start();
-
-					m = MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
-					m.find();
-					String addBefore = m.group("addBefore");
-					addAfter = m.group("addAfter");
-					String start = m.group("start");
-					String cut = m.group("cut");
-					if(Objects.isNull(start)){
-						String rule = m.group("rule");
-						start = Integer.toString(1);
-						cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
-					}
-
-					//remove last characters from subword
-					//  ll3a/aa=b,2,2
-					//syll able
-					//sylaa-bble
-					int delta = index - Integer.parseInt(start) + 1;
-					int end = subword.length() - delta;
-					after = Integer.parseInt(cut) - delta;
-					subword = subword.substring(0, end) + addBefore;
-				}
-
-				result.add(subword);
-				startIndex = endIndex;
-			}
-
-		String subword = word.substring(startIndex);
-		if(StringUtils.isNotBlank(addAfter))
-			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
-		result.add(subword);
-
-		return result;
 	}
 
 }

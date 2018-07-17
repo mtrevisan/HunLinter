@@ -32,7 +32,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 	@Override
 	protected HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
 			boolean isCompound){
-		boolean[] uppercases = HyphenationParser.extractUppercases(word);
+		boolean[] uppercases = extractUppercases(word);
 
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
@@ -57,20 +57,20 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 		else{
 			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
 
-			hyphenatedWord = HyphenationParser.createHyphenatedWord(word, hyphBreak);
+			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
 
 			rules = Arrays.asList(hyphBreak.getRules());
 		}
 		errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
 
-		hyphenatedWord = HyphenationParser.restoreUppercases(hyphenatedWord, uppercases);
+		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
 
 		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
 	private HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound){
 		int wordSize = word.length();
-		int normalizedWordSize = HyphenationParser.getNormalizedLength(word);
+		int normalizedWordSize = getNormalizedLength(word);
 		//stores the (maximum) break numbers
 		int[] indexes = new int[wordSize];
 		//the rules applied to the word
@@ -98,7 +98,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 				//check if a break point should be skipped based on left and right min options
 				else{
 					int idx = i + j - delta;
-					int normalizedIdx = (normalizedWordSize != wordSize? HyphenationParser.getNormalizedLength(word, idx): idx);
+					int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
 					if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
@@ -141,7 +141,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 				}
 		}
 
-		hypParser.enforceNoHyphens(word, indexes, rules, augmentedPatternData);
+		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
 
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}
