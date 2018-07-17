@@ -9,13 +9,15 @@ public interface HyphenationInterface{
 
 	boolean isHyphenated();
 
-	boolean hasErrors();
-
 	List<String> getSyllabes();
 
 	int countSyllabes();
 
 	List<String> getRules();
+
+	boolean[] getErrors();
+
+	boolean hasErrors();
 
 	StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter);
 

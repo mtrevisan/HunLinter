@@ -220,6 +220,21 @@ public class HyphenationParserTest{
 	}
 
 	@Test
+	public void customHyphenation(){
+		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
+		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
+		Map<HyphenationParser.Level, Map<String, String>> custom = new HashMap<>();
+		Map<String, String> custom1stLevel = new HashMap<>();
+		custom1stLevel.put("abcd", "ab=cd");
+		custom.put(HyphenationParser.Level.FIRST, custom1stLevel);
+		HyphenationOptions options = HyphenationOptions.createEmpty();
+		HyphenationParser parser = new HyphenationParser("vec", allPatterns, custom, options);
+
+		check(parser, "abcd", "ab", "cd");
+	}
+
+	@Test
 	public void competingRules(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
 		addRule(patterns1stLevel, "ab1c");

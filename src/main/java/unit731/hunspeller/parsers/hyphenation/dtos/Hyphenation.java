@@ -28,17 +28,17 @@ public class Hyphenation implements HyphenationInterface{
 	private final String breakCharacter;
 
 
-	public static Hyphenation merge(List<Hyphenation> hyphs, String breakCharacter){
+	public static Hyphenation merge(List<HyphenationInterface> hyphs, String breakCharacter){
 		List<String> syllabes = hyphs.stream()
-			.map(Hyphenation::getSyllabes)
+			.map(HyphenationInterface::getSyllabes)
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
 		List<String> rules = hyphs.stream()
-			.map(Hyphenation::getRules)
+			.map(HyphenationInterface::getRules)
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
 		Boolean[] errors = hyphs.stream()
-			.map(Hyphenation::getErrors)
+			.map(HyphenationInterface::getErrors)
 			.map(ArrayUtils::toObject)
 			.flatMap(Arrays::stream)
 			.toArray(Boolean[]::new);

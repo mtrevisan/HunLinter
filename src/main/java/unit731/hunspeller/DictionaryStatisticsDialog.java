@@ -269,15 +269,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 			List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes();
 			double uniqueWords = statistics.uniqueWords();
 
-			longestWords.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
-			longestWordSyllabes.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
+//			longestWords.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
+			longestWords = longestWords.subList(0, Math.min(longestWords.size(), 5));
+//			longestWordSyllabes.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
+			longestWordSyllabes = longestWordSyllabes.subList(0, Math.min(longestWordSyllabes.size(), 5));
 
 			totalProductionsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalProductions));
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			syllabeLengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			mostCommonSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, mostCommonSyllabes));
-			longestWordCharactersOutputLabel.setText(String.join(LIST_SEPARATOR, longestWords.subList(0, 5)) + " (" + longestWordCharsCount + ")");
-			longestWordSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, longestWordSyllabes.subList(0, 5)) + " (" + longestWordSyllabesCount + ")");
+			longestWordCharactersOutputLabel.setText(String.join(LIST_SEPARATOR, longestWords) + " (" + longestWordCharsCount + ")");
+			longestWordSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")");
 			uniqueWordsOutputLabel.setText(DictionaryStatistics.PERCENT_FORMATTER.format(uniqueWords));
 
 			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();

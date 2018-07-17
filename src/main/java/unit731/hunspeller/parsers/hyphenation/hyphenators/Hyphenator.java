@@ -1,14 +1,8 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
-import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
@@ -21,45 +15,7 @@ public class Hyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
-			boolean isCompound){
-		boolean[] uppercases = extractUppercases(word);
-
-		//clear already present word boundaries' characters
-		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
-
-		List<String> hyphenatedWord;
-		List<String> rules;
-		boolean[] errors;
-		String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
-		if(Objects.nonNull(customHyphenation)){
-			//hyphenation is custom
-			hyphenatedWord = Arrays.asList(StringUtils.split(customHyphenation, HyphenationParser.HYPHEN_EQUALS));
-
-			rules = hyphenatedWord;
-		}
-		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < (isCompound? hypParser.getOptions().getMinimumCompoundLength():
-				hypParser.getOptions().getMinimumLength())){
-			//ignore short words (early out)
-			hyphenatedWord = Arrays.asList(word);
-
-			rules = hyphenatedWord;
-		}
-		else{
-			HyphenationBreak hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
-
-			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
-
-			rules = Arrays.asList(hyphBreak.getRules());
-		}
-		errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
-
-		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
-
-		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
-	}
-
-	private HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound){
+	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound){
 		String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
 
 		int wordSize = word.length();
@@ -104,8 +60,6 @@ public class Hyphenator extends AbstractHyphenator{
 				}
 			}
 		}
-
-		enforceNoHyphens(word, indexes, rules, augmentedPatternData);
 
 		return new HyphenationBreak(indexes, rules, augmentedPatternData);
 	}

@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.dtos;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
@@ -22,12 +24,6 @@ public class CompoundHyphenation implements HyphenationInterface{
 	public boolean isHyphenated(){
 		return subHyphenations.stream()
 			.anyMatch(HyphenationInterface::isHyphenated);
-	}
-
-	@Override
-	public boolean hasErrors(){
-		return subHyphenations.stream()
-			.anyMatch(HyphenationInterface::hasErrors);
 	}
 
 	@Override
@@ -51,6 +47,21 @@ public class CompoundHyphenation implements HyphenationInterface{
 			.map(HyphenationInterface::getRules)
 			.flatMap(List::stream)
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public boolean[] getErrors(){
+		return ArrayUtils.toPrimitive(subHyphenations.stream()
+			.map(HyphenationInterface::getErrors)
+			.map(ArrayUtils::toObject)
+			.flatMap(Arrays::stream)
+			.toArray(Boolean[]::new));
+	}
+
+	@Override
+	public boolean hasErrors(){
+		return subHyphenations.stream()
+			.anyMatch(HyphenationInterface::hasErrors);
 	}
 
 	@Override
