@@ -1508,9 +1508,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		frame.hypSyllabationOutputLabel.setText(text);
 		frame.hypSyllabesCountOutputLabel.setText(count);
-		frame.hypRulesOutputLabel.setText(rules.stream()
-			.filter(StringUtils::isNotBlank)
-			.collect(Collectors.joining(StringUtils.SPACE)));
+		frame.hypRulesOutputLabel.setText(String.join(StringUtils.SPACE, rules));
 
 		frame.hypAddRuleTextField.setText(null);
 		frame.hypAddRuleLevelComboBox.setEnabled(false);

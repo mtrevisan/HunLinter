@@ -117,7 +117,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		boolean changed = hyphBreak.enforceNoHyphens(hyphenatedWord, hypParser.getOptions().getNoHyphen());
 		if(changed)
 			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
-		List<String> rules = Arrays.asList(hyphBreak.getRules());
+		List<String> rules = hyphBreak.getRules();
 		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
 
 		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
@@ -180,7 +180,6 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
-		String[] rules = hyphBreak.getRules();
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
@@ -193,7 +192,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				}
 
 				//manage augmented patterns:
-				String augmentedPatternData = rules[endIndex];
+				String augmentedPatternData = hyphBreak.getRule(endIndex);
 				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
 					int index = HyphenationParser.getIndexOfBreakpoint(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 
