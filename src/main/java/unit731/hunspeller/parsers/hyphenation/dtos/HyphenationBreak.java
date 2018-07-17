@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 @AllArgsConstructor
@@ -34,6 +35,13 @@ public class HyphenationBreak{
 				indexesAndRules.put(newKey, (oldPair == null || entry.getValue().getKey() > oldPair.getKey()? entry.getValue(): oldPair));
 			}
 			accumulator += hyphBreaks.get(i).getSize();
+
+			String parentRule = parentHyphBreak.getRule(i);
+			if(HyphenationParser.isAugmentedRule(parentRule)){
+				//TODO add added.length - 1 to accumulator
+			}
+
+			indexesAndRules.put(accumulator, Pair.of(1, parentRule));
 		}
 
 

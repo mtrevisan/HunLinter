@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import java.util.List;
@@ -228,6 +227,19 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		result.add(subword);
 
 		return result;
+	}
+
+	public static boolean getAugmentedRuleAddLength(String rule){
+		Matcher m = MATCHER_AUGMENTED_RULE.reset(rule);
+		m.find();
+		String addBefore = m.group("addBefore");
+		String start = m.group("start");
+		String cut = m.group("cut");
+		if(Objects.isNull(start)){
+			String rule = m.group("rule");
+			start = Integer.toString(1);
+			cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
+		}
 	}
 
 
