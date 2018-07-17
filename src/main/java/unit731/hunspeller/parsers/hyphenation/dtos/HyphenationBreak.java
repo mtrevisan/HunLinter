@@ -5,20 +5,21 @@ import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
 
 
 @AllArgsConstructor
 public class HyphenationBreak{
 
+	@NonNull
 	private final int[] indexes;
+	@NonNull
 	@Getter
 	private final String[] rules;
-	private final String[] augmentedPatternData;
 
 
 	public static HyphenationBreak merge(HyphenationBreak parentHyphBreak, List<HyphenationBreak> hyphBreaks, String breakCharacter){
-		//TODO add parent hyph break
 		int[] indexes = ArrayUtils.toPrimitive(hyphBreaks.stream()
 			.map(hyph -> hyph.indexes)
 			.map(ArrayUtils::toObject)
@@ -28,27 +29,35 @@ public class HyphenationBreak{
 			.map(hyph -> hyph.rules)
 			.flatMap(Arrays::stream)
 			.toArray(String[]::new);
-		String[] augmentedPatternData = hyphBreaks.stream()
-			.map(hyph -> hyph.augmentedPatternData)
-			.flatMap(Arrays::stream)
-			.toArray(String[]::new);
-		return new HyphenationBreak(indexes, rules, augmentedPatternData);
+
+		//TODO
+		//add parent hyph break
+		int accumulator = 0;
+		int size = hyphBreaks.size();
+		for(int i = 0; i < size; i ++){
+			HyphenationBreak hyphBreak = hyphBreaks.get(i);
+			String[] parentRules = parentHyphBreak.getRules();
+			if(parentHyphBreak.indexes[i] > indexes[i])
+				indexes[i] = parentHyphBreak.indexes[i];
+			if(parentHyphBreak.rules[i] != null)
+				rules[i] = parentHyphBreak.rules[i];
+
+			accumulator += hyphBreak.indexes.length;
+		}
+
+		return new HyphenationBreak(indexes, rules);
 	}
 
 	public HyphenationBreak(int[] indexes){
-		this(indexes, new String[indexes.length], null);
+		this(indexes, new String[indexes.length]);
 	}
 
 	public HyphenationBreak(int size){
-		this(null, new String[size], null);
+		this(new int[size], new String[size]);
 	}
 
 	public boolean isBreakpoint(int index){
 		return (indexes != null && indexes[index] % 2 != 0);
-	}
-
-	public String getAugmentedPatternData(int index){
-		return (augmentedPatternData != null? augmentedPatternData[index]: null);
 	}
 
 	public boolean enforceNoHyphens(List<String> syllabes, Set<String> noHyphen){
@@ -57,14 +66,14 @@ public class HyphenationBreak{
 			int nohypLength = nohyp.length();
 			if(nohyp.charAt(0) == '^'){
 				if(syllabes.get(0).startsWith(nohyp.substring(1))){
-					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
-					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength - 1);
+					resetBreakpoint(0);
+					resetBreakpoint(nohypLength - 1);
 				}
 			}
 			else if(nohyp.charAt(nohypLength - 1) == '$'){
 				if(syllabes.get(syllabes.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength - 1);
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - 2);
+					resetBreakpoint(size - nohypLength - 1);
+					resetBreakpoint(size - 2);
 				}
 			}
 			else
@@ -72,19 +81,18 @@ public class HyphenationBreak{
 					String syllabe = syllabes.get(i);
 					int idx = -1;
 					while((idx = syllabe.indexOf(nohyp, idx + 1)) >= 0){
-						resetBreakpoint(indexes, rules, augmentedPatternData, idx);
-						resetBreakpoint(indexes, rules, augmentedPatternData, idx + nohypLength);
+						resetBreakpoint(idx);
+						resetBreakpoint(idx + nohypLength);
 					}
 				}
 		}
 		return false;
 	}
 
-	private void resetBreakpoint(int[] indexes, String[] rules, String[] augmentedPatternData, int index){
+	private void resetBreakpoint(int index){
 		if(index < indexes.length){
 			indexes[index] = 0;
 			rules[index] = null;
-			augmentedPatternData[index] = null;
 		}
 	}
 

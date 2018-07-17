@@ -25,8 +25,6 @@ public class Hyphenator extends AbstractHyphenator{
 		int[] indexes = new int[wordSize];
 		//the rules applied to the word
 		String[] rules = new String[wordSize];
-		//stores the augmented patterns
-		String[] augmentedPatternData = new String[wordSize];
 		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
 		for(int i = 0; i < size; i ++){
@@ -53,7 +51,6 @@ public class Hyphenator extends AbstractHyphenator{
 							if(dd > indexes[idx]){
 								indexes[idx] = dd;
 								rules[idx] = rule;
-								augmentedPatternData[idx] = (HyphenationParser.isAugmentedRule(rule)? rule: null);
 							}
 						}
 					}
@@ -61,7 +58,7 @@ public class Hyphenator extends AbstractHyphenator{
 			}
 		}
 
-		return new HyphenationBreak(indexes, rules, augmentedPatternData);
+		return new HyphenationBreak(indexes, rules);
 	}
 
 }

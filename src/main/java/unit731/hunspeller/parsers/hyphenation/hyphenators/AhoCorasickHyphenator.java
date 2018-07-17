@@ -32,8 +32,6 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 		int[] indexes = new int[wordSize];
 		//the rules applied to the word
 		String[] rules = new String[wordSize];
-		//stores the augmented patterns
-		String[] augmentedPatternData = new String[wordSize];
 		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
 		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY);
@@ -62,7 +60,6 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 						if(dd > indexes[idx]){
 							indexes[idx] = dd;
 							rules[idx] = rule;
-							augmentedPatternData[idx] = (HyphenationParser.isAugmentedRule(rule)? rule: null);
 						}
 					}
 				}
@@ -90,7 +87,6 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 								if(dd > indexes[idx]){
 									indexes[idx] = dd;
 									rules[idx] = rl;
-									augmentedPatternData[idx] = (rl.contains(HyphenationParser.AUGMENTED_RULE)? rl: null);
 								}
 							}
 						}
@@ -98,7 +94,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 				}
 		}
 
-		return new HyphenationBreak(indexes, rules, augmentedPatternData);
+		return new HyphenationBreak(indexes, rules);
 	}
 
 }

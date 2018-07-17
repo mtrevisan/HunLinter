@@ -180,6 +180,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		int size = word.length();
 		int after = 0;
 		String addAfter = null;
+		String[] rules = hyphBreak.getRules();
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
@@ -192,8 +193,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				}
 
 				//manage augmented patterns:
-				String augmentedPatternData = hyphBreak.getAugmentedPatternData(endIndex);
-				if(Objects.nonNull(augmentedPatternData)){
+				String augmentedPatternData = rules[endIndex];
+				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
 					int index = HyphenationParser.getIndexOfBreakpoint(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 
 					Matcher m = MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
