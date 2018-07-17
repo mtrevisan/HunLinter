@@ -61,6 +61,7 @@ public class HyphenationBreak{
 	}
 
 	public boolean enforceNoHyphens(List<String> syllabes, Set<String> noHyphen){
+		boolean modified = false;
 		int size = syllabes.size();
 		for(String nohyp : noHyphen){
 			int nohypLength = nohyp.length();
@@ -68,12 +69,16 @@ public class HyphenationBreak{
 				if(syllabes.get(0).startsWith(nohyp.substring(1))){
 					resetBreakpoint(0);
 					resetBreakpoint(nohypLength - 1);
+
+					modified = true;
 				}
 			}
 			else if(nohyp.charAt(nohypLength - 1) == '$'){
 				if(syllabes.get(syllabes.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
 					resetBreakpoint(size - nohypLength - 1);
 					resetBreakpoint(size - 2);
+
+					modified = true;
 				}
 			}
 			else
@@ -83,10 +88,12 @@ public class HyphenationBreak{
 					while((idx = syllabe.indexOf(nohyp, idx + 1)) >= 0){
 						resetBreakpoint(idx);
 						resetBreakpoint(idx + nohypLength);
+
+						modified = true;
 					}
 				}
 		}
-		return false;
+		return modified;
 	}
 
 	private void resetBreakpoint(int index){
