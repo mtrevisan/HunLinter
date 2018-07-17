@@ -1,15 +1,12 @@
 package unit731.hunspeller.parsers.hyphenation.dtos;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
@@ -27,23 +24,6 @@ public class Hyphenation implements HyphenationInterface{
 	@NonNull
 	private final String breakCharacter;
 
-
-	public static Hyphenation merge(List<HyphenationInterface> hyphs, String breakCharacter){
-		List<String> syllabes = hyphs.stream()
-			.map(HyphenationInterface::getSyllabes)
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
-		List<String> rules = hyphs.stream()
-			.map(HyphenationInterface::getRules)
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
-		Boolean[] errors = hyphs.stream()
-			.map(HyphenationInterface::getErrors)
-			.map(ArrayUtils::toObject)
-			.flatMap(Arrays::stream)
-			.toArray(Boolean[]::new);
-		return new Hyphenation(syllabes, rules, ArrayUtils.toPrimitive(errors), breakCharacter);
-	}
 
 	/**
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe

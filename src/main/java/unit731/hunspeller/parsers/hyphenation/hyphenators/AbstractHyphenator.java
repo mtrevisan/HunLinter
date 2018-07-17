@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -96,21 +95,34 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @return the hyphenation object
 	 */
 	private HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
+		boolean[] uppercases = extractUppercases(word);
+		word = word.toLowerCase(Locale.ROOT);
+
 		//apply first level hyphenation
 		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
-		HyphenationInterface result = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);
+		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);
 
 		//if there is a second level
 		if(hypParser.hasSecondLevel()){
 			//apply second level hyphenation for the word parts
-			List<HyphenationInterface> subHyphenations = result.getSyllabes().stream()
+			List<String> syllabes = createHyphenatedWord(word, hyphBreak);
+			List<HyphenationBreak> subHyphBreaks = syllabes.stream()
 				.map(compound -> hyphenate(compound, patterns, HyphenationParser.Level.SECOND, breakCharacter, true))
 				.collect(Collectors.toList());
 
-			result = Hyphenation.merge(subHyphenations, breakCharacter);
+			hyphBreak = HyphenationBreak.merge(hyphBreak, subHyphBreaks, breakCharacter);
 		}
 
-		return enforceNoHyphens(result);
+		List<String> hyphenatedWord = createHyphenatedWord(word, hyphBreak);
+		boolean changed = hyphBreak.enforceNoHyphens(hyphenatedWord, hypParser.getOptions().getNoHyphen());
+		if(changed)
+			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
+		List<String> rules = Arrays.asList(hyphBreak.getRules());
+		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
+
+		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
+
+		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
 	}
 
 	/**
@@ -121,12 +133,10 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param level	Level at which to hyphenate
 	 * @param breakCharacter	Character to add to mark breakpoints
 	 * @param isCompound	Whether the word is part of a compounded word
-	 * @return the hyphenation object
+	 * @return the hyphenation breakpoints object
 	 */
-	private HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
+	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
 			boolean isCompound){
-		boolean[] uppercases = extractUppercases(word);
-
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
 		int wordSize = word.length();
@@ -147,94 +157,18 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		else
 			hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
 
-		List<String> hyphenatedWord = createHyphenatedWord(word, hyphBreak);
-		List<String> rules = Arrays.asList(hyphBreak.getRules());
-		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
-
-		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
-
-		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
+		return hyphBreak;
 	}
 
 	protected abstract HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound);
-
-	private HyphenationInterface enforceNoHyphens(HyphenationInterface hyphen){
-		List<String> syllabes = hyphen.getSyllabes();
-
-		int size = syllabes.size();
-		Set<String> noHyphen = hypParser.getOptions().getNoHyphen();
-		for(String nohyp : noHyphen){
-			int nohypLength = nohyp.length();
-			if(nohyp.charAt(0) == '^'){
-				if(syllabes.get(0).startsWith(nohyp.substring(1))){
-					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
-					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength - 1);
-				}
-			}
-			else if(nohyp.charAt(nohypLength - 1) == '$'){
-				if(syllabes.get(syllabes.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength - 1);
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - 2);
-				}
-			}
-			else
-				for(int i = 0; i < size; i ++){
-					String syllabe = syllabes.get(i);
-					int idx = -1;
-					while((idx = syllabe.indexOf(nohyp, idx + 1)) >= 0){
-						resetBreakpoint(indexes, rules, augmentedPatternData, idx);
-						resetBreakpoint(indexes, rules, augmentedPatternData, idx + nohypLength);
-					}
-				}
-		}
-	}
-
-	//TODO to be checked for correctness
-	private void enforceNoHyphens(String word, int[] indexes, String[] rules, String[] augmentedPatternData){
-		int size = word.length() + HyphenationParser.WORD_BOUNDARY.length() * 2;
-
-		Set<String> noHyphen = hypParser.getOptions().getNoHyphen();
-		for(String nohyp : noHyphen){
-			int nohypLength = nohyp.length();
-			if(nohyp.charAt(0) == '^'){
-				nohyp = nohyp.substring(1);
-				if(word.startsWith(nohyp)){
-					resetBreakpoint(indexes, rules, augmentedPatternData, 0);
-					resetBreakpoint(indexes, rules, augmentedPatternData, nohypLength - 1);
-				}
-			}
-			else if(nohyp.charAt(nohypLength - 1) == '$'){
-				nohyp = nohyp.substring(0, nohypLength - 1);
-				if(word.endsWith(nohyp)){
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - nohypLength - 1);
-					resetBreakpoint(indexes, rules, augmentedPatternData, size - 2);
-				}
-			}
-			else{
-				int idx = -1;
-				while((idx = word.indexOf(nohyp, idx + 1)) >= 0){
-					resetBreakpoint(indexes, rules, augmentedPatternData, idx);
-					resetBreakpoint(indexes, rules, augmentedPatternData, idx + nohypLength);
-				}
-			}
-		}
-	}
-
-	private void resetBreakpoint(int[] indexes, String[] rules, String[] augmentedPatternData, int index){
-		if(index < indexes.length){
-			indexes[index] = 0;
-			rules[index] = null;
-			augmentedPatternData[index] = null;
-		}
-	}
 
 	@Override
 	public List<String> splitIntoCompounds(String word){
 		List<String> response = Collections.<String>emptyList();
 		if(hypParser.hasSecondLevel()){
-			//apply first level hyphenation
-			HyphenationInterface result = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, HyphenationParser.SOFT_HYPHEN, false);
-			response = result.getSyllabes();
+			//apply first level hyphenation non-compound
+			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, HyphenationParser.SOFT_HYPHEN, false);
+			response = createHyphenatedWord(word, hyphBreak);
 		}
 		return response;
 	}
