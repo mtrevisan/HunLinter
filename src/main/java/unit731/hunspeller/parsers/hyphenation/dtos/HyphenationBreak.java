@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation.dtos;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +17,7 @@ public class HyphenationBreak{
 
 
 	@NonNull
-	private Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>();
+	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
 	@Getter
 	private final int size;
 
