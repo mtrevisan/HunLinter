@@ -207,8 +207,9 @@ public class WordVEC{
 
 	public static String unmarkDefaultStress(String word){
 		int idx = getIndexOfStress(word);
-		//check if the word have a stress and this is not on the last letter
-		if(idx >= 0 && idx < word.length() - 1){
+		//check if the word have a stress and this is not on the last letter (and not followed by a minus sign)
+		int wordSize = word.length();
+		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
 			String subword = word.substring(idx, idx + 2);
 //FIXME is there a way to optimize this PatternService.find?
 			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, PREVENT_UNMARK_STRESS)){
