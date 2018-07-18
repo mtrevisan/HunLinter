@@ -470,8 +470,9 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void hyphen(){
+	public void noHyphen(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
+		addRule(patterns1stLevel, "1_1");
 		addRule(patterns1stLevel, "1-1");
 		addRule(patterns1stLevel, "1'1");
 		addRule(patterns1stLevel, "1’1");
@@ -484,11 +485,11 @@ public class HyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "’")))
+			.noHyphen(new HashSet<>(Arrays.asList("^_", "_$", "-", "'", "’")))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "foobar'foobar-foobar’foobar", "foobar'foobar-foobar’foobar");
+		check(parser, "_foobar'foobar-foo_bar’foobar_", "_foobar'foobar", "-", "foo_bar’foobar_");
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
