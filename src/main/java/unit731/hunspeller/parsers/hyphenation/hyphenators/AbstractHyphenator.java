@@ -127,7 +127,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		}
 
 		//enforce no-hyphens
-//		boolean changed = hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
+		boolean changed = hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
 //		if(changed)
 //			syllabes = createHyphenatedWord(word, hyphBreak);
 		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);

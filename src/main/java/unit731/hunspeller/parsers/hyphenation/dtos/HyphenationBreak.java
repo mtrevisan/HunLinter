@@ -44,35 +44,36 @@ public class HyphenationBreak{
 			int nohypLength = nohyp.length();
 			if(nohyp.charAt(0) == '^'){
 				if(syllabes.get(0).startsWith(nohyp.substring(1))){
-					resetBreakpoint(0);
-					resetBreakpoint(nohypLength - 1);
+					indexesAndRules.remove(0);
+					indexesAndRules.remove(nohypLength - 1);
 
 					modified = true;
 				}
 			}
 			else if(nohyp.charAt(nohypLength - 1) == '$'){
 				if(syllabes.get(syllabes.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
-					resetBreakpoint(size - nohypLength - 1);
-					resetBreakpoint(size - 2);
+					indexesAndRules.remove(size - nohypLength - 1);
+					indexesAndRules.remove(size - 2);
 
 					modified = true;
 				}
 			}
-			else
-				for(int i = 0; i < size; i ++)
-					if(nohyp.equals(syllabes.get(i))){
-						resetBreakpoint(i);
-						resetBreakpoint(i + nohypLength);
+			else{
+				int index = 0;
+				for(int i = 0; i < size; i ++){
+					String syllabe = syllabes.get(i);
+					if(nohyp.equals(syllabe)){
+						indexesAndRules.remove(index + i);
+						indexesAndRules.remove(index + i + nohypLength);
+
+						index += syllabe.length();
 
 						modified = true;
 					}
+				}
+			}
 		}
 		return modified;
-	}
-
-	private void resetBreakpoint(int index){
-		if(index < indexesAndRules.size())
-			indexesAndRules.put(index, EMPTY_PAIR);
 	}
 
 }
