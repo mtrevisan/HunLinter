@@ -28,7 +28,7 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK);
+		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

@@ -115,8 +115,8 @@ public class OrthographyVEC extends Orthography{
 			String syllabe = syllabes.get(i);
 
 			//substitute apostrophe with vowel
-			syllabe = StringUtils.replace(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, APOSTROPHE_SUBSTITUTION);
 			syllabe = StringUtils.replace(syllabe, HyphenationParser.APOSTROPHE, APOSTROPHE_SUBSTITUTION);
+			syllabe = StringUtils.replace(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, APOSTROPHE_SUBSTITUTION);
 
 			errors[i] = (WordVEC.getLastVowelIndex(syllabe) < 0);
 		}

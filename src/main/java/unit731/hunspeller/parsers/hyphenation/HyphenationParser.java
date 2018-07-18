@@ -63,6 +63,11 @@ public class HyphenationParser{
 	public static final String EM_DASH = "\u2014";
 	public static final String APOSTROPHE = "'";
 	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
+	/**
+	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
+	 * https://en.wikipedia.org/wiki/Quotation_mark
+	 */
+	public static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
 
 	private static final String ONE = "1";
 	public static final String WORD_BOUNDARY = ".";
