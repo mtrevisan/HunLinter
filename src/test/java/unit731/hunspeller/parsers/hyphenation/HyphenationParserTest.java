@@ -473,9 +473,9 @@ public class HyphenationParserTest{
 	public void noHyphen1(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
 		addRule(patterns1stLevel, "1_1");
-		addRule(patterns1stLevel, "1-1");
-		addRule(patterns1stLevel, "1'1");
-		addRule(patterns1stLevel, "1ʼ1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.MINUS_SIGN + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.APOSTROPHE + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK + "1");
 		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
@@ -485,20 +485,20 @@ public class HyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("^_", "_$", "-", "'", "ʼ")))
+			.noHyphen(new HashSet<>(Arrays.asList("^_", "_$", "-", HyphenationParser.APOSTROPHE, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "_foobara'foobarb-foo_barcʼfoobard_", "_foobara'foobarb-foo", "_", "barcʼfoobard_");
+		check(parser, "_foobara'foobarb-foo_barc\u2019foobard_", "_foobara'foobarb-foo", "_", "barc\u2019foobard_");
 	}
 
 	@Test
 	public void noHyphen2(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
 		addRule(patterns1stLevel, "1_1");
-		addRule(patterns1stLevel, "1-1");
-		addRule(patterns1stLevel, "1'1");
-		addRule(patterns1stLevel, "1ʼ1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.MINUS_SIGN + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.APOSTROPHE + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK + "1");
 		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
@@ -508,11 +508,11 @@ public class HyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "ʼ", "=")))
+			.noHyphen(new HashSet<>(Arrays.asList("-", HyphenationParser.APOSTROPHE, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, "=")))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "=foobara'foobarb-foo_barcʼfoobard=", "=foobara'foobarb-foo", "_", "barcʼfoobard=");
+		check(parser, "=foobara'foobarb-foo_barc\u2019foobard=", "=foobara'foobarb-foo", "_", "barc\u2019foobard=");
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */

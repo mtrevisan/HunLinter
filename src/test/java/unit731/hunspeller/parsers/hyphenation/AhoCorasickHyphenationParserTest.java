@@ -485,9 +485,9 @@ public class AhoCorasickHyphenationParserTest{
 	@Test
 	public void hyphen(){
 		RadixTree<String, String> patterns1stLevel = RadixTree.createTree(new StringSequencer());
-		addRule(patterns1stLevel, "1-1");
-		addRule(patterns1stLevel, "1'1");
-		addRule(patterns1stLevel, "1ʼ1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.MINUS_SIGN + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.APOSTROPHE + "1");
+		addRule(patterns1stLevel, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK + "1");
 		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
@@ -497,11 +497,11 @@ public class AhoCorasickHyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "ʼ")))
+			.noHyphen(new HashSet<>(Arrays.asList("-", "'", HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "foobar'foobar-foobarʼfoobar", "foobar'foobar-foobarʼfoobar");
+		check(parser, "foobar'foobar-foobar\u2019foobar", "foobar'foobar-foobar\u2019foobar");
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
