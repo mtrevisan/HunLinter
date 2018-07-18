@@ -489,7 +489,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "_foobar'foobar-foo_bar’foobar_", "_foobar'foobar-foo", "_", "bar’foobar_");
+		check(parser, "_foobara'foobarb-foo_barc’foobard_", "_foobara'foobarb-foo", "_", "barc’foobard_");
 	}
 
 	@Test
@@ -512,7 +512,7 @@ public class HyphenationParserTest{
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "=foobar'foobar-foo_bar’foobar=", "=foobar'foobar-foo", "_", "bar’foobar=");
+		check(parser, "=foobara'foobarb-foo_barc’foobard=", "=foobara'foobarb-foo", "_", "barc’foobard=");
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
