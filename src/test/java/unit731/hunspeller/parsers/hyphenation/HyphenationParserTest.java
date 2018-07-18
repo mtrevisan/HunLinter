@@ -475,7 +475,7 @@ public class HyphenationParserTest{
 		addRule(patterns1stLevel, "1_1");
 		addRule(patterns1stLevel, "1-1");
 		addRule(patterns1stLevel, "1'1");
-		addRule(patterns1stLevel, "1’1");
+		addRule(patterns1stLevel, "1ʼ1");
 		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
@@ -485,11 +485,11 @@ public class HyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("^_", "_$", "-", "'", "’")))
+			.noHyphen(new HashSet<>(Arrays.asList("^_", "_$", "-", "'", "ʼ")))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "_foobara'foobarb-foo_barc’foobard_", "_foobara'foobarb-foo", "_", "barc’foobard_");
+		check(parser, "_foobara'foobarb-foo_barcʼfoobard_", "_foobara'foobarb-foo", "_", "barcʼfoobard_");
 	}
 
 	@Test
@@ -498,7 +498,7 @@ public class HyphenationParserTest{
 		addRule(patterns1stLevel, "1_1");
 		addRule(patterns1stLevel, "1-1");
 		addRule(patterns1stLevel, "1'1");
-		addRule(patterns1stLevel, "1’1");
+		addRule(patterns1stLevel, "1ʼ1");
 		RadixTree<String, String> patterns2ndLevel = RadixTree.createTree(new StringSequencer());
 		Map<HyphenationParser.Level, RadixTree<String, String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.FIRST, patterns1stLevel);
@@ -508,11 +508,11 @@ public class HyphenationParserTest{
 			.rightMin(1)
 			.leftCompoundMin(1)
 			.rightCompoundMin(1)
-			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "’", "=")))
+			.noHyphen(new HashSet<>(Arrays.asList("-", "'", "ʼ", "=")))
 			.build();
 		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, options);
 
-		check(parser, "=foobara'foobarb-foo_barc’foobard=", "=foobara'foobarb-foo", "_", "barc’foobard=");
+		check(parser, "=foobara'foobarb-foo_barcʼfoobard=", "=foobara'foobarb-foo", "_", "barcʼfoobard=");
 	}
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */

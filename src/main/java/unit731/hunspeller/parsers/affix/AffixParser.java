@@ -50,8 +50,8 @@ public class AffixParser{
 	 */
 	private static final String TAG_CHARACTER_SET = "SET";
 	/**
-	 * Set flag type. Default type is the extended ASCII (8-bit) character. ‘UTF-8’ parameter sets UTF-8 encoded Unicode character flags.
-	 * The ‘long’ value sets the double extended ASCII character flag type, the ‘num’ sets the decimal number flag type. Decimal flags numbered
+	 * Set flag type. Default type is the extended ASCII (8-bit) character. ‘UTF-8‘ parameter sets UTF-8 encoded Unicode character flags.
+	 * The ‘long‘ value sets the double extended ASCII character flag type, the ‘num‘ sets the decimal number flag type. Decimal flags numbered
 	 * from 1 to 65000, and in flag fields are separated by comma
 	 */
 	private static final String TAG_FLAG = "FLAG";

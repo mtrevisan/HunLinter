@@ -11,7 +11,7 @@ import unit731.hunspeller.services.PatternService;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘’]");
+	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘ʼ]");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
