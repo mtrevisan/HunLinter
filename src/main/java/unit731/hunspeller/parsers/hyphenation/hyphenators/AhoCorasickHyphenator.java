@@ -4,6 +4,7 @@ import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +34,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
-		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY);
+		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
 			String rule = r.getNode().getValue();

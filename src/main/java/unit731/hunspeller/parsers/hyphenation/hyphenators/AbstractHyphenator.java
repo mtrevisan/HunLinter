@@ -95,9 +95,6 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @return the hyphenation object
 	 */
 	private HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
-		boolean[] uppercases = extractUppercases(word);
-		word = word.toLowerCase(Locale.ROOT);
-
 		//apply first level hyphenation
 		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);
@@ -127,12 +124,9 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		}
 
 		//enforce no-hyphens
-		boolean changed = hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
-//		if(changed)
-//			syllabes = createHyphenatedWord(word, hyphBreak);
-		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
+		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
 
-		syllabes = restoreUppercases(syllabes, uppercases);
+		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
 
 		return new Hyphenation(syllabes, rules, errors, breakCharacter);
 	}
@@ -257,35 +251,6 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		return length;
 	}
 
-
-	protected static boolean[] extractUppercases(String word){
-		int size = word.length();
-		boolean[] uppercases = new boolean[size];
-		for(int i = 0; i < size; i ++)
-			if(Character.isUpperCase(word.charAt(i)))
-				uppercases[i] = true;
-		return uppercases;
-	}
-
-	protected static List<String> restoreUppercases(List<String> hyphenatedWord, boolean[] uppercases){
-		int size = uppercases.length;
-		for(int i = 0; i < size; i ++)
-			if(uppercases[i]){
-				int j = i;
-				int indexSoFar = 0;
-				String syll = hyphenatedWord.get(indexSoFar);
-				while(j > syll.length()){
-					j -= syll.length();
-					indexSoFar ++;
-					syll = hyphenatedWord.get(indexSoFar);
-				}
-				StringBuilder syllabe = new StringBuilder(syll);
-				String chr = Character.valueOf(syllabe.charAt(j)).toString();
-				syllabe.setCharAt(j, chr.toUpperCase(Locale.ROOT).charAt(0));
-				hyphenatedWord.set(indexSoFar, syllabe.toString());
-			}
-		return hyphenatedWord;
-	}
 
 	protected static int getNormalizedLength(String word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();

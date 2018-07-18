@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -50,13 +51,28 @@ public class HyphenationBreak{
 					indexesAndRules.remove(1);
 					indexesAndRules.remove(nohypLength);
 
+					if(syllabesCount > 1){
+						//merge syllabe with following
+						String removedSyllabe = syllabes.remove(0);
+						syllabes.set(0, removedSyllabe + syllabes.get(0));
+
+						syllabesCount --;
+					}
+
 					modified = true;
 				}
 			}
 			else if(nohyp.charAt(nohypLength - 1) == '$'){
-				if(syllabes.get(syllabes.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
+				if(syllabes.get(syllabesCount - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
 					indexesAndRules.remove(wordLength - nohypLength - 1);
 					indexesAndRules.remove(wordLength - 1);
+
+					if(syllabesCount > 1){
+						//merge syllabe with previous
+						syllabesCount --;
+						String removedSyllabe = syllabes.remove(syllabesCount);
+						syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
+					}
 
 					modified = true;
 				}
@@ -65,9 +81,22 @@ public class HyphenationBreak{
 				int index = 0;
 				for(int i = 0; i < syllabesCount; i ++){
 					String syllabe = syllabes.get(i);
+
 					if(syllabe.equals(nohyp)){
 						indexesAndRules.remove(index);
 						indexesAndRules.remove(index + nohypLength);
+
+						String removedSyllabe1 = (i >= 1? syllabes.remove(i - 1): StringUtils.EMPTY);
+						String removedSyllabe0 = (i >= 1? syllabes.remove(i - 1): StringUtils.EMPTY);
+						if(i > 0 && i < syllabesCount - 1)
+							//merge syllabe with previous
+							syllabes.set(i - 1, removedSyllabe1 + removedSyllabe0 + syllabes.get(i - 1));
+						else
+							//merge syllabe with following
+							syllabes.add(removedSyllabe1 + removedSyllabe0);
+
+						syllabesCount -= 2;
+						i --;
 
 						modified = true;
 					}

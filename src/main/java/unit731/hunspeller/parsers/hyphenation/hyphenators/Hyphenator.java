@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.hyphenation.hyphenators;
 import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
@@ -28,7 +29,7 @@ public class Hyphenator extends AbstractHyphenator{
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.get(level).getValues(w.substring(i));
+			List<String> prefixes = patterns.get(level).getValues(w.substring(i).toLowerCase(Locale.ROOT));
 
 			for(String rule : prefixes){
 				int j = -1;
