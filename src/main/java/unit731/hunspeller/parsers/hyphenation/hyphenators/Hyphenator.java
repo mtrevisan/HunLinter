@@ -1,8 +1,10 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternService;
@@ -21,10 +23,7 @@ public class Hyphenator extends AbstractHyphenator{
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
-		//stores the (maximum) break numbers
-		int[] indexes = new int[wordSize];
-		//the rules applied to the word
-		String[] rules = new String[wordSize];
+		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
 		for(int i = 0; i < size; i ++){
@@ -48,17 +47,15 @@ public class Hyphenator extends AbstractHyphenator{
 						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 							int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far
-							if(dd > indexes[idx]){
-								indexes[idx] = dd;
-								rules[idx] = rule;
-							}
+							if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
+								indexesAndRules.put(idx, Pair.of(dd, rule));
 						}
 					}
 				}
 			}
 		}
 
-		return new HyphenationBreak(indexes, rules);
+		return new HyphenationBreak(indexesAndRules, wordSize);
 	}
 
 }

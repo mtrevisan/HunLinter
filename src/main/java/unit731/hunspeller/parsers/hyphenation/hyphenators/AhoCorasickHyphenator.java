@@ -1,10 +1,12 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.SearchResult;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -28,10 +30,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound){
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
-		//stores the (maximum) break numbers
-		int[] indexes = new int[wordSize];
-		//the rules applied to the word
-		String[] rules = new String[wordSize];
+		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
 		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
 		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY);
@@ -57,10 +56,8 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 					if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 						int dd = Character.digit(chr, 10);
 						//check if the break number is great than the one stored so far
-						if(dd > indexes[idx]){
-							indexes[idx] = dd;
-							rules[idx] = rule;
-						}
+						if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
+							indexesAndRules.put(idx, Pair.of(dd, rule));
 					}
 				}
 			}
@@ -84,17 +81,15 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 							if(hypParser.getOptions().getLeftMin() <= idx && idx <= wordSize - hypParser.getOptions().getRightMin()){
 								int dd = Character.digit(chr, 10);
 								//check if the break number is great than the one stored so far
-								if(dd > indexes[idx]){
-									indexes[idx] = dd;
-									rules[idx] = rl;
-								}
+								if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
+									indexesAndRules.put(idx, Pair.of(dd, rl));
 							}
 						}
 					}
 				}
 		}
 
-		return new HyphenationBreak(indexes, rules);
+		return new HyphenationBreak(indexesAndRules, wordSize);
 	}
 
 }

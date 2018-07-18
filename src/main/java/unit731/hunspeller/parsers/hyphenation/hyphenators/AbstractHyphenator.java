@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.hyphenation.hyphenators;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import java.util.List;
 import java.util.Locale;
@@ -10,10 +11,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -101,27 +102,39 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);
 
+		List<String> syllabes = createHyphenatedWord(word, hyphBreak);
+		List<String> rules = hyphBreak.getRules();
+
 		//if there is a second level
 		if(hypParser.hasSecondLevel()){
-			//apply second level hyphenation for the word parts
-			List<String> syllabes = createHyphenatedWord(word, hyphBreak);
-			List<HyphenationBreak> subHyphBreaks = syllabes.stream()
-				.map(compound -> hyphenate(compound, patterns, HyphenationParser.Level.SECOND, breakCharacter, true))
-				.collect(Collectors.toList());
+			List<String> syllabes2ndLevel = new ArrayList<>();
+			List<String> rules2ndLevel = new ArrayList<>();
 
-			hyphBreak = HyphenationBreak.merge(hyphBreak, subHyphBreaks, breakCharacter);
+			//apply second level hyphenation for the word parts
+			int i = 0;
+			int parentRulesSize = rules.size();
+			for(String compound : syllabes){
+				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.SECOND, breakCharacter, true);
+
+				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
+				rules2ndLevel.addAll(subHyph.getRules());
+				if(i < parentRulesSize)
+					rules2ndLevel.add(rules.get(i ++));
+			}
+
+			syllabes = syllabes2ndLevel;
+			rules = rules2ndLevel;
 		}
 
-		List<String> hyphenatedWord = createHyphenatedWord(word, hyphBreak);
-		boolean changed = hyphBreak.enforceNoHyphens(hyphenatedWord, hypParser.getOptions().getNoHyphen());
-		if(changed)
-			hyphenatedWord = createHyphenatedWord(word, hyphBreak);
-		List<String> rules = hyphBreak.getRules();
-		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(hyphenatedWord);
+		//enforce no-hyphens
+//		boolean changed = hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
+//		if(changed)
+//			syllabes = createHyphenatedWord(word, hyphBreak);
+		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
 
-		hyphenatedWord = restoreUppercases(hyphenatedWord, uppercases);
+		syllabes = restoreUppercases(syllabes, uppercases);
 
-		return new Hyphenation(hyphenatedWord, rules, errors, breakCharacter);
+		return new Hyphenation(syllabes, rules, errors, breakCharacter);
 	}
 
 	/**
@@ -144,15 +157,15 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		HyphenationBreak hyphBreak;
 		if(Objects.nonNull(customHyphenation)){
 			//hyphenation is custom, extract break point positions:
-			int[] indexes = new int[wordSize];
+			Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			for(int i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS); i >= 0; i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS, i + 1))
-				indexes[i] = 1;
-			hyphBreak = new HyphenationBreak(indexes);
+				indexesAndRules.put(i, Pair.of(1, customHyphenation));
+			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
 		}
 		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < (isCompound? hypParser.getOptions().getMinimumCompoundLength():
 				hypParser.getOptions().getMinimumLength()))
 			//ignore short words (early out):
-			hyphBreak = new HyphenationBreak(wordSize);
+			hyphBreak = new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), wordSize);
 		else
 			hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
 
@@ -196,25 +209,26 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 					int index = HyphenationParser.getIndexOfBreakpoint(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
 
 					Matcher m = MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
-					m.find();
-					String addBefore = m.group("addBefore");
-					addAfter = m.group("addAfter");
-					String start = m.group("start");
-					String cut = m.group("cut");
-					if(Objects.isNull(start)){
-						String rule = m.group("rule");
-						start = Integer.toString(1);
-						cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
-					}
+					if(m.find()){
+						String addBefore = m.group("addBefore");
+						addAfter = m.group("addAfter");
+						String start = m.group("start");
+						String cut = m.group("cut");
+						if(Objects.isNull(start)){
+							String rule = m.group("rule");
+							start = Integer.toString(1);
+							cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
+						}
 
-					//remove last characters from subword
-					//  ll3a/aa=b,2,2
-					//syll able
-					//sylaa-bble
-					int delta = index - Integer.parseInt(start) + 1;
-					int end = subword.length() - delta;
-					after = Integer.parseInt(cut) - delta;
-					subword = subword.substring(0, end) + addBefore;
+						//remove last characters from subword
+						//  ll3a/aa=b,2,2
+						//syll able
+						//sylaa-bble
+						int delta = index - Integer.parseInt(start) + 1;
+						int end = subword.length() - delta;
+						after = Integer.parseInt(cut) - delta;
+						subword = subword.substring(0, end) + addBefore;
+					}
 				}
 
 				result.add(subword);
@@ -229,17 +243,18 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	public static boolean getAugmentedRuleAddLength(String rule){
+	public static int getAugmentedRuleAddLength(String rule){
+		int length = 0;
 		Matcher m = MATCHER_AUGMENTED_RULE.reset(rule);
-		m.find();
-		String addBefore = m.group("addBefore");
-		String start = m.group("start");
-		String cut = m.group("cut");
-		if(Objects.isNull(start)){
-			String rule = m.group("rule");
-			start = Integer.toString(1);
-			cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
+		if(m.find()){
+			String addBefore = m.group("addBefore");
+			String basicRule = m.group("rule");
+			String start = m.group("start");
+			if(Objects.isNull(start))
+				start = Integer.toString(1);
+			length = addBefore.length() - Integer.parseInt(start) + StringUtils.indexOfAny(basicRule, "1", "3", "5", "7", "9") - 1;
 		}
+		return length;
 	}
 
 

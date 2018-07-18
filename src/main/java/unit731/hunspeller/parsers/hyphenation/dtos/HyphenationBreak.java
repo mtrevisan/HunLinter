@@ -3,83 +3,25 @@ package unit731.hunspeller.parsers.hyphenation.dtos;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 @AllArgsConstructor
 public class HyphenationBreak{
 
-	private static final Pair<Integer, String> EMPTY_PAIR = Pair.of(0, null);
+	public static final Pair<Integer, String> EMPTY_PAIR = Pair.of(0, null);
 
 
+	@NonNull
 	private Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>();
 	@Getter
-	private int size;
+	private final int size;
 
-
-	public static HyphenationBreak merge(HyphenationBreak parentHyphBreak, List<HyphenationBreak> hyphBreaks, String breakCharacter){
-		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>();
-		int accumulator = 0;
-		int size = hyphBreaks.size();
-		for(int i = 0; i < size; i ++){
-			Set<Map.Entry<Integer, Pair<Integer, String>>> entrySet = hyphBreaks.get(i).indexesAndRules.entrySet();
-			for(Map.Entry<Integer, Pair<Integer, String>> entry : entrySet){
-				int newKey = entry.getKey() + accumulator;
-				Pair<Integer, String> oldPair = indexesAndRules.get(newKey);
-				indexesAndRules.put(newKey, (oldPair == null || entry.getValue().getKey() > oldPair.getKey()? entry.getValue(): oldPair));
-			}
-			accumulator += hyphBreaks.get(i).getSize();
-
-			String parentRule = parentHyphBreak.getRule(i);
-			if(HyphenationParser.isAugmentedRule(parentRule)){
-				//TODO add added.length - 1 to accumulator
-			}
-
-			indexesAndRules.put(accumulator, Pair.of(1, parentRule));
-		}
-
-
-		//TODO
-		//add parent hyph break
-//		int accumulator = 0;
-//		int size = hyphBreaks.size();
-//		for(int i = 0; i < size; i ++){
-//			HyphenationBreak hyphBreak = hyphBreaks.get(i);
-//			String[] parentRules = parentHyphBreak.getRules();
-//			if(parentHyphBreak.indexes[i] > indexes[i])
-//				indexes[i] = parentHyphBreak.indexes[i];
-//			if(parentHyphBreak.rules[i] != null)
-//				rules[i] = parentHyphBreak.rules[i];
-//
-//			accumulator += hyphBreak.indexes.length;
-//		}
-
-		return new HyphenationBreak(indexesAndRules, accumulator);
-	}
-
-	public HyphenationBreak(int[] indexes){
-		this(indexes, new String[indexes.length]);
-	}
-
-	public HyphenationBreak(int size){
-		this(new int[size], new String[size]);
-	}
-
-	public HyphenationBreak(int[] indexes, String[] rules){
-		Objects.requireNonNull(indexes);
-		Objects.requireNonNull(rules);
-
-		for(int i = 0; i < indexes.length; i ++)
-			if(indexes[i] > 0)
-				indexesAndRules.put(i, Pair.of(indexes[i], rules[i]));
-		size = indexes.length;
-	}
 
 	public boolean isBreakpoint(int index){
 		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getKey() % 2 != 0);
