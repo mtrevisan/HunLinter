@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.awt.Frame;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
@@ -18,9 +19,11 @@ import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.TimeWatch;
@@ -58,16 +61,19 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			WordGenerator wordGenerator = dicParser.getWordGenerator();
+			HyphenatorInterface hyphenator = dicParser.getHyphenator();
 
 			setProgress(0);
-			try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
+			File dicFile = dicParser.getDicFile();
+			long totalSize = dicFile.length();
+			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset())){
 				String line = br.readLine();
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = dicParser.getDicFile().length();
 				while(Objects.nonNull(line = br.readLine())){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -76,14 +82,14 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 					if(!line.isEmpty()){
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
 
 							for(RuleProductionEntry production : productions){
 								//collect statistics
 								String word = production.getWord();
-								List<String> subwords = dicParser.getHyphenator().splitIntoCompounds(word);
+								List<String> subwords = hyphenator.splitIntoCompounds(word);
 								for(String subword : subwords){
-									Hyphenation hyph = dicParser.getHyphenator().hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+									Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
 									dicStatistics.addData(hyph);
 								}
 							}

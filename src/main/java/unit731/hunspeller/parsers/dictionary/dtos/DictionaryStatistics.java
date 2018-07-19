@@ -38,13 +38,13 @@ public class DictionaryStatistics{
 
 
 	private int totalProductions;
+	private int longestWordCountByCharacters;
+	private int longestWordCountBySyllabes;
 	private final Frequency<Integer> lengthsFrequencies = new Frequency<>();
+	private final Frequency<String> syllabesFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
 	private final Frequency<Integer> stressFromLastFrequencies = new Frequency<>();
-	private final Frequency<String> syllabesFrequencies = new Frequency<>();
-	private int longestWordCountByCharacters;
 	private final List<String> longestWordsByCharacters = new ArrayList<>();
-	private int longestWordCountBySyllabes;
 	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
 	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
 
@@ -129,13 +129,13 @@ public class DictionaryStatistics{
 
 	public void clear(){
 		totalProductions = 0;
+		longestWordCountByCharacters = 0;
+		longestWordCountBySyllabes = 0;
 		lengthsFrequencies.clear();
 		syllabeLengthsFrequencies.clear();
-		stressFromLastFrequencies.clear();
 		syllabesFrequencies.clear();
-		longestWordCountByCharacters = 0;
+		stressFromLastFrequencies.clear();
 		longestWordsByCharacters.clear();
-		longestWordCountBySyllabes = 0;
 		longestWordsBySyllabes.clear();
 		bloomFilter.clear();
 	}
