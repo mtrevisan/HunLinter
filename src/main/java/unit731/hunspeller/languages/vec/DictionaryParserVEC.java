@@ -392,15 +392,14 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 			finalSonorizationCheck(production);
 
-			String derivedWord = production.getWord();
-			List<String> splittedWords = hyphenator.splitIntoCompounds(derivedWord);
+			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
 				ciuiCheck(subword, production);
 			}
 
-			syllabationCheck(production, derivedWord);
+			syllabationCheck(production);
 		}
 		catch(IllegalArgumentException e){
 			String message = e.getMessage();
@@ -578,18 +577,19 @@ public class DictionaryParserVEC extends DictionaryParser{
 		}
 	}
 
-	private void syllabationCheck(RuleProductionEntry production, String derivedWord) throws IllegalArgumentException{
+	private void syllabationCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		if((ENABLE_VERB_CHECK || !production.isPartOfSpeech(POS_VERB)) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
-			derivedWord = derivedWord.toLowerCase(Locale.ROOT);
-			if(!UNSYLLABABLE_INTERJECTIONS.contains(derivedWord) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(derivedWord)){
-				String correctedDerivedWord = correctOrthography(derivedWord);
-				if(!correctedDerivedWord.equals(derivedWord))
-					throw new IllegalArgumentException("Word " + derivedWord + " is mispelled (should be " + correctedDerivedWord + ")");
+			String word = production.getWord();
+			if(!UNSYLLABABLE_INTERJECTIONS.contains(word) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(word)){
+				word = word.toLowerCase(Locale.ROOT);
+				String correctedDerivedWord = correctOrthography(word);
+				if(!correctedDerivedWord.equals(word))
+					throw new IllegalArgumentException("Word " + word + " is mispelled (should be " + correctedDerivedWord + ")");
 
-				if(derivedWord.length() > 1){
-					HyphenationInterface hyphenation = hyphenator.hyphenate(derivedWord);
+				if(word.length() > 1){
+					HyphenationInterface hyphenation = hyphenator.hyphenate(word);
 					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException("Word " + derivedWord + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
+						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
 							+ ") is not syllabable");
 				}
 			}
