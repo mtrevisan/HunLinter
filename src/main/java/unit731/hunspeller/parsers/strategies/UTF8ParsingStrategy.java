@@ -1,7 +1,9 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -12,17 +14,20 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseFlags(String textFlags){
-		if(Objects.isNull(textFlags))
+		if(StringUtils.isBlank(textFlags))
 			return new String[0];
 
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
 
-		String[] flags = (!textFlags.isEmpty()? removeDuplicates(textFlags.split(StringUtils.EMPTY)): new String[0]);
-		for(String flag : flags)
-			if(StringUtils.isBlank(flag))
-				throw new IllegalArgumentException("Flag must be a valid UTF-8 character: " + flag + " from " + textFlags);
-		return flags;
+		int size = textFlags.length();
+		Set<String> flags = new HashSet<>(size);
+		for(int i = 0; i < size; i ++)
+			flags.add(Character.toString(textFlags.charAt(i)));
+		if(flags.size() < size)
+			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+
+		return flags.toArray(new String[size]);
 	}
 
 	@Override

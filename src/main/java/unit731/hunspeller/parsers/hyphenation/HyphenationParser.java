@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +89,6 @@ public class HyphenationParser{
 	public static final Matcher MATCHER_REDUCE = PatternService.matcher("/.+$");
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
 
-
 	public static enum Level{FIRST, SECOND}
 
 	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
@@ -106,7 +106,10 @@ public class HyphenationParser{
 	@Getter
 	private HyphenatorInterface hyphenator;
 
+	@Getter
 	private boolean secondLevelPresent;
+	@Getter
+	public Pattern patternNoHyphen;
 	@Getter
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
 	@Getter
@@ -227,13 +230,15 @@ public class HyphenationParser{
 
 				if(level == Level.FIRST){
 					//dash and apostrophe are added by default (retro-compatibility)
-					List<String> addedNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
+					List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 					if(charset == StandardCharsets.UTF_8)
-						addedNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
+						retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
-					options.getNoHyphen().addAll(addedNoHyphen);
+					patternNoHyphen = PatternService.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, StringUtils.EMPTY) + "]");
 
-					for(String noHyphen : addedNoHyphen){
+					options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
+
+					for(String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
 						if(!isRuleDuplicated(noHyphen, line, level))
 							patterns.get(level).put(noHyphen, line);
@@ -446,10 +451,6 @@ public class HyphenationParser{
 	private void writeln(BufferedWriter writer, String line) throws IOException{
 		writer.write(line);
 		writer.write(StringUtils.LF);
-	}
-
-	public boolean hasSecondLevel(){
-		return secondLevelPresent;
 	}
 
 	/**

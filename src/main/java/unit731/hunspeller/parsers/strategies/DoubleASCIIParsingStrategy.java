@@ -1,7 +1,9 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -18,11 +20,19 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseFlags(String textFlags){
-		if(Objects.nonNull(textFlags) && textFlags.length() % 2 != 0)
+		if(StringUtils.isBlank(textFlags))
+			return new String[0];
+
+		if(textFlags.length() % 2 != 0)
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
-		return (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(PatternService.split(textFlags, PATTERN)):
-			new String[0]);
+		int size = (textFlags.length() >>> 1);
+		Set<String> flags = new HashSet<>(size);
+		flags.addAll(Arrays.asList(PatternService.split(textFlags, PATTERN)));
+		if(flags.size() < size)
+			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+
+		return flags.toArray(new String[size]);
 	}
 
 	@Override

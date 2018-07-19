@@ -18,8 +18,14 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseFlags(String textFlags){
-		String[] flags = (Objects.nonNull(textFlags) && !textFlags.isEmpty()? removeDuplicates(StringUtils.split(textFlags, COMMA)):
-			new String[0]);
+		if(StringUtils.isBlank(textFlags))
+			return new String[0];
+
+		String[] originalFlags = StringUtils.split(textFlags, COMMA);
+		String[] flags = removeDuplicates(originalFlags);
+		if(flags.length < originalFlags.length)
+			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+
 		for(String flag : flags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);

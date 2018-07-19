@@ -2,11 +2,11 @@ package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -103,7 +103,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		List<String> rules = hyphBreak.getRules();
 
 		//if there is a second level
-		if(hypParser.hasSecondLevel()){
+		if(hypParser.isSecondLevelPresent()){
 			List<String> syllabes2ndLevel = new ArrayList<>();
 			List<String> rules2ndLevel = new ArrayList<>();
 
@@ -170,12 +170,15 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	@Override
 	public List<String> splitIntoCompounds(String word){
-		List<String> response = Collections.<String>emptyList();
-		if(hypParser.hasSecondLevel()){
+		List<String> response;
+		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non-compound
 			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, HyphenationParser.SOFT_HYPHEN, false);
 			response = createHyphenatedWord(word, hyphBreak);
 		}
+		else
+			//apply retro-compatibility word separators
+			response = Arrays.asList(PatternService.split(word, hypParser.getPatternNoHyphen()));
 		return response;
 	}
 

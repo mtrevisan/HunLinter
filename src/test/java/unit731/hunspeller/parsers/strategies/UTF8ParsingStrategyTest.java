@@ -14,7 +14,7 @@ public class UTF8ParsingStrategyTest{
 	public void ok(){
 		String[] flags = strategy.parseFlags("èŧ");
 
-		Assert.assertEquals(Arrays.asList("ŧ", "è"), Arrays.asList(flags));
+		Assert.assertEquals(Arrays.asList("è", "ŧ"), Arrays.asList(flags));
 	}
 
 	@Test
