@@ -10,14 +10,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
@@ -47,7 +45,7 @@ public class DictionaryStatistics{
 	private int longestWordCountByCharacters;
 	private final List<String> longestWordsByCharacters = new ArrayList<>();
 	private int longestWordCountBySyllabes;
-	private final List<String> longestWordsBySyllabes = new ArrayList<>();
+	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
 	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
 
 	@Getter
@@ -74,7 +72,7 @@ public class DictionaryStatistics{
 					syllabesFrequencies.addValue(syllabe);
 			}
 			lengthsFrequencies.addValue(sb.length());
-			storeLongestWord(sb.toString(), syllabes);
+			storeLongestWord(sb.toString(), hyphenation);
 			totalProductions ++;
 		}
 	}
@@ -87,7 +85,7 @@ public class DictionaryStatistics{
 		return null;
 	}
 
-	private void storeLongestWord(String word, List<String> syllabes){
+	private void storeLongestWord(String word, Hyphenation hyphenation){
 		int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -97,14 +95,15 @@ public class DictionaryStatistics{
 		else if(letterCount == longestWordCountByCharacters)
 			longestWordsByCharacters.add(word);
 
+		List<String> syllabes = hyphenation.getSyllabes();
 		int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
-			longestWordsBySyllabes.add(StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN));
+			longestWordsBySyllabes.add(hyphenation);
 			longestWordCountBySyllabes = syllabeCount;
 		}
-		else if(letterCount == longestWordCountBySyllabes)
-			longestWordsBySyllabes.add(word);
+		else if(syllabeCount == longestWordCountBySyllabes)
+			longestWordsBySyllabes.add(hyphenation);
 
 		bloomFilter.add(word);
 	}

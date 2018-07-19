@@ -21,6 +21,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
@@ -270,13 +271,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 			int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
 			List<String> longestWords = statistics.getLongestWordsByCharacters();
 			int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
-			List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes();
+			List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
+				.map(Hyphenation::getSyllabes)
+				.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
+				.collect(Collectors.toList());
 			double uniqueWords = statistics.uniqueWords();
 
-//			longestWords.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
-			longestWords = longestWords.subList(0, Math.min(longestWords.size(), 5));
-//			longestWordSyllabes.sort((str1, str2) -> LEVENSHTEIN_DISTANCE.apply(str2, str1));
-			longestWordSyllabes = longestWordSyllabes.subList(0, Math.min(longestWordSyllabes.size(), 5));
+			longestWords = extractRepresentatives(longestWords, 5);
+			longestWordSyllabes = extractRepresentatives(longestWordSyllabes, 5);
 
 			totalProductionsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalProductions));
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
@@ -297,6 +299,22 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 
 		statistics.clear();
+	}
+
+	private List<String> extractRepresentatives(List<String> population, int limitPopulation){
+		List<String> result = new ArrayList<>();
+		while(!population.isEmpty() && result.size() < limitPopulation){
+			String elem = population.get(0);
+			result.add(elem);
+
+			Iterator<String> itrRemoval = population.iterator();
+			while(itrRemoval.hasNext()){
+				int distance = LEVENSHTEIN_DISTANCE.apply(elem, itrRemoval.next());
+				if(distance <= 1)
+					itrRemoval.remove();
+			}
+		}
+		return result;
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -357,6 +375,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 				stats.addData(new Hyphenation(Arrays.asList("món", "ta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData(new Hyphenation(Arrays.asList("sko", "dàn", "do"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData(new Hyphenation(Arrays.asList("pér", "den", "do", "lo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("pér", "den", "do", "to"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("sàr", "min", "pa", "lo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
 				dialog.setLocationRelativeTo(parent);
@@ -394,4 +414,5 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel uniqueWordsLabel;
    private javax.swing.JLabel uniqueWordsOutputLabel;
    // End of variables declaration//GEN-END:variables
+
 }
