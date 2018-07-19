@@ -351,11 +351,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
-				stats.addData(new Hyphenation(Arrays.asList("a", "ba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData(new Hyphenation(Arrays.asList("ma", "ba", "pa"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData(new Hyphenation(Arrays.asList("pa", "e"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData(new Hyphenation(Arrays.asList("mon", "ta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData(new Hyphenation(Arrays.asList("sko", "dan", "do"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("à", "ba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("ma", "bà", "pa"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("pa", "è"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("món", "ta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("sko", "dàn", "do"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("pér", "den", "do", "lo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
 				dialog.setLocationRelativeTo(parent);
