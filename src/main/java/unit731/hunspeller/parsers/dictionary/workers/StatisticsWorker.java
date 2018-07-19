@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
-import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -22,7 +20,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.TimeWatch;
@@ -85,18 +83,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								String word = production.getWord();
 								List<String> subwords = dicParser.getHyphenator().splitIntoCompounds(word);
 								for(String subword : subwords){
-									HyphenationInterface hyph = dicParser.getHyphenator().hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-									if(!hyph.hasErrors()){
-										int length = Normalizer.normalize(subword, Normalizer.Form.NFKC).length();
-										int syllabes = hyph.countSyllabes();
-										List<Integer> stressIndexFromLast = getStressIndexFromLast(hyph);
-
-										if(stressIndexFromLast != null){
-											dicStatistics.addLengthAndSyllabeLengthAndStressFromLast(length, syllabes, stressIndexFromLast.get(stressIndexFromLast.size() - 1));
-											dicStatistics.addSyllabes(hyph.getSyllabes());
-											dicStatistics.storeLongestWord(subword, syllabes);
-										}
-									}
+									Hyphenation hyph = dicParser.getHyphenator().hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+									dicStatistics.addData(hyph);
 								}
 							}
 						}
@@ -129,15 +117,6 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		if(stopped)
 			publish("Stopped reading Dictionary file");
 
-		return null;
-	}
-
-	private List<Integer> getStressIndexFromLast(HyphenationInterface hyph){
-		List<String> syllabes = hyph.getSyllabes();
-		int size = syllabes.size() - 1;
-		for(int i = 0; i <= size; i ++)
-			if(dicStatistics.getOrthography().hasStressedGrapheme(syllabes.get(size - i)))
-				return Arrays.asList(i);
 		return null;
 	}
 

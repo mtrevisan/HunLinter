@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -592,7 +592,7 @@ public class HyphenationParserTest{
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
 		HyphenatorInterface hyphenator = new Hyphenator(parser);
-		HyphenationInterface hyphenation = hyphenator.hyphenate(word);
+		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
 	}

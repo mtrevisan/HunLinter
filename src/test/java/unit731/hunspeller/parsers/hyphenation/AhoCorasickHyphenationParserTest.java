@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AhoCorasickHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -256,7 +256,7 @@ public class AhoCorasickHyphenationParserTest{
 
 		String word = "savendolmento";
 		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser);
-		HyphenationInterface hyphenation = hyphenator.hyphenate(word);
+		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(".s2", "1v", "2nd", "1d", "2lm", "1m", "2nt", "1t"), hyphenation.getRules());
 		Assert.assertEquals(Arrays.asList("sa", "ven", "dol", "men", "to"), hyphenation.getSyllabes());
@@ -581,7 +581,7 @@ public class AhoCorasickHyphenationParserTest{
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
 		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser);
-		HyphenationInterface hyphenation = hyphenator.hyphenate(word);
+		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
 	}

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +49,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @return the hyphenation object(s)
 	 */
 	@Override
-	public HyphenationInterface hyphenate(String word){
+	public Hyphenation hyphenate(String word){
 		hypParser.acquireLock();
 
 		try{
@@ -72,13 +71,13 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
 	@Override
-	public HyphenationInterface hyphenate(String word, String addedRule, HyphenationParser.Level level) throws CloneNotSupportedException{
+	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level) throws CloneNotSupportedException{
 		hypParser.acquireLock();
 
 		try{
 			String key = HyphenationParser.getKeyFromData(addedRule);
 			Map<HyphenationParser.Level, RadixTree<String, String>> patterns = hypParser.getPatterns();
-			HyphenationInterface hyph = null;
+			Hyphenation hyph = null;
 			if(!patterns.get(level).containsKey(key)){
 				patterns.get(level).put(key, addedRule);
 
@@ -100,7 +99,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private HyphenationInterface hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
+	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
 		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);

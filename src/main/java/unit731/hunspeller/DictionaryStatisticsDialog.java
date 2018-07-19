@@ -6,6 +6,8 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,8 @@ import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.parsers.dictionary.dtos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
 @Slf4j
@@ -299,7 +303,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		CategoryChart chart = new CategoryChartBuilder()
 			.title(title)
 			.xAxisTitle(xAxisTitle)
-//			.yAxisTitle(yAxisTitle)
+			.yAxisTitle(yAxisTitle)
 			.theme(Styler.ChartTheme.Matlab)
 			.build();
 
@@ -310,6 +314,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		styler.setXAxisMin(0.);
 		styler.setYAxisMin(0.);
 		styler.setYAxisDecimalPattern("#%");
+		styler.setYAxisTitleVisible(false);
 		styler.setChartBackgroundColor(getBackground());
 		styler.setToolTipsEnabled(true);
 
@@ -344,10 +349,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
 				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
-				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 3, 1);
-				stats.addLengthAndSyllabeLengthAndStressFromLast(1, 1, 0);
-				stats.addLengthAndSyllabeLengthAndStressFromLast(0, 2, 1);
-				stats.addLengthAndSyllabeLengthAndStressFromLast(2, 3, 1);
+				List<String> rules = Collections.<String>emptyList();
+				boolean[] errors = new boolean[0];
+				stats.addData(new Hyphenation(Arrays.asList("a", "ba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("ma", "ba", "pa"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("pa", "e"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("mon", "ta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
+				stats.addData(new Hyphenation(Arrays.asList("sko", "dan", "do"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
 				dialog.setLocationRelativeTo(parent);

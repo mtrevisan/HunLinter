@@ -88,7 +88,7 @@ import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
@@ -1489,7 +1489,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			HyphenationInterface hyphenation = frame.hypParser.getHyphenator().hyphenate(text);
+			Hyphenation hyphenation = frame.hypParser.getHyphenator().hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
@@ -1532,8 +1532,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 					if(ruleMatchesText){
-						HyphenationInterface hyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText);
-						HyphenationInterface addedRuleHyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText, addedRule, level);
+						Hyphenation hyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText);
+						Hyphenation addedRuleHyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText, addedRule, level);
 
 						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";

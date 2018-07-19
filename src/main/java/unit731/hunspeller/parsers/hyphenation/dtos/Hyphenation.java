@@ -13,7 +13,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode(of = {"syllabes", "breakCharacter"})
-public class Hyphenation implements HyphenationInterface{
+public class Hyphenation{
 
 	@NonNull
 	private final List<String> syllabes;
@@ -51,7 +51,6 @@ public class Hyphenation implements HyphenationInterface{
 		return syllabes.get(getSyllabeIndex(idx));
 	}
 
-	@Override
 	public int countSyllabes(){
 		return syllabes.size();
 	}
@@ -68,12 +67,10 @@ public class Hyphenation implements HyphenationInterface{
 		return (idx + countSyllabes()) % countSyllabes();
 	}
 
-	@Override
 	public boolean isHyphenated(){
 		return !rules.isEmpty();
 	}
 
-	@Override
 	public boolean hasErrors(){
 		boolean result = false;
 		for(boolean error : errors)
@@ -84,7 +81,6 @@ public class Hyphenation implements HyphenationInterface{
 		return result;
 	}
 
-	@Override
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){
 		int size = countSyllabes();
 		for(int i = 0; i < size; i ++){

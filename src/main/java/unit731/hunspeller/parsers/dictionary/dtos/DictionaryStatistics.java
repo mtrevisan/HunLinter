@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
 /**
@@ -55,20 +57,36 @@ public class DictionaryStatistics{
 		orthography = OrthographyBuilder.getOrthography(language);
 	}
 
-	public void addLengthAndSyllabeLengthAndStressFromLast(int length, int syllabes, int stress){
-		lengthsFrequencies.addValue(length);
-		syllabeLengthsFrequencies.addValue(syllabes);
-		stressFromLastFrequencies.addValue(stress);
-		totalProductions ++;
+	public void addData(Hyphenation hyphenation){
+		if(!hyphenation.hasErrors()){
+			List<String> syllabes = hyphenation.getSyllabes();
+
+			List<Integer> stressIndexes = getStressIndexFromLast(syllabes);
+			if(stressIndexes != null)
+				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
+			int syllabeCount = syllabes.size();
+			syllabeLengthsFrequencies.addValue(syllabeCount);
+			StringBuilder sb = new StringBuilder();
+			for(String syllabe : syllabes){
+				sb.append(syllabe);
+				if(orthography.countGraphemes(syllabe) == syllabe.length())
+					syllabesFrequencies.addValue(syllabe);
+			}
+			lengthsFrequencies.addValue(sb.length());
+			storeLongestWord(sb.toString(), syllabeCount);
+			totalProductions ++;
+		}
 	}
 
-	public void addSyllabes(List<String> syllabes){
-		for(String syllabe : syllabes)
-			if(orthography.countGraphemes(syllabe) == syllabe.length())
-				syllabesFrequencies.addValue(syllabe);
+	private List<Integer> getStressIndexFromLast(List<String> syllabes){
+		int size = syllabes.size() - 1;
+		for(int i = 0; i <= size; i ++)
+			if(orthography.hasStressedGrapheme(syllabes.get(size - i)))
+				return Arrays.asList(i);
+		return null;
 	}
 
-	public void storeLongestWord(String word, int syllabes){
+	private void storeLongestWord(String word, int syllabes){
 		int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();

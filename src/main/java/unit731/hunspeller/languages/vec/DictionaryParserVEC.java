@@ -21,7 +21,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationInterface;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -587,7 +587,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + word + " is mispelled (should be " + correctedDerivedWord + ")");
 
 				if(word.length() > 1){
-					HyphenationInterface hyphenation = hyphenator.hyphenate(word);
+					Hyphenation hyphenation = hyphenator.hyphenate(word);
 					if(hyphenation.hasErrors())
 						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
 							+ ") is not syllabable");
