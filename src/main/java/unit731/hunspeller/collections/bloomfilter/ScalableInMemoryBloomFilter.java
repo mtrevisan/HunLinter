@@ -75,9 +75,10 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	@Override
 	public int getAddedElements(){
-		return filters.stream()
-			.map(filter -> filter.getAddedElements())
-			.reduce(0, Integer::sum);
+		int elements = 0;
+		for(BloomFilterInterface<T> filter : filters)
+			elements += filter.getAddedElements();
+		return elements;
 	}
 
 	@Override

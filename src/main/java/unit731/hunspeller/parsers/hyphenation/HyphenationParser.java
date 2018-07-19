@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -432,14 +433,14 @@ public class HyphenationParser{
 		
 		patterns.get(level).visitPrefixedBy(visitor);
 
-		//sort values
-		visitor.getResult().values()
-			.forEach(v -> Collections.sort(v, comparator::compare));
-		List<String> rules = visitor.getResult().values().stream()
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
-		for(String rule : rules)
-			writeln(writer, rule);
+		Collection<List<String>> values = visitor.getResult().values();
+		for(List<String> value : values){
+			//sort values
+			Collections.sort(value, comparator::compare);
+
+			for(String rule : value)
+				writeln(writer, rule);
+		}
 
 		//write custom hyphenations
 		List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
