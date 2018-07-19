@@ -256,9 +256,13 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			String start = m.group(PARAM_START);
 			if(Objects.isNull(start))
 				start = Integer.toString(1);
-			length = addBefore.length() - Integer.parseInt(start) + StringUtils.indexOfAny(basicRule, "1", "3", "5", "7", "9") - 1;
+			length = addBefore.length() - Integer.parseInt(start) + breakpointIndex(basicRule) - 1;
 		}
 		return length;
+	}
+
+	private static int breakpointIndex(String rule){
+		return StringUtils.indexOfAny(rule, '1', '3', '5', '7', '9');
 	}
 
 
