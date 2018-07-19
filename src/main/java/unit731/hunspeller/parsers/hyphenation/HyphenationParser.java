@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;

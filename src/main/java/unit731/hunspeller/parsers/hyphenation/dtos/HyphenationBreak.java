@@ -38,75 +38,83 @@ public class HyphenationBreak{
 	}
 
 	public void enforceNoHyphens(List<String> syllabes, Set<String> noHyphen){
-		int wordLength = syllabes.stream()
-			.map(String::length)
-			.mapToInt(x -> x)
-			.sum();
 		int syllabesCount = syllabes.size();
-		for(String nohyp : noHyphen){
-			int nohypLength = nohyp.length();
-			if(nohyp.charAt(0) == '^'){
-				if(syllabes.get(0).startsWith(nohyp.substring(1))){
-					indexesAndRules.remove(1);
-					indexesAndRules.remove(nohypLength);
+		if(syllabesCount > 1){
+			int wordLength = syllabes.stream()
+				.map(String::length)
+				.mapToInt(x -> x)
+				.sum();
+			for(String nohyp : noHyphen){
+				if(syllabesCount <= 1)
+					break;
 
-					if(syllabesCount > 1){
-						//merge syllabe with following
-						String removedSyllabe = syllabes.remove(0);
-						syllabes.set(0, removedSyllabe + syllabes.get(0));
+				int nohypLength = nohyp.length();
+				if(nohyp.charAt(0) == '^'){
+					if(syllabes.get(0).startsWith(nohyp.substring(1))){
+						indexesAndRules.remove(1);
+						indexesAndRules.remove(nohypLength);
 
-						syllabesCount --;
-					}
-				}
-			}
-			else if(nohyp.charAt(nohypLength - 1) == '$'){
-				if(syllabes.get(syllabesCount - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
-					indexesAndRules.remove(wordLength - nohypLength - 1);
-					indexesAndRules.remove(wordLength - 1);
-
-					if(syllabesCount > 1){
-						//merge syllabe with previous
-						syllabesCount --;
-						String removedSyllabe = syllabes.remove(syllabesCount);
-						syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
-					}
-				}
-			}
-			else{
-				int index = 0;
-				for(int i = 0; i < syllabesCount; i ++){
-					String syllabe = syllabes.get(i);
-
-					if(syllabe.equals(nohyp)){
-						indexesAndRules.remove(index);
-						indexesAndRules.remove(index + nohypLength);
-
-						if(i == 0){
+						if(syllabesCount > 1){
 							//merge syllabe with following
 							String removedSyllabe = syllabes.remove(0);
 							syllabes.set(0, removedSyllabe + syllabes.get(0));
 
 							syllabesCount --;
 						}
-						else if(i == syllabesCount - 1){
+					}
+				}
+				else if(nohyp.charAt(nohypLength - 1) == '$'){
+					if(syllabes.get(syllabesCount - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
+						indexesAndRules.remove(wordLength - nohypLength - 1);
+						indexesAndRules.remove(wordLength - 1);
+
+						if(syllabesCount > 1){
 							//merge syllabe with previous
 							syllabesCount --;
 							String removedSyllabe = syllabes.remove(syllabesCount);
 							syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
 						}
-						else{
-							//merge syllabe with previous
-							String removedSyllabe1 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
-							String removedSyllabe0 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
-							syllabes.set(i - 1, syllabes.get(i - 1) + removedSyllabe1 + removedSyllabe0);
+					}
+				}
+				else{
+					int index = 0;
+					for(int i = 0; syllabesCount > 1 && i < syllabesCount; i ++){
+						String syllabe = syllabes.get(i);
 
-							syllabesCount -= 2;
+						if(syllabe.equals(nohyp)){
+							indexesAndRules.remove(index);
+							indexesAndRules.remove(index + nohypLength);
+
+							if(i == 0){
+								//merge syllabe with following
+								String removedSyllabe = syllabes.remove(0);
+								syllabes.set(0, removedSyllabe + syllabes.get(0));
+
+								syllabesCount --;
+							}
+							else if(i == syllabesCount - 1){
+								//merge syllabe with previous
+								syllabesCount --;
+								String removedSyllabe = syllabes.remove(syllabesCount);
+								syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
+							}
+							else{
+								//merge syllabe with previous
+								String removedSyllabe1 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
+								String removedSyllabe0 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
+								if(syllabes.isEmpty())
+									syllabes.add(removedSyllabe1 + removedSyllabe0);
+								else
+									syllabes.set(i - 1, syllabes.get(i - 1) + removedSyllabe1 + removedSyllabe0);
+
+								syllabesCount -= 2;
+							}
+
+							i --;
 						}
 
-						i --;
+						index += syllabe.length();
 					}
-
-					index += syllabe.length();
 				}
 			}
 		}

@@ -25,7 +25,14 @@ import unit731.hunspeller.services.PatternService;
 @AllArgsConstructor
 public abstract class AbstractHyphenator implements HyphenatorInterface{
 
-	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	private static final String PARAM_RULE = "rule";
+	private static final String PARAM_ADD_BEFORE = "addBefore";
+	private static final String PARAM_HYPHEN = "hyphen";
+	private static final String PARAM_ADD_AFTER = "addAfter";
+	private static final String PARAM_START = "start";
+	private static final String PARAM_CUT = "cut";
+	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<" + PARAM_RULE + ">[^/]+)/(?<" + PARAM_ADD_BEFORE
+		+ ">.*?)(?:=|(?<" + PARAM_HYPHEN + ">.)_)(?<" + PARAM_ADD_AFTER + ">[^,]*)(?:,(?<" + PARAM_START + ">\\d+),(?<" + PARAM_CUT + ">\\d+))?$");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
@@ -207,12 +214,12 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 					Matcher m = MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
 					if(m.find()){
-						String addBefore = m.group("addBefore");
-						addAfter = m.group("addAfter");
-						String start = m.group("start");
-						String cut = m.group("cut");
+						String addBefore = m.group(PARAM_ADD_BEFORE);
+						addAfter = m.group(PARAM_ADD_AFTER);
+						String start = m.group(PARAM_START);
+						String cut = m.group(PARAM_CUT);
 						if(Objects.isNull(start)){
-							String rule = m.group("rule");
+							String rule = m.group(PARAM_RULE);
 							start = Integer.toString(1);
 							cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
 						}
@@ -244,9 +251,9 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		int length = 0;
 		Matcher m = MATCHER_AUGMENTED_RULE.reset(rule);
 		if(m.find()){
-			String addBefore = m.group("addBefore");
-			String basicRule = m.group("rule");
-			String start = m.group("start");
+			String addBefore = m.group(PARAM_ADD_BEFORE);
+			String basicRule = m.group(PARAM_RULE);
+			String start = m.group(PARAM_START);
 			if(Objects.isNull(start))
 				start = Integer.toString(1);
 			length = addBefore.length() - Integer.parseInt(start) + StringUtils.indexOfAny(basicRule, "1", "3", "5", "7", "9") - 1;
