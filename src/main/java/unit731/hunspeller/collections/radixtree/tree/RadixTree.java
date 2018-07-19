@@ -15,7 +15,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -341,10 +340,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
 	public List<V> getValuesPrefixedBy(S prefix){
+		List<V> values = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		return entries.stream()
-			.map(Map.Entry::getValue)
-			.collect(Collectors.toList());
+		for(Map.Entry<S, V> entry : entries)
+			values.add(entry.getValue());
+		return values;
 	}
 
 	/**
@@ -355,10 +355,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<S> getKeysPrefixedBy(S prefix){
+		List<S> keys = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		return entries.stream()
-			.map(Map.Entry::getKey)
-			.collect(Collectors.toList());
+		for(Map.Entry<S, V> entry : entries)
+			keys.add(entry.getKey());
+		return keys;
 	}
 
 	public RadixTreeNode<S, V> find(S keyToCheck){
@@ -411,10 +412,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
 	public List<V> getValues(S prefix){
+		List<V> values = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntries(prefix);
-		return entries.stream()
-			.map(Map.Entry::getValue)
-			.collect(Collectors.toList());
+		for(Map.Entry<S, V> entry : entries)
+			values.add(entry.getValue());
+		return values;
 	}
 
 	/**
@@ -425,10 +427,11 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<S> getKeys(S prefix){
+		List<S> keys = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntries(prefix);
-		return entries.stream()
-			.map(Map.Entry::getKey)
-			.collect(Collectors.toList());
+		for(Map.Entry<S, V> entry : entries)
+			keys.add(entry.getKey());
+		return keys;
 	}
 
 	@Override
@@ -459,18 +462,20 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	@Override
 	public Set<S> keySet(){
+		Set<S> keys = new HashSet<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		return entries.stream()
-			.map(Map.Entry::getKey)
-			.collect(Collectors.toSet());
+		for(Map.Entry<S, V> entry : entries)
+			keys.add(entry.getKey());
+		return keys;
 	}
 
 	@Override
 	public Collection<V> values(){
+		Set<V> values = new HashSet<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		return entries.stream()
-			.map(Map.Entry::getValue)
-			.collect(Collectors.toSet());
+		for(Map.Entry<S, V> entry : entries)
+			values.add(entry.getValue());
+		return values;
 	}
 
 	/**
