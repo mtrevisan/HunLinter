@@ -6,10 +6,12 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
@@ -35,6 +37,8 @@ public class DictionaryStatistics{
 		PERCENT_FORMATTER.setMinimumFractionDigits(1);
 		PERCENT_FORMATTER.setMaximumFractionDigits(1);
 	}
+
+	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
 
 	private int totalProductions;
@@ -138,6 +142,31 @@ public class DictionaryStatistics{
 		longestWordsByCharacters.clear();
 		longestWordsBySyllabes.clear();
 		bloomFilter.clear();
+	}
+
+
+	public static List<String> extractRepresentatives(List<String> population, int limitPopulation){
+		int index = 0;
+		List<String> result = new ArrayList<>(population);
+		limitPopulation = Math.min(limitPopulation, population.size());
+		while(index < limitPopulation){
+			String elem = result.get(index);
+
+			int i = 0;
+			Iterator<String> itrRemoval = result.iterator();
+			while(itrRemoval.hasNext()){
+				String removal = itrRemoval.next();
+				if(i ++ > index){
+					int distance = LEVENSHTEIN_DISTANCE.apply(elem, removal);
+					if(distance <= 1)
+						itrRemoval.remove();
+				}
+			}
+
+			index ++;
+			limitPopulation = Math.min(limitPopulation, result.size());
+		}
+		return result;
 	}
 
 }

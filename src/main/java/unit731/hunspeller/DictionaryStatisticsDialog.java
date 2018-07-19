@@ -22,7 +22,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.XChartPanel;
@@ -38,8 +37,6 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 public class DictionaryStatisticsDialog extends JDialog{
 
 	private static final long serialVersionUID = 5762751368059394067l;
-
-	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
 	private static final String LIST_SEPARATOR = ", ";
 
@@ -277,8 +274,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 				.collect(Collectors.toList());
 			double uniqueWords = statistics.uniqueWords();
 
-			longestWords = extractRepresentatives(longestWords, 5);
-			longestWordSyllabes = extractRepresentatives(longestWordSyllabes, 5);
+			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 5);
+			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 5);
 
 			totalProductionsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalProductions));
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
@@ -299,22 +296,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 
 		statistics.clear();
-	}
-
-	private List<String> extractRepresentatives(List<String> population, int limitPopulation){
-		List<String> result = new ArrayList<>();
-		while(!population.isEmpty() && result.size() < limitPopulation){
-			String elem = population.get(0);
-			result.add(elem);
-
-			Iterator<String> itrRemoval = population.iterator();
-			while(itrRemoval.hasNext()){
-				int distance = LEVENSHTEIN_DISTANCE.apply(elem, itrRemoval.next());
-				if(distance <= 1)
-					itrRemoval.remove();
-			}
-		}
-		return result;
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
