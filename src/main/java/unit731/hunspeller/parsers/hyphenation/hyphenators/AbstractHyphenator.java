@@ -25,14 +25,13 @@ import unit731.hunspeller.services.PatternService;
 @AllArgsConstructor
 public abstract class AbstractHyphenator implements HyphenatorInterface{
 
-	private static final String PARAM_RULE = "rule";
-	private static final String PARAM_ADD_BEFORE = "addBefore";
-	private static final String PARAM_HYPHEN = "hyphen";
-	private static final String PARAM_ADD_AFTER = "addAfter";
-	private static final String PARAM_START = "start";
-	private static final String PARAM_CUT = "cut";
-	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<" + PARAM_RULE + ">[^/]+)/(?<" + PARAM_ADD_BEFORE
-		+ ">.*?)(?:=|(?<" + PARAM_HYPHEN + ">.)_)(?<" + PARAM_ADD_AFTER + ">[^,]*)(?:,(?<" + PARAM_START + ">\\d+),(?<" + PARAM_CUT + ">\\d+))?$");
+	private static final int PARAM_RULE = 1;
+	private static final int PARAM_ADD_BEFORE = 2;
+	private static final int PARAM_HYPHEN = 3;
+	private static final int PARAM_ADD_AFTER = 4;
+	private static final int PARAM_START = 5;
+	private static final int PARAM_CUT = 6;
+	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
 	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
