@@ -239,7 +239,7 @@ public class AhoCorasickHyphenationParserTest{
 		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
 
 		String word = "savendolmento";
-		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser);
+		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(".s2", "1v", "2nd", "1d", "2lm", "1m", "2nt", "1t"), hyphenation.getRules());
@@ -558,7 +558,7 @@ public class AhoCorasickHyphenationParserTest{
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
-		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser);
+		HyphenatorInterface hyphenator = new AhoCorasickHyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());

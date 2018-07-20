@@ -14,8 +14,8 @@ import unit731.hunspeller.services.PatternService;
 
 public class Hyphenator extends AbstractHyphenator{
 
-	public Hyphenator(HyphenationParser hypParser){
-		super(hypParser);
+	public Hyphenator(HyphenationParser hypParser, String breakCharacter){
+		super(hypParser, breakCharacter);
 	}
 
 	@Override

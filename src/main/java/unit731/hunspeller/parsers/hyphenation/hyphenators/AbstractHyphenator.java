@@ -26,6 +26,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	@NonNull
 	protected final HyphenationParser hypParser;
+	@NonNull
+	private final String breakCharacter;
 
 
 	/**
@@ -120,7 +122,6 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
 
-		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
 		return new Hyphenation(syllabes, compounds, rules, errors, breakCharacter);
 	}
 

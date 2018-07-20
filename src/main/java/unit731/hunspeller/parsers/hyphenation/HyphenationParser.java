@@ -70,6 +70,8 @@ public class HyphenationParser{
 	 */
 	public static final String MODIFIER_LETTER_APOSTROPHE = "\u02bc";
 
+	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
+
 	private static final String ONE = "1";
 	public static final String WORD_BOUNDARY = ".";
 	public static final String AUGMENTED_RULE = "/";
@@ -135,7 +137,7 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		hyphenator = new Hyphenator(this);
+		hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -153,7 +155,7 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		hyphenator = new Hyphenator(this);
+		hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -257,7 +259,7 @@ public class HyphenationParser{
 					}
 				}
 
-				hyphenator = new Hyphenator(this);
+				hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 			}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie

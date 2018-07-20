@@ -567,7 +567,7 @@ public class HyphenationParserTest{
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
-		HyphenatorInterface hyphenator = new Hyphenator(parser);
+		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());

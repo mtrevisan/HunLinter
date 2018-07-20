@@ -17,8 +17,8 @@ import unit731.hunspeller.services.PatternService;
 
 public class AhoCorasickHyphenator extends AbstractHyphenator{
 
-	public AhoCorasickHyphenator(HyphenationParser hypParser){
-		super(hypParser);
+	public AhoCorasickHyphenator(HyphenationParser hypParser, String breakCharacter){
+		super(hypParser, breakCharacter);
 
 		preparePatterns();
 	}
