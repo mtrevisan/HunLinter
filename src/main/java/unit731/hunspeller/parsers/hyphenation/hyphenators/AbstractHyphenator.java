@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
@@ -24,19 +23,6 @@ import unit731.hunspeller.services.PatternService;
 
 @AllArgsConstructor
 public abstract class AbstractHyphenator implements HyphenatorInterface{
-
-	private static final int PARAM_RULE = 1;
-	private static final int PARAM_ADD_BEFORE = 2;
-	private static final int PARAM_HYPHEN = 3;
-	private static final int PARAM_ADD_AFTER = 4;
-	private static final int PARAM_START = 5;
-	private static final int PARAM_CUT = 6;
-	private static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	private static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
-	private static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
-
-	protected static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
-
 
 	@NonNull
 	protected final HyphenationParser hypParser;
@@ -148,7 +134,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
 		//clear already present word boundaries' characters
-		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
+		word = PatternService.clear(word, HyphenationParser.MATCHER_WORD_BOUNDARIES);
 		int wordSize = word.length();
 
 		String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
@@ -206,18 +192,18 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				//manage augmented patterns:
 				String augmentedPatternData = hyphBreak.getRule(endIndex);
 				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
-					int index = HyphenationParser.getIndexOfBreakpoint(PatternService.clear(augmentedPatternData, MATCHER_WORD_INITIAL));
+					int index = HyphenationParser.getIndexOfBreakpoint(PatternService.clear(augmentedPatternData, HyphenationParser.MATCHER_WORD_INITIAL));
 
-					Matcher m = MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
+					Matcher m = HyphenationParser.MATCHER_AUGMENTED_RULE.reset(augmentedPatternData);
 					if(m.find()){
-						String addBefore = m.group(PARAM_ADD_BEFORE);
-						addAfter = m.group(PARAM_ADD_AFTER);
-						String start = m.group(PARAM_START);
-						String cut = m.group(PARAM_CUT);
+						String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
+						addAfter = m.group(HyphenationParser.PARAM_ADD_AFTER);
+						String start = m.group(HyphenationParser.PARAM_START);
+						String cut = m.group(HyphenationParser.PARAM_CUT);
 						if(Objects.isNull(start)){
-							String rule = m.group(PARAM_RULE);
+							String rule = m.group(HyphenationParser.PARAM_RULE);
 							start = Integer.toString(1);
-							cut = Integer.toString(PatternService.clear(rule, MATCHER_POINTS_AND_NUMBERS).length());
+							cut = Integer.toString(PatternService.clear(rule, HyphenationParser.MATCHER_POINTS_AND_NUMBERS).length());
 						}
 
 						//remove last characters from subword
@@ -245,11 +231,11 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	public static int getAugmentedRuleAddLength(String rule){
 		int length = 0;
-		Matcher m = MATCHER_AUGMENTED_RULE.reset(rule);
+		Matcher m = HyphenationParser.MATCHER_AUGMENTED_RULE.reset(rule);
 		if(m.find()){
-			String addBefore = m.group(PARAM_ADD_BEFORE);
-			String basicRule = m.group(PARAM_RULE);
-			String start = m.group(PARAM_START);
+			String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
+			String basicRule = m.group(HyphenationParser.PARAM_RULE);
+			String start = m.group(HyphenationParser.PARAM_START);
 			if(Objects.isNull(start))
 				start = Integer.toString(1);
 			length = addBefore.length() - Integer.parseInt(start) + breakpointIndex(basicRule) - 1;

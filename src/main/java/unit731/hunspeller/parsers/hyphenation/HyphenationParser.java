@@ -82,6 +82,18 @@ public class HyphenationParser{
 	private static final Matcher MATCHER_INVALID_RULE_END = PatternService.matcher("[\\d]\\.$");
 	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
 
+	public static final int PARAM_RULE = 1;
+	public static final int PARAM_ADD_BEFORE = 2;
+	public static final int PARAM_HYPHEN = 3;
+	public static final int PARAM_ADD_AFTER = 4;
+	public static final int PARAM_START = 5;
+	public static final int PARAM_CUT = 6;
+	public static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	public static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
+	public static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+
+	public static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+
 	private static final Matcher MATCHER_EQUALS = PatternService.matcher(HYPHEN_EQUALS);
 	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
 	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
