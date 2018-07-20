@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -64,7 +63,7 @@ public class DictionaryStatistics{
 		if(!hyphenation.hasErrors()){
 			List<String> syllabes = hyphenation.getSyllabes();
 
-			List<Integer> stressIndexes = getStressIndexFromLast(syllabes);
+			List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
 			if(stressIndexes != null)
 				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
 			syllabeLengthsFrequencies.addValue(syllabes.size());
@@ -78,14 +77,6 @@ public class DictionaryStatistics{
 			storeLongestWord(sb.toString(), hyphenation);
 			totalProductions ++;
 		}
-	}
-
-	private List<Integer> getStressIndexFromLast(List<String> syllabes){
-		int size = syllabes.size() - 1;
-		for(int i = 0; i <= size; i ++)
-			if(orthography.hasStressedGrapheme(syllabes.get(size - i)))
-				return Arrays.asList(i);
-		return null;
 	}
 
 	private void storeLongestWord(String word, Hyphenation hyphenation){

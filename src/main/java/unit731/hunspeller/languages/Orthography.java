@@ -35,6 +35,10 @@ public class Orthography{
 		return new boolean[syllabes.size()];
 	}
 
+	public List<Integer> getStressIndexFromLast(List<String> syllabes){
+		return null;
+	}
+
 	public int countGraphemes(String word){
 		return word.length();
 	}

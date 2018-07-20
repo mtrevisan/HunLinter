@@ -124,6 +124,15 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
+	public List<Integer> getStressIndexFromLast(List<String> syllabes){
+		int size = syllabes.size() - 1;
+		for(int i = 0; i <= size; i ++)
+			if(hasStressedGrapheme(syllabes.get(size - i)))
+				return Arrays.asList(i);
+		return null;
+	}
+
+	@Override
 	public int countGraphemes(String word){
 		return WordVEC.countGraphemes(word);
 	}

@@ -285,14 +285,26 @@ public class DictionaryStatisticsDialog extends JDialog{
 			longestWordSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")");
 			uniqueWordsOutputLabel.setText(DictionaryStatistics.PERCENT_FORMATTER.format(uniqueWords));
 
-			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
-			addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalProductions);
+			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
+			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
+			if(hasData){
+				CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
+				addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalProductions);
+			}
 
-			CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
-			addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalProductions);
+			hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
+			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
+			if(hasData){
+				CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
+				addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalProductions);
+			}
 
-			CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
-			addSeriesToChart(wordStressesChart, stressesFrequencies, totalProductions);
+			hasData = stressesFrequencies.entrySetIterator().hasNext();
+			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
+			if(hasData){
+				CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
+				addSeriesToChart(wordStressesChart, stressesFrequencies, totalProductions);
+			}
 		}
 
 		statistics.clear();
