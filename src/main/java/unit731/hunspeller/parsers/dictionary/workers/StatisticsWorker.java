@@ -90,7 +90,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								List<String> subwords = hyphenator.splitIntoCompounds(word);
 								for(String subword : subwords){
 									Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-									dicStatistics.addData(hyph);
+									dicStatistics.addData(word, hyph);
 								}
 							}
 						}

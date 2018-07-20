@@ -39,6 +39,8 @@ public class DictionaryStatistics{
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
+	private static final int REPRESENTATIVE_MIN_DISTANCE = 3;
+
 
 	private int totalProductions;
 	private int longestWordCountByCharacters;
@@ -62,7 +64,7 @@ public class DictionaryStatistics{
 		orthography = OrthographyBuilder.getOrthography(language);
 	}
 
-	public void addData(Hyphenation hyphenation){
+	public void addData(String word, Hyphenation hyphenation){
 		if(!hyphenation.hasErrors()){
 			List<String> syllabes = hyphenation.getSyllabes();
 
@@ -76,12 +78,12 @@ public class DictionaryStatistics{
 				if(orthography.countGraphemes(syllabe) == syllabe.length())
 					syllabesFrequencies.addValue(syllabe);
 			}
-			String word = sb.toString();
-			lengthsFrequencies.addValue(word.length());
-			storeLongestWord(word, hyphenation);
-			if(hyphenation.isCompound())
+			String subword = sb.toString();
+			lengthsFrequencies.addValue(subword.length());
+			storeLongestWord(subword, hyphenation);
+			if(subword.length() < word.length())
 				compoundWords ++;
-			if(word.contains(HyphenationParser.APOSTROPHE))
+			if(subword.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
 			totalProductions ++;
 		}
@@ -161,7 +163,7 @@ public class DictionaryStatistics{
 				String removal = itrRemoval.next();
 				if(i ++ > index){
 					int distance = LEVENSHTEIN_DISTANCE.apply(elem, removal);
-					if(distance <= 1)
+					if(distance < REPRESENTATIVE_MIN_DISTANCE)
 						itrRemoval.remove();
 				}
 			}
