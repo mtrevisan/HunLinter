@@ -303,8 +303,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 				.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
 				.collect(Collectors.toList());
 
-			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 5);
-			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 5);
+			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
+			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 
 			totalWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalWords));
 			uniqueWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)uniqueWords / totalWords) + ")");

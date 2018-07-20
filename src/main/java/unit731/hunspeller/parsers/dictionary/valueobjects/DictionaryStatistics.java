@@ -39,8 +39,6 @@ public class DictionaryStatistics{
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
-	private static final int REPRESENTATIVE_MIN_DISTANCE = 3;
-
 
 	private int totalProductions;
 	private int longestWordCountByCharacters;
@@ -151,27 +149,36 @@ public class DictionaryStatistics{
 
 
 	public static List<String> extractRepresentatives(List<String> population, int limitPopulation){
-		int index = 0;
 		List<String> result = new ArrayList<>(population);
+		int minimumDistance = 2;
+		do{
+			removeClosestRepresentatives(result, limitPopulation, minimumDistance);
+
+			minimumDistance ++;
+		}while(result.size() > limitPopulation);
+		return result;
+	}
+
+	private static void removeClosestRepresentatives(List<String> population, int limitPopulation, int minimumDistance){
+		int index = 0;
 		limitPopulation = Math.min(limitPopulation, population.size());
 		while(index < limitPopulation){
-			String elem = result.get(index);
+			String elem = population.get(index);
 
 			int i = 0;
-			Iterator<String> itrRemoval = result.iterator();
+			Iterator<String> itrRemoval = population.iterator();
 			while(itrRemoval.hasNext()){
 				String removal = itrRemoval.next();
 				if(i ++ > index){
 					int distance = LEVENSHTEIN_DISTANCE.apply(elem, removal);
-					if(distance < REPRESENTATIVE_MIN_DISTANCE)
+					if(distance < minimumDistance)
 						itrRemoval.remove();
 				}
 			}
 
 			index ++;
-			limitPopulation = Math.min(limitPopulation, result.size());
+			limitPopulation = Math.min(limitPopulation, population.size());
 		}
-		return result;
 	}
 
 }
