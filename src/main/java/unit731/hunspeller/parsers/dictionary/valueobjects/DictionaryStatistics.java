@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.dtos;
+package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
@@ -17,7 +17,6 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
