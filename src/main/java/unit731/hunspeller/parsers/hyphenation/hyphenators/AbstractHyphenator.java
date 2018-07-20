@@ -18,6 +18,7 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
+import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -101,8 +102,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
-		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, breakCharacter, false);
+		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, hypParser.getOptParser().getNonCompoundOptions());
 
 		List<String> syllabes = createHyphenatedWord(word, hyphBreak);
 		List<String> rules = hyphBreak.getRules();
@@ -116,7 +116,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			int i = 0;
 			int parentRulesSize = rules.size();
 			for(String compound : syllabes){
-				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.SECOND, breakCharacter, true);
+				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.SECOND, hypParser.getOptParser().getCompoundOptions());
 
 				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
 				rules2ndLevel.addAll(subHyph.getRules());
@@ -129,10 +129,11 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		}
 
 		//enforce no-hyphens
-		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
+		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptParser().getNoHyphen());
 
 		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
 
+		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
 		return new Hyphenation(syllabes, rules, errors, breakCharacter);
 	}
 
@@ -142,12 +143,10 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param word	String to hyphenate
 	 * @param patterns	The radix tree containing the patterns
 	 * @param level	Level at which to hyphenate
-	 * @param breakCharacter	Character to add to mark breakpoints
-	 * @param isCompound	Whether the word is part of a compounded word
+	 * @param options	The hyphenation options
 	 * @return the hyphenation breakpoints object
 	 */
-	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, String breakCharacter,
-			boolean isCompound){
+	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
 		//clear already present word boundaries' characters
 		word = PatternService.clear(word, MATCHER_WORD_BOUNDARIES);
 		int wordSize = word.length();
@@ -161,24 +160,23 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				indexesAndRules.put(i, Pair.of(1, customHyphenation));
 			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
 		}
-		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < (isCompound? hypParser.getOptions().getMinimumCompoundLength():
-				hypParser.getOptions().getMinimumLength()))
+		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < options.getMinimumLength())
 			//ignore short words (early out):
 			hyphBreak = new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), wordSize);
 		else
-			hyphBreak = calculateBreakpoints(word, patterns, level, isCompound);
+			hyphBreak = calculateBreakpoints(word, patterns, level, options);
 
 		return hyphBreak;
 	}
 
-	protected abstract HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound);
+	protected abstract HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options);
 
 	@Override
 	public List<String> splitIntoCompounds(String word){
 		List<String> response;
 		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non-compound
-			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, HyphenationParser.SOFT_HYPHEN, false);
+			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 		}
 		else

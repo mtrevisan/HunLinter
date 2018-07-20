@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,6 +35,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
@@ -115,7 +115,7 @@ public class HyphenationParser{
 	@Getter
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	@Getter
-	private final HyphenationOptions options;
+	private final HyphenationOptionsParser optParser;
 
 
 	public HyphenationParser(String language){
@@ -132,10 +132,10 @@ public class HyphenationParser{
 			patterns.put(level, RadixTree.createTree(new StringSequencer()));
 			customHyphenations.put(level, new HashMap<>());
 		}
-		options = HyphenationOptions.createEmpty();
+		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptions options){
+	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
@@ -156,7 +156,7 @@ public class HyphenationParser{
 			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
 			this.customHyphenations.put(level, ch);
 		}
-		this.options = (Objects.nonNull(options)? options: HyphenationOptions.createEmpty());
+		this.optParser = (Objects.nonNull(optParser)? optParser: new HyphenationOptionsParser());
 	}
 
 	public void acquireLock(){
@@ -195,7 +195,7 @@ public class HyphenationParser{
 						continue;
 
 					if(!line.isEmpty()){
-						boolean parsedLine = options.parseLine(line);
+						boolean parsedLine = optParser.parseLine(line);
 						if(!parsedLine){
 							if(line.startsWith(NEXT_LEVEL)){
 								if(level == Level.SECOND)
@@ -236,7 +236,7 @@ public class HyphenationParser{
 
 					patternNoHyphen = PatternService.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, StringUtils.EMPTY) + "]");
 
-					options.getNoHyphen().addAll(retroCompatibilityNoHyphen);
+					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
 					for(String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
@@ -302,8 +302,7 @@ public class HyphenationParser{
 				.forEach(RadixTree::clear);
 			customHyphenations.values()
 				.forEach(Map::clear);
-			if(Objects.nonNull(options))
-				options.clear();
+			optParser.clear();
 		}
 		finally{
 			releaseLock();
@@ -403,7 +402,7 @@ public class HyphenationParser{
 				//save charset
 				writeln(writer, charset.name());
 				//save options
-				options.write(writer);
+				optParser.write(writer);
 
 				savePatternsByLevel(writer, Level.FIRST);
 

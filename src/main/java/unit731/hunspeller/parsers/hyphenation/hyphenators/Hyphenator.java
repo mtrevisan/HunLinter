@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -18,15 +19,15 @@ public class Hyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, boolean isCompound){
+	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
 		String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
 
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		int leftMin = (isCompound? hypParser.getOptions().getLeftCompoundMin(): hypParser.getOptions().getLeftMin());
-		int rightMin = (isCompound? hypParser.getOptions().getRightCompoundMin(): hypParser.getOptions().getRightMin());
+		int leftMin = options.getLeftMin();
+		int rightMin = options.getRightMin();
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.get(level).getValues(w.substring(i).toLowerCase(Locale.ROOT));
