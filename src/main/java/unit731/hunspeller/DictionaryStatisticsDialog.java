@@ -89,6 +89,8 @@ public class DictionaryStatisticsDialog extends JDialog{
       uniqueWordsOutputLabel = new javax.swing.JLabel();
       compoundWordsLabel = new javax.swing.JLabel();
       compoundWordsOutputLabel = new javax.swing.JLabel();
+      contractedWordsLabel = new javax.swing.JLabel();
+      contractedWordsOutputLabel = new javax.swing.JLabel();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -170,6 +172,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       compoundWordsOutputLabel.setText("...");
 
+      contractedWordsLabel.setText("Contracted words:");
+
+      contractedWordsOutputLabel.setText("...");
+
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
@@ -201,6 +207,10 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addComponent(uniqueWordsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(uniqueWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(compoundWordsLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(compoundWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                   .addGroup(layout.createSequentialGroup()
                      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -211,9 +221,9 @@ public class DictionaryStatisticsDialog extends JDialog{
                            .addComponent(longestWordCharactersOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                      .addGap(0, 0, Short.MAX_VALUE))
                   .addGroup(layout.createSequentialGroup()
-                     .addComponent(compoundWordsLabel)
+                     .addComponent(contractedWordsLabel)
                      .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                     .addComponent(compoundWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                     .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addContainerGap())
       );
       layout.setVerticalGroup(
@@ -251,7 +261,11 @@ public class DictionaryStatisticsDialog extends JDialog{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(compoundWordsLabel)
                .addComponent(compoundWordsOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(contractedWordsLabel)
+               .addComponent(contractedWordsOutputLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addContainerGap())
       );
@@ -289,6 +303,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				.collect(Collectors.toList());
 			int uniqueWords = statistics.getUniqueWords();
 			int compoundWords = statistics.getCompoundWords();
+			int contractedWords = statistics.getContractedWords();
 
 			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 5);
 			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 5);
@@ -299,8 +314,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 			mostCommonSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, mostCommonSyllabes));
 			longestWordCharactersOutputLabel.setText(String.join(LIST_SEPARATOR, longestWords) + " (" + longestWordCharsCount + ")");
 			longestWordSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")");
-			uniqueWordsOutputLabel.setText(uniqueWords + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)uniqueWords / totalWords) + ")");
-			compoundWordsOutputLabel.setText(compoundWords + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)compoundWords / uniqueWords) + ")");
+			uniqueWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)uniqueWords / totalWords) + ")");
+			compoundWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)compoundWords / uniqueWords) + ")");
+			contractedWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)contractedWords / uniqueWords) + ")");
 
 			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
 			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
@@ -408,6 +424,8 @@ public class DictionaryStatisticsDialog extends JDialog{
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel compoundWordsLabel;
    private javax.swing.JLabel compoundWordsOutputLabel;
+   private javax.swing.JLabel contractedWordsLabel;
+   private javax.swing.JLabel contractedWordsOutputLabel;
    private javax.swing.JLabel lengthsModeLabel;
    private javax.swing.JLabel lengthsModeOutputLabel;
    private javax.swing.JPanel lengthsPanel;

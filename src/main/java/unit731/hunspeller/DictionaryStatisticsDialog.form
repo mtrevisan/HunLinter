@@ -56,6 +56,11 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="uniqueWordsOutputLabel" max="32767" attributes="0"/>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="compoundWordsLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="compoundWordsOutputLabel" max="32767" attributes="0"/>
+                  </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -69,9 +74,9 @@
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="compoundWordsLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="contractedWordsLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="compoundWordsOutputLabel" max="32767" attributes="0"/>
+                          <Component id="contractedWordsOutputLabel" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -122,7 +127,12 @@
                   <Component id="compoundWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="compoundWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="152" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="contractedWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="contractedWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="132" max="32767" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -308,6 +318,16 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="compoundWordsOutputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="contractedWordsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Contracted words:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="contractedWordsOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>

@@ -16,6 +16,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
@@ -43,6 +44,7 @@ public class DictionaryStatistics{
 	private int longestWordCountByCharacters;
 	private int longestWordCountBySyllabes;
 	private int compoundWords;
+	private int contractedWords;
 	private final Frequency<Integer> lengthsFrequencies = new Frequency<>();
 	private final Frequency<String> syllabesFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
@@ -74,10 +76,13 @@ public class DictionaryStatistics{
 				if(orthography.countGraphemes(syllabe) == syllabe.length())
 					syllabesFrequencies.addValue(syllabe);
 			}
-			lengthsFrequencies.addValue(sb.length());
-			storeLongestWord(sb.toString(), hyphenation);
+			String word = sb.toString();
+			lengthsFrequencies.addValue(word.length());
+			storeLongestWord(word, hyphenation);
 			if(hyphenation.isCompound())
 				compoundWords ++;
+			if(word.contains(HyphenationParser.APOSTROPHE))
+				contractedWords ++;
 			totalProductions ++;
 		}
 	}
