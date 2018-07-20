@@ -154,7 +154,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	public boolean add(byte[] bytes){
 		boolean bitsChanged = calculateIndexes(bytes, index -> {});
-		addedElements ++;
+		if(bitsChanged)
+			addedElements ++;
 		return bitsChanged;
 	}
 

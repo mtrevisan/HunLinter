@@ -18,6 +18,8 @@ public class Hyphenation{
 	@NonNull
 	private final List<String> syllabes;
 	@NonNull
+	private final List<String> compounds;
+	@NonNull
 	private final List<String> rules;
 	@NonNull
 	private final boolean[] errors;
@@ -79,6 +81,10 @@ public class Hyphenation{
 				break;
 			}
 		return result;
+	}
+
+	public boolean isCompound(){
+		return (compounds.size() > 1);
 	}
 
 	public StringJoiner formatHyphenation(StringJoiner sj, Function<String, String> errorFormatter){

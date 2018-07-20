@@ -32,9 +32,9 @@
                       <Component id="lengthsModeOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="totalProductionsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="totalWordsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="totalProductionsOutputLabel" max="32767" attributes="0"/>
+                      <Component id="totalWordsOutputLabel" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="syllabeLengthsModeLabel" min="-2" max="-2" attributes="0"/>
@@ -56,16 +56,23 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="uniqueWordsOutputLabel" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="longestWordCharactersLabel" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="longestWordCharactersOutputLabel" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="mainTabbedPane" min="-2" pref="660" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="longestWordCharactersLabel" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="longestWordCharactersOutputLabel" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="compoundWordsLabel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="compoundWordsOutputLabel" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -77,8 +84,8 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="totalProductionsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="totalProductionsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="totalWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -110,7 +117,12 @@
                   <Component id="uniqueWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="uniqueWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="172" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="compoundWordsLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="compoundWordsOutputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="152" max="32767" attributes="0"/>
               <Component id="mainTabbedPane" min="-2" pref="329" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -118,12 +130,12 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JLabel" name="totalProductionsLabel">
+    <Component class="javax.swing.JLabel" name="totalWordsLabel">
       <Properties>
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-          <ComponentRef name="totalProductionsOutputLabel"/>
+          <ComponentRef name="totalWordsOutputLabel"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Total productions:"/>
+        <Property name="text" type="java.lang.String" value="Total words:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="mainTabbedPane">
@@ -207,7 +219,7 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JLabel" name="totalProductionsOutputLabel">
+    <Component class="javax.swing.JLabel" name="totalWordsOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>
@@ -286,6 +298,16 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="uniqueWordsOutputLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="..."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="compoundWordsLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Compound words:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="compoundWordsOutputLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="..."/>
       </Properties>

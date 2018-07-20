@@ -42,6 +42,7 @@ public class DictionaryStatistics{
 	private int totalProductions;
 	private int longestWordCountByCharacters;
 	private int longestWordCountBySyllabes;
+	private int compoundWords;
 	private final Frequency<Integer> lengthsFrequencies = new Frequency<>();
 	private final Frequency<String> syllabesFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
@@ -75,6 +76,8 @@ public class DictionaryStatistics{
 			}
 			lengthsFrequencies.addValue(sb.length());
 			storeLongestWord(sb.toString(), hyphenation);
+			if(hyphenation.isCompound())
+				compoundWords ++;
 			totalProductions ++;
 		}
 	}
@@ -116,9 +119,14 @@ public class DictionaryStatistics{
 //			.collect(Collectors.toList());
 	}
 
-	/** Returns the percentage of unique words */
-	public double uniqueWords(){
-		return (double)bloomFilter.getAddedElements() / totalProductions;
+	/** Returns the countr of unique words */
+	public int getUniqueWords(){
+		return bloomFilter.getAddedElements();
+	}
+
+	/** Returns the count of compound words */
+	public int getCompoundWords(){
+		return compoundWords;
 	}
 
 	public void clear(){

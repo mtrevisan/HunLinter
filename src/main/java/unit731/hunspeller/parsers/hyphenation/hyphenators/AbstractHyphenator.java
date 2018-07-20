@@ -90,7 +90,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		//apply first level hyphenation
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.FIRST, hypParser.getOptParser().getNonCompoundOptions());
 
-		List<String> syllabes = createHyphenatedWord(word, hyphBreak);
+		List<String> compounds = createHyphenatedWord(word, hyphBreak);
+		List<String> syllabes = compounds;
 		List<String> rules = hyphBreak.getRules();
 
 		//if there is a second level
@@ -101,7 +102,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			//apply second level hyphenation for the word parts
 			int i = 0;
 			int parentRulesSize = rules.size();
-			for(String compound : syllabes){
+			for(String compound : compounds){
 				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.SECOND, hypParser.getOptParser().getCompoundOptions());
 
 				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
@@ -120,7 +121,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		boolean[] errors = hypParser.getOrthography().getSyllabationErrors(syllabes);
 
 		String breakCharacter = HyphenationParser.SOFT_HYPHEN;
-		return new Hyphenation(syllabes, rules, errors, breakCharacter);
+		return new Hyphenation(syllabes, compounds, rules, errors, breakCharacter);
 	}
 
 	/**
