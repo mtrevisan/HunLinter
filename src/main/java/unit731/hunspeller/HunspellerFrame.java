@@ -1035,6 +1035,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				.map(line -> StringUtils.replace(line, "\t", "   "))
 				.toArray(String[]::new);
 			dicDialog.setListData(lines);
+			dicDialog.setLocationRelativeTo(this);
 			dicDialog.setVisible(true);
 		}
 		catch(IOException e){
