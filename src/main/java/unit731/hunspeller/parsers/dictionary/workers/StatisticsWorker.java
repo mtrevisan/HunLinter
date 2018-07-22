@@ -90,10 +90,11 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								List<String> subwords = hyphenator.splitIntoCompounds(word);
 								if(subwords.isEmpty())
 									dicStatistics.addData(word);
-								for(String subword : subwords){
-									Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-									dicStatistics.addData(word, hyph);
-								}
+								else
+									for(String subword : subwords){
+										Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+										dicStatistics.addData(word, hyph);
+									}
 							}
 						}
 						catch(IllegalArgumentException e){
