@@ -1578,7 +1578,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private void prepareDictionaryFile(){
 		String language = affParser.getLanguage();
 		File dicFile = getFile(language + EXTENSION_DIC);
-		dicParser = DictionaryParserBuilder.getParser(language, dicFile, hypParser.getHyphenator(), wordGenerator, affParser.getCharset());
+		dicParser = DictionaryParserBuilder.getParser(language, dicFile, (hypParser != null? hypParser.getHyphenator(): null), wordGenerator,
+			affParser.getCharset());
 
 		dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
 		dicDialog.setLocationRelativeTo(this);

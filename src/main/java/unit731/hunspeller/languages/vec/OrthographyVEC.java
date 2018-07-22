@@ -41,8 +41,6 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternService.matcher("([^aeiou]){1}\\1+");
 
-	private static final String APOSTROPHE_SUBSTITUTION = "e";
-
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
 	}
@@ -113,12 +111,8 @@ public class OrthographyVEC extends Orthography{
 		boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
-
-			//substitute apostrophe with vowel
-			syllabe = StringUtils.replace(syllabe, HyphenationParser.APOSTROPHE, APOSTROPHE_SUBSTITUTION);
-			syllabe = StringUtils.replace(syllabe, HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK, APOSTROPHE_SUBSTITUTION);
-
-			errors[i] = (WordVEC.getLastVowelIndex(syllabe) < 0);
+			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE) && !syllabe.contains(HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)
+				&& !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
 		return errors;
 	}

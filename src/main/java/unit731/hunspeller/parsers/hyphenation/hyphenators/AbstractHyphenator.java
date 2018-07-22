@@ -167,9 +167,11 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 		}
-		else
+		else if(hypParser.getPatternNoHyphen() != null)
 			//apply retro-compatibility word separators
 			response = Arrays.asList(PatternService.split(word, hypParser.getPatternNoHyphen()));
+		else
+			response = Collections.<String>emptyList();
 		return response;
 	}
 

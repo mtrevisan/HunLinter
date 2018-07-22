@@ -88,6 +88,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 								//collect statistics
 								String word = production.getWord();
 								List<String> subwords = hyphenator.splitIntoCompounds(word);
+								if(subwords.isEmpty())
+									dicStatistics.addData(word);
 								for(String subword : subwords){
 									Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
 									dicStatistics.addData(word, hyph);

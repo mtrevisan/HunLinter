@@ -29,6 +29,7 @@ public class WordVEC{
 	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
+	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍoOóÓòÒuUúÚ";
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);

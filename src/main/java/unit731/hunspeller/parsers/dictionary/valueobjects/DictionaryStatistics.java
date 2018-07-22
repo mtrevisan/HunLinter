@@ -62,8 +62,12 @@ public class DictionaryStatistics{
 		orthography = OrthographyBuilder.getOrthography(language);
 	}
 
+	public void addData(String word){
+		addData(word, null);
+	}
+
 	public void addData(String word, Hyphenation hyphenation){
-		if(!hyphenation.hasErrors()){
+		if(hyphenation != null && !hyphenation.hasErrors()){
 			List<String> syllabes = hyphenation.getSyllabes();
 
 			List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
@@ -78,16 +82,26 @@ public class DictionaryStatistics{
 			}
 			String subword = sb.toString();
 			lengthsFrequencies.addValue(subword.length());
-			storeLongestWord(subword, hyphenation);
+			storeLongestWord(subword);
+			storeHyphenation(hyphenation);
 			if(subword.length() < word.length())
 				compoundWords ++;
 			if(subword.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
 			totalProductions ++;
 		}
+		else{
+			lengthsFrequencies.addValue(word.length());
+			storeLongestWord(word);
+			if(word.length() < word.length())
+				compoundWords ++;
+			if(word.contains(HyphenationParser.APOSTROPHE))
+				contractedWords ++;
+			totalProductions ++;
+		}
 	}
 
-	private void storeLongestWord(String word, Hyphenation hyphenation){
+	private void storeLongestWord(String word){
 		int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -97,6 +111,10 @@ public class DictionaryStatistics{
 		else if(letterCount == longestWordCountByCharacters)
 			longestWordsByCharacters.add(word);
 
+		bloomFilter.add(word);
+	}
+
+	private void storeHyphenation(Hyphenation hyphenation){
 		List<String> syllabes = hyphenation.getSyllabes();
 		int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
@@ -106,8 +124,6 @@ public class DictionaryStatistics{
 		}
 		else if(syllabeCount == longestWordCountBySyllabes)
 			longestWordsBySyllabes.add(hyphenation);
-
-		bloomFilter.add(word);
 	}
 
 	public long getTotalProductions(){

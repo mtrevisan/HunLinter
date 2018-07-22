@@ -7,7 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import unit731.hunspeller.services.Memoizer;
 
 
 /**
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 public class Frequency<T>{
 
 	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getPercentInstance();
+
+	private final Function<Integer, Long> FN_SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
 
 
 	private final TreeMap<T, Long> frequencies = new TreeMap<>();
@@ -134,6 +138,10 @@ public class Frequency<T>{
 	 * @return	the total frequency count.
 	 */
 	public long getSumOfFrequencies(){
+		return FN_SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
+	}
+
+	private long sumOfFrequencies(int hashCode){
 		long result = 0l;
 		Iterator<Long> iterator = frequencies.values().iterator();
 		while(iterator.hasNext())

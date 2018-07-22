@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.dtos;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +23,10 @@ public class HyphenationBreak{
 	@Getter
 	private final int size;
 
+
+	public static HyphenationBreak getEmptyInstance(){
+		return new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), 0);
+	}
 
 	public boolean isBreakpoint(int index){
 		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getKey() % 2 != 0);

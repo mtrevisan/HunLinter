@@ -302,19 +302,25 @@ public class DictionaryStatisticsDialog extends JDialog{
 				.map(Hyphenation::getSyllabes)
 				.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
 				.collect(Collectors.toList());
-
 			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
 			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
+			boolean hasSyllabeStatistics = (totalWords > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 
 			totalWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalWords));
 			uniqueWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)uniqueWords / totalWords) + ")");
 			compoundWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)compoundWords / uniqueWords) + ")");
 			contractedWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)contractedWords / uniqueWords) + ")");
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
-			syllabeLengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
-			mostCommonSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, mostCommonSyllabes));
+			syllabeLengthsModeLabel.setEnabled(hasSyllabeStatistics);
+			syllabeLengthsModeOutputLabel.setEnabled(hasSyllabeStatistics);
+			syllabeLengthsModeOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())): StringUtils.EMPTY);
+			mostCommonSyllabesLabel.setEnabled(hasSyllabeStatistics);
+			mostCommonSyllabesOutputLabel.setEnabled(hasSyllabeStatistics);
+			mostCommonSyllabesOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, mostCommonSyllabes): StringUtils.EMPTY);
 			longestWordCharactersOutputLabel.setText(String.join(LIST_SEPARATOR, longestWords) + " (" + longestWordCharsCount + ")");
-			longestWordSyllabesOutputLabel.setText(String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")");
+			longestWordSyllabesLabel.setEnabled(hasSyllabeStatistics);
+			longestWordSyllabesOutputLabel.setEnabled(hasSyllabeStatistics);
+			longestWordSyllabesOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")": StringUtils.EMPTY);
 
 			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
 			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);

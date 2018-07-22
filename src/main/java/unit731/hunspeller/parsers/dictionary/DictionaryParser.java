@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.EmptyHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
@@ -54,12 +55,11 @@ public class DictionaryParser{
 
 	public DictionaryParser(File dicFile, HyphenatorInterface hyphenator, WordGenerator wordGenerator, Charset charset){
 		Objects.requireNonNull(dicFile);
-		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
-		this.hyphenator = hyphenator;
+		this.hyphenator = (hyphenator != null? hyphenator: EmptyHyphenator.getInstance());
 		this.wordGenerator = wordGenerator;
 		this.charset = charset;
 		String filename = dicFile.getName();
