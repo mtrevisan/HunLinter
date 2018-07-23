@@ -83,6 +83,17 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	}
 
+	private final RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+		@Override
+		public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			V value = node.getValue();
+			Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+			result.add(entry);
+
+			return false;
+		}
+	};
+
 
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
@@ -194,8 +205,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	@Override
 	public boolean containsKey(Object keyToCheck){
-		Objects.requireNonNull(keyToCheck);
-
 		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return Objects.nonNull(foundNode);
@@ -221,8 +230,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 
 	@Override
 	public V get(Object keyToCheck){
-		Objects.requireNonNull(keyToCheck);
-
 		@SuppressWarnings("unchecked")
 		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
 		return (Objects.nonNull(foundNode)? foundNode.getValue(): null);
@@ -291,8 +298,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
-		Objects.requireNonNull(keyToCheck);
-
 		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
 			@Override
 			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
@@ -317,19 +322,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
 
-		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
-			@Override
-			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				V value = node.getValue();
-				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
-				result.add(entry);
+		synchronized(visitorEntries){
+			visitorEntries.getResult().clear();
+			visitPrefixedBy(visitorEntries, prefix);
 
-				return false;
-			}
-		};
-		visitPrefixedBy(visitor, prefix);
-
-		return visitor.getResult();
+			return visitorEntries.getResult();
+		}
 	}
 
 	/**
@@ -363,8 +361,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	}
 
 	public RadixTreeNode<S, V> find(S keyToCheck){
-		Objects.requireNonNull(keyToCheck);
-
 		RadixTreeVisitor<S, V, RadixTreeNode<S, V>> visitor = new RadixTreeVisitor<S, V, RadixTreeNode<S, V>>(null){
 			@Override
 			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
@@ -389,19 +385,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<Map.Entry<S, V>> getEntries(S prefix){
 		Objects.requireNonNull(prefix);
 
-		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitor = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
-			@Override
-			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				V value = node.getValue();
-				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
-				result.add(entry);
+		synchronized(visitorEntries){
+			visitorEntries.getResult().clear();
+			visit(visitorEntries, prefix);
 
-				return false;
-			}
-		};
-		visit(visitor, prefix);
-
-		return visitor.getResult();
+			return visitorEntries.getResult();
+		}
 	}
 
 	/**
