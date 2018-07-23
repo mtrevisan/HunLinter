@@ -55,7 +55,7 @@ public class HyphenationBreak{
 
 				int nohypLength = nohyp.length();
 				if(nohyp.charAt(0) == '^'){
-					if(syllabes.get(0).startsWith(nohyp.substring(1))){
+					if(syllabes.get(0).equals(nohyp.substring(1))){
 						indexesAndRules.remove(1);
 						indexesAndRules.remove(nohypLength);
 
@@ -69,7 +69,7 @@ public class HyphenationBreak{
 					}
 				}
 				else if(nohyp.charAt(nohypLength - 1) == '$'){
-					if(syllabes.get(syllabesCount - 1).endsWith(nohyp.substring(0, nohypLength - 1))){
+					if(syllabes.get(syllabesCount - 1).equals(nohyp.substring(0, nohypLength - 1))){
 						indexesAndRules.remove(wordLength - nohypLength - 1);
 						indexesAndRules.remove(wordLength - 1);
 
