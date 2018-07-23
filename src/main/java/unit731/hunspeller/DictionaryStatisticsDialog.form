@@ -187,7 +187,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="lengthsModeOutputLabel"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Words&apos; length mode:"/>
+        <Property name="text" type="java.lang.String" value="Mode of words&apos; length:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lengthsModeOutputLabel">
@@ -200,7 +200,7 @@
         <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="syllabeLengthsModeOutputLabel"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Words&apos; syllabe mode:"/>
+        <Property name="text" type="java.lang.String" value="Mode of words&apos; syllabe:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="syllabeLengthsModeOutputLabel">

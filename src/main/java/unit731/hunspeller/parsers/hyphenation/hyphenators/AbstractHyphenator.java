@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -166,6 +167,24 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			//apply first level hyphenation non-compound
 			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.FIRST, hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
+
+			for(String nohyp : hypParser.getOptParser().getNoHyphen()){
+				int nohypLength = nohyp.length();
+				if(nohyp.charAt(0) == '^'){
+					if(response.get(0).startsWith(nohyp.substring(1)))
+						response.remove(0);
+				}
+				else if(nohyp.charAt(nohypLength - 1) == '$'){
+					if(response.get(response.size() - 1).endsWith(nohyp.substring(0, nohypLength - 1)))
+						response.remove(response.size() - 1);
+				}
+				else{
+					Iterator<String> itr = response.iterator();
+					while(itr.hasNext())
+						if(nohyp.equals(itr.next()))
+							itr.remove();
+				}
+			}
 		}
 		else if(hypParser.getPatternNoHyphen() != null)
 			//apply retro-compatibility word separators

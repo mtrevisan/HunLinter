@@ -113,12 +113,12 @@ public class DictionaryStatisticsDialog extends JDialog{
       contractedWordsOutputLabel.setText("...");
 
       lengthsModeLabel.setLabelFor(lengthsModeOutputLabel);
-      lengthsModeLabel.setText("Words' length mode:");
+      lengthsModeLabel.setText("Mode of words' length:");
 
       lengthsModeOutputLabel.setText("...");
 
       syllabeLengthsModeLabel.setLabelFor(syllabeLengthsModeOutputLabel);
-      syllabeLengthsModeLabel.setText("Words' syllabe mode:");
+      syllabeLengthsModeLabel.setText("Mode of words' syllabe:");
 
       syllabeLengthsModeOutputLabel.setText("...");
 
