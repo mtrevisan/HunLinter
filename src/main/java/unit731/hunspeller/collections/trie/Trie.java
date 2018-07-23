@@ -135,6 +135,8 @@ public class Trie<S, H, V>{
 	 *		null.
 	 */
 	public V get(S sequence){
+		Objects.requireNonNull(sequence);
+
 		TrieNode<S, H, V> node = searchAndApply(sequence, TrieMatch.EXACT, null);
 		return (Objects.nonNull(node)? node.getValue(): null);
 	}
@@ -146,11 +148,15 @@ public class Trie<S, H, V>{
 	 * @return	The data of the removed sequence, or null if no sequence was removed.
 	 */
 	public V remove(S sequence){
+		Objects.requireNonNull(sequence);
+
 		TrieNode<S, H, V> node = searchAndApply(sequence, TrieMatch.EXACT, (parent, stem) -> parent.removeChild(stem, sequencer));
 		return (Objects.nonNull(node)? node.getValue(): null);
 	}
 
 	public Collection<TrieNode<S, H, V>> collectPrefixes(S sequence){
+		Objects.requireNonNull(sequence);
+
 		Set<TrieNode<S, H, V>> prefixes = new HashSet<>();
 		searchAndApply(sequence, TrieMatch.STARTS_WITH, (parent, stem) -> prefixes.add(parent.getChildForRetrieve(stem, sequencer)));
 		return prefixes;
@@ -165,8 +171,6 @@ public class Trie<S, H, V>{
 	 * @return	The node that best matched the query based on the logic.
 	 */
 	private TrieNode<S, H, V> searchAndApply(S sequence, TrieMatch matchType, BiConsumer<TrieNode<S, H, V>, H> callback){
-		Objects.requireNonNull(sequence);
-
 		int sequenceLength = sequencer.lengthOf(sequence);
 		int sequenceOffset = root.getEndIndex();
 		//if the sequence is empty, return null

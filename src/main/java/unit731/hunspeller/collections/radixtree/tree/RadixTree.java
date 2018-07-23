@@ -709,6 +709,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
 	public void visitPrefixedBy(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
+		Objects.requireNonNull(visitor);
+		Objects.requireNonNull(prefixAllowed);
+
 		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(prefix, preAllowed);
 		visit(visitor, prefixAllowed, condition);
 	}
@@ -731,6 +734,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
 	public void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed){
+		Objects.requireNonNull(visitor);
+		Objects.requireNonNull(prefixAllowed);
+
 		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(preAllowed, prefix);
 		visit(visitor, prefixAllowed, condition);
 	}
@@ -745,9 +751,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
 	private void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed, BiFunction<S, S, Boolean> condition){
-		Objects.requireNonNull(visitor);
-		Objects.requireNonNull(prefixAllowed);
-
 		Stack<VisitElement> stack = new Stack<>();
 		stack.push(new VisitElement(root, null, root.getKey()));
 		while(!stack.isEmpty()){

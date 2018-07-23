@@ -134,10 +134,6 @@ public class DictionaryStatistics{
 		return syllabesFrequencies.getMostCommonValues(5).stream()
 			.map(value -> value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
-//		return syllabesFrequencies.getMode().stream()
-//			.limit(size)
-//			.map(String.class::cast)
-//			.collect(Collectors.toList());
 	}
 
 	/** Returns the countr of unique words */
