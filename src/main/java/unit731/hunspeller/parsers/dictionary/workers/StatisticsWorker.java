@@ -136,14 +136,16 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void done(){
-		try{
-			//show statistics window
-			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
-			dialog.setLocationRelativeTo((Frame)resultable);
-			dialog.setVisible(true);
-		}
-		catch(InterruptedException | InvocationTargetException e){
-			Logger.getLogger(StatisticsWorker.class.getName()).log(Level.SEVERE, null, e);
+		if(!isCancelled()){
+			try{
+				//show statistics window
+				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
+				dialog.setLocationRelativeTo((Frame)resultable);
+				dialog.setVisible(true);
+			}
+			catch(InterruptedException | InvocationTargetException e){
+				Logger.getLogger(StatisticsWorker.class.getName()).log(Level.SEVERE, null, e);
+			}
 		}
 	}
 

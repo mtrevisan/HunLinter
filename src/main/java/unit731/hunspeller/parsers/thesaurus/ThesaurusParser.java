@@ -128,7 +128,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		@Override
 		protected void done(){
-			if(Objects.nonNull(postExecution))
+			if(!isCancelled() && Objects.nonNull(postExecution))
 				postExecution.run();
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
