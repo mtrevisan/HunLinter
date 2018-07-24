@@ -694,8 +694,8 @@
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="2">
-                    <StringItem index="0" value="First level"/>
-                    <StringItem index="1" value="Second level"/>
+                    <StringItem index="0" value="Non compound"/>
+                    <StringItem index="1" value="Compound"/>
                   </StringArray>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>

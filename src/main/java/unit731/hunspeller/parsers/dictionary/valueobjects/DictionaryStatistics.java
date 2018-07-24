@@ -131,7 +131,7 @@ public class DictionaryStatistics{
 	}
 
 	public List<String> getMostCommonSyllabes(int size){
-		return syllabesFrequencies.getMostCommonValues(5).stream()
+		return syllabesFrequencies.getMostCommonValues(size).stream()
 			.map(value -> value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
 	}
@@ -162,7 +162,7 @@ public class DictionaryStatistics{
 
 	public static List<String> extractRepresentatives(List<String> population, int limitPopulation){
 		List<String> result = new ArrayList<>(population);
-		int minimumDistance = 2;
+		int minimumDistance = 4;
 		do{
 			removeClosestRepresentatives(result, limitPopulation, minimumDistance);
 

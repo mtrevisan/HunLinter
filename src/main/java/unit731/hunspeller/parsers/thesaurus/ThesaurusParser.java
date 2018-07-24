@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,16 +18,13 @@ import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.swing.SwingWorker;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
@@ -61,79 +57,30 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		this.undoable = undoable;
 	}
 
-	@AllArgsConstructor
-	public static class ParserWorker extends SwingWorker<List<ThesaurusEntry>, String>{
+	/**
+	 * Parse the rows out from a .aid file.
+	 *
+	 * @param theFile	The content of the thesaurus file
+	 * @throws IOException	If an I/O error occurse
+	 */
+	public void parse(File theFile) throws IOException{
+		acquireLock();
 
-		private final File theFile;
-		private final ThesaurusParser theParser;
-		private final Runnable postExecution;
-		private final Resultable resultable;
+		Charset charset = FileService.determineCharset(theFile.toPath());
+		try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
+			String line = br.readLine();
 
-
-		@Override
-		protected List<ThesaurusEntry> doInBackground() throws Exception{
-			theParser.acquireLock();
-
-			boolean stopped = false;
-			try{
-				publish("Opening Thesaurus file for parsing: " + theFile.getName());
-				setProgress(0);
-
-				long readSoFar = 0l;
-				long totalSize = theFile.length();
-
-				Charset charset = FileService.determineCharset(theFile.toPath());
-				try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
-					String line = br.readLine();
-
-					while(Objects.nonNull(line = br.readLine())){
-						readSoFar += line.length();
-						if(!line.isEmpty())
-							theParser.dictionary.add(new ThesaurusEntry(line, br));
-
-						setProgress((int)((readSoFar * 100.) / totalSize));
-					}
-					setProgress(100);
-				}
-
-				publish("Finished reading Thesaurus file");
-			}
-			catch(IOException | IllegalArgumentException e){
-				stopped = true;
-
-				publish(e instanceof ClosedChannelException? "Thesaurus parser thread interrupted": e.getClass().getSimpleName() + ": "
-					+ e.getMessage());
-			}
-			catch(Exception e){
-				stopped = true;
-
-				String message = ExceptionService.getMessage(e, getClass());
-				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-			finally{
-				theParser.dictionary.resetModified();
-
-				theParser.releaseLock();
-			}
-			if(stopped)
-				publish("Stopped reading Thesaurus file");
-
-			return theParser.getSynonymsDictionary();
+			while(Objects.nonNull(line = br.readLine()))
+				if(!line.isEmpty())
+					dictionary.add(new ThesaurusEntry(line, br));
 		}
+		finally{
+			dictionary.resetModified();
 
-		@Override
-		protected void process(List<String> chunks){
-			resultable.printResultLine(chunks);
+			releaseLock();
 		}
-
-		@Override
-		protected void done(){
-			if(!isCancelled() && Objects.nonNull(postExecution))
-				postExecution.run();
-
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
-		}
 	}
 
 	public void acquireLock(){

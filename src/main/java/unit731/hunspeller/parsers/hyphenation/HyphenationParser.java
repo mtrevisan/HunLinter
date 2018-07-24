@@ -103,7 +103,7 @@ public class HyphenationParser{
 	public static final Matcher MATCHER_REDUCE = PatternService.matcher("/.+$");
 	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
 
-	public static enum Level{FIRST, SECOND}
+	public static enum Level{NON_COMPOUND, COMPOUND}
 
 	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
@@ -160,7 +160,7 @@ public class HyphenationParser{
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
 
-		secondLevelPresent = patterns.containsKey(Level.SECOND);
+		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(Level level : Level.values()){
 			RadixTree<String, String> p = patterns.getOrDefault(level, RadixTree.createTree(new StringSequencer()));
 			this.patterns.put(level, p);
@@ -192,7 +192,7 @@ public class HyphenationParser{
 		acquireLock();
 
 		try{
-			Level level = Level.FIRST;
+			Level level = Level.NON_COMPOUND;
 
 			Path hypPath = hypFile.toPath();
 			Charset charset = FileService.determineCharset(hypPath);
@@ -212,11 +212,11 @@ public class HyphenationParser{
 						boolean parsedLine = optParser.parseLine(line);
 						if(!parsedLine){
 							if(line.startsWith(NEXT_LEVEL)){
-								if(level == Level.SECOND)
+								if(level == Level.COMPOUND)
 									throw new IllegalArgumentException("Cannot have more than two levels");
 
 								//start with non–compound level
-								level = Level.SECOND;
+								level = Level.COMPOUND;
 								secondLevelPresent = true;
 								REDUCED_PATTERNS.get(level).clear();
 							}
@@ -242,7 +242,7 @@ public class HyphenationParser{
 					}
 				}
 
-				if(level == Level.FIRST){
+				if(level == Level.NON_COMPOUND){
 					//dash and apostrophe are added by default (retro-compatibility)
 					List<String> retroCompatibilityNoHyphen = new ArrayList<>(Arrays.asList(APOSTROPHE, MINUS_SIGN));
 					if(charset == StandardCharsets.UTF_8)
@@ -413,16 +413,19 @@ public class HyphenationParser{
 		try{
 			Charset charset = StandardCharsets.UTF_8;
 			try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
-				//save charset
 				writeln(writer, charset.name());
-				//save options
+
+				writer.newLine();
 				optParser.write(writer);
 
-				savePatternsByLevel(writer, Level.FIRST);
+				writer.newLine();
+				savePatternsByLevel(writer, Level.NON_COMPOUND);
 
+				writer.newLine();
 				writeln(writer, NEXT_LEVEL);
 
-				savePatternsByLevel(writer, Level.SECOND);
+				writer.newLine();
+				savePatternsByLevel(writer, Level.COMPOUND);
 			}
 		}
 		finally{

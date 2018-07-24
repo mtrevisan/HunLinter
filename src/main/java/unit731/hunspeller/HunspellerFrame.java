@@ -156,7 +156,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
-	private SwingWorker<List<ThesaurusEntry>, String> theParserWorker;
 	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
 
 	private static RecentItems recentItems;
@@ -188,7 +187,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableMenuItemFromWorker.put(ThesaurusParser.ParserWorker.class, () -> theMenu.setEnabled(true));
 		enableMenuItemFromWorker.put(CorrectnessWorker.class, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
@@ -524,7 +522,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
          }
       });
 
-      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "First level", "Second level" }));
+      hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
       hypAddRuleLevelComboBox.setEnabled(false);
 
       hypAddRuleButton.setMnemonic('A');
@@ -1764,24 +1762,32 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
 	private void openThesaurusFile(){
-		if(Objects.isNull(theParserWorker) || theParserWorker.isDone()){
+		try{
 			clearThesaurusFile();
 
 			File theFile = getThesaurusFile();
 			if(theFile.exists()){
-				Runnable postExecution = () -> {
-					ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-					dm.setSynonyms(theParser.getSynonymsDictionary());
+				printResultLine("Opening Thesaurus file for parsing: " + theFile.getName());
 
-					updateSynonymsCounter();
+				theParser.parse(theFile);
 
-					mainTabbedPane.setEnabledAt(1, true);
-				};
-				theParserWorker = new ThesaurusParser.ParserWorker(theFile, theParser, postExecution, this);
-				theParserWorker.addPropertyChangeListener(this);
+				ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+				dm.setSynonyms(theParser.getSynonymsDictionary());
 
-				theParserWorker.execute();
+				updateSynonymsCounter();
+
+				theMenu.setEnabled(true);
+				mainTabbedPane.setEnabledAt(1, true);
+
+				printResultLine("Finished reading Thesaurus file");
 			}
+		}
+		catch(IOException e){
+			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
+		}
+		catch(Exception e){
+			String message = ExceptionService.getMessage(e, getClass());
+			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}
 
@@ -1792,7 +1798,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		theParser.clear();
 
 		theMenu.setEnabled(false);
-
 		mainTabbedPane.setEnabledAt(1, false);
 	}
 

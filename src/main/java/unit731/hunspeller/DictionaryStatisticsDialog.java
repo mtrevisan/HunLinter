@@ -294,7 +294,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
 			Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
 			Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
-			List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(5);
+			List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
 			int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
 			List<String> longestWords = statistics.getLongestWordsByCharacters();
 			int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
