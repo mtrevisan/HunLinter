@@ -1,8 +1,17 @@
 package unit731.hunspeller;
 
+import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -13,10 +22,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -27,10 +42,12 @@ import org.knowm.xchart.CategoryChartBuilder;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.services.PatternService;
 
 
 @Slf4j
@@ -52,6 +69,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 		this.statistics = statistics;
 
 		initComponents();
+
+		JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(compoundWordsOutputLabel.getHeight());
+		GUIUtils.addPopupMenu(copyingPopupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
+			longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 
 		addCancelByEscapeKey();
 

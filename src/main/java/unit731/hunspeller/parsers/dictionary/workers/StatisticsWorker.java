@@ -31,6 +31,7 @@ import unit731.hunspeller.services.TimeWatch;
 
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
+	private final boolean performHyphenationStatistics;
 	@NonNull
 	private final AffixParser affParser;
 	@NonNull
@@ -41,10 +42,11 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+	public StatisticsWorker(boolean performHyphenationStatistics, AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
 		if(!(resultable instanceof Frame))
 			throw new IllegalArgumentException("The resultable should also be a Frame");
 
+		this.performHyphenationStatistics = performHyphenationStatistics;
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.resultable = resultable;
@@ -87,14 +89,18 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 							for(RuleProductionEntry production : productions){
 								//collect statistics
 								String word = production.getWord();
-								List<String> subwords = hyphenator.splitIntoCompounds(word);
-								if(subwords.isEmpty())
-									dicStatistics.addData(word);
+								if(performHyphenationStatistics){
+									List<String> subwords = hyphenator.splitIntoCompounds(word);
+									if(subwords.isEmpty())
+										dicStatistics.addData(word);
+									else
+										for(String subword : subwords){
+											Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+											dicStatistics.addData(word, hyph);
+										}
+								}
 								else
-									for(String subword : subwords){
-										Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-										dicStatistics.addData(word, hyph);
-									}
+									dicStatistics.addData(word);
 							}
 						}
 						catch(IllegalArgumentException e){
