@@ -1,17 +1,8 @@
 package unit731.hunspeller;
 
-import java.awt.Component;
 import java.awt.Frame;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -22,16 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -43,11 +29,11 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.services.PatternService;
 
 
 @Slf4j
@@ -327,10 +313,10 @@ public class DictionaryStatisticsDialog extends JDialog{
 			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 			boolean hasSyllabeStatistics = (totalWords > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 
-			totalWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(totalWords));
-			uniqueWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)uniqueWords / totalWords) + ")");
-			compoundWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)compoundWords / uniqueWords) + ")");
-			contractedWordsOutputLabel.setText(HunspellerFrame.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryStatistics.PERCENT_FORMATTER.format((double)contractedWords / uniqueWords) + ")");
+			totalWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(totalWords));
+			uniqueWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")");
+			compoundWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")");
+			contractedWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")");
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			syllabeLengthsModeLabel.setEnabled(hasSyllabeStatistics);
 			syllabeLengthsModeOutputLabel.setEnabled(hasSyllabeStatistics);

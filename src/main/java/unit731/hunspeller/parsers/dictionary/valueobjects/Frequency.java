@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -9,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.Memoizer;
 
 
@@ -24,8 +24,6 @@ import unit731.hunspeller.services.Memoizer;
  * @param <T>	Type of value
  */
 public class Frequency<T>{
-
-	private static final NumberFormat NUMBER_FORMAT = NumberFormat.getPercentInstance();
 
 	private final Function<Integer, Long> FN_SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
 
@@ -164,7 +162,7 @@ public class Frequency<T>{
 				.append('\t')
 				.append(getCount(value))
 				.append('\t')
-				.append(NUMBER_FORMAT.format(getPercentOf(value)))
+				.append(DictionaryParser.PERCENT_FORMATTER_1.format(getPercentOf(value)))
 				.append('\n');
 		}
 		return sb.toString();

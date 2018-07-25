@@ -8,8 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
 import javax.imageio.ImageIO;
@@ -21,6 +19,7 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 /**
@@ -66,8 +65,8 @@ public class HelpDialog extends JDialog{
 
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);
-		lblReleaseDateOut.setText(buildTimestamp.format(DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US)));
-		lblCopyrightOut.setText("Copyright © " + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy", Locale.US)) + " Mauro Trevisan");
+		lblReleaseDateOut.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
+		lblCopyrightOut.setText("Copyright © " + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

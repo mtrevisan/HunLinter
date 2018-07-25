@@ -16,11 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -107,14 +103,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static final String EXTENSION_AID = ".aid";
 
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
-
-	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
-	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
-	static{
-		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
-		symbols.setGroupingSeparator(' ');
-		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
-	}
 
 	private static final ZipManager ZIPPER = new ZipManager();
 
@@ -1759,7 +1747,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(COUNTER_FORMATTER.format(theParser.getSynonymsCounter()));
+		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(theParser.getSynonymsCounter()));
 	}
 
 
@@ -1786,7 +1774,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	@Override
 	public void printResultLine(String text){
-		String timeOfDay = LocalTime.now().format(TIME_FORMATTER);
+		String timeOfDay = LocalTime.now().format(DictionaryParser.TIME_FORMATTER);
 		parsingResultTextArea.append(timeOfDay + StringUtils.SPACE + text + StringUtils.LF);
 	}
 

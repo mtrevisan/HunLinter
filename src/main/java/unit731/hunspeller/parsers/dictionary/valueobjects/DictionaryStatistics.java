@@ -1,13 +1,9 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -16,6 +12,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
@@ -25,17 +22,6 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
  */
 @Getter
 public class DictionaryStatistics{
-
-	public static final DecimalFormat PERCENT_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
-	static{
-		DecimalFormatSymbols symbols = PERCENT_FORMATTER.getDecimalFormatSymbols();
-		PERCENT_FORMATTER.setMultiplier(100);
-		PERCENT_FORMATTER.setPositiveSuffix("%");
-		symbols.setGroupingSeparator(' ');
-		PERCENT_FORMATTER.setDecimalFormatSymbols(symbols);
-		PERCENT_FORMATTER.setMinimumFractionDigits(1);
-		PERCENT_FORMATTER.setMaximumFractionDigits(1);
-	}
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
@@ -132,7 +118,7 @@ public class DictionaryStatistics{
 
 	public List<String> getMostCommonSyllabes(int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
-			.map(value -> value + " (" + PERCENT_FORMATTER.format(syllabesFrequencies.getPercentOf(value)) + ")")
+			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
 	}
 

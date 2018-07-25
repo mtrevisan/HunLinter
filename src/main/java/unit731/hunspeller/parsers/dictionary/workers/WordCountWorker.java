@@ -1,28 +1,22 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.awt.Frame;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
@@ -127,18 +121,8 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void done(){
-		if(!isCancelled()){
-publish(Integer.toString(wordCount));
-//			try{
-//				//show statistics window
-//				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
-//				dialog.setLocationRelativeTo((Frame)resultable);
-//				dialog.setVisible(true);
-//			}
-//			catch(InterruptedException | InvocationTargetException e){
-//				Logger.getLogger(WordCountWorker.class.getName()).log(Level.SEVERE, null, e);
-//			}
-		}
+		if(!isCancelled())
+			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(Integer.toString(wordCount)));
 	}
 
 }

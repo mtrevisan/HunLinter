@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
@@ -39,8 +40,17 @@ public class DictionaryParser{
 	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
 	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
-	public static final NumberFormat COUNTER_FORMATTER = NumberFormat.getInstance(Locale.US);
+	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
+	static{
+		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
+		symbols.setGroupingSeparator(' ');
+		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
+	}
 	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));
+	public static final DecimalFormat PERCENT_FORMATTER_1 = new DecimalFormat("0.0%", DecimalFormatSymbols.getInstance(Locale.US));
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
+	public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
 
 	private final File dicFile;
