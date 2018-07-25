@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
@@ -51,6 +53,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private static final long serialVersionUID = 5762751368059394067l;
 
+	private static final String SERIES_NAME = "series";
 	private static final String LIST_SEPARATOR = ", ";
 	private static final String TAB = "\t";
 
@@ -320,7 +323,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				exportToFile(outputFile);
 			}
-			catch(IOException e){
+			catch(Exception e){
 				log.error("Cannot export statistics", e);
 			}
 
@@ -443,7 +446,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			yData.add(elem.getValue().doubleValue() / totalCount);
 		}
 
-		chart.addSeries("series", xData, yData);
+		chart.addSeries(SERIES_NAME, xData, yData);
 	}
 
 	private void exportToFile(File outputFile) throws IOException{
@@ -473,26 +476,27 @@ public class DictionaryStatisticsDialog extends JDialog{
 				writer.newLine();
 			}
 
-//			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
-//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
-//			if(hasData){
-//				CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
-//				addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalWords);
-//			}
-//
-//			hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
-//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
-//			if(hasData){
-//				CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
-//				addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalWords);
-//			}
-//
-//			hasData = stressesFrequencies.entrySetIterator().hasNext();
-//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
-//			if(hasData){
-//				CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
-//				addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
-//			}
+			exportGraph(writer, lengthsPanel);
+			exportGraph(writer, syllabesPanel);
+			exportGraph(writer, stressesPanel);
+		}
+	}
+
+	private void exportGraph(BufferedWriter writer, Component comp) throws IOException{
+		int index = mainTabbedPane.indexOfComponent(comp);
+		boolean hasData = mainTabbedPane.isEnabledAt(index);
+		if(hasData){
+			String name = mainTabbedPane.getTitleAt(index);
+			CategorySeries series = ((CategoryChart)((XChartPanel)comp).getChart()).getSeriesMap().get(SERIES_NAME);
+			Iterator<?> xItr = series.getXData().iterator();
+			Iterator<? extends Number> yItr = series.getYData().iterator();
+			writer.newLine();
+			writer.write(name);
+			writer.newLine();
+			while(xItr.hasNext()){
+				writer.write(xItr.next() + ":" + TAB + DictionaryParser.PERCENT_FORMATTER_1.format(yItr.next()));
+				writer.newLine();
+			}
 		}
 	}
 
