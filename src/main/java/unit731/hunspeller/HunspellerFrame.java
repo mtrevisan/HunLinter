@@ -1229,6 +1229,21 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
+			if(Objects.nonNull(dicWordCountWorker) && dicWordCountWorker.getState() == SwingWorker.StateValue.STARTED){
+				Object[] options = {"Abort", "Cancel"};
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				if(answer == JOptionPane.YES_OPTION){
+					dicWordCountWorker.cancel(true);
+					dicWordCountWorker = null;
+
+					dicWordCountMenuItem.setEnabled(true);
+					dicSortDictionaryMenuItem.setEnabled(true);
+					printResultLine("Word count extraction aborted");
+				}
+				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
+					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
+			}
 			if(Objects.nonNull(dicStatisticsWorker) && dicStatisticsWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
