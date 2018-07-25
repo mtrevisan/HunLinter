@@ -3,10 +3,14 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,11 +22,13 @@ import java.util.stream.Collectors;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
@@ -46,8 +52,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private static final long serialVersionUID = 5762751368059394067l;
 
 	private static final String LIST_SEPARATOR = ", ";
+	private static final String TAB = "\t";
 
 	private final DictionaryStatistics statistics;
+
+	private final JFileChooser saveTextFileFileChooser;
 
 
 	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent) throws InterruptedException, InvocationTargetException{
@@ -65,6 +74,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 			longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 
 		addCancelByEscapeKey();
+		addListenerOnClose();
+
+		saveTextFileFileChooser = new JFileChooser();
+		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+		File currentDir = new File(".");
+		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
 
 		fillStatisticDatas();
@@ -102,6 +117,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       lengthsPanel = createChartPanel("Word length distribution", "Word length", "Frequency");
       syllabesPanel = createChartPanel("Word syllabe distribution", "Word syllabe", "Frequency");
       stressesPanel = createChartPanel("Word stress distribution", "Word stressed syllabe index (from last)", "Frequency");
+      exportButton = new javax.swing.JButton();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -187,6 +203,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mainTabbedPane.addTab("Word stresses", stressesPanel);
 
+      exportButton.setText("Export");
+      exportButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            exportButtonActionPerformed(evt);
+         }
+      });
+
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
@@ -234,6 +257,10 @@ public class DictionaryStatisticsDialog extends JDialog{
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addContainerGap())
+         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(exportButton)
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -276,11 +303,30 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addComponent(longestWordSyllabesOutputLabel))
             .addGap(18, 18, 18)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(18, 18, Short.MAX_VALUE)
+            .addComponent(exportButton)
             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+   private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+		int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
+		if(fileChoosen == JFileChooser.APPROVE_OPTION){
+			exportButton.setEnabled(false);
+
+			try{
+				File outputFile = saveTextFileFileChooser.getSelectedFile();
+				exportToFile(outputFile);
+			}
+			catch(IOException e){
+				log.error("Cannot export statistics", e);
+			}
+
+			exportButton.setEnabled(true);
+		}
+   }//GEN-LAST:event_exportButtonActionPerformed
 
 	/** Force the escape key to call the same action as pressing the Cancel button. */
 	private void addCancelByEscapeKey(){
@@ -294,6 +340,15 @@ public class DictionaryStatisticsDialog extends JDialog{
 		};
 		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
+
+	private void addListenerOnClose(){
+		addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosed(WindowEvent e){
+				statistics.clear();
+			}
+		});
 	}
 
 	private void fillStatisticDatas(){
@@ -354,8 +409,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 				addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
 			}
 		}
-
-		statistics.clear();
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
@@ -391,6 +444,56 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 
 		chart.addSeries("series", xData, yData);
+	}
+
+	private void exportToFile(File outputFile) throws IOException{
+		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8)){
+			boolean hasSyllabeStatistics = syllabeLengthsModeLabel.isEnabled();
+
+			writer.write(totalWordsLabel.getText() + TAB + StringUtils.replaceChars(totalWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.newLine();
+			writer.write(uniqueWordsLabel.getText() + TAB + StringUtils.replaceChars(uniqueWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.newLine();
+			writer.write(compoundWordsLabel.getText() + TAB + StringUtils.replaceChars(compoundWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.newLine();
+			writer.write(contractedWordsLabel.getText() + TAB + StringUtils.replaceChars(contractedWordsOutputLabel.getText(), DictionaryParser.COUNTER_GROUPING_SEPARATOR, ' '));
+			writer.newLine();
+			writer.write(lengthsModeLabel.getText() + TAB + lengthsModeOutputLabel.getText());
+			writer.newLine();
+			if(hasSyllabeStatistics){
+				writer.write(syllabeLengthsModeLabel.getText() + TAB + syllabeLengthsModeOutputLabel.getText());
+				writer.newLine();
+				writer.write(mostCommonSyllabesLabel.getText() + TAB + mostCommonSyllabesOutputLabel.getText());
+				writer.newLine();
+			}
+			writer.write(longestWordCharactersLabel.getText() + TAB + longestWordCharactersOutputLabel.getText());
+			writer.newLine();
+			if(hasSyllabeStatistics){
+				writer.write(longestWordSyllabesLabel.getText() + TAB + longestWordSyllabesOutputLabel.getText());
+				writer.newLine();
+			}
+
+//			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
+//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
+//			if(hasData){
+//				CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel)lengthsPanel).getChart();
+//				addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalWords);
+//			}
+//
+//			hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
+//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
+//			if(hasData){
+//				CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel)syllabesPanel).getChart();
+//				addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalWords);
+//			}
+//
+//			hasData = stressesFrequencies.entrySetIterator().hasNext();
+//			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
+//			if(hasData){
+//				CategoryChart wordStressesChart = (CategoryChart)((XChartPanel)stressesPanel).getChart();
+//				addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
+//			}
+		}
 	}
 
 
@@ -445,6 +548,7 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel compoundWordsOutputLabel;
    private javax.swing.JLabel contractedWordsLabel;
    private javax.swing.JLabel contractedWordsOutputLabel;
+   private javax.swing.JButton exportButton;
    private javax.swing.JLabel lengthsModeLabel;
    private javax.swing.JLabel lengthsModeOutputLabel;
    private javax.swing.JPanel lengthsPanel;
