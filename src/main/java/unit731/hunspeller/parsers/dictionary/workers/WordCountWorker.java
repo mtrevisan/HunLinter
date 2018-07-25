@@ -9,9 +9,11 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
-import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
+import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -33,8 +35,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 	@NonNull
 	private final Resultable resultable;
 
-	@Getter
-	private int wordCount;
+	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
 
 
 	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
@@ -49,7 +50,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 	@Override
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
-		wordCount = 0;
+		bloomFilter.clear();
 		try{
 			publish("Opening Dictionary file for word count extraction: " + affParser.getLanguage() + ".dic");
 
@@ -80,7 +81,8 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
 							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
-							wordCount += productions.size();
+							for(RuleProductionEntry production : productions)
+								bloomFilter.add(production.getWord());
 						}
 						catch(IllegalArgumentException e){
 							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
@@ -121,8 +123,13 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void done(){
-		if(!isCancelled())
-			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(wordCount));
+		if(!isCancelled()){
+			int totalProductions = bloomFilter.getAddedElements();
+			double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+			int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
+			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions) + " ± "
+				+ DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability) + " (" + falsePositiveCount + ")");
+		}
 	}
 
 }

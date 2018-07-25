@@ -128,9 +128,10 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 		int totalProductions = bloomFilter.getAddedElements();
 		double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
 		publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
-			+ " (overall duplicates ≲ " + (int)Math.ceil(totalProductions * falsePositiveProbability) + ")");
+		publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
+			+ " (overall duplicates ≲ " + falsePositiveCount + ")");
 
 		bloomFilter.close();
 		bloomFilter.clear();
@@ -186,7 +187,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
 			publish("Total duplicates: " + DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability * 100.)
+			publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
 				+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 
 			duplicatesBloomFilter.close();
