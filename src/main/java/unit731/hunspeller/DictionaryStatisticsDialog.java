@@ -47,7 +47,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 
 	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent) throws InterruptedException, InvocationTargetException{
-		super(parent, "Dictionary statistics", true);
+		super(parent, "Dictionary statistics", false);
 
 		Objects.requireNonNull(statistics);
 		Objects.requireNonNull(parent);
