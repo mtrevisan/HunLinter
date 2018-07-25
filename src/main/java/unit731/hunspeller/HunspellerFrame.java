@@ -1407,7 +1407,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				hypParser = new HyphenationParser(affParser.getLanguage());
 				hypParser.parse(hypFile);
 
-				mainTabbedPane.setEnabledAt(2, true);
+				int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
+				mainTabbedPane.setEnabledAt(index, true);
+				dicStatisticsMenuItem.setEnabled(true);
 
 				printResultLine("Finished reading Hyphenation file");
 			}
@@ -1427,7 +1429,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		
 		clearHyphenationFields();
 
-		mainTabbedPane.setEnabledAt(2, false);
+		int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
+		dicStatisticsMenuItem.setEnabled(false);
 	}
 
 	private void clearHyphenationFields(){
@@ -1570,8 +1574,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			}
 		});
 
-		mainTabbedPane.setSelectedIndex(0);
-		mainTabbedPane.setEnabledAt(0, true);
+		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
+		mainTabbedPane.setSelectedIndex(index);
+		mainTabbedPane.setEnabledAt(index, true);
 		dicInputTextField.requestFocusInWindow();
 
 
@@ -1586,7 +1591,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		clearDictionaryFields();
 
-		mainTabbedPane.setEnabledAt(0, false);
+		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
@@ -1758,7 +1764,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				updateSynonymsCounter();
 
 				theMenu.setEnabled(true);
-				mainTabbedPane.setEnabledAt(1, true);
+				int index = mainTabbedPane.indexOfComponent(theLayeredPane);
+				mainTabbedPane.setEnabledAt(index, true);
 
 				printResultLine("Finished reading Thesaurus file");
 			}
@@ -1779,7 +1786,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		theParser.clear();
 
 		theMenu.setEnabled(false);
-		mainTabbedPane.setEnabledAt(1, false);
+		int index = mainTabbedPane.indexOfComponent(theLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
 	}
 
 	private void updateSynonyms(){
