@@ -95,6 +95,7 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
  * 
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
  * @see <a href="https://compresspng.com/">PNG compresser</a>
+ * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
 @Slf4j
 public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Undoable{
