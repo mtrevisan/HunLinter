@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
@@ -33,17 +32,17 @@ import unit731.hunspeller.services.TimeWatch;
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
 	private final boolean performHyphenationStatistics;
-	@NonNull
 	private final AffixParser affParser;
-	@NonNull
 	private final DictionaryParser dicParser;
-	@NonNull
 	private final Resultable resultable;
 
 	private final DictionaryStatistics dicStatistics;
 
 
 	public StatisticsWorker(boolean performHyphenationStatistics, AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(resultable);
 		if(!(resultable instanceof Frame))
 			throw new IllegalArgumentException("The resultable should also be a Frame");
 
@@ -52,7 +51,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		this.dicParser = dicParser;
 		this.resultable = resultable;
 
-		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), dicParser.getCharset());
+		dicStatistics = new DictionaryStatistics(dicParser);
 	}
 
 	@Override

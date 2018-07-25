@@ -28,6 +28,10 @@ import unit731.hunspeller.services.PatternService;
 
 public class DictionaryParserVEC extends DictionaryParser{
 
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_005;
+	private static final double GROW_RATIO_WHEN_FULL = 1.3;
+
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
 	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
 	private static final String VERB_DAR_RULE_NON_VANISHING_EL = "a4";
@@ -364,6 +368,21 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	public DictionaryParserVEC(File dicFile, HyphenatorInterface hyphenator, WordGenerator wordGenerator, Charset charset){
 		super(dicFile, hyphenator, wordGenerator, charset);
+	}
+
+	@Override
+	public int getExpectedNumberOfElements(){
+		return EXPECTED_NUMBER_OF_ELEMENTS;
+	}
+
+	@Override
+	public double getFalsePositiveProbability(){
+		return FALSE_POSITIVE_PROBABILITY;
+	}
+
+	@Override
+	public double getGrowRatioWhenFull(){
+		return GROW_RATIO_WHEN_FULL;
 	}
 
 	@Override

@@ -36,6 +36,10 @@ import unit731.hunspeller.services.TimeWatch;
 @AllArgsConstructor
 public class DuplicatesWorker extends SwingWorker<Void, String>{
 
+	private static final int EXPECTED_NUMBER_OF_DUPLICATIONS = 1_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
+
+
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
@@ -84,9 +88,9 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 40_000_000, 0.000_000_01, 1.3);
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
 		bloomFilter.setCharset(dicParser.getCharset());
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, 1_000_000, 0.000_000_4, 2.);
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dicParser.getGrowRatioWhenFull());
 		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);

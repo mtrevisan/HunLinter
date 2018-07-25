@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
-import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -28,23 +27,26 @@ import unit731.hunspeller.services.TimeWatch;
 
 public class WordCountWorker extends SwingWorker<Void, String>{
 
-	@NonNull
 	private final AffixParser affParser;
-	@NonNull
 	private final DictionaryParser dicParser;
-	@NonNull
 	private final Resultable resultable;
 
-	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
+	private final BloomFilterInterface<String> bloomFilter;
 
 
 	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(resultable);
 		if(!(resultable instanceof Frame))
 			throw new IllegalArgumentException("The resultable should also be a Frame");
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.resultable = resultable;
+
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(dicParser.getCharset());
 	}
 
 	@Override

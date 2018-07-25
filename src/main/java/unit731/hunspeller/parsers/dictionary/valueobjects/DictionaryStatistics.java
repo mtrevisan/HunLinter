@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -37,15 +36,16 @@ public class DictionaryStatistics{
 	private final Frequency<Integer> stressFromLastFrequencies = new Frequency<>();
 	private final List<String> longestWordsByCharacters = new ArrayList<>();
 	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
-	private final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, 40_000_000, 0.000_000_01, 1.3);
 
+	private final BloomFilterInterface<String> bloomFilter;
 	@Getter
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(String language, Charset charset){
-		bloomFilter.setCharset(charset);
-		orthography = OrthographyBuilder.getOrthography(language);
+	public DictionaryStatistics(DictionaryParser dicParser){
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(dicParser.getCharset());
+		orthography = OrthographyBuilder.getOrthography(dicParser.getLanguage());
 	}
 
 	public void addData(String word){

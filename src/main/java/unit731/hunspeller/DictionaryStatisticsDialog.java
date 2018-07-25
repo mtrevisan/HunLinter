@@ -3,6 +3,8 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -29,7 +31,9 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -403,7 +407,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
+				File dicFile = File.createTempFile("vec", ".dic");
+				dicFile.deleteOnExit();
+				AffixParser affParser = new AffixParser();
+				DictionaryParser dicParser = new DictionaryParser(dicFile, null, new WordGenerator(affParser), StandardCharsets.UTF_8);
+				DictionaryStatistics stats = new DictionaryStatistics(dicParser);
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
@@ -426,7 +434,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException | InterruptedException | InvocationTargetException ex){
+			catch(IllegalArgumentException | InterruptedException | InvocationTargetException | IOException ex){
 				log.error(null, ex);
 			}
 		});

@@ -34,6 +34,10 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 @Getter
 public class DictionaryParser{
 
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_01;
+	private static final double GROW_RATIO_WHEN_FULL = 1.3;
+
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
 	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
 
@@ -75,6 +79,18 @@ public class DictionaryParser{
 		this.charset = charset;
 		String filename = dicFile.getName();
 		language = filename.substring(0, filename.indexOf(".dic"));
+	}
+
+	public int getExpectedNumberOfElements(){
+		return EXPECTED_NUMBER_OF_ELEMENTS;
+	}
+
+	public double getFalsePositiveProbability(){
+		return FALSE_POSITIVE_PROBABILITY;
+	}
+
+	public double getGrowRatioWhenFull(){
+		return GROW_RATIO_WHEN_FULL;
 	}
 
 

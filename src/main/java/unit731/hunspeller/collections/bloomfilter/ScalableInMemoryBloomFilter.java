@@ -23,17 +23,17 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
 
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability){
-		this(type, initialNumberOfElements, falsePositiveProbability, 2., 0.85);
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability){
+		this(type, expectedNumberOfElements, falsePositiveProbability, 2., 0.85);
 	}
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
-		this(type, initialNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85);
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
+		this(type, expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85);
 	}
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int initialNumberOfElements, double falsePositiveProbability,
+	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability,
 			double growRatioWhenFull, double tighteningRatio){
-		super(type, initialNumberOfElements, falsePositiveProbability);
+		super(type, expectedNumberOfElements, falsePositiveProbability);
 
 		if(growRatioWhenFull <= 1.)
 			throw new IllegalArgumentException("Grow ratio when full must be strictly greater than one");
