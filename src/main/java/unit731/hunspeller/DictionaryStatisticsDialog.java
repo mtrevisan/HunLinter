@@ -274,9 +274,9 @@ public class DictionaryStatisticsDialog extends JDialog{
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(longestWordSyllabesLabel)
                .addComponent(longestWordSyllabesOutputLabel))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
+            .addGap(18, 18, 18)
             .addComponent(mainTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addContainerGap())
+            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
 
       pack();
