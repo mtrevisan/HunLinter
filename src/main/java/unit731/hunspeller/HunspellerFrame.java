@@ -175,8 +175,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableMenuItemFromWorker.put(SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableMenuItemFromWorker.put(WordCountWorker.class, () -> {
+			dicWordCountMenuItem.setEnabled(true);
+			dicSortDictionaryMenuItem.setEnabled(true);
+		});
 		enableMenuItemFromWorker.put(StatisticsWorker.class, () -> {
-			dicStatisticsMenuItem.setEnabled(true);
+			if(dicStatisticsWorker.isPerformHyphenationStatistics())
+				dicStatisticsMenuItem.setEnabled(true);
+			else
+				disStatisticsNoHyphenationMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableMenuItemFromWorker.put(WordlistWorker.class, () -> {
@@ -1230,7 +1237,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					dicStatisticsWorker.cancel(true);
 					dicStatisticsWorker = null;
 
-					dicStatisticsMenuItem.setEnabled(true);
+					if(dicStatisticsWorker.isPerformHyphenationStatistics())
+						dicStatisticsMenuItem.setEnabled(true);
+					else
+						disStatisticsNoHyphenationMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					printResultLine("Statistics extraction aborted");
 				}
@@ -1607,7 +1617,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void extractDictionaryStatistics(boolean performHyphenationStatistics){
 		if(Objects.isNull(dicStatisticsWorker) || dicStatisticsWorker.isDone()){
-			dicStatisticsMenuItem.setEnabled(false);
+			if(performHyphenationStatistics)
+				dicStatisticsMenuItem.setEnabled(false);
+			else
+				disStatisticsNoHyphenationMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);

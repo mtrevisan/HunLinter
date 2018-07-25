@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
+import lombok.Getter;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
@@ -31,6 +32,7 @@ import unit731.hunspeller.services.TimeWatch;
 
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
+	@Getter
 	private final boolean performHyphenationStatistics;
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
