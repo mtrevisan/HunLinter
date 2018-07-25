@@ -129,7 +129,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 			int totalProductions = bloomFilter.getAddedElements();
 			double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 			int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions) + " ± "
+			publish("Total unique productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions) + " ± "
 				+ DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability) + " (" + falsePositiveCount + ")");
 		}
 	}
