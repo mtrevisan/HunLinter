@@ -92,6 +92,8 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
 /**
  * @see <a href="http://manpages.ubuntu.com/manpages/trusty/man4/hunspell.4.html">Hunspell 4</a>
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
+ * @see <a href="https://github.com/nuspell/nuspell">Nuspell on github</a>
+ * @see <a href="https://github.com/hunspell/hyphen">Hyphen on github</a>
  * 
  * @see <a href="https://www.shareicon.net/"Share icon></a>
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
