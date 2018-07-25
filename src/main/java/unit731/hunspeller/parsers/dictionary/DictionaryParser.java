@@ -43,7 +43,7 @@ public class DictionaryParser{
 	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
 	static{
 		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
-		symbols.setGroupingSeparator(' ');
+		symbols.setGroupingSeparator('\u2007');
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}
 	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));

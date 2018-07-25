@@ -122,7 +122,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 	@Override
 	protected void done(){
 		if(!isCancelled())
-			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(Integer.toString(wordCount)));
+			publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(wordCount));
 	}
 
 }
