@@ -19,7 +19,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="fileOpenAFFMenuItem">
               <Properties>
-                <Property name="mnemonic" type="int" value="65"/>
+                <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="Open AFF file..."/>
               </Properties>
               <Events>
@@ -28,6 +28,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="fileCreatePackageMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/file_package.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="112"/>
                 <Property name="text" type="java.lang.String" value="Create package"/>
                 <Property name="enabled" type="boolean" value="false"/>
@@ -64,6 +67,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="dicCheckCorrectnessMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_correctness.png"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="99"/>
                 <Property name="text" type="java.lang.String" value="Check correctness"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
@@ -85,20 +91,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicSortDictionaryMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dicExtractDuplicatesMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" value="100"/>
-                <Property name="text" type="java.lang.String" value="Extract duplicates..."/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractDuplicatesMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicDuplicatesSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicWordCountMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_count.png"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="119"/>
                 <Property name="text" type="java.lang.String" value="Word count"/>
               </Properties>
               <Events>
@@ -107,6 +107,10 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicStatisticsMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_statistics.png"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="116"/>
                 <Property name="text" type="java.lang.String" value="Statistics"/>
               </Properties>
               <Events>
@@ -115,6 +119,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="disStatisticsNoHyphenationMenuItem">
               <Properties>
+                <Property name="mnemonic" type="int" value="104"/>
                 <Property name="text" type="java.lang.String" value="Statistics without hyphenation"/>
               </Properties>
               <Events>
@@ -123,12 +128,25 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicStatisticsSeparator">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dicExtractDuplicatesMenuItem">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_duplicates.png"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="100"/>
+                <Property name="text" type="java.lang.String" value="Extract duplicates..."/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractDuplicatesMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="3" name="/dictionary_extractWordlist.png"/>
+                  <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="119"/>
+                <Property name="mnemonic" type="int" value="108"/>
                 <Property name="text" type="java.lang.String" value="Extract wordlist..."/>
               </Properties>
               <Events>
@@ -156,6 +174,10 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="theFindDuplicatesMenuItem">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_duplicates.png"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="100"/>
                 <Property name="text" type="java.lang.String" value="Find duplicates"/>
               </Properties>
               <Events>
@@ -175,7 +197,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/about.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="65"/>
+                <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="About"/>
               </Properties>
               <Events>

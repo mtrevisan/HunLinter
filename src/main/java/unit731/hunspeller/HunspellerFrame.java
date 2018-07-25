@@ -92,6 +92,9 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
 /**
  * @see <a href="http://manpages.ubuntu.com/manpages/trusty/man4/hunspell.4.html">Hunspell 4</a>
  * @see <a href="https://github.com/lopusz/hunspell-stemmer">Hunspell stemmer on github</a>
+ * 
+ * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
+ * @see <a href="https://compresspng.com/">PNG compresser</a>
  */
 @Slf4j
 public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Undoable{
@@ -243,12 +246,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
-      dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
       disStatisticsNoHyphenationMenuItem = new javax.swing.JMenuItem();
       dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
+      dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
@@ -633,7 +636,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       fileMenu.setText("File");
       fileMenu.setToolTipText("");
 
-      fileOpenAFFMenuItem.setMnemonic('A');
+      fileOpenAFFMenuItem.setMnemonic('a');
       fileOpenAFFMenuItem.setText("Open AFF file...");
       fileOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -642,6 +645,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       });
       fileMenu.add(fileOpenAFFMenuItem);
 
+      fileCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
       fileCreatePackageMenuItem.setMnemonic('p');
       fileCreatePackageMenuItem.setText("Create package");
       fileCreatePackageMenuItem.setEnabled(false);
@@ -675,6 +679,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicMenu.setToolTipText("");
       dicMenu.setEnabled(false);
 
+      dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
       dicCheckCorrectnessMenuItem.setMnemonic('c');
       dicCheckCorrectnessMenuItem.setText("Check correctness");
       dicCheckCorrectnessMenuItem.setToolTipText("");
@@ -695,18 +700,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
          }
       });
       dicMenu.add(dicSortDictionaryMenuItem);
-
-      dicExtractDuplicatesMenuItem.setMnemonic('d');
-      dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
-      dicExtractDuplicatesMenuItem.setToolTipText("");
-      dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicExtractDuplicatesMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicExtractDuplicatesMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
+      dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
+      dicWordCountMenuItem.setMnemonic('w');
       dicWordCountMenuItem.setText("Word count");
       dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -715,6 +712,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       });
       dicMenu.add(dicWordCountMenuItem);
 
+      dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+      dicStatisticsMenuItem.setMnemonic('t');
       dicStatisticsMenuItem.setText("Statistics");
       dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -723,6 +722,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       });
       dicMenu.add(dicStatisticsMenuItem);
 
+      disStatisticsNoHyphenationMenuItem.setMnemonic('h');
       disStatisticsNoHyphenationMenuItem.setText("Statistics without hyphenation");
       disStatisticsNoHyphenationMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -732,8 +732,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicMenu.add(disStatisticsNoHyphenationMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_extractWordlist.png"))); // NOI18N
-      dicExtractWordlistMenuItem.setMnemonic('w');
+      dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
+      dicExtractDuplicatesMenuItem.setMnemonic('d');
+      dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
+      dicExtractDuplicatesMenuItem.setToolTipText("");
+      dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicExtractDuplicatesMenuItemActionPerformed(evt);
+         }
+      });
+      dicMenu.add(dicExtractDuplicatesMenuItem);
+
+      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+      dicExtractWordlistMenuItem.setMnemonic('l');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
       dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -758,6 +769,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       theMenu.setToolTipText("");
       theMenu.setEnabled(false);
 
+      theFindDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
+      theFindDuplicatesMenuItem.setMnemonic('d');
       theFindDuplicatesMenuItem.setText("Find duplicates");
       theFindDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -772,7 +785,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       hlpMenu.setText("Help");
 
       hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
-      hlpAboutMenuItem.setMnemonic('A');
+      hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
       hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
