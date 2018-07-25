@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
@@ -198,6 +199,9 @@ public class HyphenationParser{
 			Charset charset = FileService.determineCharset(hypPath);
 			try(BufferedReader br = Files.newBufferedReader(hypPath, charset)){
 				String line = br.readLine();
+				//ignore any BOM marker on first line
+				if(line.startsWith(FileService.BOM_MARKER))
+					line = line.substring(1);
 				if(Charset.forName(line) != charset)
 					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 

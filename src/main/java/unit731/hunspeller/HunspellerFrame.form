@@ -97,6 +97,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicDuplicatesSeparator">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dicWordCountMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Word count"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicWordCountMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicStatisticsMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Statistics"/>

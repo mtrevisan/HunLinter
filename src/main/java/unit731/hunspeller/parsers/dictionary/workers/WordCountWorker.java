@@ -1,20 +1,27 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.awt.Frame;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
@@ -22,30 +29,44 @@ import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
-@AllArgsConstructor
-public class WordlistWorker extends SwingWorker<Void, String>{
+public class WordCountWorker extends SwingWorker<Void, String>{
 
+	@NonNull
 	private final AffixParser affParser;
+	@NonNull
 	private final DictionaryParser dicParser;
-	private final File outputFile;
+	@NonNull
 	private final Resultable resultable;
 
+	@Getter
+	private int wordCount;
+
+
+	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+		if(!(resultable instanceof Frame))
+			throw new IllegalArgumentException("The resultable should also be a Frame");
+
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.resultable = resultable;
+	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
+		wordCount = 0;
 		try{
-			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for word count extraction: " + affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			WordGenerator wordGenerator = dicParser.getWordGenerator();
 
 			setProgress(0);
-			try(
-					BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset());
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
-					){
+			File dicFile = dicParser.getDicFile();
+			long totalSize = dicFile.length();
+			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset())){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(line.startsWith(FileService.BOM_MARKER))
@@ -55,7 +76,6 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = dicParser.getDicFile().length();
 				while(Objects.nonNull(line = br.readLine())){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -64,12 +84,8 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 					if(!line.isEmpty()){
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
-
-							for(RuleProductionEntry production : productions){
-								writer.write(production.getWord());
-								writer.newLine();
-							}
+							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
+							wordCount += productions.size();
 						}
 						catch(IllegalArgumentException e){
 							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
@@ -84,15 +100,12 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 			setProgress(100);
 
-			publish("File written: " + outputFile.getAbsolutePath());
-			publish("Wordlist extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
-
-			DictionaryParser.openFileWithChoosenEditor(outputFile);
+			publish("Word count extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
 		catch(IOException | IllegalArgumentException e){
 			stopped = true;
 
-			publish(e instanceof ClosedChannelException? "Wodlist thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
+			publish(e instanceof ClosedChannelException? "Statistics thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		catch(Exception e){
 			stopped = true;
@@ -109,6 +122,22 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 	@Override
 	protected void process(List<String> chunks){
 		resultable.printResultLine(chunks);
+	}
+
+	@Override
+	protected void done(){
+		if(!isCancelled()){
+publish(Integer.toString(wordCount));
+//			try{
+//				//show statistics window
+//				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
+//				dialog.setLocationRelativeTo((Frame)resultable);
+//				dialog.setVisible(true);
+//			}
+//			catch(InterruptedException | InvocationTargetException e){
+//				Logger.getLogger(WordCountWorker.class.getName()).log(Level.SEVERE, null, e);
+//			}
+		}
 	}
 
 }

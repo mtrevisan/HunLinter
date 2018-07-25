@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +24,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.memento.CaretakerInterface;
@@ -69,6 +72,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		Charset charset = FileService.determineCharset(theFile.toPath());
 		try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
 			String line = br.readLine();
+			//ignore any BOM marker on first line
+			if(line.startsWith(FileService.BOM_MARKER))
+				line = line.substring(1);
+			//line should be a charset
+			try{ Charsets.toCharset(line); }
+			catch(UnsupportedCharsetException e){
+				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
+			}
 
 			while(Objects.nonNull(line = br.readLine()))
 				if(!line.isEmpty())

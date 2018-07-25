@@ -29,6 +29,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
@@ -91,6 +92,9 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		setProgress(0);
 		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 			String line = br.readLine();
+			//ignore any BOM marker on first line
+			if(line.startsWith(FileService.BOM_MARKER))
+				line = line.substring(1);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
@@ -146,6 +150,11 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 			try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 				String line = br.readLine();
+				//ignore any BOM marker on first line
+				if(line.startsWith(FileService.BOM_MARKER))
+					line = line.substring(1);
+				if(!NumberUtils.isCreatable(line))
+					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 				int lineIndex = 1;
 				long readSoFar = line.length();

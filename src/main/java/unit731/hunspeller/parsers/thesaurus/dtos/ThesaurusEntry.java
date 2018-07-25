@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.thesaurus.dtos;
 
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import unit731.hunspeller.services.FileService;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,6 +48,10 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		meanings = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			String meaning = br.readLine();
+			//ignore any BOM marker on first line
+			if(meaning.startsWith(FileService.BOM_MARKER))
+				meaning = line.substring(1);
+
 			meanings.add(new MeaningEntry(meaning));
 		}
 	}

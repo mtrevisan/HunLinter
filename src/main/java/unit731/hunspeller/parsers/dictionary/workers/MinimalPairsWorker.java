@@ -25,6 +25,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
@@ -57,6 +58,9 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
 				String line = br.readLine();
+				//ignore any BOM marker on first line
+				if(line.startsWith(FileService.BOM_MARKER))
+					line = line.substring(1);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 

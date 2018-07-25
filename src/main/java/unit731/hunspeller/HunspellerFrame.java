@@ -75,6 +75,7 @@ import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
+import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
@@ -142,6 +143,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private CorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
+	private WordCountWorker dicWordCountWorker;
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
@@ -248,6 +250,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
+      dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
       disStatisticsNoHyphenationMenuItem = new javax.swing.JMenuItem();
       dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
@@ -708,6 +711,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       });
       dicMenu.add(dicExtractDuplicatesMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
+
+      dicWordCountMenuItem.setText("Word count");
+      dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicWordCountMenuItemActionPerformed(evt);
+         }
+      });
+      dicMenu.add(dicWordCountMenuItem);
 
       dicStatisticsMenuItem.setText("Statistics");
       dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1181,6 +1192,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		extractDictionaryStatistics(false);
    }//GEN-LAST:event_disStatisticsNoHyphenationMenuItemActionPerformed
 
+   private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		extractWordCount();
+   }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -1587,6 +1604,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		}
 	}
 
+	private void extractWordCount(){
+		if(Objects.isNull(dicWordCountWorker) || dicWordCountWorker.isDone()){
+			dicWordCountMenuItem.setEnabled(false);
+			dicSortDictionaryMenuItem.setEnabled(false);
+
+			mainProgressBar.setValue(0);
+
+			dicWordCountWorker = new WordCountWorker(affParser, dicParser, this);
+			dicWordCountWorker.addPropertyChangeListener(this);
+			dicWordCountWorker.execute();
+		}
+	}
+
 	private void extractDictionaryStatistics(boolean performHyphenationStatistics){
 		if(Objects.isNull(dicStatisticsWorker) || dicStatisticsWorker.isDone()){
 			dicStatisticsMenuItem.setEnabled(false);
@@ -1822,6 +1852,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
    private javax.swing.JTable dicTable;
+   private javax.swing.JMenuItem dicWordCountMenuItem;
    private javax.swing.JMenuItem disStatisticsNoHyphenationMenuItem;
    private javax.swing.JMenuItem fileCreatePackageMenuItem;
    private javax.swing.JMenuItem fileExitMenuItem;

@@ -26,6 +26,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
@@ -71,6 +72,9 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 			long totalSize = dicFile.length();
 			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset())){
 				String line = br.readLine();
+				//ignore any BOM marker on first line
+				if(line.startsWith(FileService.BOM_MARKER))
+					line = line.substring(1);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
