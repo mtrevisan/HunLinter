@@ -4,10 +4,10 @@ import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.memento.CaretakerInterface;
@@ -70,11 +69,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		acquireLock();
 
 		Charset charset = FileService.determineCharset(theFile.toPath());
-		try(BufferedReader br = Files.newBufferedReader(theFile.toPath(), charset)){
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
-			if(line.startsWith(FileService.BOM_MARKER))
-				line = line.substring(1);
+			if(br.getLineNumber() == 1)
+				line = FileService.clearBOMMarker(line);
+
 			//line should be a charset
 			try{ Charsets.toCharset(line); }
 			catch(UnsupportedCharsetException e){

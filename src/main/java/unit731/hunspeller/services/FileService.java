@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class FileService{
 
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
-	public static final String BOM_MARKER = "\uFEFF";
+	private static final String BOM_MARKER = "\uFEFF";
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
 	static{
@@ -63,6 +63,11 @@ public class FileService{
 		catch(IOException e){
 			throw new RuntimeException("Failed creating temporary file for content '" + content + "'", e);
 		}
+	}
+
+	/** Ignore any BOM marker */
+	public static String clearBOMMarker(String line){
+		return (line.startsWith(BOM_MARKER)? line.substring(1): line);
 	}
 
 }

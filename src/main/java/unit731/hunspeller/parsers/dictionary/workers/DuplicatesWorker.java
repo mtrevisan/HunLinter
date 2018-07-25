@@ -1,9 +1,9 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -90,11 +90,11 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);
-		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
-			if(line.startsWith(FileService.BOM_MARKER))
-				line = line.substring(1);
+			if(br.getLineNumber() == 1)
+				line = FileService.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
@@ -148,11 +148,11 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 			setProgress(0);
-			try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
-				if(line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 

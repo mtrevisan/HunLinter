@@ -1,8 +1,8 @@
 package unit731.hunspeller.parsers.thesaurus.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +37,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	private List<MeaningEntry> meanings;
 
 
-	public ThesaurusEntry(String line, BufferedReader br) throws IOException{
+	public ThesaurusEntry(String line, LineNumberReader br) throws IOException{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 
@@ -49,8 +49,8 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		for(int i = 0; i < numEntries; i ++){
 			String meaning = br.readLine();
 			//ignore any BOM marker on first line
-			if(meaning.startsWith(FileService.BOM_MARKER))
-				meaning = line.substring(1);
+			if(i == 0)
+				meaning = FileService.clearBOMMarker(meaning);
 
 			meanings.add(new MeaningEntry(meaning));
 		}

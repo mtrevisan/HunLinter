@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
@@ -66,11 +67,11 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 			File dicFile = dicParser.getDicFile();
 			long totalSize = dicFile.length();
-			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset())){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
-				if(line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 

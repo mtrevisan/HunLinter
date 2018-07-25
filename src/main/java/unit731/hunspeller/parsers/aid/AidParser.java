@@ -30,8 +30,8 @@ public class AidParser{
 			String line;
 			while(Objects.nonNull(line = br.readLine())){
 				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1 && line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 
 				if(!line.isEmpty())
 					lines.add(line);

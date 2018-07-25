@@ -2,10 +2,10 @@ package unit731.hunspeller.parsers.hyphenation;
 
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
@@ -197,11 +196,11 @@ public class HyphenationParser{
 
 			Path hypPath = hypFile.toPath();
 			Charset charset = FileService.determineCharset(hypPath);
-			try(BufferedReader br = Files.newBufferedReader(hypPath, charset)){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(hypPath, charset))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
-				if(line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 				if(Charset.forName(line) != charset)
 					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 

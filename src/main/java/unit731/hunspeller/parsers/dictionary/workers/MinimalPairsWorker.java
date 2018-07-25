@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -54,13 +55,13 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			setProgress(0);
 			try(
-					BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset());
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()));
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
-				if(line.startsWith(FileService.BOM_MARKER))
-					line = line.substring(1);
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
