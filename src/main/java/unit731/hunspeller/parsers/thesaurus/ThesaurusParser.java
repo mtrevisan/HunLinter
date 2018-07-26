@@ -68,7 +68,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public void parse(File theFile) throws IOException{
 		acquireLock();
 
-		dictionary.clear();
+		clearInternal();
 
 		Charset charset = FileService.determineCharset(theFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
@@ -362,11 +362,15 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		acquireLock();
 
 		try{
-			dictionary.clear();
+			clearInternal();
 		}
 		finally{
 			releaseLock();
 		}
+	}
+
+	private void clearInternal(){
+		dictionary.clear();
 	}
 
 	public boolean canUndo(){

@@ -101,7 +101,7 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
 @Slf4j
-public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Undoable{
+public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Hunspellable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -1841,6 +1841,49 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
 		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
+	}
+
+
+	@Override
+	public void clearAffixParser(){
+		clearDictionaryParser();
+	}
+
+	@Override
+	public void clearHyphenationParser(){
+		clearHyphenationFields();
+
+		int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
+		dicStatisticsMenuItem.setEnabled(false);
+	}
+
+	@Override
+	public void clearDictionaryParser(){
+		clearDictionaryFields();
+
+		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
+
+		//disable menu
+		dicMenu.setEnabled(false);
+		fileCreatePackageMenuItem.setEnabled(false);
+	}
+
+	@Override
+	public void clearAidParser(){
+		if(dicRuleTagsAidComboBox.getItemCount() > 0)
+			dicRuleTagsAidComboBox.removeAllItems();
+	}
+
+	@Override
+	public void clearThesaurusParser(){
+		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+		dm.setSynonyms(null);
+
+		theMenu.setEnabled(false);
+		int index = mainTabbedPane.indexOfComponent(theLayeredPane);
+		mainTabbedPane.setEnabledAt(index, false);
 	}
 
 

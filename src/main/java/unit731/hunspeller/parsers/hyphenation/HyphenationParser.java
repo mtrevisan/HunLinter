@@ -191,6 +191,8 @@ public class HyphenationParser{
 	public void parse(File hypFile) throws IOException, IllegalArgumentException{
 		acquireLock();
 
+		clearInternal();
+
 		try{
 			Level level = Level.NON_COMPOUND;
 
@@ -315,15 +317,19 @@ public class HyphenationParser{
 		acquireLock();
 
 		try{
-			patterns.values()
-				.forEach(RadixTree::clear);
-			customHyphenations.values()
-				.forEach(Map::clear);
-			optParser.clear();
+			clearInternal();
 		}
 		finally{
 			releaseLock();
 		}
+	}
+
+	private void clearInternal(){
+		patterns.values()
+			.forEach(RadixTree::clear);
+		customHyphenations.values()
+			.forEach(Map::clear);
+		optParser.clear();
 	}
 
 	/**

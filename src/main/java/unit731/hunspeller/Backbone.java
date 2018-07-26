@@ -45,15 +45,17 @@ public class Backbone implements FileChangeListener{
 
 	private final WordGenerator wordGenerator;
 
+	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
 
 
-	public Backbone(Undoable undoable){
+	public Backbone(Hunspellable hunspellable, Undoable undoable){
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		wordGenerator = new WordGenerator(affParser);
 
+		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
 	}
 
@@ -95,6 +97,8 @@ public class Backbone implements FileChangeListener{
 		if(!affFile.exists()){
 			affParser.clear();
 
+			hunspellable.clearAffixParser();
+
 			throw new FileNotFoundException("The file does not exists");
 		}
 
@@ -112,6 +116,8 @@ public class Backbone implements FileChangeListener{
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 
+			hunspellable.clearHyphenationParser();
+
 			log.info("Finished reading Hyphenation file");
 		}
 		else
@@ -123,6 +129,8 @@ public class Backbone implements FileChangeListener{
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, charset);
 			if(hypParser != null)
 				dicParser.setHyphenator(hypParser.getHyphenator());
+
+			hunspellable.clearDictionaryParser();
 		}
 		else
 			dicParser.clear();
@@ -133,6 +141,8 @@ public class Backbone implements FileChangeListener{
 			log.info("Opening Aid file for parsing: {}", aidFile.getName());
 
 			aidParser.parse(aidFile);
+
+			hunspellable.clearAidParser();
 
 			log.info("Finished reading Aid file");
 		}
@@ -145,6 +155,8 @@ public class Backbone implements FileChangeListener{
 			log.info("Opening Thesaurus file for parsing: {}", theFile.getName());
 
 			theParser.parse(theFile);
+
+			hunspellable.clearThesaurusParser();
 
 			log.info("Finished reading Thesaurus file");
 		}

@@ -428,7 +428,7 @@ public class AffixParser{
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
 		acquireLock();
 
-		clear();
+		clearData();
 
 		try{
 			boolean encodingRead = false;
@@ -503,7 +503,14 @@ public class AffixParser{
 	}
 
 	public void clear(){
-		clearData();
+		acquireLock();
+
+		try{
+			clearData();
+		}
+		finally{
+			releaseLock();
+		}
 	}
 
 	/**
