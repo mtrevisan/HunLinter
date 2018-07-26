@@ -105,9 +105,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
+	private static final String STAR = "*";
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
+	private static final String EXTENSION_THESAURUS_INDEX = ".idx";
+	private static final String EXTENSION_THESAURUS_DATA = ".dat";
+	private static final String PREFIX_THESAURUS = "th_";
+	private static final String SUFFIX_THESAURUS = "_v2";
+	private static final String PREFIX_HYPHENATION = "hyph_";
+	private static final String FOLDER_AID = "aids/";
 
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
 
@@ -1151,9 +1158,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
    }//GEN-LAST:event_theRedoButtonActionPerformed
 
 	private void saveThesaurusFiles() throws IOException{
-		String language = affParser.getLanguage();
-		File thesIndexFile = getFile("th_" + language + "_v2.idx");
-		File thesDataFile = getFile("th_" + language + "_v2.dat");
+		File thesIndexFile = getThesaurusIndexFile();
+		File thesDataFile = getThesaurusDataFile();
 		theParser.save(thesIndexFile, thesDataFile);
 	}
 
@@ -1366,19 +1372,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			//clear hyphenation
 			clearHyphenationFields();
 		}
-	}
-
-	private boolean hasAFFExtension(String path){
-		return path.endsWith(EXTENSION_AFF);
-	}
-
-	private boolean hasAIDExtension(String path){
-		return path.endsWith(EXTENSION_AID);
-	}
-
-	private boolean isHyphenationFile(String path){
-		String baseName = FilenameUtils.getBaseName(path);
-		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
 	}
 
 
@@ -1716,9 +1709,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		try{
 			clearAidFile();
 
-			String codePath = getCurrentWorkingDirectory();
-			codePath += "aids/" + affParser.getLanguage() + EXTENSION_AID;
-			File aidFile = new File(codePath);
+			File aidFile = getAidFile();
 			if(aidFile.exists()){
 				printResultLine("Opening AID file for parsing: " + aidFile.getName());
 
@@ -1764,7 +1755,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		try{
 			clearThesaurusFile();
 
-			File theFile = getThesaurusFile();
+			File theFile = getThesaurusDataFile();
 			if(theFile.exists()){
 				printResultLine("Opening Thesaurus file for parsing: " + theFile.getName());
 
@@ -1820,12 +1811,33 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		return getFile(affParser.getLanguage() + EXTENSION_DIC);
 	}
 
-	private File getThesaurusFile(){
-		return getFile("th_" + affParser.getLanguage() + "_v2.dat");
+	private File getThesaurusIndexFile(){
+		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
+	}
+
+	private File getThesaurusDataFile(){
+		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
 	}
 
 	private File getHyphenationFile(){
-		return getFile("hyph_" + affParser.getLanguage() + EXTENSION_DIC);
+		return getFile(PREFIX_HYPHENATION + affParser.getLanguage() + EXTENSION_DIC);
+	}
+
+	private File getAidFile(){
+		return getFile(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getLanguage() + EXTENSION_AID);
+	}
+
+	private boolean hasAFFExtension(String path){
+		return path.endsWith(EXTENSION_AFF);
+	}
+
+	private boolean hasAIDExtension(String path){
+		return path.endsWith(EXTENSION_AID);
+	}
+
+	private boolean isHyphenationFile(String path){
+		String baseName = FilenameUtils.getBaseName(path);
+		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
 	}
 
 
