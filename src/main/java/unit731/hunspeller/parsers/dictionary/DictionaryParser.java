@@ -44,11 +44,13 @@ public class DictionaryParser{
 	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
 	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
+	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
+	//figure space
+//	public static final char COUNTER_GROUPING_SEPARATOR = '\u2007';
 	public static final DecimalFormat COUNTER_FORMATTER = (DecimalFormat)NumberFormat.getInstance(Locale.US);
 	static{
 		DecimalFormatSymbols symbols = COUNTER_FORMATTER.getDecimalFormatSymbols();
-		//add thin space between groups
 		symbols.setGroupingSeparator(COUNTER_GROUPING_SEPARATOR);
 		COUNTER_FORMATTER.setDecimalFormatSymbols(symbols);
 	}

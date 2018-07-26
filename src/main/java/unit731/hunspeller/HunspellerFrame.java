@@ -169,10 +169,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		OutputStream os = new TextAreaOutputStream(parsingResultTextArea);
 		ApplicationLogAppender.setStaticOutputStream(os);
+//TODO thin space does not works!
+//log.info(Backbone.MARKER_APPLICATION, "±\u2009");
 
 
-//File currentDir = new File("C:\\Users\\mauro\\Projects\\VenetanHTML5App\\public_html\\app\\tools\\lang\\data\\dict-vec-oxt\\dictionaries");
-//File currentDir = new File("C:\\ApacheHTDocs\\VenetanHTML5App\\public_html\\app\\tools\\lang\\data\\dict-vec-oxt\\dictionaries");
 		File currentDir = new File(".");
 		openAffixFileFileChooser = new JFileChooser();
 		openAffixFileFileChooser.setFileFilter(new FileNameExtensionFilter("AFF files", "aff"));
@@ -279,6 +279,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
       parsingResultTextArea.setRows(5);
+      parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
