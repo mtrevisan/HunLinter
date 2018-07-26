@@ -67,16 +67,15 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			if(!duplicates.isEmpty())
 				DictionaryParser.openFileWithChoosenEditor(outputFile);
 		}
-		catch(IOException | IllegalArgumentException e){
-			stopped = true;
-
-			publish(e instanceof ClosedChannelException? "Duplicates thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
 			stopped = true;
 
-			String message = ExceptionService.getMessage(e, getClass());
-			publish(e.getClass().getSimpleName() + ": " + message);
+			if(e instanceof ClosedChannelException)
+				publish("Duplicates thread interrupted");
+			else{
+				String message = ExceptionService.getMessage(e);
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
 		}
 		if(stopped)
 			publish("Stopped reading Dictionary file");

@@ -16,6 +16,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
+import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -202,10 +203,16 @@ public class Backbone implements FileChangeListener{
 		log.debug("File {} deleted", path.toFile().getName());
 
 		String absolutePath = path.toString().toLowerCase();
-		if(hasAFFExtension(absolutePath))
+		if(hasAFFExtension(absolutePath)){
 			affParser.clear();
-		else if(hasAIDExtension(absolutePath))
+
+			hunspellable.clearAffixParser();
+		}
+		else if(hasAIDExtension(absolutePath)){
 			aidParser.clear();
+
+			hunspellable.clearAidParser();
+		}
 	}
 
 	@Override
@@ -227,7 +234,8 @@ public class Backbone implements FileChangeListener{
 			}
 		}
 		catch(IOException e){
-			log.error(e.getMessage(), e);
+			String message = ExceptionService.getMessage(e);
+			log.error(e.getClass().getSimpleName() + ": " + message, e);
 		}
 	}
 

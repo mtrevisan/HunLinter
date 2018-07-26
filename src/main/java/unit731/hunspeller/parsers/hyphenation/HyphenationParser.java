@@ -274,7 +274,7 @@ public class HyphenationParser{
 //106 800 B basic trie
 		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			throw new IllegalArgumentException(e.getClass().getSimpleName() + ": " + message);
 		}
 		finally{

@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
@@ -201,16 +200,15 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			DictionaryParser.openFileWithChoosenEditor(outputFile);
 		}
-		catch(IOException | IllegalArgumentException e){
-			stopped = true;
-
-			publish(e instanceof ClosedChannelException? "Minimal pairs thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
 			stopped = true;
 
-			String message = ExceptionService.getMessage(e, getClass());
-			publish(e.getClass().getSimpleName() + ": " + message);
+			if(e instanceof ClosedChannelException)
+				publish("Duplicates thread interrupted");
+			else{
+				String message = ExceptionService.getMessage(e);
+				publish(e.getClass().getSimpleName() + ": " + message);
+			}
 		}
 		if(stopped)
 			publish("Stopped reading Dictionary file");

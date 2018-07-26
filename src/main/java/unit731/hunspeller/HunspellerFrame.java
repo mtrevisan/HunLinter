@@ -1062,11 +1062,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
-		catch(ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
-			printResultLine("Insertion error: " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine("Insertion error: " + message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
@@ -1116,11 +1113,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			//... and save the files
 			saveThesaurusFiles();
 		}
-		catch(ArrayIndexOutOfBoundsException | IllegalArgumentException | IOException e){
-			printResultLine("Deletion error: " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine("Deletion error: " + message);
 		}
 	}
@@ -1387,11 +1381,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			printResultLine("Finished reading Affix file");
 		}
-		catch(IOException | IllegalArgumentException e){
-			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}
@@ -1421,11 +1412,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Finished reading Hyphenation file");
 			}
 		}
-		catch(IOException | IllegalArgumentException e){
-			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}
@@ -1730,11 +1718,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Finished reading Aid file");
 			}
 		}
-		catch(IOException e){
-			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}
@@ -1776,11 +1761,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				printResultLine("Finished reading Thesaurus file");
 			}
 		}
-		catch(IOException e){
-			printResultLine(e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e, getClass());
+			String message = ExceptionService.getMessage(e);
 			printResultLine(e.getClass().getSimpleName() + ": " + message);
 		}
 	}

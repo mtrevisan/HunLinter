@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
@@ -78,16 +77,15 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 
 			publish("Finished processing Dictionary file (it takes " + watch.toStringMinuteSeconds() + ")");
 		}
-		catch(IOException | IllegalArgumentException e){
-			stopped = true;
-
-			publish(e instanceof ClosedChannelException? "Correctness thread interrupted": e.getClass().getSimpleName() + ": " + e.getMessage());
-		}
 		catch(Exception e){
 			stopped = true;
 
-			String message = ExceptionService.getMessage(e, getClass());
-			publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
+			if(e instanceof ClosedChannelException)
+				publish("Correctness thread interrupted");
+			else{
+				String message = ExceptionService.getMessage(e);
+				publish(e.getClass().getSimpleName() + (lineIndex >= 0? " on line " + lineIndex: StringUtils.EMPTY) + ": " + message);
+			}
 		}
 		if(stopped)
 			publish("Stopped processing Dictionary file");

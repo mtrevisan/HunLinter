@@ -6,12 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ExceptionService{
 
-	public static String getMessage(Exception e, Class<?> cl){
+	public static String getMessage(Exception e){
 		String message = e.getMessage();
 		if(Objects.isNull(message)){
 			StackTraceElement[] stackTrace = e.getStackTrace();
 			StackTraceElement stackTrace0 = e.getStackTrace()[0];
-			String classPackage = cl.getName();
+			String classPackage = ExceptionService.class.getName();
 			classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
 			for(StackTraceElement trace : stackTrace)
 				if(trace.getClassName().startsWith(classPackage)){
