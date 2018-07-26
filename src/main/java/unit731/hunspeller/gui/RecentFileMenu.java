@@ -27,10 +27,22 @@ public class RecentFileMenu extends JMenu{
 		this.recentItems = recentItems;
 		this.onSelectFile = onSelectFile;
 
-		addEntries();
+		addEntriesToMenu();
 	}
 
-	private void addEntries(){
+	public void addEntry(String filePath){
+		recentItems.push(filePath);
+
+		addEntriesToMenu();
+	}
+
+	public void removeEntry(String filePath){
+		recentItems.remove(filePath);
+
+		addEntriesToMenu();
+	}
+
+	private void addEntriesToMenu(){
 		//clear the existing items
 		removeAll();
 
@@ -44,7 +56,7 @@ public class RecentFileMenu extends JMenu{
 				String path = actionEvent.getActionCommand();
 				recentItems.push(path);
 
-				addEntries();
+				addEntriesToMenu();
 
 				onSelectFile.accept(path);
 			});

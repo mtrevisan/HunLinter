@@ -129,6 +129,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private HyphenationParser hypParser;
 
 	private final WordGenerator wordGenerator;
+
+	private RecentFileMenu rfm;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, 400);
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(HunspellerFrame::filterThesaurus, 400);
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(HunspellerFrame::hyphenate, 400);
@@ -144,13 +146,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
 
-	private static RecentItems recentItems;
-
 
 	public HunspellerFrame(){
-		Preferences preferences = Preferences.userNodeForPackage(HunspellerFrame.class);
-		recentItems = new RecentItems(5, preferences);
-
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(this);
@@ -673,7 +670,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
       fileMenu.add(fileExitMenuItem);
 
       mainMenuBar.add(fileMenu);
-      RecentFileMenu rfm = new RecentFileMenu(recentItems, this::loadFile);
+      Preferences preferences = Preferences.userNodeForPackage(HunspellerFrame.class);
+      RecentItems recentItems = new RecentItems(5, preferences);
+      rfm = new RecentFileMenu(recentItems, this::loadFile);
       rfm.setText("Recent files");
       rfm.setMnemonic('R');
       fileMenu.add(rfm, 3);
@@ -841,7 +840,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
-			recentItems.push(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
+			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
 
 			affFile = openAffixFileFileChooser.getSelectedFile();
 
@@ -1298,31 +1297,40 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 	private void loadFile(String filePath){
-		flm.stop();
-
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		affFile = new File(filePath);
+		printResultLine("Loading file " + affFile.getName());
 
-		clearResultTextArea();
+		if(!affFile.exists()){
+			printResultLine("The file does not exists");
 
-		openAffixFile();
-
-		openHyphenationFile();
-
-		prepareDictionaryFile();
-
-		openAidFile();
-
-		openThesaurusFile();
-
-
-		try{
-			flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
-			flm.start();
+			//remove file from recent list
+			rfm.removeEntry(filePath);
 		}
-		catch(IOException e){
-			printResultLine("Unable to register file change listener");
+		else{
+			flm.stop();
+
+			clearResultTextArea();
+
+			openAffixFile();
+
+			openHyphenationFile();
+
+			prepareDictionaryFile();
+
+			openAidFile();
+
+			openThesaurusFile();
+
+
+			try{
+				flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
+				flm.start();
+			}
+			catch(IOException e){
+				printResultLine("Unable to register file change listener");
+			}
 		}
 	}
 

@@ -14,7 +14,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="RecentFileMenu rfm = new RecentFileMenu(recentItems, this::loadFile);&#xa;rfm.setText(&quot;Recent files&quot;);&#xa;rfm.setMnemonic(&apos;R&apos;);&#xa;fileMenu.add(rfm, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(HunspellerFrame.class);&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;rfm = new RecentFileMenu(recentItems, this::loadFile);&#xa;rfm.setText(&quot;Recent files&quot;);&#xa;rfm.setMnemonic(&apos;R&apos;);&#xa;fileMenu.add(rfm, 3);"/>
           </AuxValues>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="fileOpenAFFMenuItem">
