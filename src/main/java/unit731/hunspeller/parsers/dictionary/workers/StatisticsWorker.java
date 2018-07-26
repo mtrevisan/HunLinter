@@ -12,9 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.DictionaryStatisticsDialog;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -29,28 +30,27 @@ import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
+@Slf4j
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
 	@Getter
 	private final boolean performHyphenationStatistics;
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
-	private final Resultable resultable;
+	private final Frame parent;
 
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(boolean performHyphenationStatistics, AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+	public StatisticsWorker(boolean performHyphenationStatistics, AffixParser affParser, DictionaryParser dicParser, Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(resultable);
-		if(!(resultable instanceof Frame))
-			throw new IllegalArgumentException("The resultable should also be a Frame");
+		Objects.requireNonNull(parent);
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 		this.affParser = affParser;
 		this.dicParser = dicParser;
-		this.resultable = resultable;
+		this.parent = parent;
 
 		dicStatistics = new DictionaryStatistics(dicParser);
 	}
@@ -140,7 +140,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void process(List<String> chunks){
-		resultable.printResultLine(chunks);
+		for(String chunk : chunks)
+			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 	@Override
@@ -148,8 +149,8 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 		if(!isCancelled()){
 			try{
 				//show statistics window
-				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, (Frame)resultable);
-				dialog.setLocationRelativeTo((Frame)resultable);
+				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+				dialog.setLocationRelativeTo(parent);
 				dialog.setVisible(true);
 			}
 			catch(InterruptedException | InvocationTargetException e){

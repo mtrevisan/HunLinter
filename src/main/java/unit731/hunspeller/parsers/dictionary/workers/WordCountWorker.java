@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import java.awt.Frame;
 import java.io.File;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
@@ -8,11 +7,12 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -24,25 +24,21 @@ import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
+@Slf4j
 public class WordCountWorker extends SwingWorker<Void, String>{
 
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
-	private final Resultable resultable;
 
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, Resultable resultable){
+	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(resultable);
-		if(!(resultable instanceof Frame))
-			throw new IllegalArgumentException("The resultable should also be a Frame");
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
-		this.resultable = resultable;
 
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
 		bloomFilter.setCharset(dicParser.getCharset());
@@ -118,7 +114,8 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void process(List<String> chunks){
-		resultable.printResultLine(chunks);
+		for(String chunk : chunks)
+			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 	@Override

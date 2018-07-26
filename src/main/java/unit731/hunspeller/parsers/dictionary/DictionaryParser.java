@@ -55,7 +55,6 @@ public class DictionaryParser{
 	public static final DecimalFormat PERCENT_FORMATTER = new DecimalFormat("0.#####%", DecimalFormatSymbols.getInstance(Locale.US));
 	public static final DecimalFormat PERCENT_FORMATTER_1 = new DecimalFormat("0.0%", DecimalFormatSymbols.getInstance(Locale.US));
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.US);
-	public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
 

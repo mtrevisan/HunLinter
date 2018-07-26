@@ -14,7 +14,8 @@ import java.util.Map;
 import java.util.Objects;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
-import unit731.hunspeller.interfaces.Resultable;
+import lombok.extern.slf4j.Slf4j;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionService;
@@ -22,11 +23,11 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 @AllArgsConstructor
+@Slf4j
 public class SorterWorker extends SwingWorker<Void, String>{
 
 	private final DictionaryParser dicParser;
 	private final int lineIndex;
-	private final Resultable resultable;
 
 
 	@Override
@@ -147,7 +148,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void process(List<String> chunks){
-		resultable.printResultLine(chunks);
+		for(String chunk : chunks)
+			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }

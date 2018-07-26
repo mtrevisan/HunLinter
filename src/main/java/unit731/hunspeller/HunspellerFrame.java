@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
@@ -16,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,7 +51,6 @@ import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
@@ -101,11 +100,10 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
 @Slf4j
-public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Resultable, Hunspellable, Undoable{
+public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Hunspellable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
-	private static final String STAR = "*";
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
@@ -385,11 +383,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
                         saveThesaurusFiles();
                      }
                      catch(IllegalArgumentException | IOException ex){
-                        printResultLine(ex.getMessage());
+                        log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(ex));
                      }
                   };
                   ThesaurusEntry synonym = theParser.getSynonymsDictionary().get(row);
-                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, (Resultable)parent, parent);
+                  ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
                }
@@ -887,13 +885,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		//package entire folder with ZIP
 		if(found){
-			printResultLine("Found base path on " + parentPath.toString());
+			log.info(Backbone.MARKER_APPLICATION, "Found base path on " + parentPath.toString());
 
 			try{
 				String outputFilename = parentPath.toString() + File.separator + parentPath.getName(parentPath.getNameCount() - 1) + ".zip";
 				ZIPPER.zipDirectory(parentPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
-				printResultLine("Package created");
+				log.info(Backbone.MARKER_APPLICATION, "Package created");
 
 				//open directory
 				if(Desktop.isDesktopSupported())
@@ -902,7 +900,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			catch(IOException e){
 				log.error("Something very bad happend while creating package", e);
 
-				printResultLine("Package error: " + e.getMessage());
+				log.info(Backbone.MARKER_APPLICATION, "Package error: " + e.getMessage());
 			}
 		}
    }//GEN-LAST:event_fileCreatePackageMenuItemActionPerformed
@@ -954,7 +952,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				dm.setProductions(productions);
 			}
 			catch(IllegalArgumentException e){
-				frame.printResultLine(e.getMessage() + " for input " + inputText);
+				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
 			}
 		}
 		else
@@ -1064,7 +1062,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine("Insertion error: " + message);
+			log.info(Backbone.MARKER_APPLICATION, "Insertion error: " + message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
@@ -1115,7 +1113,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine("Deletion error: " + message);
+			log.info(Backbone.MARKER_APPLICATION, "Deletion error: " + message);
 		}
 	}
 
@@ -1193,7 +1191,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			printResultLine("Duplicated rule found (" + foundRule + "), cannot insert " + newRule);
+			log.info(Backbone.MARKER_APPLICATION, "Duplicated rule found (" + foundRule + "), cannot insert " + newRule);
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
@@ -1225,7 +1223,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					printResultLine("Dictionary correctness check aborted");
+					log.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1240,7 +1238,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 					dicExtractDuplicatesMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					printResultLine("Dictionary duplicate extraction aborted");
+					log.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1255,7 +1253,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 					dicWordCountMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					printResultLine("Word count extraction aborted");
+					log.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1273,7 +1271,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					else
 						disStatisticsNoHyphenationMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					printResultLine("Statistics extraction aborted");
+					log.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1288,7 +1286,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 					dicExtractWordlistMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					printResultLine("Dictionary wordlist extraction aborted");
+					log.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1304,10 +1302,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 		affFile = new File(filePath);
 
-		printResultLine("Loading file " + affFile.getName());
+		log.info(Backbone.MARKER_APPLICATION, "Loading file " + affFile.getName());
 
 		if(!affFile.exists()){
-			printResultLine("The file does not exists");
+			log.info(Backbone.MARKER_APPLICATION, "The file does not exists");
 
 			//remove file from recent list
 			rfm.removeEntry(filePath);
@@ -1331,7 +1329,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				flm.start();
 			}
 			catch(IOException e){
-				printResultLine("Unable to register file change listener");
+				log.info(Backbone.MARKER_APPLICATION, "Unable to register file change listener");
 			}
 		}
 	}
@@ -1344,7 +1342,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	@Override
 	public void fileDeleted(Path path){
-		printResultLine("File " + path.toFile().getName() + " deleted");
+		log.info(Backbone.MARKER_APPLICATION, "File " + path.toFile().getName() + " deleted");
 
 		String absolutePath = path.toString().toLowerCase();
 		if(hasAFFExtension(absolutePath))
@@ -1355,7 +1353,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	@Override
 	public void fileModified(Path path){
-		printResultLine("File " + path.toFile().getName() + " modified");
+		log.info(Backbone.MARKER_APPLICATION, "File " + path.toFile().getName() + " modified");
 
 		String absolutePath = path.toString().toLowerCase();
 		if(hasAFFExtension(absolutePath))
@@ -1375,15 +1373,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		try{
 			clearAffixFile();
 
-			printResultLine("Opening Affix file for parsing: " + affFile.getName());
+			log.info(Backbone.MARKER_APPLICATION, "Opening Affix file for parsing: " + affFile.getName());
 
 			affParser.parse(affFile);
 
-			printResultLine("Finished reading Affix file");
+			log.info(Backbone.MARKER_APPLICATION, "Finished reading Affix file");
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine(e.getClass().getSimpleName() + ": " + message);
+			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 		}
 	}
 
@@ -1400,7 +1398,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			File hypFile = getHyphenationFile();
 			if(hypFile.exists()){
-				printResultLine("Opening Hyphenation file for parsing: " + hypFile.getName());
+				log.info(Backbone.MARKER_APPLICATION, "Opening Hyphenation file for parsing: " + hypFile.getName());
 
 				hypParser = new HyphenationParser(affParser.getLanguage());
 				hypParser.parse(hypFile);
@@ -1409,12 +1407,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainTabbedPane.setEnabledAt(index, true);
 				dicStatisticsMenuItem.setEnabled(true);
 
-				printResultLine("Finished reading Hyphenation file");
+				log.info(Backbone.MARKER_APPLICATION, "Finished reading Hyphenation file");
 			}
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine(e.getClass().getSimpleName() + ": " + message);
+			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 		}
 	}
 
@@ -1559,7 +1557,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 						mainProgressBar.setValue(0);
 
 
-						dicSorterWorker = new SorterWorker(dicParser, selectedRow, this);
+						dicSorterWorker = new SorterWorker(dicParser, selectedRow);
 						dicSorterWorker.addPropertyChangeListener(this);
 						dicSorterWorker.execute();
 					}
@@ -1609,7 +1607,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new CorrectnessWorker(affParser, dicParser, this);
+			dicCorrectnessWorker = new CorrectnessWorker(affParser, dicParser);
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1625,7 +1623,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(affParser, dicParser, outputFile, this);
+				dicDuplicatesWorker = new DuplicatesWorker(affParser, dicParser, outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1639,7 +1637,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(affParser, dicParser, this);
+			dicWordCountWorker = new WordCountWorker(affParser, dicParser);
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1671,7 +1669,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(affParser, dicParser, outputFile, this);
+				dicWordlistWorker = new WordlistWorker(affParser, dicParser, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -1688,7 +1686,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(affParser, dicParser, outputFile, this);
+				dicMinimalPairsWorker = new MinimalPairsWorker(affParser, dicParser, outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}
@@ -1702,7 +1700,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			File aidFile = getAidFile();
 			if(aidFile.exists()){
-				printResultLine("Opening AID file for parsing: " + aidFile.getName());
+				log.info(Backbone.MARKER_APPLICATION, "Opening AID file for parsing: " + aidFile.getName());
 
 				aidParser.parse(aidFile);
 				List<String> lines = aidParser.getLines();
@@ -1715,12 +1713,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 					dicRuleTagsAidComboBox.setEnabled(true);
 				}
 
-				printResultLine("Finished reading Aid file");
+				log.info(Backbone.MARKER_APPLICATION, "Finished reading Aid file");
 			}
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine(e.getClass().getSimpleName() + ": " + message);
+			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 		}
 	}
 
@@ -1745,7 +1743,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			File theFile = getThesaurusDataFile();
 			if(theFile.exists()){
-				printResultLine("Opening Thesaurus file for parsing: " + theFile.getName());
+				log.info(Backbone.MARKER_APPLICATION, "Opening Thesaurus file for parsing: " + theFile.getName());
 
 				theParser.parse(theFile);
 
@@ -1758,12 +1756,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 				int index = mainTabbedPane.indexOfComponent(theLayeredPane);
 				mainTabbedPane.setEnabledAt(index, true);
 
-				printResultLine("Finished reading Thesaurus file");
+				log.info(Backbone.MARKER_APPLICATION, "Finished reading Thesaurus file");
 			}
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			printResultLine(e.getClass().getSimpleName() + ": " + message);
+			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 		}
 	}
 
@@ -1871,12 +1869,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void clearResultTextArea(){
 		parsingResultTextArea.setText(null);
-	}
-
-	@Override
-	public void printResultLine(String text){
-		String timeOfDay = LocalTime.now().format(DictionaryParser.TIME_FORMATTER);
-		parsingResultTextArea.append(timeOfDay + StringUtils.SPACE + text + StringUtils.LF);
 	}
 
 	@Override

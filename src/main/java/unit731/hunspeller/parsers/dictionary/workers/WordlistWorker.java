@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.interfaces.Resultable;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -22,12 +23,12 @@ import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
+@Slf4j
 public class WordlistWorker extends SwingWorker<Void, String>{
 
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
-	private final Resultable resultable;
 
 
 	@Override
@@ -106,7 +107,8 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void process(List<String> chunks){
-		resultable.printResultLine(chunks);
+		for(String chunk : chunks)
+			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }

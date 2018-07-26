@@ -1,4 +1,4 @@
-package unit731.hunspeller;
+package unit731.hunspeller.interfaces;
 
 public interface Hunspellable{
 

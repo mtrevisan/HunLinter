@@ -17,7 +17,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
@@ -30,18 +29,16 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 	private final ThesaurusEntry synonym;
 	private final BiConsumer<List<MeaningEntry>, String> okButtonAction;
-	private final Resultable resultable;
 
 	private final List<MeaningEntry> meanings;
 
 
-	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Resultable resultable, Frame parent){
+	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Frame parent){
 		super(parent, "Change meanings for \"" + synonym.getSynonym() + "\"", true);
 
 		Objects.requireNonNull(parent);
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(okButtonAction);
-		Objects.requireNonNull(resultable);
 
 		initComponents();
 
@@ -52,8 +49,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		meanings = synonym.getMeanings();
 		String content = StringUtils.join(meanings, StringUtils.LF);
 		meaningsTextArea.setText(content);
-
-		this.resultable = resultable;
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -145,7 +140,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			okButtonAction.accept(meanings, text);
 		}
 		catch(IllegalArgumentException e){
-			resultable.printResultLine("Error while changing the meanings for word \"" + synonym.getSynonym() + "\": " + e.getMessage());
+			log.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"" + synonym.getSynonym() + "\": " + e.getMessage());
 		}
 
 		dispose();
@@ -188,7 +183,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 				));
 				ThesaurusEntry synonym = new ThesaurusEntry("synonym", meanings);
 				javax.swing.JFrame parent = new javax.swing.JFrame();
-				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, (means, text) -> {}, null, parent);
+				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, (means, text) -> {}, parent);
 				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override

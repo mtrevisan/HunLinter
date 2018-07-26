@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,6 +9,8 @@ import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -23,6 +26,8 @@ import unit731.hunspeller.services.filelistener.FileListenerManager;
 
 @Slf4j
 public class Backbone implements FileChangeListener{
+
+	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 
 	private static final String STAR = "*";
 	private static final String EXTENSION_AFF = ".aff";
@@ -103,23 +108,23 @@ public class Backbone implements FileChangeListener{
 			throw new FileNotFoundException("The file does not exists");
 		}
 
-		log.info("Opening Affix file for parsing: {}", affFile.getName());
+		log.info(MARKER_APPLICATION, "Opening Affix file for parsing: {}", affFile.getName());
 
 		affParser.parse(affFile);
 
-		log.info("Finished reading Affix file");
+		log.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
 	private void openHyphenationFile(File hypFile, String language) throws IOException{
 		if(hypFile.exists()){
-			log.info("Opening Hyphenation file for parsing: {}", hypFile.getName());
+			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
 
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 
 			hunspellable.clearHyphenationParser();
 
-			log.info("Finished reading Hyphenation file");
+			log.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
 		}
 		else
 			hypParser.clear();
@@ -139,13 +144,13 @@ public class Backbone implements FileChangeListener{
 
 	private void openAidFile(File aidFile) throws IOException{
 		if(aidFile.exists()){
-			log.info("Opening Aid file for parsing: {}", aidFile.getName());
+			log.info(MARKER_APPLICATION, "Opening Aid file for parsing: {}", aidFile.getName());
 
 			aidParser.parse(aidFile);
 
 			hunspellable.clearAidParser();
 
-			log.info("Finished reading Aid file");
+			log.info(MARKER_APPLICATION, "Finished reading Aid file");
 		}
 		else
 			aidParser.clear();
@@ -153,13 +158,13 @@ public class Backbone implements FileChangeListener{
 
 	private void openThesaurusFile(File theFile) throws IOException{
 		if(theFile.exists()){
-			log.info("Opening Thesaurus file for parsing: {}", theFile.getName());
+			log.info(MARKER_APPLICATION, "Opening Thesaurus file for parsing: {}", theFile.getName());
 
 			theParser.parse(theFile);
 
 			hunspellable.clearThesaurusParser();
 
-			log.info("Finished reading Thesaurus file");
+			log.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
 		}
 		else
 			theParser.clear();
@@ -200,7 +205,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(Path path){
-		log.debug("File {} deleted", path.toFile().getName());
+		log.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
 		String absolutePath = path.toString().toLowerCase();
 		if(hasAFFExtension(absolutePath)){
@@ -217,7 +222,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.debug("File {} modified", path.toFile().getName());
+		log.info(MARKER_APPLICATION, "File {} modified", path.toFile().getName());
 
 		try{
 			String absolutePath = path.toString().toLowerCase();
@@ -235,7 +240,7 @@ public class Backbone implements FileChangeListener{
 		}
 		catch(IOException e){
 			String message = ExceptionService.getMessage(e);
-			log.error(e.getClass().getSimpleName() + ": " + message, e);
+			log.error(MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message, e);
 		}
 	}
 

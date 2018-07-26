@@ -15,12 +15,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.interfaces.Resultable;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -34,6 +35,7 @@ import unit731.hunspeller.services.TimeWatch;
 
 
 @AllArgsConstructor
+@Slf4j
 public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 	private static final int EXPECTED_NUMBER_OF_DUPLICATIONS = 1_000_000;
@@ -43,7 +45,6 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
-	private final Resultable resultable;
 
 
 	@Override
@@ -258,7 +259,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 	@Override
 	protected void process(List<String> chunks){
-		resultable.printResultLine(chunks);
+		for(String chunk : chunks)
+			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }
