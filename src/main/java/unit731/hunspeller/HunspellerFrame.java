@@ -170,7 +170,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		OutputStream os = new TextAreaOutputStream(parsingResultTextArea);
 		ApplicationLogAppender.setStaticOutputStream(os);
 //TODO thin space does not works!
-//log.info(Backbone.MARKER_APPLICATION, "±\u2009");
+log.info(Backbone.MARKER_APPLICATION, "±\u2009a");
 
 
 		File currentDir = new File(".");

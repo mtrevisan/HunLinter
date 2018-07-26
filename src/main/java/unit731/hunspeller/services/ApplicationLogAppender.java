@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 
+/* http://poth-chola.blogspot.com/2015/08/custom-slf4j-logger-adapter.html */
 public class ApplicationLogAppender<T> extends OutputStreamAppender<T>{
 
 	private static final DelegatingOutputStream DELEGATING_OUTPUT_STREAM = new DelegatingOutputStream(null);
@@ -14,7 +15,7 @@ public class ApplicationLogAppender<T> extends OutputStreamAppender<T>{
 	private static class DelegatingOutputStream extends FilterOutputStream{
 
 		/** Creates a delegating output stream with a NO-OP delegate */
-		public DelegatingOutputStream(OutputStream out){
+		DelegatingOutputStream(OutputStream out){
 			super(new OutputStream(){
 				@Override
 				public void write(int b) throws IOException{}
