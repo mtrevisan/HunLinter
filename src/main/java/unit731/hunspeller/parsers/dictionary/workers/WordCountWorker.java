@@ -80,14 +80,14 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
+							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
 							for(RuleProductionEntry production : productions)
 								bloomFilter.add(production.getWord());
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 

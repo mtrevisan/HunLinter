@@ -81,9 +81,11 @@ public class ThesaurusDictionary{
 	}
 
 	public void clear(){
-		synonyms.clear();
+		if(!synonyms.isEmpty()){
+			synonyms.clear();
 
-		modified = true;
+			modified = true;
+		}
 	}
 
 	public void resetModified(){
