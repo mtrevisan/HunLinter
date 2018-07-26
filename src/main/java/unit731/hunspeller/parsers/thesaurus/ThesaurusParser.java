@@ -68,6 +68,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public void parse(File theFile) throws IOException{
 		acquireLock();
 
+		dictionary.clear();
+
 		Charset charset = FileService.determineCharset(theFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
 			String line = br.readLine();

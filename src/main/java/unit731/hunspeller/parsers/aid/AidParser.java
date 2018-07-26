@@ -25,6 +25,8 @@ public class AidParser{
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File aidFile) throws IOException{
+		clear();
+
 		Charset charset = FileService.determineCharset(aidFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(aidFile.toPath(), charset))){
 			String line;

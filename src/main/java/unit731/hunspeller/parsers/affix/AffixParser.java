@@ -428,6 +428,8 @@ public class AffixParser{
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
 		acquireLock();
 
+		clear();
+
 		try{
 			boolean encodingRead = false;
 			charset = FileService.determineCharset(affFile.toPath());

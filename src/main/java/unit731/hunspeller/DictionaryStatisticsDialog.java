@@ -517,7 +517,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				File dicFile = File.createTempFile("vec", ".dic");
 				dicFile.deleteOnExit();
 				AffixParser affParser = new AffixParser();
-				DictionaryParser dicParser = new DictionaryParser(dicFile, null, new WordGenerator(affParser), StandardCharsets.UTF_8);
+				DictionaryParser dicParser = new DictionaryParser(dicFile, new WordGenerator(affParser), StandardCharsets.UTF_8);
 				DictionaryStatistics stats = new DictionaryStatistics(dicParser);
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];

@@ -851,8 +851,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 			affFile = openAffixFileFileChooser.getSelectedFile();
 
-			clearResultTextArea();
-
 			openAffixFile();
 
 			openAidFile();
@@ -862,6 +860,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 			hypParser = new HyphenationParser(affParser.getLanguage());
 
 			openHyphenationFile();
+
+			clearResultTextArea();
 		}
    }//GEN-LAST:event_fileOpenAFFMenuItemActionPerformed
 
@@ -1305,7 +1305,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private void loadFile(String filePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		clearResultTextArea();
+
+
 		affFile = new File(filePath);
+
 		printResultLine("Loading file " + affFile.getName());
 
 		if(!affFile.exists()){
@@ -1316,8 +1320,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		}
 		else{
 			flm.stop();
-
-			clearResultTextArea();
 
 			openAffixFile();
 
@@ -1359,7 +1361,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	@Override
 	public void fileModified(Path path){
-//		printResultLine("File " + path.toFile().getName() + " modified");
+		printResultLine("File " + path.toFile().getName() + " modified");
 
 		String absolutePath = path.toString().toLowerCase();
 		if(hasAFFExtension(absolutePath))
@@ -1396,7 +1398,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private void clearAffixFile(){
 		affParser.clear();
-		
+
 		clearDictionaryFile();
 	}
 
@@ -1431,7 +1433,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private void clearHyphenationFile(){
 		if(Objects.nonNull(hypParser))
 			hypParser.clear();
-		
+
 		clearHyphenationFields();
 
 		int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
@@ -1550,8 +1552,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private void prepareDictionaryFile(){
 		String language = affParser.getLanguage();
 		File dicFile = getFile(language + EXTENSION_DIC);
-		dicParser = DictionaryParserBuilder.getParser(language, dicFile, (hypParser != null? hypParser.getHyphenator(): null), wordGenerator,
-			affParser.getCharset());
+		dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
+		if(hypParser != null)
+			dicParser.setHyphenator(hypParser.getHyphenator());
 
 		dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
 		dicDialog.setLocationRelativeTo(this);

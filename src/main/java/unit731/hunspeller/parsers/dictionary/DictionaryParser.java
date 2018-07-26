@@ -63,23 +63,27 @@ public class DictionaryParser{
 	protected final WordGenerator wordGenerator;
 	private final Charset charset;
 	private final String language;
-	protected final HyphenatorInterface hyphenator;
+	protected HyphenatorInterface hyphenator = EmptyHyphenator.getInstance();
 	private final ExternalSorter sorter = new ExternalSorter();
 
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, HyphenatorInterface hyphenator, WordGenerator wordGenerator, Charset charset){
+	public DictionaryParser(File dicFile, WordGenerator wordGenerator, Charset charset){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
-		this.hyphenator = (hyphenator != null? hyphenator: EmptyHyphenator.getInstance());
 		this.wordGenerator = wordGenerator;
 		this.charset = charset;
 		String filename = dicFile.getName();
 		language = filename.substring(0, filename.indexOf(".dic"));
+	}
+
+	public void setHyphenator(HyphenatorInterface hyphenator){
+		if(hyphenator != null)
+			this.hyphenator = hyphenator;
 	}
 
 	public int getExpectedNumberOfElements(){
