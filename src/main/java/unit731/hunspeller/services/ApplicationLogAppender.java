@@ -22,7 +22,7 @@ public class ApplicationLogAppender<T> extends OutputStreamAppender<T>{
 		}
 
 		void setOutputStream(OutputStream outputStream){
-			this.out = outputStream;
+			out = outputStream;
 		}
 
 	}

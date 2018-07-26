@@ -39,7 +39,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.MenuSelectionManager;
@@ -50,7 +49,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +58,7 @@ import unit731.hunspeller.gui.DictionarySortCellRenderer;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
+import unit731.hunspeller.gui.TextAreaOutputStream;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -121,21 +120,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
 
 	private static final ZipManager ZIPPER = new ZipManager();
-
-
-	@AllArgsConstructor
-	private static class TextAreaOutputStream extends OutputStream{
-
-		private final JTextArea textArea;
-
-
-		@Override
-		public void write(int b) throws IOException{
-			textArea.append(Character.toString((char)b));
-		}
-
-	}
-
 
 	private File affFile;
 
