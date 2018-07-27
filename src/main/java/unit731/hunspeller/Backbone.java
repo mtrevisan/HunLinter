@@ -354,6 +354,18 @@ public class Backbone implements FileChangeListener{
 		return lines;
 	}
 
+	public int getExpectedNumberOfDictionaryElements(){
+		return dicParser.getExpectedNumberOfElements();
+	}
+
+	public double getFalsePositiveDictionaryProbability(){
+		return dicParser.getFalsePositiveProbability();
+	}
+
+	public double getGrowRatioWhenDictionaryFull(){
+		return dicParser.getGrowRatioWhenFull();
+	}
+
 	public boolean isDictionaryLineInBoundary(int lineIndex){
 		return dicParser.isInBoundary(lineIndex);
 	}

@@ -20,7 +20,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -384,7 +383,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	public void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{
+	public void checkProduction(RuleProductionEntry production) throws IllegalArgumentException{
 //		if(!ENABLE_VERB_CHECK && production.isPartOfSpeech(POS_VERB))
 //			return;
 

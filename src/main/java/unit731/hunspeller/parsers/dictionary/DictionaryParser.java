@@ -25,7 +25,6 @@ import org.apache.commons.lang3.SystemUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.EmptyHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
@@ -101,7 +100,7 @@ public class DictionaryParser{
 
 
 	//correctness worker:
-	public void checkProduction(RuleProductionEntry production, FlagParsingStrategy strategy) throws IllegalArgumentException{}
+	public void checkProduction(RuleProductionEntry production) throws IllegalArgumentException{}
 
 
 	//minimal pairs worker:

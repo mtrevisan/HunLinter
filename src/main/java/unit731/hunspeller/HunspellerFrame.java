@@ -53,7 +53,6 @@ import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
@@ -63,7 +62,6 @@ import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -1119,7 +1117,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
-					dicCorrectnessWorker.cancel(true);
+					dicCorrectnessWorker.cancel();
 					dicCorrectnessWorker = null;
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
@@ -1149,7 +1147,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
-					dicWordCountWorker.cancel(true);
+					dicWordCountWorker.cancel();
 					dicWordCountWorker = null;
 
 					dicWordCountMenuItem.setEnabled(true);
@@ -1164,7 +1162,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
-					dicStatisticsWorker.cancel(true);
+					dicStatisticsWorker.cancel();
 					dicStatisticsWorker = null;
 
 					if(dicStatisticsWorker.isPerformHyphenationStatistics())

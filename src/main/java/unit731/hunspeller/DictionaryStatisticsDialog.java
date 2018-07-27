@@ -9,7 +9,6 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -62,7 +61,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private final JFileChooser saveTextFileFileChooser;
 
 
-	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent) throws InterruptedException, InvocationTargetException{
+	public DictionaryStatisticsDialog(DictionaryStatistics statistics, Frame parent){
 		super(parent, "Dictionary statistics", false);
 
 		Objects.requireNonNull(statistics);
@@ -541,7 +540,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException | InterruptedException | InvocationTargetException | IOException ex){
+			catch(IllegalArgumentException | IOException ex){
 				log.error(null, ex);
 			}
 		});
