@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
@@ -21,19 +20,16 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 
 
 		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
-			line = DictionaryParser.cleanLine(line);
-			if(!line.isEmpty()){
-				List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = backbone.applyRules(line);
 
-				try{
-					for(RuleProductionEntry production : productions){
-						writer.write(production.getWord());
-						writer.newLine();
-					}
+			try{
+				for(RuleProductionEntry production : productions){
+					writer.write(production.getWord());
+					writer.newLine();
 				}
-				catch(IOException e){
-					throw new IllegalArgumentException(e);
-				}
+			}
+			catch(IOException e){
+				throw new IllegalArgumentException(e);
 			}
 		};
 		Runnable done = () -> {

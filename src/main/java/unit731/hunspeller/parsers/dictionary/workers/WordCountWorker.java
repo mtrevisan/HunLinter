@@ -26,12 +26,9 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 
 		Consumer<String> body = (line) -> {
-			line = DictionaryParser.cleanLine(line);
-			if(!line.isEmpty()){
-				List<RuleProductionEntry> productions = backbone.applyRules(line);
-				for(RuleProductionEntry production : productions)
-					bloomFilter.add(production.getWord());
-			}
+			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			for(RuleProductionEntry production : productions)
+				bloomFilter.add(production.getWord());
 		};
 		Runnable done = () -> {
 			int totalProductions = bloomFilter.getAddedElements();

@@ -12,6 +12,7 @@ import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
@@ -60,6 +61,7 @@ public class BackboneWorkerDictionaryRead extends SwingWorker<Void, Void>{
 			while((line = br.readLine()) != null){
 				readSoFar += line.length();
 
+				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
 						body.accept(line);
