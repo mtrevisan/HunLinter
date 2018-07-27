@@ -16,7 +16,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -874,10 +873,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		formerInputText = inputText;
 
 		if(StringUtils.isNotBlank(inputText)){
-			FlagParsingStrategy strategy = frame.affParser.getFlagParsingStrategy();
+			FlagParsingStrategy strategy = frame.backbone.getFlagParsingStrategy();
 			DictionaryEntry dicEntry = new DictionaryEntry(inputText, strategy);
 			try{
-				List<RuleProductionEntry> productions = frame.wordGenerator.applyRules(dicEntry);
+				List<RuleProductionEntry> productions = frame.backbone.applyRules(dicEntry);
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
@@ -902,10 +901,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dicSortDictionaryMenuItem.setEnabled(false);
 
 		try{
-			File dicFile = getDictionaryFile();
-			String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
-				.map(line -> StringUtils.replace(line, "\t", "   "))
-				.toArray(String[]::new);
+			String[] lines = backbone.getDictionaryLines();
 			dicDialog.setListData(lines);
 			dicDialog.setLocationRelativeTo(this);
 			dicDialog.setVisible(true);
@@ -949,7 +945,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(theParser.extractDuplicates(), this);
+		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.extractThesaurusDuplicates(), this);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
@@ -978,7 +974,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
 				sorter.setRowFilter(null);
 
-				updateSynonymsCounter();
+				//update synonyms counter
+				theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
 
 				//... and save the files
 				saveThesaurusFiles();

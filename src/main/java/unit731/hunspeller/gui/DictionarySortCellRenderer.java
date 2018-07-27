@@ -1,14 +1,13 @@
 package unit731.hunspeller.gui;
 
 import java.awt.Component;
-import java.io.IOException;
+import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.Watercolors;
 
 
@@ -23,27 +22,22 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 
 
 	@NonNull
-	private final DictionaryParser dicParser;
+	private final Function<Integer, Integer> getBoundaryIndex;
 
 
 	@Override
 	public Component getListCellRendererComponent(JList<? extends String> list, String value, int lineIndex, boolean isSelected, boolean cellHasFocus){
-		try{
-			int boundaryIndex = dicParser.getBoundaryIndex(lineIndex);
-			if(boundaryIndex >= 0){
-				Watercolors watercolor = COLORS[boundaryIndex % COLORS_SIZE];
+		int boundaryIndex = getBoundaryIndex.apply(lineIndex);
+		if(boundaryIndex >= 0){
+			Watercolors watercolor = COLORS[boundaryIndex % COLORS_SIZE];
 
-				setOpaque(true);
-				setBackground(watercolor.getColor());
-			}
-			else
-				setOpaque(false);
+			setOpaque(true);
+			setBackground(watercolor.getColor());
+		}
+		else
+			setOpaque(false);
 
-			setText(value);
-		}
-		catch(IOException e){
-			log.error(null, e);
-		}
+		setText(value);
 
 		return this;
 	}

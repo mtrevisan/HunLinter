@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +22,10 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
@@ -47,6 +51,9 @@ public class Backbone implements FileChangeListener{
 	private static final String SUFFIX_THESAURUS = "_v2";
 	private static final String PREFIX_HYPHENATION = "hyph_";
 	private static final String FOLDER_AID = "aids/";
+
+	private static final String TAB = "\t";
+	private static final String TAB_SPACES = StringUtils.repeat(' ', 3);
 
 
 	private File affFile;
@@ -315,6 +322,26 @@ public class Backbone implements FileChangeListener{
 	}
 
 
+	public Charset getCharset(){
+		return affParser.getCharset();
+	}
+
+	public FlagParsingStrategy getFlagParsingStrategy(){
+		return affParser.getFlagParsingStrategy();
+	}
+
+	public String[] getDictionaryLines() throws IOException{
+		File dicFile = getDictionaryFile();
+		String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
+			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
+			.toArray(String[]::new);
+		return lines;
+	}
+
+	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry){
+		return wordGenerator.applyRules(dicEntry);
+	}
+
 	public List<String> getAidLines(){
 		return aidParser.getLines();
 	}
@@ -325,6 +352,10 @@ public class Backbone implements FileChangeListener{
 
 	public int getSynonymsCounter(){
 		return theParser.getSynonymsCounter();
+	}
+
+	public List<String> extractThesaurusDuplicates(){
+		return theParser.extractDuplicates();
 	}
 
 }

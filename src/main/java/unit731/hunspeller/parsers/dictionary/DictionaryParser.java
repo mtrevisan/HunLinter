@@ -121,7 +121,7 @@ public class DictionaryParser{
 			.orElse(null);
 	}
 
-	public final int getBoundaryIndex(int lineIndex) throws IOException{
+	public final int getBoundaryIndex(int lineIndex){
 		calculateDictionaryBoundaries();
 
 		return searchBoundary(lineIndex)
@@ -146,12 +146,12 @@ public class DictionaryParser{
 			.isPresent();
 	}
 
-	private Optional<Map.Entry<Integer, Integer>> searchBoundary(int lineIndex) throws IOException{
+	private Optional<Map.Entry<Integer, Integer>> searchBoundary(int lineIndex){
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
 			.filter(e -> lineIndex <= e.getValue());
 	}
 
-	public final void calculateDictionaryBoundaries() throws IOException{
+	public final void calculateDictionaryBoundaries(){
 		if(boundaries.isEmpty()){
 			int lineIndex = 0;
 			try(BufferedReader br = Files.newBufferedReader(dicFile.toPath(), charset)){
@@ -185,6 +185,9 @@ public class DictionaryParser{
 				//filter out single word that doesn't need to be sorted
 				if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
 					boundaries.put(startSection, lineIndex - 1);
+			}
+			catch(IOException e){
+				log.error(null, e);
 			}
 		}
 	}

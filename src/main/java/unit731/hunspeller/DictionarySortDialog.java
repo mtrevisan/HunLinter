@@ -44,7 +44,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		initComponents();
 
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone.dicParser);
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone.dicParser::getBoundaryIndex);
 		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
