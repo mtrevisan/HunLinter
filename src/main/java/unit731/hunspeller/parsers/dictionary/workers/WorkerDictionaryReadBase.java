@@ -4,7 +4,6 @@ import java.beans.PropertyChangeListener;
 import java.util.function.Consumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.WorkerDictionaryRead;
 
 
 public class WorkerDictionaryReadBase{

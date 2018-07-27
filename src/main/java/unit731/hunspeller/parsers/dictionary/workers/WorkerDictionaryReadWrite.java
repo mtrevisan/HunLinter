@@ -1,5 +1,6 @@
-package unit731.hunspeller;
+package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -7,35 +8,38 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
 @Slf4j
-public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
+public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 
 	private final File dicFile;
+	private final File outputFile;
 	private final Charset charset;
-	private final Consumer<String> body;
+	private final BiConsumer<BufferedWriter, String> body;
 	private final Runnable done;
 
 	@Getter
 	private final TimeWatch watch = TimeWatch.start();
 
 
-	public WorkerDictionaryRead(File dicFile, Charset charset, Consumer<String> body, Runnable done){
+	public WorkerDictionaryReadWrite(File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
 		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
 
 		this.dicFile = dicFile;
+		this.outputFile = outputFile;
 		this.charset = charset;
 		this.body = body;
 		this.done = done;
@@ -49,7 +53,10 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 
 		setProgress(0);
 		long totalSize = dicFile.length();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
+		try(
+				LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset));
+				BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+			){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -61,10 +68,9 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 			while((line = br.readLine()) != null){
 				readSoFar += line.length();
 
-				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						body.accept(line);
+						body.accept(writer, line);
 					}
 					catch(IllegalArgumentException e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
