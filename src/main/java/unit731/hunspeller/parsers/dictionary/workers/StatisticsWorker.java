@@ -26,7 +26,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
-		dicStatistics = new DictionaryStatistics(backbone.dicParser);
+		dicStatistics = new DictionaryStatistics(backbone);
 
 
 		BiConsumer<String, Integer> body = (line, lineNumber) -> {
@@ -55,7 +55,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		createWorker(backbone.dicFile, backbone.getCharset(), body, done);
+		createWorker(backbone, body, done);
 	}
 
 	@Override

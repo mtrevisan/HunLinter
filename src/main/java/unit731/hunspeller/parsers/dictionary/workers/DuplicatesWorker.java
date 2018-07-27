@@ -83,9 +83,9 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), backbone.dicParser.getGrowRatioWhenFull());
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
 		bloomFilter.setCharset(backbone.getCharset());
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.dicParser.getGrowRatioWhenFull());
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.getGrowRatioWhenDictionaryFull());
 		duplicatesBloomFilter.setCharset(backbone.getCharset());
 
 		setProgress(0);
@@ -164,7 +164,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					if(!line.isEmpty()){
 						try{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 							for(RuleProductionEntry production : productions){
 								String text = production.toStringWithSignificantMorphologicalFields();
 								if(duplicatesBloomFilter.contains(text))
@@ -190,7 +190,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
-			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.affParser.getLanguage());
+			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getLanguage());
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
@@ -243,7 +243,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					return oldValue;
 				}));
 
-		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.affParser.getLanguage());
+		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getLanguage());
 		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));

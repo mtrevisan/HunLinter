@@ -1,10 +1,9 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.nio.charset.Charset;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.BackboneWorkerDictionaryRead;
 
 
@@ -13,8 +12,8 @@ public class WorkerDictionaryReadBase{
 	private BackboneWorkerDictionaryRead worker;
 
 
-	public final void createWorker(File dicFile, Charset charset, BiConsumer<String, Integer> body, Runnable done){
-		worker = new BackboneWorkerDictionaryRead(dicFile, charset, body, done);
+	public final void createWorker(Backbone backbone, BiConsumer<String, Integer> body, Runnable done){
+		worker = new BackboneWorkerDictionaryRead(backbone.dicFile, backbone.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

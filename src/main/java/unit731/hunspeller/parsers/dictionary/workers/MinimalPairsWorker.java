@@ -90,7 +90,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(backbone.getCharset())
-				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(backbone.dicParser.getLanguage())))
+				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(backbone.getLanguage())))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
@@ -178,7 +178,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
 				.charset(backbone.getCharset())
-				.comparator(ComparatorBuilder.getComparator(backbone.dicParser.getLanguage()))
+				.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();

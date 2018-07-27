@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -11,6 +12,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
+@Slf4j
 public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -39,7 +41,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				DictionaryParser.COUNTER_FORMATTER.format(totalProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		createWorker(backbone.dicFile, backbone.getCharset(), body, done);
+		createWorker(backbone, body, done);
 	}
 
 	@Override

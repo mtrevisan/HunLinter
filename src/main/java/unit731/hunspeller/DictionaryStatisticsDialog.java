@@ -513,11 +513,12 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				File dicFile = File.createTempFile("vec", ".dic");
-				dicFile.deleteOnExit();
-				AffixParser affParser = new AffixParser();
-				DictionaryParser dicParser = new DictionaryParser(dicFile, new WordGenerator(affParser), StandardCharsets.UTF_8);
-				DictionaryStatistics stats = new DictionaryStatistics(dicParser);
+//				File dicFile = File.createTempFile("vec", ".dic");
+//				dicFile.deleteOnExit();
+//				AffixParser affParser = new AffixParser();
+//				DictionaryParser dicParser = new DictionaryParser(dicFile, new WordGenerator(affParser), StandardCharsets.UTF_8);
+				Backbone backbone = null;
+				DictionaryStatistics stats = new DictionaryStatistics(backbone);
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));

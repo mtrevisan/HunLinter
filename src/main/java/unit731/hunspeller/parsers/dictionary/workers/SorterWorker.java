@@ -51,7 +51,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				File sortSection = chunks.get(1);
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(backbone.getCharset())
-					.comparator(ComparatorBuilder.getComparator(backbone.dicParser.getLanguage()))
+					.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
 					.useZip(true)
 					.removeDuplicates(true)
 					.build();

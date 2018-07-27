@@ -342,6 +342,10 @@ public class Backbone implements FileChangeListener{
 		return affParser.getCharset();
 	}
 
+	public String getLanguage(){
+		return dicParser.getLanguage();
+	}
+
 	public long getDictionaryFileLength(){
 		return dicParser.getDicFile().length();
 	}
@@ -364,6 +368,10 @@ public class Backbone implements FileChangeListener{
 
 	public double getGrowRatioWhenDictionaryFull(){
 		return dicParser.getGrowRatioWhenFull();
+	}
+
+	public void checkDictionaryProduction(RuleProductionEntry production){
+		dicParser.checkProduction(production);
 	}
 
 	public boolean isDictionaryLineInBoundary(int lineIndex){

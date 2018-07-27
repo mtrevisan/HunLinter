@@ -16,9 +16,9 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 		BiConsumer<String, Integer> body = (line, lineNumber) -> {
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 
-			productions.forEach(production -> backbone.dicParser.checkProduction(production));
+			productions.forEach(production -> backbone.checkDictionaryProduction(production));
 		};
-		createWorker(backbone.dicFile, backbone.getCharset(), body, null);
+		createWorker(backbone, body, null);
 	}
 
 }

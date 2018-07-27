@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
@@ -42,10 +43,10 @@ public class DictionaryStatistics{
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(DictionaryParser dicParser){
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
-		bloomFilter.setCharset(dicParser.getCharset());
-		orthography = OrthographyBuilder.getOrthography(dicParser.getLanguage());
+	public DictionaryStatistics(Backbone backbone){
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
+		bloomFilter.setCharset(backbone.getCharset());
+		orthography = OrthographyBuilder.getOrthography(backbone.getLanguage());
 	}
 
 	public void addData(String word){
