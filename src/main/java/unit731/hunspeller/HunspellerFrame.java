@@ -959,7 +959,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					"Please select one", JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
-			DuplicationResult duplicationResult = theParser.insertMeanings(synonyms, duplicatesDiscriminator);
+			DuplicationResult duplicationResult = backbone.insertThesaurusMeanings(synonyms, duplicatesDiscriminator);
 			List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
 			if(duplicationResult.isForcedInsertion() || duplicates.isEmpty()){
@@ -974,8 +974,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
 				sorter.setRowFilter(null);
 
-				//update synonyms counter
-				theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
+				updateSynonymsCounter();
 
 				//... and save the files
 				saveThesaurusFiles();
@@ -1017,7 +1016,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.dicParser.prepareTextForFilter(formerFilterThesaurusText);
+				String filterText = frame.backbone.prepareTextForThesaurusFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
@@ -1029,7 +1028,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
 				.map(theTable::convertRowIndexToModel)
 				.toArray();
-			theParser.deleteMeanings(selectedRows);
+			backbone.deleteThesaurusMeanings(selectedRows);
 
 			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.fireTableDataChanged();
@@ -1284,8 +1283,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//thesaurus file:
 			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.setSynonyms(backbone.getSynonymsDictionary());
-			//update synonyms counter
-			theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
+			updateSynonymsCounter();
 			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 		}
@@ -1297,6 +1295,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			log.error("A bad error occurred", e);
 		}
+	}
+
+	private void updateSynonymsCounter(){
+		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
 	}
 
 	private int setTabbedPaneEnable(JTabbedPane tabbedPane, Component component, boolean enabled){

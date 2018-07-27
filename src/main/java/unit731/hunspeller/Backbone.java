@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.zip.Deflater;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -27,6 +28,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
+import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.ZipManager;
@@ -356,6 +358,18 @@ public class Backbone implements FileChangeListener{
 
 	public List<String> extractThesaurusDuplicates(){
 		return theParser.extractDuplicates();
+	}
+
+	public String prepareTextForThesaurusFilter(String text){
+		return dicParser.prepareTextForFilter(text);
+	}
+
+	public DuplicationResult insertThesaurusMeanings(String synonyms, Supplier<Boolean> duplicatesDiscriminator){
+		return theParser.insertMeanings(synonyms, duplicatesDiscriminator);
+	}
+
+	public void deleteThesaurusMeanings(int[] selectedRows){
+		theParser.deleteMeanings(selectedRows);
 	}
 
 }
