@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import java.awt.Component;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.Desktop;
 import java.awt.EventQueue;
@@ -14,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +30,8 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -37,6 +41,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -101,7 +106,7 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
 @Slf4j
-public class HunspellerFrame extends JFrame implements ActionListener, FileChangeListener, PropertyChangeListener, Hunspellable, Undoable{
+public class HunspellerFrame extends JFrame implements ActionListener, PropertyChangeListener, Hunspellable, Undoable{
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -119,8 +124,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 	private static final ZipManager ZIPPER = new ZipManager();
 
-	private File affFile;
-
 	private static String formerInputText;
 	private static String formerFilterThesaurusText;
 	private static String formerHyphenationText;
@@ -128,20 +131,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	private final JFileChooser saveTextFileFileChooser;
 	private DictionarySortDialog dicDialog;
 
-	private final AffixParser affParser;
-	private final AidParser aidParser;
-	private DictionaryParser dicParser;
-	private final ThesaurusParser theParser;
-	private HyphenationParser hypParser;
-
-	private final WordGenerator wordGenerator;
+	private final Backbone backbone;
 
 	private RecentFileMenu rfm;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, 400);
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(HunspellerFrame::filterThesaurus, 400);
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(HunspellerFrame::hyphenate, 400);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(HunspellerFrame::hyphenateAddRule, 400);
-	private final FileListenerManager flm;
 
 	private CorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
@@ -154,11 +150,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
 	public HunspellerFrame(){
-		affParser = new AffixParser();
-		aidParser = new AidParser();
-		theParser = new ThesaurusParser(this);
-		wordGenerator = new WordGenerator(affParser);
-		flm = new FileListenerManager();
+		backbone = new Backbone(this, this);
 
 		initComponents();
 
@@ -1303,146 +1295,85 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		clearResultTextArea();
 
 
-		affFile = new File(filePath);
+		try{
+			backbone.loadFile(filePath);
 
-		log.info(Backbone.MARKER_APPLICATION, "Loading file " + affFile.getName());
 
-		if(!affFile.exists()){
+			//hyphenation file:
+			dicStatisticsMenuItem.setEnabled(true);
+			setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
+
+
+			//dictionary file:
+			dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
+			dicDialog.setLocationRelativeTo(this);
+			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
+			dicDialog.setCellRenderer(dicCellRenderer);
+			dicDialog.addListSelectionListener(e -> {
+				if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
+					int selectedRow = dicDialog.getSelectedIndex();
+					try{
+						if(dicParser.isInBoundary(selectedRow)){
+							dicDialog.setVisible(false);
+
+							dicSortDictionaryMenuItem.setEnabled(false);
+							mainProgressBar.setValue(0);
+
+
+							dicSorterWorker = new SorterWorker(dicParser, selectedRow);
+							dicSorterWorker.addPropertyChangeListener(this);
+							dicSorterWorker.execute();
+						}
+					}
+					catch(IOException exc){
+						log.error(null, exc);
+					}
+				}
+			});
+
+			fileCreatePackageMenuItem.setEnabled(true);
+			dicMenu.setEnabled(true);
+			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+			mainTabbedPane.setSelectedIndex(index);
+			dicInputTextField.requestFocusInWindow();
+
+
+			//aid file:
+			List<String> lines = backbone.getAidLines();
+			boolean aidLinesPresent = !lines.isEmpty();
+			if(aidLinesPresent)
+				lines.stream()
+					.forEach(dicRuleTagsAidComboBox::addItem);
+			else
+				dicRuleTagsAidComboBox.removeAllItems();
+			//enable combo-box only if an AID file exists
+			dicRuleTagsAidComboBox.setEnabled(aidLinesPresent);
+
+
+			//thesaurus file:
+			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+			dm.setSynonyms(backbone.getSynonymsDictionary());
+			//update synonyms counter
+			theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
+			theMenu.setEnabled(true);
+			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
+		}
+		catch(FileNotFoundException e){
 			log.info(Backbone.MARKER_APPLICATION, "The file does not exists");
-
-			//remove file from recent list
-			rfm.removeEntry(filePath);
 		}
-		else{
-			flm.stop();
+		catch(IOException e){
+			log.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionService.getMessage(e));
 
-			openAffixFile();
-
-			openHyphenationFile();
-
-			prepareDictionaryFile();
-
-			openAidFile();
-
-			openThesaurusFile();
-
-
-			try{
-				flm.register(this, affFile.getParent(), "*.aff", "*.dic", "*.aid");
-				flm.start();
-			}
-			catch(IOException e){
-				log.info(Backbone.MARKER_APPLICATION, "Unable to register file change listener");
-			}
+			log.error("A bad error occurred", e);
 		}
 	}
 
-	public void clearOutputTable(){
-		ProductionTableModel dm = (ProductionTableModel)dicTable.getModel();
-		dm.setProductions(null);
+	private int setTabbedPaneEnable(JTabbedPane tabbedPane, Component component, boolean enabled){
+		int index = tabbedPane.indexOfComponent(component);
+		tabbedPane.setEnabledAt(index, enabled);
+		return index;
 	}
 
-
-	@Override
-	public void fileDeleted(Path path){
-		log.info(Backbone.MARKER_APPLICATION, "File " + path.toFile().getName() + " deleted");
-
-		String absolutePath = path.toString().toLowerCase();
-		if(hasAFFExtension(absolutePath))
-			clearAffixFile();
-		else if(hasAIDExtension(absolutePath))
-			clearAidFile();
-	}
-
-	@Override
-	public void fileModified(Path path){
-		log.info(Backbone.MARKER_APPLICATION, "File " + path.toFile().getName() + " modified");
-
-		String absolutePath = path.toString().toLowerCase();
-		if(hasAFFExtension(absolutePath))
-			openAffixFile();
-		else if(hasAIDExtension(absolutePath))
-			openAidFile();
-		else if(isHyphenationFile(absolutePath)){
-			openHyphenationFile();
-
-			//clear hyphenation
-			clearHyphenationFields();
-		}
-	}
-
-
-	private void openAffixFile(){
-		try{
-			clearAffixFile();
-
-			log.info(Backbone.MARKER_APPLICATION, "Opening Affix file for parsing: " + affFile.getName());
-
-			affParser.parse(affFile);
-
-			log.info(Backbone.MARKER_APPLICATION, "Finished reading Affix file");
-		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
-		}
-	}
-
-	private void clearAffixFile(){
-		affParser.clear();
-
-		clearDictionaryFile();
-	}
-
-
-	private void openHyphenationFile(){
-		try{
-			clearHyphenationFile();
-
-			File hypFile = getHyphenationFile();
-			if(hypFile.exists()){
-				log.info(Backbone.MARKER_APPLICATION, "Opening Hyphenation file for parsing: " + hypFile.getName());
-
-				hypParser = new HyphenationParser(affParser.getLanguage());
-				hypParser.parse(hypFile);
-
-				int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
-				mainTabbedPane.setEnabledAt(index, true);
-				dicStatisticsMenuItem.setEnabled(true);
-
-				log.info(Backbone.MARKER_APPLICATION, "Finished reading Hyphenation file");
-			}
-		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
-		}
-	}
-
-	private void clearHyphenationFile(){
-		if(Objects.nonNull(hypParser))
-			hypParser.clear();
-
-		clearHyphenationFields();
-
-		int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
-		dicStatisticsMenuItem.setEnabled(false);
-	}
-
-	private void clearHyphenationFields(){
-		formerHyphenationText = null;
-
-		hypWordTextField.setText(null);
-		hypSyllabationOutputLabel.setText(null);
-		hypSyllabesCountOutputLabel.setText(null);
-		hypRulesOutputLabel.setText(null);
-		hypAddRuleTextField.setText(null);
-		hypAddRuleLevelComboBox.setEnabled(false);
-		hypAddRuleButton.setEnabled(false);
-		hypAddRuleSyllabationOutputLabel.setText(null);
-		hypAddRuleSyllabesCountOutputLabel.setText(null);
-	}
 
 	private static void hyphenate(HunspellerFrame frame){
 		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
@@ -1538,71 +1469,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 
 
 
-	private void prepareDictionaryFile(){
-		String language = affParser.getLanguage();
-		File dicFile = getFile(language + EXTENSION_DIC);
-		dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, affParser.getCharset());
-		if(hypParser != null)
-			dicParser.setHyphenator(hypParser.getHyphenator());
-
-		dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
-		dicDialog.setLocationRelativeTo(this);
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
-		dicDialog.setCellRenderer(dicCellRenderer);
-		dicDialog.addListSelectionListener(e -> {
-			if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
-				int selectedRow = dicDialog.getSelectedIndex();
-				try{
-					if(dicParser.isInBoundary(selectedRow)){
-						dicDialog.setVisible(false);
-
-						dicSortDictionaryMenuItem.setEnabled(false);
-						mainProgressBar.setValue(0);
-
-
-						dicSorterWorker = new SorterWorker(dicParser, selectedRow);
-						dicSorterWorker.addPropertyChangeListener(this);
-						dicSorterWorker.execute();
-					}
-				}
-				catch(IOException exc){
-					log.error(null, exc);
-				}
-			}
-		});
-
-		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
-		mainTabbedPane.setSelectedIndex(index);
-		mainTabbedPane.setEnabledAt(index, true);
-		dicInputTextField.requestFocusInWindow();
-
-
-		//enable menu
-		dicMenu.setEnabled(true);
-		fileCreatePackageMenuItem.setEnabled(true);
-	}
-
-	private void clearDictionaryFile(){
-		if(Objects.nonNull(dicParser))
-			dicParser.clear();
-
-		clearDictionaryFields();
-
-		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
-
-		//disable menu
-		dicMenu.setEnabled(false);
-		fileCreatePackageMenuItem.setEnabled(false);
-	}
-
-	private void clearDictionaryFields(){
-		clearOutputTable();
-
-		formerInputText = null;
-		dicInputTextField.setText(null);
-	}
-
 	private void checkDictionaryCorrectness(){
 		if(Objects.isNull(dicCorrectnessWorker) || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
@@ -1697,134 +1563,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	}
 
 
-	private void openAidFile(){
-		try{
-			clearAidFile();
-
-			File aidFile = getAidFile();
-			if(aidFile.exists()){
-				log.info(Backbone.MARKER_APPLICATION, "Opening AID file for parsing: " + aidFile.getName());
-
-				aidParser.parse(aidFile);
-				List<String> lines = aidParser.getLines();
-
-				if(!lines.isEmpty()){
-					lines.stream()
-						.forEach(dicRuleTagsAidComboBox::addItem);
-
-					//enable combo-box only if an AID file exists
-					dicRuleTagsAidComboBox.setEnabled(true);
-				}
-
-				log.info(Backbone.MARKER_APPLICATION, "Finished reading Aid file");
-			}
-		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
-		}
-	}
-
-	private String getCurrentWorkingDirectory(){
-		String codePath = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-		return codePath
-			.replaceFirst("(classes/)?[^/]*$", StringUtils.EMPTY)
-			.replaceAll("%20", StringUtils.SPACE);
-	}
-
-	private void clearAidFile(){
-		if(dicRuleTagsAidComboBox.getItemCount() > 0)
-			dicRuleTagsAidComboBox.removeAllItems();
-
-		aidParser.clear();
-	}
-
-
-	private void openThesaurusFile(){
-		try{
-			clearThesaurusFile();
-
-			File theFile = getThesaurusDataFile();
-			if(theFile.exists()){
-				log.info(Backbone.MARKER_APPLICATION, "Opening Thesaurus file for parsing: " + theFile.getName());
-
-				theParser.parse(theFile);
-
-				ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.setSynonyms(theParser.getSynonymsDictionary());
-
-				updateSynonymsCounter();
-
-				theMenu.setEnabled(true);
-				int index = mainTabbedPane.indexOfComponent(theLayeredPane);
-				mainTabbedPane.setEnabledAt(index, true);
-
-				log.info(Backbone.MARKER_APPLICATION, "Finished reading Thesaurus file");
-			}
-		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
-		}
-	}
-
-	private void clearThesaurusFile(){
-		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-		dm.setSynonyms(null);
-
-		theParser.clear();
-
-		theMenu.setEnabled(false);
-		int index = mainTabbedPane.indexOfComponent(theLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
-	}
-
 	private void updateSynonyms(){
 		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.fireTableDataChanged();
 	}
 
-	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(theParser.getSynonymsCounter()));
-	}
-
-
-	private File getFile(String filename){
-		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
-	}
-
-	private File getDictionaryFile(){
-		return getFile(affParser.getLanguage() + EXTENSION_DIC);
-	}
-
-	private File getThesaurusIndexFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
-	}
-
-	private File getThesaurusDataFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
-	}
-
-	private File getHyphenationFile(){
-		return getFile(PREFIX_HYPHENATION + affParser.getLanguage() + EXTENSION_DIC);
-	}
-
-	private File getAidFile(){
-		return getFile(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getLanguage() + EXTENSION_AID);
-	}
-
-	private boolean hasAFFExtension(String path){
-		return path.endsWith(EXTENSION_AFF);
-	}
-
-	private boolean hasAIDExtension(String path){
-		return path.endsWith(EXTENSION_AID);
-	}
-
-	private boolean isHyphenationFile(String path){
-		String baseName = FilenameUtils.getBaseName(path);
-		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
-	}
 
 
 	@Override
@@ -1836,21 +1579,45 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 	public void clearHyphenationParser(){
 		clearHyphenationFields();
 
-		int index = mainTabbedPane.indexOfComponent(hypLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
 		dicStatisticsMenuItem.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+	}
+
+	private void clearHyphenationFields(){
+		formerHyphenationText = null;
+
+		hypWordTextField.setText(null);
+		hypSyllabationOutputLabel.setText(null);
+		hypSyllabesCountOutputLabel.setText(null);
+		hypRulesOutputLabel.setText(null);
+		hypAddRuleTextField.setText(null);
+		hypAddRuleLevelComboBox.setEnabled(false);
+		hypAddRuleButton.setEnabled(false);
+		hypAddRuleSyllabationOutputLabel.setText(null);
+		hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
 	@Override
 	public void clearDictionaryParser(){
 		clearDictionaryFields();
 
-		int index = mainTabbedPane.indexOfComponent(dicLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
+		setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);
 		fileCreatePackageMenuItem.setEnabled(false);
+	}
+
+	private void clearDictionaryFields(){
+		clearOutputTable();
+
+		formerInputText = null;
+		dicInputTextField.setText(null);
+	}
+
+	public void clearOutputTable(){
+		ProductionTableModel dm = (ProductionTableModel)dicTable.getModel();
+		dm.setProductions(null);
 	}
 
 	@Override
@@ -1865,8 +1632,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		dm.setSynonyms(null);
 
 		theMenu.setEnabled(false);
-		int index = mainTabbedPane.indexOfComponent(theLayeredPane);
-		mainTabbedPane.setEnabledAt(index, false);
+		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 
 

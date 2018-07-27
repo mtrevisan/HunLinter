@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
+import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
@@ -100,6 +102,9 @@ public class Backbone implements FileChangeListener{
 
 	private void openAffixFile(String filePath) throws IOException{
 		affFile = new File(filePath);
+
+		log.info(Backbone.MARKER_APPLICATION, "Loading file {}", affFile.getName());
+
 		if(!affFile.exists()){
 			affParser.clear();
 
@@ -255,6 +260,19 @@ public class Backbone implements FileChangeListener{
 
 	private boolean hasAIDExtension(String path){
 		return path.endsWith(EXTENSION_AID);
+	}
+
+
+	public List<String> getAidLines(){
+		return aidParser.getLines();
+	}
+
+	public List<ThesaurusEntry> getSynonymsDictionary(){
+		return theParser.getSynonymsDictionary();
+	}
+
+	public int getSynonymsCounter(){
+		return theParser.getSynonymsCounter();
 	}
 
 }
