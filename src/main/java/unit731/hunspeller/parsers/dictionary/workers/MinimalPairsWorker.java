@@ -47,8 +47,9 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			TimeWatch watch = TimeWatch.start();
 
 			setProgress(0);
+			File dicFile = backbone.dicParser.getDicFile();
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()));
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()));
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset());
 					){
 				String line = br.readLine();
@@ -60,7 +61,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = backbone.dicParser.getDicFile().length();
+				long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -94,7 +95,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
-			backbone.dicParser.getSorter().sort(outputFile, options, outputFile);
+			backbone.getDictionarySorter().sort(outputFile, options, outputFile);
 
 			setProgress(100);
 
@@ -182,7 +183,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
-			backbone.dicParser.getSorter().sort(outputFile, options, outputFile);
+			backbone.getDictionarySorter().sort(outputFile, options, outputFile);
 
 			watch.stop();
 

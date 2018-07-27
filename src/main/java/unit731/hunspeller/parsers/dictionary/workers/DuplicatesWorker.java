@@ -22,11 +22,9 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
@@ -89,7 +87,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		duplicatesBloomFilter.setCharset(backbone.getCharset());
 
 		setProgress(0);
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()))){
+		File dicFile = backbone.dicParser.getDicFile();
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -99,7 +98,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 			int lineIndex = 1;
 			long readSoFar = line.length();
-			long totalSize = backbone.dicParser.getDicFile().length();
+			long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.length();
@@ -143,10 +142,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			publish("Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-
-			setProgress(0);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()))){
+			File dicFile = backbone.dicParser.getDicFile();
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -156,19 +153,19 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = backbone.dicParser.getDicFile().length();
+				long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 							List<RuleProductionEntry> productions = backbone.applyRules(line);
+							String word = productions.get(0).getWord();
 							for(RuleProductionEntry production : productions){
 								String text = production.toStringWithSignificantMorphologicalFields();
 								if(duplicatesBloomFilter.contains(text))
-									result.add(new Duplicate(production, dictionaryWord, lineIndex));
+									result.add(new Duplicate(production, word, lineIndex));
 							}
 						}
 						catch(IllegalArgumentException e){
@@ -214,7 +211,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					writer.write(": ");
 					writer.write(entries.stream()
 						.map(duplicate -> 
-							String.join(StringUtils.EMPTY, duplicate.getDictionaryWord().getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+							String.join(StringUtils.EMPTY, duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 								(duplicate.getProduction().hasProductionRules()? " via " + duplicate.getProduction().getRulesSequence(): StringUtils.EMPTY), ")")
 						)
 						.collect(Collectors.joining(", ")));

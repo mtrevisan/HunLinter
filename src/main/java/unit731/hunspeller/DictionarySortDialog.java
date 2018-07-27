@@ -43,7 +43,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		initComponents();
 
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone.dicParser::getBoundaryIndex);
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone::getDictionaryBoundaryIndex);
 		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
@@ -117,7 +117,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		int lineIndex = list.getFirstVisibleIndex();
-		int boundaryIndex = backbone.dicParser.getNextBoundaryIndex(lineIndex);
+		int boundaryIndex = backbone.getDictionaryNextBoundaryIndex(lineIndex);
 		if(boundaryIndex >= 0){
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
@@ -129,9 +129,9 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		int lineIndex = list.getFirstVisibleIndex();
-		int boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(lineIndex);
+		int boundaryIndex = backbone.getDictionaryPreviousBoundaryIndex(lineIndex);
 		if(boundaryIndex < 0){
-			boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
+			boundaryIndex = backbone.getDictionaryPreviousBoundaryIndex(list.getModel().getSize());
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 		}

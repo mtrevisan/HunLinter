@@ -34,6 +34,7 @@ import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.ZipManager;
+import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -372,6 +373,22 @@ public class Backbone implements FileChangeListener{
 
 	public void checkDictionaryProduction(RuleProductionEntry production){
 		dicParser.checkProduction(production);
+	}
+
+	public ExternalSorter getDictionarySorter(){
+		return dicParser.getSorter();
+	}
+
+	public int getDictionaryBoundaryIndex(int row){
+		return dicParser.getBoundaryIndex(row);
+	}
+
+	public int getDictionaryNextBoundaryIndex(int row){
+		return dicParser.getNextBoundaryIndex(row);
+	}
+
+	public int getDictionaryPreviousBoundaryIndex(int row){
+		return dicParser.getPreviousBoundaryIndex(row);
 	}
 
 	public boolean isDictionaryLineInBoundary(int lineIndex){

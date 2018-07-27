@@ -55,7 +55,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 					.useZip(true)
 					.removeDuplicates(true)
 					.build();
-				backbone.dicParser.getSorter().sort(sortSection, options, sortSection);
+				backbone.getDictionarySorter().sort(sortSection, options, sortSection);
 
 				setProgress(60);
 
