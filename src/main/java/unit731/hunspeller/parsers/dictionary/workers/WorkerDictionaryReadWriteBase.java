@@ -6,16 +6,16 @@ import java.io.File;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.BackboneWorkerDictionaryReadWrite;
+import unit731.hunspeller.WorkerDictionaryReadWrite;
 
 
 public class WorkerDictionaryReadWriteBase{
 
-	private BackboneWorkerDictionaryReadWrite worker;
+	private WorkerDictionaryReadWrite worker;
 
 
 	public final void createWorker(Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new BackboneWorkerDictionaryReadWrite(backbone.getDictionaryFile(), outputFile, backbone.getCharset(), body, done);
+		worker = new WorkerDictionaryReadWrite(backbone.getDictionaryFile(), outputFile, backbone.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

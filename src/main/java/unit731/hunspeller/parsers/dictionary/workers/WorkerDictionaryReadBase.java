@@ -4,16 +4,16 @@ import java.beans.PropertyChangeListener;
 import java.util.function.Consumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.BackboneWorkerDictionaryRead;
+import unit731.hunspeller.WorkerDictionaryRead;
 
 
 public class WorkerDictionaryReadBase{
 
-	private BackboneWorkerDictionaryRead worker;
+	private WorkerDictionaryRead worker;
 
 
 	public final void createWorker(Backbone backbone, Consumer<String> body, Runnable done){
-		worker = new BackboneWorkerDictionaryRead(backbone.getDictionaryFile(), backbone.getCharset(), body, done);
+		worker = new WorkerDictionaryRead(backbone.getDictionaryFile(), backbone.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

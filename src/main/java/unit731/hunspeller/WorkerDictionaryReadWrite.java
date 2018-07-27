@@ -19,7 +19,7 @@ import unit731.hunspeller.services.TimeWatch;
 
 
 @Slf4j
-public class BackboneWorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
+public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 
 	private final File dicFile;
 	private final File outputFile;
@@ -31,7 +31,7 @@ public class BackboneWorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 	private final TimeWatch watch = TimeWatch.start();
 
 
-	public BackboneWorkerDictionaryReadWrite(File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
+	public WorkerDictionaryReadWrite(File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
