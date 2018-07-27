@@ -14,10 +14,7 @@ public class MyLoggerFactory implements ILoggerFactory{
 	@Override
 	public Logger getLogger(String name){
 		synchronized(loggerMap){
-			if(!loggerMap.containsKey(name))
-				loggerMap.put(name, new MyLoggerAdapter(name));
-
-			return loggerMap.get(name);
+			return loggerMap.putIfAbsent(name, new MyLoggerAdapter(name));
 		}
 	}
 

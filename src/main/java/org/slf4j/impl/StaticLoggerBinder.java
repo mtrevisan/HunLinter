@@ -20,15 +20,16 @@ public class StaticLoggerBinder implements LoggerFactoryBinder{
 	 * compiled against. The value of this field is usually modified
 	 * with each release.
 	 */
-	// To avoid constant folding by the compiler,
-	// this field must *not* be final
-	public static String REQUESTED_API_VERSION = "1.6";  // !final
+	// To avoid constant folding by the compiler, this field must *not* be final
+	public static String REQUESTED_API_VERSION = "1.6";
 
 	private static final String LOGGER_FACTORY_CLASS_STR = MyLoggerFactory.class.getName();
+
 
 	/** The ILoggerFactory instance returned by the {@link #getLoggerFactory} method should always be the same object. */
 	@Getter
 	private final ILoggerFactory loggerFactory = new MyLoggerFactory();
+
 
 	@Override
 	public String getLoggerFactoryClassStr(){

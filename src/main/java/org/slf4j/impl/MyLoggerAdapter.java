@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.Marker;
 
 
-/* http://javaeenotes.blogspot.com/2011/12/custom-slf4j-logger-adapter.html */
+/**
+ * @see <a href="http://poth-chola.blogspot.com/2015/08/custom-slf4j-logger-adapter.html">Custom SLF4J Logger Adapter</a>
+ */
 @AllArgsConstructor
 public class MyLoggerAdapter implements Logger{
 
