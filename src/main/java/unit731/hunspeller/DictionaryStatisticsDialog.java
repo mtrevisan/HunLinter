@@ -38,9 +38,7 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.gui.GUIUtils;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -541,8 +539,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException | IOException ex){
-				log.error(null, ex);
+			catch(IllegalArgumentException e){
+				log.error(null, e);
 			}
 		});
 	}

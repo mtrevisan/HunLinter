@@ -2,105 +2,44 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.LineNumberReader;
-import java.nio.channels.ClosedChannelException;
-import java.nio.file.Files;
+import java.io.IOException;
 import java.util.List;
-import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.TimeWatch;
 
 
-@AllArgsConstructor
 @Slf4j
-public class WordlistWorker extends SwingWorker<Void, String>{
+public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 
-	private final Backbone backbone;
-	private final File outputFile;
+	public WordlistWorker(Backbone backbone, File outputFile){
+		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(outputFile);
 
 
-	@Override
-	protected Void doInBackground() throws Exception{
-		boolean stopped = false;
-		try{
-			publish("Opening Dictionary file for wordlist extraction");
+		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
+			line = DictionaryParser.cleanLine(line);
+			if(!line.isEmpty()){
+				List<RuleProductionEntry> productions = backbone.applyRules(line);
 
-			TimeWatch watch = TimeWatch.start();
-
-			setProgress(0);
-			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()));
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset());
-					){
-				String line = br.readLine();
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileService.clearBOMMarker(line);
-				if(!NumberUtils.isCreatable(line))
-					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
-
-				int lineIndex = 1;
-				long readSoFar = line.length();
-				long totalSize = backbone.getDictionaryFileLength();
-				while((line = br.readLine()) != null){
-					lineIndex ++;
-					readSoFar += line.length();
-
-					line = DictionaryParser.cleanLine(line);
-					if(!line.isEmpty()){
-						try{
-							List<RuleProductionEntry> productions = backbone.applyRules(line);
-
-							for(RuleProductionEntry production : productions){
-								writer.write(production.getWord());
-								writer.newLine();
-							}
-						}
-						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
-						}
+				try{
+					for(RuleProductionEntry production : productions){
+						writer.write(production.getWord());
+						writer.newLine();
 					}
-
-					setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+				}
+				catch(IOException e){
+					throw new IllegalArgumentException(e);
 				}
 			}
-
-			watch.stop();
-
-			setProgress(100);
-
-			publish("File written: " + outputFile.getAbsolutePath());
-			publish("Wordlist extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
-
-			DictionaryParser.openFileWithChoosenEditor(outputFile);
-		}
-		catch(Exception e){
-			stopped = true;
-
-			if(e instanceof ClosedChannelException)
-				publish("Duplicates thread interrupted");
-			else{
-				String message = ExceptionService.getMessage(e);
-				publish(e.getClass().getSimpleName() + ": " + message);
-			}
-		}
-		if(stopped)
-			publish("Stopped reading Dictionary file");
-
-		return null;
-	}
-
-	@Override
-	protected void process(List<String> chunks){
-		for(String chunk : chunks)
-			log.info(Backbone.MARKER_APPLICATION, chunk);
+		};
+		Runnable done = () -> {
+			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+		};
+		createWorker(backbone, body, done);
 	}
 
 }

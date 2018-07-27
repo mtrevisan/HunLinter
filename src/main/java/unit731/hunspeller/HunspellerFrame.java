@@ -1180,7 +1180,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
-					dicWordlistWorker.cancel(true);
+					dicWordlistWorker.cancel();
 					dicWordlistWorker = null;
 
 					dicExtractWordlistMenuItem.setEnabled(true);
