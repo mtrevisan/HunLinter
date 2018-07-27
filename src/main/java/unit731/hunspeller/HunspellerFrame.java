@@ -166,8 +166,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 
 		ApplicationLogAppender.setTextArea(parsingResultTextArea);
-//TODO thin space does not works!
-log.info(Backbone.MARKER_APPLICATION, "±\u2009a");
 
 
 		File currentDir = new File(".");

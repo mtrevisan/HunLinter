@@ -1,12 +1,16 @@
 package unit731.hunspeller.services;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.encoder.Encoder;
+import java.nio.charset.StandardCharsets;
 import javax.swing.JTextArea;
-import org.apache.commons.lang3.StringUtils;
+import lombok.Setter;
 
 
 public class ApplicationLogAppender<T> extends AppenderBase<T>{
+
+	@Setter
+	private Encoder<T> encoder;
 
 	private static JTextArea textArea;
 
@@ -17,8 +21,11 @@ public class ApplicationLogAppender<T> extends AppenderBase<T>{
 
 	@Override
 	protected void append(T eventObject){
-		if(textArea != null)
-			textArea.append(((LoggingEvent)eventObject).getFormattedMessage() + StringUtils.LF);
+		if(textArea != null){
+			byte[] encoded = encoder.encode(eventObject);
+			String message = new String(encoded, StandardCharsets.UTF_8);
+			textArea.append(message);
+		}
 	}
 
 }
