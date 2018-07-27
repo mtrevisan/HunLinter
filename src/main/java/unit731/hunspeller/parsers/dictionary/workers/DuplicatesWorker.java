@@ -22,7 +22,6 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
@@ -41,8 +40,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
 
 
-	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 	private final File outputFile;
 
 
@@ -50,7 +48,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for duplications extraction: " + affParser.getLanguage() + ".dic (pass 1/3)");
+			publish("Opening Dictionary file for duplications extraction: " + backbone.affParser.getLanguage() + ".dic (pass 1/3)");
 
 			TimeWatch watch = TimeWatch.start();
 
@@ -84,16 +82,16 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
 
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
-		bloomFilter.setCharset(dicParser.getCharset());
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dicParser.getGrowRatioWhenFull());
-		duplicatesBloomFilter.setCharset(dicParser.getCharset());
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), backbone.dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(backbone.dicParser.getCharset());
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.dicParser.getGrowRatioWhenFull());
+		duplicatesBloomFilter.setCharset(backbone.dicParser.getCharset());
 
 		setProgress(0);
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()))){
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -103,7 +101,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 			int lineIndex = 1;
 			long readSoFar = line.length();
-			long totalSize = dicParser.getDicFile().length();
+			long totalSize = backbone.dicParser.getDicFile().length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.length();
@@ -112,7 +110,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
 					try{
-						List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
+						List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
 
 						productions.stream()
 							.map(RuleProductionEntry::toStringWithSignificantMorphologicalFields)
@@ -149,10 +147,10 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			publish("Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
 
 			setProgress(0);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -162,7 +160,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = dicParser.getDicFile().length();
+				long totalSize = backbone.dicParser.getDicFile().length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -170,7 +168,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					if(!line.isEmpty()){
 						try{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
 							for(RuleProductionEntry production : productions){
 								String text = production.toStringWithSignificantMorphologicalFields();
 								if(duplicatesBloomFilter.contains(text))
@@ -196,7 +194,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
-			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
+			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.affParser.getLanguage());
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
@@ -214,7 +212,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			int writtenSoFar = 0;
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress((int)(100. / (totalSize + 1)));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
+			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.dicParser.getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
@@ -249,7 +247,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 					return oldValue;
 				}));
 
-		Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
+		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.affParser.getLanguage());
 		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));

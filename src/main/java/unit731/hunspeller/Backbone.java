@@ -26,6 +26,7 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
@@ -340,8 +341,32 @@ public class Backbone implements FileChangeListener{
 		return lines;
 	}
 
+	public boolean isDictionaryLineInBoundary(int lineIndex){
+		return dicParser.isInBoundary(lineIndex);
+	}
+
+	public boolean isDictionaryModified(){
+		return theParser.isDictionaryModified();
+	}
+
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry){
 		return wordGenerator.applyRules(dicEntry);
+	}
+
+	public String correctOrthography(String word){
+		return dicParser.correctOrthography(word);
+	}
+
+	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){
+		return hypParser.hasRule(addedRule, level);
+	}
+
+	public Hyphenation hyphenate(String word){
+		return hypParser.getHyphenator().hyphenate(word);
+	}
+
+	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
+		return hypParser.getHyphenator().hyphenate(word, addedRule, level);
 	}
 
 	public List<String> getAidLines(){
@@ -370,6 +395,30 @@ public class Backbone implements FileChangeListener{
 
 	public void deleteThesaurusMeanings(int[] selectedRows){
 		theParser.deleteMeanings(selectedRows);
+	}
+
+	public boolean restorePreviousThesaurusSnapshot() throws IOException{
+		boolean restored = theParser.restorePreviousSnapshot();
+		if(restored)
+			//save the files
+			saveThesaurusFiles();
+
+		return restored;
+	}
+
+	public boolean restoreNextThesaurusSnapshot() throws IOException{
+		boolean restored = theParser.restoreNextSnapshot();
+		if(restored)
+			//save the files
+			saveThesaurusFiles();
+
+		return restored;
+	}
+
+	public void saveThesaurusFiles() throws IOException{
+		File thesIndexFile = getThesaurusIndexFile();
+		File thesDataFile = getThesaurusDataFile();
+		theParser.save(thesIndexFile, thesDataFile);
 	}
 
 }

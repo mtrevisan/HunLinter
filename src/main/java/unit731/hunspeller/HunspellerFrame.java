@@ -842,7 +842,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_fileExitMenuItemActionPerformed
 
 	private void exit(){
-		if(theParser.isDictionaryModified()){
+		if(backbone.isDictionaryModified()){
 			//there are unsaved synonyms, ask the user if he really want to quit
 			Object[] options ={"Quit", "Cancel"};
 			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?", "Warning!", JOptionPane.YES_NO_OPTION,
@@ -977,7 +977,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				updateSynonymsCounter();
 
 				//... and save the files
-				saveThesaurusFiles();
+				backbone.saveThesaurusFiles();
 			}
 			else{
 				theMeaningsTextField.requestFocusInWindow();
@@ -1036,7 +1036,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			updateSynonymsCounter();
 
 			//... and save the files
-			saveThesaurusFiles();
+			backbone.saveThesaurusFiles();
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
@@ -1046,13 +1046,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
    private void theUndoButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theUndoButtonActionPerformed
 		try{
-			if(theParser.restorePreviousSnapshot()){
+			if(backbone.restorePreviousThesaurusSnapshot()){
 				updateSynonyms();
 
 				updateSynonymsCounter();
-
-				//save the files
-				saveThesaurusFiles();
 			}
 		}
 		catch(IOException e){
@@ -1062,25 +1059,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
    private void theRedoButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theRedoButtonActionPerformed
 		try{
-			if(theParser.restoreNextSnapshot()){
+			if(backbone.restoreNextThesaurusSnapshot()){
 				updateSynonyms();
 
 				updateSynonymsCounter();
-
-				//save the files
-				saveThesaurusFiles();
 			}
 		}
 		catch(IOException e){
 			log.error("Something very bad happend while redoing changes to the thesaurus file", e);
 		}
    }//GEN-LAST:event_theRedoButtonActionPerformed
-
-	private void saveThesaurusFiles() throws IOException{
-		File thesIndexFile = getThesaurusIndexFile();
-		File thesDataFile = getThesaurusDataFile();
-		theParser.save(thesIndexFile, thesDataFile);
-	}
 
 
 	private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_hypWordTextFieldKeyReleased
@@ -1242,21 +1230,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicDialog.addListSelectionListener(e -> {
 				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 					int selectedRow = dicDialog.getSelectedIndex();
-					try{
-						if(dicParser.isInBoundary(selectedRow)){
-							dicDialog.setVisible(false);
+					if(backbone.isDictionaryLineInBoundary(selectedRow)){
+						dicDialog.setVisible(false);
 
-							dicSortDictionaryMenuItem.setEnabled(false);
-							mainProgressBar.setValue(0);
+						dicSortDictionaryMenuItem.setEnabled(false);
+						mainProgressBar.setValue(0);
 
 
-							dicSorterWorker = new SorterWorker(dicParser, selectedRow);
-							dicSorterWorker.addPropertyChangeListener(this);
-							dicSorterWorker.execute();
-						}
-					}
-					catch(IOException exc){
-						log.error(null, exc);
+						dicSorterWorker = new SorterWorker(backbone, selectedRow);
+						dicSorterWorker.addPropertyChangeListener(this);
+						dicSorterWorker.execute();
 					}
 				}
 			});
@@ -1309,7 +1292,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
+		String text = frame.backbone.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -1317,7 +1300,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			Hyphenation hyphenation = frame.hypParser.getHyphenator().hyphenate(text);
+			Hyphenation hyphenation = frame.backbone.hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
@@ -1346,58 +1329,53 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		try{
-			String addedRuleText = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
-			String addedRule = frame.dicParser.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
-			HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
-			String addedRuleCount = null;
-			if(StringUtils.isNotBlank(addedRule)){
-				boolean alreadyHasRule = frame.hypParser.hasRule(addedRule, level);
-				boolean ruleMatchesText = false;
-				boolean hyphenationChanged = false;
-				boolean correctHyphenation = false;
-				if(!alreadyHasRule){
-					ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
+		String addedRuleText = frame.backbone.correctOrthography(frame.hypWordTextField.getText());
+		String addedRule = frame.backbone.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
+		String addedRuleCount = null;
+		if(StringUtils.isNotBlank(addedRule)){
+			boolean alreadyHasRule = frame.backbone.hasHyphenationRule(addedRule, level);
+			boolean ruleMatchesText = false;
+			boolean hyphenationChanged = false;
+			boolean correctHyphenation = false;
+			if(!alreadyHasRule){
+				ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
-					if(ruleMatchesText){
-						Hyphenation hyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText);
-						Hyphenation addedRuleHyphenation = frame.hypParser.getHyphenator().hyphenate(addedRuleText, addedRule, level);
+				if(ruleMatchesText){
+					Hyphenation hyphenation = frame.backbone.hyphenate(addedRuleText);
+					Hyphenation addedRuleHyphenation = frame.backbone.hyphenate(addedRuleText, addedRule, level);
 
-						Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
-						Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
-						String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
-							.toString();
-						addedRuleText = addedRuleHyphenation.formatHyphenation(sj.get(), errorFormatter)
-							.toString();
-						addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
+					Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
+					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
+					String text = hyphenation.formatHyphenation(sj.get(), errorFormatter)
+						.toString();
+					addedRuleText = addedRuleHyphenation.formatHyphenation(sj.get(), errorFormatter)
+						.toString();
+					addedRuleCount = Long.toString(addedRuleHyphenation.countSyllabes());
 
-						hyphenationChanged = !text.equals(addedRuleText);
-						correctHyphenation = !addedRuleHyphenation.hasErrors();
-					}
+					hyphenationChanged = !text.equals(addedRuleText);
+					correctHyphenation = !addedRuleHyphenation.hasErrors();
 				}
-
-				if(alreadyHasRule || !ruleMatchesText)
-					addedRuleText = null;
-				boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
-				frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
-				frame.hypAddRuleButton.setEnabled(enableAddRule);
 			}
-			else{
+
+			if(alreadyHasRule || !ruleMatchesText)
 				addedRuleText = null;
-
-				frame.hypAddRuleTextField.setText(null);
-				frame.hypAddRuleLevelComboBox.setEnabled(false);
-				frame.hypAddRuleButton.setEnabled(false);
-				frame.hypAddRuleSyllabationOutputLabel.setText(null);
-				frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
-			}
-
-			frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
-			frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
+			boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
+			frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
+			frame.hypAddRuleButton.setEnabled(enableAddRule);
 		}
-		catch(CloneNotSupportedException e){
-			log.error("Unexpected exception", e);
+		else{
+			addedRuleText = null;
+
+			frame.hypAddRuleTextField.setText(null);
+			frame.hypAddRuleLevelComboBox.setEnabled(false);
+			frame.hypAddRuleButton.setEnabled(false);
+			frame.hypAddRuleSyllabationOutputLabel.setText(null);
+			frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
 		}
+
+		frame.hypAddRuleSyllabationOutputLabel.setText(addedRuleText);
+		frame.hypAddRuleSyllabesCountOutputLabel.setText(addedRuleCount);
 	}
 
 
@@ -1409,7 +1387,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new CorrectnessWorker(affParser, dicParser);
+			dicCorrectnessWorker = new CorrectnessWorker(backbone);
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1425,7 +1403,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(affParser, dicParser, outputFile);
+				dicDuplicatesWorker = new DuplicatesWorker(backbone, outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1439,7 +1417,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(affParser, dicParser);
+			dicWordCountWorker = new WordCountWorker(backbone);
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1455,7 +1433,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicStatisticsWorker = new StatisticsWorker(performHyphenationStatistics, affParser, dicParser, this);
+			dicStatisticsWorker = new StatisticsWorker(backbone, performHyphenationStatistics, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
@@ -1471,7 +1449,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(affParser, dicParser, outputFile);
+				dicWordlistWorker = new WordlistWorker(backbone, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -1488,7 +1466,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(affParser, dicParser, outputFile);
+				dicMinimalPairsWorker = new MinimalPairsWorker(backbone, outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}

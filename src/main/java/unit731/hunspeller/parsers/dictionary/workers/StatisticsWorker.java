@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.DictionaryStatisticsDialog;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -33,44 +32,41 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class StatisticsWorker extends SwingWorker<Void, String>{
 
+	private final Backbone backbone;
 	@Getter
 	private final boolean performHyphenationStatistics;
-	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
 	private final Frame parent;
 
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(boolean performHyphenationStatistics, AffixParser affParser, DictionaryParser dicParser, Frame parent){
-		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(dicParser);
+	public StatisticsWorker(Backbone backbone, boolean performHyphenationStatistics, Frame parent){
+		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(parent);
 
+		this.backbone = backbone;
 		this.performHyphenationStatistics = performHyphenationStatistics;
-		this.affParser = affParser;
-		this.dicParser = dicParser;
 		this.parent = parent;
 
-		dicStatistics = new DictionaryStatistics(dicParser);
+		dicStatistics = new DictionaryStatistics(backbone);
 	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for statistics extraction: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for statistics extraction: " + backbone.affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			WordGenerator wordGenerator = dicParser.getWordGenerator();
-			HyphenatorInterface hyphenator = dicParser.getHyphenator();
+			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
+			WordGenerator wordGenerator = backbone.dicParser.getWordGenerator();
+			HyphenatorInterface hyphenator = backbone.dicParser.getHyphenator();
 
 			setProgress(0);
-			File dicFile = dicParser.getDicFile();
+			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)

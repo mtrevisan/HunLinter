@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
@@ -25,7 +24,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 @Slf4j
 public class SorterWorker extends SwingWorker<Void, String>{
 
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 	private final int lineIndex;
 
 
@@ -33,15 +32,15 @@ public class SorterWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Sorting file " + dicParser.getDicFile().getName());
+			publish("Sorting file " + backbone.dicParser.getDicFile().getName());
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
-			dicParser.calculateDictionaryBoundaries();
+			backbone.dicParser.calculateDictionaryBoundaries();
 
 			setProgress(20);
 
-			Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
+			Map.Entry<Integer, Integer> boundary = backbone.dicParser.getBoundary(lineIndex);
 			if(boundary != null){
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
@@ -51,12 +50,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				//sort the chosen section
 				File sortSection = chunks.get(1);
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(dicParser.getCharset())
-					.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+					.charset(backbone.dicParser.getCharset())
+					.comparator(ComparatorBuilder.getComparator(backbone.dicParser.getLanguage()))
 					.useZip(true)
 					.removeDuplicates(true)
 					.build();
-				dicParser.getSorter().sort(sortSection, options, sortSection);
+				backbone.dicParser.getSorter().sort(sortSection, options, sortSection);
 
 				setProgress(60);
 
@@ -68,12 +67,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				//remove temporary files
 				chunks.forEach(File::delete);
 
-				publish("File " + dicParser.getDicFile().getName() + " sorted");
+				publish("File " + backbone.dicParser.getDicFile().getName() + " sorted");
 
-				dicParser.getBoundaries().clear();
+				backbone.dicParser.getBoundaries().clear();
 			}
 			else
-				publish("File " + dicParser.getDicFile().getName() + " NOT sorted");
+				publish("File " + backbone.dicParser.getDicFile().getName() + " NOT sorted");
 
 			setProgress(100);
 		}
@@ -97,8 +96,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
-			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
+		try(BufferedReader br = Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset())){
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.dicParser.getCharset());
 			String line;
 			while((line = br.readLine()) != null){
 				if(index == boundary.getKey() || index == boundary.getValue() + 1){
@@ -107,7 +106,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 					files.add(file);
 
 					file = File.createTempFile("split", ".out");
-					writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
+					writer = Files.newBufferedWriter(file.toPath(), backbone.dicParser.getCharset());
 				}
 
 				writer.write(line);
@@ -134,8 +133,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 	private void copyFile(File inputFile, boolean append) throws IOException{
 		try(
-				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), dicParser.getCharset());
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dicParser.getDicFile(), append), dicParser.getCharset()));
+				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.dicParser.getCharset());
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.dicParser.getDicFile(), append), backbone.dicParser.getCharset()));
 				){
 			String line;
 			while((line = br.readLine()) != null){

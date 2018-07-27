@@ -13,7 +13,6 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -27,21 +26,18 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class WordCountWorker extends SwingWorker<Void, String>{
 
-	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser){
-		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(dicParser);
+	public WordCountWorker(Backbone backbone){
+		Objects.requireNonNull(backbone);
 
-		this.affParser = affParser;
-		this.dicParser = dicParser;
+		this.backbone = backbone;
 
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
-		bloomFilter.setCharset(dicParser.getCharset());
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(backbone.dicParser.getCharset());
 	}
 
 	@Override
@@ -49,17 +45,17 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 		boolean stopped = false;
 		bloomFilter.clear();
 		try{
-			publish("Opening Dictionary file for word count extraction: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for word count extraction: " + backbone.affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			WordGenerator wordGenerator = dicParser.getWordGenerator();
+			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
+			WordGenerator wordGenerator = backbone.dicParser.getWordGenerator();
 
 			setProgress(0);
-			File dicFile = dicParser.getDicFile();
+			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)

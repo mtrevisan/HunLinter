@@ -57,10 +57,9 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
 	 * @param level	The level to add the rule to
 	 * @return the hyphenation object
-	 * @throws CloneNotSupportedException	If the radix tree does not support the {@code Cloneable} interface
 	 */
 	@Override
-	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level) throws CloneNotSupportedException{
+	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
 		hypParser.acquireLock();
 
 		try{

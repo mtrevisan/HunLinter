@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -24,8 +23,7 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class CorrectnessWorker extends SwingWorker<Void, String>{
 
-	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 
 
 	@Override
@@ -33,14 +31,14 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		int lineIndex = 1;
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for correctness checking: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for correctness checking: " + backbone.affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
 
 			setProgress(0);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -49,7 +47,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 				long readSoFar = line.length();
-				long totalSize = dicParser.getDicFile().length();
+				long totalSize = backbone.dicParser.getDicFile().length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -58,9 +56,9 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 						try{
 							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 
-							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
 
-							productions.forEach(production -> dicParser.checkProduction(production, strategy));
+							productions.forEach(production -> backbone.dicParser.checkProduction(production, strategy));
 						}
 						catch(IllegalArgumentException e){
 							publish(e.getMessage() + " on line " + lineIndex + ": " + line);

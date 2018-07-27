@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -25,8 +24,7 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class WordlistWorker extends SwingWorker<Void, String>{
 
-	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 	private final File outputFile;
 
 
@@ -34,16 +32,16 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for wordlist extraction: " + affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for wordlist extraction: " + backbone.affParser.getLanguage() + ".dic");
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
 
 			setProgress(0);
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset()));
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()));
+					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.dicParser.getCharset());
 					){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
@@ -54,7 +52,7 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = dicParser.getDicFile().length();
+				long totalSize = backbone.dicParser.getDicFile().length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
@@ -63,7 +61,7 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 					if(!line.isEmpty()){
 						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
 
 							for(RuleProductionEntry production : productions){
 								writer.write(production.getWord());

@@ -9,7 +9,7 @@ public interface HyphenatorInterface{
 
 	Hyphenation hyphenate(String word);
 
-	Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level) throws CloneNotSupportedException;
+	Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level);
 
 	List<String> splitIntoCompounds(String word);
 
