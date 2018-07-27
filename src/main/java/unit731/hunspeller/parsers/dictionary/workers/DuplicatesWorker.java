@@ -87,7 +87,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		duplicatesBloomFilter.setCharset(backbone.getCharset());
 
 		setProgress(0);
-		File dicFile = backbone.dicParser.getDicFile();
+		File dicFile = backbone.getDictionaryFile();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
@@ -142,7 +142,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			publish("Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			File dicFile = backbone.dicParser.getDicFile();
+			File dicFile = backbone.getDictionaryFile();
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line

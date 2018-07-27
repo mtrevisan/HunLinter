@@ -39,7 +39,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 		Runnable done = () -> {
 			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		};
-		createWorker(backbone, body, done);
+		createWorker(backbone, outputFile, body, done);
 	}
 
 }

@@ -47,7 +47,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			TimeWatch watch = TimeWatch.start();
 
 			setProgress(0);
-			File dicFile = backbone.dicParser.getDicFile();
+			File dicFile = backbone.getDictionaryFile();
 			try(
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()));
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset());

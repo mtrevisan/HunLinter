@@ -96,7 +96,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset())){
+		try(BufferedReader br = Files.newBufferedReader(backbone.getDictionaryFile().toPath(), backbone.getCharset())){
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.getCharset());
 			String line;
 			while((line = br.readLine()) != null){
@@ -134,7 +134,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 	private void copyFile(File inputFile, boolean append) throws IOException{
 		try(
 				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.getCharset());
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.dicParser.getDicFile(), append), backbone.getCharset()));
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.getDictionaryFile(), append), backbone.getCharset()));
 				){
 			String line;
 			while((line = br.readLine()) != null){
