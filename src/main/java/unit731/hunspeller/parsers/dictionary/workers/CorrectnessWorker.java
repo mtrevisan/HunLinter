@@ -7,7 +7,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
-public class CorrectnessWorker extends AbstractWorkerDictionaryRead{
+public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 	public CorrectnessWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);

@@ -12,7 +12,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
-public class StatisticsWorker extends AbstractWorkerDictionaryRead{
+public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 	@Getter
 	private final boolean performHyphenationStatistics;

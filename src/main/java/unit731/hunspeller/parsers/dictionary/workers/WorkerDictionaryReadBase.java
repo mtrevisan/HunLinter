@@ -8,7 +8,7 @@ import javax.swing.SwingWorker;
 import unit731.hunspeller.BackboneWorkerDictionaryRead;
 
 
-public class AbstractWorkerDictionaryRead{
+public class WorkerDictionaryReadBase{
 
 	private BackboneWorkerDictionaryRead worker;
 

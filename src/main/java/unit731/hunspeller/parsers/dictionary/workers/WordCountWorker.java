@@ -11,7 +11,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
-public class WordCountWorker extends AbstractWorkerDictionaryRead{
+public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	private final BloomFilterInterface<String> bloomFilter;
 
