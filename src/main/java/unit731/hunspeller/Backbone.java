@@ -192,6 +192,12 @@ public class Backbone implements FileChangeListener{
 	}
 
 
+	public void storeHyphenationFile() throws IOException{
+		File hypFile = getHyphenationFile();
+		hypParser.save(hypFile);
+	}
+
+
 	private File getFile(String filename){
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
@@ -359,6 +365,10 @@ public class Backbone implements FileChangeListener{
 
 	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){
 		return hypParser.hasRule(addedRule, level);
+	}
+
+	public String addHyphenationRule(String newRule, HyphenationParser.Level level){
+		return hypParser.addRule(newRule, level);
 	}
 
 	public Hyphenation hyphenate(String word){

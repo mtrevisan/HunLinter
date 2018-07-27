@@ -1082,11 +1082,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
 		String newRule = hypAddRuleTextField.getText();
 		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT), level);
+		String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
 		if(foundRule == null){
 			try{
-				File hypFile = getHyphenationFile();
-				hypParser.save(hypFile);
+				backbone.storeHyphenationFile();
 
 				if(hypWordTextField.getText() != null){
 					formerHyphenationText = null;
