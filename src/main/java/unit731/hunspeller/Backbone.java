@@ -30,6 +30,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
+import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.ZipManager;
@@ -195,6 +196,12 @@ public class Backbone implements FileChangeListener{
 	public void storeHyphenationFile() throws IOException{
 		File hypFile = getHyphenationFile();
 		hypParser.save(hypFile);
+	}
+
+	public void storeThesaurusFiles() throws IOException{
+		File thesIndexFile = getThesaurusIndexFile();
+		File thesDataFile = getThesaurusDataFile();
+		theParser.save(thesIndexFile, thesDataFile);
 	}
 
 
@@ -391,6 +398,14 @@ public class Backbone implements FileChangeListener{
 		return theParser.getSynonymsCounter();
 	}
 
+	public ThesaurusEntry getThesaurusSynonym(int row){
+		return theParser.getSynonymsDictionary().get(row);
+	}
+
+	public void setThesaurusSynonym(int row, List<MeaningEntry> meanings, String text){
+		theParser.setMeanings(row, meanings, text);
+	}
+
 	public List<String> extractThesaurusDuplicates(){
 		return theParser.extractDuplicates();
 	}
@@ -410,8 +425,7 @@ public class Backbone implements FileChangeListener{
 	public boolean restorePreviousThesaurusSnapshot() throws IOException{
 		boolean restored = theParser.restorePreviousSnapshot();
 		if(restored)
-			//save the files
-			saveThesaurusFiles();
+			storeThesaurusFiles();
 
 		return restored;
 	}
@@ -419,16 +433,9 @@ public class Backbone implements FileChangeListener{
 	public boolean restoreNextThesaurusSnapshot() throws IOException{
 		boolean restored = theParser.restoreNextSnapshot();
 		if(restored)
-			//save the files
-			saveThesaurusFiles();
+			storeThesaurusFiles();
 
 		return restored;
-	}
-
-	public void saveThesaurusFiles() throws IOException{
-		File thesIndexFile = getThesaurusIndexFile();
-		File thesDataFile = getThesaurusDataFile();
-		theParser.save(thesIndexFile, thesDataFile);
 	}
 
 }

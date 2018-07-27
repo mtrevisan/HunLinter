@@ -343,16 +343,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   int row = theTable.convertRowIndexToModel(target.getSelectedRow());
                   BiConsumer<List<MeaningEntry>, String> okButtonAction = (meanings, text) -> {
                      try{
-                        theParser.setMeanings(row, meanings, text);
+                        backbone.setThesaurusSynonym(row, meanings, text);
 
                         // ... and save the files
-                        saveThesaurusFiles();
+                        backbone.storeThesaurusFiles();
                      }
                      catch(IllegalArgumentException | IOException ex){
                         log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(ex));
                      }
                   };
-                  ThesaurusEntry synonym = theParser.getSynonymsDictionary().get(row);
+                  ThesaurusEntry synonym = backbone.getThesaurusSynonym(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
@@ -813,19 +813,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
 			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
 
-			affFile = openAffixFileFileChooser.getSelectedFile();
-
-			openAffixFile();
-
-			openAidFile();
-
-			openThesaurusFile();
-
-			hypParser = new HyphenationParser(affParser.getLanguage());
-
-			openHyphenationFile();
-
-			clearResultTextArea();
+			File affFile = openAffixFileFileChooser.getSelectedFile();
+			loadFile(affFile.getAbsolutePath());
 		}
    }//GEN-LAST:event_fileOpenAFFMenuItemActionPerformed
 
@@ -977,7 +966,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				updateSynonymsCounter();
 
 				//... and save the files
-				backbone.saveThesaurusFiles();
+				backbone.storeThesaurusFiles();
 			}
 			else{
 				theMeaningsTextField.requestFocusInWindow();
@@ -1036,7 +1025,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			updateSynonymsCounter();
 
 			//... and save the files
-			backbone.saveThesaurusFiles();
+			backbone.storeThesaurusFiles();
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
