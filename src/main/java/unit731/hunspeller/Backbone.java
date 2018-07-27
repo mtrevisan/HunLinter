@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.zip.Deflater;
 import lombok.extern.slf4j.Slf4j;
@@ -394,6 +395,26 @@ public class Backbone implements FileChangeListener{
 
 	public boolean isDictionaryLineInBoundary(int lineIndex){
 		return dicParser.isInBoundary(lineIndex);
+	}
+
+	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
+		return dicParser.shouldBeProcessedForMinimalPair(production);
+	}
+
+	public boolean isConsonant(char chr){
+		return dicParser.isConsonant(chr);
+	}
+
+	public void calculateDictionaryBoundaries(){
+		dicParser.calculateDictionaryBoundaries();
+	}
+
+	public Map.Entry<Integer, Integer> getDictionaryBoundary(int row){
+		return dicParser.getBoundary(row);
+	}
+
+	public void clearDictionaryBoundaries(){
+		dicParser.getBoundaries().clear();
 	}
 
 	public boolean isDictionaryModified(){

@@ -72,7 +72,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							for(RuleProductionEntry production : productions)
-								if(backbone.dicParser.shouldBeProcessedForMinimalPair(production)){
+								if(backbone.shouldBeProcessedForMinimalPair(production)){
 									String word = production.getWord();
 									writer.write(word);
 									writer.newLine();
@@ -129,7 +129,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 								char left = difference.getLeft();
 								char right = difference.getRight();
-								if(backbone.dicParser.isConsonant(left) && backbone.dicParser.isConsonant(right)){
+								if(backbone.isConsonant(left) && backbone.isConsonant(right)){
 									String key = left + SLASH + right;
 									String value = sourceLine + SLASH + line2;
 									minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())

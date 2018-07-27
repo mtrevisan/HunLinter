@@ -36,11 +36,11 @@ public class SorterWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
-			backbone.dicParser.calculateDictionaryBoundaries();
+			backbone.calculateDictionaryBoundaries();
 
 			setProgress(20);
 
-			Map.Entry<Integer, Integer> boundary = backbone.dicParser.getBoundary(lineIndex);
+			Map.Entry<Integer, Integer> boundary = backbone.getDictionaryBoundary(lineIndex);
 			if(boundary != null){
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
@@ -69,7 +69,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 				publish("File sorted");
 
-				backbone.dicParser.getBoundaries().clear();
+				backbone.clearDictionaryBoundaries();
 			}
 			else
 				publish("File NOT sorted");
