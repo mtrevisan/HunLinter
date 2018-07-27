@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
@@ -54,9 +53,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-
-							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							productions.forEach(production -> backbone.dicParser.checkProduction(production, strategy));
 						}

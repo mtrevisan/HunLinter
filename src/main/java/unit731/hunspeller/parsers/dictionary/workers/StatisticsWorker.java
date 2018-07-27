@@ -16,14 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.DictionaryStatisticsDialog;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
@@ -59,10 +55,6 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-			WordGenerator wordGenerator = backbone.dicParser.getWordGenerator();
-			HyphenatorInterface hyphenator = backbone.dicParser.getHyphenator();
-
 			setProgress(0);
 			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
@@ -82,20 +74,19 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							for(RuleProductionEntry production : productions){
 								//collect statistics
 								String word = production.getWord();
 								if(performHyphenationStatistics){
-									List<String> subwords = hyphenator.splitIntoCompounds(word);
+									List<String> subwords = backbone.splitWordIntoCompounds(word);
 									if(subwords.isEmpty())
 										dicStatistics.addData(word);
 									else
 										for(String subword : subwords){
-											Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+											Hyphenation hyph = backbone.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
 											dicStatistics.addData(word, hyph);
 										}
 								}
@@ -104,7 +95,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 

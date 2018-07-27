@@ -862,10 +862,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		formerInputText = inputText;
 
 		if(StringUtils.isNotBlank(inputText)){
-			FlagParsingStrategy strategy = frame.backbone.getFlagParsingStrategy();
-			DictionaryEntry dicEntry = new DictionaryEntry(inputText, strategy);
 			try{
-				List<RuleProductionEntry> productions = frame.backbone.applyRules(dicEntry);
+				List<RuleProductionEntry> productions = frame.backbone.applyRules(inputText);
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);

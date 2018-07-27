@@ -342,8 +342,8 @@ public class Backbone implements FileChangeListener{
 		return affParser.getCharset();
 	}
 
-	public FlagParsingStrategy getFlagParsingStrategy(){
-		return affParser.getFlagParsingStrategy();
+	public long getDictionaryFileLength(){
+		return dicParser.getDicFile().length();
 	}
 
 	public String[] getDictionaryLines() throws IOException{
@@ -362,12 +362,18 @@ public class Backbone implements FileChangeListener{
 		return theParser.isDictionaryModified();
 	}
 
-	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry){
+	public List<RuleProductionEntry> applyRules(String line){
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 		return wordGenerator.applyRules(dicEntry);
 	}
 
 	public String correctOrthography(String word){
 		return dicParser.correctOrthography(word);
+	}
+
+	public List<String> splitWordIntoCompounds(String word){
+		return dicParser.getHyphenator().splitIntoCompounds(word);
 	}
 
 	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){

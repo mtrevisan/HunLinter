@@ -19,10 +19,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.HammingDistance;
@@ -48,8 +46,6 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-
 			setProgress(0);
 			try(
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()));
@@ -71,9 +67,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							for(RuleProductionEntry production : productions)
 								if(backbone.dicParser.shouldBeProcessedForMinimalPair(production)){
@@ -83,7 +78,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 
@@ -133,7 +128,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 								char left = difference.getLeft();
 								char right = difference.getRight();
-								if(backbone.dicParser.isConsonant(left) && dicParser.isConsonant(right)){
+								if(backbone.dicParser.isConsonant(left) && backbone.dicParser.isConsonant(right)){
 									String key = left + SLASH + right;
 									String value = sourceLine + SLASH + line2;
 									minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())

@@ -67,12 +67,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				//remove temporary files
 				chunks.forEach(File::delete);
 
-				publish("File " + backbone.dicParser.getDicFile().getName() + " sorted");
+				publish("File sorted");
 
 				backbone.dicParser.getBoundaries().clear();
 			}
 			else
-				publish("File " + backbone.dicParser.getDicFile().getName() + " NOT sorted");
+				publish("File NOT sorted");
 
 			setProgress(100);
 		}

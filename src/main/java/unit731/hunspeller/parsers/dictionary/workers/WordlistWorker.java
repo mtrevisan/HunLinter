@@ -11,10 +11,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
@@ -36,8 +34,6 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-
 			setProgress(0);
 			try(
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()));
@@ -52,16 +48,15 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				long totalSize = backbone.dicParser.getDicFile().length();
+				long totalSize = backbone.getDictionaryFileLength();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
 
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
-						DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
 						try{
-							List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							for(RuleProductionEntry production : productions){
 								writer.write(production.getWord());
@@ -69,7 +64,7 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 

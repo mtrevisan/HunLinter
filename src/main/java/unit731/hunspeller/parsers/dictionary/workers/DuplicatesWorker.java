@@ -82,8 +82,6 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), backbone.dicParser.getGrowRatioWhenFull());
 		bloomFilter.setCharset(backbone.getCharset());
@@ -107,10 +105,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 				readSoFar += line.length();
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
-					DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-
 					try{
-						List<RuleProductionEntry> productions = backbone.dicParser.getWordGenerator().applyRules(dictionaryWord);
+						List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 						productions.stream()
 							.map(RuleProductionEntry::toStringWithSignificantMorphologicalFields)
@@ -118,7 +114,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						publish(e.getMessage() + " on line " + lineIndex + ": " + dictionaryWord.toString());
+						publish(e.getMessage() + " on line " + lineIndex + ": " + line);
 					}
 				}
 

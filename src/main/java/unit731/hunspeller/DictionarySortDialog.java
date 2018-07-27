@@ -3,7 +3,6 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -117,36 +116,26 @@ public class DictionarySortDialog extends javax.swing.JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
-		try{
-			int lineIndex = list.getFirstVisibleIndex();
-			int boundaryIndex = backbone.dicParser.getNextBoundaryIndex(lineIndex);
-			if(boundaryIndex >= 0){
-				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
-			}
-			else
-				boundaryIndex = 0;
-			list.ensureIndexIsVisible(boundaryIndex);
+		int lineIndex = list.getFirstVisibleIndex();
+		int boundaryIndex = backbone.dicParser.getNextBoundaryIndex(lineIndex);
+		if(boundaryIndex >= 0){
+			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 		}
-		catch(IOException e){
-			log.error(null, e);
-		}
+		else
+			boundaryIndex = 0;
+		list.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
-		try{
-			int lineIndex = list.getFirstVisibleIndex();
-			int boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(lineIndex);
-			if(boundaryIndex < 0){
-				boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
-				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
-			}
-			list.ensureIndexIsVisible(boundaryIndex);
+		int lineIndex = list.getFirstVisibleIndex();
+		int boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(lineIndex);
+		if(boundaryIndex < 0){
+			boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
+			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 		}
-		catch(IOException e){
-			log.error(null, e);
-		}
+		list.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
 
 	/** Force the escape key to call the same action as pressing the Cancel button. */

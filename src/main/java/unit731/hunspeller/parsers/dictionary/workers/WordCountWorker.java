@@ -13,11 +13,8 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
@@ -49,9 +46,6 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 			TimeWatch watch = TimeWatch.start();
 
-			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
-			WordGenerator wordGenerator = backbone.dicParser.getWordGenerator();
-
 			setProgress(0);
 			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
@@ -72,8 +66,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							DictionaryEntry dictionaryWord = new DictionaryEntry(line, strategy);
-							List<RuleProductionEntry> productions = wordGenerator.applyRules(dictionaryWord);
+							List<RuleProductionEntry> productions = backbone.applyRules(line);
 							for(RuleProductionEntry production : productions)
 								bloomFilter.add(production.getWord());
 						}
