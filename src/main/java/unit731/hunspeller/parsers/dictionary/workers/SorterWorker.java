@@ -32,7 +32,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Sorting file " + backbone.dicParser.getDicFile().getName());
+			publish("Sorting Dictionary file");
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
@@ -50,7 +50,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				//sort the chosen section
 				File sortSection = chunks.get(1);
 				ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(backbone.dicParser.getCharset())
+					.charset(backbone.getCharset())
 					.comparator(ComparatorBuilder.getComparator(backbone.dicParser.getLanguage()))
 					.useZip(true)
 					.removeDuplicates(true)
@@ -96,8 +96,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset())){
-			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.dicParser.getCharset());
+		try(BufferedReader br = Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset())){
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.getCharset());
 			String line;
 			while((line = br.readLine()) != null){
 				if(index == boundary.getKey() || index == boundary.getValue() + 1){
@@ -106,7 +106,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 					files.add(file);
 
 					file = File.createTempFile("split", ".out");
-					writer = Files.newBufferedWriter(file.toPath(), backbone.dicParser.getCharset());
+					writer = Files.newBufferedWriter(file.toPath(), backbone.getCharset());
 				}
 
 				writer.write(line);
@@ -133,8 +133,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 	private void copyFile(File inputFile, boolean append) throws IOException{
 		try(
-				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.dicParser.getCharset());
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.dicParser.getDicFile(), append), backbone.dicParser.getCharset()));
+				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.getCharset());
+				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.dicParser.getDicFile(), append), backbone.getCharset()));
 				){
 			String line;
 			while((line = br.readLine()) != null){

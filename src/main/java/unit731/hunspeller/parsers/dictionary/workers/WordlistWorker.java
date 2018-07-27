@@ -32,7 +32,7 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for wordlist extraction: " + backbone.affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for wordlist extraction");
 
 			TimeWatch watch = TimeWatch.start();
 
@@ -40,8 +40,8 @@ public class WordlistWorker extends SwingWorker<Void, String>{
 
 			setProgress(0);
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()));
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.dicParser.getCharset());
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()));
+					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset());
 					){
 				String line = br.readLine();
 				//ignore any BOM marker on first line

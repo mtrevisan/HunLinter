@@ -37,7 +37,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 		this.backbone = backbone;
 
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
-		bloomFilter.setCharset(backbone.dicParser.getCharset());
+		bloomFilter.setCharset(backbone.getCharset());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 		boolean stopped = false;
 		bloomFilter.clear();
 		try{
-			publish("Opening Dictionary file for word count extraction: " + backbone.affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for word count extraction");
 
 			TimeWatch watch = TimeWatch.start();
 
@@ -55,7 +55,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)

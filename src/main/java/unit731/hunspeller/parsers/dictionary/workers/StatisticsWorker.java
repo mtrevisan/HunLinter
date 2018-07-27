@@ -55,7 +55,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for statistics extraction: " + backbone.affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for statistics extraction");
 
 			TimeWatch watch = TimeWatch.start();
 
@@ -66,7 +66,7 @@ public class StatisticsWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 			File dicFile = backbone.dicParser.getDicFile();
 			long totalSize = dicFile.length();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)

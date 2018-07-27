@@ -31,7 +31,7 @@ public class CorrectnessWorker extends SwingWorker<Void, String>{
 		int lineIndex = 1;
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for correctness checking: " + backbone.affParser.getLanguage() + ".dic");
+			publish("Opening Dictionary file for correctness checking");
 
 			TimeWatch watch = TimeWatch.start();
 

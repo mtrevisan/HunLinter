@@ -48,7 +48,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for duplications extraction: " + backbone.affParser.getLanguage() + ".dic (pass 1/3)");
+			publish("Opening Dictionary file for duplications extraction (pass 1/3)");
 
 			TimeWatch watch = TimeWatch.start();
 
@@ -86,12 +86,12 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.dicParser.getExpectedNumberOfElements(), backbone.dicParser.getFalsePositiveProbability(), backbone.dicParser.getGrowRatioWhenFull());
-		bloomFilter.setCharset(backbone.dicParser.getCharset());
+		bloomFilter.setCharset(backbone.getCharset());
 		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.dicParser.getGrowRatioWhenFull());
-		duplicatesBloomFilter.setCharset(backbone.dicParser.getCharset());
+		duplicatesBloomFilter.setCharset(backbone.getCharset());
 
 		setProgress(0);
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()))){
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -150,7 +150,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			FlagParsingStrategy strategy = backbone.affParser.getFlagParsingStrategy();
 
 			setProgress(0);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.dicParser.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(backbone.dicParser.getDicFile().toPath(), backbone.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -212,7 +212,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			int writtenSoFar = 0;
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress((int)(100. / (totalSize + 1)));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.dicParser.getCharset())){
+			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
