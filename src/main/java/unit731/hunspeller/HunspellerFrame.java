@@ -15,7 +15,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -58,7 +57,6 @@ import unit731.hunspeller.gui.DictionarySortCellRenderer;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
-import unit731.hunspeller.gui.TextAreaOutputStream;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -167,8 +165,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, FileChang
 		JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 		GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 
-		OutputStream os = new TextAreaOutputStream(parsingResultTextArea);
-		ApplicationLogAppender.setStaticOutputStream(os);
+		ApplicationLogAppender.setTextArea(parsingResultTextArea);
 //TODO thin space does not works!
 log.info(Backbone.MARKER_APPLICATION, "±\u2009a");
 
