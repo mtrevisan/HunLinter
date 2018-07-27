@@ -3,7 +3,6 @@ package unit731.hunspeller.collections.trie;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.AccessLevel;
@@ -63,14 +62,14 @@ public class TrieNode<S, H, V>{
 	 */
 	@SuppressWarnings("unchecked")
 	public void addValue(V value){
-		if(Objects.nonNull(this.value) && List.class.isAssignableFrom(value.getClass()))
+		if(this.value != null && List.class.isAssignableFrom(value.getClass()))
 			((List)this.value).addAll((List<?>)value);
 		else
 			this.value = value;
 	}
 
 	public boolean isLeaf(TrieSequencerInterface<S, H> sequencer){
-		return (Objects.nonNull(value) && sequencer.lengthOf(sequence) == endIndex);
+		return (value != null && sequencer.lengthOf(sequence) == endIndex);
 	}
 
 	public int getLength(){
@@ -78,11 +77,11 @@ public class TrieNode<S, H, V>{
 	}
 
 	public TrieNode<S, H, V> getChildForInsert(H stem){
-		return (Objects.nonNull(children)? children.get(stem): null);
+		return (children != null? children.get(stem): null);
 	}
 
 	public TrieNode<S, H, V> getChildForRetrieve(H stem, TrieSequencerInterface<S, H> sequencer){
-		return (Objects.nonNull(children)? sequencer.getChild(children, stem): null);
+		return (children != null? sequencer.getChild(children, stem): null);
 	}
 
 	public void addChild(H stem, TrieNode<S, H, V> node){
@@ -93,10 +92,10 @@ public class TrieNode<S, H, V>{
 
 	public TrieNode<S, H, V> removeChild(H stem, TrieSequencerInterface<S, H> sequencer){
 		TrieNode<S, H, V> removedNode = null;
-		if(Objects.nonNull(children)){
+		if(children != null){
 			TrieNode<S, H, V> node = sequencer.getChild(children, stem);
 			//when there are no children, remove this node from it's parent
-			if(Objects.nonNull(node) && Objects.isNull(node.children)){
+			if(node != null && node.children == null){
 				removedNode = children.remove(stem);
 
 				if(children.isEmpty())
@@ -108,17 +107,17 @@ public class TrieNode<S, H, V>{
 	}
 
 	public void forEachChild(Consumer<TrieNode<S, H, V>> callback){
-		if(Objects.nonNull(children))
+		if(children != null)
 			children.values()
 				.forEach(callback::accept);
 	}
 
 	public boolean isEmpty(){
-		return (Objects.isNull(value) && !hasChildren());
+		return (value == null && !hasChildren());
 	}
 
 	public boolean hasChildren(){
-		return Objects.nonNull(children);
+		return (children != null);
 	}
 
 	/**

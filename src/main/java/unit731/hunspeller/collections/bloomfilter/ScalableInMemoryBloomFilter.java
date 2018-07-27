@@ -2,7 +2,6 @@ package unit731.hunspeller.collections.bloomfilter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
@@ -46,11 +45,11 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	@Override
 	public boolean add(T value){
-		if(Objects.isNull(value))
+		if(value == null)
 			return false;
 
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
-		if(Objects.isNull(currentFilter) || currentFilter.isFull() && !currentFilter.contains(value)){
+		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
 			int size = filters.size();
 			currentFilter = new BloomFilter<>(type, (int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
 				falsePositiveProbability * Math.pow(tighteningRatio, size));
@@ -64,7 +63,7 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 	@Override
 	public boolean contains(T value){
 		boolean result = false;
-		if(Objects.nonNull(value))
+		if(value != null)
 			for(BloomFilterInterface<T> filter : filters)
 				if(filter.contains(value)){
 					result = true;

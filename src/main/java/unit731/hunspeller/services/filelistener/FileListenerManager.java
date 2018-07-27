@@ -121,7 +121,7 @@ public class FileListenerManager implements FileListener, Runnable{
 				WatchKey key = watcher.take();
 
 				Path dir = getDirPath(key);
-				if(Objects.isNull(dir)){
+				if(dir == null){
 					log.warn("Watch key not recognized");
 
 					continue;

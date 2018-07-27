@@ -1,6 +1,5 @@
 package unit731.hunspeller.services.externalsorter;
 
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +16,7 @@ public class StringSizeEstimator{
 		//nevertheless the worst thing that might happen is that the JVM is 32bit but we assume its 64bit, so we will be
 		//counting a few extra bytes per string object: no harm done here since this is just an approximation
 		String arch = System.getProperty("sun.arch.data.model");
-		if(Objects.nonNull(arch) && arch.contains("32"))
+		if(arch != null && arch.contains("32"))
 			//if exists and is 32 bit then we assume a 32bit JVM
 			is64bitJVM = false;
 

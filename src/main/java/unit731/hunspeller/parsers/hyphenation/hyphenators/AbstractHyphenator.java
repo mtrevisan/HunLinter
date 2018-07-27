@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -142,7 +141,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 		String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
 		HyphenationBreak hyphBreak;
-		if(Objects.nonNull(customHyphenation)){
+		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
 			Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			for(int i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS); i >= 0; i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS, i + 1))
@@ -223,7 +222,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 						addAfter = m.group(HyphenationParser.PARAM_ADD_AFTER);
 						String start = m.group(HyphenationParser.PARAM_START);
 						String cut = m.group(HyphenationParser.PARAM_CUT);
-						if(Objects.isNull(start)){
+						if(start == null){
 							String rule = m.group(HyphenationParser.PARAM_RULE);
 							start = Integer.toString(1);
 							cut = Integer.toString(PatternService.clear(rule, HyphenationParser.MATCHER_POINTS_AND_NUMBERS).length());
@@ -259,7 +258,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
 			String basicRule = m.group(HyphenationParser.PARAM_RULE);
 			String start = m.group(HyphenationParser.PARAM_START);
-			if(Objects.isNull(start))
+			if(start == null)
 				start = Integer.toString(1);
 			length = addBefore.length() - Integer.parseInt(start) + breakpointIndex(basicRule) - 1;
 		}

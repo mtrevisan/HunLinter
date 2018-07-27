@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -61,15 +60,15 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	}
 
 	public boolean isEmpty(){
-		return (Objects.isNull(children) || children.isEmpty());
+		return (children == null || children.isEmpty());
 	}
 
 	public RadixTreeNode<S, V> getNextNode(S sequence, int index, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> newNode = null;
 		RadixTreeNode<S, V> currentNode = this;
-		while(Objects.nonNull(currentNode)){
+		while(currentNode != null){
 			newNode = currentNode.getChild(sequence, index, sequencer);
-			if(Objects.nonNull(newNode))
+			if(newNode != null)
 				break;
 
 			currentNode = currentNode.getFailNode();
@@ -79,7 +78,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 
 	public RadixTreeNode<S, V> getChild(S key, int index, SequencerInterface<S> sequencer){
 		RadixTreeNode<S, V> response = null;
-		if(Objects.nonNull(children))
+		if(children != null)
 			for(RadixTreeNode<S, V> child : children){
 				boolean found = true;
 				int size = sequencer.length(child.key);
@@ -99,12 +98,12 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	}
 
 	public void addChild(RadixTreeNode<S, V> child){
-		if(Objects.nonNull(child))
+		if(child != null)
 			addChildren(Collections.singleton(child));
 	}
 
 	public void addChildren(Collection<RadixTreeNode<S, V>> children){
-		if(Objects.nonNull(children)){
+		if(children != null){
 			//delayed creation of children to reduce memory cost
 			this.children = ObjectUtils.defaultIfNull(this.children, new HashSet<>());
 
@@ -117,7 +116,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	}
 
 	public void forEachChildren(Consumer<? super RadixTreeNode<S, V>> action){
-		if(Objects.nonNull(children))
+		if(children != null)
 			children.forEach(action);
 	}
 
@@ -127,17 +126,17 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	 * @return	Whether or not this node has a value
 	 */
 	public boolean hasValue(){
-		return Objects.nonNull(value);
+		return (value != null);
 	}
 
 	public void addAdditionalValues(RadixTreeNode<S, V> node){
 		V nodeValue = node.getValue();
 		List<V> nodeAdditionalValues = node.getAdditionalValues();
-		if(Objects.nonNull(nodeValue) || Objects.nonNull(nodeAdditionalValues)){
+		if(nodeValue != null || nodeAdditionalValues != null){
 			additionalValues = ObjectUtils.defaultIfNull(additionalValues, new ArrayList<>());
-			if(Objects.nonNull(nodeValue))
+			if(nodeValue != null)
 				additionalValues.add(node.getValue());
-			if(Objects.nonNull(nodeAdditionalValues))
+			if(nodeAdditionalValues != null)
 				additionalValues.addAll(nodeAdditionalValues);
 		}
 	}
@@ -173,7 +172,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 
 		key = sequencer.subSequence(key, 0, splitIndex);
 		value = null;
-		if(Objects.nonNull(children))
+		if(children != null)
 			children.clear();
 		addChild(leafNode);
 
@@ -182,7 +181,7 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 
 	@Override
 	public Iterator<RadixTreeNode<S, V>> iterator(){
-		return (Objects.nonNull(children)? children.iterator(): Collections.<RadixTreeNode<S, V>>emptyIterator());
+		return (children != null? children.iterator(): Collections.<RadixTreeNode<S, V>>emptyIterator());
 	}
 
 }

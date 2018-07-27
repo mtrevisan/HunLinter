@@ -69,7 +69,7 @@ public class WordCountWorker extends SwingWorker<Void, String>{
 
 				int lineIndex = 1;
 				long readSoFar = line.length();
-				while(Objects.nonNull(line = br.readLine())){
+				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
 

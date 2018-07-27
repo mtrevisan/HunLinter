@@ -1,7 +1,6 @@
 package unit731.hunspeller.gui;
 
 import java.util.List;
-import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
@@ -30,7 +29,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public int getRowCount(){
-		return (Objects.nonNull(synonyms)? synonyms.size(): 0);
+		return (synonyms != null? synonyms.size(): 0);
 	}
 
 	@Override
@@ -40,7 +39,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex){
-		if(Objects.isNull(synonyms) || synonyms.size() <= rowIndex)
+		if(synonyms == null || synonyms.size() <= rowIndex)
 			return null;
 
 		ThesaurusEntry thesaurus = synonyms.get(rowIndex);

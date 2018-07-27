@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -45,7 +44,7 @@ public class ThesaurusDictionary{
 			ThesaurusEntry foundSynonym = findByMeaning(mean);
 
 			MeaningEntry entry = new MeaningEntry(mm);
-			if(Objects.nonNull(foundSynonym))
+			if(foundSynonym != null)
 				//add to meanings if synonym does exists
 				foundSynonym.getMeanings().add(entry);
 			else

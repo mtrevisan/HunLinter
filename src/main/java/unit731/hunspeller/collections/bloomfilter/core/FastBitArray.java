@@ -1,7 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter.core;
 
-import java.util.Objects;
-
 
 
 /**
@@ -26,7 +24,7 @@ public class FastBitArray implements BitArray{
 	}
 
 	public FastBitArray(long[] data){
-		if(Objects.isNull(data) || data.length == 0)
+		if(data == null || data.length == 0)
 			throw new IllegalArgumentException("Data must be valued");
 
 		this.data = data;

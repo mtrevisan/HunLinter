@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
@@ -105,7 +104,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			int lineIndex = 1;
 			long readSoFar = line.length();
 			long totalSize = dicParser.getDicFile().length();
-			while(Objects.nonNull(line = br.readLine())){
+			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.length();
 				line = DictionaryParser.cleanLine(line);
@@ -164,7 +163,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 				int lineIndex = 1;
 				long readSoFar = line.length();
 				long totalSize = dicParser.getDicFile().length();
-				while(Objects.nonNull(line = br.readLine())){
+				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
 					line = DictionaryParser.cleanLine(line);

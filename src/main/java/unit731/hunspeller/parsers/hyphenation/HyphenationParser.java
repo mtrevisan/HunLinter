@@ -170,7 +170,7 @@ public class HyphenationParser{
 			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
 			this.customHyphenations.put(level, ch);
 		}
-		this.optParser = (Objects.nonNull(optParser)? optParser: new HyphenationOptionsParser());
+		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
 	}
 
 	public void acquireLock(){
@@ -208,7 +208,7 @@ public class HyphenationParser{
 
 				REDUCED_PATTERNS.get(level).clear();
 
-				while(Objects.nonNull(line = br.readLine())){
+				while((line = br.readLine()) != null){
 					line = removeComment(line);
 					if(line.isEmpty())
 						continue;
@@ -292,7 +292,7 @@ public class HyphenationParser{
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
 		String foundNodeValue = patterns.get(level).get(key);
-		if(Objects.nonNull(foundNodeValue)){
+		if(foundNodeValue != null){
 			String clearedLine = PatternService.clear(line, MATCHER_REDUCE);
 			String clearedFoundNodeValue = PatternService.clear(foundNodeValue, MATCHER_REDUCE);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
@@ -347,7 +347,7 @@ public class HyphenationParser{
 
 			String key = getKeyFromData(rule);
 			String newRule = patterns.get(level).get(key);
-			if(Objects.isNull(newRule))
+			if(newRule == null)
 				patterns.get(level).put(key, rule);
 
 			return newRule;
@@ -383,8 +383,8 @@ public class HyphenationParser{
 			if(parts.length > 1){
 				int index = getIndexOfBreakpoint(rule);
 
-				int startIndex = (Objects.nonNull(parts[1])? Integer.parseInt(parts[1]) - 1: -1);
-				int length = (parts.length > 2 && Objects.nonNull(parts[2])? Integer.parseInt(parts[2]): 0);
+				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
+				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
 				if(startIndex < 0 || startIndex >= index)
 					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
 				if(length < 0 || startIndex + length < index)
@@ -404,7 +404,7 @@ public class HyphenationParser{
 				alreadyPresentRule = pattern;
 				break;
 			}
-		if(Objects.nonNull(alreadyPresentRule))
+		if(alreadyPresentRule != null)
 			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
 
 		reducedPatterns.add(cleanedRule);

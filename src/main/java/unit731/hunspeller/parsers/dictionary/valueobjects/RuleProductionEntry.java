@@ -71,9 +71,9 @@ public class RuleProductionEntry implements Productable{
 
 	private String[] combineContinuationFlags(String[] continuationFlags1, Set<String> continuationFlags2){
 		Set<String> flags = new HashSet<>();
-		if(Objects.nonNull(continuationFlags1))
+		if(continuationFlags1 != null)
 			flags.addAll(Arrays.asList(continuationFlags1));
-		if(Objects.nonNull(continuationFlags2) && !continuationFlags2.isEmpty())
+		if(continuationFlags2 != null && !continuationFlags2.isEmpty())
 			flags.addAll(continuationFlags2);
 		return flags.toArray(new String[flags.size()]);
 	}
@@ -84,21 +84,21 @@ public class RuleProductionEntry implements Productable{
 		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 		//	removed by splitting rules
-		if(Objects.nonNull(morphologicalFields))
+		if(morphologicalFields != null)
 			for(String morphologicalField : morphologicalFields)
 				if(!morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
-						&& (!morphologicalField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || Objects.isNull(affixEntryMorphologicalFields)
+						&& (!morphologicalField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || affixEntryMorphologicalFields == null
 							|| !Arrays.stream(affixEntryMorphologicalFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
-						&& (!morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || Objects.isNull(affixEntryMorphologicalFields)
+						&& (!morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryMorphologicalFields == null
 							|| !Arrays.stream(affixEntryMorphologicalFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
 					newMorphologicalFields.add(morphologicalField);
-		if(Objects.nonNull(affixEntryMorphologicalFields))
+		if(affixEntryMorphologicalFields != null)
 			newMorphologicalFields.addAll(Arrays.asList(affixEntryMorphologicalFields));
 		return newMorphologicalFields.toArray(new String[0]);
 	}
 
 	public int getContinuationFlagsCount(){
-		return (Objects.nonNull(continuationFlags)? continuationFlags.length: 0);
+		return (continuationFlags != null? continuationFlags.length: 0);
 	}
 
 	public boolean hasContinuationFlags(){
@@ -107,7 +107,7 @@ public class RuleProductionEntry implements Productable{
 
 	@Override
 	public boolean containsContinuationFlag(String ... continuationFlags){
-		if(Objects.nonNull(this.continuationFlags))
+		if(this.continuationFlags != null)
 			for(String flag : continuationFlags)
 				if(ArrayUtils.contains(this.continuationFlags, flag))
 					return true;
@@ -115,37 +115,37 @@ public class RuleProductionEntry implements Productable{
 	}
 
 	public boolean hasMorphologicalFields(){
-		return (Objects.nonNull(morphologicalFields) && morphologicalFields.length > 0);
+		return (morphologicalFields != null && morphologicalFields.length > 0);
 	}
 
 	@Override
 	public boolean containsMorphologicalField(String morphologicalField){
-		return (Objects.nonNull(morphologicalFields) && ArrayUtils.contains(morphologicalFields, morphologicalField));
+		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
 	public void prependAppliedRules(List<AffixEntry> appliedRules){
-		if(Objects.nonNull(appliedRules)){
+		if(appliedRules != null){
 			this.appliedRules = ObjectUtils.defaultIfNull(this.appliedRules, new ArrayList<>(3));
 			this.appliedRules.addAll(0, appliedRules);
 		}
 	}
 
 	public boolean hasProductionRules(){
-		return (Objects.nonNull(appliedRules) && !appliedRules.isEmpty());
+		return (appliedRules != null && !appliedRules.isEmpty());
 	}
 
 	public boolean hasProductionRule(String continuationFlag){
-		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
+		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getFlag).anyMatch(flag -> flag.equals(continuationFlag)));
 	}
 
 	public boolean hasProductionRule(AffixEntry.Type type){
-		return (Objects.nonNull(appliedRules) && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
+		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 	}
 
 	public boolean hasDoublefoldAffixRule(){
 		int prefixRules = 0;
 		int suffixRules = 0;
-		if(Objects.nonNull(appliedRules) && appliedRules.size() > 1)
+		if(appliedRules != null && appliedRules.size() > 1)
 			for(AffixEntry appliedRule : appliedRules){
 				if(appliedRule.getType() == AffixEntry.Type.PREFIX)
 					prefixRules ++;
@@ -157,7 +157,7 @@ public class RuleProductionEntry implements Productable{
 
 	public String getRulesSequence(){
 		StringJoiner sj = new StringJoiner(" > ");
-		if(Objects.nonNull(appliedRules))
+		if(appliedRules != null)
 			appliedRules.stream()
 				.map(AffixEntry::getFlag)
 				.forEach(sj::add);
@@ -167,7 +167,7 @@ public class RuleProductionEntry implements Productable{
 //	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
 	public List<String> getSignificantMorphologicalFields(){
 //		List<String> significant = new ArrayList<>();
-//		if(Objects.nonNull(morphologicalFields))
+//		if(morphologicalFields != null)
 //			for(String morphologicalField : morphologicalFields)
 //				if(!morphologicalField.startsWith(WordGenerator.TAG_PHONETIC) && !morphologicalField.startsWith(WordGenerator.TAG_STEM)
 //						&& !morphologicalField.startsWith(WordGenerator.TAG_ALLOMORPH))
@@ -185,10 +185,10 @@ public class RuleProductionEntry implements Productable{
 //		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
 //			.add(word)
 //			.add(AffixEntry.joinFlags(continuationFlags, flag));
-//		if(Objects.nonNull(morphologicalFields) && morphologicalFields.length > 0)
+//		if(morphologicalFields != null && morphologicalFields.length > 0)
 //			sj.add("\t")
 //				.add(String.join(StringUtils.SPACE, morphologicalFields));
-//		if(Objects.nonNull(rules) && rules.size() > 0)
+//		if(rules != null && rules.size() > 0)
 //			sj.add(" from ")
 //				.add(String.join(" > ", rules));
 //		return sj.toString();

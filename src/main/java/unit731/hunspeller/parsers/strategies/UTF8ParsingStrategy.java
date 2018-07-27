@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.strategies;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,11 +31,11 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String joinFlags(String[] textFlags){
-		if(Objects.isNull(textFlags) || textFlags.length == 0)
+		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
 		for(String flag : textFlags){
-			if(Objects.isNull(flag) || flag.length() != 1)
+			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
 			if(!StandardCharsets.UTF_8.newEncoder().canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");

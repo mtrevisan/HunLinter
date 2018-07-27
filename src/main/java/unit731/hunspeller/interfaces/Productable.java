@@ -1,6 +1,5 @@
 package unit731.hunspeller.interfaces;
 
-import java.util.Objects;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 
 
@@ -17,7 +16,7 @@ public interface Productable{
 
 	default String getMorphologicalFieldPrefixedBy(String typePrefix){
 		String[] morphologicalFields = getMorphologicalFields();
-		if(Objects.nonNull(morphologicalFields))
+		if(morphologicalFields != null)
 			for(String field : morphologicalFields)
 				if(field.startsWith(typePrefix))
 					return field;

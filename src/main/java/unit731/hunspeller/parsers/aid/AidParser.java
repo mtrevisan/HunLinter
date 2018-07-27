@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import lombok.Getter;
 import unit731.hunspeller.services.FileService;
 
@@ -30,7 +29,7 @@ public class AidParser{
 		Charset charset = FileService.determineCharset(aidFile.toPath());
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(aidFile.toPath(), charset))){
 			String line;
-			while(Objects.nonNull(line = br.readLine())){
+			while((line = br.readLine()) != null){
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
 					line = FileService.clearBOMMarker(line);

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.SearchResult;
@@ -65,7 +64,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 			}
 
 			List<String> rls = r.getNode().getAdditionalValues();
-			if(Objects.nonNull(rls))
+			if(rls != null)
 				for(String rl : rls){
 					//remove non–standard part
 					reducedData = PatternService.clear(rl, HyphenationParser.MATCHER_REDUCE);

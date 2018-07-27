@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -83,7 +82,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
 			}
 
-			while(Objects.nonNull(line = br.readLine()))
+			while((line = br.readLine()) != null)
 				if(!line.isEmpty())
 					dictionary.add(new ThesaurusEntry(line, br));
 		}
@@ -175,7 +174,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				try{
 					undoCaretaker.pushMemento(createMemento());
 
-					if(Objects.nonNull(undoable))
+					if(undoable != null)
 						undoable.onUndoChange(true);
 				}
 				catch(IOException ex){
@@ -237,7 +236,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 			dictionary.setMeanings(index, meanings, text);
 
-			if(Objects.nonNull(undoable))
+			if(undoable != null)
 				undoable.onUndoChange(true);
 		}
 		catch(IOException e){
@@ -274,7 +273,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				try{
 					undoCaretaker.pushMemento(createMemento());
 
-					if(Objects.nonNull(undoable))
+					if(undoable != null)
 						undoable.onUndoChange(true);
 				}
 				catch(IOException ex){
@@ -387,7 +386,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			redoCaretaker.pushMemento(createMemento());
 
 			Memento memento = undoCaretaker.popMemento();
-			if(Objects.nonNull(undoable)){
+			if(undoable != null){
 				undoable.onUndoChange(canUndo());
 				undoable.onRedoChange(true);
 			}
@@ -405,7 +404,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			undoCaretaker.pushMemento(createMemento());
 
 			Memento memento = redoCaretaker.popMemento();
-			if(Objects.nonNull(undoable)){
+			if(undoable != null){
 				undoable.onUndoChange(true);
 				undoable.onRedoChange(canRedo());
 			}

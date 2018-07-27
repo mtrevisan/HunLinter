@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
@@ -68,7 +67,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 				int lineIndex = 1;
 				long readSoFar = line.length();
 				long totalSize = dicParser.getDicFile().length();
-				while(Objects.nonNull(line = br.readLine())){
+				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.length();
 
@@ -118,7 +117,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 				String sourceLine;
 				long readSoFarSource = 0;
 				long totalSizeSource = outputFile.length();
-				while(Objects.nonNull(sourceLine = sourceBR.readLine())){
+				while((sourceLine = sourceBR.readLine()) != null){
 					readSoFarSource += sourceLine.length();
 
 					sourceBR.mark((int)(totalSizeSource - readSoFarSource));
@@ -127,7 +126,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 						String sourceLineLowercase = sourceLine.toLowerCase(Locale.ROOT);
 
 						String line2;
-						while(Objects.nonNull(line2 = sourceBR.readLine())){
+						while((line2 = sourceBR.readLine()) != null){
 							String line2Lowercase = line2.toLowerCase(Locale.ROOT);
 
 							//calculate distance

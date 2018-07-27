@@ -1,12 +1,15 @@
 package unit731.hunspeller;
 
+import java.awt.Desktop;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.zip.Deflater;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +25,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -30,6 +34,8 @@ import unit731.hunspeller.services.filelistener.FileListenerManager;
 public class Backbone implements FileChangeListener{
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
+
+	private static final ZipManager ZIPPER = new ZipManager();
 
 	private static final String STAR = "*";
 	private static final String EXTENSION_AFF = ".aff";
@@ -260,6 +266,52 @@ public class Backbone implements FileChangeListener{
 
 	private boolean hasAIDExtension(String path){
 		return path.endsWith(EXTENSION_AID);
+	}
+
+
+	public void createPackage(){
+		Path basePath = getPackageBaseDirectory();
+
+		//package entire folder with ZIP
+		if(basePath != null){
+			log.info(Backbone.MARKER_APPLICATION, "Found base path on " + basePath.toString());
+
+			try{
+				String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
+				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
+
+				log.info(Backbone.MARKER_APPLICATION, "Package created");
+
+				//open directory
+				if(Desktop.isDesktopSupported())
+					Desktop.getDesktop().open(new File(basePath.toString()));
+			}
+			catch(IOException e){
+				log.info(Backbone.MARKER_APPLICATION, "Package error: " + e.getMessage());
+
+				log.error("Something very bad happend while creating package", e);
+			}
+		}
+	}
+
+	/** Go up directories until description.xml or install.rdf is found */
+	private Path getPackageBaseDirectory(){
+		boolean found = false;
+		Path parentPath = affFile.toPath().getParent();
+		while(true){
+			File[] files = parentPath.toFile().listFiles();
+			if(files == null)
+				break;
+
+			found = Arrays.stream(files)
+				.map(File::getName)
+				.anyMatch(name -> "description.xml".equals(name) || "install.rdf".equals(name));
+			if(found)
+				break;
+
+			parentPath = parentPath.getParent();
+		}
+		return (found? parentPath: null);
 	}
 
 

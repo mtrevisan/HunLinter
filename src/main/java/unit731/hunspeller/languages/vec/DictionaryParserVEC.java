@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -20,7 +19,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
@@ -431,7 +429,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 
 	private void morphologicalFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
 		String[] morphologicalFields = production.getMorphologicalFields();
-		if(Objects.nonNull(morphologicalFields))
+		if(morphologicalFields != null)
 			for(String morphologicalField : morphologicalFields){
 				if(morphologicalField.length() < 4)
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
@@ -441,7 +439,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
 
 				Set<String> morphologicalFieldTypes = DATA_FIELDS.get(morphologicalFieldPrefix);
-				if(Objects.nonNull(morphologicalFieldTypes) && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+				if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
 					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
 			}
 	}
@@ -577,7 +575,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 		if(accents == 1 && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
 			boolean elBetweenVowelsRemoval = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(Objects.nonNull(appliedRules))
+			if(appliedRules != null)
 				for(AffixEntry appliedRule : appliedRules)
 					if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
 						elBetweenVowelsRemoval = true;

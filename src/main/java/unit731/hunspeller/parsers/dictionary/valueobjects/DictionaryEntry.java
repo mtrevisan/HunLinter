@@ -46,7 +46,7 @@ public class DictionaryEntry implements Productable{
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(dicFlags);
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = (Objects.nonNull(dicMorphologicalFields)? StringUtils.split(dicMorphologicalFields): new String[0]);
+		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): new String[0]);
 		combineable = true;
 
 		this.strategy = strategy;
@@ -69,7 +69,7 @@ public class DictionaryEntry implements Productable{
 		return Arrays.stream(continuationFlags)
 			.filter(rf -> {
 				RuleEntry r = ruleEntryExtractor.apply(rf);
-				return (Objects.nonNull(r) && !r.isSuffix());
+				return (r != null && !r.isSuffix());
 			})
 			.collect(Collectors.toList());
 	}

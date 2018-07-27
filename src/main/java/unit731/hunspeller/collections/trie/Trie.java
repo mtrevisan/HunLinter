@@ -70,7 +70,7 @@ public class Trie<S, H, V>{
 		int sequenceLength = sequencer.lengthOf(sequence);
 		int sequenceOffset = 0;
 		TrieNode<S, H, V> node = root;
-		while(Objects.nonNull(node)){
+		while(node != null){
 			int nodeLength = node.getLength();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesPut(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
@@ -112,7 +112,7 @@ public class Trie<S, H, V>{
 			//full match, end of node
 			H stem = sequencer.hashOf(sequence, sequenceOffset);
 			TrieNode<S, H, V> nextNode = node.getChildForInsert(stem);
-			if(Objects.isNull(nextNode))
+			if(nextNode == null)
 				createAndAttachNode(sequence, sequenceOffset, sequenceLength, value, node);
 
 			//full match, query or node remaining
@@ -138,7 +138,7 @@ public class Trie<S, H, V>{
 		Objects.requireNonNull(sequence);
 
 		TrieNode<S, H, V> node = searchAndApply(sequence, TrieMatch.EXACT, null);
-		return (Objects.nonNull(node)? node.getValue(): null);
+		return (node != null? node.getValue(): null);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class Trie<S, H, V>{
 		Objects.requireNonNull(sequence);
 
 		TrieNode<S, H, V> node = searchAndApply(sequence, TrieMatch.EXACT, (parent, stem) -> parent.removeChild(stem, sequencer));
-		return (Objects.nonNull(node)? node.getValue(): null);
+		return (node != null? node.getValue(): null);
 	}
 
 	public Collection<TrieNode<S, H, V>> collectPrefixes(S sequence){
@@ -180,7 +180,7 @@ public class Trie<S, H, V>{
 		H stem = sequencer.hashOf(sequence, sequenceOffset);
 		TrieNode<S, H, V> parent = root;
 		TrieNode<S, H, V> node = root.getChildForRetrieve(stem, sequencer);
-		while(Objects.nonNull(node)){
+		while(node != null){
 			int nodeLength = node.getLength();
 			int max = Math.min(nodeLength, sequenceLength - sequenceOffset);
 			int matches = sequencer.matchesGet(node.getSequence(), node.getStartIndex(), sequence, sequenceOffset, max);
@@ -191,21 +191,21 @@ public class Trie<S, H, V>{
 				//not found
 				node = null;
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){
-				if(Objects.nonNull(callback) && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
+				if(callback != null && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
 					callback.accept(parent, stem);
 
 				break;
 			}
 			else{
 				//call callback for each leaf node found so far
-				if(Objects.nonNull(callback) && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
+				if(callback != null && node.isLeaf(sequencer) && sequencer.startsWith(sequence, node.getSequence()))
 					callback.accept(parent, stem);
 
 				stem = sequencer.hashOf(sequence, sequenceOffset);
 				TrieNode<S, H, V> next = node.getChildForRetrieve(stem, sequencer);
 
 				//if there is no next, node could be a STARTS_WITH match
-				if(Objects.isNull(next))
+				if(next == null)
 					break;
 
 				parent = node;
@@ -214,7 +214,7 @@ public class Trie<S, H, V>{
 		}
 
 		//EXACT matches
-		if(Objects.nonNull(node) && matchType == TrieMatch.EXACT){
+		if(node != null && matchType == TrieMatch.EXACT){
 			//check length of last node against query
 			int endIndex = node.getEndIndex();
 			if(!node.isLeaf(sequencer) || endIndex != sequenceLength)
@@ -236,7 +236,7 @@ public class Trie<S, H, V>{
 	 * @return Whether the sequence is fully contained into this Trie
 	 */
 	public boolean containsKey(S sequence){
-		return Objects.nonNull(get(sequence));
+		return (get(sequence) != null);
 	}
 
 	/**

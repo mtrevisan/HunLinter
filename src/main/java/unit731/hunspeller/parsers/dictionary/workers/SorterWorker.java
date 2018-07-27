@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import javax.swing.SwingWorker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 			setProgress(20);
 
 			Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
-			if(Objects.nonNull(boundary)){
+			if(boundary != null){
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
 
@@ -101,7 +100,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
 			String line;
-			while(Objects.nonNull(line = br.readLine())){
+			while((line = br.readLine()) != null){
 				if(index == boundary.getKey() || index == boundary.getValue() + 1){
 					writer.close();
 
@@ -139,7 +138,7 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dicParser.getDicFile(), append), dicParser.getCharset()));
 				){
 			String line;
-			while(Objects.nonNull(line = br.readLine())){
+			while((line = br.readLine()) != null){
 				writer.write(line);
 				writer.newLine();
 			}

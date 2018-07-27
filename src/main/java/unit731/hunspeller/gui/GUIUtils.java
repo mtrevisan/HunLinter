@@ -9,7 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -47,7 +46,7 @@ public class GUIUtils{
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
 
-			if(Objects.nonNull(textToCopy)){
+			if(textToCopy != null){
 				textToCopy = removeHTMLCode(textToCopy);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

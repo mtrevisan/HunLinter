@@ -14,7 +14,7 @@ public class BitArrayBuilder{
 
 	@SuppressWarnings("fallthrough")
 	public static BitArray getBitArray(Type type, int bits){
-		Objects.nonNull(type);
+		Objects.requireNonNull(type);
 
 		BitArray ba = null;
 		switch(type){

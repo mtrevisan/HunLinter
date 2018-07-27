@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
-import java.util.Objects;
 
 
 /**
@@ -31,7 +30,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 
 	public MemoryMappedFileBitArray(File backingFile, int bits) throws FileNotFoundException, IOException{
-		if(Objects.isNull(backingFile))
+		if(backingFile == null)
 			throw new IllegalArgumentException("Backing file cannot be empty/null");
 		if(backingFile.exists() && !backingFile.isFile())
 			throw new IllegalArgumentException("Backing file does not represent a valid file");
@@ -95,7 +94,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 	@Override
 	public void clearAll(){
-		if(Objects.nonNull(buffer))
+		if(buffer != null)
 			for(int index = 0; index < numberOfBytes; index ++)
 				buffer.put(index, (byte)0);
 	}
@@ -115,7 +114,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	 * Method that helps unmap a memory-mapped file before being garbage-collected.
 	 */
 	private void closeDirectBuffer(){
-		if(Objects.nonNull(buffer) && buffer.isDirect()){
+		if(buffer != null && buffer.isDirect()){
 			//we could use this type cast and call functions without reflection code,
 			//but static import from sun.* package is risky for non–SUN virtual machine
 			//try{

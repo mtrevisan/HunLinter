@@ -17,7 +17,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionListener;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.gui.DictionarySortCellRenderer;
 
 
 @Slf4j
@@ -27,22 +27,25 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 
 	@NonNull
-	private final DictionaryParser dicParser;
+	private final Backbone backbone;
 
 	private final JList<String> list = new JList();
 
 
-	public DictionarySortDialog(DictionaryParser dicParser, String title, String message, Frame parent){
+	public DictionarySortDialog(Backbone backbone, String title, String message, Frame parent){
 		super(parent, title, true);
 
-		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(title);
 		Objects.requireNonNull(message);
 
-		this.dicParser = dicParser;
+		this.backbone = backbone;
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		initComponents();
+
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone.dicParser);
+		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
 
@@ -116,7 +119,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		try{
 			int lineIndex = list.getFirstVisibleIndex();
-			int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
+			int boundaryIndex = backbone.dicParser.getNextBoundaryIndex(lineIndex);
 			if(boundaryIndex >= 0){
 				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
@@ -133,9 +136,9 @@ public class DictionarySortDialog extends javax.swing.JDialog{
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		try{
 			int lineIndex = list.getFirstVisibleIndex();
-			int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
+			int boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(lineIndex);
 			if(boundaryIndex < 0){
-				boundaryIndex = dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
+				boundaryIndex = backbone.dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
 				int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 				boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 			}

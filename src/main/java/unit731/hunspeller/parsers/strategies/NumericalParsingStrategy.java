@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -41,7 +40,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String joinFlags(String[] textFlags){
-		if(Objects.isNull(textFlags) || textFlags.length == 0)
+		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
 		for(String flag : textFlags){

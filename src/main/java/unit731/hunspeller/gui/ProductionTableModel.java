@@ -1,7 +1,6 @@
 package unit731.hunspeller.gui;
 
 import java.util.List;
-import java.util.Objects;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
@@ -26,7 +25,7 @@ public class ProductionTableModel extends AbstractTableModel{
 
 	@Override
 	public int getRowCount(){
-		return (Objects.nonNull(productions)? productions.size(): 0);
+		return (productions != null? productions.size(): 0);
 	}
 
 	@Override
@@ -36,19 +35,19 @@ public class ProductionTableModel extends AbstractTableModel{
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex){
-		if(Objects.isNull(productions) || productions.size() <= rowIndex)
+		if(productions == null || productions.size() <= rowIndex)
 			return null;
 
 		RuleProductionEntry production = productions.get(rowIndex);
 		List<AffixEntry> rules = production.getAppliedRules();
-		int rulesSize = (Objects.nonNull(rules)? rules.size(): 0);
+		int rulesSize = (rules != null? rules.size(): 0);
 		switch(columnIndex){
 			case 0:
 				return production.getWord();
 
 			case 1:
 				String[] morphologicalFields = production.getMorphologicalFields();
-				return (Objects.nonNull(morphologicalFields)? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
+				return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 
 			case 2:
 				return (rulesSize > 0? rules.get(0): null);

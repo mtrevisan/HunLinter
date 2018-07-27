@@ -2,7 +2,6 @@ package unit731.hunspeller;
 
 import java.awt.Component;
 import unit731.hunspeller.interfaces.Hunspellable;
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -18,24 +17,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import java.util.zip.Deflater;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -44,7 +38,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.MenuSelectionManager;
 import javax.swing.RowFilter;
 import javax.swing.SwingWorker;
@@ -54,22 +47,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
-import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.interfaces.Undoable;;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
-import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -78,7 +65,6 @@ import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -87,11 +73,8 @@ import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.filelistener.FileListenerManager;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
-import unit731.hunspeller.services.ZipManager;
-import unit731.hunspeller.services.filelistener.FileChangeListener;
 
 
 /**
@@ -110,19 +93,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
-	private static final String EXTENSION_AFF = ".aff";
-	private static final String EXTENSION_DIC = ".dic";
-	private static final String EXTENSION_AID = ".aid";
-	private static final String EXTENSION_THESAURUS_INDEX = ".idx";
-	private static final String EXTENSION_THESAURUS_DATA = ".dat";
-	private static final String PREFIX_THESAURUS = "th_";
-	private static final String SUFFIX_THESAURUS = "_v2";
-	private static final String PREFIX_HYPHENATION = "hyph_";
-	private static final String FOLDER_AID = "aids/";
-
+	private static final int DEBOUNCER_INTERVAL = 400;
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
-
-	private static final ZipManager ZIPPER = new ZipManager();
 
 	private static String formerInputText;
 	private static String formerFilterThesaurusText;
@@ -134,10 +106,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Backbone backbone;
 
 	private RecentFileMenu rfm;
-	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, 400);
-	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(HunspellerFrame::filterThesaurus, 400);
-	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(HunspellerFrame::hyphenate, 400);
-	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(HunspellerFrame::hyphenateAddRule, 400);
+	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(HunspellerFrame::filterThesaurus, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(HunspellerFrame::hyphenate, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(HunspellerFrame::hyphenateAddRule, DEBOUNCER_INTERVAL);
 
 	private CorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
@@ -861,43 +833,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void fileCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		//go up directories until description.xml or install.rdf is found
-		boolean found = false;
-		Path parentPath = affFile.toPath().getParent();
-		while(true){
-			File[] files = parentPath.toFile().listFiles();
-			if(Objects.isNull(files))
-				break;
-
-			found = Arrays.stream(files)
-				.map(File::getName)
-				.anyMatch(name -> "description.xml".equals(name) || "install.rdf".equals(name));
-			if(found)
-				break;
-
-			parentPath = parentPath.getParent();
-		}
-
-		//package entire folder with ZIP
-		if(found){
-			log.info(Backbone.MARKER_APPLICATION, "Found base path on " + parentPath.toString());
-
-			try{
-				String outputFilename = parentPath.toString() + File.separator + parentPath.getName(parentPath.getNameCount() - 1) + ".zip";
-				ZIPPER.zipDirectory(parentPath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
-
-				log.info(Backbone.MARKER_APPLICATION, "Package created");
-
-				//open directory
-				if(Desktop.isDesktopSupported())
-					Desktop.getDesktop().open(new File(parentPath.toString()));
-			}
-			catch(IOException e){
-				log.error("Something very bad happend while creating package", e);
-
-				log.info(Backbone.MARKER_APPLICATION, "Package error: " + e.getMessage());
-			}
-		}
+		backbone.createPackage();
    }//GEN-LAST:event_fileCreatePackageMenuItemActionPerformed
 
    private void fileExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileExitMenuItemActionPerformed
@@ -933,7 +869,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static void calculateProductions(HunspellerFrame frame){
 		String inputText = frame.dicInputTextField.getText();
 		inputText = StringUtils.strip(inputText);
-		if(Objects.nonNull(formerInputText) && formerInputText.equals(inputText))
+		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
 
@@ -1063,14 +999,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
 		String text = theMeaningsTextField.getText();
-		theAddButton.setEnabled(Objects.nonNull(text) && !text.isEmpty());
+		theAddButton.setEnabled(text != null && !text.isEmpty());
 
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
 	private static void filterThesaurus(HunspellerFrame frame){
 		String text = StringUtils.strip(frame.theMeaningsTextField.getText());
-		if(Objects.nonNull(formerFilterThesaurusText) && formerFilterThesaurusText.equals(text))
+		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
 			return;
 
 		//remove part of speech and format the search string
@@ -1163,12 +1099,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		String newRule = hypAddRuleTextField.getText();
 		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
 		String foundRule = hypParser.addRule(newRule.toLowerCase(Locale.ROOT), level);
-		if(Objects.isNull(foundRule)){
+		if(foundRule == null){
 			try{
 				File hypFile = getHyphenationFile();
 				hypParser.save(hypFile);
 
-				if(Objects.nonNull(hypWordTextField.getText())){
+				if(hypWordTextField.getText() != null){
 					formerHyphenationText = null;
 					hyphenate(this);
 				}
@@ -1208,7 +1144,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
 		else{
-			if(Objects.nonNull(dicCorrectnessWorker) && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1223,7 +1159,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(Objects.nonNull(dicDuplicatesWorker) && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1238,7 +1174,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(Objects.nonNull(dicWordCountWorker) && dicWordCountWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(dicWordCountWorker != null && dicWordCountWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1253,7 +1189,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(Objects.nonNull(dicStatisticsWorker) && dicStatisticsWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(dicStatisticsWorker != null && dicStatisticsWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1271,7 +1207,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
 			}
-			if(Objects.nonNull(dicWordlistWorker) && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
+			if(dicWordlistWorker != null && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
@@ -1305,12 +1241,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicDialog = new DictionarySortDialog(dicParser, "Sorter", "Please select a section from the list:", this);
+			dicDialog = new DictionarySortDialog(backbone, "Sorter", "Please select a section from the list:", this);
 			dicDialog.setLocationRelativeTo(this);
-			ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser);
-			dicDialog.setCellRenderer(dicCellRenderer);
 			dicDialog.addListSelectionListener(e -> {
-				if(e.getValueIsAdjusting() && (Objects.isNull(dicSorterWorker) || dicSorterWorker.isDone())){
+				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 					int selectedRow = dicDialog.getSelectedIndex();
 					try{
 						if(dicParser.isInBoundary(selectedRow)){
@@ -1377,7 +1311,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static void hyphenate(HunspellerFrame frame){
 		String text = frame.dicParser.correctOrthography(frame.hypWordTextField.getText());
-		if(Objects.nonNull(formerHyphenationText) && formerHyphenationText.equals(text))
+		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
 
@@ -1470,7 +1404,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private void checkDictionaryCorrectness(){
-		if(Objects.isNull(dicCorrectnessWorker) || dicCorrectnessWorker.isDone()){
+		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -1483,7 +1417,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void extractDictionaryDuplicates(){
-		if(Objects.isNull(dicDuplicatesWorker) || dicDuplicatesWorker.isDone()){
+		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
@@ -1500,7 +1434,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void extractWordCount(){
-		if(Objects.isNull(dicWordCountWorker) || dicWordCountWorker.isDone()){
+		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
 			dicWordCountMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
 
@@ -1513,7 +1447,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void extractDictionaryStatistics(boolean performHyphenationStatistics){
-		if(Objects.isNull(dicStatisticsWorker) || dicStatisticsWorker.isDone()){
+		if(dicStatisticsWorker == null || dicStatisticsWorker.isDone()){
 			if(performHyphenationStatistics)
 				dicStatisticsMenuItem.setEnabled(false);
 			else
@@ -1529,7 +1463,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void extractDictionaryWordlist(){
-		if(Objects.isNull(dicWordlistWorker) || dicWordlistWorker.isDone()){
+		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
@@ -1546,7 +1480,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void extractMinimalPairs(){
-		if(Objects.isNull(dicMinimalPairsWorker) || dicMinimalPairsWorker.isDone()){
+		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
@@ -1662,7 +1596,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
 					Runnable menuItemEnabler = enableMenuItemFromWorker.get(evt.getSource().getClass());
-					if(Objects.nonNull(menuItemEnabler))
+					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}
 				break;

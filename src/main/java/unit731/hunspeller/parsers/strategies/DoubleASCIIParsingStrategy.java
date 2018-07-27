@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -37,10 +36,10 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String joinFlags(String[] textFlags){
-		if(Objects.isNull(textFlags) || textFlags.length == 0)
+		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 		for(String flag : textFlags)
-			if(Objects.isNull(flag) || flag.length() != 2)
+			if(flag == null || flag.length() != 2)
 				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);

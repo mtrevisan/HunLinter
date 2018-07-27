@@ -57,7 +57,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	}
 
 	private byte[] compress(byte[] bytes) throws IOException{
-		if(Objects.isNull(bytes) || bytes.length== 0)
+		if(bytes == null || bytes.length== 0)
 			return new byte[0];
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -72,7 +72,7 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	}
 
 	private byte[] decompress(byte[] bytes) throws IOException{
-		if(Objects.isNull(bytes) || bytes.length == 0)
+		if(bytes == null || bytes.length == 0)
 			return new byte[0];
 
 		try(GZIPInputStream is = new GZIPInputStream(new ByteArrayInputStream(bytes))){
