@@ -91,11 +91,13 @@ public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 			}
 		}
 
-		watch.stop();
+		if(!isCancelled()){
+			watch.stop();
 
-		setProgress(100);
+			setProgress(100);
 
-		log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+		}
 
 		return null;
 	}

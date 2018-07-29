@@ -1118,11 +1118,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicCorrectnessWorker.cancel();
-					dicCorrectnessWorker = null;
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
+
+					dicCorrectnessWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1133,11 +1134,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicDuplicatesWorker.cancel(true);
-					dicDuplicatesWorker = null;
 
 					dicExtractDuplicatesMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
+
+					dicDuplicatesWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1148,11 +1150,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicWordCountWorker.cancel();
-					dicWordCountWorker = null;
 
 					dicWordCountMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
+
+					dicWordCountWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1163,7 +1166,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicStatisticsWorker.cancel();
-					dicStatisticsWorker = null;
 
 					if(dicStatisticsWorker.isPerformHyphenationStatistics())
 						dicStatisticsMenuItem.setEnabled(true);
@@ -1171,6 +1173,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 						disStatisticsNoHyphenationMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
+
+					dicStatisticsWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1181,11 +1185,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicWordlistWorker.cancel();
-					dicWordlistWorker = null;
 
 					dicExtractWordlistMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
+
+					dicWordlistWorker = null;
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
