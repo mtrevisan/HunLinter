@@ -28,7 +28,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 	@NonNull
 	private final Backbone backbone;
 
-	private final JList<String> list = new JList();
+	private final JList<String> list = new JList<>();
 
 
 	public DictionarySortDialog(Backbone backbone, String title, String message, Frame parent){

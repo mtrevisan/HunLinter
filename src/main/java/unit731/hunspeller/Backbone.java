@@ -259,7 +259,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.info(MARKER_APPLICATION, "File {} modified", path.toFile().getName());
+		log.info("File {} modified", path.toFile().getName());
 
 		try{
 			String absolutePath = path.toString().toLowerCase();
