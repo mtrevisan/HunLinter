@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileListenerManager implements FileListener, Runnable{
 
+	private static final String ASTERISK = "*";
+
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
 	private static final FileSystem FILE_SYSTEM_DEFAULT = FileSystems.getDefault();
@@ -105,7 +107,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			.forEach(filePatterns::add);
 		if(filePatterns.isEmpty())
 			//match everything if no filter is found
-			filePatterns.add(matcherForExpression("*"));
+			filePatterns.add(matcherForExpression(ASTERISK));
 
 		listenerToFilePatterns.put(listener, filePatterns);
 	}

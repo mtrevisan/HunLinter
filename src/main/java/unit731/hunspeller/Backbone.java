@@ -47,7 +47,7 @@ public class Backbone implements FileChangeListener{
 
 	private static final ZipManager ZIPPER = new ZipManager();
 
-	private static final String STAR = "*";
+	private static final String ASTERISK = "*";
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
@@ -107,15 +107,16 @@ public class Backbone implements FileChangeListener{
 		openThesaurusFile(theFile);
 
 
+		flm.register(this, affFile.getParent(), ASTERISK + EXTENSION_AFF, ASTERISK + EXTENSION_DIC, ASTERISK + EXTENSION_AID);
+
 		startFileListener();
 	}
 
-	private void stopFileListener(){
+	public void stopFileListener(){
 		flm.stop();
 	}
 
-	private void startFileListener() throws IOException{
-		flm.register(this, affFile.getParent(), STAR + EXTENSION_AFF, STAR + EXTENSION_DIC, STAR + EXTENSION_AID);
+	public void startFileListener() throws IOException{
 		flm.start();
 	}
 
@@ -259,7 +260,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.info("File {} modified", path.toFile().getName());
+		log.info(MARKER_APPLICATION, "File {} modified", path.toFile().getName());
 
 		try{
 			String absolutePath = path.toString().toLowerCase();

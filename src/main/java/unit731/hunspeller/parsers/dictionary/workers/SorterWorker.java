@@ -42,6 +42,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 			Map.Entry<Integer, Integer> boundary = backbone.getDictionaryBoundary(lineIndex);
 			if(boundary != null){
+				backbone.stopFileListener();
+
 				//split dictionary isolating the sorted section
 				List<File> chunks = splitDictionary(boundary);
 
@@ -70,6 +72,8 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				publish("File sorted");
 
 				backbone.clearDictionaryBoundaries();
+
+				backbone.startFileListener();
 			}
 			else
 				publish("File NOT sorted");
