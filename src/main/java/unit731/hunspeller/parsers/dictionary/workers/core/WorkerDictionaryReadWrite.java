@@ -72,7 +72,7 @@ public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 					try{
 						body.accept(writer, line);
 					}
-					catch(IllegalArgumentException e){
+					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
 					}
 				}
