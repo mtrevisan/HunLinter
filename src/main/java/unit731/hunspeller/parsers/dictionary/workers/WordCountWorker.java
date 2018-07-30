@@ -2,7 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
@@ -25,7 +25,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		bloomFilter.setCharset(backbone.getCharset());
 
 
-		Consumer<String> body = (line) -> {
+		BiConsumer<String, Integer> body = (line, row) -> {
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 			for(RuleProductionEntry production : productions)
 				bloomFilter.add(production.getWord());

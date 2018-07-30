@@ -7,7 +7,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +24,14 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 
 	private final File dicFile;
 	private final Charset charset;
-	private final Consumer<String> body;
+	private final BiConsumer<String, Integer> body;
 	private final Runnable done;
 
 	@Getter
 	private final TimeWatch watch = TimeWatch.start();
 
 
-	public WorkerDictionaryRead(File dicFile, Charset charset, Consumer<String> body, Runnable done){
+	public WorkerDictionaryRead(File dicFile, Charset charset, BiConsumer<String, Integer> body, Runnable done){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
@@ -65,7 +65,7 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						body.accept(line);
+						body.accept(line, br.getLineNumber());
 					}
 					catch(IllegalArgumentException e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
