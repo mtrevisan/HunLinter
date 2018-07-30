@@ -93,12 +93,10 @@ public class Backbone implements FileChangeListener{
 		openAffixFile(filePath);
 
 		File hypFile = getHyphenationFile();
-		String language = affParser.getLanguage();
-		openHyphenationFile(hypFile, language);
+		openHyphenationFile(hypFile);
 
 		File dicFile = getDictionaryFile();
-		Charset charset = affParser.getCharset();
-		prepareDictionaryFile(dicFile, language, charset);
+		prepareDictionaryFile(dicFile);
 
 		File aidFile = getAidFile();
 		openAidFile(aidFile);
@@ -140,10 +138,11 @@ public class Backbone implements FileChangeListener{
 		log.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
-	private void openHyphenationFile(File hypFile, String language) throws IOException{
+	private void openHyphenationFile(File hypFile) throws IOException{
 		if(hypFile.exists()){
 			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
 
+			String language = affParser.getLanguage();
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 
@@ -155,8 +154,10 @@ public class Backbone implements FileChangeListener{
 			hypParser.clear();
 	}
 
-	private void prepareDictionaryFile(File dicFile, String language, Charset charset){
+	private void prepareDictionaryFile(File dicFile){
 		if(dicFile.exists()){
+			String language = affParser.getLanguage();
+			Charset charset = affParser.getCharset();
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, charset);
 			if(hypParser != null)
 				dicParser.setHyphenator(hypParser.getHyphenator());
@@ -268,8 +269,7 @@ public class Backbone implements FileChangeListener{
 				openAffixFile(absolutePath);
 			else if(isHyphenationFile(absolutePath)){
 				File hypFile = getHyphenationFile();
-				String language = affParser.getLanguage();
-				openHyphenationFile(hypFile, language);
+				openHyphenationFile(hypFile);
 			}
 			else if(hasAIDExtension(absolutePath)){
 				File aidFile = getAidFile();
