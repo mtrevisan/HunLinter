@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.TimeWatch;
@@ -20,6 +21,7 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class WorkerWrite<T> extends SwingWorker<Void, Void>{
 
+	private final String workerName;
 	private final List<T> entries;
 	private final File outputFile;
 	private final Charset charset;
@@ -30,12 +32,13 @@ public class WorkerWrite<T> extends SwingWorker<Void, Void>{
 	private final TimeWatch watch = TimeWatch.start();
 
 
-	public WorkerWrite(List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
+	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
 		Objects.requireNonNull(entries);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
 
+		this.workerName = workerName;
 		this.entries = entries;
 		this.outputFile = outputFile;
 		this.charset = charset;
@@ -45,7 +48,7 @@ public class WorkerWrite<T> extends SwingWorker<Void, Void>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening output file");
+		log.info(Backbone.MARKER_APPLICATION, "Opening output file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
