@@ -1,7 +1,6 @@
 package unit731.hunspeller;
 
 import java.awt.Desktop;
-import java.io.BufferedReader;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,6 +30,8 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
@@ -74,6 +75,7 @@ public class Backbone implements FileChangeListener{
 	private HyphenationParser hypParser;
 
 	private final WordGenerator wordGenerator;
+	private final AbstractHyphenator hyphenator;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -84,6 +86,7 @@ public class Backbone implements FileChangeListener{
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		wordGenerator = new WordGenerator(affParser);
+		hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -161,9 +164,7 @@ public class Backbone implements FileChangeListener{
 		if(dicFile.exists()){
 			String language = getLanguage();
 			Charset charset = getCharset();
-			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, charset);
-			if(hypParser != null)
-				dicParser.setHyphenator(hypParser.getHyphenator());
+			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, hyphenator, charset);
 
 			hunspellable.clearDictionaryParser();
 		}
@@ -445,7 +446,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public List<String> splitWordIntoCompounds(String word){
-		return dicParser.getHyphenator().splitIntoCompounds(word);
+		return hyphenator.splitIntoCompounds(word);
 	}
 
 	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){
@@ -457,11 +458,11 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public Hyphenation hyphenate(String word){
-		return hypParser.getHyphenator().hyphenate(word);
+		return hyphenator.hyphenate(word);
 	}
 
 	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
-		return hypParser.getHyphenator().hyphenate(word, addedRule, level);
+		return hyphenator.hyphenate(word, addedRule, level);
 	}
 
 	public List<String> getAidLines(){

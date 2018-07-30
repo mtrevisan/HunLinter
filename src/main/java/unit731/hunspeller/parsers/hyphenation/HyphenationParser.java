@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation;
 
-import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -117,8 +115,6 @@ public class HyphenationParser{
 	private final Comparator<String> comparator;
 	@Getter
 	private final Orthography orthography;
-	@Getter
-	private HyphenatorInterface hyphenator;
 
 	@Getter
 	private boolean secondLevelPresent;
@@ -137,7 +133,6 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -155,7 +150,6 @@ public class HyphenationParser{
 
 		comparator = ComparatorBuilder.getComparator(language);
 		orthography = OrthographyBuilder.getOrthography(language);
-		hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -263,8 +257,6 @@ public class HyphenationParser{
 							patterns.get(level).put(noHyphen, line);
 					}
 				}
-
-				hyphenator = new Hyphenator(this, BREAK_CHARACTER);
 			}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
