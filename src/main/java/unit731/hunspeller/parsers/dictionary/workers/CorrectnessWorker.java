@@ -2,7 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
@@ -13,7 +13,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(backbone);
 
 
-		Consumer<String> body = (line) -> {
+		BiConsumer<String, Integer> body = (line, lineIndex) -> {
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 			productions.forEach(production -> backbone.checkDictionaryProduction(production));

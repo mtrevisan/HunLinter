@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.awt.Frame;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import lombok.Getter;
 import unit731.hunspeller.Backbone;;
 import unit731.hunspeller.DictionaryStatisticsDialog;
@@ -29,7 +29,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 		dicStatistics = new DictionaryStatistics(backbone);
 
 
-		Consumer<String> body = (line) -> {
+		BiConsumer<String, Integer> body = (line, lineIndex) -> {
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 			for(RuleProductionEntry production : productions){
