@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadWriteBase;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;

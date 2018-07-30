@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.io.BufferedWriter;
 import java.io.File;
