@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,20 +47,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 				setProgress(40);
 
-				//sort the chosen section
-				File sortSection = chunks.get(1);
-				ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(backbone.getCharset())
-					.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
-					.useZip(true)
-					.removeDuplicates(true)
-					.build();
-				backbone.getDictionarySorter().sort(sortSection, options, sortSection);
+				sortSection(chunks);
 
 				setProgress(60);
 
-				//re-merge dictionary
-				mergeDictionary(chunks);
+				//re-merge sections
+				backbone.mergeSectionsToDictionary(chunks);
 
 				setProgress(80);
 
@@ -126,13 +116,16 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		return files;
 	}
 
-	private void mergeDictionary(List<File> files) throws IOException{
-		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
-		for(File file : files){
-			Files.write(backbone.getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
-
-			option = StandardOpenOption.APPEND;
-		}
+	private void sortSection(List<File> chunks) throws IOException{
+		//sort the chosen section
+		File sortSection = chunks.get(1);
+		ExternalSorterOptions options = ExternalSorterOptions.builder()
+			.charset(backbone.getCharset())
+			.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
+			.useZip(true)
+			.removeDuplicates(true)
+			.build();
+		backbone.getDictionarySorter().sort(sortSection, options, sortSection);
 	}
 
 	@Override

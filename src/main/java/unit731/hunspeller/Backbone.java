@@ -1,13 +1,16 @@
 package unit731.hunspeller;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -420,6 +423,15 @@ public class Backbone implements FileChangeListener{
 
 	public boolean isDictionaryModified(){
 		return theParser.isDictionaryModified();
+	}
+
+	public void mergeSectionsToDictionary(List<File> files) throws IOException{
+		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
+		for(File file : files){
+			Files.write(getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
+
+			option = StandardOpenOption.APPEND;
+		}
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
