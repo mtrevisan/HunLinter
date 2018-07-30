@@ -1,20 +1,21 @@
-package unit731.hunspeller.parsers.dictionary.workers;
+package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.util.List;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.Backbone;
 
 
-public class WorkerDictionaryReadWriteBase{
+public class WorkerWriteBase<T>{
 
-	private WorkerDictionaryReadWrite worker;
+	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new WorkerDictionaryReadWrite(backbone.getDictionaryFile(), outputFile, backbone.getCharset(), body, done);
+	public final void createWorker(String workerName, List<T> entries, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
+		worker = new WorkerWrite(workerName, entries, outputFile, backbone.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

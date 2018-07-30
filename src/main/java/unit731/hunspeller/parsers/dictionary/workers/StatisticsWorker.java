@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.awt.Frame;
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +56,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		createWorker(backbone, body, done);
+		createWorker("Statistics", backbone, body, done);
 	}
 
 	@Override

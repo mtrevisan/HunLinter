@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -38,7 +39,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				DictionaryParser.COUNTER_FORMATTER.format(totalProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		createWorker(backbone, body, done);
+		createWorker("Word count", backbone, body, done);
 	}
 
 	@Override

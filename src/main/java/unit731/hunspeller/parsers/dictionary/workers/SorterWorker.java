@@ -3,9 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -49,20 +47,12 @@ public class SorterWorker extends SwingWorker<Void, String>{
 
 				setProgress(40);
 
-				//sort the chosen section
-				File sortSection = chunks.get(1);
-				ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(backbone.getCharset())
-					.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
-					.useZip(true)
-					.removeDuplicates(true)
-					.build();
-				backbone.getDictionarySorter().sort(sortSection, options, sortSection);
+				sortSection(chunks);
 
 				setProgress(60);
 
-				//re-merge dictionary
-				mergeDictionary(chunks);
+				//re-merge sections
+				backbone.mergeSectionsToDictionary(chunks);
 
 				setProgress(80);
 
@@ -126,26 +116,16 @@ public class SorterWorker extends SwingWorker<Void, String>{
 		return files;
 	}
 
-	private void mergeDictionary(List<File> files) throws IOException{
-		boolean append = false;
-		for(File file : files){
-			copyFile(file, append);
-
-			append = true;
-		}
-	}
-
-	private void copyFile(File inputFile, boolean append) throws IOException{
-		try(
-				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.getCharset());
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.getDictionaryFile(), append), backbone.getCharset()));
-				){
-			String line;
-			while((line = br.readLine()) != null){
-				writer.write(line);
-				writer.newLine();
-			}
-		}
+	private void sortSection(List<File> chunks) throws IOException{
+		//sort the chosen section
+		File sortSection = chunks.get(1);
+		ExternalSorterOptions options = ExternalSorterOptions.builder()
+			.charset(backbone.getCharset())
+			.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
+			.useZip(true)
+			.removeDuplicates(true)
+			.build();
+		backbone.getDictionarySorter().sort(sortSection, options, sortSection);
 	}
 
 	@Override

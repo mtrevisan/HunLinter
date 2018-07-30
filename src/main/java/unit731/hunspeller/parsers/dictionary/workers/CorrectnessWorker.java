@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -18,7 +19,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> backbone.checkDictionaryProduction(production));
 		};
-		createWorker(backbone, body, null);
+		createWorker("Correctness checking", backbone, body, null);
 	}
 
 }

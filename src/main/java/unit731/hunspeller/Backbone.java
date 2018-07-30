@@ -1,13 +1,16 @@
 package unit731.hunspeller;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +145,7 @@ public class Backbone implements FileChangeListener{
 		if(hypFile.exists()){
 			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
 
-			String language = affParser.getLanguage();
+			String language = getLanguage();
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 
@@ -156,8 +159,8 @@ public class Backbone implements FileChangeListener{
 
 	private void prepareDictionaryFile(File dicFile){
 		if(dicFile.exists()){
-			String language = affParser.getLanguage();
-			Charset charset = affParser.getCharset();
+			String language = getLanguage();
+			Charset charset = getCharset();
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, charset);
 			if(hypParser != null)
 				dicParser.setHyphenator(hypParser.getHyphenator());
@@ -215,11 +218,11 @@ public class Backbone implements FileChangeListener{
 
 	/** FIXME should be private! */
 	public File getDictionaryFile(){
-		return getFile(affParser.getLanguage() + EXTENSION_DIC);
+		return getFile(getLanguage() + EXTENSION_DIC);
 	}
 
 	private File getAidFile(){
-		return getFile(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getLanguage() + EXTENSION_AID);
+		return getFile(getCurrentWorkingDirectory() + FOLDER_AID + getLanguage() + EXTENSION_AID);
 	}
 
 	private String getCurrentWorkingDirectory(){
@@ -230,15 +233,15 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getThesaurusIndexFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
+		return getFile(PREFIX_THESAURUS + getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
 	}
 
 	private File getThesaurusDataFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
+		return getFile(PREFIX_THESAURUS + getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
 	}
 
 	private File getHyphenationFile(){
-		return getFile(PREFIX_HYPHENATION + affParser.getLanguage() + EXTENSION_DIC);
+		return getFile(PREFIX_HYPHENATION + getLanguage() + EXTENSION_DIC);
 	}
 
 
@@ -347,7 +350,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public String getLanguage(){
-		return dicParser.getLanguage();
+		return affParser.getLanguage();
 	}
 
 	public long getDictionaryFileLength(){
@@ -356,7 +359,7 @@ public class Backbone implements FileChangeListener{
 
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
-		String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
+		String[] lines = Files.lines(dicFile.toPath(), getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
 		return lines;
@@ -420,6 +423,15 @@ public class Backbone implements FileChangeListener{
 
 	public boolean isDictionaryModified(){
 		return theParser.isDictionaryModified();
+	}
+
+	public void mergeSectionsToDictionary(List<File> files) throws IOException{
+		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
+		for(File file : files){
+			Files.write(getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
+
+			option = StandardOpenOption.APPEND;
+		}
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
