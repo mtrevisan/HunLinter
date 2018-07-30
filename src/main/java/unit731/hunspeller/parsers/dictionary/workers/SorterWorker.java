@@ -3,11 +3,11 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -127,24 +127,11 @@ public class SorterWorker extends SwingWorker<Void, String>{
 	}
 
 	private void mergeDictionary(List<File> files) throws IOException{
-		boolean append = false;
+		OpenOption option = StandardOpenOption.TRUNCATE_EXISTING;
 		for(File file : files){
-			copyFile(file, append);
+			Files.write(backbone.getDictionaryFile().toPath(), Files.readAllBytes(file.toPath()), option);
 
-			append = true;
-		}
-	}
-
-	private void copyFile(File inputFile, boolean append) throws IOException{
-		try(
-				BufferedReader br = Files.newBufferedReader(inputFile.toPath(), backbone.getCharset());
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(backbone.getDictionaryFile(), append), backbone.getCharset()));
-				){
-			String line;
-			while((line = br.readLine()) != null){
-				writer.write(line);
-				writer.newLine();
-			}
+			option = StandardOpenOption.APPEND;
 		}
 	}
 
