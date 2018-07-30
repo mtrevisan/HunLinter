@@ -33,6 +33,10 @@ public class WorkerDictionaryReadWriteBase{
 		worker.cancel(true);
 	}
 
+	public boolean isCancelled(){
+		return worker.isCancelled();
+	}
+
 	public boolean isDone(){
 		return worker.isDone();
 	}

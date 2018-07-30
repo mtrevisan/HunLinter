@@ -102,7 +102,7 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 
 	@Override
 	protected void done(){
-		if(done != null && !isCancelled())
+		if(done != null)
 			done.run();
 	}
 

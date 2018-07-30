@@ -51,10 +51,12 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			}
 		};
 		Runnable done = () -> {
-			//show statistics window
-			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-			dialog.setLocationRelativeTo(parent);
-			dialog.setVisible(true);
+			if(!isCancelled()){
+				//show statistics window
+				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+				dialog.setLocationRelativeTo(parent);
+				dialog.setVisible(true);
+			}
 		};
 		createWorker("Statistics", backbone, body, done);
 	}

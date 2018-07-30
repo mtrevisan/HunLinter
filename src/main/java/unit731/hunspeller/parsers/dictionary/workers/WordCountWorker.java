@@ -32,12 +32,14 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				bloomFilter.add(production.getWord());
 		};
 		Runnable done = () -> {
-			int totalProductions = bloomFilter.getAddedElements();
-			double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-			int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-			log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
-				DictionaryParser.COUNTER_FORMATTER.format(totalProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
-				falsePositiveCount);
+			if(!isCancelled()){
+				int totalProductions = bloomFilter.getAddedElements();
+				double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+				int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
+				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+					DictionaryParser.COUNTER_FORMATTER.format(totalProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
+					falsePositiveCount);
+			}
 		};
 		createWorker("Word count", backbone, body, done);
 	}
