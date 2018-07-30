@@ -38,7 +38,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				DictionaryParser.COUNTER_FORMATTER.format(totalProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		createWorker(backbone, body, done);
+		createWorker("Word count", backbone, body, done);
 	}
 
 	@Override

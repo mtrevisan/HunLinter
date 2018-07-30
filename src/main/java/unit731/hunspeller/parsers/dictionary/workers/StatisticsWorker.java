@@ -55,7 +55,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		createWorker(backbone, body, done);
+		createWorker("Statistics", backbone, body, done);
 	}
 
 	@Override

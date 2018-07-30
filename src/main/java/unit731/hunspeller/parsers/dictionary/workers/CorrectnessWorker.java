@@ -18,7 +18,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> backbone.checkDictionaryProduction(production));
 		};
-		createWorker(backbone, body, null);
+		createWorker("Correctness checking", backbone, body, null);
 	}
 
 }

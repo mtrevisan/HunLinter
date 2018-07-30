@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -22,6 +23,7 @@ import unit731.hunspeller.services.TimeWatch;
 @Slf4j
 public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 
+	private final String workerName;
 	private final File dicFile;
 	private final Charset charset;
 	private final BiConsumer<String, Integer> body;
@@ -31,11 +33,12 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 	private final TimeWatch watch = TimeWatch.start();
 
 
-	public WorkerDictionaryRead(File dicFile, Charset charset, BiConsumer<String, Integer> body, Runnable done){
+	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> body, Runnable done){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
 
+		this.workerName = workerName;
 		this.dicFile = dicFile;
 		this.charset = charset;
 		this.body = body;
@@ -44,7 +47,7 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file");
+		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
