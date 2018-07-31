@@ -70,12 +70,14 @@ public class WordGenerator{
 			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
 
 			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
+			checkTwofoldCorrectness(twofoldProductions);
 
 			List<RuleProductionEntry> productions = new ArrayList<>();
 			productions.add(baseProduction);
 			productions.addAll(onefoldProductions);
 			productions.addAll(twofoldProductions);
 			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
+			checkTwofoldCorrectness(lastfoldProductions);
 			productions.addAll(lastfoldProductions);
 
 			//convert using output table
@@ -107,15 +109,9 @@ public class WordGenerator{
 			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(RuleProductionEntry prod : productions){
+			for(RuleProductionEntry prod : productions)
 				//add parent derivations
 				prod.prependAppliedRules(appliedRules);
-
-				//check correctness
-				if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0) > 0)
-					throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
-						+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
-			}
 
 			twofoldProductions.addAll(productions);
 		}
@@ -131,15 +127,9 @@ public class WordGenerator{
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
-				for(RuleProductionEntry prod : prods){
+				for(RuleProductionEntry prod : prods)
 					//add parent derivations
 					prod.prependAppliedRules(appliedRules);
-
-					//check correctness
-					if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0) > 0)
-						throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
-							+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
-				}
 
 				lastfoldProductions.addAll(prods);
 			}
@@ -154,6 +144,14 @@ public class WordGenerator{
 			Collections.reverse(applyAffixes);
 		applyAffixes.add(affixes.getTerminalAffixes());
 		return applyAffixes;
+	}
+
+	private void checkTwofoldCorrectness(List<RuleProductionEntry> twofoldProductions) throws IllegalArgumentException{
+		for(RuleProductionEntry prod : twofoldProductions)
+			if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0)
+				- (prod.containsContinuationFlag(affParser.getCircumfixFlag())? 1: 0) > 0)
+				throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
+					+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 	}
 
 	public boolean isAffixProductive(String word, String affix){
