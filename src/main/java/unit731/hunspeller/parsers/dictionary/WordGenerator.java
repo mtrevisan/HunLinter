@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -150,7 +151,7 @@ public class WordGenerator{
 	}
 
 	private List<Set<String>> extractAffixes(Productable productable, boolean reverse){
-		Affixes affixes = separateAffixes(productable.getContinuationFlags());
+		Affixes affixes = separateAffixes(productable);
 		List<Set<String>> applyAffixes = new ArrayList<>(3);
 		applyAffixes.addAll(Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes()));
 		if(reverse)
@@ -217,7 +218,9 @@ public class WordGenerator{
 	 * @param continuationFlags	List of flags
 	 * @return	An object with separated flags, one for each group
 	 */
-	private Affixes separateAffixes(String[] continuationFlags) throws IllegalArgumentException{
+	private Affixes separateAffixes(Productable productable) throws IllegalArgumentException{
+		String[] continuationFlags = productable.getContinuationFlags();
+
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
@@ -229,8 +232,10 @@ public class WordGenerator{
 				}
 
 				Object rule = affParser.getData(continuationFlag);
-				if(rule == null)
-					throw new IllegalArgumentException("Non–existent rule " + continuationFlag + " found");
+				if(rule == null){
+					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
+					throw new IllegalArgumentException("Non–existent rule " + continuationFlag + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+				}
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry)rule).isSuffix())
@@ -257,8 +262,10 @@ public class WordGenerator{
 
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
-				if(rule == null)
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found");
+				if(rule == null){
+					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
+					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+				}
 
 				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
