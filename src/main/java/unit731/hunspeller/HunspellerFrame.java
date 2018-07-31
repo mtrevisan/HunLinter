@@ -1204,9 +1204,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		clearResultTextArea();
 
+		backbone.stopFileListener();
+
+		loadFileInternal(filePath);
 
 		try{
+			backbone.registerFileListener();
+			backbone.startFileListener();
+		}
+		catch(IOException e){
+			log.error(Backbone.MARKER_APPLICATION, "Cannot start file listener");
+
+			log.error("Cannot start file listener", e);
+		}
+	}
+
+	@Override
+	public void loadFileInternal(String filePath){
+		try{
 			backbone.loadFile(filePath);
+
 
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);

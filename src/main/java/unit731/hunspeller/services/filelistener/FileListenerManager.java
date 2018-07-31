@@ -1,12 +1,11 @@
 package unit731.hunspeller.services.filelistener;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -73,31 +72,27 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void register(FileChangeListener listener, String dirPath, String... patterns) throws IOException{
+	public void register(FileChangeListener listener, String... patterns) throws IOException{
 		Objects.requireNonNull(listener);
-		Objects.requireNonNull(dirPath);
 
-		Path dir = Paths.get(dirPath);
-		if(!Files.isDirectory(dir))
-			throw new IllegalArgumentException(dirPath + " is not a directory");
+		for(String pattern : patterns){
+			Path dir = (new File(pattern)).getParentFile().toPath();
+			if(dir.toFile().exists() && !dirPathToListeners.containsKey(dir)){
+				try{
+					//TODO manage non-existing directory
+					WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
-		if(!dirPathToListeners.containsKey(dir)){
-			try{
-				WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY,
-					StandardWatchEventKinds.ENTRY_DELETE);
-
-				watchKeyToDirPath.put(key, dir);
+					watchKeyToDirPath.put(key, dir);
+				}
+				catch(IOException e){
+					log.error("Exception while watching {}", dir, e);
+				}
 			}
-			catch(IOException e){
-				log.error("Exception while watching {}", dir, e);
-			}
+			dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
+				.add(listener);
 		}
-		dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
-			.add(listener);
 
 		addFilePatterns(listener, patterns);
-
-		log.info("Watching files under {} for changes", dirPath);
 	}
 
 	private void addFilePatterns(FileChangeListener listener, String[] patterns){
@@ -113,7 +108,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private PathMatcher matcherForExpression(String pattern){
-		return FILE_SYSTEM_DEFAULT.getPathMatcher("glob:" + pattern);
+		return FILE_SYSTEM_DEFAULT.getPathMatcher("glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1));
 	}
 
 	@Override
@@ -121,6 +116,13 @@ public class FileListenerManager implements FileListener, Runnable{
 		while(!Thread.interrupted()){
 			try{
 				WatchKey key = watcher.take();
+
+				//prevent receiving two separate ENTRY_MODIFY events: file modified and timestamp updated. Instead, receive one ENTRY_MODIFY event
+				//with two counts
+				try{ Thread.sleep(50); }
+				catch(InterruptedException e){
+					Thread.currentThread().interrupt();
+				}
 
 				Path dir = getDirPath(key);
 				if(dir == null){

@@ -37,7 +37,6 @@ import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
-import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
@@ -51,7 +50,6 @@ public class Backbone implements FileChangeListener{
 
 	private static final ZipManager ZIPPER = new ZipManager();
 
-	private static final String ASTERISK = "*";
 	private static final String EXTENSION_AFF = ".aff";
 	private static final String EXTENSION_DIC = ".dic";
 	private static final String EXTENSION_AID = ".aid";
@@ -92,9 +90,6 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void loadFile(String filePath) throws FileNotFoundException, IOException{
-		stopFileListener();
-
-
 		openAffixFile(filePath);
 
 		File hypFile = getHyphenationFile();
@@ -108,19 +103,20 @@ public class Backbone implements FileChangeListener{
 
 		File theFile = getThesaurusDataFile();
 		openThesaurusFile(theFile);
+	}
 
+	public void registerFileListener() throws IOException{
+		File hypFile = getHyphenationFile();
+		File aidFile = getAidFile();
+		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
+	}
 
-		flm.register(this, affFile.getParent(), ASTERISK + EXTENSION_AFF, ASTERISK + EXTENSION_DIC, ASTERISK + EXTENSION_AID);
-
-		startFileListener();
+	public void startFileListener(){
+		flm.start();
 	}
 
 	public void stopFileListener(){
 		flm.stop();
-	}
-
-	public void startFileListener() throws IOException{
-		flm.start();
 	}
 
 	private void openAffixFile(String filePath) throws IOException{
@@ -223,7 +219,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getAidFile(){
-		return getFile(getCurrentWorkingDirectory() + FOLDER_AID + getLanguage() + EXTENSION_AID);
+		return new File(getCurrentWorkingDirectory() + FOLDER_AID + getLanguage() + EXTENSION_AID);
 	}
 
 	private String getCurrentWorkingDirectory(){
@@ -265,25 +261,9 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.info(MARKER_APPLICATION, "File {} modified", path.toFile().getName());
+		log.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
-		try{
-			String absolutePath = affFile.getParent() + File.separator + path.toString();
-			if(hasAFFExtension(absolutePath))
-				openAffixFile(absolutePath);
-			else if(isHyphenationFile(absolutePath)){
-				File hypFile = getHyphenationFile();
-				openHyphenationFile(hypFile);
-			}
-			else if(hasAIDExtension(absolutePath)){
-				File aidFile = getAidFile();
-				openAidFile(aidFile);
-			}
-		}
-		catch(IOException e){
-			String message = ExceptionService.getMessage(e);
-			log.error(MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message, e);
-		}
+		hunspellable.loadFileInternal(affFile.getAbsolutePath());
 	}
 
 	private boolean hasAFFExtension(String path){

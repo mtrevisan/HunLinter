@@ -17,11 +17,10 @@ public interface FileListener{
 	 * of the <code>globPatterns</code>, <code>listener</code> should be notified.
 	 *
 	 * @param listener	The listener.
-	 * @param dirPath		The directory path.
 	 * @param patterns	Zero or more file patterns to be matched against file names.
 	 *							If none provided, matches <em>any</em> file.
 	 * @throws IOException	If <code>dirPath</code> is not a directory.
 	 */
-	void register(FileChangeListener listener, String dirPath, String... patterns) throws IOException;
+	void register(FileChangeListener listener, String... patterns) throws IOException;
 
 }
