@@ -77,24 +77,6 @@ public class WordGenerator{
 			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
 			checkTwofoldCorrectness(twofoldProductions);
 
-			//remove productions that invalidate circumfix rule
-			String circumfixFlag = affParser.getCircumfixFlag();
-			Iterator<RuleProductionEntry> itr = twofoldProductions.iterator();
-			while(itr.hasNext()){
-				RuleProductionEntry production = itr.next();
-
-				List<AffixEntry> appliedRules = production.getAppliedRules();
-				boolean brokenRule = false;
-				if(ArrayUtils.contains(appliedRules.get(0).getContinuationFlags(), circumfixFlag))
-					brokenRule = appliedRules.stream()
-						.anyMatch(rule -> !ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
-				else
-					brokenRule = appliedRules.stream()
-						.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
-				if(brokenRule)
-					itr.remove();
-			}
-
 			//collect productions
 			List<RuleProductionEntry> productions = new ArrayList<>();
 			productions.add(baseProduction);
@@ -103,22 +85,8 @@ public class WordGenerator{
 			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 			checkTwofoldCorrectness(lastfoldProductions);
 
-			//remove productions that invalidate circumfix rule
-			itr = lastfoldProductions.iterator();
-			while(itr.hasNext()){
-				RuleProductionEntry production = itr.next();
-
-				List<AffixEntry> appliedRules = production.getAppliedRules();
-				boolean brokenRule = false;
-				if(ArrayUtils.contains(appliedRules.get(0).getContinuationFlags(), circumfixFlag))
-					brokenRule = appliedRules.stream()
-						.anyMatch(rule -> !ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
-				else
-					brokenRule = appliedRules.stream()
-						.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
-				if(brokenRule)
-					itr.remove();
-			}
+			//remove rules that invalidate the circumfix rule
+			removeRulesInvalidatingCircumfix(lastfoldProductions);
 
 			productions.addAll(lastfoldProductions);
 
@@ -194,6 +162,29 @@ public class WordGenerator{
 				- (prod.containsContinuationFlag(affParser.getCircumfixFlag())? 1: 0) > 0)
 				throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
 					+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
+	}
+
+	private void removeRulesInvalidatingCircumfix(List<RuleProductionEntry> lastfoldProductions){
+		String circumfixFlag = affParser.getCircumfixFlag();
+		Iterator<RuleProductionEntry> itr = lastfoldProductions.iterator();
+		while(itr.hasNext()){
+			RuleProductionEntry production = itr.next();
+			
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			boolean rulesContainsCircumfixFlag = appliedRules.stream()
+				.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+			if(rulesContainsCircumfixFlag){
+				//check if at least one SFX and one PFX have the circumfix flag
+				boolean suffixWithCircumfix = appliedRules.stream()
+					.filter(rule -> rule.isSuffix())
+					.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				boolean prefixWithCircumfix = appliedRules.stream()
+					.filter(rule -> !rule.isSuffix())
+					.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				if(suffixWithCircumfix ^ prefixWithCircumfix)
+					itr.remove();
+			}
+		}
 	}
 
 	public boolean isAffixProductive(String word, String affix){
