@@ -203,12 +203,14 @@ public class WordGenerator{
 	public boolean isAffixProductive(String word, String affix){
 		word = affParser.applyInputConversionTable(word);
 
-		boolean productive = false;
+		boolean productive;
 		RuleEntry rule = affParser.getData(affix);
 		if(rule != null){
 			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 			productive = !applicableAffixes.isEmpty();
 		}
+		else
+			productive = affParser.isManagedByCompoundRule(affix);
 		return productive;
 	}
 
@@ -219,32 +221,35 @@ public class WordGenerator{
 	 * @return	An object with separated flags, one for each group
 	 */
 	private Affixes separateAffixes(Productable productable) throws IllegalArgumentException{
-		String[] continuationFlags = productable.getContinuationFlags();
+		String[] affixes = productable.getContinuationFlags();
 
 		Set<String> terminalAffixes = new HashSet<>();
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
-		if(continuationFlags != null){
-			for(String continuationFlag : continuationFlags){
-				if(affParser.isTerminalAffix(continuationFlag)){
-					terminalAffixes.add(continuationFlag);
+		if(affixes != null){
+			for(String affix : affixes){
+				if(affParser.isTerminalAffix(affix)){
+					terminalAffixes.add(affix);
 					continue;
 				}
 
-				Object rule = affParser.getData(continuationFlag);
+				Object rule = affParser.getData(affix);
 				if(rule == null){
+					if(affParser.isManagedByCompoundRule(affix))
+						continue;
+
 					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
-					throw new IllegalArgumentException("Non–existent rule " + continuationFlag + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
 				if(rule instanceof RuleEntry){
 					if(((RuleEntry)rule).isSuffix())
-						suffixes.add(continuationFlag);
+						suffixes.add(affix);
 					else
-						prefixes.add(continuationFlag);
+						prefixes.add(affix);
 				}
 				else
-					terminalAffixes.add(continuationFlag);
+					terminalAffixes.add(affix);
 			}
 		}
 
@@ -263,6 +268,9 @@ public class WordGenerator{
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
 				if(rule == null){
+					if(affParser.isManagedByCompoundRule(affix))
+						continue;
+
 					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}

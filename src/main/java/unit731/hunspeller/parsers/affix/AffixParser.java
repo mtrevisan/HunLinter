@@ -565,6 +565,16 @@ public class AffixParser{
 		return terminalAffixes.contains(flag);
 	}
 
+	public Set<String> getCompoundRules(){
+		return getData(TAG_COMPOUND_RULE);
+	}
+
+	public boolean isManagedByCompoundRule(String flag){
+		Set<String> compoundRules = getCompoundRules();
+		return compoundRules.stream()
+			.anyMatch(rule -> rule.contains(flag));
+	}
+
 	public Charset getCharset(){
 		return Charset.forName(getData(TAG_CHARACTER_SET));
 	}
