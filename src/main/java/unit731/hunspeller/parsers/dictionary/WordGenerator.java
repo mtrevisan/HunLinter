@@ -65,13 +65,17 @@ public class WordGenerator{
 			String word = affParser.applyInputConversionTable(dicEntry.getWord());
 			dicEntry.setWord(word);
 
+			//extract base production
 			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
+			//extract onefold production
 			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
 
+			//extract twofold production
 			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
 			checkTwofoldCorrectness(twofoldProductions);
 
+			//collect productions
 			List<RuleProductionEntry> productions = new ArrayList<>();
 			productions.add(baseProduction);
 			productions.addAll(onefoldProductions);
@@ -79,6 +83,9 @@ public class WordGenerator{
 			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 			checkTwofoldCorrectness(lastfoldProductions);
 			productions.addAll(lastfoldProductions);
+
+			//remove productions that invalidate circumfix rule
+			//TODO
 
 			//convert using output table
 			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
