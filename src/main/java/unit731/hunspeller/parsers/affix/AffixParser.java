@@ -34,7 +34,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Options managed: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV
+ * Options managed: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX
  */
 public class AffixParser{
 
