@@ -70,24 +70,24 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 			}
+
+			if(!isCancelled()){
+				watch.stop();
+
+				setProgress(100);
+
+				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			}
 		}
 		catch(Exception e){
-			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
-
 			if(e instanceof ClosedChannelException)
 				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				log.error("{}: {}", e.getClass().getSimpleName(), message);
 			}
-		}
 
-		if(!isCancelled()){
-			watch.stop();
-
-			setProgress(100);
-
-			log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 		}
 
 		return null;

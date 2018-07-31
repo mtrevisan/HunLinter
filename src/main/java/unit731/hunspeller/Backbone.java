@@ -152,7 +152,7 @@ public class Backbone implements FileChangeListener{
 
 			log.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
 		}
-		else
+		else if(hypParser != null)
 			hypParser.clear();
 	}
 
