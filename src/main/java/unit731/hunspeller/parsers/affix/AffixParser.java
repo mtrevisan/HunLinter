@@ -84,10 +84,7 @@ public class AffixParser{
 	private static final String TAG_COMPOUND_END = "COMPOUNDEND";
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	private static final String TAG_ONLY_IN_COMPOUND = "ONLYINCOMPOUND";
-	/**
-	 * Prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds by default.
-	 * Affixes with this flag may be inside of compounds.
-	 */
+	/** Affixes with this flag may be inside of compounds (normally, prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds only). */
 	private static final String TAG_COMPOUND_PERMIT_FLAG = "COMPOUNDPERMITFLAG";
 	/** Allow twofold suffixes within compounds */
 	private static final String TAG_COMPOUND_MORE_SUFFIXES = "COMPOUNDMORESUFFIXES";
