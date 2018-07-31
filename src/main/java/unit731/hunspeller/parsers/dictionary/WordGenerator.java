@@ -95,14 +95,14 @@ public class WordGenerator{
 	}
 
 	private List<RuleProductionEntry> getOnefoldProductions(Productable productable) throws NoApplicableRuleException{
-		List<Set<String>> applyAffixes = extractAffixes(productable);
+		List<Set<String>> applyAffixes = extractAffixes(productable, !affParser.isComplexPrefixes());
 		return applyAffixRules(productable, applyAffixes);
 	}
 
 	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions) throws NoApplicableRuleException{
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
-			List<Set<String>> applyAffixes = extractAffixes(production);
+			List<Set<String>> applyAffixes = extractAffixes(production, !affParser.isComplexPrefixes());
 			applyAffixes.set(1, null);
 			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
 
@@ -126,9 +126,7 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
-				List<Set<String>> applyAffixes = extractAffixes(production);
-				//swap prefixes with suffixes
-				Collections.reverse(applyAffixes);
+				List<Set<String>> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
 				applyAffixes.set(1, null);
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
@@ -148,11 +146,13 @@ public class WordGenerator{
 		return lastfoldProductions;
 	}
 
-	private List<Set<String>> extractAffixes(Productable productable){
+	private List<Set<String>> extractAffixes(Productable productable, boolean reverse){
 		Affixes affixes = separateAffixes(productable.getContinuationFlags());
-		List<Set<String>> applyAffixes = Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes());
-		if(!affParser.isComplexPrefixes())
+		List<Set<String>> applyAffixes = new ArrayList<>(3);
+		applyAffixes.addAll(Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes()));
+		if(reverse)
 			Collections.reverse(applyAffixes);
+		applyAffixes.add(affixes.getTerminalAffixes());
 		return applyAffixes;
 	}
 
@@ -180,9 +180,12 @@ public class WordGenerator{
 		Set<String> suffixes = new HashSet<>();
 		if(continuationFlags != null){
 			String keepCaseFlag = affParser.getKeepCaseFlag();
+			String circumfixFlag = affParser.getCircumfixFlag();
 			for(String continuationFlag : continuationFlags){
-				if(continuationFlag.equals(keepCaseFlag))
+				if(continuationFlag.equals(keepCaseFlag) || continuationFlag.equals(circumfixFlag)){
+					terminalAffixes.add(continuationFlag);
 					continue;
+				}
 
 				Object rule = affParser.getData(continuationFlag);
 				if(rule == null)
