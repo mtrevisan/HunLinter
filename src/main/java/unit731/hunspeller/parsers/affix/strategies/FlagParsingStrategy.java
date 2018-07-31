@@ -3,12 +3,40 @@ package unit731.hunspeller.parsers.affix.strategies;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
 
 	static final String SLASH = "/";
+
+	@AllArgsConstructor
+	@Getter
+	static enum Type{
+		ASCII(null, new ASCIIParsingStrategy()),
+		UTF_8("UTF-8", new UTF8ParsingStrategy()),
+		LONG("long", new DoubleASCIIParsingStrategy()),
+		NUMERIC("num", new NumericalParsingStrategy());
+
+		private final String code;
+		private final FlagParsingStrategy stategy;
+
+		public static Type toEnum(String flag){
+			Type type = ASCII;
+			if(!StringUtils.isBlank(flag)){
+				type = null;
+				for(Type t : values())
+					if(flag.equals(t.getCode())){
+						type = t;
+						break;
+					}
+			}
+			return type;
+		}
+	};
 
 
 	/**

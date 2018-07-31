@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.affix;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.NumericalParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.UTF8ParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.DoubleASCIIParsingStrategy;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,10 +36,6 @@ import unit731.hunspeller.services.PatternService;
  * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX
  */
 public class AffixParser{
-
-	public static final String FLAG_TYPE_UTF_8 = "UTF-8";
-	public static final String FLAG_TYPE_DOUBLE_CHAR = "long";
-	public static final String FLAG_TYPE_NUMERIC = "num";
 
 	//General options
 	/**
@@ -159,7 +154,7 @@ public class AffixParser{
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
 	@Getter
-	private FlagParsingStrategy strategy;
+	private FlagParsingStrategy strategy = new ASCIIParsingStrategy();
 
 	private final Set<String> terminalAffixes = new HashSet<>();
 
@@ -177,9 +172,6 @@ public class AffixParser{
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
 					+ ": Bad number of entries, it must be a positive integer");
-
-			String flag = getFlag();
-			strategy = getFlagParsingStrategy(flag);
 
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -217,9 +209,6 @@ public class AffixParser{
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
 					+ ": Bad number of entries, it must be a positive integer");
-
-			String flag = getFlag();
-			strategy = getFlagParsingStrategy(flag);
 
 //List<AffixEntry> prefixEntries = new ArrayList<>();
 //List<AffixEntry> suffixEntries = new ArrayList<>();
@@ -322,31 +311,6 @@ public class AffixParser{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-
-	/** Determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file */
-	private static FlagParsingStrategy getFlagParsingStrategy(String flag){
-		FlagParsingStrategy stategy = null;
-		if(flag == null)
-			stategy = new ASCIIParsingStrategy();
-		else
-			switch(flag){
-				case FLAG_TYPE_UTF_8:
-					stategy = new UTF8ParsingStrategy();
-					break;
-
-				case FLAG_TYPE_DOUBLE_CHAR:
-					stategy = new DoubleASCIIParsingStrategy();
-					break;
-
-				case FLAG_TYPE_NUMERIC:
-					stategy = new NumericalParsingStrategy();
-					break;
-
-				default:
-					throw new IllegalArgumentException("Unknown flag type: " + flag);
-			}
-		return stategy;
-	}
 
 	private static boolean containsUnique(String[] list){
 		if(list == null)
@@ -451,10 +415,19 @@ public class AffixParser{
 						encodingRead = true;
 
 					ParsingContext context = new ParsingContext(line, br);
-					Consumer<ParsingContext> fun = RULE_FUNCTION.get(context.getRuleType());
+					String ruleType = context.getRuleType();
+					Consumer<ParsingContext> fun = RULE_FUNCTION.get(ruleType);
 					if(fun != null){
 						try{
 							fun.accept(context);
+
+							if(TAG_FLAG.equals(ruleType)){
+								String flag = getFlag();
+								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
+								strategy = FlagParsingStrategy.Type.toEnum(flag).getStategy();
+								if(strategy == null)
+									throw new IllegalArgumentException("Unknown flag type: " + flag);
+							}
 						}
 						catch(RuntimeException e){
 							throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
@@ -570,9 +543,16 @@ public class AffixParser{
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
+		boolean found = false;
 		Set<String> compoundRules = getCompoundRules();
-		return compoundRules.stream()
-			.anyMatch(rule -> rule.contains(flag));
+		if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
+			flag = "(" + flag + ")";
+		for(String rule : compoundRules)
+			if(rule.contains(flag)){
+				found = true;
+				break;
+			}
+		return found;
 	}
 
 	public Charset getCharset(){
