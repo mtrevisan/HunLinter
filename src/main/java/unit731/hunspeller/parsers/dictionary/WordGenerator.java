@@ -90,6 +90,9 @@ public class WordGenerator{
 
 			productions.addAll(lastfoldProductions);
 
+			//remove rules without an affix and signed with the need affix flag
+			enforceNeedAffixFlag(productions);
+
 			//convert using output table
 			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
@@ -187,6 +190,15 @@ public class WordGenerator{
 		}
 	}
 
+	private void enforceNeedAffixFlag(List<RuleProductionEntry> productions){
+		Iterator<RuleProductionEntry> itr = productions.iterator();
+		while(itr.hasNext()){
+			RuleProductionEntry production = itr.next();
+			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
+				itr.remove();
+		}
+	}
+
 	public boolean isAffixProductive(String word, String affix){
 		word = affParser.applyInputConversionTable(word);
 
@@ -210,10 +222,8 @@ public class WordGenerator{
 		Set<String> prefixes = new HashSet<>();
 		Set<String> suffixes = new HashSet<>();
 		if(continuationFlags != null){
-			String keepCaseFlag = affParser.getKeepCaseFlag();
-			String circumfixFlag = affParser.getCircumfixFlag();
 			for(String continuationFlag : continuationFlags){
-				if(continuationFlag.equals(keepCaseFlag) || continuationFlag.equals(circumfixFlag)){
+				if(affParser.isTerminalAffix(continuationFlag)){
 					terminalAffixes.add(continuationFlag);
 					continue;
 				}

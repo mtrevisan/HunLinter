@@ -34,7 +34,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX
+ * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX
  */
 public class AffixParser{
 
@@ -163,6 +163,8 @@ public class AffixParser{
 	private Charset charset;
 	@Getter
 	private FlagParsingStrategy strategy;
+
+	private Set<String> terminalAffixes = new HashSet<>();
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
@@ -405,7 +407,7 @@ public class AffixParser{
 		//Other options
 		RULE_FUNCTION.put(TAG_FULLSTRIP, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_KEEP_CASE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_NEED_AFFIX, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_NEED_AFFIX, FUN_COPY_OVER);
 		RULE_FUNCTION.put(TAG_INPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
 		RULE_FUNCTION.put(TAG_OUTPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
 //		RULE_FUNCTION.put(TAG_WORD_CHARS, FUN_COPY_OVER);
@@ -494,6 +496,11 @@ public class AffixParser{
 //			}
 //			if(!containsData(TAG_KEY))
 //				addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+
+
+			terminalAffixes.add(getKeepCaseFlag());
+			terminalAffixes.add(getCircumfixFlag());
+			terminalAffixes.add(getNeedAffixFlag());
 		}
 		finally{
 			releaseLock();
@@ -550,6 +557,14 @@ public class AffixParser{
 
 	public String getKeepCaseFlag(){
 		return getData(TAG_KEEP_CASE);
+	}
+
+	public String getNeedAffixFlag(){
+		return getData(TAG_NEED_AFFIX);
+	}
+
+	public boolean isTerminalAffix(String flag){
+		return terminalAffixes.contains(flag);
 	}
 
 	public Charset getCharset(){
