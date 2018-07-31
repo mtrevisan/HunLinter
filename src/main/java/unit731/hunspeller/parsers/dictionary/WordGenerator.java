@@ -91,7 +91,10 @@ public class WordGenerator{
 
 			productions.addAll(lastfoldProductions);
 
-			//remove rules without an affix and signed with the need affix flag
+			//TODO manage compound rules
+			//...
+
+			//remove rules with the need affix flag
 			enforceNeedAffixFlag(productions);
 
 			//convert using output table
