@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix.strategies;
 
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 
 
 /**
@@ -54,7 +55,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 			}
 		}
 
-		return SLASH + String.join(COMMA, textFlags);
+		return AffixEntry.SLASH + String.join(COMMA, textFlags);
 	}
 
 }

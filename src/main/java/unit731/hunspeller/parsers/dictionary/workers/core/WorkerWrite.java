@@ -58,7 +58,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 			log.info(Backbone.MARKER_APPLICATION, "Stopped writing output file");
 
 			if(e instanceof ClosedChannelException)
-				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
+				log.warn("Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
 				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);

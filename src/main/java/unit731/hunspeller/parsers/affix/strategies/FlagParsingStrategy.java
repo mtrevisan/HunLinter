@@ -11,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
 
-	static final String SLASH = "/";
-
 	@AllArgsConstructor
 	@Getter
 	static enum Type{

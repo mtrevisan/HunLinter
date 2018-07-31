@@ -81,7 +81,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		}
 		catch(Exception e){
 			if(e instanceof ClosedChannelException)
-				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
+				log.warn("Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
 				log.error("{}: {}", e.getClass().getSimpleName(), message);

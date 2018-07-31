@@ -13,7 +13,7 @@ import unit731.hunspeller.services.PatternService;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
-	private static final String SLASH = "/";
+	public static final String SLASH = "/";
 	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
 	private static final String DOT = ".";

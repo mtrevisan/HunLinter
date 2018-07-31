@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.services.PatternService;
 
 
@@ -42,7 +43,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 			if(flag == null || flag.length() != 2)
 				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
 
-		return SLASH + String.join(StringUtils.EMPTY, textFlags);
+		return AffixEntry.SLASH + String.join(StringUtils.EMPTY, textFlags);
 	}
 
 }

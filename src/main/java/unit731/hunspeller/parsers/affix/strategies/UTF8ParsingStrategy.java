@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 
 
 /**
@@ -41,7 +42,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
 		}
 
-		return SLASH + String.join(StringUtils.EMPTY, textFlags);
+		return AffixEntry.SLASH + String.join(StringUtils.EMPTY, textFlags);
 	}
 
 }
