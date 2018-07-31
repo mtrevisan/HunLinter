@@ -10,6 +10,9 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
+	public static final String WORKER_NAME = "Correctness checking";
+
+
 	public CorrectnessWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
 
@@ -19,7 +22,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> backbone.checkDictionaryProduction(production));
 		};
-		createWorker("Correctness checking", backbone, body, null);
+		createWorker(WORKER_NAME, backbone, body, null);
 	}
 
 }

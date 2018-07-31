@@ -15,6 +15,8 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 public class StatisticsWorker extends WorkerDictionaryReadBase{
 
+	public static final String WORKER_NAME = "Statistics";
+
 	@Getter
 	private final boolean performHyphenationStatistics;
 
@@ -58,7 +60,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 				dialog.setVisible(true);
 			}
 		};
-		createWorker("Statistics", backbone, body, done);
+		createWorker(WORKER_NAME, backbone, body, done);
 	}
 
 	@Override

@@ -13,8 +13,8 @@ public class WorkerDictionaryReadWriteBase{
 	private WorkerDictionaryReadWrite worker;
 
 
-	public final void createWorker(Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new WorkerDictionaryReadWrite(backbone.getDictionaryFile(), outputFile, backbone.getCharset(), body, done);
+	public final void createWorker(String workerName, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
+		worker = new WorkerDictionaryReadWrite(workerName, backbone.getDictionaryFile(), outputFile, backbone.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

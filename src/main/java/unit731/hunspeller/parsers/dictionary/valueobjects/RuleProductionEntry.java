@@ -16,7 +16,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
 
 @Getter

@@ -15,6 +15,9 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 @Slf4j
 public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 
+	public static final String WORKER_NAME = "Wordlist";
+
+
 	public WordlistWorker(Backbone backbone, File outputFile){
 		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(outputFile);
@@ -37,7 +40,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 			if(!isCancelled())
 				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		};
-		createWorker(backbone, outputFile, body, done);
+		createWorker(WORKER_NAME, backbone, outputFile, body, done);
 	}
 
 }

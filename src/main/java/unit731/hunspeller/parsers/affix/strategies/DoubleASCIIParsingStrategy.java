@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.strategies;
+package unit731.hunspeller.parsers.affix.strategies;
 
 import java.util.Arrays;
 import java.util.HashSet;

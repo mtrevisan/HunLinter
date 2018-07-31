@@ -1,10 +1,10 @@
 package unit731.hunspeller.parsers.affix;
 
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.strategies.NumericalParsingStrategy;
-import unit731.hunspeller.parsers.strategies.UTF8ParsingStrategy;
-import unit731.hunspeller.parsers.strategies.DoubleASCIIParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.NumericalParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.UTF8ParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.DoubleASCIIParsingStrategy;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.strategies.ASCIIParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
 
@@ -107,6 +107,8 @@ public class AffixParser{
 	private static final String TAG_CHECK_COMPOUND_TRIPLE = "CHECKCOMPOUNDTRIPLE";
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
 	private static final String TAG_SIMPLIFIED_TRIPLE = "SIMPLIFIEDTRIPLE";
+	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
+	private static final String TAG_CIRCUMFIX = "CIRCUMFIX";
 	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from set of the accepted affixed and compound words) */
 	private static final String TAG_FORBIDDEN_WORD = "FORBIDDENWORD";
 
@@ -395,7 +397,7 @@ public class AffixParser{
 //		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_CASE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_CIRCUMFIX, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_CIRCUMFIX, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_FORBIDDEN_WORD, FUN_COPY_OVER);
 		//Options for affix creation
 		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);
@@ -620,6 +622,10 @@ public class AffixParser{
 
 	public Set<String> getWordBreakCharacters(){
 		return getData(TAG_BREAK);
+	}
+
+	public String getCircumfixFlag(){
+		return getData(TAG_CIRCUMFIX);
 	}
 
 }

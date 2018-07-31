@@ -8,8 +8,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.SwingWorker;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -17,23 +15,16 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.TimeWatch;
 
 
 @Slf4j
-public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
+public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
-	private final String workerName;
 	private final File dicFile;
-	private final Charset charset;
-	private final BiConsumer<String, Integer> body;
-	private final Runnable done;
-
-	@Getter
-	private final TimeWatch watch = TimeWatch.start();
 
 
 	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> body, Runnable done){
+		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
@@ -72,6 +63,8 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
+						
+						throw e;
 					}
 				}
 
@@ -82,10 +75,10 @@ public class WorkerDictionaryRead extends SwingWorker<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			if(e instanceof ClosedChannelException)
-				log.info(Backbone.MARKER_APPLICATION, "Thread interrupted");
+				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.info(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 

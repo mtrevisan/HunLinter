@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.strategies;
 
+import unit731.hunspeller.parsers.affix.strategies.UTF8ParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;

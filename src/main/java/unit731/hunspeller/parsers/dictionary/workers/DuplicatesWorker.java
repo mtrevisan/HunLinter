@@ -11,9 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -25,14 +24,16 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.TimeWatch;
 
 
-@AllArgsConstructor
 @Slf4j
-public class DuplicatesWorker extends SwingWorker<Void, String>{
+public class DuplicatesWorker extends WorkerBase<Void, Void>{
+
+	public static final String WORKER_NAME = "Duplications extraction";
 
 	private static final int EXPECTED_NUMBER_OF_DUPLICATIONS = 1_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
@@ -42,13 +43,22 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	private final File outputFile;
 
 
+	public DuplicatesWorker(Backbone backbone, File outputFile){
+		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(outputFile);
+
+		this.backbone = backbone;
+		this.outputFile = outputFile;
+		workerName = WORKER_NAME;
+	}
+
 	@Override
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for duplications extraction (pass 1/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
 
-			TimeWatch watch = TimeWatch.start();
+			watch = TimeWatch.start();
 
 			BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
@@ -58,7 +68,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 			watch.stop();
 
-			publish("Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			if(!duplicates.isEmpty())
 				DictionaryParser.openFileWithChoosenEditor(outputFile);
@@ -67,14 +77,14 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			stopped = true;
 
 			if(e instanceof ClosedChannelException)
-				publish("Duplicates thread interrupted");
+				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				publish(e.getClass().getSimpleName() + ": " + message);
+				log.error(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 			}
 		}
 		if(stopped)
-			publish("Stopped reading Dictionary file");
+			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}
@@ -113,7 +123,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						publish(e.getMessage() + " on line " + lineIndex + ": " + line);
+						log.error(Backbone.MARKER_APPLICATION, e.getMessage() + " on line " + lineIndex + ": " + line);
 					}
 				}
 
@@ -125,8 +135,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		int totalProductions = bloomFilter.getAddedElements();
 		double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 		int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-		publish("Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
+		log.info(Backbone.MARKER_APPLICATION, "Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+		log.info(Backbone.MARKER_APPLICATION, "False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
 			+ " (overall duplicates ≲ " + falsePositiveCount + ")");
 
 		bloomFilter.close();
@@ -139,7 +149,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			publish("Extracting duplicates (pass 2/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
 			File dicFile = backbone.getDictionaryFile();
@@ -169,7 +179,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 							}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage());
+							log.warn(Backbone.MARKER_APPLICATION, e.getMessage());
 						}
 					}
 
@@ -180,8 +190,8 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 
 			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-			publish("Total duplicates: " + DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			publish("False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
+			log.info(Backbone.MARKER_APPLICATION, "Total duplicates: " + DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
+			log.info(Backbone.MARKER_APPLICATION, "False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
 				+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 
 			duplicatesBloomFilter.close();
@@ -191,7 +201,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
-			publish("No duplicates found, skip remaining passes");
+			log.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining passes");
 
 		return result;
 	}
@@ -199,7 +209,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 	private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
 		int totalSize = duplicates.size();
 		if(totalSize > 0){
-			publish("Write results to file (pass 3/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
 			setProgress(0);
 
 			int writtenSoFar = 0;
@@ -223,7 +233,7 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 			}
 			setProgress(100);
 
-			publish("File written: " + outputFile.getAbsolutePath());
+			log.info(Backbone.MARKER_APPLICATION, "File written: " + outputFile.getAbsolutePath());
 		}
 	}
 
@@ -245,12 +255,6 @@ public class DuplicatesWorker extends SwingWorker<Void, String>{
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
 		return result;
-	}
-
-	@Override
-	protected void process(List<String> chunks){
-		for(String chunk : chunks)
-			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }

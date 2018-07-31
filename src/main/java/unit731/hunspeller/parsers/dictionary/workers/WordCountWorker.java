@@ -16,6 +16,8 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 @Slf4j
 public class WordCountWorker extends WorkerDictionaryReadBase{
 
+	public static final String WORKER_NAME = "Word count";
+
 	private final BloomFilterInterface<String> bloomFilter;
 
 
@@ -41,7 +43,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker("Word count", backbone, body, done);
+		createWorker(WORKER_NAME, backbone, body, done);
 	}
 
 	@Override

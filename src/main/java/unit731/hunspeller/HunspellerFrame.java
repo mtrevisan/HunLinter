@@ -62,6 +62,7 @@ import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordlistWorker;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -115,7 +116,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
-	private final Map<Class<?>, Runnable> enableMenuItemFromWorker = new HashMap<>();
+	private final Map<String, Runnable> enableMenuItemFromWorker = new HashMap<>();
 
 
 	public HunspellerFrame(){
@@ -138,27 +139,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableMenuItemFromWorker.put(CorrectnessWorker.class, () -> {
+		enableMenuItemFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(DuplicatesWorker.class, () -> {
+		enableMenuItemFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
 			dicExtractDuplicatesMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(SorterWorker.class, () -> dicSortDictionaryMenuItem.setEnabled(true));
-		enableMenuItemFromWorker.put(WordCountWorker.class, () -> {
+		enableMenuItemFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableMenuItemFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(StatisticsWorker.class, () -> {
+		enableMenuItemFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				dicStatisticsMenuItem.setEnabled(true);
 			else
 				disStatisticsNoHyphenationMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(WordlistWorker.class, () -> {
+		enableMenuItemFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
@@ -1207,6 +1208,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		try{
 			backbone.loadFile(filePath);
 
+			dicCheckCorrectnessMenuItem.setEnabled(true);
+			dicSortDictionaryMenuItem.setEnabled(true);
 
 			//hyphenation file:
 			dicStatisticsMenuItem.setEnabled(true);
@@ -1561,7 +1564,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			case "state":
 				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					Runnable menuItemEnabler = enableMenuItemFromWorker.get(evt.getSource().getClass());
+					Runnable menuItemEnabler = enableMenuItemFromWorker.get(((WorkerBase)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

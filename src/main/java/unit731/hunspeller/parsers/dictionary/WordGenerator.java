@@ -17,7 +17,7 @@ import lombok.NonNull;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
 
 @AllArgsConstructor

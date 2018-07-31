@@ -32,7 +32,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
-import unit731.hunspeller.parsers.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
@@ -75,7 +75,7 @@ public class Backbone implements FileChangeListener{
 	private HyphenationParser hypParser;
 
 	private final WordGenerator wordGenerator;
-	private final AbstractHyphenator hyphenator;
+	private AbstractHyphenator hyphenator;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -86,7 +86,6 @@ public class Backbone implements FileChangeListener{
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
 		wordGenerator = new WordGenerator(affParser);
-		hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -151,6 +150,7 @@ public class Backbone implements FileChangeListener{
 			String language = getLanguage();
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
+			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
 			hunspellable.clearHyphenationParser();
 

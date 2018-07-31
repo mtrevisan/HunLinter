@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.strategies;
+package unit731.hunspeller.parsers.affix.strategies;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -9,15 +9,15 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Simple implementation of {@link FlagParsingStrategy} that treats the chars in each String as a individual flags.
  */
-public class UTF8ParsingStrategy implements FlagParsingStrategy{
+public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
 			return new String[0];
 
-		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
+		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
+			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);
 
 		int size = textFlags.length();
 		Set<String> flags = new HashSet<>(size);
@@ -37,8 +37,8 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!StandardCharsets.UTF_8.newEncoder().canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
+			if(!StandardCharsets.US_ASCII.newEncoder().canEncode(flag))
+				throw new IllegalArgumentException("Each flag must be in ASCII encoding");
 		}
 
 		return SLASH + String.join(StringUtils.EMPTY, textFlags);

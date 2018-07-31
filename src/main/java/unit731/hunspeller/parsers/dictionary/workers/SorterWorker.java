@@ -9,28 +9,37 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
-@AllArgsConstructor
 @Slf4j
-public class SorterWorker extends SwingWorker<Void, String>{
+public class SorterWorker extends WorkerBase<Void, Void>{
+
+	public static final String WORKER_NAME = "Sorting";
 
 	private final Backbone backbone;
 	private final int lineIndex;
 
 
+	public SorterWorker(Backbone backbone, int lineIndex){
+		Objects.requireNonNull(backbone);
+
+		this.backbone = backbone;
+		this.lineIndex = lineIndex;
+		workerName = WORKER_NAME;
+	}
+
 	@Override
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Sorting Dictionary file");
+			log.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
@@ -59,14 +68,14 @@ public class SorterWorker extends SwingWorker<Void, String>{
 				//remove temporary files
 				chunks.forEach(File::delete);
 
-				publish("File sorted");
+				log.info(Backbone.MARKER_APPLICATION, "File sorted");
 
 				backbone.clearDictionaryBoundaries();
 
 				backbone.startFileListener();
 			}
 			else
-				publish("File NOT sorted");
+				log.info(Backbone.MARKER_APPLICATION, "File NOT sorted");
 
 			setProgress(100);
 		}
@@ -74,14 +83,14 @@ public class SorterWorker extends SwingWorker<Void, String>{
 			stopped = true;
 
 			if(e instanceof ClosedChannelException)
-				publish("Duplicates thread interrupted");
+				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				publish(e.getClass().getSimpleName() + ": " + message);
+				log.error(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 			}
 		}
 		if(stopped)
-			publish("Stopped reading Dictionary file");
+			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}
@@ -126,12 +135,6 @@ public class SorterWorker extends SwingWorker<Void, String>{
 			.removeDuplicates(true)
 			.build();
 		backbone.getDictionarySorter().sort(sortSection, options, sortSection);
-	}
-
-	@Override
-	protected void process(List<String> chunks){
-		for(String chunk : chunks)
-			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }

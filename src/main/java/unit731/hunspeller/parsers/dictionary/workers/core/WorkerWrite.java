@@ -9,30 +9,21 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.SwingWorker;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.TimeWatch;
 
 
 @Slf4j
-public class WorkerWrite<T> extends SwingWorker<Void, Void>{
+public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
-	private final String workerName;
 	private final List<T> entries;
 	private final File outputFile;
-	private final Charset charset;
-	private final BiConsumer<BufferedWriter, T> body;
-	private final Runnable done;
-
-	@Getter
-	private final TimeWatch watch = TimeWatch.start();
 
 
 	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
+		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(entries);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
@@ -67,10 +58,10 @@ public class WorkerWrite<T> extends SwingWorker<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Stopped writing output file");
 
 			if(e instanceof ClosedChannelException)
-				log.info(Backbone.MARKER_APPLICATION, "Thread interrupted");
+				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.info(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 

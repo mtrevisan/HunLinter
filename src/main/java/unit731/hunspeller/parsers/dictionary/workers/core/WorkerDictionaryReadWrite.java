@@ -9,35 +9,29 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.SwingWorker;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.TimeWatch;
 
 
 @Slf4j
-public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
+public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String>{
 
 	private final File dicFile;
 	private final File outputFile;
-	private final Charset charset;
-	private final BiConsumer<BufferedWriter, String> body;
-	private final Runnable done;
-
-	@Getter
-	private final TimeWatch watch = TimeWatch.start();
 
 
-	public WorkerDictionaryReadWrite(File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
+	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
+		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
 		Objects.requireNonNull(body);
 
+		this.workerName = workerName;
 		this.dicFile = dicFile;
 		this.outputFile = outputFile;
 		this.charset = charset;
@@ -47,7 +41,7 @@ public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file");
+		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
@@ -74,6 +68,8 @@ public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
+						
+						throw e;
 					}
 				}
 
@@ -84,10 +80,10 @@ public class WorkerDictionaryReadWrite extends SwingWorker<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			if(e instanceof ClosedChannelException)
-				log.info(Backbone.MARKER_APPLICATION, "Thread interrupted");
+				log.warn(Backbone.MARKER_APPLICATION, "Thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.info(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 
