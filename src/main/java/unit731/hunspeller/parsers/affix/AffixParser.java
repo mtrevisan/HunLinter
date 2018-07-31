@@ -161,7 +161,7 @@ public class AffixParser{
 	@Getter
 	private FlagParsingStrategy strategy;
 
-	private Set<String> terminalAffixes = new HashSet<>();
+	private final Set<String> terminalAffixes = new HashSet<>();
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
@@ -191,6 +191,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ TAG_COMPOUND_RULE + ")");
 				String rule = lineParts[1];
+				//FIXME interpret the rule?
 				if(StringUtils.isBlank(rule))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": rule type cannot be empty");
 
@@ -379,7 +380,7 @@ public class AffixParser{
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
 		RULE_FUNCTION.put(TAG_BREAK, FUN_WORD_BREAK_TABLE);
-//		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
+		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
 //		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_BEGIN, FUN_COPY_OVER);
