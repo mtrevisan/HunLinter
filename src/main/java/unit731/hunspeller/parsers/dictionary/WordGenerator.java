@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import org.apache.commons.lang3.ArrayUtils;
 
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -75,6 +77,24 @@ public class WordGenerator{
 			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
 			checkTwofoldCorrectness(twofoldProductions);
 
+			//remove productions that invalidate circumfix rule
+			String circumfixFlag = affParser.getCircumfixFlag();
+			Iterator<RuleProductionEntry> itr = twofoldProductions.iterator();
+			while(itr.hasNext()){
+				RuleProductionEntry production = itr.next();
+
+				List<AffixEntry> appliedRules = production.getAppliedRules();
+				boolean brokenRule = false;
+				if(ArrayUtils.contains(appliedRules.get(0).getContinuationFlags(), circumfixFlag))
+					brokenRule = appliedRules.stream()
+						.anyMatch(rule -> !ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				else
+					brokenRule = appliedRules.stream()
+						.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				if(brokenRule)
+					itr.remove();
+			}
+
 			//collect productions
 			List<RuleProductionEntry> productions = new ArrayList<>();
 			productions.add(baseProduction);
@@ -82,10 +102,25 @@ public class WordGenerator{
 			productions.addAll(twofoldProductions);
 			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 			checkTwofoldCorrectness(lastfoldProductions);
-			productions.addAll(lastfoldProductions);
 
 			//remove productions that invalidate circumfix rule
-			//TODO
+			itr = lastfoldProductions.iterator();
+			while(itr.hasNext()){
+				RuleProductionEntry production = itr.next();
+
+				List<AffixEntry> appliedRules = production.getAppliedRules();
+				boolean brokenRule = false;
+				if(ArrayUtils.contains(appliedRules.get(0).getContinuationFlags(), circumfixFlag))
+					brokenRule = appliedRules.stream()
+						.anyMatch(rule -> !ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				else
+					brokenRule = appliedRules.stream()
+						.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				if(brokenRule)
+					itr.remove();
+			}
+
+			productions.addAll(lastfoldProductions);
 
 			//convert using output table
 			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));

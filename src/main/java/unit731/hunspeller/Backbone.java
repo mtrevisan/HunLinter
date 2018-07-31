@@ -250,7 +250,7 @@ public class Backbone implements FileChangeListener{
 	public void fileDeleted(Path path){
 		log.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
-		String absolutePath = path.toString().toLowerCase();
+		String absolutePath = affFile.getParent() + File.separator + path.toString();
 		if(hasAFFExtension(absolutePath)){
 			affParser.clear();
 
@@ -268,7 +268,7 @@ public class Backbone implements FileChangeListener{
 		log.info(MARKER_APPLICATION, "File {} modified", path.toFile().getName());
 
 		try{
-			String absolutePath = path.toString().toLowerCase();
+			String absolutePath = affFile.getParent() + File.separator + path.toString();
 			if(hasAFFExtension(absolutePath))
 				openAffixFile(absolutePath);
 			else if(isHyphenationFile(absolutePath)){
