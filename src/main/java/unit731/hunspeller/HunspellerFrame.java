@@ -1400,7 +1400,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 //			dicCorrectnessWorker = new CorrectnessWorker(backbone);
 //			dicCorrectnessWorker.addPropertyChangeListener(this);
 //			dicCorrectnessWorker.execute();
-CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker("(nn)*(11)(tt)", backbone);
+CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone);
 compoundRulesWorker.addPropertyChangeListener(this);
 compoundRulesWorker.execute();
 		}

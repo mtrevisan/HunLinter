@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.zip.Deflater;
 import lombok.extern.slf4j.Slf4j;
@@ -427,6 +428,10 @@ public class Backbone implements FileChangeListener{
 
 	public boolean isManagedByCompoundRule(String compoundRule, String affix){
 		return affParser.isManagedByCompoundRule(compoundRule, affix);
+	}
+
+	public Set<String> getCompoundRules(){
+		return affParser.getCompoundRules();
 	}
 
 	public String correctOrthography(String word){

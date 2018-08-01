@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
@@ -21,11 +19,24 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 @Slf4j
 public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
-	public static final String WORKER_NAME = "Compound rules extractions";
+	public static final String WORKER_NAME = "Compound rules extraction";
+
+	private static final String PIPE = "|";
+	private static final String LEFT_PARENTHESIS_DOUBLE = "((";
+	private static final String RIGHT_PARENTHESIS_DOUBLE = "))";
+	private static final String[] PARENTHESIS_DOUBLE = new String[]{LEFT_PARENTHESIS_DOUBLE, RIGHT_PARENTHESIS_DOUBLE};
+	private static final String LEFT_PARENTHESIS = "(";
+	private static final String RIGHT_PARENTHESIS = ")";
+	private static final String[] PARENTHESIS = new String[]{LEFT_PARENTHESIS, RIGHT_PARENTHESIS};
+
+	private final Map<String, String> expandedCompounds = new HashMap<>();
+
+	private String compoundRule;
 
 
-	public CompoundRulesWorker(String compoundRule, Backbone backbone){
+	public CompoundRulesWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
+		//"(nn)*(11)(tt)"
 
 
 		Map<String, Set<String>> compounds = new HashMap<>();
@@ -53,39 +64,51 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			if(!isCancelled()){
 				//extract values for the given compound rule
 				Map<String, String> rule = compounds.entrySet().stream()
-					.filter(entry -> backbone.isManagedByCompoundRule(compoundRule, entry.getKey()))
-					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> "(" + StringUtils.join(entry.getValue(), "|") + ")"));
+					.filter(entry -> backbone.isManagedByCompoundRule(entry.getKey()))
+					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
 
 				//compose compound rule
-				String expandedCompoundRule = StringUtils.replaceEach(compoundRule, rule.keySet().toArray(new String[rule.size()]),
-					rule.values().toArray(new String[rule.size()]));
-				expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, new String[]{"((", "))"}, new String[]{"(", ")"});
-				System.out.println(expandedCompoundRule);
+				Set<String> compoundRules = backbone.getCompoundRules();
+				for(String compound : compoundRules){
+					String expandedCompoundRule = StringUtils.replaceEach(compound, rule.keySet().toArray(new String[rule.size()]),
+						rule.values().toArray(new String[rule.size()]));
+					expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
+					expandedCompounds.put(compound, expandedCompoundRule);
+				}
 
-				HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
-				long wordCount = regexWordGenerator.wordCount();
-				log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
-				//generate all the words that matches the given regex
-				long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
-				List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
-				for(String word : words)
-					log.info(Backbone.MARKER_APPLICATION, word);
-				if(wordPrintedCount != wordCount)
-					log.info(Backbone.MARKER_APPLICATION, "\u2026");
+				extract(compoundRule);
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
 	}
 
-	private Set<String> extractCompoundRuleAffixes(Backbone backbone, Productable productable){
-		String[] affixes = productable.getContinuationFlags();
+	public void extractCompounds(String compoundRule){
+		if(expandedCompounds.isEmpty()){
+			this.compoundRule = compoundRule;
 
-		Set<String> applyAffixes = new HashSet<>();
-		if(affixes != null)
-			for(String affix : affixes)
-				if(backbone.isManagedByCompoundRule(affix))
-					applyAffixes.add(affix);
-		return applyAffixes;
+			super.execute();
+		}
+		else
+			extract(compoundRule);
+	}
+
+	private void extract(String expandedCompoundRule){
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
+		long wordCount = regexWordGenerator.wordCount();
+		log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
+		//generate all the words that matches the given regex
+		long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
+		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
+
+		//FIXME redirect output to table
+		for(String word : words)
+			log.info(Backbone.MARKER_APPLICATION, word);
+		if(wordPrintedCount != wordCount)
+			log.info(Backbone.MARKER_APPLICATION, "\u2026");
+	}
+
+	public void clear(){
+		expandedCompounds.clear();
 	}
 
 }
