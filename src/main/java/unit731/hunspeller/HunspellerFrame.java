@@ -55,6 +55,7 @@ import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -1396,9 +1397,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new CorrectnessWorker(backbone);
-			dicCorrectnessWorker.addPropertyChangeListener(this);
-			dicCorrectnessWorker.execute();
+//			dicCorrectnessWorker = new CorrectnessWorker(backbone);
+//			dicCorrectnessWorker.addPropertyChangeListener(this);
+//			dicCorrectnessWorker.execute();
+CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker("(nn)*(11)(tt)", backbone);
+compoundRulesWorker.addPropertyChangeListener(this);
+compoundRulesWorker.execute();
 		}
 	}
 

@@ -8,21 +8,23 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class ReverseRegexTest{
+public class HunspellRegexWordGeneratorTest{
 
 	private final Random random = new Random();
 
 
 	@Test
 	public void shouldGenerateTextCorrectly(){
-		String regex = "[ab]{4,6}c";
+		String regex = "[ab]{2,6}c";
 
 		Matcher m = Pattern.compile(regex).matcher(StringUtils.EMPTY);
 
-		ReverseRegex generator = new ReverseRegex(regex);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		for(int i = 0; i < 100; i ++){
-			String text = generator.generateRandom(random);
+			String text = generator.generate(random, 4, 6);
 
+			Assert.assertTrue(text.length() >= 4);
+			Assert.assertTrue(text.length() <= 6);
 			Assert.assertTrue(m.reset(text).matches());
 		}
 	}

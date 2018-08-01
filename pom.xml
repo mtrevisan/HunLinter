@@ -175,8 +175,8 @@
 		<!-- Murmur3 Hash -->
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
 
-		<!-- Brics Automaton -->
-		<dk.brics.automaton.version>1.11-8</dk.brics.automaton.version>
+		<!-- Generex -->
+		<com.github.mifmif.version>1.0.2</com.github.mifmif.version>
 
 		<!-- Lombok -->
 		<org.projectlombok.version>1.18.0</org.projectlombok.version>
@@ -231,11 +231,11 @@
 			<version>${com.sangupta.murmur.version}</version>
 		</dependency>
 
-		<!-- Brics Automaton -->
+		<!-- Generex -->
 		<dependency>
-			<groupId>dk.brics.automaton</groupId>
-			<artifactId>automaton</artifactId>
-			<version>${dk.brics.automaton.version}</version>
+			<groupId>com.github.mifmif</groupId>
+			<artifactId>generex</artifactId>
+			<version>${com.github.mifmif.version}</version>
 		</dependency>
 
 		<!-- Lombok -->

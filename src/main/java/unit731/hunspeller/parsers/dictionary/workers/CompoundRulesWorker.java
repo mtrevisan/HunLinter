@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import com.mifmif.common.regex.Generex;
+import com.mifmif.common.regex.util.Iterator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +63,14 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			if(!isCancelled()){
 				//TODO extract compounds
 				System.out.println(compounds.toString());
+
+				Generex generex = new Generex("[0-3]([a-c]|[e-g]{1,2})");
+				//generate all the words that matches the given regex
+				Iterator itr = generex.iterator();
+				while(itr.hasNext()){
+					System.out.print(itr.next() + " ");
+				}
+				System.out.println();
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
