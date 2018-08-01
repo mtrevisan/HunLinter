@@ -241,6 +241,7 @@ public class WordGenerator{
 		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
 
+	//FIXME
 //	private Set<String> extractCompoundRuleAffixes(Productable productable){
 //		String[] affixes = productable.getContinuationFlags();
 //

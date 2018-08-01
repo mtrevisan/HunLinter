@@ -48,18 +48,6 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 						sub.addAll(prods);
 				}
 			}
-//			for(RuleProductionEntry production : productions)
-//				for(String affix : production.getContinuationFlags())
-//					if(backbone.isManagedByCompoundRule(affix)){
-//						if(!compounds.containsKey(affix)){
-//							Set<RuleProductionEntry> list = new HashSet<>();
-//							list.add(production);
-//
-//							compounds.put(affix, list);
-//						}
-//						else
-//							compounds.get(affix).add(production);
-//					}
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
@@ -76,12 +64,14 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 				HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
 				long wordCount = regexWordGenerator.wordCount();
-				log.info("total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
+				log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 				//generate all the words that matches the given regex
-				List<String> words = regexWordGenerator.generateAll(wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
-				for(String word : words){
-					log.info(word + " ");
-				}
+				long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
+				List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
+				for(String word : words)
+					log.info(Backbone.MARKER_APPLICATION, word);
+				if(wordPrintedCount != wordCount)
+					log.info(Backbone.MARKER_APPLICATION, "\u2026");
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
