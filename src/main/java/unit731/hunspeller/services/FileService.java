@@ -54,8 +54,12 @@ public class FileService{
 	}
 
 	public static File getTemporaryUTF8File(String content){
+		return getTemporaryUTF8File(content, ".tmp");
+	}
+
+	public static File getTemporaryUTF8File(String content, String extension){
 		try{
-			File tmpFile = File.createTempFile("test", ".tmp");
+			File tmpFile = File.createTempFile("test", extension);
 			Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
 			tmpFile.deleteOnExit();
 			return tmpFile;

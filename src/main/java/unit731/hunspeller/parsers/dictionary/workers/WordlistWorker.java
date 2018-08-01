@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
@@ -18,14 +20,14 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(Backbone backbone, File outputFile){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getDicParser());
+	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
 		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
-			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 			try{
 				for(RuleProductionEntry production : productions){
@@ -41,7 +43,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 			if(!isCancelled())
 				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		};
-		createWorker(WORKER_NAME, backbone.getDicParser(), outputFile, body, done);
+		createWorker(WORKER_NAME, dicParser, outputFile, body, done);
 	}
 
 }

@@ -15,6 +15,7 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -364,8 +365,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public DictionaryParserVEC(File dicFile, WordGenerator wordGenerator, AbstractHyphenator hyphenator, Charset charset){
-		super(dicFile, wordGenerator, hyphenator, charset);
+	public DictionaryParserVEC(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
+		super(affParser, dicFile, hyphenator, wordGenerator, charset);
 	}
 
 	@Override
@@ -490,7 +491,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
 			else{
-				boolean canHaveMetaphonesis = wordGenerator.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
+				boolean canHaveMetaphonesis = affParser.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 					if(canHaveMetaphonesis && hasPluralFlag)
 						throw new IllegalArgumentException("Metaphonesis missing for " + line + ", add " + METAPHONESIS_RULE);
@@ -509,7 +510,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
-				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && wordGenerator.isAffixProductive(word, rule));
+				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
 				if(canHaveNorthernPlural)
 					throw new IllegalArgumentException("Northern plural missing for " + word + ", add " + rule);

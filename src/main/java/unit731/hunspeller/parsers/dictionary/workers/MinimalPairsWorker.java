@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
@@ -33,18 +34,18 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 	private static final String SLASH = "/";
 
-	private final Backbone backbone;
+	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 
 
-	public MinimalPairsWorker(Backbone backbone, File outputFile){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getDicParser());
+	public MinimalPairsWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
-		this.backbone = backbone;
-		dicParser = backbone.getDicParser();
+		this.dicParser = dicParser;
+		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 	}
 
@@ -79,7 +80,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<RuleProductionEntry> productions = backbone.applyRules(line);
+							List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 							for(RuleProductionEntry production : productions)
 								if(dicParser.shouldBeProcessedForMinimalPair(production)){

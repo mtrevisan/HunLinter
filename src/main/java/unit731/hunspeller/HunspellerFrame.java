@@ -121,7 +121,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	public HunspellerFrame(){
-		backbone = new Backbone(this, this, this);
+		backbone = new Backbone(this, this);
 
 		initComponents();
 
@@ -863,7 +863,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-				List<RuleProductionEntry> productions = frame.backbone.applyRules(inputText);
+				List<RuleProductionEntry> productions = frame.backbone.getWordGenerator().applyRules(inputText);
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
@@ -1223,7 +1223,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void loadFileInternal(String filePath){
 		try{
-			backbone.loadFile(filePath);
+			backbone.loadFile(filePath, this);
 
 
 			dicCheckCorrectnessMenuItem.setEnabled(true);
@@ -1400,7 +1400,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 //			dicCorrectnessWorker = new CorrectnessWorker(backbone);
 //			dicCorrectnessWorker.addPropertyChangeListener(this);
 //			dicCorrectnessWorker.execute();
-CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone);
+CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
 compoundRulesWorker.addPropertyChangeListener(this);
 compoundRulesWorker.execute();
 		}
@@ -1416,7 +1416,7 @@ compoundRulesWorker.execute();
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(backbone, outputFile);
+				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1430,7 +1430,7 @@ compoundRulesWorker.execute();
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone);
+			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1446,7 +1446,8 @@ compoundRulesWorker.execute();
 
 			mainProgressBar.setValue(0);
 
-			dicStatisticsWorker = new StatisticsWorker(backbone, performHyphenationStatistics, this);
+			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
+				backbone.getWordGenerator(), performHyphenationStatistics, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
@@ -1462,7 +1463,7 @@ compoundRulesWorker.execute();
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(backbone, outputFile);
+				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -1479,7 +1480,7 @@ compoundRulesWorker.execute();
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(backbone, outputFile);
+				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}

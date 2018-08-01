@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.Getter;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -26,23 +26,21 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(Backbone backbone, boolean performHyphenationStatistics, Frame parent){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getAffParser());
-		Objects.requireNonNull(backbone.getDicParser());
-		Objects.requireNonNull(backbone.getHyphenator());
+	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
+			boolean performHyphenationStatistics, Frame parent){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(hyphenator);
+		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(parent);
 
-		AffixParser affParser = backbone.getAffParser();
-		DictionaryParser dicParser = backbone.getDicParser();
-		AbstractHyphenator hyphenator = backbone.getHyphenator();
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
 		dicStatistics = new DictionaryStatistics(affParser, dicParser);
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 			for(RuleProductionEntry production : productions){
 				//collect statistics

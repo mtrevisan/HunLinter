@@ -10,6 +10,7 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
@@ -21,11 +22,9 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(Backbone backbone){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getDicParser());
-
-		DictionaryParser dicParser = backbone.getDicParser();
+	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator){
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
 			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
@@ -33,7 +32,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 			for(RuleProductionEntry production : productions)
 				bloomFilter.add(production.getWord());
 		};

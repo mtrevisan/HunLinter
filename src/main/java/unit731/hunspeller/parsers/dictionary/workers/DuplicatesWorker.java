@@ -23,6 +23,7 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
@@ -40,21 +41,21 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
 
 
-	private final Backbone backbone;
+	private final WordGenerator wordGenerator;
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 
 
-	public DuplicatesWorker(Backbone backbone, File outputFile){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getAffParser());
-		Objects.requireNonNull(backbone.getDicParser());
+	public DuplicatesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
-		this.backbone = backbone;
-		affParser = backbone.getAffParser();
-		dicParser = backbone.getDicParser();
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 		workerName = WORKER_NAME;
 	}
@@ -124,7 +125,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						List<RuleProductionEntry> productions = backbone.applyRules(line);
+						List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 						productions.stream()
 							.map(RuleProductionEntry::toStringWithSignificantMorphologicalFields)
@@ -179,7 +180,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<RuleProductionEntry> productions = backbone.applyRules(line);
+							List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 							String word = productions.get(0).getWord();
 							for(RuleProductionEntry production : productions){
 								String text = production.toStringWithSignificantMorphologicalFields();

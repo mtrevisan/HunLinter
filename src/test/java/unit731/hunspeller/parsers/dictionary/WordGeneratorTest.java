@@ -25,6 +25,7 @@ public class WordGeneratorTest{
 	private AffixParser affParser;
 	private DictionaryParser dicParser;
 	private FlagParsingStrategy strategy;
+	private WordGenerator wordGenerator;
 
 
 	@Before
@@ -32,18 +33,16 @@ public class WordGeneratorTest{
 		backbone = Mockito.mock(Backbone.class);
 		affParser = new AffixParser();
 		Mockito.when(backbone.getAffParser()).thenReturn(affParser);
-		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY);
-		WordGenerator wordGenerator = new WordGenerator(backbone, null);
-		dicParser = new DictionaryParser(dicFile, wordGenerator, null, StandardCharsets.UTF_8);
 		Mockito.when(backbone.getDicParser()).thenReturn(dicParser);
+		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY, ".dic");
+		wordGenerator = new WordGenerator(affParser);
+		dicParser = new DictionaryParser(affParser, dicFile, null, wordGenerator, StandardCharsets.UTF_8);
 		Mockito.when(backbone.getDictionaryFile()).thenReturn(dicFile);
-		Mockito.when(backbone.applyRules(Mockito.any(String.class))).then(invocation -> applyRules(invocation.getArgumentAt(0, String.class)));
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
 		strategy = affParser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
-		WordGenerator wordGenerator = new WordGenerator(backbone, null);
 		return wordGenerator.applyRules(dicEntry);
 	}
 

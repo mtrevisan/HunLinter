@@ -514,7 +514,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				Backbone backbone = new Backbone(null, null, null);
+				Backbone backbone = new Backbone(null, null);
 				DictionaryStatistics stats = new DictionaryStatistics(backbone.getAffParser(), backbone.getDicParser());
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];

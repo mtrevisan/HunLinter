@@ -4,8 +4,8 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBa
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
@@ -14,13 +14,12 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 	public static final String WORKER_NAME = "Correctness checking";
 
 
-	public CorrectnessWorker(Backbone backbone){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getDicParser());
+	public CorrectnessWorker(DictionaryParser dicParser, WordGenerator wordGenerator){
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 
-		DictionaryParser dicParser = backbone.getDicParser();
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 			productions.forEach(production -> dicParser.checkProduction(production));
 		};

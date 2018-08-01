@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
@@ -38,17 +39,15 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	private BiConsumer<List<String>, Long> fnDeferring;
 
 
-	public CompoundRulesWorker(Backbone backbone){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getAffParser());
-		Objects.requireNonNull(backbone.getDicParser());
+	public CompoundRulesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(wordGenerator);
 
-		AffixParser affParser = backbone.getAffParser();
-		DictionaryParser dicParser = backbone.getDicParser();
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			//collect words belonging to a compound rule
-			List<RuleProductionEntry> productions = backbone.applyRules(line);
+			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 			for(RuleProductionEntry production : productions){
 				Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
 					.filter(affParser::isManagedByCompoundRule)

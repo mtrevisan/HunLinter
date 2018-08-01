@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
@@ -58,9 +59,10 @@ public class DictionaryParser{
 	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
 
+	protected AffixParser affParser;
 	private final File dicFile;
-	protected final WordGenerator wordGenerator;
 	protected final AbstractHyphenator hyphenator;
+	protected final WordGenerator wordGenerator;
 	private final Charset charset;
 	private final String language;
 	private final ExternalSorter sorter = new ExternalSorter();
@@ -68,14 +70,15 @@ public class DictionaryParser{
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, WordGenerator wordGenerator, AbstractHyphenator hyphenator, Charset charset){
+	public DictionaryParser(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(charset);
 
+		this.affParser = affParser;
 		this.dicFile = dicFile;
-		this.wordGenerator = wordGenerator;
 		this.hyphenator = hyphenator;
+		this.wordGenerator = wordGenerator;
 		this.charset = charset;
 		String filename = dicFile.getName();
 		language = filename.substring(0, filename.indexOf(".dic"));

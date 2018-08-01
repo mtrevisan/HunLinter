@@ -615,6 +615,29 @@ public class AffixParser{
 		}
 	}
 
+	public boolean isAffixProductive(String word, String affix){
+		word = applyInputConversionTable(word);
+
+		boolean productive;
+		RuleEntry rule = getData(affix);
+		if(rule != null){
+			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+			productive = !applicableAffixes.isEmpty();
+		}
+		else
+			productive = isManagedByCompoundRule(affix);
+		return productive;
+	}
+
+	public List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+		//extract the list of applicable affixes...
+		List<AffixEntry> applicableAffixes = new ArrayList<>();
+		for(AffixEntry entry : entries)
+			if(entry.match(word))
+				applicableAffixes.add(entry);
+		return applicableAffixes;
+	}
+
 	public String applyInputConversionTable(String word){
 		return applyConversionTable(word, getData(TAG_INPUT_CONVERSION_TABLE));
 	}

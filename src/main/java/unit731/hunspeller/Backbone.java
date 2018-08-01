@@ -26,12 +26,9 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
@@ -71,6 +68,7 @@ public class Backbone implements FileChangeListener{
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
+	@Getter
 	private final WordGenerator wordGenerator;
 	@Getter
 	private AbstractHyphenator hyphenator;
@@ -79,24 +77,24 @@ public class Backbone implements FileChangeListener{
 	private final FileListenerManager flm;
 
 
-	public Backbone(Hunspellable hunspellable, Undoable undoable, PropertyChangeListener listener){
+	public Backbone(Hunspellable hunspellable, Undoable undoable){
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
-		wordGenerator = new WordGenerator(this, listener);
+		wordGenerator = new WordGenerator(affParser);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
 	}
 
-	public void loadFile(String filePath) throws FileNotFoundException, IOException{
+	public void loadFile(String filePath, PropertyChangeListener listener) throws FileNotFoundException, IOException{
 		openAffixFile(filePath);
 
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
 		File dicFile = getDictionaryFile();
-		prepareDictionaryFile(dicFile);
+		prepareDictionaryFile(dicFile, listener);
 
 		File aidFile = getAidFile();
 		openAidFile(aidFile);
@@ -156,11 +154,12 @@ public class Backbone implements FileChangeListener{
 			hypParser.clear();
 	}
 
-	private void prepareDictionaryFile(File dicFile){
+	private void prepareDictionaryFile(File dicFile, PropertyChangeListener listener){
 		if(dicFile.exists()){
 			String language = affParser.getLanguage();
 			Charset charset = affParser.getCharset();
-			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, hyphenator, charset);
+			dicParser = DictionaryParserBuilder.getParser(language, affParser, dicFile, hyphenator, wordGenerator, charset);
+			wordGenerator.initializeCompoundRules(dicParser, listener);
 
 			hunspellable.clearDictionaryParser();
 		}
@@ -341,12 +340,6 @@ public class Backbone implements FileChangeListener{
 
 			option = StandardOpenOption.APPEND;
 		}
-	}
-
-	public List<RuleProductionEntry> applyRules(String line){
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
-		return wordGenerator.applyRules(dicEntry);
 	}
 
 	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){

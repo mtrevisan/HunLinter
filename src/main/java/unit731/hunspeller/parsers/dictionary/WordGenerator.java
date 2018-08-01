@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -48,21 +47,30 @@ public class WordGenerator{
 	private static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
-	private final CompoundRulesWorker compoundRulesWorker;
+	private CompoundRulesWorker compoundRulesWorker;
 
 
 	private final AffixParser affParser;
 
 
-	public WordGenerator(Backbone backbone, PropertyChangeListener listener){
-		Objects.requireNonNull(backbone);
-		Objects.requireNonNull(backbone.getAffParser());
+	public WordGenerator(AffixParser affParser){
+		Objects.requireNonNull(affParser);
 
-		affParser = backbone.getAffParser();
+		this.affParser = affParser;
+	}
 
-		compoundRulesWorker = new CompoundRulesWorker(backbone);
+	public void initializeCompoundRules(DictionaryParser dicParser, PropertyChangeListener listener){
+		Objects.requireNonNull(dicParser);
+
+		compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this);
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
+	}
+
+	public List<RuleProductionEntry> applyRules(String line){
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+		return applyRules(dicEntry);
 	}
 
 	/**
@@ -130,6 +138,9 @@ public class WordGenerator{
 	 */
 	//TODO
 	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
+		if(compoundRulesWorker == null)
+			throw new UnsupportedOperationException("Worker not initialized");
+
 		affParser.acquireLock();
 
 		long limit = 20l;
@@ -298,20 +309,6 @@ public class WordGenerator{
 		}
 	}
 
-	public boolean isAffixProductive(String word, String affix){
-		word = affParser.applyInputConversionTable(word);
-
-		boolean productive;
-		RuleEntry rule = affParser.getData(affix);
-		if(rule != null){
-			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
-			productive = !applicableAffixes.isEmpty();
-		}
-		else
-			productive = affParser.isManagedByCompoundRule(affix);
-		return productive;
-	}
-
 	private List<RuleProductionEntry> applyAffixRules(Productable productable, List<Set<String>> applyAffixes) throws NoApplicableRuleException{
 		Set<String> appliedAffixes = applyAffixes.get(0);
 		Set<String> postponedAffixes = applyAffixes.get(1);
@@ -331,7 +328,7 @@ public class WordGenerator{
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
-				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+				List<AffixEntry> applicableAffixes = affParser.extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
 					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toString());
 
@@ -377,15 +374,6 @@ public class WordGenerator{
 		}
 
 		return productions;
-	}
-
-	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
-		//extract the list of applicable affixes...
-		List<AffixEntry> applicableAffixes = new ArrayList<>();
-		for(AffixEntry entry : entries)
-			if(entry.match(word))
-				applicableAffixes.add(entry);
-		return applicableAffixes;
 	}
 
 }
