@@ -4,8 +4,10 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -258,8 +260,121 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 
 	@Override
 	public Iterator<String> iterator(){
-		//TODO
-		return null;
+		Iterator<String> itr = new Iterator<String>(){
+			private boolean found;
+			private final Deque<IterationStep> steps = new ArrayDeque<>();
+			private final StringBuilder sb = new StringBuilder();
+
+			@Override
+			public boolean hasNext(){
+				if(found)
+					return true;
+				if(steps.isEmpty())
+					return false;
+
+				nextImpl();
+				return found;
+			}
+
+			private void nextImpl(){
+				IterationStep currentStep;
+				while(!steps.isEmpty() && !found){
+					currentStep = steps.pop();
+					found = currentStep.build(sb, steps);
+				}
+			}
+
+			@Override
+			public String next(){
+				if(!found)
+					nextImpl();
+
+				if(!found)
+					throw new IllegalStateException();
+
+				found = false;
+				return sb.toString();
+			}
+		};
+
+		return itr;
 	}
-	
+
+	/**
+	 * A step, in the iteration process, to build a string using {@code State}s.
+	 * <p>
+	 * It's responsible to keep the information of a {@code State}, like current char and transitions that need to be followed.
+	 * Also it adds (and removes) the characters while iterating over the characters (when the state has a range) and
+	 * transitions.
+	 * <p>
+	 * Implementation based on {@code SpecialOperations.getFiniteStrings(Automaton,int)}, but in a non-recursive way to avoid
+	 * {@code StackOverflowError}s.
+	 *
+	 * @see State
+	 * @see dk.brics.automaton.SpecialOperations#getFiniteStrings(dk.brics.automaton.Automaton,int)
+	 */
+	private static class IterationStep{
+
+		private final Iterator<Transition> iteratorTransitions;
+		private Transition currentTransition;
+		private char currentChar;
+
+		public IterationStep(State state){
+			iteratorTransitions = state.getSortedTransitions(true).iterator();
+		}
+
+		public boolean build(StringBuilder stringBuilder, Deque<IterationStep> steps){
+			if(hasCurrentTransition())
+				currentChar ++;
+			else if(!moveToNextTransition()){
+				removeLastChar(stringBuilder);
+
+				return false;
+			}
+
+			if(currentChar <= currentTransition.getMax()){
+				stringBuilder.append(currentChar);
+				if(currentTransition.getDest().isAccept()){
+					pushForDestinationOfCurrentTransition(steps);
+					if(currentChar >= currentTransition.getMax())
+						currentTransition = null;
+
+					return true;
+				}
+				pushForDestinationOfCurrentTransition(steps);
+
+				return false;
+			}
+			steps.push(this);
+			currentTransition = null;
+
+			return false;
+		}
+
+		private boolean hasCurrentTransition(){
+			return (currentTransition != null);
+		}
+
+		private boolean moveToNextTransition(){
+			if(!iteratorTransitions.hasNext())
+				return false;
+
+			currentTransition = iteratorTransitions.next();
+			currentChar = currentTransition.getMin();
+			return true;
+		}
+
+		private static void removeLastChar(StringBuilder sb){
+			int len = sb.length();
+			if(len > 0)
+				sb.deleteCharAt(len - 1);
+		}
+
+		private void pushForDestinationOfCurrentTransition(Deque<IterationStep> steps){
+			steps.push(this);
+			steps.push(new IterationStep(currentTransition.getDest()));
+		}
+
+	}
+
 }
