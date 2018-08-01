@@ -425,6 +425,10 @@ public class Backbone implements FileChangeListener{
 		return affParser.isManagedByCompoundRule(affix);
 	}
 
+	public boolean isManagedByCompoundRule(String compoundRule, String affix){
+		return affParser.isManagedByCompoundRule(compoundRule, affix);
+	}
+
 	public String correctOrthography(String word){
 		return dicParser.correctOrthography(word);
 	}

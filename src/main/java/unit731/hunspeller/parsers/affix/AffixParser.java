@@ -543,6 +543,7 @@ public class AffixParser{
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
+		//TODO migliorare con una regex
 		boolean found = false;
 		Set<String> compoundRules = getCompoundRules();
 		if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
@@ -553,6 +554,13 @@ public class AffixParser{
 				break;
 			}
 		return found;
+	}
+
+	public boolean isManagedByCompoundRule(String compoundRule, String flag){
+		//TODO migliorare con una regex
+		if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
+			flag = "(" + flag + ")";
+		return compoundRule.contains(flag);
 	}
 
 	public Charset getCharset(){
@@ -618,7 +626,7 @@ public class AffixParser{
 	private String applyConversionTable(String word, Map<String, String> table){
 		if(table != null){
 			int size = table.size();
-			word = StringUtils.replaceEachRepeatedly(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+			word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
 		}
 		return word;
 	}

@@ -56,7 +56,7 @@ public class HunspellRegexWordGenerator{
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
-		regex = StringUtils.replaceEachRepeatedly(requote(regex),
+		regex = StringUtils.replaceEach(requote(regex),
 			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		RegExp re = new RegExp(regex);

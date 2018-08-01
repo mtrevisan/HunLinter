@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -60,12 +61,19 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
-				//TODO extract compounds
-				System.out.println(compounds.toString());
+				//extract values for the given compound rule
+				Map<String, String> rule = compounds.entrySet().stream()
+					.filter(entry -> backbone.isManagedByCompoundRule(compoundRule, entry.getKey()))
+					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> "(" + StringUtils.join(entry.getValue(), "|") + ")"));
 
-				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator("[0-3]([a-c]|[e-g]{1,2})");
+				//compose compound rule
+				String expandedCompoundRule = StringUtils.replaceEach(compoundRule, rule.keySet().toArray(new String[rule.size()]),
+					rule.values().toArray(new String[rule.size()]));
+				expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, new String[]{"((", "))"}, new String[]{"(", ")"});
+
+				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator(expandedCompoundRule);
 				//generate all the words that matches the given regex
-				List<String> words = generex.generateAll();
+				List<String> words = generex.generateAll(50);
 				for(String word : words){
 					System.out.print(word + " ");
 				}
