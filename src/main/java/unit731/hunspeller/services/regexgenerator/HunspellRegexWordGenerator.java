@@ -31,10 +31,17 @@ import org.apache.commons.lang3.StringUtils;
  * </p>
  *
  * @see <a href="https://github.com/mifmif/Generex">Generex</a>
+ * @see <a href="https://github.com/bluezio/xeger">Xeger</a>
  */
 public class HunspellRegexWordGenerator{
 
 	public static final long INFINITY = -1l;
+
+	@AllArgsConstructor
+	private class GeneratedElement{
+		private final String word;
+		private final State state;
+	}
 
 	private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
 	static{
@@ -226,7 +233,7 @@ public class HunspellRegexWordGenerator{
 	 * @return	All the words that will be matcher by the given regex
 	 */
 	public List<String> generateAll(){
-		return generateAll(Integer.MAX_VALUE);
+		return generateAll(-1l);
 	}
 
 	/**
@@ -265,45 +272,6 @@ public class HunspellRegexWordGenerator{
 		}
 
 		return matchedWords;
-	}
-
-	@AllArgsConstructor
-	class GeneratedElement{
-		private final String word;
-		private final State state;
-	}
-
-	/**
-	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
-	 * <p>
-	 * The Strings are ordered in lexicographical order.
-	 *
-	 * @param limit	The maximum size of the list
-	 * @return	The list of words that matcher the given regex
-	 */
-	public List<String> generateAll2(int limit){
-		matchedWords.clear();
-		matchedWordCounter = 0l;
-		generate(StringUtils.EMPTY, automaton.getInitialState(), limit);
-		return matchedWords;
-	}
-
-	private void generate(String subword, State state, int limit){
-		if(matchedWordCounter == limit)
-			return;
-
-		List<Transition> transitions = state.getSortedTransitions(true);
-		if(transitions.isEmpty() || state.isAccept()){
-			matchedWords.add(subword);
-			matchedWordCounter ++;
-
-			if(transitions.isEmpty())
-				return;
-		}
-
-		for(Transition transition : transitions)
-			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
-				generate(subword + chr, transition.getDest(), limit);
 	}
 
 }
