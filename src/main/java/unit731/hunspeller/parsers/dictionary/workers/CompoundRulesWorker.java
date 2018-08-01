@@ -70,6 +70,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				String expandedCompoundRule = StringUtils.replaceEach(compoundRule, rule.keySet().toArray(new String[rule.size()]),
 					rule.values().toArray(new String[rule.size()]));
 				expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, new String[]{"((", "))"}, new String[]{"(", ")"});
+				System.out.println(expandedCompoundRule);
 
 				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator(expandedCompoundRule);
 				//generate all the words that matches the given regex
