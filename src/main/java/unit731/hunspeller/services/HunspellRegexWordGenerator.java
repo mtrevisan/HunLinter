@@ -15,6 +15,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -46,11 +48,34 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
-		regex = StringUtils.replaceEachRepeatedly(regex,
+		regex = StringUtils.replaceEachRepeatedly(requote(regex),
 			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		RegExp re = new RegExp(regex);
 		automaton = re.toAutomaton();
+	}
+
+	/**
+	 * Requote a regular expression by escaping some parts of it from generation without need to escape each special
+	 * character one by one. <br> this is done by setting the part to be interpreted as normal characters (thus, quote
+	 * all meta-characters) between \Q and \E , ex : <br> <code> minion_\d{3}\Q@gru.evil\E </code> <br> will be
+	 * transformed to : <br> <code> minion_\d{3}\@gru\.evil </code>
+	 *
+	 * @param regex
+	 * @return
+	 */
+	private String requote(String regex){
+		//http://stackoverflow.com/questions/399078/what-special-characters-must-be-escaped-in-regular-expressions
+		//adding "@" prevents StackOverflowError inside generex: https://github.com/mifmif/Generex/issues/21
+		Pattern patternSpecial = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
+		StringBuilder sb = new StringBuilder(regex);
+		Matcher matcher = Pattern.compile("\\\\Q(.*?)\\\\E")
+			.matcher(sb);
+		while(matcher.find()){
+			sb.replace(matcher.start(), matcher.end(), patternSpecial.matcher(matcher.group(1)).replaceAll("\\\\$0"));
+			//matcher.reset();
+		}
+		return sb.toString();
 	}
 
 
