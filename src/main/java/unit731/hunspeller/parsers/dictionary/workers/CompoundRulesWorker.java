@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import com.mifmif.common.regex.Generex;
-import com.mifmif.common.regex.util.Iterator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +13,7 @@ import java.util.stream.Collectors;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 public class CompoundRulesWorker extends WorkerDictionaryReadBase{
@@ -26,20 +25,20 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(backbone);
 
 
-		Map<String, Set<RuleProductionEntry>> compounds = new HashMap<>();
+		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			//collect words belonging to a compound rule
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 			for(RuleProductionEntry production : productions){
-				Map<String, Set<RuleProductionEntry>> c = Arrays.stream(production.getContinuationFlags())
+				Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
 					.filter(backbone::isManagedByCompoundRule)
-					.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production, Collectors.toSet())));
+					.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production.getWord(), Collectors.toSet())));
 
-				for(Map.Entry<String, Set<RuleProductionEntry>> entry: c.entrySet()){
+				for(Map.Entry<String, Set<String>> entry: c.entrySet()){
 					String affix = entry.getKey();
-					Set<RuleProductionEntry> prods = entry.getValue();
+					Set<String> prods = entry.getValue();
 
-					Set<RuleProductionEntry> sub = compounds.get(affix);
+					Set<String> sub = compounds.get(affix);
 					if(sub == null)
 						compounds.put(affix, prods);
 					else
@@ -64,11 +63,11 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				//TODO extract compounds
 				System.out.println(compounds.toString());
 
-				Generex generex = new Generex("[0-3]([a-c]|[e-g]{1,2})");
+				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator("[0-3]([a-c]|[e-g]{1,2})");
 				//generate all the words that matches the given regex
-				Iterator itr = generex.iterator();
-				while(itr.hasNext()){
-					System.out.print(itr.next() + " ");
+				List<String> words = generex.generateAll();
+				for(String word : words){
+					System.out.print(word + " ");
 				}
 				System.out.println();
 			}
