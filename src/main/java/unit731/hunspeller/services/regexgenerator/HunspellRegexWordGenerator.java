@@ -1,4 +1,4 @@
-package unit731.hunspeller.services;
+package unit731.hunspeller.services.regexgenerator;
 
 import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
@@ -50,6 +50,9 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 	private final List<String> matchedWords = new ArrayList<>(0);
 	private int matchedWordCounter = 0;
 
+	private HunspellAutomataNode rootNode;
+	private boolean isTransactionNodeBuilt;
+
 
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
@@ -98,46 +101,60 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 	 * @return	The number of words that are matched by the given pattern.
 	 * @throws StackOverflowError	If the given pattern generates a large, possibly infinite, number of words.
 	 */
-	public int wordCount(){
+	public long wordCount(){
 		if(isInfinite())
 			throw new StackOverflowError();
 
-		matchedWordCounter = 0;
-		count(automaton.getInitialState());
+		buildRootNode();
 
-		return matchedWordCounter;
-
-//		buildRootNode();
-//
-//		return rootNode.getNbrMatchedString();
-	}
-
-	private void count(State state){
-		List<Transition> transitions = state.getSortedTransitions(true);
-		if(transitions.isEmpty() || state.isAccept()){
-			matchedWordCounter ++;
-
-			if(transitions.isEmpty())
-				return;
-		}
-
-		for(Transition transition : transitions)
-			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
-				count(transition.getDest());
+		return rootNode.getMatchedWordCount();
 	}
 
 	/** Prepare the rootNode and it's child nodes so that we can get matchedString by index */
-//	private void buildRootNode(){
-//		if(isTransactionNodeBuilt)
-//			return;
-//
-//		isTransactionNodeBuilt = true;
-//		rootNode = new Node();
-//		rootNode.setNbrChar(1);
-//		List<Node> nextNodes = prepareTransactionNodes(automaton.getInitialState());
-//		rootNode.setNextNodes(nextNodes);
-//		rootNode.updateNbrMatchedString();
-//	}
+	private void buildRootNode(){
+		if(isTransactionNodeBuilt)
+			return;
+
+		isTransactionNodeBuilt = true;
+
+		rootNode = new HunspellAutomataNode();
+		rootNode.setCharCount(1);
+		List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(automaton.getInitialState());
+		rootNode.setNextNodes(nextNodes);
+		rootNode.updateMatchedWordCount();
+	}
+
+	private int preparedTransactionNode;
+
+	/**
+	 * Build list of nodes that present possible transactions from the <code>state</code>.
+	 *
+	 * @param state
+	 * @return
+	 */
+	private List<HunspellAutomataNode> prepareTransactionNodes(State state){
+		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
+		if(preparedTransactionNode == Integer.MAX_VALUE / 2)
+			return transactionNodes;
+
+		preparedTransactionNode ++;
+
+		if(state.isAccept()){
+			HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
+			acceptedNode.setCharCount(1);
+			transactionNodes.add(acceptedNode);
+		}
+		List<Transition> transitions = state.getSortedTransitions(true);
+		for(Transition transition : transitions){
+			HunspellAutomataNode trsNode = new HunspellAutomataNode();
+			int nbrChar = transition.getMax() - transition.getMin() + 1;
+			trsNode.setCharCount(nbrChar);
+			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(transition.getDest());
+			trsNode.setNextNodes(nextNodes);
+			transactionNodes.add(trsNode);
+		}
+		return transactionNodes;
+	}
 
 
 	/**

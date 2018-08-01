@@ -1,6 +1,5 @@
-package unit731.hunspeller.services;
+package unit731.hunspeller.services.regexgenerator;
 
-import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,9 +30,9 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "[abc]c[de]?";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		int wordCount = generator.wordCount();
+		long wordCount = generator.wordCount();
 
-		Assert.assertEquals(9, wordCount);
+		Assert.assertEquals(9l, wordCount);
 	}
 
 	@Test(expected = StackOverflowError.class)
