@@ -58,8 +58,8 @@ public class WordGenerator{
 	 * Generates a list of stems for the provided word
 	 * TODO: manage AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
-	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the stems for
-	 * @return	The list of stems for the given word
+	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the productions for
+	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
@@ -113,47 +113,23 @@ public class WordGenerator{
 	 * Generates a list of stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
 	 * TODO: manage AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
-	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the stems for
-	 * @return	The list of stems for the given word
+	 * @param compoundRule	Rule used to generate the productions for
+	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	//TODO
-	public List<RuleProductionEntry> applyCompoundRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
+	public List<RuleProductionEntry> applyCompoundRules(String compoundRule) throws IllegalArgumentException, NoApplicableRuleException{
 		affParser.acquireLock();
 
 		try{
-			//convert using input table
-			String word = affParser.applyInputConversionTable(dicEntry.getWord());
-			dicEntry.setWord(word);
-
-//			//extract base production
-//			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
-//
-//			//extract onefold production
-//			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
-//
-//			//extract twofold production
-//			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
-//			checkTwofoldCorrectness(twofoldProductions);
-
 			//collect productions
 			List<RuleProductionEntry> productions = new ArrayList<>();
-//			productions.add(baseProduction);
-//			productions.addAll(onefoldProductions);
-//			productions.addAll(twofoldProductions);
-//			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
-//			checkTwofoldCorrectness(lastfoldProductions);
-//
-//			//remove rules that invalidate the circumfix rule
-//			removeRulesInvalidatingCircumfix(lastfoldProductions);
-//
-//			productions.addAll(lastfoldProductions);
 
 			//manage compound rules
-			Set<String> compoundRuleAffixes = extractCompoundRuleAffixes(dicEntry);
-			if(!compoundRuleAffixes.isEmpty()){
-				//TODO
-			}
+//			Set<String> compoundRuleAffixes = extractCompoundRuleAffixes(dicEntry);
+//			if(!compoundRuleAffixes.isEmpty()){
+//				//TODO
+//			}
 
 //			//remove rules with the need affix flag
 //			enforceNeedAffixFlag(productions);
