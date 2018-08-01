@@ -4,6 +4,7 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -43,6 +45,10 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 	}
 
 	private final Automaton automaton;
+
+	@Getter
+	private final List<String> matchedWords = new ArrayList<>(0);
+	private int matchedWordCounter = 0;
 
 
 	public HunspellRegexWordGenerator(String regex){
@@ -87,6 +93,51 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 	public boolean isInfinite(){
 		return !automaton.isFinite();
 	}
+
+	/**
+	 * @return	The number of words that are matched by the given pattern.
+	 * @throws StackOverflowError	If the given pattern generates a large, possibly infinite, number of words.
+	 */
+	public int wordCount(){
+		if(isInfinite())
+			throw new StackOverflowError();
+
+		matchedWordCounter = 0;
+		count(automaton.getInitialState());
+
+		return matchedWordCounter;
+
+//		buildRootNode();
+//
+//		return rootNode.getNbrMatchedString();
+	}
+
+	private void count(State state){
+		List<Transition> transitions = state.getSortedTransitions(true);
+		if(transitions.isEmpty() || state.isAccept()){
+			matchedWordCounter ++;
+
+			if(transitions.isEmpty())
+				return;
+		}
+
+		for(Transition transition : transitions)
+			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
+				count(transition.getDest());
+	}
+
+	/** Prepare the rootNode and it's child nodes so that we can get matchedString by index */
+//	private void buildRootNode(){
+//		if(isTransactionNodeBuilt)
+//			return;
+//
+//		isTransactionNodeBuilt = true;
+//		rootNode = new Node();
+//		rootNode.setNbrChar(1);
+//		List<Node> nextNodes = prepareTransactionNodes(automaton.getInitialState());
+//		rootNode.setNextNodes(nextNodes);
+//		rootNode.updateNbrMatchedString();
+//	}
 
 
 	/**
@@ -145,50 +196,47 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 		return sb.toString();
 	}
 
+	/**
+	 * Generate all strings that matches the given regex.
+	 *
+	 * @return	All the words that will be matcher by the given regex
+	 */
+	public List<String> generateAll(){
+		return generateAll(Integer.MAX_VALUE);
+	}
 
 	/**
-	 * @param index	The index at which to extract the word
-	 * @return	The matched word by the given pattern in the given it's order in the sorted list of matched words.<br>
-	 *		<code>indexOrder</code> between <code>1</code> and <code>n</code> where <code>n</code> is the number of matched words.<br>
-	 *		If <code>indexOrder >= n</code>, return an empty string. If there is an infinite number of words that matches the given Regex,
-	 *		the method throws {@code StackOverflowError}.
+	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
+	 * <p>
+	 * The Strings are ordered in lexicographical order.
+	 *
+	 * @param limit	The maximum size of the list
+	 * @return	The list of words that matcher the given regex
 	 */
-//	public String generate(int index){
-//		buildRootNode();
-//		if(index == 0)
-//			index = 1;
-//		String result = buildStringFromNode(rootNode, index);
-//		result = result.substring(1, result.length() - 1);
-//		return result;
-//	}
-//
-//	private String buildStringFromNode(Node node, int indexOrder){
-//		String result = StringUtils.EMPTY;
-//		long passedStringNbr = 0;
-//		long step = node.getNbrMatchedString() / node.getNbrChar();
-//		for(char usedChar = node.getMinChar(); usedChar <= node.getMaxChar();  ++ usedChar){
-//			passedStringNbr += step;
-//			if(passedStringNbr >= indexOrder){
-//				passedStringNbr -= step;
-//				indexOrder -= passedStringNbr;
-//				result += usedChar;
-//				break;
-//			}
-//		}
-//		long passedStringNbrInChildNode = 0;
-//		if(result.length() == 0)
-//			passedStringNbrInChildNode = passedStringNbr;
-//		for(Node childN : node.getNextNodes()){
-//			passedStringNbrInChildNode += childN.getNbrMatchedString();
-//			if(passedStringNbrInChildNode >= indexOrder){
-//				passedStringNbrInChildNode -= childN.getNbrMatchedString();
-//				indexOrder -= passedStringNbrInChildNode;
-//				result = result.concat(buildStringFromNode(childN, indexOrder));
-//				break;
-//			}
-//		}
-//		return result;
-//	}
+	public List<String> generateAll(int limit){
+		matchedWords.clear();
+		matchedWordCounter = 0;
+		generate(StringUtils.EMPTY, automaton.getInitialState(), limit);
+		return matchedWords;
+	}
+
+	private void generate(String subword, State state, int limit){
+		if(matchedWordCounter == limit)
+			return;
+
+		List<Transition> transitions = state.getSortedTransitions(true);
+		if(transitions.isEmpty() || state.isAccept()){
+			matchedWords.add(subword);
+			matchedWordCounter ++;
+
+			if(transitions.isEmpty())
+				return;
+		}
+
+		for(Transition transition : transitions)
+			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
+				generate(subword + chr, transition.getDest(), limit);
+	}
 
 
 	@Override

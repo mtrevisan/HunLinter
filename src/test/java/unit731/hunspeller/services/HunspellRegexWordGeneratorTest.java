@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,21 +11,37 @@ import org.junit.Test;
 
 public class HunspellRegexWordGeneratorTest{
 
-	private final Random random = new Random();
-
-
 	@Test
-	public void shouldGenerateTextCorrectly(){
+	public void shouldGenerateRandomWord(){
 		String regex = "[ab]{2,6}c";
 
 		Matcher m = Pattern.compile(regex).matcher(StringUtils.EMPTY);
 
+		Random random = new Random();
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		for(int i = 0; i < 100; i ++){
-			String text = generator.generate(random);
+			String word = generator.generate(random);
 
-			Assert.assertTrue(m.reset(text).matches());
+			Assert.assertTrue(m.reset(word).matches());
 		}
+	}
+
+	@Test
+	public void shouldGenerateAllWords(){
+		String regex = "[abc]c[de]?";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		int wordCount = generator.wordCount();
+
+		Assert.assertEquals(9, wordCount);
+	}
+
+	@Test(expected = StackOverflowError.class)
+	public void shouldGenerateInfiniteWords(){
+		String regex = "[abc]c[de]*";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		generator.wordCount();
 	}
 
 }
