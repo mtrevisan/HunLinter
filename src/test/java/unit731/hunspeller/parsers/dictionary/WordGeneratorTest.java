@@ -36,7 +36,7 @@ public class WordGeneratorTest{
 		Mockito.when(backbone.getDicParser()).thenReturn(dicParser);
 		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY, ".dic");
 		wordGenerator = new WordGenerator(affParser);
-		dicParser = new DictionaryParser(affParser, dicFile, null, wordGenerator, StandardCharsets.UTF_8);
+		dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
 		Mockito.when(backbone.getDictionaryFile()).thenReturn(dicFile);
 	}
 
