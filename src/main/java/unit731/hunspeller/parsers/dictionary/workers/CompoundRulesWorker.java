@@ -78,7 +78,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				long wordCount = regexWordGenerator.wordCount();
 				log.info("total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 				//generate all the words that matches the given regex
-				List<String> words = regexWordGenerator.generateAll(10);
+				List<String> words = regexWordGenerator.generateAll(wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
 				for(String word : words){
 					log.info(word + " ");
 				}

@@ -52,7 +52,7 @@ public class HunspellRegexWordGenerator{
 
 	@Getter
 	private final List<String> matchedWords = new ArrayList<>(0);
-	private int matchedWordCounter = 0;
+	private long matchedWordCounter;
 
 	private HunspellAutomataNode rootNode;
 	private boolean isTransactionNodeBuilt;
@@ -237,9 +237,9 @@ public class HunspellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<String> generateAll(int limit){
+	public List<String> generateAll(long limit){
 		matchedWords.clear();
-		matchedWordCounter = 0;
+		matchedWordCounter = 0l;
 
 		Deque<GeneratedElement> deque = new LinkedList<>();
 		deque.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
@@ -283,7 +283,7 @@ public class HunspellRegexWordGenerator{
 	 */
 	public List<String> generateAll2(int limit){
 		matchedWords.clear();
-		matchedWordCounter = 0;
+		matchedWordCounter = 0l;
 		generate(StringUtils.EMPTY, automaton.getInitialState(), limit);
 		return matchedWords;
 	}
