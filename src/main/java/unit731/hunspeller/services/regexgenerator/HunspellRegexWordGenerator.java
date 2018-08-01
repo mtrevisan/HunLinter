@@ -34,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HunspellRegexWordGenerator{
 
+	public static final long INFINITY = -1l;
+
 	private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
 	static{
 		Map<String, String> characterClasses = new HashMap<>();
@@ -100,16 +102,19 @@ public class HunspellRegexWordGenerator{
 	}
 
 	/**
-	 * @return	The number of words that are matched by the given pattern.
-	 * @throws StackOverflowError	If the given pattern generates a large, possibly infinite, number of words.
+	 * @return	The number of words that are matched by the given pattern, or {@value #INFINITY} if infinite.
 	 */
 	public long wordCount(){
-		if(isInfinite())
-			throw new StackOverflowError();
+		long count = -1l;
+		try{
+			if(!isInfinite()){
+				buildRootNode();
 
-		buildRootNode();
-
-		return rootNode.getMatchedWordCount();
+				count = rootNode.getMatchedWordCount();
+			}
+		}
+		catch(StackOverflowError e){}
+		return count;
 	}
 
 	/** Prepare the rootNode and it's child nodes so that we can get matchedString by index */
@@ -251,7 +256,7 @@ public class HunspellRegexWordGenerator{
 				matchedWordCounter ++;
 
 				if(transitions.isEmpty())
-					break;
+					continue;
 			}
 
 			for(Transition transition : transitions)
@@ -266,6 +271,39 @@ public class HunspellRegexWordGenerator{
 	class GeneratedElement{
 		private final String word;
 		private final State state;
+	}
+
+	/**
+	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
+	 * <p>
+	 * The Strings are ordered in lexicographical order.
+	 *
+	 * @param limit	The maximum size of the list
+	 * @return	The list of words that matcher the given regex
+	 */
+	public List<String> generateAll2(int limit){
+		matchedWords.clear();
+		matchedWordCounter = 0;
+		generate(StringUtils.EMPTY, automaton.getInitialState(), limit);
+		return matchedWords;
+	}
+
+	private void generate(String subword, State state, int limit){
+		if(matchedWordCounter == limit)
+			return;
+
+		List<Transition> transitions = state.getSortedTransitions(true);
+		if(transitions.isEmpty() || state.isAccept()){
+			matchedWords.add(subword);
+			matchedWordCounter ++;
+
+			if(transitions.isEmpty())
+				return;
+		}
+
+		for(Transition transition : transitions)
+			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
+				generate(subword + chr, transition.getDest(), limit);
 	}
 
 }

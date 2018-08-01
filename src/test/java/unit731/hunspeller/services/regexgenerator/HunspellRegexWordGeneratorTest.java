@@ -33,17 +33,21 @@ public class HunspellRegexWordGeneratorTest{
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		long wordCount = generator.wordCount();
 		List<String> words = generator.generateAll();
+		List<String> words2 = generator.generateAll2(-1);
 
 		Assert.assertEquals(9l, wordCount);
+		Assert.assertEquals(9l, words2.size());
 		Assert.assertEquals(9l, words.size());
 	}
 
-	@Test(expected = StackOverflowError.class)
+	@Test
 	public void shouldGenerateInfiniteWords(){
 		String regex = "[abc]c[de]*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		generator.wordCount();
+		long wordCount = generator.wordCount();
+
+		Assert.assertEquals(HunspellRegexWordGenerator.INFINITY, wordCount);
 	}
 
 }

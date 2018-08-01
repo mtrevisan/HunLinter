@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Productable;
@@ -17,6 +18,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
+@Slf4j
 public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Compound rules extractions";
@@ -72,13 +74,14 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, new String[]{"((", "))"}, new String[]{"(", ")"});
 				System.out.println(expandedCompoundRule);
 
-				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator(expandedCompoundRule);
+				HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
+				long wordCount = regexWordGenerator.wordCount();
+				log.info("total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 				//generate all the words that matches the given regex
-				List<String> words = generex.generateAll(10);
+				List<String> words = regexWordGenerator.generateAll(10);
 				for(String word : words){
-					System.out.print(word + " ");
+					log.info(word + " ");
 				}
-				System.out.println();
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
