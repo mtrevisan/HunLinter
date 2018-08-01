@@ -4,6 +4,7 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -27,12 +29,27 @@ import java.util.function.Function;
  */
 public class HunspellRegexWordGenerator implements Iterable<String>{
 
+	private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
+	static{
+		Map<String, String> characterClasses = new HashMap<>();
+		characterClasses.put("\\\\d", "[0-9]");
+		characterClasses.put("\\\\D", "[^0-9]");
+		characterClasses.put("\\\\s", "[ \t\n\f\r]");
+		characterClasses.put("\\\\S", "[^ \t\n\f\r]");
+		characterClasses.put("\\\\w", "[a-zA-Z_0-9]");
+		characterClasses.put("\\\\W", "[^a-zA-Z_0-9]");
+		PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
+	}
+
 	private final Automaton automaton;
 
 
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
+		regex = StringUtils.replaceEachRepeatedly(regex,
+			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
+			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		RegExp re = new RegExp(regex);
 		automaton = re.toAutomaton();
 	}
