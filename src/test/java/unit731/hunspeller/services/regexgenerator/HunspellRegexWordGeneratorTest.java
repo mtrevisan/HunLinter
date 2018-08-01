@@ -19,6 +19,8 @@ public class HunspellRegexWordGeneratorTest{
 
 		Random random = new Random();
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		boolean infinite = generator.isInfinite();
+		Assert.assertFalse(infinite);
 		for(int i = 0; i < 100; i ++){
 			String word = generator.generate(random);
 
@@ -31,9 +33,11 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "[abc]c[de]?";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		boolean infinite = generator.isInfinite();
 		long wordCount = generator.wordCount();
 		List<String> words = generator.generateAll();
 
+		Assert.assertFalse(infinite);
 		Assert.assertEquals(9l, wordCount);
 		Assert.assertEquals(9l, words.size());
 	}
@@ -43,8 +47,10 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "[abc]c[de]*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		boolean infinite = generator.isInfinite();
 		long wordCount = generator.wordCount();
 
+		Assert.assertTrue(infinite);
 		Assert.assertEquals(HunspellRegexWordGenerator.INFINITY, wordCount);
 	}
 

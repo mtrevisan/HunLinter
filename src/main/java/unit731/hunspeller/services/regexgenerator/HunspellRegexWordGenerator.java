@@ -62,7 +62,8 @@ public class HunspellRegexWordGenerator{
 	private long matchedWordCounter;
 
 	private HunspellAutomataNode rootNode;
-	private boolean isTransactionNodeBuilt;
+
+	private int preparedTransactionNode;
 
 
 	public HunspellRegexWordGenerator(String regex){
@@ -112,7 +113,7 @@ public class HunspellRegexWordGenerator{
 	 * @return	The number of words that are matched by the given pattern, or {@value #INFINITY} if infinite.
 	 */
 	public long wordCount(){
-		long count = -1l;
+		long count = INFINITY;
 		try{
 			if(!isInfinite()){
 				buildRootNode();
@@ -124,12 +125,9 @@ public class HunspellRegexWordGenerator{
 		return count;
 	}
 
-	/** Prepare the rootNode and it's child nodes so that we can get matchedString by index */
 	private void buildRootNode(){
-		if(isTransactionNodeBuilt)
+		if(rootNode != null)
 			return;
-
-		isTransactionNodeBuilt = true;
 
 		rootNode = new HunspellAutomataNode();
 		rootNode.setCharCount(1);
@@ -138,13 +136,8 @@ public class HunspellRegexWordGenerator{
 		rootNode.updateMatchedWordCount();
 	}
 
-	private int preparedTransactionNode;
-
 	/**
-	 * Build list of nodes that present possible transactions from the <code>state</code>.
-	 *
-	 * @param state
-	 * @return
+	 * Build list of nodes that represent all the possible transactions from the <code>state</code>.
 	 */
 	private List<HunspellAutomataNode> prepareTransactionNodes(State state){
 		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
@@ -160,12 +153,13 @@ public class HunspellRegexWordGenerator{
 		}
 		List<Transition> transitions = state.getSortedTransitions(true);
 		for(Transition transition : transitions){
-			HunspellAutomataNode trsNode = new HunspellAutomataNode();
+			HunspellAutomataNode transactionNode = new HunspellAutomataNode();
 			int nbrChar = transition.getMax() - transition.getMin() + 1;
-			trsNode.setCharCount(nbrChar);
+			transactionNode.setCharCount(nbrChar);
 			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(transition.getDest());
-			trsNode.setNextNodes(nextNodes);
-			transactionNodes.add(trsNode);
+			transactionNode.setNextNodes(nextNodes);
+
+			transactionNodes.add(transactionNode);
 		}
 		return transactionNodes;
 	}
@@ -233,7 +227,7 @@ public class HunspellRegexWordGenerator{
 	 * @return	All the words that will be matcher by the given regex
 	 */
 	public List<String> generateAll(){
-		return generateAll(-1l);
+		return generateAll(INFINITY);
 	}
 
 	/**
