@@ -21,8 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * A class that help generating words that match a given regular expression.
  * <p>
- * It generate all values that are matched by the Regex, a random value, or you can generate only a specific string based on it's
- * lexicographical order.
+ * It generates all values that are matched by the Regex, or a random value.
  * </p>
  *
  * @see <a href="https://github.com/mifmif/Generex">Generex</a>
@@ -56,80 +55,50 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 
 
 	/**
-	 * Generate a random word that matches the given pattern.
+	 * Tells whether or not the given pattern (or {@code Automaton}) is infinite, that is, generates an infinite number of words.
 	 *
-	 * @param random	A random generator
-	 * @return	A random word
+	 * @return	Whether the pattern (or {@code Automaton}) generates an infinite number of words
 	 */
-	public String generate(Random random){
-		return generate(random, 1, Integer.MAX_VALUE);
+	public boolean isInfinite(){
+		return !automaton.isFinite();
 	}
 
-	/**
-	 * Generate a random word that matches the given pattern, and the word has a <code>length >= minLength</code>
-	 *
-	 * @param random	A random generator
-	 * @param minLength	Minimum word length
-	 * @return	A random word
-	 */
-	public String generate(Random random, int minLength){
-		return generate(random, minLength, Integer.MAX_VALUE);
-	}
 
 	/**
 	 * Generate a random word that matches the given pattern, and the string has a <code>minLength <= length <= maxLength</code>
 	 *
 	 * @param random	A random generator
-	 * @param minLength	Minimum word length
-	 * @param maxLength	Maximum word length
 	 * @return	A random word
 	 */
-	public String generate(Random random, int minLength, int maxLength){
+	public String generate(Random random){
 		Function<Integer, Integer> fnTransition = (max) -> getRandomInt(random, 0, max);
 		BiFunction<Character, Character, Character> fnCharIntoTransition = (min, max) -> (char)getRandomInt(random, min, max);
-		return generate(automaton.getInitialState(), fnTransition, fnCharIntoTransition, minLength, maxLength);
+		return generate(automaton.getInitialState(), fnTransition, fnCharIntoTransition);
 	}
 
-//	private String prepareRandom(Random random, String wordMatch, State state, int minLength, int maxLength){
-//		List<Transition> transitions = state.getSortedTransitions(false);
-//		Set<Integer> selectedTransitions = new HashSet<>();
-//		String result = wordMatch;
-//
-//		for(int resultLength = -1; selectedTransitions.size() < transitions.size() && (resultLength < minLength || resultLength > maxLength); resultLength = result.length()){
-//			if(randomPrepared(wordMatch, state, minLength, maxLength, transitions)){
-//				result = wordMatch;
-//				break;
-//			}
-//
-//			int nextInt = random.nextInt(transitions.size());
-//			if(!selectedTransitions.contains(nextInt)){
-//				selectedTransitions.add(nextInt);
-//
-//				Transition randomTransition = transitions.get(nextInt);
-//				int diff = randomTransition.getMax() - randomTransition.getMin() + 1;
-//				int randomOffset = (diff > 0? random.nextInt(diff): diff);
-//				char randomChar = (char)(randomOffset + randomTransition.getMin());
-//				result = prepareRandom(random, wordMatch + randomChar, randomTransition.getDest(), minLength, maxLength);
-//			}
-//		}
-//
-//		return result;
-//	}
+	/**
+	 * Generates a random number within the given bounds.
+	 *
+	 * @param min	The minimum number (inclusive).
+	 * @param max	The maximum number (inclusive).
+	 * @param random	The object used as the randomizer.
+	 * @return	A random number in the given range.
+	 */
+	private int getRandomInt(Random random, int min, int max){
+		//use random.nextInt as it guarantees a uniform distribution
+		return (max > min? random.nextInt(max - min): 0) + min;
+	}
 
-	private String generate(State initialState, Function<Integer, Integer> fnTransition, BiFunction<Character, Character, Character> fnCharIntoTransition, int minLength, int maxLength){
+	private String generate(State initialState, Function<Integer, Integer> fnTransition, BiFunction<Character, Character, Character> fnCharIntoTransition){
 		State state = initialState;
 		StringBuilder sb = new StringBuilder();
 		Map<State, Set<Integer>> automatonSelectedTransitions = new HashMap<>();
 		while(true){
 			List<Transition> transitions = state.getSortedTransitions(false);
 			if(transitions.isEmpty()){
-				if(minLength <= sb.length() && sb.length() <= maxLength)
-					break;
+				assert state.isAccept();
 
-				state = initialState;
-				transitions = state.getSortedTransitions(false);
-				sb.setLength(0);
-				automatonSelectedTransitions.clear();
+				break;
 			}
 
 			//choose a transition
@@ -151,19 +120,6 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 		return sb.toString();
 	}
 
-	/**
-	 * Generates a random number within the given bounds.
-	 *
-	 * @param min	The minimum number (inclusive).
-	 * @param max	The maximum number (inclusive).
-	 * @param random	The object used as the randomizer.
-	 * @return	A random number in the given range.
-	 */
-	private int getRandomInt(Random random, int min, int max){
-		//use random.nextInt as it guarantees a uniform distribution
-		return (max > min? random.nextInt(max - min): 0) + min;
-	}
-
 
 	/**
 	 * @param index	The index at which to extract the word
@@ -180,6 +136,35 @@ public class HunspellRegexWordGenerator implements Iterable<String>{
 //		result = result.substring(1, result.length() - 1);
 //		return result;
 //	}
+//
+//	private String buildStringFromNode(Node node, int indexOrder){
+//		String result = StringUtils.EMPTY;
+//		long passedStringNbr = 0;
+//		long step = node.getNbrMatchedString() / node.getNbrChar();
+//		for(char usedChar = node.getMinChar(); usedChar <= node.getMaxChar();  ++ usedChar){
+//			passedStringNbr += step;
+//			if(passedStringNbr >= indexOrder){
+//				passedStringNbr -= step;
+//				indexOrder -= passedStringNbr;
+//				result += usedChar;
+//				break;
+//			}
+//		}
+//		long passedStringNbrInChildNode = 0;
+//		if(result.length() == 0)
+//			passedStringNbrInChildNode = passedStringNbr;
+//		for(Node childN : node.getNextNodes()){
+//			passedStringNbrInChildNode += childN.getNbrMatchedString();
+//			if(passedStringNbrInChildNode >= indexOrder){
+//				passedStringNbrInChildNode -= childN.getNbrMatchedString();
+//				indexOrder -= passedStringNbrInChildNode;
+//				result = result.concat(buildStringFromNode(childN, indexOrder));
+//				break;
+//			}
+//		}
+//		return result;
+//	}
+
 
 	@Override
 	public Iterator<String> iterator(){

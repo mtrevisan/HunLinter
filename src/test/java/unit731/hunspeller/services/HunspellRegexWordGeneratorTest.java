@@ -21,10 +21,8 @@ public class HunspellRegexWordGeneratorTest{
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		for(int i = 0; i < 100; i ++){
-			String text = generator.generate(random, 4, 6);
+			String text = generator.generate(random);
 
-			Assert.assertTrue(text.length() >= 4);
-			Assert.assertTrue(text.length() <= 6);
 			Assert.assertTrue(m.reset(text).matches());
 		}
 	}
