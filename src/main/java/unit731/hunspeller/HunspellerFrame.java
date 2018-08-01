@@ -121,7 +121,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	public HunspellerFrame(){
-		backbone = new Backbone(this, this);
+		backbone = new Backbone(this, this, this);
 
 		initComponents();
 

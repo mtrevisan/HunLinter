@@ -32,11 +32,12 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	private final Map<String, String> expandedCompounds = new HashMap<>();
 
 	private String compoundRule;
+	private long limit;
+	private BiConsumer<List<String>, Long> fnDeferring;
 
 
 	public CompoundRulesWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
-		//"(nn)*(11)(tt)"
 
 
 		Map<String, Set<String>> compounds = new HashMap<>();
@@ -76,35 +77,32 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 					expandedCompounds.put(compound, expandedCompoundRule);
 				}
 
-				extract(compoundRule);
+				extract();
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
 	}
 
-	public void extractCompounds(String compoundRule){
-		if(expandedCompounds.isEmpty()){
-			this.compoundRule = compoundRule;
+	public void extractCompounds(String compoundRule, long limit, BiConsumer<List<String>, Long> fnDeferring){
+		this.compoundRule = compoundRule;
+		this.limit = limit;
+		this.fnDeferring = fnDeferring;
 
+		if(expandedCompounds.isEmpty())
 			super.execute();
-		}
 		else
-			extract(compoundRule);
+			extract();
 	}
 
-	private void extract(String expandedCompoundRule){
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
+	private void extract(){
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		long wordCount = regexWordGenerator.wordCount();
 		log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 		//generate all the words that matches the given regex
-		long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? 20l: Math.min(wordCount, 20l));
+		long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordCount, limit));
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
 
-		//FIXME redirect output to table
-		for(String word : words)
-			log.info(Backbone.MARKER_APPLICATION, word);
-		if(wordPrintedCount != wordCount)
-			log.info(Backbone.MARKER_APPLICATION, "\u2026");
+		fnDeferring.accept(words, wordCount);
 	}
 
 	public void clear(){

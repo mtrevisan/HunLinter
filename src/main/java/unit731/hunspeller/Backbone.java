@@ -1,6 +1,7 @@
 package unit731.hunspeller;
 
 import java.awt.Desktop;
+import java.beans.PropertyChangeListener;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -80,11 +81,11 @@ public class Backbone implements FileChangeListener{
 	private final FileListenerManager flm;
 
 
-	public Backbone(Hunspellable hunspellable, Undoable undoable){
+	public Backbone(Hunspellable hunspellable, Undoable undoable, PropertyChangeListener listener){
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
-		wordGenerator = new WordGenerator(affParser);
+		wordGenerator = new WordGenerator(this, listener);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -335,6 +336,10 @@ public class Backbone implements FileChangeListener{
 		return affParser.getLanguage();
 	}
 
+	public FlagParsingStrategy getFlagParsingStrategy(){
+		return affParser.getFlagParsingStrategy();
+	}
+
 	public long getDictionaryFileLength(){
 		return dicParser.getDicFile().length();
 	}
@@ -387,6 +392,51 @@ public class Backbone implements FileChangeListener{
 		return dicParser.shouldBeProcessedForMinimalPair(production);
 	}
 
+	public void acquireAffixLock(){
+		affParser.acquireLock();
+	}
+
+	public void releaseAffixLock(){
+		affParser.releaseLock();
+	}
+
+	public boolean isComplexPrefixes(){
+		return affParser.isComplexPrefixes();
+	}
+
+	public boolean isFullstrip(){
+		return affParser.isFullstrip();
+	}
+
+	public boolean isTerminalAffix(String affix){
+		return affParser.isTerminalAffix(affix);
+	}
+
+	public String getNeedAffixFlag(){
+		return affParser.getNeedAffixFlag();
+	}
+
+	public String getCircumfixFlag(){
+		return affParser.getCircumfixFlag();
+	}
+
+	public String getKeepCaseFlag(){
+		return affParser.getKeepCaseFlag();
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getData(String key){
+		return affParser.getData(key);
+	}
+
+	public String applyInputConversionTable(String word){
+		return affParser.applyInputConversionTable(word);
+	}
+
+	public String applyOutputConversionTable(String word){
+		return affParser.applyOutputConversionTable(word);
+	}
+
 	public boolean isConsonant(char chr){
 		return dicParser.isConsonant(chr);
 	}
@@ -417,7 +467,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 		return wordGenerator.applyRules(dicEntry);
 	}

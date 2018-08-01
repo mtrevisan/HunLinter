@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.beans.PropertyChangeListener;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -11,17 +12,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.interfaces.Productable;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 
 
 @AllArgsConstructor
@@ -45,13 +47,20 @@ public class WordGenerator{
 	private static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
-
-	@NonNull
-	private final AffixParser affParser;
+	private final CompoundRulesWorker compoundRulesWorker;
 
 
-	public FlagParsingStrategy getFlagParsingStrategy(){
-		return affParser.getFlagParsingStrategy();
+	private final Backbone backbone;
+
+
+	public WordGenerator(Backbone backbone, PropertyChangeListener listener){
+		Objects.requireNonNull(backbone);
+
+		this.backbone = backbone;
+
+		compoundRulesWorker = new CompoundRulesWorker(backbone);
+		if(listener != null)
+			compoundRulesWorker.addPropertyChangeListener(listener);
 	}
 
 	/**
@@ -63,15 +72,15 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
-		affParser.acquireLock();
+		backbone.acquireAffixLock();
 
 		try{
 			//convert using input table
-			String word = affParser.applyInputConversionTable(dicEntry.getWord());
+			String word = backbone.applyInputConversionTable(dicEntry.getWord());
 			dicEntry.setWord(word);
 
 			//extract base production
-			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
+			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, backbone.getFlagParsingStrategy());
 
 			//extract onefold production
 			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
@@ -97,7 +106,7 @@ public class WordGenerator{
 			enforceNeedAffixFlag(productions);
 
 			//convert using output table
-			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+			productions.forEach(production -> production.setWord(backbone.applyOutputConversionTable(production.getWord())));
 
 			if(log.isTraceEnabled())
 				productions.forEach(production -> log.trace("Produced word {}", production));
@@ -105,7 +114,7 @@ public class WordGenerator{
 			return productions;
 		}
 		finally{
-			affParser.releaseLock();
+			backbone.releaseAffixLock();
 		}
 	}
 
@@ -114,16 +123,24 @@ public class WordGenerator{
 	 * TODO: manage AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
 	 * @param compoundRule	Rule used to generate the productions for
-	 * @return	The list of productions for the given word
+	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	//TODO
-	public List<RuleProductionEntry> applyCompoundRules(String compoundRule) throws IllegalArgumentException, NoApplicableRuleException{
-		affParser.acquireLock();
+	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
+		backbone.acquireAffixLock();
 
+		long limit = 20l;
+		compoundRulesWorker.extractCompounds(compoundRule, limit, fnDeferring);
+//		BiConsumer<List<String>, Long> fnDeferring = (words, count) -> {
+//			for(String word : words)
+//				log.info(Backbone.MARKER_APPLICATION, word);
+//			if(count != limit)
+//				log.info(Backbone.MARKER_APPLICATION, "\u2026");
+//		};
 		try{
 			//collect productions
-			List<RuleProductionEntry> productions = new ArrayList<>();
+//			List<RuleProductionEntry> productions = new ArrayList<>();
 
 			//manage compound rules
 //			Set<String> compoundRuleAffixes = extractCompoundRuleAffixes(dicEntry);
@@ -138,11 +155,9 @@ public class WordGenerator{
 //			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
 //			productions.forEach(production -> log.trace("Produced word {}", production));
-
-			return productions;
 		}
 		finally{
-			affParser.releaseLock();
+			backbone.releaseAffixLock();
 		}
 	}
 
@@ -151,14 +166,14 @@ public class WordGenerator{
 	}
 
 	private List<RuleProductionEntry> getOnefoldProductions(Productable productable) throws NoApplicableRuleException{
-		List<Set<String>> applyAffixes = extractAffixes(productable, !affParser.isComplexPrefixes());
+		List<Set<String>> applyAffixes = extractAffixes(productable, !backbone.isComplexPrefixes());
 		return applyAffixRules(productable, applyAffixes);
 	}
 
 	private List<RuleProductionEntry> getTwofoldProductions(List<RuleProductionEntry> onefoldProductions) throws NoApplicableRuleException{
 		List<RuleProductionEntry> twofoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : onefoldProductions){
-			List<Set<String>> applyAffixes = extractAffixes(production, !affParser.isComplexPrefixes());
+			List<Set<String>> applyAffixes = extractAffixes(production, !backbone.isComplexPrefixes());
 			applyAffixes.set(1, null);
 			List<RuleProductionEntry> productions = applyAffixRules(production, applyAffixes);
 
@@ -176,7 +191,7 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = new ArrayList<>();
 		for(RuleProductionEntry production : productions)
 			if(production.isCombineable()){
-				List<Set<String>> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
+				List<Set<String>> applyAffixes = extractAffixes(production, backbone.isComplexPrefixes());
 				applyAffixes.set(1, null);
 				List<RuleProductionEntry> prods = applyAffixRules(production, applyAffixes);
 
@@ -214,14 +229,14 @@ public class WordGenerator{
 		Set<String> suffixes = new HashSet<>();
 		if(affixes != null)
 			for(String affix : affixes){
-				if(affParser.isTerminalAffix(affix)){
+				if(backbone.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
 					continue;
 				}
 
-				Object rule = affParser.getData(affix);
+				Object rule = backbone.getData(affix);
 				if(rule == null){
-					if(affParser.isManagedByCompoundRule(affix))
+					if(backbone.isManagedByCompoundRule(affix))
 						continue;
 
 					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
@@ -241,28 +256,16 @@ public class WordGenerator{
 		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
 
-	//FIXME
-//	private Set<String> extractCompoundRuleAffixes(Productable productable){
-//		String[] affixes = productable.getContinuationFlags();
-//
-//		Set<String> applyAffixes = new HashSet<>();
-//		if(affixes != null)
-//			for(String affix : affixes)
-//				if(affParser.isManagedByCompoundRule(affix))
-//					applyAffixes.add(affix);
-//		return applyAffixes;
-//	}
-
 	private void checkTwofoldCorrectness(List<RuleProductionEntry> twofoldProductions) throws IllegalArgumentException{
 		for(RuleProductionEntry prod : twofoldProductions)
-			if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0)
-				- (prod.containsContinuationFlag(affParser.getCircumfixFlag())? 1: 0) > 0)
+			if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(backbone.getKeepCaseFlag())? 1: 0)
+				- (prod.containsContinuationFlag(backbone.getCircumfixFlag())? 1: 0) > 0)
 				throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
 					+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 	}
 
 	private void removeRulesInvalidatingCircumfix(List<RuleProductionEntry> lastfoldProductions){
-		String circumfixFlag = affParser.getCircumfixFlag();
+		String circumfixFlag = backbone.getCircumfixFlag();
 		Iterator<RuleProductionEntry> itr = lastfoldProductions.iterator();
 		while(itr.hasNext()){
 			RuleProductionEntry production = itr.next();
@@ -288,22 +291,22 @@ public class WordGenerator{
 		Iterator<RuleProductionEntry> itr = productions.iterator();
 		while(itr.hasNext()){
 			RuleProductionEntry production = itr.next();
-			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
+			if(production.containsContinuationFlag(backbone.getNeedAffixFlag()))
 				itr.remove();
 		}
 	}
 
 	public boolean isAffixProductive(String word, String affix){
-		word = affParser.applyInputConversionTable(word);
+		word = backbone.applyInputConversionTable(word);
 
 		boolean productive;
-		RuleEntry rule = affParser.getData(affix);
+		RuleEntry rule = backbone.getData(affix);
 		if(rule != null){
 			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 			productive = !applicableAffixes.isEmpty();
 		}
 		else
-			productive = affParser.isManagedByCompoundRule(affix);
+			productive = backbone.isManagedByCompoundRule(affix);
 		return productive;
 	}
 
@@ -317,9 +320,9 @@ public class WordGenerator{
 			String[] morphologicalFields = productable.getMorphologicalFields();
 
 			for(String affix : appliedAffixes){
-				RuleEntry rule = affParser.getData(affix);
+				RuleEntry rule = backbone.getData(affix);
 				if(rule == null){
-					if(affParser.isManagedByCompoundRule(affix))
+					if(backbone.isManagedByCompoundRule(affix))
 						continue;
 
 					String parentFlag = (productable instanceof RuleProductionEntry? ((RuleProductionEntry)productable).getAppliedRules().get(0).getFlag(): null);
@@ -362,9 +365,9 @@ public class WordGenerator{
 
 				for(AffixEntry entry : applicableAffixes){
 					//produce the new word
-					String newWord = entry.applyRule(word, affParser.isFullstrip());
+					String newWord = entry.applyRule(word, backbone.isFullstrip());
 
-					RuleProductionEntry production = new RuleProductionEntry(newWord, morphologicalFields, entry, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, morphologicalFields, entry, postponedAffixes, rule.isCombineable(), backbone.getFlagParsingStrategy());
 
 					productions.add(production);
 				}
@@ -382,17 +385,5 @@ public class WordGenerator{
 				applicableAffixes.add(entry);
 		return applicableAffixes;
 	}
-
-//	private List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
-//		//extract the list of applicable affixes...
-//		List<AffixEntry> applicableAffixes = new ArrayList<>();
-//		for(AffixEntry entry : entries){
-//			Matcher match = entry.getMatch();
-//			//... only if it matches the given word...
-//			if(match == null || PatternService.find(word, match))
-//				applicableAffixes.add(entry);
-//		}
-//		return applicableAffixes;
-//	}
 
 }
