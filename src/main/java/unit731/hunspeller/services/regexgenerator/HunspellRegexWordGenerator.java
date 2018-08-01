@@ -6,8 +6,10 @@ import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +19,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -232,26 +235,37 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		matchedWords.clear();
 		matchedWordCounter = 0;
-		generate(StringUtils.EMPTY, automaton.getInitialState(), limit);
+
+		Deque<GeneratedElement> deque = new LinkedList<>();
+		deque.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
+		while(!deque.isEmpty()){
+			if(matchedWordCounter == limit)
+				break;
+
+			GeneratedElement elem = (GeneratedElement)deque.pop();
+			String subword = elem.word;
+			State state = elem.state;
+			List<Transition> transitions = state.getSortedTransitions(true);
+			if(transitions.isEmpty() || state.isAccept()){
+				matchedWords.add(subword);
+				matchedWordCounter ++;
+
+				if(transitions.isEmpty())
+					break;
+			}
+
+			for(Transition transition : transitions)
+				for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
+					deque.add(new GeneratedElement(subword + chr, transition.getDest()));
+		}
+
 		return matchedWords;
 	}
 
-	private void generate(String subword, State state, int limit){
-		if(matchedWordCounter == limit)
-			return;
-
-		List<Transition> transitions = state.getSortedTransitions(true);
-		if(transitions.isEmpty() || state.isAccept()){
-			matchedWords.add(subword);
-			matchedWordCounter ++;
-
-			if(transitions.isEmpty())
-				return;
-		}
-
-		for(Transition transition : transitions)
-			for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
-				generate(subword + chr, transition.getDest(), limit);
+	@AllArgsConstructor
+	class GeneratedElement{
+		private final String word;
+		private final State state;
 	}
 
 }

@@ -1,5 +1,6 @@
 package unit731.hunspeller.services.regexgenerator;
 
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,8 +32,10 @@ public class HunspellRegexWordGeneratorTest{
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		long wordCount = generator.wordCount();
+		List<String> words = generator.generateAll();
 
 		Assert.assertEquals(9l, wordCount);
+		Assert.assertEquals(9l, words.size());
 	}
 
 	@Test(expected = StackOverflowError.class)

@@ -74,7 +74,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 				HunspellRegexWordGenerator generex = new HunspellRegexWordGenerator(expandedCompoundRule);
 				//generate all the words that matches the given regex
-				List<String> words = generex.generateAll(50);
+				List<String> words = generex.generateAll(10);
 				for(String word : words){
 					System.out.print(word + " ");
 				}
