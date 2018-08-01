@@ -6,8 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.StringJoiner;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
@@ -15,6 +19,28 @@ import unit731.hunspeller.services.FileService;
 
 //https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > morph.aff upward
 public class WordGeneratorTest{
+
+	private Backbone backbone;
+	private AffixParser affParser;
+	private FlagParsingStrategy strategy;
+
+
+	@Before
+	public void init(){
+		backbone = Mockito.mock(Backbone.class);
+		affParser = new AffixParser();
+		Mockito.when(backbone.getAffParser()).thenReturn(affParser);
+		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY);
+		Mockito.when(backbone.getDictionaryFile()).thenReturn(dicFile);
+		Mockito.when(backbone.applyRules(Mockito.any(String.class))).then(invocation -> applyRules(invocation.getArgumentAt(0, String.class)));
+	}
+
+	public List<RuleProductionEntry> applyRules(String line){
+		strategy = affParser.getFlagParsingStrategy();
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+		WordGenerator wordGenerator = new WordGenerator(backbone, null);
+		return wordGenerator.applyRules(dicEntry);
+	}
 
 	@Test
 	public void conditions() throws IOException{
@@ -29,14 +55,10 @@ public class WordGeneratorTest{
 			.add("SFX A 0 f a[^ab]b")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
-		AffixParser parser = new AffixParser();
-		parser.parse(affFile);
-		WordGenerator generator = new WordGenerator(parser);
+		affParser.parse(affFile);
 		String line = "a/A";
-		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
-		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+		List<RuleProductionEntry> stems = applyRules(line);
 
 		Assert.assertEquals(4, stems.size());
 		//base production
@@ -63,14 +85,10 @@ public class WordGeneratorTest{
 			.add("PFX E 0 e")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
-		AffixParser parser = new AffixParser();
-		parser.parse(affFile);
-		WordGenerator generator = new WordGenerator(parser);
+		affParser.parse(affFile);
 		String line = "a/ABCDE";
-		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
-		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+		List<RuleProductionEntry> stems = applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
 		//base production
@@ -112,14 +130,10 @@ public class WordGeneratorTest{
 			.add("PFX H 0 h/AE")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
-		AffixParser parser = new AffixParser();
-		parser.parse(affFile);
-		WordGenerator generator = new WordGenerator(parser);
+		affParser.parse(affFile);
 		String line = "a/ABCDEFGH";
-		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
-		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+		List<RuleProductionEntry> stems = applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
 		//base production
@@ -172,14 +186,10 @@ public class WordGeneratorTest{
 			.add("SFX E 0 e")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
-		AffixParser parser = new AffixParser();
-		parser.parse(affFile);
-		WordGenerator generator = new WordGenerator(parser);
+		affParser.parse(affFile);
 		String line = "a/ABCDE";
-		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
-		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+		List<RuleProductionEntry> stems = applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
 		//base production
@@ -222,14 +232,10 @@ public class WordGeneratorTest{
 			.add("SFX H 0 h/AE")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
-		AffixParser parser = new AffixParser();
-		parser.parse(affFile);
-		WordGenerator generator = new WordGenerator(parser);
+		affParser.parse(affFile);
 		String line = "a/ABCDEFGH";
-		FlagParsingStrategy strategy = parser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 
-		List<RuleProductionEntry> stems = generator.applyRules(dicEntry);
+		List<RuleProductionEntry> stems = applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
 		//base production

@@ -45,8 +45,8 @@ public class DictionaryStatistics{
 
 	public DictionaryStatistics(Backbone backbone){
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getCharset());
-		orthography = OrthographyBuilder.getOrthography(backbone.getLanguage());
+		bloomFilter.setCharset(backbone.getAffParser().getCharset());
+		orthography = OrthographyBuilder.getOrthography(backbone.getAffParser().getLanguage());
 	}
 
 	public void addData(String word){

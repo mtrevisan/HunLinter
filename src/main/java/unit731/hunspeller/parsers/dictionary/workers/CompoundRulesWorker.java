@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
@@ -39,6 +40,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	public CompoundRulesWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
 
+		AffixParser affParser = backbone.getAffParser();
 
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
@@ -46,7 +48,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 			for(RuleProductionEntry production : productions){
 				Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
-					.filter(backbone::isManagedByCompoundRule)
+					.filter(affParser::isManagedByCompoundRule)
 					.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production.getWord(), Collectors.toSet())));
 
 				for(Map.Entry<String, Set<String>> entry: c.entrySet()){
@@ -65,11 +67,11 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			if(!isCancelled()){
 				//extract values for the given compound rule
 				Map<String, String> rule = compounds.entrySet().stream()
-					.filter(entry -> backbone.isManagedByCompoundRule(entry.getKey()))
+					.filter(entry -> affParser.isManagedByCompoundRule(entry.getKey()))
 					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
 
 				//compose compound rule
-				Set<String> compoundRules = backbone.getCompoundRules();
+				Set<String> compoundRules = affParser.getCompoundRules();
 				for(String compound : compoundRules){
 					String expandedCompoundRule = StringUtils.replaceEach(compound, rule.keySet().toArray(new String[rule.size()]),
 						rule.values().toArray(new String[rule.size()]));

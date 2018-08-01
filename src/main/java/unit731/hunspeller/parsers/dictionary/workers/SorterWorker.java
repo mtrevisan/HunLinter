@@ -99,8 +99,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(backbone.getDictionaryFile().toPath(), backbone.getCharset())){
-			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.getCharset());
+		try(BufferedReader br = Files.newBufferedReader(backbone.getDictionaryFile().toPath(), backbone.getAffParser().getCharset())){
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.getAffParser().getCharset());
 			String line;
 			while((line = br.readLine()) != null){
 				if(index == boundary.getKey() || index == boundary.getValue() + 1){
@@ -109,7 +109,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 					files.add(file);
 
 					file = File.createTempFile("split", ".out");
-					writer = Files.newBufferedWriter(file.toPath(), backbone.getCharset());
+					writer = Files.newBufferedWriter(file.toPath(), backbone.getAffParser().getCharset());
 				}
 
 				writer.write(line);
@@ -129,8 +129,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		//sort the chosen section
 		File sortSection = chunks.get(1);
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
-			.charset(backbone.getCharset())
-			.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
+			.charset(backbone.getAffParser().getCharset())
+			.comparator(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage()))
 			.useZip(true)
 			.removeDuplicates(true)
 			.build();

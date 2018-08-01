@@ -49,8 +49,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 			File dicFile = backbone.getDictionaryFile();
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()));
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset());
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()));
+					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset());
 					){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
@@ -90,8 +90,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(backbone.getCharset())
-				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(backbone.getLanguage())))
+				.charset(backbone.getAffParser().getCharset())
+				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage())))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
@@ -107,7 +107,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			int totalPairs = 0;
 			Map<String, List<String>> minimalPairs = new HashMap<>();
-			try(BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), backbone.getCharset())){
+			try(BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), backbone.getAffParser().getCharset())){
 				String sourceLine;
 				long readSoFarSource = 0;
 				long totalSizeSource = outputFile.length();
@@ -158,7 +158,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 
 			//write result
-			try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset())){
+			try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset())){
 				int index = 0;
 				int size = minimalPairs.size();
 				for(Map.Entry<String, List<String>> entry : minimalPairs.entrySet()){
@@ -178,8 +178,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
-				.charset(backbone.getCharset())
-				.comparator(ComparatorBuilder.getComparator(backbone.getLanguage()))
+				.charset(backbone.getAffParser().getCharset())
+				.comparator(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage()))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();

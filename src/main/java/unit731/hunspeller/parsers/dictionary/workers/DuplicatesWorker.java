@@ -92,13 +92,13 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getCharset());
+		bloomFilter.setCharset(backbone.getAffParser().getCharset());
 		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.getGrowRatioWhenDictionaryFull());
-		duplicatesBloomFilter.setCharset(backbone.getCharset());
+		duplicatesBloomFilter.setCharset(backbone.getAffParser().getCharset());
 
 		setProgress(0);
 		File dicFile = backbone.getDictionaryFile();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -153,7 +153,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			setProgress(0);
 
 			File dicFile = backbone.getDictionaryFile();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getCharset()))){
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -197,7 +197,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
-			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getLanguage());
+			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
@@ -215,7 +215,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			int writtenSoFar = 0;
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress((int)(100. / (totalSize + 1)));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getCharset())){
+			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
@@ -250,7 +250,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					return oldValue;
 				}));
 
-		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getLanguage());
+		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
 		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));

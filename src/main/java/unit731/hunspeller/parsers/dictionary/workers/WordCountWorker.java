@@ -25,7 +25,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(backbone);
 
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getCharset());
+		bloomFilter.setCharset(backbone.getAffParser().getCharset());
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {

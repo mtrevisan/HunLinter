@@ -12,7 +12,7 @@ public class WorkerDictionaryReadBase{
 
 
 	public final void createWorker(String workerName, Backbone backbone, BiConsumer<String, Integer> body, Runnable done){
-		worker = new WorkerDictionaryRead(workerName, backbone.getDictionaryFile(), backbone.getCharset(), body, done);
+		worker = new WorkerDictionaryRead(workerName, backbone.getDictionaryFile(), backbone.getAffParser().getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

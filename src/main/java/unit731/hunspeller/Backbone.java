@@ -14,9 +14,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.zip.Deflater;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +68,7 @@ public class Backbone implements FileChangeListener{
 
 	private File affFile;
 
+	@Getter
 	private final AffixParser affParser;
 	private final AidParser aidParser;
 	private DictionaryParser dicParser;
@@ -145,7 +146,7 @@ public class Backbone implements FileChangeListener{
 		if(hypFile.exists()){
 			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
 
-			String language = getLanguage();
+			String language = affParser.getLanguage();
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
@@ -160,8 +161,8 @@ public class Backbone implements FileChangeListener{
 
 	private void prepareDictionaryFile(File dicFile){
 		if(dicFile.exists()){
-			String language = getLanguage();
-			Charset charset = getCharset();
+			String language = affParser.getLanguage();
+			Charset charset = affParser.getCharset();
 			dicParser = DictionaryParserBuilder.getParser(language, dicFile, wordGenerator, hyphenator, charset);
 
 			hunspellable.clearDictionaryParser();
@@ -217,11 +218,11 @@ public class Backbone implements FileChangeListener{
 
 	/** FIXME should be private! */
 	public File getDictionaryFile(){
-		return getFile(getLanguage() + EXTENSION_DIC);
+		return getFile(affParser.getLanguage() + EXTENSION_DIC);
 	}
 
 	private File getAidFile(){
-		return new File(getCurrentWorkingDirectory() + FOLDER_AID + getLanguage() + EXTENSION_AID);
+		return new File(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getLanguage() + EXTENSION_AID);
 	}
 
 	private String getCurrentWorkingDirectory(){
@@ -232,15 +233,15 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getThesaurusIndexFile(){
-		return getFile(PREFIX_THESAURUS + getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
+		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
 	}
 
 	private File getThesaurusDataFile(){
-		return getFile(PREFIX_THESAURUS + getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
+		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
 	}
 
 	private File getHyphenationFile(){
-		return getFile(PREFIX_HYPHENATION + getLanguage() + EXTENSION_DIC);
+		return getFile(PREFIX_HYPHENATION + affParser.getLanguage() + EXTENSION_DIC);
 	}
 
 
@@ -328,25 +329,13 @@ public class Backbone implements FileChangeListener{
 	}
 
 
-	public Charset getCharset(){
-		return affParser.getCharset();
-	}
-
-	public String getLanguage(){
-		return affParser.getLanguage();
-	}
-
-	public FlagParsingStrategy getFlagParsingStrategy(){
-		return affParser.getFlagParsingStrategy();
-	}
-
 	public long getDictionaryFileLength(){
 		return dicParser.getDicFile().length();
 	}
 
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
-		String[] lines = Files.lines(dicFile.toPath(), getCharset())
+		String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
 		return lines;
@@ -392,51 +381,6 @@ public class Backbone implements FileChangeListener{
 		return dicParser.shouldBeProcessedForMinimalPair(production);
 	}
 
-	public void acquireAffixLock(){
-		affParser.acquireLock();
-	}
-
-	public void releaseAffixLock(){
-		affParser.releaseLock();
-	}
-
-	public boolean isComplexPrefixes(){
-		return affParser.isComplexPrefixes();
-	}
-
-	public boolean isFullstrip(){
-		return affParser.isFullstrip();
-	}
-
-	public boolean isTerminalAffix(String affix){
-		return affParser.isTerminalAffix(affix);
-	}
-
-	public String getNeedAffixFlag(){
-		return affParser.getNeedAffixFlag();
-	}
-
-	public String getCircumfixFlag(){
-		return affParser.getCircumfixFlag();
-	}
-
-	public String getKeepCaseFlag(){
-		return affParser.getKeepCaseFlag();
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T getData(String key){
-		return affParser.getData(key);
-	}
-
-	public String applyInputConversionTable(String word){
-		return affParser.applyInputConversionTable(word);
-	}
-
-	public String applyOutputConversionTable(String word){
-		return affParser.applyOutputConversionTable(word);
-	}
-
 	public boolean isConsonant(char chr){
 		return dicParser.isConsonant(chr);
 	}
@@ -467,21 +411,9 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 		return wordGenerator.applyRules(dicEntry);
-	}
-
-	public boolean isManagedByCompoundRule(String affix){
-		return affParser.isManagedByCompoundRule(affix);
-	}
-
-	public boolean isManagedByCompoundRule(String compoundRule, String affix){
-		return affParser.isManagedByCompoundRule(compoundRule, affix);
-	}
-
-	public Set<String> getCompoundRules(){
-		return affParser.getCompoundRules();
 	}
 
 	public String correctOrthography(String word){
