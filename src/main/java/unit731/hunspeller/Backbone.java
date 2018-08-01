@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 import java.util.zip.Deflater;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +29,11 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
-import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
-import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ZipManager;
-import unit731.hunspeller.services.externalsorter.ExternalSorter;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
@@ -70,12 +63,16 @@ public class Backbone implements FileChangeListener{
 
 	@Getter
 	private final AffixParser affParser;
+	@Getter
 	private final AidParser aidParser;
+	@Getter
 	private DictionaryParser dicParser;
+	@Getter
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
 	private final WordGenerator wordGenerator;
+	@Getter
 	private AbstractHyphenator hyphenator;
 
 	private final Hunspellable hunspellable;
@@ -329,76 +326,12 @@ public class Backbone implements FileChangeListener{
 	}
 
 
-	public long getDictionaryFileLength(){
-		return dicParser.getDicFile().length();
-	}
-
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
 		String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
 		return lines;
-	}
-
-	public int getExpectedNumberOfDictionaryElements(){
-		return dicParser.getExpectedNumberOfElements();
-	}
-
-	public double getFalsePositiveDictionaryProbability(){
-		return dicParser.getFalsePositiveProbability();
-	}
-
-	public double getGrowRatioWhenDictionaryFull(){
-		return dicParser.getGrowRatioWhenFull();
-	}
-
-	public void checkDictionaryProduction(RuleProductionEntry production){
-		dicParser.checkProduction(production);
-	}
-
-	public ExternalSorter getDictionarySorter(){
-		return dicParser.getSorter();
-	}
-
-	public int getDictionaryBoundaryIndex(int row){
-		return dicParser.getBoundaryIndex(row);
-	}
-
-	public int getDictionaryNextBoundaryIndex(int row){
-		return dicParser.getNextBoundaryIndex(row);
-	}
-
-	public int getDictionaryPreviousBoundaryIndex(int row){
-		return dicParser.getPreviousBoundaryIndex(row);
-	}
-
-	public boolean isDictionaryLineInBoundary(int lineIndex){
-		return dicParser.isInBoundary(lineIndex);
-	}
-
-	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
-		return dicParser.shouldBeProcessedForMinimalPair(production);
-	}
-
-	public boolean isConsonant(char chr){
-		return dicParser.isConsonant(chr);
-	}
-
-	public void calculateDictionaryBoundaries(){
-		dicParser.calculateDictionaryBoundaries();
-	}
-
-	public Map.Entry<Integer, Integer> getDictionaryBoundary(int row){
-		return dicParser.getBoundary(row);
-	}
-
-	public void clearDictionaryBoundaries(){
-		dicParser.getBoundaries().clear();
-	}
-
-	public boolean isDictionaryModified(){
-		return theParser.isDictionaryModified();
 	}
 
 	public void mergeSectionsToDictionary(List<File> files) throws IOException{
@@ -416,64 +349,12 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator.applyRules(dicEntry);
 	}
 
-	public String correctOrthography(String word){
-		return dicParser.correctOrthography(word);
-	}
-
-	public List<String> splitWordIntoCompounds(String word){
-		return hyphenator.splitIntoCompounds(word);
-	}
-
 	public boolean hasHyphenationRule(String addedRule, HyphenationParser.Level level){
 		return hypParser.hasRule(addedRule, level);
 	}
 
 	public String addHyphenationRule(String newRule, HyphenationParser.Level level){
 		return hypParser.addRule(newRule, level);
-	}
-
-	public Hyphenation hyphenate(String word){
-		return hyphenator.hyphenate(word);
-	}
-
-	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
-		return hyphenator.hyphenate(word, addedRule, level);
-	}
-
-	public List<String> getAidLines(){
-		return aidParser.getLines();
-	}
-
-	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return theParser.getSynonymsDictionary();
-	}
-
-	public int getSynonymsCounter(){
-		return theParser.getSynonymsCounter();
-	}
-
-	public ThesaurusEntry getThesaurusSynonym(int row){
-		return theParser.getSynonymsDictionary().get(row);
-	}
-
-	public void setThesaurusSynonym(int row, List<MeaningEntry> meanings, String text){
-		theParser.setMeanings(row, meanings, text);
-	}
-
-	public List<String> extractThesaurusDuplicates(){
-		return theParser.extractDuplicates();
-	}
-
-	public String prepareTextForThesaurusFilter(String text){
-		return dicParser.prepareTextForFilter(text);
-	}
-
-	public DuplicationResult insertThesaurusMeanings(String synonyms, Supplier<Boolean> duplicatesDiscriminator){
-		return theParser.insertMeanings(synonyms, duplicatesDiscriminator);
-	}
-
-	public void deleteThesaurusMeanings(int[] selectedRows){
-		theParser.deleteMeanings(selectedRows);
 	}
 
 	public boolean restorePreviousThesaurusSnapshot() throws IOException{

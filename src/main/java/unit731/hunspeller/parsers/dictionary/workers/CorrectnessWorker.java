@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
@@ -15,14 +16,15 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 	public CorrectnessWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getDicParser());
 
-
+		DictionaryParser dicParser = backbone.getDicParser();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			List<RuleProductionEntry> productions = backbone.applyRules(line);
 
-			productions.forEach(production -> backbone.checkDictionaryProduction(production));
+			productions.forEach(production -> dicParser.checkProduction(production));
 		};
-		createWorker(WORKER_NAME, backbone, body, null);
+		createWorker(WORKER_NAME, dicParser, body, null);
 	}
 
 }

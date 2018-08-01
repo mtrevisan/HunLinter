@@ -56,6 +56,7 @@ public class WordGenerator{
 
 	public WordGenerator(Backbone backbone, PropertyChangeListener listener){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getAffParser());
 
 		affParser = backbone.getAffParser();
 

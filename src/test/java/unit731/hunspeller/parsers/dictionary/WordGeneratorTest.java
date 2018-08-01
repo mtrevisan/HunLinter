@@ -4,6 +4,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringJoiner;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ public class WordGeneratorTest{
 
 	private Backbone backbone;
 	private AffixParser affParser;
+	private DictionaryParser dicParser;
 	private FlagParsingStrategy strategy;
 
 
@@ -31,6 +33,9 @@ public class WordGeneratorTest{
 		affParser = new AffixParser();
 		Mockito.when(backbone.getAffParser()).thenReturn(affParser);
 		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY);
+		WordGenerator wordGenerator = new WordGenerator(backbone, null);
+		dicParser = new DictionaryParser(dicFile, wordGenerator, null, StandardCharsets.UTF_8);
+		Mockito.when(backbone.getDicParser()).thenReturn(dicParser);
 		Mockito.when(backbone.getDictionaryFile()).thenReturn(dicFile);
 		Mockito.when(backbone.applyRules(Mockito.any(String.class))).then(invocation -> applyRules(invocation.getArgumentAt(0, String.class)));
 	}

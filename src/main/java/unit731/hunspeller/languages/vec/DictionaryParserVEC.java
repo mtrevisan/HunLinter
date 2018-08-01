@@ -639,8 +639,8 @@ public class DictionaryParserVEC extends DictionaryParser{
 	}
 
 	@Override
-	public String prepareTextForFilter(String text){
-		text = super.prepareTextForFilter(text);
+	public String prepareTextForThesaurusFilter(String text){
+		text = super.prepareTextForThesaurusFilter(text);
 
 		return correctOrthography(text);
 	}

@@ -81,6 +81,10 @@ public class DictionaryParser{
 		language = filename.substring(0, filename.indexOf(".dic"));
 	}
 
+	public File getDictionaryFile(){
+		return dicFile;
+	}
+
 	public int getExpectedNumberOfElements(){
 		return EXPECTED_NUMBER_OF_ELEMENTS;
 	}
@@ -191,7 +195,7 @@ public class DictionaryParser{
 		return PatternService.find(line, REGEX_COMMENT);
 	}
 
-	public String prepareTextForFilter(String text){
+	public String prepareTextForThesaurusFilter(String text){
 		text = StringUtils.strip(text);
 		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
 		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");

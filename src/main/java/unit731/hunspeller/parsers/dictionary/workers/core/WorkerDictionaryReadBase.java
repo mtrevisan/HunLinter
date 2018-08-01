@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 import java.beans.PropertyChangeListener;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class WorkerDictionaryReadBase{
@@ -11,8 +11,8 @@ public class WorkerDictionaryReadBase{
 	private WorkerDictionaryRead worker;
 
 
-	public final void createWorker(String workerName, Backbone backbone, BiConsumer<String, Integer> body, Runnable done){
-		worker = new WorkerDictionaryRead(workerName, backbone.getDictionaryFile(), backbone.getAffParser().getCharset(), body, done);
+	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> body, Runnable done){
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDictionaryFile(), dicParser.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

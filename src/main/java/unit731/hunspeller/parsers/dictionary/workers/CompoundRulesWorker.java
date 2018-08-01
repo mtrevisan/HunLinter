@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
@@ -39,9 +40,11 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	public CompoundRulesWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getAffParser());
+		Objects.requireNonNull(backbone.getDicParser());
 
 		AffixParser affParser = backbone.getAffParser();
-
+		DictionaryParser dicParser = backbone.getDicParser();
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			//collect words belonging to a compound rule
@@ -82,7 +85,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				extract();
 			}
 		};
-		createWorker(WORKER_NAME, backbone, body, done);
+		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	public void extractCompounds(String compoundRule, long limit, BiConsumer<List<String>, Long> fnDeferring){

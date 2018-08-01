@@ -343,7 +343,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   int row = theTable.convertRowIndexToModel(target.getSelectedRow());
                   BiConsumer<List<MeaningEntry>, String> okButtonAction = (meanings, text) -> {
                      try{
-                        backbone.setThesaurusSynonym(row, meanings, text);
+                        backbone.getTheParser().setMeanings(row, meanings, text);
 
                         // ... and save the files
                         backbone.storeThesaurusFiles();
@@ -352,7 +352,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(ex));
                      }
                   };
-                  ThesaurusEntry synonym = backbone.getThesaurusSynonym(row);
+                  ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
@@ -831,7 +831,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_fileExitMenuItemActionPerformed
 
 	private void exit(){
-		if(backbone.isDictionaryModified()){
+		if(backbone.getTheParser().isDictionaryModified()){
 			//there are unsaved synonyms, ask the user if he really want to quit
 			Object[] options ={"Quit", "Cancel"};
 			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?", "Warning!", JOptionPane.YES_NO_OPTION,
@@ -932,7 +932,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.extractThesaurusDuplicates(), this);
+		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
@@ -946,7 +946,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					"Please select one", JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
-			DuplicationResult duplicationResult = backbone.insertThesaurusMeanings(synonyms, duplicatesDiscriminator);
+			DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
 			List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 
 			if(duplicationResult.isForcedInsertion() || duplicates.isEmpty()){
@@ -1003,7 +1003,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.backbone.prepareTextForThesaurusFilter(formerFilterThesaurusText);
+				String filterText = frame.backbone.getDicParser().prepareTextForThesaurusFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
@@ -1015,7 +1015,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int[] selectedRows = Arrays.stream(theTable.getSelectedRows())
 				.map(theTable::convertRowIndexToModel)
 				.toArray();
-			backbone.deleteThesaurusMeanings(selectedRows);
+			backbone.getTheParser().deleteMeanings(selectedRows);
 
 			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 			dm.fireTableDataChanged();
@@ -1235,12 +1235,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicDialog = new DictionarySortDialog(backbone, "Sorter", "Please select a section from the list:", this);
+			dicDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
 			dicDialog.setLocationRelativeTo(this);
 			dicDialog.addListSelectionListener(e -> {
 				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
 					int selectedRow = dicDialog.getSelectedIndex();
-					if(backbone.isDictionaryLineInBoundary(selectedRow)){
+					if(backbone.getDicParser().isInBoundary(selectedRow)){
 						dicDialog.setVisible(false);
 
 						dicSortDictionaryMenuItem.setEnabled(false);
@@ -1262,7 +1262,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//aid file:
-			List<String> lines = backbone.getAidLines();
+			List<String> lines = backbone.getAidParser().getLines();
 			boolean aidLinesPresent = !lines.isEmpty();
 			if(aidLinesPresent)
 				lines.stream()
@@ -1275,7 +1275,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//thesaurus file:
 			ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-			dm.setSynonyms(backbone.getSynonymsDictionary());
+			dm.setSynonyms(backbone.getTheParser().getSynonymsDictionary());
 			updateSynonymsCounter();
 			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
@@ -1291,7 +1291,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void updateSynonymsCounter(){
-		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getSynonymsCounter()));
+		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
 	}
 
 	private int setTabbedPaneEnable(JTabbedPane tabbedPane, Component component, boolean enabled){
@@ -1302,7 +1302,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.backbone.correctOrthography(frame.hypWordTextField.getText());
+		String text = frame.backbone.getDicParser().correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -1310,7 +1310,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		String count = null;
 		List<String> rules = Collections.<String>emptyList();
 		if(StringUtils.isNotBlank(text)){
-			Hyphenation hyphenation = frame.backbone.hyphenate(text);
+			Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
 
 			Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 			Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
@@ -1339,8 +1339,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		String addedRuleText = frame.backbone.correctOrthography(frame.hypWordTextField.getText());
-		String addedRule = frame.backbone.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		String addedRuleText = frame.backbone.getDicParser().correctOrthography(frame.hypWordTextField.getText());
+		String addedRule = frame.backbone.getDicParser().correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
@@ -1352,8 +1352,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
-					Hyphenation hyphenation = frame.backbone.hyphenate(addedRuleText);
-					Hyphenation addedRuleHyphenation = frame.backbone.hyphenate(addedRuleText, addedRule, level);
+					Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);
+					Hyphenation addedRuleHyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText, addedRule, level);
 
 					Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>", "</html>");
 					Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";

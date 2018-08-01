@@ -20,6 +20,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 
 	public WordlistWorker(Backbone backbone, File outputFile){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getDicParser());
 		Objects.requireNonNull(outputFile);
 
 
@@ -40,7 +41,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 			if(!isCancelled())
 				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		};
-		createWorker(WORKER_NAME, backbone, outputFile, body, done);
+		createWorker(WORKER_NAME, backbone.getDicParser(), outputFile, body, done);
 	}
 
 }

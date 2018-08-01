@@ -21,6 +21,7 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -40,14 +41,20 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 
 	private final Backbone backbone;
+	private final AffixParser affParser;
+	private final DictionaryParser dicParser;
 	private final File outputFile;
 
 
 	public DuplicatesWorker(Backbone backbone, File outputFile){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getAffParser());
+		Objects.requireNonNull(backbone.getDicParser());
 		Objects.requireNonNull(outputFile);
 
 		this.backbone = backbone;
+		affParser = backbone.getAffParser();
+		dicParser = backbone.getDicParser();
 		this.outputFile = outputFile;
 		workerName = WORKER_NAME;
 	}
@@ -91,14 +98,16 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getAffParser().getCharset());
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType, EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, backbone.getGrowRatioWhenDictionaryFull());
-		duplicatesBloomFilter.setCharset(backbone.getAffParser().getCharset());
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType,
+			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(dicParser.getCharset());
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType,
+			EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dicParser.getGrowRatioWhenFull());
+		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);
-		File dicFile = backbone.getDictionaryFile();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()))){
+		File dicFile = dicParser.getDictionaryFile();
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -152,8 +161,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			File dicFile = backbone.getDictionaryFile();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()))){
+			File dicFile = dicParser.getDictionaryFile();
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -191,13 +200,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
 			log.info(Backbone.MARKER_APPLICATION, "Total duplicates: " + DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			log.info(Backbone.MARKER_APPLICATION, "False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
-				+ " (overall duplicates ≲ " + (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
+			log.info(Backbone.MARKER_APPLICATION, "False positive probability is "
+				+ DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability) + " (overall duplicates ≲ "
+				+ (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
 
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
-			Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
+			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
@@ -215,7 +225,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			int writtenSoFar = 0;
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress((int)(100. / (totalSize + 1)));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset())){
+			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
 					writer.write(": ");
@@ -250,7 +260,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					return oldValue;
 				}));
 
-		Comparator<String> comparator = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
+		Comparator<String> comparator = ComparatorBuilder.getComparator(dicParser.getLanguage());
 		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));

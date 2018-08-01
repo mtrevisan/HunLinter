@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
-import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class WorkerDictionaryReadWriteBase{
@@ -13,8 +13,8 @@ public class WorkerDictionaryReadWriteBase{
 	private WorkerDictionaryReadWrite worker;
 
 
-	public final void createWorker(String workerName, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new WorkerDictionaryReadWrite(workerName, backbone.getDictionaryFile(), outputFile, backbone.getAffParser().getCharset(), body, done);
+	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
+		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDictionaryFile(), outputFile, dicParser.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

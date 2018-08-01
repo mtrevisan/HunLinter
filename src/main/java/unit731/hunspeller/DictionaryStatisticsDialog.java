@@ -38,11 +38,14 @@ import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.services.FileService;
 
 
 @Slf4j
@@ -511,12 +514,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-//				File dicFile = File.createTempFile("vec", ".dic");
-//				dicFile.deleteOnExit();
-//				AffixParser affParser = new AffixParser();
-//				DictionaryParser dicParser = new DictionaryParser(dicFile, new WordGenerator(affParser), StandardCharsets.UTF_8);
-				Backbone backbone = null;
-				DictionaryStatistics stats = new DictionaryStatistics(backbone);
+				Backbone backbone = new Backbone(null, null, null);
+				DictionaryStatistics stats = new DictionaryStatistics(backbone.getAffParser(), backbone.getDicParser());
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));

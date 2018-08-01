@@ -23,9 +23,13 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	public WordCountWorker(Backbone backbone){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getDicParser());
 
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getAffParser().getCharset());
+		DictionaryParser dicParser = backbone.getDicParser();
+
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
+			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(dicParser.getCharset());
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
@@ -43,7 +47,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker(WORKER_NAME, backbone, body, done);
+		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	@Override

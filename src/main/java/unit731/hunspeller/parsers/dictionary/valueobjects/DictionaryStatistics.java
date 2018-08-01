@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.text.similarity.LevenshteinDistance;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -43,10 +43,11 @@ public class DictionaryStatistics{
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(Backbone backbone){
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST, backbone.getExpectedNumberOfDictionaryElements(), backbone.getFalsePositiveDictionaryProbability(), backbone.getGrowRatioWhenDictionaryFull());
-		bloomFilter.setCharset(backbone.getAffParser().getCharset());
-		orthography = OrthographyBuilder.getOrthography(backbone.getAffParser().getLanguage());
+	public DictionaryStatistics(AffixParser affParser, DictionaryParser dicParser){
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
+			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+		bloomFilter.setCharset(affParser.getCharset());
+		orthography = OrthographyBuilder.getOrthography(affParser.getLanguage());
 	}
 
 	public void addData(String word){

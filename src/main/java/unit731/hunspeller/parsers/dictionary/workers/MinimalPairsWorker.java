@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,15 +28,25 @@ import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
-@AllArgsConstructor
 @Slf4j
 public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 	private static final String SLASH = "/";
 
 	private final Backbone backbone;
+	private final DictionaryParser dicParser;
 	private final File outputFile;
 
+
+	public MinimalPairsWorker(Backbone backbone, File outputFile){
+		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getDicParser());
+		Objects.requireNonNull(outputFile);
+
+		this.backbone = backbone;
+		dicParser = backbone.getDicParser();
+		this.outputFile = outputFile;
+	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
@@ -47,10 +57,10 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			TimeWatch watch = TimeWatch.start();
 
 			setProgress(0);
-			File dicFile = backbone.getDictionaryFile();
+			File dicFile = dicParser.getDictionaryFile();
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), backbone.getAffParser().getCharset()));
-					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset());
+					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()));
+					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
@@ -72,7 +82,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 							List<RuleProductionEntry> productions = backbone.applyRules(line);
 
 							for(RuleProductionEntry production : productions)
-								if(backbone.shouldBeProcessedForMinimalPair(production)){
+								if(dicParser.shouldBeProcessedForMinimalPair(production)){
 									String word = production.getWord();
 									writer.write(word);
 									writer.newLine();
@@ -90,12 +100,12 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(backbone.getAffParser().getCharset())
-				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage())))
+				.charset(dicParser.getCharset())
+				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(dicParser.getLanguage())))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
-			backbone.getDictionarySorter().sort(outputFile, options, outputFile);
+			dicParser.getSorter().sort(outputFile, options, outputFile);
 
 			setProgress(100);
 
@@ -107,7 +117,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			int totalPairs = 0;
 			Map<String, List<String>> minimalPairs = new HashMap<>();
-			try(BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), backbone.getAffParser().getCharset())){
+			try(BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), dicParser.getCharset())){
 				String sourceLine;
 				long readSoFarSource = 0;
 				long totalSizeSource = outputFile.length();
@@ -129,7 +139,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 								char left = difference.getLeft();
 								char right = difference.getRight();
-								if(backbone.isConsonant(left) && backbone.isConsonant(right)){
+								if(dicParser.isConsonant(left) && dicParser.isConsonant(right)){
 									String key = left + SLASH + right;
 									String value = sourceLine + SLASH + line2;
 									minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
@@ -158,7 +168,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			setProgress(0);
 
 			//write result
-			try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), backbone.getAffParser().getCharset())){
+			try(BufferedWriter destinationWriter = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				int index = 0;
 				int size = minimalPairs.size();
 				for(Map.Entry<String, List<String>> entry : minimalPairs.entrySet()){
@@ -178,12 +188,12 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
-				.charset(backbone.getAffParser().getCharset())
-				.comparator(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage()))
+				.charset(dicParser.getCharset())
+				.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
-			backbone.getDictionarySorter().sort(outputFile, options, outputFile);
+			dicParser.getSorter().sort(outputFile, options, outputFile);
 
 			watch.stop();
 

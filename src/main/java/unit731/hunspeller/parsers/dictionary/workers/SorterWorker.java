@@ -13,6 +13,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
@@ -24,13 +25,16 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	public static final String WORKER_NAME = "Sorting";
 
 	private final Backbone backbone;
+	private final DictionaryParser dicParser;
 	private final int lineIndex;
 
 
 	public SorterWorker(Backbone backbone, int lineIndex){
 		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(backbone.getDicParser());
 
 		this.backbone = backbone;
+		dicParser = backbone.getDicParser();
 		this.lineIndex = lineIndex;
 		workerName = WORKER_NAME;
 	}
@@ -43,11 +47,11 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
-			backbone.calculateDictionaryBoundaries();
+			dicParser.calculateDictionaryBoundaries();
 
 			setProgress(20);
 
-			Map.Entry<Integer, Integer> boundary = backbone.getDictionaryBoundary(lineIndex);
+			Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 			if(boundary != null){
 				backbone.stopFileListener();
 
@@ -70,7 +74,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 				log.info(Backbone.MARKER_APPLICATION, "File sorted");
 
-				backbone.clearDictionaryBoundaries();
+				dicParser.clear();
 
 				backbone.startFileListener();
 			}
@@ -99,8 +103,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(backbone.getDictionaryFile().toPath(), backbone.getAffParser().getCharset())){
-			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), backbone.getAffParser().getCharset());
+		try(BufferedReader br = Files.newBufferedReader(dicParser.getDictionaryFile().toPath(), dicParser.getCharset())){
+			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
 			String line;
 			while((line = br.readLine()) != null){
 				if(index == boundary.getKey() || index == boundary.getValue() + 1){
@@ -109,7 +113,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 					files.add(file);
 
 					file = File.createTempFile("split", ".out");
-					writer = Files.newBufferedWriter(file.toPath(), backbone.getAffParser().getCharset());
+					writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
 				}
 
 				writer.write(line);
@@ -129,12 +133,12 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		//sort the chosen section
 		File sortSection = chunks.get(1);
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
-			.charset(backbone.getAffParser().getCharset())
-			.comparator(ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage()))
+			.charset(dicParser.getCharset())
+			.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
 			.useZip(true)
 			.removeDuplicates(true)
 			.build();
-		backbone.getDictionarySorter().sort(sortSection, options, sortSection);
+		dicParser.getSorter().sort(sortSection, options, sortSection);
 	}
 
 }

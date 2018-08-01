@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 @Slf4j
@@ -26,24 +27,24 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 
 	@NonNull
-	private final Backbone backbone;
+	private final DictionaryParser dicParser;
 
 	private final JList<String> list = new JList<>();
 
 
-	public DictionarySortDialog(Backbone backbone, String title, String message, Frame parent){
+	public DictionarySortDialog(DictionaryParser dicParser, String title, String message, Frame parent){
 		super(parent, title, true);
 
-		Objects.requireNonNull(backbone);
+		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(title);
 		Objects.requireNonNull(message);
 
-		this.backbone = backbone;
+		this.dicParser = dicParser;
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		initComponents();
 
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(backbone::getDictionaryBoundaryIndex);
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex);
 		setCellRenderer(dicCellRenderer);
 
 		lblMessage.setText(message);
@@ -117,7 +118,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		int lineIndex = list.getFirstVisibleIndex();
-		int boundaryIndex = backbone.getDictionaryNextBoundaryIndex(lineIndex);
+		int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
 		if(boundaryIndex >= 0){
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
@@ -129,9 +130,9 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
    private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		int lineIndex = list.getFirstVisibleIndex();
-		int boundaryIndex = backbone.getDictionaryPreviousBoundaryIndex(lineIndex);
+		int boundaryIndex = dicParser.getPreviousBoundaryIndex(lineIndex);
 		if(boundaryIndex < 0){
-			boundaryIndex = backbone.getDictionaryPreviousBoundaryIndex(list.getModel().getSize());
+			boundaryIndex = dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
 			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
 		}
