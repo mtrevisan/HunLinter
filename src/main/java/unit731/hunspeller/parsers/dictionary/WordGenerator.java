@@ -241,16 +241,16 @@ public class WordGenerator{
 		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
 
-	private Set<String> extractCompoundRuleAffixes(Productable productable){
-		String[] affixes = productable.getContinuationFlags();
-
-		Set<String> applyAffixes = new HashSet<>();
-		if(affixes != null)
-			for(String affix : affixes)
-				if(affParser.isManagedByCompoundRule(affix))
-					applyAffixes.add(affix);
-		return applyAffixes;
-	}
+//	private Set<String> extractCompoundRuleAffixes(Productable productable){
+//		String[] affixes = productable.getContinuationFlags();
+//
+//		Set<String> applyAffixes = new HashSet<>();
+//		if(affixes != null)
+//			for(String affix : affixes)
+//				if(affParser.isManagedByCompoundRule(affix))
+//					applyAffixes.add(affix);
+//		return applyAffixes;
+//	}
 
 	private void checkTwofoldCorrectness(List<RuleProductionEntry> twofoldProductions) throws IllegalArgumentException{
 		for(RuleProductionEntry prod : twofoldProductions)

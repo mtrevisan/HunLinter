@@ -36,6 +36,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 				for(Map.Entry<String, Set<RuleProductionEntry>> entry: c.entrySet()){
 					String affix = entry.getKey();
 					Set<RuleProductionEntry> prods = entry.getValue();
+
 					Set<RuleProductionEntry> sub = compounds.get(affix);
 					if(sub == null)
 						compounds.put(affix, prods);
@@ -59,6 +60,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Runnable done = () -> {
 			if(!isCancelled()){
 				//TODO extract compounds
+				System.out.println(compounds.toString());
 			}
 		};
 		createWorker(WORKER_NAME, backbone, body, done);
