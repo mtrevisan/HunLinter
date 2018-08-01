@@ -1,5 +1,7 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.languages;
 
+import unit731.hunspeller.parsers.dictionary.*;
+import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +22,10 @@ import java.util.regex.Matcher;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
@@ -28,13 +33,17 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 //FIXME create a separate file for correctness checking
 @Slf4j
 @Getter
-public class DictionaryParser{
+public class CorrectnessChecker{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_01;
 	private static final double GROW_RATIO_WHEN_FULL = 1.3;
 
 	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
+	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
+
+	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
@@ -52,7 +61,10 @@ public class DictionaryParser{
 	public static final DateTimeFormatter YEAR_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
 
+	protected AffixParser affParser;
 	private final File dicFile;
+	protected final AbstractHyphenator hyphenator;
+	protected final WordGenerator wordGenerator;
 	private final Charset charset;
 	private final String language;
 	private final ExternalSorter sorter = new ExternalSorter();
@@ -60,14 +72,23 @@ public class DictionaryParser{
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, Charset charset){
+	public CorrectnessChecker(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
 		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(charset);
 
+		this.affParser = affParser;
 		this.dicFile = dicFile;
+		this.hyphenator = hyphenator;
+		this.wordGenerator = wordGenerator;
 		this.charset = charset;
 		String filename = dicFile.getName();
 		language = filename.substring(0, filename.indexOf(".dic"));
+	}
+
+	//FIXME useful?
+	public File getDictionaryFile(){
+		return dicFile;
 	}
 
 	public int getExpectedNumberOfElements(){
@@ -80,6 +101,20 @@ public class DictionaryParser{
 
 	public double getGrowRatioWhenFull(){
 		return GROW_RATIO_WHEN_FULL;
+	}
+
+
+	//correctness worker:
+	public void checkProduction(RuleProductionEntry production) throws IllegalArgumentException{}
+
+
+	//minimal pairs worker:
+	public boolean isConsonant(char chr){
+		return true;
+	}
+
+	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
+		return true;
 	}
 
 
@@ -166,6 +201,18 @@ public class DictionaryParser{
 		return PatternService.find(line, REGEX_COMMENT);
 	}
 
+	public String prepareTextForThesaurusFilter(String text){
+		text = StringUtils.strip(text);
+		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
+		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
+		text = PatternService.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
+		return "(?iu)(" + text + ")";
+	}
+
+	public String correctOrthography(String text){
+		return text;
+	}
+
 	public final void clear(){
 		if(boundaries != null)
 			boundaries.clear();
@@ -183,6 +230,26 @@ public class DictionaryParser{
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;
+	}
+
+	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
+	public static void openFileWithChoosenEditor(File file) throws InterruptedException, IOException{
+		ProcessBuilder builder = null;
+		if(SystemUtils.IS_OS_WINDOWS)
+			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_LINUX)
+			builder = new ProcessBuilder("edit", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_MAC)
+			builder = new ProcessBuilder("open", file.getAbsolutePath());
+
+		if(builder != null){
+			builder.redirectErrorStream();
+			builder.redirectOutput();
+			Process process = builder.start();
+			process.waitFor();
+		}
+		else
+			log.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 	}
 
 }

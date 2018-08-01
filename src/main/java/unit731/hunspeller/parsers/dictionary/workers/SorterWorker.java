@@ -103,7 +103,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		int index = 0;
 		List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(dicParser.getDictionaryFile().toPath(), dicParser.getCharset())){
+		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
 			String line;
 			while((line = br.readLine()) != null){

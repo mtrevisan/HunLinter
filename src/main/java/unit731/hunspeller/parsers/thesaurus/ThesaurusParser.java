@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
@@ -34,6 +36,11 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 @Slf4j
 @Getter
 public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+
+	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
+
+	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
 	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
 
@@ -298,6 +305,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		finally{
 			releaseLock();
 		}
+	}
+
+	public String prepareTextForThesaurusFilter(String text){
+		text = StringUtils.strip(text);
+		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
+		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
+		text = PatternService.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
+		return "(?iu)(" + text + ")";
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{

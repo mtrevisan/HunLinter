@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -34,17 +35,20 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 	private static final String SLASH = "/";
 
+	private final CorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 
 
-	public MinimalPairsWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public MinimalPairsWorker(DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile){
 		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 		this.dicParser = dicParser;
+		this.checker = checker;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 	}
@@ -58,7 +62,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			TimeWatch watch = TimeWatch.start();
 
 			setProgress(0);
-			File dicFile = dicParser.getDictionaryFile();
+			File dicFile = dicParser.getDicFile();
 			try(
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()));
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
@@ -83,7 +87,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 							List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
 
 							for(RuleProductionEntry production : productions)
-								if(dicParser.shouldBeProcessedForMinimalPair(production)){
+								if(checker.shouldBeProcessedForMinimalPair(production)){
 									String word = production.getWord();
 									writer.write(word);
 									writer.newLine();
@@ -140,7 +144,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								Pair<Character, Character> difference = HammingDistance.findFirstDifference(sourceLineLowercase, line2Lowercase);
 								char left = difference.getLeft();
 								char right = difference.getRight();
-								if(dicParser.isConsonant(left) && dicParser.isConsonant(right)){
+								if(checker.isConsonant(left) && checker.isConsonant(right)){
 									String key = left + SLASH + right;
 									String value = sourceLine + SLASH + line2;
 									minimalPairs.computeIfAbsent(key, k -> new ArrayList<>())
@@ -203,7 +207,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			publish("File written: " + outputFile.getAbsolutePath());
 			publish("Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
-			DictionaryParser.openFileWithChoosenEditor(outputFile);
+			FileService.openFileWithChoosenEditor(outputFile);
 		}
 		catch(Exception e){
 			stopped = true;

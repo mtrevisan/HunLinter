@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -25,7 +25,9 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.services.PatternService;
 
 
-public class DictionaryParserVEC extends DictionaryParser{
+public class CorrectnessCheckerVEC extends CorrectnessChecker{
+
+	public static final String LANGUAGE = "vec";
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_005;
@@ -365,7 +367,7 @@ public class DictionaryParserVEC extends DictionaryParser{
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public DictionaryParserVEC(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
+	public CorrectnessCheckerVEC(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
 		super(affParser, dicFile, hyphenator, wordGenerator, charset);
 	}
 

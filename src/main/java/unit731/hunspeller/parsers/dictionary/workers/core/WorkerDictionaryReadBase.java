@@ -12,7 +12,7 @@ public class WorkerDictionaryReadBase{
 
 
 	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> body, Runnable done){
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDictionaryFile(), dicParser.getCharset(), body, done);
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

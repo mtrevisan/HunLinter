@@ -79,7 +79,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			if(!duplicates.isEmpty())
-				DictionaryParser.openFileWithChoosenEditor(outputFile);
+				FileService.openFileWithChoosenEditor(outputFile);
 		}
 		catch(Exception e){
 			stopped = true;
@@ -107,7 +107,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);
-		File dicFile = dicParser.getDictionaryFile();
+		File dicFile = dicParser.getDicFile();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
 			//ignore any BOM marker on first line
@@ -162,7 +162,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			File dicFile = dicParser.getDictionaryFile();
+			File dicFile = dicParser.getDicFile();
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line

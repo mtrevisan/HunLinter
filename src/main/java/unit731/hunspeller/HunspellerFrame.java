@@ -1003,7 +1003,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.backbone.getDicParser().prepareTextForThesaurusFilter(formerFilterThesaurusText);
+				String filterText = frame.backbone.getTheParser().prepareTextForThesaurusFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
@@ -1302,7 +1302,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.backbone.getDicParser().correctOrthography(frame.hypWordTextField.getText());
+		String text = frame.backbone.getChecker().correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -1339,8 +1339,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		String addedRuleText = frame.backbone.getDicParser().correctOrthography(frame.hypWordTextField.getText());
-		String addedRule = frame.backbone.getDicParser().correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		String addedRuleText = frame.backbone.getChecker().correctOrthography(frame.hypWordTextField.getText());
+		String addedRule = frame.backbone.getChecker().correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){
@@ -1480,7 +1480,8 @@ compoundRulesWorker.execute();
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
+				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(),
+					outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}

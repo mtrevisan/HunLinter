@@ -13,9 +13,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Slf4j
 public class FileService{
 
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
@@ -72,6 +75,26 @@ public class FileService{
 	/** Ignore any BOM marker */
 	public static String clearBOMMarker(String line){
 		return (line.startsWith(BOM_MARKER)? line.substring(1): line);
+	}
+
+	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
+	public static void openFileWithChoosenEditor(File file) throws InterruptedException, IOException{
+		ProcessBuilder builder = null;
+		if(SystemUtils.IS_OS_WINDOWS)
+			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_LINUX)
+			builder = new ProcessBuilder("edit", file.getAbsolutePath());
+		else if(SystemUtils.IS_OS_MAC)
+			builder = new ProcessBuilder("open", file.getAbsolutePath());
+
+		if(builder != null){
+			builder.redirectErrorStream();
+			builder.redirectOutput();
+			Process process = builder.start();
+			process.waitFor();
+		}
+		else
+			log.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 	}
 
 }

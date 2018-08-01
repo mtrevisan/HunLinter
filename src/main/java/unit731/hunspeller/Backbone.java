@@ -21,7 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.languages.builders.DictionaryParserBuilder;
+import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.builders.CorrectnessCheckerBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -70,6 +71,8 @@ public class Backbone implements FileChangeListener{
 
 	@Getter
 	private final WordGenerator wordGenerator;
+	@Getter
+	private CorrectnessChecker checker;
 	@Getter
 	private AbstractHyphenator hyphenator;
 
@@ -145,6 +148,7 @@ public class Backbone implements FileChangeListener{
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
+			checker = CorrectnessCheckerBuilder.getParser(language, affParser, dicParser.getDicFile(), hyphenator, wordGenerator, affParser.getCharset());
 
 			hunspellable.clearHyphenationParser();
 
@@ -156,9 +160,8 @@ public class Backbone implements FileChangeListener{
 
 	private void prepareDictionaryFile(File dicFile, PropertyChangeListener listener){
 		if(dicFile.exists()){
-			String language = affParser.getLanguage();
 			Charset charset = affParser.getCharset();
-			dicParser = DictionaryParserBuilder.getParser(language, affParser, dicFile, hyphenator, wordGenerator, charset);
+			dicParser = new DictionaryParser(dicFile, charset);
 			wordGenerator.initializeCompoundRules(dicParser, listener);
 
 			hunspellable.clearDictionaryParser();
