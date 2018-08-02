@@ -98,6 +98,11 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			extract();
 	}
 
+	@Override
+	public void execute(){
+		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds instead");
+	}
+
 	private void extract(){
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		long wordCount = regexWordGenerator.wordCount();

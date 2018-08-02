@@ -48,6 +48,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.gui.CompoundTableModel;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.ProductionTableModel;
@@ -58,6 +59,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -327,10 +329,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpRuleTagsAidLabel.setLabelFor(cmpRuleTagsAidComboBox);
       cmpRuleTagsAidLabel.setText("Rule tags aid:");
 
-      cmpTable.setModel(new ProductionTableModel());
+      cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
       cmpTable.setShowVerticalLines(false);
-      dicTable.setRowSelectionAllowed(true);
+      cmpTable.setRowSelectionAllowed(true);
       dicScrollPane1.setViewportView(cmpTable);
 
       cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -961,13 +963,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-//CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
-//compoundRulesWorker.addPropertyChangeListener(this);
-//compoundRulesWorker.execute();
-				List<RuleProductionEntry> productions = frame.backbone.getWordGenerator().applyRules(inputText);
-
-				ProductionTableModel dm = (ProductionTableModel)frame.cmpTable.getModel();
-				dm.setProductions(productions);
+				CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(frame.backbone.getAffParser(), frame.backbone.getDicParser(), frame.backbone.getWordGenerator());
+				compoundRulesWorker.addPropertyChangeListener(frame);
+				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
+					CompoundTableModel dm = (CompoundTableModel)frame.cmpTable.getModel();
+					dm.setProductions(words);
+				};
+				compoundRulesWorker.extractCompounds(inputText, 20l, filler);
 			}
 			catch(IllegalArgumentException e){
 				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
