@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 
@@ -62,6 +63,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			while((line = br.readLine()) != null){
 				readSoFar += line.length();
 
+				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
 						body.accept(writer, line);

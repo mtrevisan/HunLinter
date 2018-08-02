@@ -83,8 +83,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
-			if(!duplicates.isEmpty())
-				FileService.openFileWithChoosenEditor(outputFile);
+			if(!duplicates.isEmpty()){
+				try{
+					FileService.openFileWithChoosenEditor(outputFile);
+				}
+				catch(IOException | InterruptedException e){
+					log.warn("Exception while opening the resulting file", e);
+				}
+			}
 		}
 		catch(Exception e){
 			stopped = true;

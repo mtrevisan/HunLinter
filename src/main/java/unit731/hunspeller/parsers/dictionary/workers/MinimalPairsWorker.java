@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
@@ -207,7 +208,12 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			publish("File written: " + outputFile.getAbsolutePath());
 			publish("Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
-			FileService.openFileWithChoosenEditor(outputFile);
+			try{
+				FileService.openFileWithChoosenEditor(outputFile);
+			}
+			catch(IOException | InterruptedException e){
+				log.warn("Exception while opening the resulting file", e);
+			}
 		}
 		catch(Exception e){
 			stopped = true;

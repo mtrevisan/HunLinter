@@ -12,6 +12,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.services.FileService;
 
 
 @Slf4j
@@ -40,8 +41,16 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 			}
 		};
 		Runnable done = () -> {
-			if(!isCancelled())
+			if(!isCancelled()){
 				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+
+				try{
+					FileService.openFileWithChoosenEditor(outputFile);
+				}
+				catch(IOException | InterruptedException e){
+					log.warn("Exception while opening the resulting file", e);
+				}
+			}
 		};
 		createWorker(WORKER_NAME, dicParser, outputFile, body, done);
 	}
