@@ -144,34 +144,18 @@ public class WordGenerator{
 		affParser.acquireLock();
 
 		long limit = 20l;
-		compoundRulesWorker.extractCompounds(compoundRule, limit, fnDeferring);
+		BiConsumer<List<String>, Long> done = (words, wordCount) -> {
+			affParser.releaseLock();
+
+			fnDeferring.accept(words, wordCount);
+		};
+		compoundRulesWorker.extractCompounds(compoundRule, limit, done);
 //		BiConsumer<List<String>, Long> fnDeferring = (words, count) -> {
 //			for(String word : words)
 //				log.info(Backbone.MARKER_APPLICATION, word);
 //			if(count != limit)
 //				log.info(Backbone.MARKER_APPLICATION, "\u2026");
 //		};
-		try{
-			//collect productions
-//			List<RuleProductionEntry> productions = new ArrayList<>();
-
-			//manage compound rules
-//			Set<String> compoundRuleAffixes = extractCompoundRuleAffixes(dicEntry);
-//			if(!compoundRuleAffixes.isEmpty()){
-//				//TODO
-//			}
-
-//			//remove rules with the need affix flag
-//			enforceNeedAffixFlag(productions);
-
-//			//convert using output table
-//			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
-
-//			productions.forEach(production -> log.trace("Produced word {}", production));
-		}
-		finally{
-			affParser.releaseLock();
-		}
 	}
 
 	private RuleProductionEntry getBaseProduction(Productable productable, FlagParsingStrategy strategy){
