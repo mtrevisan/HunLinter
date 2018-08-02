@@ -470,7 +470,7 @@
                 <Property name="editable" type="boolean" value="true"/>
               </Properties>
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBocKeyReleased(evt);&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});&#xd;&#xa;cmpInputComboBox.addItemListener(new ItemListener(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void itemStateChanged(ItemEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBoxKeyReleased();&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>

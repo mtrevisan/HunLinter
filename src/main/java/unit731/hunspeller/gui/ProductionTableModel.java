@@ -7,7 +7,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 
 
-public class ProductionTableModel extends AbstractTableModel{
+public class ProductionTableModel extends AbstractTableModel implements HunspellerTableModel<RuleProductionEntry>{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
@@ -17,6 +17,7 @@ public class ProductionTableModel extends AbstractTableModel{
 	private List<RuleProductionEntry> productions;
 
 
+	@Override
 	public void setProductions(List<RuleProductionEntry> productions){
 		this.productions = productions;
 

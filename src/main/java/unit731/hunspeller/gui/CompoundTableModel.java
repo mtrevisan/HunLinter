@@ -3,7 +3,8 @@ package unit731.hunspeller.gui;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
-public class CompoundTableModel extends AbstractTableModel{
+
+public class CompoundTableModel extends AbstractTableModel implements HunspellerTableModel<String>{
 
 	private static final long serialVersionUID = -7276635232728680738L;
 
@@ -13,6 +14,7 @@ public class CompoundTableModel extends AbstractTableModel{
 	private List<String> productions;
 
 
+	@Override
 	public void setProductions(List<String> productions){
 		this.productions = productions;
 
@@ -40,6 +42,11 @@ public class CompoundTableModel extends AbstractTableModel{
 	@Override
 	public String getColumnName(int column){
 		return COLUMN_NAMES[column];
+	}
+
+	@Override
+	public void clear(){
+		setProductions(null);
 	}
 
 }

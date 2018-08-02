@@ -72,35 +72,25 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 					.filter(entry -> affParser.isManagedByCompoundRule(entry.getKey()))
 					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
 
-				//compose compound rule
-				Set<String> compoundRules = affParser.getCompoundRules();
-				for(String compound : compoundRules){
-					String expandedCompoundRule = StringUtils.replaceEach(compound, rule.keySet().toArray(new String[rule.size()]),
-						rule.values().toArray(new String[rule.size()]));
-					expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
-					expandedCompounds.put(compound, expandedCompoundRule);
-				}
+				if(!rule.isEmpty()){
+					//compose compound rule
+					Set<String> compoundRules = affParser.getCompoundRules();
+					for(String compound : compoundRules){
+						String expandedCompoundRule = StringUtils.replaceEach(compound, rule.keySet().toArray(new String[rule.size()]),
+							rule.values().toArray(new String[rule.size()]));
+						//FIXME recognize if each rule has been replaced
+						if(!expandedCompoundRule.equals(compound)){
+							expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
+							expandedCompounds.put(compound, expandedCompoundRule);
+						}
+					}
 
-				extract();
+					if(!expandedCompounds.isEmpty())
+						extract();
+				}
 			}
 		};
 		createWorker(WORKER_NAME, dicParser, body, done);
-	}
-
-	public void extractCompounds(String compoundRule, long limit, BiConsumer<List<String>, Long> fnDeferring){
-		this.compoundRule = compoundRule;
-		this.limit = limit;
-		this.fnDeferring = fnDeferring;
-
-		if(expandedCompounds.isEmpty())
-			super.execute();
-		else
-			extract();
-	}
-
-	@Override
-	public void execute(){
-		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds instead");
 	}
 
 	private void extract(){
@@ -112,6 +102,20 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
 
 		fnDeferring.accept(words, wordCount);
+	}
+
+	public void extractCompounds(String compoundRule, long limit, BiConsumer<List<String>, Long> fnDeferring){
+		this.compoundRule = compoundRule;
+		this.limit = limit;
+		this.fnDeferring = fnDeferring;
+		expandedCompounds.clear();
+
+		super.execute();
+	}
+
+	@Override
+	public void execute(){
+		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds instead");
 	}
 
 	public void clear(){

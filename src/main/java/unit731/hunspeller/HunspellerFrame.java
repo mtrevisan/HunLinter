@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,6 +53,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.gui.CompoundTableModel;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.gui.HunspellerTableModel;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
@@ -322,7 +325,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
          @Override
          public void keyReleased(java.awt.event.KeyEvent evt){
-            cmpInputComboBocKeyReleased(evt);
+            cmpInputComboBoxKeyReleased();
+         }
+      });
+      cmpInputComboBox.addItemListener(new ItemListener(){
+         @Override
+         public void itemStateChanged(ItemEvent evt){
+            cmpInputComboBoxKeyReleased();
          }
       });
 
@@ -1031,7 +1040,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
-	private void cmpInputComboBocKeyReleased(java.awt.event.KeyEvent evt){
+	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
 	}
 
@@ -1664,8 +1673,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	public void clearOutputTable(JTable table){
-		ProductionTableModel dm = (ProductionTableModel)table.getModel();
-		dm.setProductions(null);
+		HunspellerTableModel dm = (HunspellerTableModel)table.getModel();
+		dm.clear();
 	}
 
 	@Override
