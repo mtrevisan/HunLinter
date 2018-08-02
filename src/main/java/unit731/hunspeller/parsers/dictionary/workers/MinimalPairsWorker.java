@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.swing.SwingWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,6 +23,7 @@ import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.HammingDistance;
@@ -32,7 +32,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
 @Slf4j
-public class MinimalPairsWorker extends SwingWorker<Void, String>{
+public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	private static final String SLASH = "/";
 
@@ -58,9 +58,9 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			publish("Opening Dictionary file for minimal pairs extraction (pass 1/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
-			TimeWatch watch = TimeWatch.start();
+			watch = TimeWatch.start();
 
 			setProgress(0);
 			File dicFile = dicParser.getDicFile();
@@ -95,14 +95,14 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							publish(e.getMessage() + " on line " + lineIndex + ": " + line);
+							log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " on line " + lineIndex + ": " + line);
 						}
 					}
 
 					setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 				}
 			}
-			publish("Support file written");
+			log.info(Backbone.MARKER_APPLICATION, "Support file written");
 
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -115,10 +115,10 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			setProgress(100);
 
-			publish("Support file sorted");
+			log.info(Backbone.MARKER_APPLICATION, "Support file sorted");
 
 
-			publish("Extracting minimal pairs (pass 2/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (pass 2/3)");
 			setProgress(0);
 
 			int totalPairs = 0;
@@ -167,10 +167,10 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			}
 			setProgress(100);
 
-			publish("Total minimal pairs: " + DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
+			log.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: " + DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
-			publish("Reordering minimal pairs (pass 3/3)");
+			log.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (pass 3/3)");
 			setProgress(0);
 
 			//write result
@@ -190,7 +190,7 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			setProgress(100);
 
-			publish("Minimal pairs file written");
+			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs file written");
 
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
@@ -205,8 +205,8 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 
 			setProgress(100);
 
-			publish("File written: " + outputFile.getAbsolutePath());
-			publish("Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "File written: " + outputFile.getAbsolutePath());
+			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 
 			try{
 				FileService.openFileWithChoosenEditor(outputFile);
@@ -219,22 +219,16 @@ public class MinimalPairsWorker extends SwingWorker<Void, String>{
 			stopped = true;
 
 			if(e instanceof ClosedChannelException)
-				publish("Duplicates thread interrupted");
+				log.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				publish(e.getClass().getSimpleName() + ": " + message);
+				log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 			}
 		}
 		if(stopped)
-			publish("Stopped reading Dictionary file");
+			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
-	}
-
-	@Override
-	protected void process(List<String> chunks){
-		for(String chunk : chunks)
-			log.info(Backbone.MARKER_APPLICATION, chunk);
 	}
 
 }
