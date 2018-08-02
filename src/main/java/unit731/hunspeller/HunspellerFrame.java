@@ -306,7 +306,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
 
       cmpInputLabel.setLabelFor(cmpInputComboBox);
-      cmpInputLabel.setText("Compound Rule:");
+      cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
 
@@ -1335,12 +1335,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//aid file:
 			List<String> lines = backbone.getAidParser().getLines();
 			boolean aidLinesPresent = !lines.isEmpty();
-			if(aidLinesPresent)
+			dicRuleTagsAidComboBox.removeAllItems();
+			cmpRuleTagsAidComboBox.removeAllItems();
+			if(aidLinesPresent){
 				lines.forEach(dicRuleTagsAidComboBox::addItem);
-			else
-				dicRuleTagsAidComboBox.removeAllItems();
+				lines.forEach(cmpRuleTagsAidComboBox::addItem);
+			}
 			//enable combo-box only if an AID file exists
 			dicRuleTagsAidComboBox.setEnabled(aidLinesPresent);
+			cmpRuleTagsAidComboBox.setEnabled(aidLinesPresent);
 
 
 			//thesaurus file:
@@ -1625,6 +1628,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void clearAidParser(){
 		dicRuleTagsAidComboBox.removeAllItems();
+		cmpRuleTagsAidComboBox.removeAllItems();
 	}
 
 	@Override

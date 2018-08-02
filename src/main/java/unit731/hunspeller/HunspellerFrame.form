@@ -459,7 +459,7 @@
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
                   <ComponentRef name="cmpInputComboBox"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Compound Rule:"/>
+                <Property name="text" type="java.lang.String" value="Compound rule:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="cmpInputComboBox">
