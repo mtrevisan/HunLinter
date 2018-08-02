@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.Getter;
 import unit731.hunspeller.DictionaryStatisticsDialog;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -27,16 +28,17 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 
 	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
-			boolean performHyphenationStatistics, Frame parent){
+			CorrectnessChecker checker, boolean performHyphenationStatistics, Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(checker);
 		Objects.requireNonNull(parent);
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
-		dicStatistics = new DictionaryStatistics(affParser, dicParser);
+		dicStatistics = new DictionaryStatistics(affParser, checker);
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {

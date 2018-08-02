@@ -20,6 +20,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -41,21 +42,25 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
 
 
-	private final WordGenerator wordGenerator;
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
+	private final WordGenerator wordGenerator;
+	private final CorrectnessChecker checker;
 	private final File outputFile;
 
 
-	public DuplicatesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public DuplicatesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker,
+			File outputFile){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(checker);
 		Objects.requireNonNull(outputFile);
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
+		this.checker = checker;
 		this.outputFile = outputFile;
 		workerName = WORKER_NAME;
 	}
@@ -100,10 +105,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
 		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType,
-			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
 		bloomFilter.setCharset(dicParser.getCharset());
 		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType,
-			EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dicParser.getGrowRatioWhenFull());
+			EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, checker.getGrowRatioWhenFull());
 		duplicatesBloomFilter.setCharset(dicParser.getCharset());
 
 		setProgress(0);

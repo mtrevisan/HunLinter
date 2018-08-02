@@ -57,7 +57,6 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -1422,7 +1421,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
+				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(),
+					backbone.getChecker(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1436,7 +1436,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator());
+			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getChecker());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1453,7 +1453,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainProgressBar.setValue(0);
 
 			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
-				backbone.getWordGenerator(), performHyphenationStatistics, this);
+				backbone.getWordGenerator(), backbone.getChecker(), performHyphenationStatistics, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}

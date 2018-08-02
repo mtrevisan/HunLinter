@@ -27,6 +27,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
 
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_01;
+	private static final double GROW_RATIO_WHEN_FULL = 1.3;
+
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
 	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
 	private static final String VERB_DAR_RULE_NON_VANISHING_EL = "a4";
@@ -363,6 +367,18 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator){
 		super(affParser, hyphenator);
+	}
+
+	public int getExpectedNumberOfElements(){
+		return EXPECTED_NUMBER_OF_ELEMENTS;
+	}
+
+	public double getFalsePositiveProbability(){
+		return FALSE_POSITIVE_PROBABILITY;
+	}
+
+	public double getGrowRatioWhenFull(){
+		return GROW_RATIO_WHEN_FULL;
 	}
 
 	@Override

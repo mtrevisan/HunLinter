@@ -9,6 +9,7 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -43,9 +44,9 @@ public class DictionaryStatistics{
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(AffixParser affParser, DictionaryParser dicParser){
+	public DictionaryStatistics(AffixParser affParser, CorrectnessChecker checker){
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
-			dicParser.getExpectedNumberOfElements(), dicParser.getFalsePositiveProbability(), dicParser.getGrowRatioWhenFull());
+			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
 		bloomFilter.setCharset(affParser.getCharset());
 		orthography = OrthographyBuilder.getOrthography(affParser.getLanguage());
 	}
