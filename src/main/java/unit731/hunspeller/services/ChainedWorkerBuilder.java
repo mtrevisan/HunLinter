@@ -13,7 +13,7 @@ public class ChainedWorkerBuilder<T, V>{
 	private volatile SwingWorker<T, V> current;
 
 
-	public ChainedWorkerBuilder add(SwingWorker<T, V> worker){
+	public ChainedWorkerBuilder<T, V> add(SwingWorker<T, V> worker){
 		workers.add(worker);
 		return this;
 	}
@@ -25,12 +25,12 @@ public class ChainedWorkerBuilder<T, V>{
 				@Override
 				public void propertyChange(PropertyChangeEvent evt){
 					if("state".equals(evt.getPropertyName())){
+						@SuppressWarnings("unchecked")
 						SwingWorker<T, V> source = (SwingWorker<T, V>)evt.getSource();
-						switch(source.getState()){
-							case DONE:
-								source.removePropertyChangeListener(this);
+						if(source.getState() == SwingWorker.StateValue.DONE){
+							source.removePropertyChangeListener(this);
 
-								execute();
+							execute();
 						}
 					}
 				}

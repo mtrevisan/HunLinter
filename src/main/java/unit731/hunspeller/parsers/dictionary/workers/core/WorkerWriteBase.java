@@ -14,8 +14,8 @@ public class WorkerWriteBase<T>{
 	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(String workerName, List<T> entries, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new WorkerWrite(workerName, entries, outputFile, backbone.getAffParser().getCharset(), body, done);
+	public final void createWorker(String workerName, List<T> entries, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, T> body, Runnable done){
+		worker = new WorkerWrite<T>(workerName, entries, outputFile, backbone.getAffParser().getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

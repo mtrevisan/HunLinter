@@ -52,7 +52,6 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 		addCancelByEscapeKey();
 	}
 
-	@SuppressWarnings("unchecked")
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
@@ -71,7 +70,8 @@ public class DictionarySortDialog extends javax.swing.JDialog{
       btnNextUnsortedArea.setText("▼");
       btnNextUnsortedArea.setToolTipText("Next unsorted area");
       btnNextUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnNextUnsortedAreaActionPerformed(evt);
          }
       });
@@ -79,7 +79,8 @@ public class DictionarySortDialog extends javax.swing.JDialog{
       btnPreviousUnsortedArea.setText("▲");
       btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
       btnPreviousUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnPreviousUnsortedAreaActionPerformed(evt);
          }
       });

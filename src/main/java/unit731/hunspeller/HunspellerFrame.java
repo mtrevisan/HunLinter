@@ -47,7 +47,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.interfaces.Undoable;;
+import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
@@ -247,7 +247,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicInputLabel.setText("Dictionary entry:");
 
       dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         @Override
+			public void keyReleased(java.awt.event.KeyEvent evt) {
             dicInputTextFieldKeyReleased(evt);
          }
       });
@@ -307,7 +308,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theMeaningsLabel.setText("New synonym:");
 
       theMeaningsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         @Override
+			public void keyReleased(java.awt.event.KeyEvent evt) {
             theMeaningsTextFieldKeyReleased(evt);
          }
       });
@@ -317,7 +319,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theAddButton.setToolTipText("");
       theAddButton.setEnabled(false);
       theAddButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             theAddButtonActionPerformed(evt);
          }
       });
@@ -336,7 +339,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       JFrame parent = this;
       theTable.addMouseListener(new MouseAdapter(){
-         public void mouseClicked(MouseEvent e){
+         @Override
+			public void mouseClicked(MouseEvent e){
             if(e.getClickCount() == 1){
                JTable target = (JTable)e.getSource();
                int col = target.getSelectedColumn();
@@ -376,7 +380,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theUndoButton.setToolTipText("");
       theUndoButton.setEnabled(false);
       theUndoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             theUndoButtonActionPerformed(evt);
          }
       });
@@ -385,7 +390,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theRedoButton.setText("Redo");
       theRedoButton.setEnabled(false);
       theRedoButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             theRedoButtonActionPerformed(evt);
          }
       });
@@ -449,7 +455,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       hypWordTextField.setNextFocusableComponent(hypAddRuleTextField);
       hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         @Override
+			public void keyReleased(java.awt.event.KeyEvent evt) {
             hypWordTextFieldKeyReleased(evt);
          }
       });
@@ -474,7 +481,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       hypAddRuleTextField.setEnabled(false);
       hypAddRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         @Override
+			public void keyReleased(java.awt.event.KeyEvent evt) {
             hypAddRuleTextFieldKeyReleased(evt);
          }
       });
@@ -486,7 +494,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleButton.setText("Add rule");
       hypAddRuleButton.setEnabled(false);
       hypAddRuleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             hypAddRuleButtonActionPerformed(evt);
          }
       });
@@ -612,7 +621,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       fileOpenAFFMenuItem.setMnemonic('a');
       fileOpenAFFMenuItem.setText("Open AFF file...");
       fileOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             fileOpenAFFMenuItemActionPerformed(evt);
          }
       });
@@ -623,7 +633,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       fileCreatePackageMenuItem.setText("Create package");
       fileCreatePackageMenuItem.setEnabled(false);
       fileCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             fileCreatePackageMenuItemActionPerformed(evt);
          }
       });
@@ -635,7 +646,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       fileExitMenuItem.setMnemonic('x');
       fileExitMenuItem.setText("Exit");
       fileExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             fileExitMenuItemActionPerformed(evt);
          }
       });
@@ -659,7 +671,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicCheckCorrectnessMenuItem.setText("Check correctness");
       dicCheckCorrectnessMenuItem.setToolTipText("");
       dicCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicCheckCorrectnessMenuItemActionPerformed(evt);
          }
       });
@@ -670,7 +683,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicSortDictionaryMenuItem.setText("Sort dictionary...");
       dicSortDictionaryMenuItem.setToolTipText("");
       dicSortDictionaryMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicSortDictionaryMenuItemActionPerformed(evt);
          }
       });
@@ -681,7 +695,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicWordCountMenuItem.setMnemonic('w');
       dicWordCountMenuItem.setText("Word count");
       dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicWordCountMenuItemActionPerformed(evt);
          }
       });
@@ -691,7 +706,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicStatisticsMenuItem.setMnemonic('t');
       dicStatisticsMenuItem.setText("Statistics");
       dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicStatisticsMenuItemActionPerformed(evt);
          }
       });
@@ -700,7 +716,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       disStatisticsNoHyphenationMenuItem.setMnemonic('h');
       disStatisticsNoHyphenationMenuItem.setText("Statistics without hyphenation");
       disStatisticsNoHyphenationMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             disStatisticsNoHyphenationMenuItemActionPerformed(evt);
          }
       });
@@ -712,7 +729,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
       dicExtractDuplicatesMenuItem.setToolTipText("");
       dicExtractDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractDuplicatesMenuItemActionPerformed(evt);
          }
       });
@@ -722,7 +740,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractWordlistMenuItem.setMnemonic('l');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
       dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractWordlistMenuItemActionPerformed(evt);
          }
       });
@@ -731,7 +750,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
       dicExtractMinimalPairsMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicExtractMinimalPairsMenuItemActionPerformed(evt);
          }
       });
@@ -748,7 +768,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theFindDuplicatesMenuItem.setMnemonic('d');
       theFindDuplicatesMenuItem.setText("Find duplicates");
       theFindDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             theFindDuplicatesMenuItemActionPerformed(evt);
          }
       });
@@ -763,7 +784,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
       hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
+         @Override
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
             hlpAboutMenuItemActionPerformed(evt);
          }
       });
@@ -1593,7 +1615,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			case "state":
 				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					Runnable menuItemEnabler = enableMenuItemFromWorker.get(((WorkerBase)evt.getSource()).getWorkerName());
+					Runnable menuItemEnabler = enableMenuItemFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

@@ -4,14 +4,12 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 
 
 @AllArgsConstructor
 @Getter
-@Slf4j
 public class CorrectnessChecker{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
