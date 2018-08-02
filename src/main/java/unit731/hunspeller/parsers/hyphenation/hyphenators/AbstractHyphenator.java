@@ -39,13 +39,12 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	@Override
 	public Hyphenation hyphenate(String word){
-		hypParser.acquireLock();
-
+		hypParser.acquireReadLock();
 		try{
 			return hyphenate(word, hypParser.getPatterns());
 		}
 		finally{
-			hypParser.releaseLock();
+			hypParser.releaseReadLock();
 		}
 	}
 
@@ -60,8 +59,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	@Override
 	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
-		hypParser.acquireLock();
-
+		hypParser.acquireReadLock();
 		try{
 			String key = HyphenationParser.getKeyFromData(addedRule);
 			Map<HyphenationParser.Level, RadixTree<String, String>> patterns = hypParser.getPatterns();
@@ -76,7 +74,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			return hyph;
 		}
 		finally{
-			hypParser.releaseLock();
+			hypParser.releaseReadLock();
 		}
 	}
 
@@ -160,36 +158,42 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	@Override
 	public List<String> splitIntoCompounds(String word){
-		List<String> response;
-		if(hypParser.isSecondLevelPresent()){
-			//apply first level hyphenation non-compound
-			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND, hypParser.getOptParser().getNonCompoundOptions());
-			response = createHyphenatedWord(word, hyphBreak);
+		hypParser.acquireReadLock();
+		try{
+			List<String> response;
+			if(hypParser.isSecondLevelPresent()){
+				//apply first level hyphenation non-compound
+				HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND, hypParser.getOptParser().getNonCompoundOptions());
+				response = createHyphenatedWord(word, hyphBreak);
 
-			for(String nohyp : hypParser.getOptParser().getNoHyphen()){
-				int nohypLength = nohyp.length();
-				if(nohyp.charAt(0) == '^'){
-					if(response.get(0).equals(nohyp.substring(1)))
-						response.remove(0);
-				}
-				else if(nohyp.charAt(nohypLength - 1) == '$'){
-					if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
-						response.remove(response.size() - 1);
-				}
-				else{
-					Iterator<String> itr = response.iterator();
-					while(itr.hasNext())
-						if(nohyp.equals(itr.next()))
-							itr.remove();
+				for(String nohyp : hypParser.getOptParser().getNoHyphen()){
+					int nohypLength = nohyp.length();
+					if(nohyp.charAt(0) == '^'){
+						if(response.get(0).equals(nohyp.substring(1)))
+							response.remove(0);
+					}
+					else if(nohyp.charAt(nohypLength - 1) == '$'){
+						if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
+							response.remove(response.size() - 1);
+					}
+					else{
+						Iterator<String> itr = response.iterator();
+						while(itr.hasNext())
+							if(nohyp.equals(itr.next()))
+								itr.remove();
+					}
 				}
 			}
+			else if(hypParser.getPatternNoHyphen() != null)
+				//apply retro-compatibility word separators
+				response = Arrays.asList(PatternService.split(word, hypParser.getPatternNoHyphen()));
+			else
+				response = Collections.<String>emptyList();
+			return response;
 		}
-		else if(hypParser.getPatternNoHyphen() != null)
-			//apply retro-compatibility word separators
-			response = Arrays.asList(PatternService.split(word, hypParser.getPatternNoHyphen()));
-		else
-			response = Collections.<String>emptyList();
-		return response;
+		finally{
+			hypParser.releaseReadLock();
+		}
 	}
 
 	protected List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){

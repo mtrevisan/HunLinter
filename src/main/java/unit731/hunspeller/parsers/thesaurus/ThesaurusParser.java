@@ -15,7 +15,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
 	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
 
-	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
@@ -72,74 +73,64 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File theFile) throws IOException{
-		acquireLock();
+		READ_WRITE_LOCK.writeLock().lock();
+		try{
+			clearInternal();
 
-		clearInternal();
+			Charset charset = FileService.determineCharset(theFile.toPath());
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
+				String line = br.readLine();
+				//ignore any BOM marker on first line
+				if(br.getLineNumber() == 1)
+					line = FileService.clearBOMMarker(line);
 
-		Charset charset = FileService.determineCharset(theFile.toPath());
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
-			String line = br.readLine();
-			//ignore any BOM marker on first line
-			if(br.getLineNumber() == 1)
-				line = FileService.clearBOMMarker(line);
+				//line should be a charset
+				try{ Charsets.toCharset(line); }
+				catch(UnsupportedCharsetException e){
+					throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
+				}
 
-			//line should be a charset
-			try{ Charsets.toCharset(line); }
-			catch(UnsupportedCharsetException e){
-				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
+				while((line = br.readLine()) != null)
+					if(!line.isEmpty())
+						dictionary.add(new ThesaurusEntry(line, br));
 			}
-
-			while((line = br.readLine()) != null)
-				if(!line.isEmpty())
-					dictionary.add(new ThesaurusEntry(line, br));
 		}
 		finally{
 			dictionary.resetModified();
 
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
 
-	public void acquireLock(){
-		LOCK_SAVING.lock();
-	}
-
-	public void releaseLock(){
-		LOCK_SAVING.unlock();
-	}
-
 	public int getSynonymsCounter(){
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return dictionary.size();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 
 	public boolean isDictionaryModified(){
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return dictionary.isModified();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return dictionary.getSynonyms();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 
@@ -150,8 +141,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
 			if(partOfSpeechAndMeanings.length != 2)
@@ -194,15 +184,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return duplicationResult;
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
 	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
 			throws IllegalArgumentException{
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			boolean forcedInsertion = false;
 			List<ThesaurusEntry> duplicates = new ArrayList<>();
@@ -231,13 +220,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return new DuplicationResult(duplicates, forcedInsertion);
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			undoCaretaker.pushMemento(createMemento());
 
@@ -267,13 +255,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			log.warn("Error while modifying the meanings", e);
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			int count = selectedRowIDs.length;
 			if(count > 0){
@@ -292,22 +279,21 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
 	public List<String> extractDuplicates(){
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return dictionary.extractDuplicates();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 
-	public String prepareTextForThesaurusFilter(String text){
+	public static String prepareTextForThesaurusFilter(String text){
 		text = StringUtils.strip(text);
 		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
 		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
@@ -316,8 +302,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			//sort the synonyms
 			dictionary.sort();
@@ -368,18 +353,17 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
 	public void clear(){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			clearInternal();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
@@ -388,47 +372,71 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public boolean canUndo(){
-		return undoCaretaker.canUndo();
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			return undoCaretaker.canUndo();
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public boolean canRedo(){
-		return redoCaretaker.canUndo();
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			return redoCaretaker.canUndo();
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public boolean restorePreviousSnapshot() throws IOException{
-		boolean restored = false;
-		if(canUndo()){
-			redoCaretaker.pushMemento(createMemento());
+		READ_WRITE_LOCK.writeLock().lock();
+		try{
+			boolean restored = false;
+			if(canUndo()){
+				redoCaretaker.pushMemento(createMemento());
 
-			Memento memento = undoCaretaker.popMemento();
-			if(undoable != null){
-				undoable.onUndoChange(canUndo());
-				undoable.onRedoChange(true);
+				Memento memento = undoCaretaker.popMemento();
+				if(undoable != null){
+					undoable.onUndoChange(canUndo());
+					undoable.onRedoChange(true);
+				}
+
+				restoreMemento(memento);
+
+				restored = true;
 			}
-
-			restoreMemento(memento);
-
-			restored = true;
+			return restored;
 		}
-		return restored;
+		finally{
+			READ_WRITE_LOCK.writeLock().unlock();
+		}
 	}
 
 	public boolean restoreNextSnapshot() throws IOException{
-		boolean restored = false;
-		if(canRedo()){
-			undoCaretaker.pushMemento(createMemento());
+		READ_WRITE_LOCK.writeLock().lock();
+		try{
+			boolean restored = false;
+			if(canRedo()){
+				undoCaretaker.pushMemento(createMemento());
 
-			Memento memento = redoCaretaker.popMemento();
-			if(undoable != null){
-				undoable.onUndoChange(true);
-				undoable.onRedoChange(canRedo());
+				Memento memento = redoCaretaker.popMemento();
+				if(undoable != null){
+					undoable.onUndoChange(true);
+					undoable.onRedoChange(canRedo());
+				}
+
+				restoreMemento(memento);
+
+				restored = true;
 			}
-
-			restoreMemento(memento);
-
-			restored = true;
+			return restored;
 		}
-		return restored;
+		finally{
+			READ_WRITE_LOCK.writeLock().unlock();
+		}
 	}
 
 	@Override

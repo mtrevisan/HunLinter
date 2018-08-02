@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Getter;
@@ -103,7 +104,7 @@ public class HyphenationParser{
 
 	public static enum Level{NON_COMPOUND, COMPOUND}
 
-	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
@@ -167,12 +168,12 @@ public class HyphenationParser{
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
 	}
 
-	public void acquireLock(){
-		LOCK_SAVING.lock();
+	public void acquireReadLock(){
+		READ_WRITE_LOCK.readLock().lock();
 	}
 
-	public void releaseLock(){
-		LOCK_SAVING.unlock();
+	public void releaseReadLock(){
+		READ_WRITE_LOCK.readLock().unlock();
 	}
 
 	/**
@@ -183,11 +184,10 @@ public class HyphenationParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
 	public void parse(File hypFile) throws IOException, IllegalArgumentException{
-		acquireLock();
-
-		clearInternal();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
+			clearInternal();
+
 			Level level = Level.NON_COMPOUND;
 
 			Path hypPath = hypFile.toPath();
@@ -270,10 +270,10 @@ public class HyphenationParser{
 			throw new IllegalArgumentException(e.getClass().getSimpleName() + ": " + message);
 		}
 		finally{
-			releaseLock();
-
 			for(Level level : Level.values())
 				REDUCED_PATTERNS.get(level).clear();
+
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
@@ -306,13 +306,12 @@ public class HyphenationParser{
 	}
 
 	public void clear(){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			clearInternal();
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
@@ -332,8 +331,7 @@ public class HyphenationParser{
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule, Level level){
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			validateRule(rule, level);
 
@@ -345,7 +343,7 @@ public class HyphenationParser{
 			return newRule;
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
@@ -409,8 +407,7 @@ public class HyphenationParser{
 	}
 
 	public void save(File hypFile) throws IOException{
-		acquireLock();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
 			Charset charset = StandardCharsets.UTF_8;
 			try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
@@ -430,7 +427,7 @@ public class HyphenationParser{
 			}
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 	}
 
@@ -478,14 +475,13 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(String rule, Level level){
-		acquireLock();
-
+		READ_WRITE_LOCK.readLock().lock();
 		try{
 			String key = getKeyFromData(rule);
 			return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key));
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.readLock().unlock();
 		}
 	}
 

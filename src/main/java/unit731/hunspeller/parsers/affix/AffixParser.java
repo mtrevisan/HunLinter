@@ -18,7 +18,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
@@ -129,7 +130,7 @@ public class AffixParser{
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
-	private final ReentrantLock LOCK_SAVING = new ReentrantLock();
+	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
 
 	@AllArgsConstructor
@@ -375,14 +376,6 @@ public class AffixParser{
 //		RULE_FUNCTION.put(TAG_WORD_CHARS, FUN_COPY_OVER);
 	}
 
-	public void acquireLock(){
-		LOCK_SAVING.lock();
-	}
-
-	public void releaseLock(){
-		LOCK_SAVING.unlock();
-	}
-
 	/**
 	 * Parse the rules out from a .aff file.
 	 *
@@ -391,11 +384,10 @@ public class AffixParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
-		acquireLock();
-
-		clearData();
-
+		READ_WRITE_LOCK.writeLock().lock();
 		try{
+			clearData();
+
 			boolean encodingRead = false;
 			charset = FileService.determineCharset(affFile.toPath());
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
@@ -474,7 +466,7 @@ public class AffixParser{
 			terminalAffixes.add(getNeedAffixFlag());
 		}
 		finally{
-			releaseLock();
+			READ_WRITE_LOCK.writeLock().unlock();
 		}
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
@@ -482,14 +474,7 @@ public class AffixParser{
 	}
 
 	public void clear(){
-		acquireLock();
-
-		try{
-			clearData();
-		}
-		finally{
-			releaseLock();
-		}
+		clearData();
 	}
 
 	/**
@@ -506,12 +491,24 @@ public class AffixParser{
 	}
 
 	private boolean containsData(String key){
-		return data.containsKey(key);
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			return data.containsKey(key);
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key){
-		return (T)data.get(key);
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			return (T)data.get(key);
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	private <T> void addData(String key, T value){
@@ -519,7 +516,13 @@ public class AffixParser{
 	}
 
 	private void clearData(){
-		data.clear();
+		READ_WRITE_LOCK.writeLock().lock();
+		try{
+			data.clear();
+		}
+		finally{
+			READ_WRITE_LOCK.writeLock().unlock();
+		}
 	}
 
 	public String getLanguage(){
@@ -535,7 +538,13 @@ public class AffixParser{
 	}
 
 	public boolean isTerminalAffix(String flag){
-		return terminalAffixes.contains(flag);
+		READ_WRITE_LOCK.writeLock().lock();
+		try{
+			return terminalAffixes.contains(flag);
+		}
+		finally{
+			READ_WRITE_LOCK.writeLock().unlock();
+		}
 	}
 
 	public Set<String> getCompoundRules(){
@@ -543,24 +552,36 @@ public class AffixParser{
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
-		//TODO migliorare con una regex
-		boolean found = false;
-		Set<String> compoundRules = getCompoundRules();
-		if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
-			flag = "(" + flag + ")";
-		for(String rule : compoundRules)
-			if(rule.contains(flag)){
-				found = true;
-				break;
-			}
-		return found;
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			//TODO migliorare con una regex
+			boolean found = false;
+			Set<String> compoundRules = getCompoundRules();
+			if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
+				flag = "(" + flag + ")";
+			for(String rule : compoundRules)
+				if(rule.contains(flag)){
+					found = true;
+					break;
+				}
+			return found;
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public boolean isManagedByCompoundRule(String compoundRule, String flag){
-		//TODO migliorare con una regex
-		if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
-			flag = "(" + flag + ")";
-		return compoundRule.contains(flag);
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			//TODO migliorare con una regex
+			if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
+				flag = "(" + flag + ")";
+			return compoundRule.contains(flag);
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public Charset getCharset(){
@@ -581,23 +602,35 @@ public class AffixParser{
 	}
 
 	public Boolean isSuffix(String affixCode){
-		Boolean isSuffix = null;
-		Object affix = getData(affixCode);
-		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
-			isSuffix = ((RuleEntry)affix).isSuffix();
-		return isSuffix;
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			Boolean isSuffix = null;
+			Object affix = getData(affixCode);
+			if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
+				isSuffix = ((RuleEntry)affix).isSuffix();
+			return isSuffix;
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public Set<String> getProductiveAffixes(){
-		//keeps only items with RuleEntry as value
-		Set<String> affixes = new HashSet<>();
-		Set<String> keys = data.keySet();
-		for(String key : keys){
-			Object affix = getData(key);
-			if(RuleEntry.class.isAssignableFrom(affix.getClass()))
-				affixes.add(key);
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			//keeps only items with RuleEntry as value
+			Set<String> affixes = new HashSet<>();
+			Set<String> keys = data.keySet();
+			for(String key : keys){
+				Object affix = getData(key);
+				if(RuleEntry.class.isAssignableFrom(affix.getClass()))
+					affixes.add(key);
+			}
+			return affixes;
 		}
-		return affixes;
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public String getFlag(){
@@ -605,24 +638,36 @@ public class AffixParser{
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
-		return strategy;
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			return strategy;
+		}
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public boolean isAffixProductive(String word, String affix){
-		word = applyInputConversionTable(word);
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			word = applyInputConversionTable(word);
 
-		boolean productive;
-		RuleEntry rule = getData(affix);
-		if(rule != null){
-			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
-			productive = !applicableAffixes.isEmpty();
+			boolean productive;
+			RuleEntry rule = getData(affix);
+			if(rule != null){
+				List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+				productive = !applicableAffixes.isEmpty();
+			}
+			else
+				productive = isManagedByCompoundRule(affix);
+			return productive;
 		}
-		else
-			productive = isManagedByCompoundRule(affix);
-		return productive;
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
-	public List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+	public static List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
 		//extract the list of applicable affixes...
 		List<AffixEntry> applicableAffixes = new ArrayList<>();
 		for(AffixEntry entry : entries)
@@ -640,11 +685,17 @@ public class AffixParser{
 	}
 
 	private String applyConversionTable(String word, Map<String, String> table){
-		if(table != null){
-			int size = table.size();
-			word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+		READ_WRITE_LOCK.readLock().lock();
+		try{
+			if(table != null){
+				int size = table.size();
+				word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+			}
+			return word;
 		}
-		return word;
+		finally{
+			READ_WRITE_LOCK.readLock().unlock();
+		}
 	}
 
 	public Set<String> getWordBreakCharacters(){
