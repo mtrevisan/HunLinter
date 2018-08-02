@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -29,11 +28,6 @@ public class WordGeneratorTest{
 		wordGenerator = new WordGenerator(affParser);
 	}
 
-	public List<RuleProductionEntry> applyRules(String line){
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
-		return wordGenerator.applyRules(dicEntry);
-	}
-
 	@Test
 	public void conditions() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
@@ -50,7 +44,7 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		String line = "a/A";
 
-		List<RuleProductionEntry> stems = applyRules(line);
+		List<RuleProductionEntry> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(4, stems.size());
 		//base production
@@ -80,7 +74,7 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		String line = "a/ABCDE";
 
-		List<RuleProductionEntry> stems = applyRules(line);
+		List<RuleProductionEntry> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
 		//base production
@@ -125,7 +119,7 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		String line = "a/ABCDEFGH";
 
-		List<RuleProductionEntry> stems = applyRules(line);
+		List<RuleProductionEntry> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
 		//base production
@@ -181,7 +175,7 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		String line = "a/ABCDE";
 
-		List<RuleProductionEntry> stems = applyRules(line);
+		List<RuleProductionEntry> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
 		//base production
@@ -227,7 +221,7 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		String line = "a/ABCDEFGH";
 
-		List<RuleProductionEntry> stems = applyRules(line);
+		List<RuleProductionEntry> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
 		//base production
