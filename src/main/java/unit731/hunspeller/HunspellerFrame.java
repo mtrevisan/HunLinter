@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -176,12 +177,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new javax.swing.JLayeredPane();
       dicInputLabel = new javax.swing.JLabel();
+      dicInputTextField = new javax.swing.JTextField();
       dicRuleTagsAidLabel = new javax.swing.JLabel();
       dicRuleTagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new javax.swing.JTable();
-      dicInputTextField = new javax.swing.JTextField();
       cmpLayeredPane = new javax.swing.JLayeredPane();
+      cmpInputLabel = new javax.swing.JLabel();
+      cmpInputComboBox = new javax.swing.JComboBox<>();
+      cmpRuleTagsAidLabel = new javax.swing.JLabel();
+      cmpRuleTagsAidComboBox = new javax.swing.JComboBox<>();
+      dicScrollPane1 = new javax.swing.JScrollPane();
+      cmpTable = new javax.swing.JTable();
       theLayeredPane = new javax.swing.JLayeredPane();
       theMeaningsLabel = new javax.swing.JLabel();
       theMeaningsTextField = new javax.swing.JTextField();
@@ -244,6 +251,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
+      dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
       dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
@@ -256,10 +264,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicScrollPane.setViewportView(dicTable);
 
       dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
       dicLayeredPane.setLayout(dicLayeredPaneLayout);
@@ -296,6 +304,61 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       );
 
       mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+
+      cmpInputLabel.setLabelFor(cmpInputComboBox);
+      cmpInputLabel.setText("Compound Rule:");
+
+      cmpInputComboBox.setEditable(true);
+
+      cmpRuleTagsAidLabel.setLabelFor(cmpRuleTagsAidComboBox);
+      cmpRuleTagsAidLabel.setText("Rule tags aid:");
+
+      cmpTable.setModel(new ProductionTableModel());
+      cmpTable.setShowHorizontalLines(false);
+      cmpTable.setShowVerticalLines(false);
+      dicTable.setRowSelectionAllowed(true);
+      dicScrollPane1.setViewportView(cmpTable);
+
+      cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(dicScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+      javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
+      cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
+      cmpLayeredPaneLayout.setHorizontalGroup(
+         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(cmpInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(cmpInputComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(cmpRuleTagsAidLabel)
+                  .addGap(18, 18, 18)
+                  .addComponent(cmpRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE))
+            .addContainerGap())
+      );
+      cmpLayeredPaneLayout.setVerticalGroup(
+         cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(cmpInputLabel)
+               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(cmpRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(cmpRuleTagsAidLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addContainerGap())
+      );
+
       mainTabbedPane.addTab("Compound Rules", cmpLayeredPane);
 
       theMeaningsLabel.setLabelFor(theMeaningsTextField);
@@ -1229,12 +1292,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//affix file:
-//			Set<String> compoundRules = backbone.getAffParser().getCompoundRules();
-//			dicInputComboBox.removeAllItems();
-//			compoundRules.forEach(dicInputComboBox::addItem);
-//			dicInputComboBox.setEnabled(true);
-//			dicInputComboBox.setSelectedItem(null);
-//			dicInputComboBox.requestFocusInWindow();
+			Set<String> compoundRules = backbone.getAffParser().getCompoundRules();
+			cmpInputComboBox.removeAllItems();
+			compoundRules.forEach(cmpInputComboBox::addItem);
+			cmpInputComboBox.setEnabled(true);
+			cmpInputComboBox.setSelectedItem(null);
 			dicInputTextField.requestFocusInWindow();
 
 
@@ -1625,7 +1687,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JComboBox<String> cmpInputComboBox;
+   private javax.swing.JLabel cmpInputLabel;
    private javax.swing.JLayeredPane cmpLayeredPane;
+   private javax.swing.JComboBox<String> cmpRuleTagsAidComboBox;
+   private javax.swing.JLabel cmpRuleTagsAidLabel;
+   private javax.swing.JTable cmpTable;
    private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
@@ -1638,6 +1705,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
    private javax.swing.JScrollPane dicScrollPane;
+   private javax.swing.JScrollPane dicScrollPane1;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
