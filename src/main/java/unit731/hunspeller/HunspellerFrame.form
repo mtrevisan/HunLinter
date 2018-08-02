@@ -314,7 +314,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="dicRuleTagsAidComboBox" max="32767" attributes="0"/>
-                                  <Component id="dicInputTextField" max="32767" attributes="0"/>
+                                  <Component id="dicInputComboBox" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="dicScrollPane" alignment="0" pref="904" max="32767" attributes="0"/>
@@ -329,7 +329,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="dicInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="dicInputTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicInputComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -347,15 +347,20 @@
             <Component class="javax.swing.JLabel" name="dicInputLabel">
               <Properties>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="dicInputTextField"/>
+                  <ComponentRef name="default"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Dictionary entry:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="dicInputTextField">
-              <Events>
-                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="dicInputTextFieldKeyReleased"/>
-              </Events>
+            <Component class="javax.swing.JComboBox" name="dicInputComboBox">
+              <Properties>
+                <Property name="editable" type="boolean" value="true"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;dicInputTextFieldKeyReleased(evt);&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="dicRuleTagsAidLabel">
               <Properties>
