@@ -1403,12 +1403,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-//			dicCorrectnessWorker = new CorrectnessWorker(backbone);
-//			dicCorrectnessWorker.addPropertyChangeListener(this);
-//			dicCorrectnessWorker.execute();
-CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
-compoundRulesWorker.addPropertyChangeListener(this);
-compoundRulesWorker.execute();
+			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
+			dicCorrectnessWorker.addPropertyChangeListener(this);
+			dicCorrectnessWorker.execute();
+//CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
+//compoundRulesWorker.addPropertyChangeListener(this);
+//compoundRulesWorker.execute();
 		}
 	}
 
