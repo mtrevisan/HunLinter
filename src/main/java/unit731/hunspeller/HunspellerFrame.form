@@ -353,6 +353,9 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="dicInputTextField">
+              <Events>
+                <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="dicInputTextFieldKeyReleased"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="dicRuleTagsAidLabel">
               <Properties>
@@ -467,6 +470,7 @@
                 <Property name="editable" type="boolean" value="true"/>
               </Properties>
               <AuxValues>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;@Override&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;cmpInputComboBocKeyReleased(evt);&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>

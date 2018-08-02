@@ -98,6 +98,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
 
 	private static String formerInputText;
+	private static String formerCompoundInputText;
 	private static String formerFilterThesaurusText;
 	private static String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
@@ -108,6 +109,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private RecentFileMenu rfm;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(HunspellerFrame::calculateProductions, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> compoundProductionDebouncer = new Debouncer<>(HunspellerFrame::calculateCompoundProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(HunspellerFrame::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(HunspellerFrame::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(HunspellerFrame::hyphenateAddRule, DEBOUNCER_INTERVAL);
@@ -254,6 +256,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicInputLabel.setLabelFor(dicInputTextField);
       dicInputLabel.setText("Dictionary entry:");
 
+      dicInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            dicInputTextFieldKeyReleased(evt);
+         }
+      });
+
       dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
       dicRuleTagsAidLabel.setText("Rule tags aid:");
 
@@ -309,6 +317,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpInputLabel.setText("Compound rule:");
 
       cmpInputComboBox.setEditable(true);
+      cmpInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){
+         @Override
+         public void keyReleased(java.awt.event.KeyEvent evt){
+            cmpInputComboBocKeyReleased(evt);
+         }
+      });
 
       cmpRuleTagsAidLabel.setLabelFor(cmpRuleTagsAidComboBox);
       cmpRuleTagsAidLabel.setText("Rule tags aid:");
@@ -934,7 +948,33 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		}
 		else
-			frame.clearOutputTable();
+			frame.clearOutputTable(frame.dicTable);
+	}
+
+	private static void calculateCompoundProductions(HunspellerFrame frame){
+		String inputText = (String)frame.cmpInputComboBox.getEditor().getItem();
+
+		inputText = StringUtils.strip(inputText);
+		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
+			return;
+		formerCompoundInputText = inputText;
+
+		if(StringUtils.isNotBlank(inputText)){
+			try{
+//CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
+//compoundRulesWorker.addPropertyChangeListener(this);
+//compoundRulesWorker.execute();
+				List<RuleProductionEntry> productions = frame.backbone.getWordGenerator().applyRules(inputText);
+
+				ProductionTableModel dm = (ProductionTableModel)frame.cmpTable.getModel();
+				dm.setProductions(productions);
+			}
+			catch(IllegalArgumentException e){
+				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
+			}
+		}
+		else
+			frame.clearOutputTable(frame.cmpTable);
 	}
 
 
@@ -989,6 +1029,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		productionDebouncer.call(this);
 	}//GEN-LAST:event_dicInputTextFieldKeyReleased
 
+	private void cmpInputComboBocKeyReleased(java.awt.event.KeyEvent evt){
+		compoundProductionDebouncer.call(this);
+	}
 
    private void theFindDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theFindDuplicatesMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1476,9 +1519,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
-//CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator());
-//compoundRulesWorker.addPropertyChangeListener(this);
-//compoundRulesWorker.execute();
 		}
 	}
 
@@ -1614,14 +1654,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void clearDictionaryFields(){
-		clearOutputTable();
+		clearOutputTable(dicTable);
+		clearOutputTable(cmpTable);
 
 		formerInputText = null;
 		dicInputTextField.setText(null);
 	}
 
-	public void clearOutputTable(){
-		ProductionTableModel dm = (ProductionTableModel)dicTable.getModel();
+	public void clearOutputTable(JTable table){
+		ProductionTableModel dm = (ProductionTableModel)table.getModel();
 		dm.setProductions(null);
 	}
 
