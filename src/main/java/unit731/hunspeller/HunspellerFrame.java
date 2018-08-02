@@ -53,6 +53,8 @@ import unit731.hunspeller.gui.ProductionTableModel;
 import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
+import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
@@ -1302,7 +1304,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private static void hyphenate(HunspellerFrame frame){
-		String text = frame.backbone.getChecker().correctOrthography(frame.hypWordTextField.getText());
+		String language = frame.backbone.getAffParser().getLanguage();
+		Orthography orthography = OrthographyBuilder.getOrthography(language);
+		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
 		formerHyphenationText = text;
@@ -1339,8 +1343,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private static void hyphenateAddRule(HunspellerFrame frame){
-		String addedRuleText = frame.backbone.getChecker().correctOrthography(frame.hypWordTextField.getText());
-		String addedRule = frame.backbone.getChecker().correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
+		String language = frame.backbone.getAffParser().getLanguage();
+		Orthography orthography = OrthographyBuilder.getOrthography(language);
+		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
+		String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];
 		String addedRuleCount = null;
 		if(StringUtils.isNotBlank(addedRule)){

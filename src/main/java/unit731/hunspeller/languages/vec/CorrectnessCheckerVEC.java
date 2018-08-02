@@ -1,7 +1,5 @@
 package unit731.hunspeller.languages.vec;
 
-import java.io.File;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,10 +26,6 @@ import unit731.hunspeller.services.PatternService;
 public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
-
-	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
-	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_005;
-	private static final double GROW_RATIO_WHEN_FULL = 1.3;
 
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
 	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
@@ -367,23 +361,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public CorrectnessCheckerVEC(AffixParser affParser, File dicFile, AbstractHyphenator hyphenator, WordGenerator wordGenerator, Charset charset){
-		super(affParser, dicFile, hyphenator, wordGenerator, charset);
-	}
-
-	@Override
-	public int getExpectedNumberOfElements(){
-		return EXPECTED_NUMBER_OF_ELEMENTS;
-	}
-
-	@Override
-	public double getFalsePositiveProbability(){
-		return FALSE_POSITIVE_PROBABILITY;
-	}
-
-	@Override
-	public double getGrowRatioWhenFull(){
-		return GROW_RATIO_WHEN_FULL;
+	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator){
+		super(affParser, hyphenator);
 	}
 
 	@Override
@@ -471,13 +450,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		continuationFlagIncompatibilityCheck(production, GUA_TO_VA_RULE, GUA_TO_VA_CHECKS);
 	}
 
-	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks, String... contains)
-			throws IllegalArgumentException{
-		if(StringUtils.containsAny(production.getWord(), contains))
-			for(MatcherEntry entry : checks)
-				entry.match(production);
-	}
-
 	private void continuationFlagIncompatibilityCheck(RuleProductionEntry production, String continuationFlag, Set<MatcherEntry> checks)
 			throws IllegalArgumentException{
 		if(production.containsContinuationFlag(continuationFlag))
@@ -526,48 +498,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
 	}
 
-	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks)
+	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks, String... contains)
 			throws IllegalArgumentException{
-		if(canContainsVanishingEl(production.getWord()))
+		if(StringUtils.containsAny(production.getWord(), contains))
 			for(MatcherEntry entry : checks)
 				entry.match(production);
-	}
-
-	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
-	private static boolean canContainsVanishingEl(String word){
-		boolean result = false;
-		int size = word.length();
-		if(size > 1){
-			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
-			if(index + 1 < size){
-				char chr = word.charAt(index);
-				result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
-				while(!result){
-					index = WordVEC.getFirstVowelIndex(word, index);
-					if(index < 0 || index + 2 >= size)
-						break;
-
-					if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
-						result = true;
-
-					index ++;
-				}
-			}
-		}
-		return result;
-	}
-
-	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
-//		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
-//			boolean hasFinalSonorizationFlag = production.containsContinuationFlag(FINAL_SONORIZATION_RULE);
-//			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
-//			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
-//				if(canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
-//				else if(!canHaveFinalSonorization)
-//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
-//			}
-//		}
 	}
 
 	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
@@ -602,7 +537,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			String word = production.getWord();
 			if(!UNSYLLABABLE_INTERJECTIONS.contains(word) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(word)){
 				word = word.toLowerCase(Locale.ROOT);
-				String correctedDerivedWord = correctOrthography(word);
+				String correctedDerivedWord = orthography.correctOrthography(word);
 				if(!correctedDerivedWord.equals(word))
 					throw new IllegalArgumentException("Word " + word + " is mispelled (should be " + correctedDerivedWord + ")");
 
@@ -614,6 +549,50 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				}
 			}
 		}
+	}
+
+//	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks)
+//			throws IllegalArgumentException{
+//		if(canContainsVanishingEl(production.getWord()))
+//			for(MatcherEntry entry : checks)
+//				entry.match(production);
+//	}
+//
+//	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
+//	private static boolean canContainsVanishingEl(String word){
+//		boolean result = false;
+//		int size = word.length();
+//		if(size > 1){
+//			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
+//			if(index + 1 < size){
+//				char chr = word.charAt(index);
+//				result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
+//				while(!result){
+//					index = WordVEC.getFirstVowelIndex(word, index);
+//					if(index < 0 || index + 2 >= size)
+//						break;
+//
+//					if(word.charAt(index + 1) == 'l' && WordVEC.isVowel(word.charAt(index + 2)))
+//						result = true;
+//
+//					index ++;
+//				}
+//			}
+//		}
+//		return result;
+//	}
+
+	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
+//		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
+//			boolean hasFinalSonorizationFlag = production.containsContinuationFlag(FINAL_SONORIZATION_RULE);
+//			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
+//			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
+//				if(canHaveFinalSonorization)
+//					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
+//				else if(!canHaveFinalSonorization)
+//					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
+//			}
+//		}
 	}
 
 
@@ -639,18 +618,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_PREPOSITION)
 			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)
 			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_CONJUNCTION)));
-	}
-
-	@Override
-	public String prepareTextForThesaurusFilter(String text){
-		text = super.prepareTextForThesaurusFilter(text);
-
-		return correctOrthography(text);
-	}
-
-	@Override
-	public String correctOrthography(String text){
-		return orthography.correctOrthography(text);
 	}
 
 }

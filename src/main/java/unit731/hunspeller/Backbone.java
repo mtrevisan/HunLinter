@@ -148,7 +148,7 @@ public class Backbone implements FileChangeListener{
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
-			checker = CorrectnessCheckerBuilder.getParser(language, affParser, dicParser.getDicFile(), hyphenator, wordGenerator, affParser.getCharset());
+			checker = CorrectnessCheckerBuilder.getParser(language, affParser, hyphenator);
 
 			hunspellable.clearHyphenationParser();
 
