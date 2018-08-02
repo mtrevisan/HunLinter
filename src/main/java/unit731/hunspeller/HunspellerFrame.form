@@ -286,7 +286,7 @@
     </Component>
     <Container class="javax.swing.JTabbedPane" name="mainTabbedPane">
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="mainTabbedPane.setEnabledAt(0, false);&#xa;mainTabbedPane.setEnabledAt(1, false);&#xa;mainTabbedPane.setEnabledAt(2, false);&#xa;KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);&#xa;mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);"/>
+        <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="mainTabbedPane.setEnabledAt(0, false);&#xa;mainTabbedPane.setEnabledAt(1, false);&#xa;mainTabbedPane.setEnabledAt(2, false);&#xa;mainTabbedPane.setEnabledAt(3, false);&#xa;KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);&#xa;mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);"/>
       </AuxValues>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
@@ -314,7 +314,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="dicRuleTagsAidComboBox" max="32767" attributes="0"/>
-                                  <Component id="dicInputComboBox" max="32767" attributes="0"/>
+                                  <Component id="dicInputTextField" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="dicScrollPane" alignment="0" pref="904" max="32767" attributes="0"/>
@@ -329,7 +329,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="dicInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="dicInputComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="dicInputTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -346,21 +346,8 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="dicInputLabel">
               <Properties>
-                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                  <ComponentRef name="default"/>
-                </Property>
                 <Property name="text" type="java.lang.String" value="Dictionary entry:"/>
               </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="dicInputComboBox">
-              <Properties>
-                <Property name="editable" type="boolean" value="true"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicInputComboBox.getEditor().getEditorComponent().addKeyListener(new java.awt.event.KeyAdapter(){&#xd;&#xa;&#x9;public void keyReleased(java.awt.event.KeyEvent evt){&#xd;&#xa;&#x9;&#x9;dicInputTextFieldKeyReleased(evt);&#xd;&#xa;&#x9;}&#xd;&#xa;});"/>
-                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
-              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="dicRuleTagsAidLabel">
               <Properties>
@@ -408,7 +395,22 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JTextField" name="dicInputTextField">
+            </Component>
           </SubComponents>
+        </Container>
+        <Container class="javax.swing.JLayeredPane" name="cmpLayeredPane">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Compound Rules">
+                <Property name="tabTitle" type="java.lang.String" value="Compound Rules"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+            <Property name="useNullLayout" type="boolean" value="true"/>
+          </Layout>
         </Container>
         <Container class="javax.swing.JLayeredPane" name="theLayeredPane">
           <Constraints>
