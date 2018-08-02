@@ -62,7 +62,6 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
-import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -972,13 +971,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-				CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(frame.backbone.getAffParser(), frame.backbone.getDicParser(), frame.backbone.getWordGenerator());
-				compoundRulesWorker.addPropertyChangeListener(frame);
 				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
 					CompoundTableModel dm = (CompoundTableModel)frame.cmpTable.getModel();
 					dm.setProductions(words);
 				};
-				compoundRulesWorker.extractCompounds(inputText, 20l, filler);
+				frame.backbone.getWordGenerator().applyCompoundRules(inputText, filler);
 			}
 			catch(IllegalArgumentException e){
 				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);

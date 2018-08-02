@@ -70,7 +70,7 @@ public class Backbone implements FileChangeListener{
 	private HyphenationParser hypParser;
 
 	@Getter
-	private final WordGenerator wordGenerator;
+	private WordGenerator wordGenerator;
 	@Getter
 	private CorrectnessChecker checker;
 	@Getter
@@ -84,7 +84,6 @@ public class Backbone implements FileChangeListener{
 		affParser = new AffixParser();
 		aidParser = new AidParser();
 		theParser = new ThesaurusParser(undoable);
-		wordGenerator = new WordGenerator(affParser);
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
@@ -162,7 +161,7 @@ public class Backbone implements FileChangeListener{
 		if(dicFile.exists()){
 			Charset charset = affParser.getCharset();
 			dicParser = new DictionaryParser(dicFile, charset);
-			wordGenerator.initializeCompoundRules(dicParser, listener);
+			wordGenerator = new WordGenerator(affParser, dicParser, listener);
 
 			hunspellable.clearDictionaryParser();
 		}

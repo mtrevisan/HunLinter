@@ -32,17 +32,21 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	private static final String RIGHT_PARENTHESIS = ")";
 	private static final String[] PARENTHESIS = new String[]{LEFT_PARENTHESIS, RIGHT_PARENTHESIS};
 
-	private final Map<String, String> expandedCompounds = new HashMap<>();
+	private Map<String, String> rules;
 
 	private String compoundRule;
-	private long limit;
+	private final long limit;
 	private BiConsumer<List<String>, Long> fnDeferring;
 
 
-	public CompoundRulesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
+	public CompoundRulesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, long limit){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
+		if(limit <= 0)
+			throw new IllegalArgumentException("Limit canno be non-positive");
+
+		this.limit = limit;
 
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
@@ -68,33 +72,26 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Runnable done = () -> {
 			if(!isCancelled()){
 				//extract values for the given compound rule
-				Map<String, String> rule = compounds.entrySet().stream()
+				rules = compounds.entrySet().stream()
 					.filter(entry -> affParser.isManagedByCompoundRule(entry.getKey()))
 					.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
 
-				if(!rule.isEmpty()){
-					//compose compound rule
-					Set<String> compoundRules = affParser.getCompoundRules();
-					for(String compound : compoundRules){
-						String expandedCompoundRule = StringUtils.replaceEach(compound, rule.keySet().toArray(new String[rule.size()]),
-							rule.values().toArray(new String[rule.size()]));
-						//FIXME recognize if each rule has been replaced
-						if(!expandedCompoundRule.equals(compound)){
-							expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
-							expandedCompounds.put(compound, expandedCompoundRule);
-						}
-					}
-
-					if(!expandedCompounds.isEmpty())
-						extract();
-				}
+				if(!rules.isEmpty())
+					extract();
 			}
 		};
 		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	private void extract(){
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
+		//compose compound rule
+		String expandedCompoundRule = StringUtils.replaceEach(compoundRule, rules.keySet().toArray(new String[rules.size()]),
+			rules.values().toArray(new String[rules.size()]));
+		//FIXME recognize if each rule has been replaced
+		if(!expandedCompoundRule.equals(compoundRule))
+			expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
+
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
 		long wordCount = regexWordGenerator.wordCount();
 		log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 		//generate all the words that matches the given regex
@@ -104,11 +101,10 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		fnDeferring.accept(words, wordCount);
 	}
 
-	public void extractCompounds(String compoundRule, long limit, BiConsumer<List<String>, Long> fnDeferring){
+	public void extractCompounds(String compoundRule, BiConsumer<List<String>, Long> fnDeferring){
 		this.compoundRule = compoundRule;
-		this.limit = limit;
 		this.fnDeferring = fnDeferring;
-		expandedCompounds.clear();
+		clear();
 
 		super.execute();
 	}
@@ -119,7 +115,8 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	}
 
 	public void clear(){
-		expandedCompounds.clear();
+		if(rules != null)
+			rules.clear();
 	}
 
 }

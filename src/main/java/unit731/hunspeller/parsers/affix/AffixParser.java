@@ -605,14 +605,7 @@ public class AffixParser{
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
-		acquireLock();
-
-		try{
-			return strategy;
-		}
-		finally{
-			releaseLock();
-		}
+		return strategy;
 	}
 
 	public boolean isAffixProductive(String word, String affix){

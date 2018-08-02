@@ -3,8 +3,10 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringJoiner;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +27,9 @@ public class WordGeneratorTest{
 	public void init(){
 		affParser = new AffixParser();
 		strategy = affParser.getFlagParsingStrategy();
-		wordGenerator = new WordGenerator(affParser);
+		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY, ".dic");
+		DictionaryParser dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
+		wordGenerator = new WordGenerator(affParser, dicParser, null);
 	}
 
 	@Test

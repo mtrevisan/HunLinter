@@ -12,11 +12,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,25 +47,15 @@ public class WordGenerator{
 	private static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
-	private CompoundRulesWorker compoundRulesWorker;
+	private static final long COMPOUND_WORDS_LIMIT = 20l;
 
 
+	@NonNull
 	private final AffixParser affParser;
+	@NonNull
+	private final DictionaryParser dicParser;
+	private final PropertyChangeListener listener;
 
-
-	public WordGenerator(AffixParser affParser){
-		Objects.requireNonNull(affParser);
-
-		this.affParser = affParser;
-	}
-
-	public void initializeCompoundRules(DictionaryParser dicParser, PropertyChangeListener listener){
-		Objects.requireNonNull(dicParser);
-
-		compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this);
-		if(listener != null)
-			compoundRulesWorker.addPropertyChangeListener(listener);
-	}
 
 	public List<RuleProductionEntry> applyRules(String line){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -82,50 +72,43 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<RuleProductionEntry> applyRules(DictionaryEntry dicEntry) throws IllegalArgumentException, NoApplicableRuleException{
-		affParser.acquireLock();
+		//convert using input table
+		String word = affParser.applyInputConversionTable(dicEntry.getWord());
+		dicEntry.setWord(word);
 
-		try{
-			//convert using input table
-			String word = affParser.applyInputConversionTable(dicEntry.getWord());
-			dicEntry.setWord(word);
+		//extract base production
+		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, affParser.getFlagParsingStrategy());
 
-			//extract base production
-			RuleProductionEntry baseProduction = getBaseProduction(dicEntry, affParser.getFlagParsingStrategy());
+		//extract onefold production
+		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
 
-			//extract onefold production
-			List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
+		//extract twofold production
+		List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
+		checkTwofoldCorrectness(twofoldProductions);
 
-			//extract twofold production
-			List<RuleProductionEntry> twofoldProductions = getTwofoldProductions(onefoldProductions);
-			checkTwofoldCorrectness(twofoldProductions);
+		//collect productions
+		List<RuleProductionEntry> productions = new ArrayList<>();
+		productions.add(baseProduction);
+		productions.addAll(onefoldProductions);
+		productions.addAll(twofoldProductions);
+		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
+		checkTwofoldCorrectness(lastfoldProductions);
 
-			//collect productions
-			List<RuleProductionEntry> productions = new ArrayList<>();
-			productions.add(baseProduction);
-			productions.addAll(onefoldProductions);
-			productions.addAll(twofoldProductions);
-			List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
-			checkTwofoldCorrectness(lastfoldProductions);
+		//remove rules that invalidate the circumfix rule
+		removeRulesInvalidatingCircumfix(lastfoldProductions);
 
-			//remove rules that invalidate the circumfix rule
-			removeRulesInvalidatingCircumfix(lastfoldProductions);
+		productions.addAll(lastfoldProductions);
 
-			productions.addAll(lastfoldProductions);
+		//remove rules with the need affix flag
+		enforceNeedAffixFlag(productions);
 
-			//remove rules with the need affix flag
-			enforceNeedAffixFlag(productions);
+		//convert using output table
+		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
-			//convert using output table
-			productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+		if(log.isTraceEnabled())
+			productions.forEach(production -> log.trace("Produced word {}", production));
 
-			if(log.isTraceEnabled())
-				productions.forEach(production -> log.trace("Produced word {}", production));
-
-			return productions;
-		}
-		finally{
-			affParser.releaseLock();
-		}
+		return productions;
 	}
 
 	/**
@@ -138,18 +121,14 @@ public class WordGenerator{
 	 */
 	//TODO
 	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
-		if(compoundRulesWorker == null)
-			throw new UnsupportedOperationException("Worker not initialized");
+		CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, COMPOUND_WORDS_LIMIT);
+		if(listener != null)
+			compoundRulesWorker.addPropertyChangeListener(listener);
 
-		affParser.acquireLock();
-
-		long limit = 20l;
 		BiConsumer<List<String>, Long> done = (words, wordCount) -> {
-			affParser.releaseLock();
-
 			fnDeferring.accept(words, wordCount);
 		};
-		compoundRulesWorker.extractCompounds(compoundRule, limit, done);
+		compoundRulesWorker.extractCompounds(compoundRule, done);
 //		BiConsumer<List<String>, Long> fnDeferring = (words, count) -> {
 //			for(String word : words)
 //				log.info(Backbone.MARKER_APPLICATION, word);
