@@ -4,15 +4,11 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringJoiner;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
@@ -21,27 +17,19 @@ import unit731.hunspeller.services.FileService;
 //https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > morph.aff upward
 public class WordGeneratorTest{
 
-	private Backbone backbone;
 	private AffixParser affParser;
-	private DictionaryParser dicParser;
 	private FlagParsingStrategy strategy;
 	private WordGenerator wordGenerator;
 
 
 	@Before
 	public void init(){
-		backbone = Mockito.mock(Backbone.class);
 		affParser = new AffixParser();
-		Mockito.when(backbone.getAffParser()).thenReturn(affParser);
-		Mockito.when(backbone.getDicParser()).thenReturn(dicParser);
-		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY, ".dic");
+		strategy = affParser.getFlagParsingStrategy();
 		wordGenerator = new WordGenerator(affParser);
-		dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
-		Mockito.when(backbone.getDictionaryFile()).thenReturn(dicFile);
 	}
 
 	public List<RuleProductionEntry> applyRules(String line){
-		strategy = affParser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 		return wordGenerator.applyRules(dicEntry);
 	}
