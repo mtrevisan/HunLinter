@@ -105,7 +105,6 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString());
 		long wordCount = regexWordGenerator.wordCount();
-		log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 		//generate all the words that matches the given regex
 		long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordCount, limit));
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);

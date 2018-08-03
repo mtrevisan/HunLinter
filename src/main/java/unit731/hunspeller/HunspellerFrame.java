@@ -189,6 +189,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicRuleTagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane = new javax.swing.JScrollPane();
       dicTable = new javax.swing.JTable();
+      totalProductionsLabel = new javax.swing.JLabel();
+      totalProductionsOutputLabel = new javax.swing.JLabel();
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
       cmpInputComboBox = new javax.swing.JComboBox<>();
@@ -198,6 +200,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable = new javax.swing.JTable();
       limitComboBox = new javax.swing.JComboBox<>();
       limitLabel = new javax.swing.JLabel();
+      totalCompoundsLabel = new javax.swing.JLabel();
+      totalCompoundsOutputLabel = new javax.swing.JLabel();
       theLayeredPane = new javax.swing.JLayeredPane();
       theMeaningsLabel = new javax.swing.JLabel();
       theMeaningsTextField = new javax.swing.JTextField();
@@ -278,11 +282,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicTable.setRowSelectionAllowed(true);
       dicScrollPane.setViewportView(dicTable);
 
+      totalProductionsLabel.setLabelFor(totalProductionsOutputLabel);
+      totalProductionsLabel.setText("Total productions:");
+
+      totalProductionsOutputLabel.setText("...");
+
       dicLayeredPane.setLayer(dicInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       dicLayeredPane.setLayer(dicScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(totalProductionsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      dicLayeredPane.setLayer(totalProductionsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout dicLayeredPaneLayout = new javax.swing.GroupLayout(dicLayeredPane);
       dicLayeredPane.setLayout(dicLayeredPaneLayout);
@@ -299,7 +310,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(dicRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                      .addComponent(dicInputTextField)))
-               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE))
+               .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE)
+               .addGroup(dicLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(totalProductionsLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(totalProductionsOutputLabel)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       dicLayeredPaneLayout.setVerticalGroup(
@@ -314,7 +330,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(dicRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(dicRuleTagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addComponent(dicScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(dicLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(totalProductionsLabel)
+               .addComponent(totalProductionsOutputLabel))
             .addContainerGap())
       );
 
@@ -346,7 +366,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable.setRowSelectionAllowed(true);
       dicScrollPane1.setViewportView(cmpTable);
 
-      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10", "20", "50", "100", "500", "1000" }));
+      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
       limitComboBox.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             limitComboBoxActionPerformed(evt);
@@ -356,6 +376,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       limitLabel.setLabelFor(limitComboBox);
       limitLabel.setText("Limit:");
 
+      totalCompoundsLabel.setLabelFor(totalCompoundsOutputLabel);
+      totalCompoundsLabel.setText("Total productions:");
+
+      totalCompoundsOutputLabel.setText("...");
+
       cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -363,6 +388,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLayeredPane.setLayer(dicScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(totalCompoundsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(totalCompoundsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
       cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
@@ -384,7 +411,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         .addGap(18, 18, 18)
                         .addComponent(limitLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(totalCompoundsLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(totalCompoundsOutputLabel)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
       cmpLayeredPaneLayout.setVerticalGroup(
@@ -401,7 +433,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(cmpRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(cmpRuleTagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+            .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(totalCompoundsLabel)
+               .addComponent(totalCompoundsOutputLabel))
             .addContainerGap())
       );
 
@@ -974,13 +1010,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
+
+				frame.totalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
 			catch(IllegalArgumentException e){
 				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
 			}
 		}
-		else
+		else{
 			frame.clearOutputTable(frame.dicTable);
+			frame.totalProductionsOutputLabel.setText(StringUtils.EMPTY);
+		}
 	}
 
 	private static void calculateCompoundProductions(HunspellerFrame frame){
@@ -1240,6 +1280,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 					dm.setProductions(words);
+
+					totalCompoundsOutputLabel.setText(wordCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(wordCount));
 				};
 				long limit = Long.valueOf((String)limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
 				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);
@@ -1248,8 +1290,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
 			}
 		}
-		else
+		else{
 			clearOutputTable(cmpTable);
+			totalCompoundsOutputLabel.setText(StringUtils.EMPTY);
+		}
    }//GEN-LAST:event_limitComboBoxActionPerformed
 
 
@@ -1695,7 +1739,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void clearDictionaryFields(){
 		clearOutputTable(dicTable);
+		totalProductionsOutputLabel.setText(StringUtils.EMPTY);
 		clearOutputTable(cmpTable);
+		totalCompoundsOutputLabel.setText(StringUtils.EMPTY);
 
 		formerInputText = null;
 		dicInputTextField.setText(null);
@@ -1841,6 +1887,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel theSynonymsRecordedOutputLabel;
    private javax.swing.JTable theTable;
    private javax.swing.JButton theUndoButton;
+   private javax.swing.JLabel totalCompoundsLabel;
+   private javax.swing.JLabel totalCompoundsOutputLabel;
+   private javax.swing.JLabel totalProductionsLabel;
+   private javax.swing.JLabel totalProductionsOutputLabel;
    // End of variables declaration//GEN-END:variables
 
 }
