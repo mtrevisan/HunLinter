@@ -30,7 +30,7 @@ public class ParsingContext{
 	}
 
 	public boolean isSuffix(){
-		return AffixEntry.Type.SUFFIX.getFlag().equals(getRuleType());
+		return AffixEntry.Type.SUFFIX.getFlag().getCode().equals(getRuleType());
 	}
 
 	public String getFirstParameter(){
