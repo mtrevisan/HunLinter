@@ -91,10 +91,16 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		StringBuilder expandedCompoundRule = new StringBuilder();
 		for(String component : compoundRuleComponents){
 			String flag = strategy.cleanCompoundRuleComponent(component);
-			String expandedFlag = rules.get(flag);
-			String expandedComponent = StringUtils.replace(component, flag, expandedFlag);
+			String expandedComponent = rules.get(flag);
+
+			char lastChar = component.charAt(component.length() - 1);
+			if(lastChar == '*' || lastChar == '?')
+				expandedComponent += lastChar;
+
 			if(expandedComponent.equals(component))
 				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule " + compoundRule);
+
+			expandedCompoundRule.append(expandedComponent);
 		}
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString());

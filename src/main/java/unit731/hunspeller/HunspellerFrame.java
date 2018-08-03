@@ -80,6 +80,7 @@ import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 /**
@@ -972,6 +973,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
+					if(wordCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordCount)
+						words.add("\u2026");
+
 					CompoundTableModel dm = (CompoundTableModel)frame.cmpTable.getModel();
 					dm.setProductions(words);
 				};

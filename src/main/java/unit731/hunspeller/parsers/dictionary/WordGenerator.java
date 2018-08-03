@@ -123,22 +123,12 @@ public class WordGenerator{
 	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	//TODO
 	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
 		CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, COMPOUND_WORDS_LIMIT);
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
 
-		BiConsumer<List<String>, Long> done = (words, wordCount) -> {
-			fnDeferring.accept(words, wordCount);
-		};
-		compoundRulesWorker.extractCompounds(compoundRule, done);
-//		BiConsumer<List<String>, Long> fnDeferring = (words, count) -> {
-//			for(String word : words)
-//				log.info(Backbone.MARKER_APPLICATION, word);
-//			if(count != limit)
-//				log.info(Backbone.MARKER_APPLICATION, "\u2026");
-//		};
+		compoundRulesWorker.extractCompounds(compoundRule, fnDeferring);
 	}
 
 	private RuleProductionEntry getBaseProduction(Productable productable, FlagParsingStrategy strategy){

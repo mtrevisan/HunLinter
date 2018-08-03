@@ -81,8 +81,10 @@ public interface FlagParsingStrategy{
 		char chr = component.charAt(lastCharIndex);
 		if(chr == '*' || chr == '?')
 			lastCharIndex --;
-		if(component.charAt(firstCharIndex) == '(' && component.charAt(lastCharIndex) == ')')
+		if(component.charAt(firstCharIndex) == '(' && component.charAt(lastCharIndex) == ')'){
 			firstCharIndex ++;
+			lastCharIndex --;
+		}
 		return component.substring(firstCharIndex, lastCharIndex + 1);
 	}
 
