@@ -40,95 +40,6 @@ import unit731.hunspeller.services.PatternService;
  */
 public class AffixParser{
 
-	//General options
-	/**
-	 * Set character encoding of words and morphemes in affix and dictionary files. Possible values are UTF-8, ISO8859-1 through ISO8859-10,
-	 * ISO8859-13 through ISO8859-15, KOI8-R, KOI8-U, MICROSOFT-CP1251, ISCII-DEVANAGARI
-	 */
-	private static final String TAG_CHARACTER_SET = "SET";
-	/**
-	 * Set flag type. Default type is the extended ASCII (8-bit) character. 'UTF-8' parameter sets UTF-8 encoded Unicode character flags.
-	 * The 'long' value sets the double extended ASCII character flag type, the 'num' sets the decimal number flag type. Decimal flags numbered
-	 * from 1 to 65000, and in flag fields are separated by comma
-	 */
-	private static final String TAG_FLAG = "FLAG";
-	/** Set twofold prefix stripping (but single suffix stripping) for agglutinative languages with right-to-left writing system */
-	private static final String TAG_COMPLEX_PREFIXES = "COMPLEXPREFIXES";
-	/** Language code */
-	private static final String TAG_LANGUAGE = "LANG";
-	/** Sets characters to ignore in dictionary words, affixes and input words */
-	private static final String TAG_IGNORE = "IGNORE";
-	/** Search and suggest words with one different character replaced by a neighbor character */
-	private static final String TAG_KEY = "KEY";
-
-	//Options for suggestions
-	/** Words signed with this flag are not suggested (but still accepted when typed correctly) */
-	private static final String TAG_NO_SUGGEST = "NOSUGGEST";
-	/** Similar to NOSUGGEST, but it forbids to use the word in n-gram based (more, than 1-character distance) suggestions */
-	private static final String TAG_NO_NGRAM_SUGGEST = "NONGRAMSUGGEST";
-
-	//Options for compounding
-	/** Define new break points for breaking words and checking word parts separately (use ^ and $ to delete characters at end and start of the word) */
-	private static final String TAG_BREAK = "BREAK";
-	/** Define custom compound patterns */
-	private static final String TAG_COMPOUND_RULE = "COMPOUNDRULE";
-	/** Minimum length of words in compound words */
-	private static final String TAG_COMPOUND_MIN = "COMPOUNDMIN";
-	/** Words signed with this flag (or with a signed affix) may be first elements in compound words */
-	private static final String TAG_COMPOUND_BEGIN = "COMPOUNDBEGIN";
-	/** Words signed with this flag (or with a signed affix) may be middle elements in compound words */
-	private static final String TAG_COMPOUND_MIDDLE = "COMPOUNDMIDDLE";
-	/** Words signed with this flag (or with a signed affix) may be last elements in compound words */
-	private static final String TAG_COMPOUND_END = "COMPOUNDEND";
-	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
-	private static final String TAG_ONLY_IN_COMPOUND = "ONLYINCOMPOUND";
-	/** Affixes with this flag may be inside of compounds (normally, prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds only). */
-	private static final String TAG_COMPOUND_PERMIT_FLAG = "COMPOUNDPERMITFLAG";
-	/** Allow twofold suffixes within compounds */
-	private static final String TAG_COMPOUND_MORE_SUFFIXES = "COMPOUNDMORESUFFIXES";
-	/** Signs the compounds in the dictionary (now it is used only in the Hungarian language specific code) */
-	private static final String TAG_COMPOUND_ROOT = "COMPOUNDROOT";
-	/** Suffixes with this flag forbid compounding of the affixed word */
-	private static final String TAG_COMPOUND_FORBID_FLAG = "COMPOUNDFORBIDFLAG";
-	/** Set maximum word count in a compound word (default is unlimited) */
-	private static final String TAG_COMPOUND_WORD_MAX = "COMPOUNDWORDMAX";
-	/** Forbid word duplication in compounds */
-	private static final String TAG_CHECK_COMPOUND_DUPLICATION = "CHECKCOMPOUNDDUP";
-	/** Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with 'compound friendly' orthography) */
-	private static final String TAG_CHECK_COMPOUND_REPLACEMENT = "CHECKCOMPOUNDREP";
-	/** Forbid upper case characters at word bound in compounds */
-	private static final String TAG_CHECK_COMPOUND_CASE = "CHECKCOMPOUNDCASE";
-	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
-	private static final String TAG_CHECK_COMPOUND_TRIPLE = "CHECKCOMPOUNDTRIPLE";
-	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
-	private static final String TAG_SIMPLIFIED_TRIPLE = "SIMPLIFIEDTRIPLE";
-	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
-	private static final String TAG_CIRCUMFIX = "CIRCUMFIX";
-	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from set of the accepted affixed and compound words) */
-	private static final String TAG_FORBIDDEN_WORD = "FORBIDDENWORD";
-
-	//Options for affix creation
-	private static final String TAG_PREFIX = AffixEntry.Type.PREFIX.getFlag();
-	private static final String TAG_SUFFIX = AffixEntry.Type.SUFFIX.getFlag();
-
-	//Other options
-	/** With this flag the affix rules can strip full words, not only one less characters */
-	private static final String TAG_FULLSTRIP = "FULLSTRIP";
-	/** Forbid uppercased and capitalized forms of words signed with this flag */
-	private static final String TAG_KEEP_CASE = "KEEPCASE";
-	/**
-	 * Signs virtual stems in the dictionary, words are valid only when affixed, except if the dictionary word has a homonym or a zero affix
-	 * (it works also with prefixes and prefix + suffix combinations)
-	 */
-	private static final String TAG_NEED_AFFIX = "NEEDAFFIX";
-	/** Extends tokenizer of Hunspell command line interface with additional word character */
-	private static final String TAG_WORD_CHARS = "WORDCHARS";
-	/** Define input conversion table */
-	private static final String TAG_INPUT_CONVERSION_TABLE = "ICONV";
-	/** Define output conversion table */
-	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
-
-
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
 	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
@@ -138,12 +49,12 @@ public class AffixParser{
 
 	@AllArgsConstructor
 	private static enum ConversionTableType{
-		INPUT(TAG_INPUT_CONVERSION_TABLE),
-		OUTPUT(TAG_OUTPUT_CONVERSION_TABLE);
+		INPUT(AffixTag.INPUT_CONVERSION_TABLE),
+		OUTPUT(AffixTag.OUTPUT_CONVERSION_TABLE);
 
 
 		@Getter
-		private final String flag;
+		private final AffixTag flag;
 
 		public static ConversionTableType toEnum(String flag){
 			ConversionTableType[] types = ConversionTableType.values();
@@ -184,9 +95,9 @@ public class AffixParser{
 
 				String[] lineParts = StringUtils.split(line);
 				String tag = lineParts[0];
-				if(!TAG_COMPOUND_RULE.equals(tag))
+				if(!AffixTag.COMPOUND_RULE.equals(tag))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched compound rule type (expected "
-						+ TAG_COMPOUND_RULE + ")");
+						+ AffixTag.COMPOUND_RULE + ")");
 				String rule = lineParts[1];
 				if(StringUtils.isBlank(rule))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule type cannot be empty");
@@ -200,7 +111,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 			}
 
-			addData(TAG_COMPOUND_RULE, compoundRules);
+			addData(AffixTag.COMPOUND_RULE.getCode(), compoundRules);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -272,9 +183,9 @@ public class AffixParser{
 
 				String[] lineParts = StringUtils.split(line);
 				String tag = lineParts[0];
-				if(!TAG_BREAK.equals(tag))
+				if(!AffixTag.BREAK.equals(tag))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
-						+ TAG_BREAK + ")");
+						+ AffixTag.BREAK + ")");
 				String breakCharacter = lineParts[1];
 				if(StringUtils.isBlank(breakCharacter))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
@@ -286,7 +197,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 			}
 
-			addData(TAG_BREAK, wordBreakCharacters);
+			addData(AffixTag.BREAK.getCode(), wordBreakCharacters);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -313,7 +224,7 @@ public class AffixParser{
 				conversionTable.put(parts[1], parts[2]);
 			}
 
-			addData(conversionTableType.getFlag(), conversionTable);
+			addData(conversionTableType.getFlag().getCode(), conversionTable);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -329,7 +240,7 @@ public class AffixParser{
 			.allMatch(set::add);
 	}
 
-	private final Map<String, Consumer<ParsingContext>> RULE_FUNCTION = new HashMap<>();
+	private final Map<AffixTag, Consumer<ParsingContext>> RULE_FUNCTION = new HashMap<>();
 
 
 	public AffixParser(){
@@ -337,50 +248,50 @@ public class AffixParser{
 //		RULE_FUNCTION.put("NAME", FUN_COPY_OVER);
 //		RULE_FUNCTION.put("VERSION", FUN_COPY_OVER);
 //		RULE_FUNCTION.put("HOME", FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_CHARACTER_SET, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_COMPLEX_PREFIXES, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_LANGUAGE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_IGNORE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.CHARACTER_SET, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPLEX_PREFIXES, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.LANGUAGE, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.IGNORE, FUN_COPY_OVER);
 		//Options for suggestions
-//		RULE_FUNCTION.put(TAG_KEY, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.KEY, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("TRY", FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_NO_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_NO_NGRAM_SUGGEST, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.NO_SUGGEST, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.NO_NGRAM_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("REP", FUN_COPY_OVER);
 //		RULE_FUNCTION.put("MAP", FUN_MAP);
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
-		RULE_FUNCTION.put(TAG_BREAK, FUN_WORD_BREAK_TABLE);
-		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
-		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_FLAG, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_BEGIN, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_MIDDLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_END, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_ROOT, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
-//		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_CASE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_CIRCUMFIX, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_FORBIDDEN_WORD, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.BREAK, FUN_WORD_BREAK_TABLE);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_RULE, FUN_COMPOUND_RULE);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_FLAG, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_BEGIN, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.ONLY_IN_COMPOUND, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_ROOT, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
+//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.CIRCUMFIX, FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.FORBIDDEN_WORD, FUN_COPY_OVER);
 		//Options for affix creation
-		RULE_FUNCTION.put(TAG_PREFIX, FUN_AFFIX);
-		RULE_FUNCTION.put(TAG_SUFFIX, FUN_AFFIX);
+		RULE_FUNCTION.put(AffixTag.PREFIX, FUN_AFFIX);
+		RULE_FUNCTION.put(AffixTag.SUFFIX, FUN_AFFIX);
 		//Other options
-		RULE_FUNCTION.put(TAG_FULLSTRIP, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_KEEP_CASE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_NEED_AFFIX, FUN_COPY_OVER);
-		RULE_FUNCTION.put(TAG_INPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
-		RULE_FUNCTION.put(TAG_OUTPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
-//		RULE_FUNCTION.put(TAG_WORD_CHARS, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.FULLSTRIP, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.KEEP_CASE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.NEED_AFFIX, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.INPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
+		RULE_FUNCTION.put(AffixTag.OUTPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
+//		RULE_FUNCTION.put(AffixTag.WORD_CHARS, FUN_COPY_OVER);
 	}
 
 	/**
@@ -408,7 +319,7 @@ public class AffixParser{
 					if(line.isEmpty())
 						continue;
 
-					if(!encodingRead && !line.startsWith(TAG_CHARACTER_SET + StringUtils.SPACE))
+					if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET + StringUtils.SPACE))
 						throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
 					else
 						encodingRead = true;
@@ -420,7 +331,7 @@ public class AffixParser{
 						try{
 							fun.accept(context);
 
-							if(TAG_FLAG.equals(ruleType)){
+							if(AffixTag.FLAG.equals(ruleType)){
 								String flag = getFlag();
 								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
 								strategy = FlagParsingStrategy.Type.toEnum(flag).getStategy();
@@ -435,39 +346,39 @@ public class AffixParser{
 				}
 			}
 
-			if(!containsData(TAG_COMPOUND_MIN))
-				addData(TAG_COMPOUND_MIN, 3);
+			if(!containsData(AffixTag.COMPOUND_MIN))
+				addData(AffixTag.COMPOUND_MIN.getCode(), 3);
 			else{
-				int compoundMin = getData(TAG_COMPOUND_MIN);
+				int compoundMin = getData(AffixTag.COMPOUND_MIN.getCode());
 				if(compoundMin < 1)
-					addData(TAG_COMPOUND_MIN, 1);
+					addData(AffixTag.COMPOUND_MIN.getCode(), 1);
 			}
 			//apply default charset
-			if(!containsData(TAG_CHARACTER_SET))
-				addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
-			if(!containsData(TAG_LANGUAGE))
+			if(!containsData(AffixTag.CHARACTER_SET))
+				addData(AffixTag.CHARACTER_SET.getCode(), StandardCharsets.ISO_8859_1);
+			if(!containsData(AffixTag.LANGUAGE))
 				//try to infer language from filename
-				addData(TAG_LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
-			if(!containsData(TAG_BREAK)){
+				addData(AffixTag.LANGUAGE.getCode(), affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
+			if(!containsData(AffixTag.BREAK)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add("^" + HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + "$");
-				addData(TAG_BREAK, wordBreakCharacters);
+				addData(AffixTag.BREAK.getCode(), wordBreakCharacters);
 			}
 //			if(isComplexPrefixes()){
-//				String compoundBegin = getData(TAG_COMPOUND_BEGIN);
-//				String compoundEnd = getData(TAG_COMPOUND_END);
-//				addData(TAG_COMPOUND_BEGIN, compoundEnd);
-//				addData(TAG_COMPOUND_END, compoundBegin);
+//				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN);
+//				String compoundEnd = getData(AffixTag.COMPOUND_END);
+//				addData(AffixTag.COMPOUND_BEGIN, compoundEnd);
+//				addData(AffixTag.COMPOUND_END, compoundBegin);
 //
-//				RuleEntry prefixes = getData(TAG_PREFIX);
-//				RuleEntry suffixes = getData(TAG_SUFFIX);
-//				addData(TAG_PREFIX, suffixes);
-//				addData(TAG_SUFFIX, prefixes);
+//				RuleEntry prefixes = getData(AffixTag.PREFIX);
+//				RuleEntry suffixes = getData(AffixTag.SUFFIX);
+//				addData(AffixTag.PREFIX, suffixes);
+//				addData(AffixTag.SUFFIX, prefixes);
 //			}
-//			if(!containsData(TAG_KEY))
-//				addData(TAG_KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+//			if(!containsData(AffixTag.KEY))
+//				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 
 
 			terminalAffixes.add(getKeepCaseFlag());
@@ -500,7 +411,7 @@ public class AffixParser{
 		return StringUtils.strip(line);
 	}
 
-	private boolean containsData(String key){
+	private boolean containsData(AffixTag key){
 		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return data.containsKey(key);
@@ -536,15 +447,15 @@ public class AffixParser{
 	}
 
 	public String getLanguage(){
-		return getData(TAG_LANGUAGE);
+		return getData(AffixTag.LANGUAGE.getCode());
 	}
 
 	public String getKeepCaseFlag(){
-		return getData(TAG_KEEP_CASE);
+		return getData(AffixTag.KEEP_CASE.getCode());
 	}
 
 	public String getNeedAffixFlag(){
-		return getData(TAG_NEED_AFFIX);
+		return getData(AffixTag.NEED_AFFIX.getCode());
 	}
 
 	public boolean isTerminalAffix(String flag){
@@ -558,7 +469,7 @@ public class AffixParser{
 	}
 
 	public Set<String> getCompoundRules(){
-		return getData(TAG_COMPOUND_RULE);
+		return getData(AffixTag.COMPOUND_RULE.getCode());
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
@@ -591,11 +502,11 @@ public class AffixParser{
 	}
 
 	public Charset getCharset(){
-		return Charset.forName(getData(TAG_CHARACTER_SET));
+		return Charset.forName(getData(AffixTag.CHARACTER_SET.getCode()));
 	}
 
 	public boolean isFullstrip(){
-		return containsData(TAG_FULLSTRIP);
+		return containsData(AffixTag.FULLSTRIP);
 	}
 
 	/**
@@ -604,7 +515,7 @@ public class AffixParser{
 	 * @return Whether the prefix is complex
 	 */
 	public boolean isComplexPrefixes(){
-		return containsData(TAG_COMPLEX_PREFIXES);
+		return containsData(AffixTag.COMPLEX_PREFIXES);
 	}
 
 	public Boolean isSuffix(String affixCode){
@@ -640,7 +551,7 @@ public class AffixParser{
 	}
 
 	public String getFlag(){
-		return getData(TAG_FLAG);
+		return getData(AffixTag.FLAG.getCode());
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
@@ -683,11 +594,11 @@ public class AffixParser{
 	}
 
 	public String applyInputConversionTable(String word){
-		return applyConversionTable(word, getData(TAG_INPUT_CONVERSION_TABLE));
+		return applyConversionTable(word, getData(AffixTag.INPUT_CONVERSION_TABLE.getCode()));
 	}
 
 	public String applyOutputConversionTable(String word){
-		return applyConversionTable(word, getData(TAG_OUTPUT_CONVERSION_TABLE));
+		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE.getCode()));
 	}
 
 	private String applyConversionTable(String word, Map<String, String> table){
@@ -705,19 +616,19 @@ public class AffixParser{
 	}
 
 	public Set<String> getWordBreakCharacters(){
-		return getData(TAG_BREAK);
+		return getData(AffixTag.BREAK.getCode());
 	}
 
 	public String getOnlyInCompoundFlag(){
-		return getData(TAG_ONLY_IN_COMPOUND);
+		return getData(AffixTag.ONLY_IN_COMPOUND.getCode());
 	}
 
 	public int getCompoundMinimumLength(){
-		return getData(TAG_COMPOUND_MIN);
+		return getData(AffixTag.COMPOUND_MIN.getCode());
 	}
 
 	public String getCircumfixFlag(){
-		return getData(TAG_CIRCUMFIX);
+		return getData(AffixTag.CIRCUMFIX.getCode());
 	}
 
 }

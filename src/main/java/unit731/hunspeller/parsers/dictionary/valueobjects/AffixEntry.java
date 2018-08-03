@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PatternService;
 
@@ -22,17 +23,17 @@ public class AffixEntry{
 
 	@AllArgsConstructor
 	public static enum Type{
-		SUFFIX("SFX"),
-		PREFIX("PFX");
+		SUFFIX(AffixTag.SUFFIX),
+		PREFIX(AffixTag.PREFIX);
 
 
 		@Getter
-		private final String flag;
+		private final AffixTag flag;
 
 		public static Type toEnum(String flag){
 			Type[] types = Type.values();
 			for(Type type : types)
-				if(type.getFlag().equals(flag))
+				if(type.getFlag().getCode().equals(flag))
 					return type;
 			return null;
 		}
