@@ -59,7 +59,7 @@ public class AffixParser{
 		public static ConversionTableType toEnum(String flag){
 			ConversionTableType[] types = ConversionTableType.values();
 			for(ConversionTableType type : types)
-				if(type.getFlag().equals(flag))
+				if(type.getFlag().getCode().equals(flag))
 					return type;
 			return null;
 		}
@@ -94,8 +94,8 @@ public class AffixParser{
 				String line = br.readLine();
 
 				String[] lineParts = StringUtils.split(line);
-				String tag = lineParts[0];
-				if(!AffixTag.COMPOUND_RULE.equals(tag))
+				AffixTag tag = AffixTag.toEnum(lineParts[0]);
+				if(tag != AffixTag.COMPOUND_RULE)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched compound rule type (expected "
 						+ AffixTag.COMPOUND_RULE + ")");
 				String rule = lineParts[1];
@@ -111,7 +111,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 			}
 
-			addData(AffixTag.COMPOUND_RULE.getCode(), compoundRules);
+			addData(AffixTag.COMPOUND_RULE, compoundRules);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -182,8 +182,8 @@ public class AffixParser{
 				String line = br.readLine();
 
 				String[] lineParts = StringUtils.split(line);
-				String tag = lineParts[0];
-				if(!AffixTag.BREAK.equals(tag))
+				AffixTag tag = AffixTag.toEnum(lineParts[0]);
+				if(tag != AffixTag.BREAK)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
 						+ AffixTag.BREAK + ")");
 				String breakCharacter = lineParts[1];
@@ -197,7 +197,7 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 			}
 
-			addData(AffixTag.BREAK.getCode(), wordBreakCharacters);
+			addData(AffixTag.BREAK, wordBreakCharacters);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -224,7 +224,7 @@ public class AffixParser{
 				conversionTable.put(parts[1], parts[2]);
 			}
 
-			addData(conversionTableType.getFlag().getCode(), conversionTable);
+			addData(conversionTableType.getFlag(), conversionTable);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -319,19 +319,19 @@ public class AffixParser{
 					if(line.isEmpty())
 						continue;
 
-					if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET + StringUtils.SPACE))
+					if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET.getCode() + StringUtils.SPACE))
 						throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
 					else
 						encodingRead = true;
 
 					ParsingContext context = new ParsingContext(line, br);
-					String ruleType = context.getRuleType();
+					AffixTag ruleType = AffixTag.toEnum(context.getRuleType());
 					Consumer<ParsingContext> fun = RULE_FUNCTION.get(ruleType);
 					if(fun != null){
 						try{
 							fun.accept(context);
 
-							if(AffixTag.FLAG.equals(ruleType)){
+							if(ruleType == AffixTag.FLAG){
 								String flag = getFlag();
 								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
 								strategy = FlagParsingStrategy.Type.toEnum(flag).getStategy();
@@ -347,24 +347,24 @@ public class AffixParser{
 			}
 
 			if(!containsData(AffixTag.COMPOUND_MIN))
-				addData(AffixTag.COMPOUND_MIN.getCode(), 3);
+				addData(AffixTag.COMPOUND_MIN, 3);
 			else{
-				int compoundMin = getData(AffixTag.COMPOUND_MIN.getCode());
+				int compoundMin = getData(AffixTag.COMPOUND_MIN);
 				if(compoundMin < 1)
-					addData(AffixTag.COMPOUND_MIN.getCode(), 1);
+					addData(AffixTag.COMPOUND_MIN, 1);
 			}
 			//apply default charset
 			if(!containsData(AffixTag.CHARACTER_SET))
-				addData(AffixTag.CHARACTER_SET.getCode(), StandardCharsets.ISO_8859_1);
+				addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
 			if(!containsData(AffixTag.LANGUAGE))
 				//try to infer language from filename
-				addData(AffixTag.LANGUAGE.getCode(), affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
+				addData(AffixTag.LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
 			if(!containsData(AffixTag.BREAK)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add("^" + HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + "$");
-				addData(AffixTag.BREAK.getCode(), wordBreakCharacters);
+				addData(AffixTag.BREAK, wordBreakCharacters);
 			}
 //			if(isComplexPrefixes()){
 //				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN);
@@ -412,6 +412,10 @@ public class AffixParser{
 	}
 
 	private boolean containsData(AffixTag key){
+		return containsData(key.getCode());
+	}
+
+	private boolean containsData(String key){
 		READ_WRITE_LOCK.readLock().lock();
 		try{
 			return data.containsKey(key);
@@ -419,6 +423,11 @@ public class AffixParser{
 		finally{
 			READ_WRITE_LOCK.readLock().unlock();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getData(AffixTag key){
+		return getData(key.getCode());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -430,6 +439,10 @@ public class AffixParser{
 		finally{
 			READ_WRITE_LOCK.readLock().unlock();
 		}
+	}
+
+	private <T> T addData(AffixTag key, T value){
+		return addData(key.getCode(), value);
 	}
 
 	private <T> T addData(String key, T value){
@@ -447,15 +460,15 @@ public class AffixParser{
 	}
 
 	public String getLanguage(){
-		return getData(AffixTag.LANGUAGE.getCode());
+		return getData(AffixTag.LANGUAGE);
 	}
 
 	public String getKeepCaseFlag(){
-		return getData(AffixTag.KEEP_CASE.getCode());
+		return getData(AffixTag.KEEP_CASE);
 	}
 
 	public String getNeedAffixFlag(){
-		return getData(AffixTag.NEED_AFFIX.getCode());
+		return getData(AffixTag.NEED_AFFIX);
 	}
 
 	public boolean isTerminalAffix(String flag){
@@ -469,7 +482,7 @@ public class AffixParser{
 	}
 
 	public Set<String> getCompoundRules(){
-		return getData(AffixTag.COMPOUND_RULE.getCode());
+		return getData(AffixTag.COMPOUND_RULE);
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
@@ -502,7 +515,7 @@ public class AffixParser{
 	}
 
 	public Charset getCharset(){
-		return Charset.forName(getData(AffixTag.CHARACTER_SET.getCode()));
+		return Charset.forName(getData(AffixTag.CHARACTER_SET));
 	}
 
 	public boolean isFullstrip(){
@@ -551,7 +564,7 @@ public class AffixParser{
 	}
 
 	public String getFlag(){
-		return getData(AffixTag.FLAG.getCode());
+		return getData(AffixTag.FLAG);
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
@@ -594,11 +607,11 @@ public class AffixParser{
 	}
 
 	public String applyInputConversionTable(String word){
-		return applyConversionTable(word, getData(AffixTag.INPUT_CONVERSION_TABLE.getCode()));
+		return applyConversionTable(word, getData(AffixTag.INPUT_CONVERSION_TABLE));
 	}
 
 	public String applyOutputConversionTable(String word){
-		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE.getCode()));
+		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 	}
 
 	private String applyConversionTable(String word, Map<String, String> table){
@@ -616,19 +629,19 @@ public class AffixParser{
 	}
 
 	public Set<String> getWordBreakCharacters(){
-		return getData(AffixTag.BREAK.getCode());
+		return getData(AffixTag.BREAK);
 	}
 
 	public String getOnlyInCompoundFlag(){
-		return getData(AffixTag.ONLY_IN_COMPOUND.getCode());
+		return getData(AffixTag.ONLY_IN_COMPOUND);
 	}
 
 	public int getCompoundMinimumLength(){
-		return getData(AffixTag.COMPOUND_MIN.getCode());
+		return getData(AffixTag.COMPOUND_MIN);
 	}
 
 	public String getCircumfixFlag(){
-		return getData(AffixTag.CIRCUMFIX.getCode());
+		return getData(AffixTag.CIRCUMFIX);
 	}
 
 }

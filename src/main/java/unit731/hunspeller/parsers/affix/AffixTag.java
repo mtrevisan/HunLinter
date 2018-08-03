@@ -112,4 +112,12 @@ public enum AffixTag{
 
 	private final String code;
 
+
+	public static AffixTag toEnum(String code){
+		for(AffixTag tag : values())
+			if(tag.getCode().equals(code))
+				return tag;
+		return null;
+	}
+
 }
