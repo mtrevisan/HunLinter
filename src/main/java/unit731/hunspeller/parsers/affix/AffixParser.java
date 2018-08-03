@@ -75,7 +75,6 @@ public class AffixParser{
 	private final Set<String> terminalAffixes = new HashSet<>();
 
 
-	//TODO check for duplicated rules
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
 		addData(context.getRuleType(), context.getAllButFirstParameter());
 	};
@@ -111,7 +110,6 @@ public class AffixParser{
 				List<String> compounds = strategy.extractCompoundRule(rule);
 				if(compounds.isEmpty())
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule is bad formatted");
-				//FIXME does the rule not duplicates any other flags?
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
