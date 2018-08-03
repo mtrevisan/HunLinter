@@ -67,7 +67,6 @@ public class WordGenerator{
 
 	/**
 	 * Generates a list of stems for the provided word
-	 * TODO: manage AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
 	 * @param dicEntry	{@link DictionaryEntry dictionary entry} to generate the productions for
 	 * @return	The list of productions for the given word
@@ -96,6 +95,9 @@ public class WordGenerator{
 		List<RuleProductionEntry> lastfoldProductions = getLastfoldProductions(productions);
 		checkTwofoldCorrectness(lastfoldProductions);
 
+		//remove rules that invalidate the onlyInCompound rule
+		removeRulesInvalidatingOnlyInCompound(productions);
+
 		//remove rules that invalidate the circumfix rule
 		removeRulesInvalidatingCircumfix(lastfoldProductions);
 
@@ -115,7 +117,6 @@ public class WordGenerator{
 
 	/**
 	 * Generates a list of stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
-	 * TODO: manage AffixParser.TAG_ONLY_IN_COMPOUND
 	 * 
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param fnDeferring	Function to be called whenever the list of production is ready
@@ -232,12 +233,24 @@ public class WordGenerator{
 					+ Arrays.stream(prod.getContinuationFlags()).collect(Collectors.joining(", ")) + ")");
 	}
 
-	private void removeRulesInvalidatingCircumfix(List<RuleProductionEntry> lastfoldProductions){
+	private List<RuleProductionEntry> removeRulesInvalidatingOnlyInCompound(List<RuleProductionEntry> productions){
+		String onlyInCompoundFlag = affParser.getOnlyInCompoundFlag();
+		Iterator<RuleProductionEntry> itr = productions.iterator();
+		while(itr.hasNext()){
+			RuleProductionEntry production = itr.next();
+
+			if(production.getAppliedRules() == null && production.containsContinuationFlag(onlyInCompoundFlag))
+				itr.remove();
+		}
+		return productions;
+	}
+
+	private List<RuleProductionEntry> removeRulesInvalidatingCircumfix(List<RuleProductionEntry> lastfoldProductions){
 		String circumfixFlag = affParser.getCircumfixFlag();
 		Iterator<RuleProductionEntry> itr = lastfoldProductions.iterator();
 		while(itr.hasNext()){
 			RuleProductionEntry production = itr.next();
-			
+
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			boolean rulesContainsCircumfixFlag = appliedRules.stream()
 				.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
@@ -253,6 +266,7 @@ public class WordGenerator{
 					itr.remove();
 			}
 		}
+		return lastfoldProductions;
 	}
 
 	private void enforceNeedAffixFlag(List<RuleProductionEntry> productions){

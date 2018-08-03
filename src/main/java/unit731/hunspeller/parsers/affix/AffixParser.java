@@ -32,7 +32,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX, COMPOUNDRULE
+ * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX, COMPOUNDRULE, ONLYINCOMPOUND
  */
 public class AffixParser{
 
@@ -353,7 +353,7 @@ public class AffixParser{
 //		RULE_FUNCTION.put(TAG_COMPOUND_BEGIN, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_MIDDLE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_END, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
+		RULE_FUNCTION.put(TAG_ONLY_IN_COMPOUND, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_ROOT, FUN_COPY_OVER);
@@ -466,6 +466,7 @@ public class AffixParser{
 			terminalAffixes.add(getKeepCaseFlag());
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getNeedAffixFlag());
+			terminalAffixes.add(getOnlyInCompoundFlag());
 		}
 		finally{
 			READ_WRITE_LOCK.writeLock().unlock();
@@ -575,7 +576,7 @@ public class AffixParser{
 		try{
 			List<String> flags = strategy.extractCompoundRule(compoundRule);
 			flags = strategy.cleanCompoundRuleComponents(flags);
-			return compoundRule.contains(flag);
+			return flags.contains(flag);
 		}
 		finally{
 			READ_WRITE_LOCK.readLock().unlock();
@@ -698,6 +699,10 @@ public class AffixParser{
 
 	public Set<String> getWordBreakCharacters(){
 		return getData(TAG_BREAK);
+	}
+
+	public String getOnlyInCompoundFlag(){
+		return getData(TAG_ONLY_IN_COMPOUND);
 	}
 
 	public String getCircumfixFlag(){
