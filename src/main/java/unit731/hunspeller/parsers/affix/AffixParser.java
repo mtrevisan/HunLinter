@@ -32,7 +32,7 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX
+ * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX, COMPOUNDRULE
  */
 public class AffixParser{
 
@@ -180,12 +180,15 @@ public class AffixParser{
 				String[] lineParts = StringUtils.split(line);
 				String tag = lineParts[0];
 				if(!TAG_COMPOUND_RULE.equals(tag))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched compound rule type (expected "
 						+ TAG_COMPOUND_RULE + ")");
 				String rule = lineParts[1];
 				if(StringUtils.isBlank(rule))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": rule type cannot be empty");
-				//FIXME is the rule well formatted? does it not duplicates any other flags?
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule type cannot be empty");
+				List<String> compounds = strategy.extractCompoundRule(rule);
+				if(compounds.isEmpty())
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule is bad formatted");
+				//FIXME does the rule not duplicates any other flags?
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
