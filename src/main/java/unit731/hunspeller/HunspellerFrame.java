@@ -196,6 +196,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpRuleTagsAidComboBox = new javax.swing.JComboBox<>();
       dicScrollPane1 = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
+      limitComboBox = new javax.swing.JComboBox<>();
+      limitLabel = new javax.swing.JLabel();
       theLayeredPane = new javax.swing.JLayeredPane();
       theMeaningsLabel = new javax.swing.JLabel();
       theMeaningsTextField = new javax.swing.JTextField();
@@ -344,11 +346,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable.setRowSelectionAllowed(true);
       dicScrollPane1.setViewportView(cmpTable);
 
+      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "10", "20", "50", "100", "500", "1000" }));
+      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            limitComboBoxActionPerformed(evt);
+         }
+      });
+
+      limitLabel.setLabelFor(limitComboBox);
+      limitLabel.setText("Limit:");
+
       cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(dicScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
       cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
@@ -357,15 +371,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(dicScrollPane1)
                .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(cmpInputLabel)
+                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                     .addComponent(cmpInputLabel)
+                     .addComponent(cmpRuleTagsAidLabel))
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(cmpInputComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(cmpRuleTagsAidLabel)
-                  .addGap(18, 18, 18)
-                  .addComponent(cmpRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-               .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 904, Short.MAX_VALUE))
+                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                     .addComponent(cmpRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                        .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 728, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(limitLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
             .addContainerGap())
       );
       cmpLayeredPaneLayout.setVerticalGroup(
@@ -374,7 +393,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap()
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(cmpInputLabel)
-               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+               .addComponent(cmpInputComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(limitLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(cmpRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -970,23 +991,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			return;
 		formerCompoundInputText = inputText;
 
-		if(StringUtils.isNotBlank(inputText)){
-			try{
-				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
-					if(wordCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordCount)
-						words.add("\u2026");
-
-					CompoundTableModel dm = (CompoundTableModel)frame.cmpTable.getModel();
-					dm.setProductions(words);
-				};
-				frame.backbone.getWordGenerator().applyCompoundRules(inputText, filler);
-			}
-			catch(IllegalArgumentException e){
-				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
-			}
-		}
-		else
-			frame.clearOutputTable(frame.cmpTable);
+		frame.limitComboBoxActionPerformed(null);
 	}
 
 
@@ -1223,6 +1228,29 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		extractWordCount();
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
+
+   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
+		String inputText = (String)cmpInputComboBox.getEditor().getItem();
+		inputText = StringUtils.strip(inputText);
+		if(StringUtils.isNotBlank(inputText)){
+			try{
+				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
+					if(wordCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordCount)
+						words.add("\u2026");
+
+					CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
+					dm.setProductions(words);
+				};
+				long limit = Long.valueOf((String)limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
+				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);
+			}
+			catch(IllegalArgumentException e){
+				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
+			}
+		}
+		else
+			clearOutputTable(cmpTable);
+   }//GEN-LAST:event_limitComboBoxActionPerformed
 
 
 	@Override
@@ -1793,6 +1821,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel hypSyllabesCountOutputLabel;
    private javax.swing.JLabel hypWordLabel;
    private javax.swing.JTextField hypWordTextField;
+   private javax.swing.JComboBox<String> limitComboBox;
+   private javax.swing.JLabel limitLabel;
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
