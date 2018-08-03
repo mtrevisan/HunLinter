@@ -47,8 +47,6 @@ public class WordGenerator{
 	private static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
-	private static final long COMPOUND_WORDS_LIMIT = 20l;
-
 
 	@NonNull
 	private final AffixParser affParser;
@@ -123,8 +121,8 @@ public class WordGenerator{
 	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
-		CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, COMPOUND_WORDS_LIMIT);
+	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException, NoApplicableRuleException{
+		CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, limit);
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
 
