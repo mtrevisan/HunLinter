@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -79,11 +80,17 @@ public class AffixParser{
 		addData(context.getRuleType(), context.getAllButFirstParameter());
 	};
 	private final Consumer<ParsingContext> FUN_COPY_OVER_AS_NUMBER = context -> {
-		addData(context.getRuleType(), Integer.valueOf(context.getAllButFirstParameter()));
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new IllegalArgumentException("Error reading line \"" + context.toString()
+				+ "\": The first parameter is not a number");
+		addData(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
 	};
 	private final Consumer<ParsingContext> FUN_COMPOUND_RULE = context -> {
 		try{
 			BufferedReader br = context.getReader();
+			if(!NumberUtils.isCreatable(context.getFirstParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -124,6 +131,9 @@ public class AffixParser{
 			boolean isSuffix = context.isSuffix();
 			String ruleFlag = context.getFirstParameter();
 			char combineable = context.getSecondParameter().charAt(0);
+			if(!NumberUtils.isCreatable(context.getThirdParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ "\": The third parameter is not a number");
 			int numEntries = Integer.parseInt(context.getThirdParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -172,6 +182,9 @@ public class AffixParser{
 	private final Consumer<ParsingContext> FUN_WORD_BREAK_TABLE = context -> {
 		try{
 			BufferedReader br = context.getReader();
+			if(!NumberUtils.isCreatable(context.getFirstParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -207,6 +220,9 @@ public class AffixParser{
 		try{
 			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
 			BufferedReader br = context.getReader();
+			if(!NumberUtils.isCreatable(context.getFirstParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -441,12 +457,15 @@ public class AffixParser{
 		}
 	}
 
-	private <T> T addData(AffixTag key, T value){
-		return addData(key.getCode(), value);
+	private <T> void addData(AffixTag key, T value){
+		addData(key.getCode(), value);
 	}
 
-	private <T> T addData(String key, T value){
-		return (T)data.put(key, value);
+	private <T> void addData(String key, T value){
+		T prevValue = (T)data.put(key, value);
+
+		if(prevValue != null)
+			throw new IllegalArgumentException("Duplicated flag: " + key);
 	}
 
 	private void clearData(){

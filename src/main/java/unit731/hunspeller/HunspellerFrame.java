@@ -73,6 +73,7 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
@@ -1164,7 +1165,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.backbone.getTheParser().prepareTextForThesaurusFilter(formerFilterThesaurusText);
+				String filterText = ThesaurusParser.prepareTextForThesaurusFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
@@ -1482,6 +1483,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(FileNotFoundException e){
 			log.info(Backbone.MARKER_APPLICATION, "The file does not exists");
+		}
+		catch(IllegalArgumentException e){
+			log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(e));
 		}
 		catch(IOException e){
 			log.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionService.getMessage(e));

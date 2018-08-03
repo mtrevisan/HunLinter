@@ -84,7 +84,6 @@ public class FileListenerManager implements FileListener, Runnable{
 
 			if(!dirPathToListeners.containsKey(dir)){
 				try{
-					//TODO manage non-existing directory
 					WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
 
 					watchKeyToDirPath.put(key, dir);
