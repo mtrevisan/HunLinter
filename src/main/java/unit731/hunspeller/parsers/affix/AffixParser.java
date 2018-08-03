@@ -32,7 +32,9 @@ import unit731.hunspeller.services.PatternService;
 
 
 /**
- * Managed options: SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX, COMPOUNDRULE, ONLYINCOMPOUND
+ * Managed options:
+ *		SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX,
+ *		COMPOUNDRULE, ONLYINCOMPOUND, COMPOUNDMIN
  */
 public class AffixParser{
 
@@ -348,7 +350,7 @@ public class AffixParser{
 		//default break table contains: "-", "^-", and "-$"
 		RULE_FUNCTION.put(TAG_BREAK, FUN_WORD_BREAK_TABLE);
 		RULE_FUNCTION.put(TAG_COMPOUND_RULE, FUN_COMPOUND_RULE);
-//		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
+		RULE_FUNCTION.put(TAG_COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_BEGIN, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(TAG_COMPOUND_MIDDLE, FUN_COPY_OVER);
@@ -430,11 +432,13 @@ public class AffixParser{
 				}
 			}
 
-//			if(!containsData(TAG_COMPOUND_MIN))
-//				addData(TAG_COMPOUND_MIN, 3);
-//			Integer compoundMin = getData(TAG_COMPOUND_MIN);
-//			if(compoundMin != null && compoundMin < 1)
-//				addData(TAG_COMPOUND_MIN, 1);
+			if(!containsData(TAG_COMPOUND_MIN))
+				addData(TAG_COMPOUND_MIN, 3);
+			else{
+				int compoundMin = getData(TAG_COMPOUND_MIN);
+				if(compoundMin < 1)
+					addData(TAG_COMPOUND_MIN, 1);
+			}
 			//apply default charset
 			if(!containsData(TAG_CHARACTER_SET))
 				addData(TAG_CHARACTER_SET, StandardCharsets.ISO_8859_1);
@@ -703,6 +707,10 @@ public class AffixParser{
 
 	public String getOnlyInCompoundFlag(){
 		return getData(TAG_ONLY_IN_COMPOUND);
+	}
+
+	public int getCompoundMinimumLength(){
+		return getData(TAG_COMPOUND_MIN);
 	}
 
 	public String getCircumfixFlag(){

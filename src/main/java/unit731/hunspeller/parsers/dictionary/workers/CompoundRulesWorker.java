@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -48,26 +49,28 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		this.wordGenerator = wordGenerator;
 		this.limit = limit;
 
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			//collect words belonging to a compound rule
 			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
-			for(RuleProductionEntry production : productions){
-				Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
-					.filter(affParser::isManagedByCompoundRule)
-					.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production.getWord(), Collectors.toSet())));
+			for(RuleProductionEntry production : productions)
+				if(production.getWord().length() >= compoundMinimumLength){
+					Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
+						.filter(affParser::isManagedByCompoundRule)
+						.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production.getWord(), Collectors.toSet())));
 
-				for(Map.Entry<String, Set<String>> entry: c.entrySet()){
-					String affix = entry.getKey();
-					Set<String> prods = entry.getValue();
+					for(Map.Entry<String, Set<String>> entry: c.entrySet()){
+						String affix = entry.getKey();
+						Set<String> prods = entry.getValue();
 
-					Set<String> sub = compounds.get(affix);
-					if(sub == null)
-						compounds.put(affix, prods);
-					else
-						sub.addAll(prods);
+						Set<String> sub = compounds.get(affix);
+						if(sub == null)
+							compounds.put(affix, prods);
+						else
+							sub.addAll(prods);
+					}
 				}
-			}
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
@@ -91,15 +94,18 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		for(String component : compoundRuleComponents){
 			String flag = strategy.cleanCompoundRuleComponent(component);
 			String expandedComponent = rules.get(flag);
+			if(expandedComponent == null)
+				log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+			else{
+				char lastChar = component.charAt(component.length() - 1);
+				if(lastChar == '*' || lastChar == '?')
+					expandedComponent += lastChar;
 
-			char lastChar = component.charAt(component.length() - 1);
-			if(lastChar == '*' || lastChar == '?')
-				expandedComponent += lastChar;
-
-			if(expandedComponent.equals(component))
-				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule " + compoundRule);
-
-			expandedCompoundRule.append(expandedComponent);
+				if(expandedComponent.equals(component))
+					log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+				else
+					expandedCompoundRule.append(expandedComponent);
+			}
 		}
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString());
