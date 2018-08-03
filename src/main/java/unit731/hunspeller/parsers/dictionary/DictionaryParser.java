@@ -25,7 +25,6 @@ import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
 
-//FIXME create a separate file for correctness checking
 @Slf4j
 @Getter
 public class DictionaryParser{

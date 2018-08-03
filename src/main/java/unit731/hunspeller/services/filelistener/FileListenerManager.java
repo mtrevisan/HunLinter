@@ -77,7 +77,12 @@ public class FileListenerManager implements FileListener, Runnable{
 
 		for(String pattern : patterns){
 			Path dir = (new File(pattern)).getParentFile().toPath();
-			if(dir.toFile().exists() && !dirPathToListeners.containsKey(dir)){
+			File fil = dir.toFile();
+			//create directory if it doesn't exists
+			if(!fil.exists())
+				fil.mkdirs();
+
+			if(!dirPathToListeners.containsKey(dir)){
 				try{
 					//TODO manage non-existing directory
 					WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
@@ -179,7 +184,6 @@ public class FileListenerManager implements FileListener, Runnable{
 			WatchEvent.Kind<?> eventKind = event.kind();
 			if(eventKind.equals(StandardWatchEventKinds.OVERFLOW)){
 				//overflow occurs when the watch event queue is overflown with events
-				//TODO notify all listeners
 
 				break;
 			}
