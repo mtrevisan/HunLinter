@@ -33,8 +33,10 @@ import unit731.hunspeller.services.PatternService;
 
 /**
  * Managed options:
- *		SET, LANG, FLAG, COMPLEXPREFIXES, PFX, SFX, FULLSTRIP, KEEPCASE, ICONV, OCONV, CIRCUMFIX, NEEDAFFIX,
- *		COMPOUNDRULE, ONLYINCOMPOUND, COMPOUNDMIN
+ *		SET, FLAG, COMPLEXPREFIXES, LANG
+ *		COMPOUNDRULE, COMPOUNDMIN, ONLYINCOMPOUND, CIRCUMFIX
+ *		PFX, SFX
+ *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
  */
 public class AffixParser{
 
@@ -125,6 +127,7 @@ public class AffixParser{
 	private static final String TAG_INPUT_CONVERSION_TABLE = "ICONV";
 	/** Define output conversion table */
 	private static final String TAG_OUTPUT_CONVERSION_TABLE = "OCONV";
+
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
