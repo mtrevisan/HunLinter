@@ -1,5 +1,7 @@
 package unit731.hunspeller.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AccessLevel;
@@ -35,6 +37,14 @@ public class PatternService{
 
 	public static String[] split(String text, Pattern pattern, int limit){
 		return pattern.split(text, limit);
+	}
+
+	public static List<String> extract(String text, Matcher matcher){
+		List<String> result = new ArrayList<>();
+		matcher.reset(text);
+		while(matcher.find())
+			result.add(matcher.group());
+		return result;
 	}
 
 	public static boolean find(String text, Matcher matcher){

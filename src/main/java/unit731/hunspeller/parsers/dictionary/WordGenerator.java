@@ -57,8 +57,12 @@ public class WordGenerator{
 	private final PropertyChangeListener listener;
 
 
+	public FlagParsingStrategy getFlagParsingStrategy(){
+		return affParser.getFlagParsingStrategy();
+	}
+
 	public List<RuleProductionEntry> applyRules(String line){
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
 		return applyRules(dicEntry);
 	}
@@ -77,7 +81,7 @@ public class WordGenerator{
 		dicEntry.setWord(word);
 
 		//extract base production
-		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, affParser.getFlagParsingStrategy());
+		RuleProductionEntry baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
 
 		//extract onefold production
 		List<RuleProductionEntry> onefoldProductions = getOnefoldProductions(dicEntry);
@@ -291,7 +295,7 @@ public class WordGenerator{
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
-				List<AffixEntry> applicableAffixes = affParser.extractListOfApplicableAffixes(word, rule.getEntries());
+				List<AffixEntry> applicableAffixes = AffixParser.extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
 					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toString());
 
@@ -329,7 +333,7 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					RuleProductionEntry production = new RuleProductionEntry(newWord, morphologicalFields, entry, postponedAffixes, rule.isCombineable(), affParser.getFlagParsingStrategy());
+					RuleProductionEntry production = new RuleProductionEntry(newWord, morphologicalFields, entry, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
 
 					productions.add(production);
 				}

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
@@ -25,17 +26,16 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	public static final String WORKER_NAME = "Compound rules extraction";
 
 	private static final String PIPE = "|";
-	private static final String LEFT_PARENTHESIS_DOUBLE = "((";
-	private static final String RIGHT_PARENTHESIS_DOUBLE = "))";
-	private static final String[] PARENTHESIS_DOUBLE = new String[]{LEFT_PARENTHESIS_DOUBLE, RIGHT_PARENTHESIS_DOUBLE};
 	private static final String LEFT_PARENTHESIS = "(";
 	private static final String RIGHT_PARENTHESIS = ")";
-	private static final String[] PARENTHESIS = new String[]{LEFT_PARENTHESIS, RIGHT_PARENTHESIS};
+
+
+	private final WordGenerator wordGenerator;
+	private final long limit;
 
 	private Map<String, String> rules;
 
 	private String compoundRule;
-	private final long limit;
 	private BiConsumer<List<String>, Long> fnDeferring;
 
 
@@ -44,8 +44,9 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		if(limit <= 0)
-			throw new IllegalArgumentException("Limit canno be non-positive");
+			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+		this.wordGenerator = wordGenerator;
 		this.limit = limit;
 
 		Map<String, Set<String>> compounds = new HashMap<>();
@@ -85,13 +86,18 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	private void extract(){
 		//compose compound rule
-		String expandedCompoundRule = StringUtils.replaceEach(compoundRule, rules.keySet().toArray(new String[rules.size()]),
-			rules.values().toArray(new String[rules.size()]));
-		//FIXME recognize if each rule has been replaced
-		if(!expandedCompoundRule.equals(compoundRule))
-			expandedCompoundRule = StringUtils.replaceEach(expandedCompoundRule, PARENTHESIS_DOUBLE, PARENTHESIS);
+		FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
+		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		StringBuilder expandedCompoundRule = new StringBuilder();
+		for(String component : compoundRuleComponents){
+			String flag = strategy.cleanCompoundRuleComponent(component);
+			String expandedFlag = rules.get(flag);
+			String expandedComponent = StringUtils.replace(component, flag, expandedFlag);
+			if(expandedComponent.equals(component))
+				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule " + compoundRule);
+		}
 
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString());
 		long wordCount = regexWordGenerator.wordCount();
 		log.info(Backbone.MARKER_APPLICATION, "Total compounds: {}", (wordCount == HunspellRegexWordGenerator.INFINITY? '\u221E': wordCount));
 		//generate all the words that matches the given regex

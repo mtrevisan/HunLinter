@@ -2,8 +2,6 @@ package unit731.hunspeller.parsers.affix;
 
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.NumericalParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.DoubleASCIIParsingStrategy;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -160,6 +158,7 @@ public class AffixParser{
 	private final Set<String> terminalAffixes = new HashSet<>();
 
 
+	//TODO check for duplicated rules
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
 		addData(context.getRuleType(), context.getAllButFirstParameter());
 	};
@@ -184,9 +183,9 @@ public class AffixParser{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ TAG_COMPOUND_RULE + ")");
 				String rule = lineParts[1];
-				//FIXME interpret the rule?
 				if(StringUtils.isBlank(rule))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": rule type cannot be empty");
+				//FIXME is the rule well formatted? does it not duplicates any other flags?
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
@@ -511,8 +510,8 @@ public class AffixParser{
 		}
 	}
 
-	private <T> void addData(String key, T value){
-		data.put(key, value);
+	private <T> T addData(String key, T value){
+		return (T)data.put(key, value);
 	}
 
 	private void clearData(){
@@ -554,13 +553,10 @@ public class AffixParser{
 	public boolean isManagedByCompoundRule(String flag){
 		READ_WRITE_LOCK.readLock().lock();
 		try{
-			//TODO migliorare con una regex
 			boolean found = false;
 			Set<String> compoundRules = getCompoundRules();
-			if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
-				flag = "(" + flag + ")";
 			for(String rule : compoundRules)
-				if(rule.contains(flag)){
+				if(isManagedByCompoundRule(rule, flag)){
 					found = true;
 					break;
 				}
@@ -574,9 +570,8 @@ public class AffixParser{
 	public boolean isManagedByCompoundRule(String compoundRule, String flag){
 		READ_WRITE_LOCK.readLock().lock();
 		try{
-			//TODO migliorare con una regex
-			if(strategy instanceof DoubleASCIIParsingStrategy || strategy instanceof NumericalParsingStrategy)
-				flag = "(" + flag + ")";
+			List<String> flags = strategy.extractCompoundRule(compoundRule);
+			flags = strategy.cleanCompoundRuleComponents(flags);
 			return compoundRule.contains(flag);
 		}
 		finally{

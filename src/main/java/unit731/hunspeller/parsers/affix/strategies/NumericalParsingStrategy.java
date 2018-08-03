@@ -1,8 +1,11 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
+import unit731.hunspeller.services.PatternService;
 
 
 /**
@@ -14,6 +17,8 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 	private static final int MAX_NUMERICAL_FLAG = 65_000;
 
 	private static final String COMMA = ",";
+
+	private static final Matcher COMPOUND_RULE = PatternService.matcher("\\(\\d+\\)[*?]?");
 
 
 	@Override
@@ -56,6 +61,11 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 		}
 
 		return AffixEntry.SLASH + String.join(COMMA, textFlags);
+	}
+
+	@Override
+	public List<String> extractCompoundRule(String compoundRule){
+		return PatternService.extract(compoundRule, COMPOUND_RULE);
 	}
 
 }
