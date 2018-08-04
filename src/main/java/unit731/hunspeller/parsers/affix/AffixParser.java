@@ -445,6 +445,7 @@ public class AffixParser{
 		return addData(key.getCode(), value);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T addData(String key, T value){
 		return (T)data.put(key, value);
 	}

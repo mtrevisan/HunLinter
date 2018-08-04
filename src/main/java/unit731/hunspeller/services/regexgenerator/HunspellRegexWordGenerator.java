@@ -248,7 +248,7 @@ public class HunspellRegexWordGenerator{
 			if(matchedWordCounter == limit)
 				break;
 
-			GeneratedElement elem = (GeneratedElement)deque.pop();
+			GeneratedElement elem = deque.pop();
 			String subword = elem.word;
 			State state = elem.state;
 			List<Transition> transitions = state.getSortedTransitions(true);
