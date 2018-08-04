@@ -12,10 +12,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -26,7 +28,6 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 
 
-@AllArgsConstructor
 @Slf4j
 public class WordGenerator{
 
@@ -48,12 +49,22 @@ public class WordGenerator{
 	private static final String TAG_FLAG = "fl:";
 
 
-	@NonNull
 	private final AffixParser affParser;
-	@NonNull
 	private final DictionaryParser dicParser;
 	private final PropertyChangeListener listener;
 
+	@Getter
+	private CompoundRulesWorker compoundRulesWorker;
+
+
+	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, PropertyChangeListener listener){
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(dicParser);
+
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.listener = listener;
+	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
 		return affParser.getFlagParsingStrategy();
@@ -120,10 +131,11 @@ public class WordGenerator{
 	 * 
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param fnDeferring	Function to be called whenever the list of production is ready
+	 * @param limit	Limit results
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException, NoApplicableRuleException{
-		CompoundRulesWorker compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, limit);
+		compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, limit);
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
 

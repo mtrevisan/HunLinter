@@ -73,6 +73,7 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
@@ -363,6 +364,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable.setModel(new CompoundTableModel());
       cmpTable.setShowHorizontalLines(false);
       cmpTable.setShowVerticalLines(false);
+      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+      cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
+
       cmpTable.setRowSelectionAllowed(true);
       dicScrollPane1.setViewportView(cmpTable);
 
@@ -471,7 +475,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
       theTable.getColumnModel().getColumn(0).setMaxWidth(500);
 
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       JFrame parent = this;
@@ -1164,7 +1167,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
 		if(StringUtils.isNotBlank(text))
 			EventQueue.invokeLater(() -> {
-				String filterText = frame.backbone.getTheParser().prepareTextForThesaurusFilter(formerFilterThesaurusText);
+				String filterText = ThesaurusParser.prepareTextForThesaurusFilter(formerFilterThesaurusText);
 				sorter.setRowFilter(RowFilter.regexFilter(filterText));
 			});
 		else
@@ -1274,7 +1277,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		inputText = StringUtils.strip(inputText);
 		if(StringUtils.isNotBlank(inputText)){
 			try{
+				dicSortDictionaryMenuItem.setEnabled(false);
+
 				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
+					dicSortDictionaryMenuItem.setEnabled(true);
+
 					if(wordCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordCount)
 						words.add("\u2026");
 
@@ -1283,7 +1290,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					totalCompoundsOutputLabel.setText(wordCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(wordCount));
 				};
-				long limit = Long.valueOf((String)limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
+				long limit = Long.valueOf(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
 				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);
 			}
 			catch(IllegalArgumentException e){
@@ -1381,6 +1388,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					log.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
 
 					dicWordlistWorker = null;
+				}
+				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
+					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
+			}
+			if(backbone.getWordGenerator().getCompoundRulesWorker() != null && backbone.getWordGenerator().getCompoundRulesWorker().getState() == SwingWorker.StateValue.STARTED){
+				Object[] options = {"Abort", "Cancel"};
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the compound extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				if(answer == JOptionPane.YES_OPTION){
+					backbone.getWordGenerator().getCompoundRulesWorker().cancel();
+
+					dicSortDictionaryMenuItem.setEnabled(true);
+					log.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(HunspellerFrame.DO_NOTHING_ON_CLOSE);
@@ -1748,7 +1768,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	public void clearOutputTable(JTable table){
-		HunspellerTableModel dm = (HunspellerTableModel)table.getModel();
+		HunspellerTableModel<?> dm = (HunspellerTableModel<?>)table.getModel();
 		dm.clear();
 	}
 
