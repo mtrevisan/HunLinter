@@ -43,7 +43,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializable{
+public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	private static final long serialVersionUID = -5213027224293608217L;
 
