@@ -39,10 +39,10 @@ public class RegExpTrieSequencer implements TrieSequencerInterface<String[], Str
 
 	@Override
 	public <V> TrieNode<String[], String, V> getChild(Map<String, TrieNode<String[], String, V>> children, String stem){
-		Set<String> keys = children.keySet();
-		for(String key : keys)
-			if(!matches(stem, key))
-				return children.get(key);
+		Set<Map.Entry<String, TrieNode<String[], String, V>>> entries = children.entrySet();
+		for(Map.Entry<String, TrieNode<String[], String, V>> entry : entries)
+			if(!matches(stem, entry.getKey()))
+				return entry.getValue();
 		return null;
 	}
 

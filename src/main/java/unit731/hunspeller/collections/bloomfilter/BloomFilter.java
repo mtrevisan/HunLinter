@@ -295,13 +295,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public void close(){
-		if(bitArray instanceof Closeable){
-			try{
-				((Closeable)bitArray).close();
-			}
-			catch(IOException e){
-				log.error("Error closing the Bloom filter", e);
-			}
+		try{
+			((Closeable)bitArray).close();
+		}
+		catch(IOException e){
+			log.error("Error closing the Bloom filter", e);
 		}
 	}
 
