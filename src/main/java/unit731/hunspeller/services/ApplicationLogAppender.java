@@ -21,7 +21,7 @@ public class ApplicationLogAppender<T> extends AppenderBase<T>{
 
 	@Override
 	protected void append(T eventObject){
-		if(textArea != null){
+		if(textArea != null && encoder != null){
 			byte[] encoded = encoder.encode(eventObject);
 			String message = new String(encoded, StandardCharsets.UTF_8);
 			textArea.append(message);

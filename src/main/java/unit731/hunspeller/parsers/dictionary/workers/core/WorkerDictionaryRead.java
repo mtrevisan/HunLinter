@@ -46,6 +46,8 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		long totalSize = dicFile.length();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
+			if(line == null)
+				throw new IllegalArgumentException("Dictionary file empty");
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
 				line = FileService.clearBOMMarker(line);

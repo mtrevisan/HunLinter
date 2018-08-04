@@ -48,6 +48,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		meanings = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			String meaning = br.readLine();
+			if(meaning == null)
+				throw new IllegalArgumentException("Unexpected EOF while reading Thesaurus file");
+
 			//ignore any BOM marker on first line
 			if(i == 0)
 				meaning = FileService.clearBOMMarker(meaning);
