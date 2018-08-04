@@ -18,7 +18,6 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Productable;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -263,15 +262,15 @@ public class WordGenerator{
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			boolean rulesContainsCircumfixFlag = appliedRules.stream()
-				.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+				.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
 			if(rulesContainsCircumfixFlag){
 				//check if at least one SFX and one PFX have the circumfix flag
 				boolean suffixWithCircumfix = appliedRules.stream()
 					.filter(rule -> rule.isSuffix())
-					.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+					.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
 				boolean prefixWithCircumfix = appliedRules.stream()
 					.filter(rule -> !rule.isSuffix())
-					.anyMatch(rule -> ArrayUtils.contains(rule.getContinuationFlags(), circumfixFlag));
+					.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
 				if(suffixWithCircumfix ^ prefixWithCircumfix)
 					itr.remove();
 			}

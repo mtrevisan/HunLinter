@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -144,7 +143,7 @@ public class AffixParser{
 				if(!ruleFlag.equals(entry.getFlag()))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule flag (expected "
 						+ ruleFlag + ")");
-				if(!containsUnique(entry.getContinuationFlags()))
+				if(!entry.containsUniqueContinuationFlags())
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": multiple rule flags");
 
 				boolean inserted = entries.add(entry);
@@ -230,15 +229,6 @@ public class AffixParser{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-
-	private static boolean containsUnique(String[] list){
-		if(list == null)
-			return true;
-
-		Set<String> set = new HashSet<>();
-		return Arrays.stream(list)
-			.allMatch(set::add);
-	}
 
 	private final Map<AffixTag, Consumer<ParsingContext>> RULE_FUNCTION = new HashMap<>();
 

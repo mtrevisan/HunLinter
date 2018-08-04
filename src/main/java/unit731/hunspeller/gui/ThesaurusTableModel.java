@@ -63,18 +63,20 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex){
-		try{
-			String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
-			text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
+		if(synonyms != null){
+			try{
+				String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
+				text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
 
-			List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
-			meanings.clear();
+				List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
+				meanings.clear();
 
-			String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-			for(String line : lines)
-				meanings.add(new MeaningEntry(line));
+				String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
+				for(String line : lines)
+					meanings.add(new MeaningEntry(line));
+			}
+			catch(IllegalArgumentException e){}
 		}
-		catch(IllegalArgumentException e){}
 	}
 
 }

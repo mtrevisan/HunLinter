@@ -50,7 +50,7 @@ public class RuleProductionEntry implements Productable{
 		Objects.requireNonNull(appliedEntry);
 
 		this.word = word;
-		continuationFlags = combineContinuationFlags(appliedEntry.getContinuationFlags(), remainingContinuationFlags);
+		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		this.morphologicalFields = combineMorphologicalFields(originalMorphologicalFields, appliedEntry.getMorphologicalFields());
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
@@ -67,15 +67,6 @@ public class RuleProductionEntry implements Productable{
 		combineable = false;
 
 		this.strategy = strategy;
-	}
-
-	private String[] combineContinuationFlags(String[] continuationFlags1, Set<String> continuationFlags2){
-		Set<String> flags = new HashSet<>();
-		if(continuationFlags1 != null)
-			flags.addAll(Arrays.asList(continuationFlags1));
-		if(continuationFlags2 != null && !continuationFlags2.isEmpty())
-			flags.addAll(continuationFlags2);
-		return flags.toArray(new String[flags.size()]);
 	}
 
 	private String[] combineMorphologicalFields(String[] morphologicalFields, String[] affixEntryMorphologicalFields){
