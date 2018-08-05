@@ -214,7 +214,7 @@ public class Backbone implements FileChangeListener{
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
 
-	/** FIXME should be private!? */
+	/* FIXME should be private!? */
 	public File getDictionaryFile(){
 		return getFile(affParser.getLanguage() + EXTENSION_DIC);
 	}

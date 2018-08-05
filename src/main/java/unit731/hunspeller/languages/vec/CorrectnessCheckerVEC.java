@@ -369,14 +369,17 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		super(affParser, hyphenator);
 	}
 
+	@Override
 	public int getExpectedNumberOfElements(){
 		return EXPECTED_NUMBER_OF_ELEMENTS;
 	}
 
+	@Override
 	public double getFalsePositiveProbability(){
 		return FALSE_POSITIVE_PROBABILITY;
 	}
 
+	@Override
 	public double getGrowRatioWhenFull(){
 		return GROW_RATIO_WHEN_FULL;
 	}

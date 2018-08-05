@@ -41,6 +41,7 @@ public class Trie<S, H, V>{
 
 
 	private final TrieNode<S, H, V> root = TrieNode.makeRoot();
+
 	private TrieSequencerInterface<S, H> sequencer;
 
 

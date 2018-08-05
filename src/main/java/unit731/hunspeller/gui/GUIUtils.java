@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import unit731.hunspeller.services.PatternService;
@@ -41,8 +41,8 @@ public class GUIUtils{
 		copyMenuItem.addActionListener(e -> {
 			String textToCopy = null;
 			Component c = popupMenu.getInvoker();
-			if(c instanceof JTextField)
-				textToCopy = ((JTextField)c).getText();
+			if(c instanceof JTextComponent)
+				textToCopy = ((JTextComponent)c).getText();
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
 

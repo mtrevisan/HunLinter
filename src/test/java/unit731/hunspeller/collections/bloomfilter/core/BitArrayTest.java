@@ -13,43 +13,43 @@ public class BitArrayTest{
 
 	@Test
 	public void fast() throws IOException{
-		FastBitArray bits = new FastBitArray(MAX);
-		for(int i = 0; i < MAX; i ++){
-			Assert.assertFalse(bits.get(i));
-			bits.set(i);
-			Assert.assertTrue(bits.get(i));
-			bits.clear(i);
-			Assert.assertFalse(bits.get(i));
+		try(FastBitArray bits = new FastBitArray(MAX)){
+			for(int i = 0; i < MAX; i ++){
+				Assert.assertFalse(bits.get(i));
+				bits.set(i);
+				Assert.assertTrue(bits.get(i));
+				bits.clear(i);
+				Assert.assertFalse(bits.get(i));
+			}
 		}
-		bits.close();
 	}
 
 	@Test
 	public void java() throws IOException{
-		JavaBitArray bits = new JavaBitArray(MAX);
-		for(int i = 0; i < MAX; i ++){
-			Assert.assertFalse(bits.get(i));
-			bits.set(i);
-			Assert.assertTrue(bits.get(i));
-			bits.clear(i);
-			Assert.assertFalse(bits.get(i));
+		try(JavaBitArray bits = new JavaBitArray(MAX)){
+			for(int i = 0; i < MAX; i ++){
+				Assert.assertFalse(bits.get(i));
+				bits.set(i);
+				Assert.assertTrue(bits.get(i));
+				bits.clear(i);
+				Assert.assertFalse(bits.get(i));
+			}
 		}
-		bits.close();
 	}
 
 	@Test
 	public void memoryMappedFile() throws IOException{
 		File file = File.createTempFile("hunspeller-duplications-bitarray", ".bits");
 		file.deleteOnExit();
-		MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX);
-		for(int i = 0; i < MAX; i ++){
-			Assert.assertFalse(bits.get(i));
-			bits.set(i);
-			Assert.assertTrue(bits.get(i));
-			bits.clear(i);
-			Assert.assertFalse(bits.get(i));
+		try(MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX)){
+			for(int i = 0; i < MAX; i ++){
+				Assert.assertFalse(bits.get(i));
+				bits.set(i);
+				Assert.assertTrue(bits.get(i));
+				bits.clear(i);
+				Assert.assertFalse(bits.get(i));
+			}
 		}
-		bits.close();
 	}
 
 }

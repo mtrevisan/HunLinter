@@ -44,8 +44,7 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 		initComponents();
 
-		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex);
-		setCellRenderer(dicCellRenderer);
+		init();
 
 		lblMessage.setText(message);
 
@@ -116,6 +115,11 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
+
+	private void init(){
+		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex);
+		setCellRenderer(dicCellRenderer);
+	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		int lineIndex = list.getFirstVisibleIndex();

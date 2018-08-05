@@ -49,13 +49,13 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 				return production.getMorphologicalFields();
 
 			case 2:
-				return (rulesSize > 0? rules.get(0): null);
+				return (rules != null && rulesSize > 0? rules.get(0): null);
 
 			case 3:
-				return (rulesSize > 1? rules.get(1): null);
+				return (rules != null && rulesSize > 1? rules.get(1): null);
 
 			case 4:
-				return (rulesSize > 2? rules.get(2): null);
+				return (rules != null && rulesSize > 2? rules.get(2): null);
 
 			default:
 				return null;

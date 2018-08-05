@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.trie;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class TrieNode<S, H, V>{
 	@SuppressWarnings("unchecked")
 	public void addValue(V value){
 		if(this.value != null && List.class.isAssignableFrom(value.getClass()))
-			((List)this.value).addAll((List<?>)value);
+			((Collection)this.value).addAll((List<?>)value);
 		else
 			this.value = value;
 	}

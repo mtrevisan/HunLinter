@@ -173,6 +173,7 @@ public class DictionaryEntry{
 	/**
 	 * Separate the prefixes from the suffixes
 	 * 
+	 * @param affParser	The {@link AffixParser}
 	 * @return	An object with separated flags, one for each group
 	 */
 	public Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{

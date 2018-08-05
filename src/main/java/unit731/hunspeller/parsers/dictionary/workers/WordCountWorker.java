@@ -34,8 +34,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 		BiConsumer<String, Integer> body = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
-			for(Production production : productions)
-				bloomFilter.add(production.getWord());
+			productions.forEach(production -> bloomFilter.add(production.getWord()));
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
