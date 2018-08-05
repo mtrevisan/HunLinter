@@ -4,6 +4,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
+//https://dzone.com/articles/java-concurrency-read-write-lo
+//https://github.com/DannyHoo/HighConcurrence
+//https://github.com/markkolich/kolich-bolt
 public class ReadWriteLockable{
 
 	private static final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
