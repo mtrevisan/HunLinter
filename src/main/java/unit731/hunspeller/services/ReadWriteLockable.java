@@ -5,8 +5,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 //https://dzone.com/articles/java-concurrency-read-write-lo
-//https://github.com/DannyHoo/HighConcurrence
-//https://github.com/markkolich/kolich-bolt
+//https://blog.takipi.com/java-8-stampedlocks-vs-readwritelocks-and-synchronized/
+//https://www.javaspecialists.eu/talks/jfokus13/PhaserAndStampedLock.pdf
+//https://www.javaspecialists.eu/archive/Issue165.html
 public class ReadWriteLockable{
 
 	private static final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
