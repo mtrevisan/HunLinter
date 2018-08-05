@@ -104,6 +104,18 @@ public class HyphenationParser{
 
 	public static enum Level{NON_COMPOUND, COMPOUND}
 
+	/** Extract (compound) data from the radix tree */
+	private static RadixTreeVisitor<String, String, Map<Integer, List<String>>> SAVE_VISITOR = new RadixTreeVisitor<String, String, Map<Integer, List<String>>>(new HashMap<>()){
+		@Override
+		public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
+			String value = node.getValue();
+			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
+				.add(value);
+
+			return false;
+		}
+	};
+
 	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
 
@@ -432,21 +444,9 @@ public class HyphenationParser{
 	}
 
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
-		//extract (compound) data from the radix tree
-		RadixTreeVisitor<String, String, Map<Integer, List<String>>> visitor = new RadixTreeVisitor<String, String, Map<Integer, List<String>>>(new HashMap<>()){
-			@Override
-			public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
-				String value = node.getValue();
-				result.computeIfAbsent(value.length(), k -> new ArrayList<>())
-					.add(value);
-				
-				return false;
-			}
-		};
-		
-		patterns.get(level).visitPrefixedBy(visitor);
+		patterns.get(level).visitPrefixedBy(SAVE_VISITOR);
 
-		Collection<List<String>> values = visitor.getResult().values();
+		Collection<List<String>> values = SAVE_VISITOR.getResult().values();
 		for(List<String> value : values){
 			//sort values
 			Collections.sort(value, comparator::compare);

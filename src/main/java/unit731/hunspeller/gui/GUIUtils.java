@@ -28,16 +28,13 @@ public class GUIUtils{
 	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+>");
 
 
-	public static JPopupMenu createCopyingPopupMenu(int iconSize){
+	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
 		JPopupMenu popupMenu = new JPopupMenu();
 
 		JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
-		try{
-			BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
-			ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-			copyMenuItem.setIcon(icon);
-		}
-		catch(IOException e){}
+		BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
+		ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+		copyMenuItem.setIcon(icon);
 		copyMenuItem.addActionListener(e -> {
 			String textToCopy = null;
 			Component c = popupMenu.getInvoker();

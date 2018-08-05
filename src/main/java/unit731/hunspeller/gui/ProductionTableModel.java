@@ -1,5 +1,9 @@
 package unit731.hunspeller.gui;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
@@ -65,6 +69,14 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 	@Override
 	public String getColumnName(int column){
 		return COLUMN_NAMES[column];
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

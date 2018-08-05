@@ -1,5 +1,9 @@
 package unit731.hunspeller.gui;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
@@ -77,6 +81,14 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			}
 			catch(IllegalArgumentException e){}
 		}
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

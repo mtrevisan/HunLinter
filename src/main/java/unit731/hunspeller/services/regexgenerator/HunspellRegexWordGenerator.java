@@ -38,7 +38,7 @@ public class HunspellRegexWordGenerator{
 	public static final long INFINITY = -1l;
 
 	@AllArgsConstructor
-	private class GeneratedElement{
+	private static class GeneratedElement{
 		private final String word;
 		private final State state;
 	}

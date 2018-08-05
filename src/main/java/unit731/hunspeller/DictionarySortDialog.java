@@ -3,10 +3,15 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Objects;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
@@ -21,7 +26,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 @Slf4j
-public class DictionarySortDialog extends javax.swing.JDialog{
+public class DictionarySortDialog extends JDialog{
 
 	private static final long serialVersionUID = -4815599935456195094L;
 
@@ -172,6 +177,14 @@ public class DictionarySortDialog extends javax.swing.JDialog{
 
 	public int getSelectedIndex(){
 		return list.getSelectedIndex();
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 

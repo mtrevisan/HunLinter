@@ -1,6 +1,10 @@
 package unit731.hunspeller.gui;
 
 import java.awt.Component;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -38,6 +42,14 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 		setText(value);
 
 		return this;
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

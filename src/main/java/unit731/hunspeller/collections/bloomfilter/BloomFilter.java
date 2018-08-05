@@ -45,7 +45,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private static final HashFunction DEFAULT_HASHER = new Murmur3HashFunction();
 
 	/** The default {@link Charset} is the platform encoding charset */
-	protected transient Charset currentCharset = Charset.defaultCharset();
+	protected Charset currentCharset = Charset.defaultCharset();
 
 
 	protected final BitArrayBuilder.Type type;
