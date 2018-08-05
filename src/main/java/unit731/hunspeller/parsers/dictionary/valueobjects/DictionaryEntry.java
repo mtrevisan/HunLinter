@@ -38,8 +38,6 @@ public class DictionaryEntry{
 	@Getter
 	private final boolean combineable;
 
-	private final FlagParsingStrategy strategy;
-
 
 	public DictionaryEntry(String line, FlagParsingStrategy strategy){
 		Objects.requireNonNull(line);
@@ -55,8 +53,6 @@ public class DictionaryEntry{
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): new String[0]);
 		combineable = true;
-
-		this.strategy = strategy;
 	}
 
 	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){
@@ -66,8 +62,6 @@ public class DictionaryEntry{
 		continuationFlags = productable.continuationFlags;
 		morphologicalFields = productable.morphologicalFields;
 		combineable = true;
-
-		this.strategy = strategy;
 	}
 
 	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry productable, Set<String> remainingContinuationFlags,
@@ -79,8 +73,6 @@ public class DictionaryEntry{
 		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		this.morphologicalFields = combineMorphologicalFields(productable.morphologicalFields, appliedEntry.getMorphologicalFields());
 		this.combineable = combineable;
-
-		this.strategy = strategy;
 	}
 
 	/** NOTE: used for testing purposes */
@@ -93,8 +85,6 @@ public class DictionaryEntry{
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		morphologicalFields = productable.morphologicalFields;
 		combineable = productable.isCombineable();
-
-		this.strategy = strategy;
 	}
 
 	public void forEachMorphologicalField(Consumer<String> fun){
@@ -128,8 +118,6 @@ public class DictionaryEntry{
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		morphologicalFields = new String[0];
 		combineable = false;
-
-		this.strategy = strategy;
 	}
 
 	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
@@ -216,7 +204,7 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		return word + strategy.joinFlags(continuationFlags);
+		return word + AffixEntry.SLASH + StringUtils.join(continuationFlags, ", ");
 	}
 
 }
