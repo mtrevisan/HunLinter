@@ -7,7 +7,7 @@ import java.util.function.BiConsumer;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 
 
 public class CorrectnessWorker extends WorkerDictionaryReadBase{
@@ -20,7 +20,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(wordGenerator);
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyRules(line);
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};

@@ -22,7 +22,7 @@ import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
@@ -87,9 +87,9 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+							List<Production> productions = wordGenerator.applyRules(line);
 
-							for(RuleProductionEntry production : productions)
+							for(Production production : productions)
 								if(checker.shouldBeProcessedForMinimalPair(production)){
 									String word = production.getWord();
 									writer.write(word);

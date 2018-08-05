@@ -12,7 +12,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 
@@ -42,9 +42,9 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyRules(line);
 
-			for(RuleProductionEntry production : productions){
+			for(Production production : productions){
 				//collect statistics
 				String word = production.getWord();
 				if(performHyphenationStatistics){

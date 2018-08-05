@@ -12,7 +12,7 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 
 
 @Slf4j
@@ -33,8 +33,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
-			for(RuleProductionEntry production : productions)
+			List<Production> productions = wordGenerator.applyRules(line);
+			for(Production production : productions)
 				bloomFilter.add(production.getWord());
 		};
 		Runnable done = () -> {
