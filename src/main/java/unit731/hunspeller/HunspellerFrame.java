@@ -103,7 +103,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
-	private static final int DEBOUNCER_INTERVAL = 400;
+	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
 
 	private String formerInputText;
