@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 
@@ -38,7 +39,8 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
+		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file"
+			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
