@@ -141,7 +141,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
 			Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-			for(int i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS); i >= 0; i = customHyphenation.indexOf(HyphenationParser.HYPHEN_EQUALS, i + 1))
+			for(int i = customHyphenation.indexOf('='); i >= 0; i = customHyphenation.indexOf('=', i + 1))
 				indexesAndRules.put(i, Pair.of(1, customHyphenation));
 			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
 		}

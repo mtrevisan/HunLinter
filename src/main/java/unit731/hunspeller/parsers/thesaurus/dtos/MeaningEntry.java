@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(of = "partOfSpeech")
 public class MeaningEntry implements Comparable<MeaningEntry>{
 
 	@NonNull
