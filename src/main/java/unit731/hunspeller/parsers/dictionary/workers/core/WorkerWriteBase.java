@@ -3,10 +3,10 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
-import unit731.hunspeller.Backbone;
 
 
 public class WorkerWriteBase<T>{
@@ -14,8 +14,9 @@ public class WorkerWriteBase<T>{
 	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(String workerName, List<T> entries, Backbone backbone, File outputFile, BiConsumer<BufferedWriter, T> body, Runnable done){
-		worker = new WorkerWrite<>(workerName, entries, outputFile, backbone.getAffParser().getCharset(), body, done);
+	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body,
+			Runnable done){
+		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

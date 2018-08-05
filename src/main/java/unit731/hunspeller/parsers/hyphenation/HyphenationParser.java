@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Getter;
@@ -38,6 +36,7 @@ import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsPar
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.ReadWriteLockable;
 
 
 /**
@@ -49,7 +48,7 @@ import unit731.hunspeller.services.PatternService;
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
-public class HyphenationParser{
+public class HyphenationParser extends ReadWriteLockable{
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -116,8 +115,6 @@ public class HyphenationParser{
 		}
 	};
 
-	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
-
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
@@ -180,14 +177,6 @@ public class HyphenationParser{
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
 	}
 
-	public void acquireReadLock(){
-		READ_WRITE_LOCK.readLock().lock();
-	}
-
-	public void releaseReadLock(){
-		READ_WRITE_LOCK.readLock().unlock();
-	}
-
 	/**
 	 * Parse the hyphenation rules out from a .dic file.
 	 *
@@ -196,7 +185,7 @@ public class HyphenationParser{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
 	public void parse(File hypFile) throws IOException, IllegalArgumentException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			clearInternal();
 
@@ -285,7 +274,7 @@ public class HyphenationParser{
 			for(Level level : Level.values())
 				REDUCED_PATTERNS.get(level).clear();
 
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
@@ -318,12 +307,12 @@ public class HyphenationParser{
 	}
 
 	public void clear(){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			clearInternal();
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
@@ -343,20 +332,14 @@ public class HyphenationParser{
 	 * @return The value of a rule if already in place, <code>null</code> if the insertion has completed successfully
 	 */
 	public String addRule(String rule, Level level){
-		READ_WRITE_LOCK.writeLock().lock();
-		try{
-			validateRule(rule, level);
+		validateRule(rule, level);
 
-			String key = getKeyFromData(rule);
-			String newRule = patterns.get(level).get(key);
-			if(newRule == null)
-				patterns.get(level).put(key, rule);
+		String key = getKeyFromData(rule);
+		String newRule = patterns.get(level).get(key);
+		if(newRule == null)
+			patterns.get(level).put(key, rule);
 
-			return newRule;
-		}
-		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
-		}
+		return newRule;
 	}
 
 	/**
@@ -419,27 +402,21 @@ public class HyphenationParser{
 	}
 
 	public void save(File hypFile) throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
-		try{
-			Charset charset = StandardCharsets.UTF_8;
-			try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
-				writeln(writer, charset.name());
+		Charset charset = StandardCharsets.UTF_8;
+		try(BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
+			writeln(writer, charset.name());
 
-				writer.newLine();
-				optParser.write(writer);
+			writer.newLine();
+			optParser.write(writer);
 
-				writer.newLine();
-				savePatternsByLevel(writer, Level.NON_COMPOUND);
+			writer.newLine();
+			savePatternsByLevel(writer, Level.NON_COMPOUND);
 
-				writer.newLine();
-				writeln(writer, NEXT_LEVEL);
+			writer.newLine();
+			writeln(writer, NEXT_LEVEL);
 
-				writer.newLine();
-				savePatternsByLevel(writer, Level.COMPOUND);
-			}
-		}
-		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			writer.newLine();
+			savePatternsByLevel(writer, Level.COMPOUND);
 		}
 	}
 
@@ -475,14 +452,8 @@ public class HyphenationParser{
 	 * @return	Whether the hyphenator has the given rule
 	 */
 	public boolean hasRule(String rule, Level level){
-		READ_WRITE_LOCK.readLock().lock();
-		try{
-			String key = getKeyFromData(rule);
-			return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key));
-		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		String key = getKeyFromData(rule);
+		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key));
 	}
 
 	public static String getKeyFromData(String rule){

@@ -7,15 +7,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.ReadWriteLockable;
 
 
-public class AidParser{
-
-	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
-
+public class AidParser extends ReadWriteLockable{
 
 	private final List<String> lines = new ArrayList<>();
 
@@ -27,7 +23,7 @@ public class AidParser{
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File aidFile) throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			clear();
 
@@ -45,27 +41,27 @@ public class AidParser{
 			}
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public void clear(){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			lines.clear();
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public List<String> getLines(){
-		READ_WRITE_LOCK.readLock().lock();
+		acquireReadLock();
 		try{
 			return lines;
 		}
 		finally{
-			READ_WRITE_LOCK.readLock().unlock();
+			releaseReadLock();
 		}
 	}
 

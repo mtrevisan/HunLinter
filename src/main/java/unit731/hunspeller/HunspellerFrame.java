@@ -1626,7 +1626,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
+			dicCorrectnessWorker = new CorrectnessWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1657,7 +1657,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getChecker());
+			dicWordCountWorker = new WordCountWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(),
+				backbone.getChecker());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1690,7 +1691,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
+				dicWordlistWorker = new WordlistWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
