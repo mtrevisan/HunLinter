@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.ReadWriteLockable;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class AidParser extends ReadWriteLockable{

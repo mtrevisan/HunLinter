@@ -1,4 +1,4 @@
-package unit731.hunspeller.services;
+package unit731.hunspeller.services.concurrency;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -7,10 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 
-//https://dzone.com/articles/java-concurrency-read-write-lo
-//https://blog.takipi.com/java-8-stampedlocks-vs-readwritelocks-and-synchronized/
-//https://www.javaspecialists.eu/talks/jfokus13/PhaserAndStampedLock.pdf
-//https://www.javaspecialists.eu/archive/Issue165.html
+/** @see <a href="https://www.javaspecialists.eu/talks/jfokus13/PhaserAndStampedLock.pdf">Phaser and StampedLock Concurrency synchronizers</a> */
 public class ReadWriteLockable{
 
 	private static final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
@@ -34,10 +31,9 @@ public class ReadWriteLockable{
 		READ_WRITE_LOCK.writeLock().unlock();
 	}
 
-	public <T> void w(Supplier<T> getter, Consumer<T> setter, T newState){
+	public static <T> void writeVariable(Consumer<T> setter, T newState, T oldState){
 		long stamp = RW_LOCK.readLock();
 		try{
-			T oldState = getter.get();
 			while(newState == oldState){
 				long writeStamp = RW_LOCK.tryConvertToWriteLock(stamp);
 				if(writeStamp != 0l){
@@ -56,7 +52,7 @@ public class ReadWriteLockable{
 		}
 	}
 
-	public <T> T r(Supplier<T> getter){
+	public static <T> T readVariable(Supplier<T> getter){
 		long stamp = RW_LOCK.tryOptimisticRead();
 		T currState = getter.get();
 		if(!RW_LOCK.validate(stamp)){

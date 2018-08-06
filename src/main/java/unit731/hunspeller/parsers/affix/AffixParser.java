@@ -27,7 +27,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
-import unit731.hunspeller.services.ReadWriteLockable;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 /**

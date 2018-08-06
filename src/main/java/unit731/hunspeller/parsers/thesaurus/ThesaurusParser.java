@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
-import unit731.hunspeller.services.ReadWriteLockable;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 

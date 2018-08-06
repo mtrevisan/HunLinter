@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.services.ReadWriteLockable;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WorkerDictionaryReadWriteBase{

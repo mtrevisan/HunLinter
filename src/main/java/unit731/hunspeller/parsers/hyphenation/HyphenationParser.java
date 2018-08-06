@@ -36,7 +36,7 @@ import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsPar
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
-import unit731.hunspeller.services.ReadWriteLockable;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 /**
