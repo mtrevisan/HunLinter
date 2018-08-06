@@ -31,10 +31,12 @@ public class ReadWriteLockable{
 		READ_WRITE_LOCK.writeLock().unlock();
 	}
 
-	public static <T> void writeVariable(Consumer<T> setter, T newState, T oldState){
+	public static <T> void writeValue(Supplier<T> getter, Consumer<T> setter, T newState){
+		T oldState = getter.get();
+
 		long stamp = RW_LOCK.readLock();
 		try{
-			while(newState == oldState){
+			while(getter.get() == oldState){
 				long writeStamp = RW_LOCK.tryConvertToWriteLock(stamp);
 				if(writeStamp != 0l){
 					stamp = writeStamp;
@@ -52,7 +54,7 @@ public class ReadWriteLockable{
 		}
 	}
 
-	public static <T> T readVariable(Supplier<T> getter){
+	public static <T> T readValue(Supplier<T> getter){
 		long stamp = RW_LOCK.tryOptimisticRead();
 		T currState = getter.get();
 		if(!RW_LOCK.validate(stamp)){
