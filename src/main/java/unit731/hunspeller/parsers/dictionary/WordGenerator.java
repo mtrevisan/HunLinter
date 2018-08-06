@@ -7,7 +7,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -115,18 +114,20 @@ public class WordGenerator{
 		}
 
 		//remove rules that invalidate the onlyInCompound rule
+//FIXME
 //		removeRulesInvalidatingOnlyInCompound(productions);
 
 		//remove rules that invalidate the circumfix rule
 		removeRulesInvalidatingCircumfix(lastfoldProductions);
 
 		List<Production> productions = new ArrayList<>();
-		productions.addAll(Arrays.asList(baseProduction));
+		productions.add(baseProduction);
 		productions.addAll(onefoldProductions);
 		productions.addAll(twofoldProductions);
 		productions.addAll(lastfoldProductions);
 
 		//remove rules with the need affix flag
+//FIXME
 		enforceNeedAffixFlag(productions);
 
 		//convert using output table
@@ -167,7 +168,6 @@ public class WordGenerator{
 		List<Production> twofoldProductions = new ArrayList<>();
 		for(Production production : onefoldProductions){
 			List<String[]> applyAffixes = extractAffixes(production, !affParser.isComplexPrefixes());
-//			applyAffixes.set(1, null);
 			List<Production> productions = applyAffixRules(production, applyAffixes);
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
@@ -253,12 +253,12 @@ public class WordGenerator{
 	}
 
 	private void enforceNeedAffixFlag(List<Production> productions){
-//		Iterator<Production> itr = productions.iterator();
-//		while(itr.hasNext()){
-//			Production production = itr.next();
-//			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
-//				itr.remove();
-//		}
+		Iterator<Production> itr = productions.iterator();
+		while(itr.hasNext()){
+			Production production = itr.next();
+			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
+				itr.remove();
+		}
 	}
 
 	private List<Production> applyAffixRules(DictionaryEntry productable, List<String[]> applyAffixes) throws NoApplicableRuleException{
