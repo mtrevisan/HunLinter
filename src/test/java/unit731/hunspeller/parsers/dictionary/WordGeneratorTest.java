@@ -3,10 +3,8 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringJoiner;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,9 +25,7 @@ public class WordGeneratorTest{
 	public void init(){
 		affParser = new AffixParser();
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(StringUtils.EMPTY, ".dic");
-		DictionaryParser dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
-		wordGenerator = new WordGenerator(affParser, dicParser, null);
+		wordGenerator = new WordGenerator(affParser, null, null);
 	}
 
 	@Test
@@ -96,6 +92,41 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(8));
 		Assert.assertEquals(new Production("eac", "", strategy), stems.get(10));
 		Assert.assertEquals(new Production("ead", "", strategy), stems.get(11));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void stemsInvalidFullstrip() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 1")
+			.add("SFX A a b a")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		String line = "a/A";
+
+		wordGenerator.applyRules(line);
+	}
+
+	@Test
+	public void stemsValidFullstrip() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("FULLSTRIP")
+			.add("SFX A Y 1")
+			.add("SFX A a b a")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		String line = "a/A";
+
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(2, stems.size());
+		//base production
+		Assert.assertEquals(new Production("a", "A", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("b", null, strategy), stems.get(1));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

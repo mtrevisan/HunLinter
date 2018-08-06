@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,6 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
 
 @Getter
-@EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class Production extends DictionaryEntry{
 
 	private List<AffixEntry> appliedRules;

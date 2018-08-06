@@ -53,7 +53,6 @@ public class WordGenerator{
 
 	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, PropertyChangeListener listener){
 		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(dicParser);
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;

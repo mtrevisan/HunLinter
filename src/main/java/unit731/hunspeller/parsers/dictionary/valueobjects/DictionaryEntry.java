@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -22,6 +23,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.services.PatternService;
 
 
+@EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class DictionaryEntry{
 
 	private static final int PARAM_WORD = 1;
