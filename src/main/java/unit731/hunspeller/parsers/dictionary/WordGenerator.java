@@ -113,10 +113,6 @@ public class WordGenerator{
 			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production, production.getRulesSequence()));
 		}
 
-		//remove rules that invalidate the onlyInCompound rule
-//FIXME
-//		removeRulesInvalidatingOnlyInCompound(productions);
-
 		//remove rules that invalidate the circumfix rule
 		removeRulesInvalidatingCircumfix(lastfoldProductions);
 
@@ -126,8 +122,12 @@ public class WordGenerator{
 		productions.addAll(twofoldProductions);
 		productions.addAll(lastfoldProductions);
 
-		//remove rules with the need affix flag
 //FIXME
+		//remove rules that invalidate the onlyInCompound rule
+//		enforceOnlyInCompound(productions);
+
+//FIXME
+		//remove rules with the need affix flag
 		enforceNeedAffixFlag(productions);
 
 		//convert using output table
@@ -216,7 +216,7 @@ public class WordGenerator{
 					+ prod.getContinuationFlags() + ")");
 	}
 
-	private List<Production> removeRulesInvalidatingOnlyInCompound(List<Production> productions){
+	private List<Production> enforceOnlyInCompound(List<Production> productions){
 		String onlyInCompoundFlag = affParser.getOnlyInCompoundFlag();
 		Iterator<Production> itr = productions.iterator();
 		while(itr.hasNext()){
@@ -253,10 +253,12 @@ public class WordGenerator{
 	}
 
 	private void enforceNeedAffixFlag(List<Production> productions){
+		String needAffixFlag = affParser.getNeedAffixFlag();
 		Iterator<Production> itr = productions.iterator();
 		while(itr.hasNext()){
 			Production production = itr.next();
-			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
+
+			if(production.containsContinuationFlag(needAffixFlag))
 				itr.remove();
 		}
 	}
