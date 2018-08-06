@@ -191,8 +191,7 @@ public class WordGenerator{
 
 	private void checkTwofoldCorrectness(List<Production> twofoldProductions) throws IllegalArgumentException{
 		for(Production prod : twofoldProductions)
-			if(prod.getContinuationFlagsCount() - (prod.containsContinuationFlag(affParser.getKeepCaseFlag())? 1: 0)
-				- (prod.containsContinuationFlag(affParser.getCircumfixFlag())? 1: 0) > 0)
+			if(prod.hasContinuationFlags(affParser))
 				throw new IllegalArgumentException("Twofold rule violated (" + prod.getRulesSequence() + " still has rules "
 					+ prod.getContinuationFlags() + ")");
 	}

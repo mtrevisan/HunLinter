@@ -400,7 +400,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			incompatibilityCheck(production);
 
 			String derivedWordWithoutMorphologicalFields = production.toString();
-			if(production.hasContinuationFlags() && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
+			if(production.hasContinuationFlags(affParser) && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
 				northernPluralCheck(production);

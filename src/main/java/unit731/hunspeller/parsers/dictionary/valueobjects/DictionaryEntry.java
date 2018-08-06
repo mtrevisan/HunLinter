@@ -206,7 +206,7 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		return word + AffixEntry.SLASH + StringUtils.join(continuationFlags, ", ");
+		return word + (continuationFlags != null && continuationFlags.length > 0? AffixEntry.SLASH + StringUtils.join(continuationFlags, ", "): StringUtils.EMPTY);
 	}
 
 }

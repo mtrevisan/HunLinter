@@ -297,22 +297,35 @@ public class WordGeneratorTest{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
 			.add("NEEDAFFIX X")
-			.add("SFX A Y 1")
-			.add("SFX A 0 s/XB .")
+			.add("SFX A Y 2")
+			.add("SFX A 0 suf/B .")
+			.add("SFX A 0 pseudosuf/XB .")
 			.add("SFX B Y 1")
 			.add("SFX B 0 bar .")
+			.add("PFX C Y 2")
+			.add("PFX C 0 pre .")
+			.add("PFX C 0 pseudopre/X .")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
 
-		String line = "foo/A";
+		String line = "foo/AC";
 		List<Production> stems = wordGenerator.applyRules(line);
 
-		Assert.assertEquals(2, stems.size());
-		//base production
-		Assert.assertEquals(new Production("foo", "A", strategy), stems.get(0));
-		//twofold productions
-		Assert.assertEquals(new Production("foosbar", null, strategy), stems.get(1));
+		for(Production p : stems)
+			System.out.println(p.toString());
+		Assert.assertEquals(11, stems.size());
+		Assert.assertEquals(new Production("foo", "AC", strategy), stems.get(0));
+		Assert.assertEquals(new Production("prefoo", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("foosuf", "BC", strategy), stems.get(2));
+		Assert.assertEquals(new Production("prefoosuf", null, strategy), stems.get(3));
+		Assert.assertEquals(new Production("foosufbar", null, strategy), stems.get(4));
+		Assert.assertEquals(new Production("prefoosufbar", null, strategy), stems.get(5));
+		Assert.assertEquals(new Production("pseudoprefoosuf", null, strategy), stems.get(6));
+		Assert.assertEquals(new Production("pseudoprefoosufbar", null, strategy), stems.get(7));
+		Assert.assertEquals(new Production("pseudoprefoopseudosufbar", null, strategy), stems.get(8));
+		Assert.assertEquals(new Production("prefoopseudosuf", null, strategy), stems.get(9));
+		Assert.assertEquals(new Production("prefoopseudosufbar", null, strategy), stems.get(10));
 	}
 
 }

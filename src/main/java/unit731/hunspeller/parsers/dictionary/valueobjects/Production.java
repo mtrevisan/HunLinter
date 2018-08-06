@@ -38,8 +38,15 @@ public class Production extends DictionaryEntry{
 		super(word, continuationFlags, strategy);
 	}
 
-	public int getContinuationFlagsCount(){
-		return (continuationFlags != null? continuationFlags.length: 0);
+	public int getContinuationFlagsCount(AffixParser affParser){
+		int continuationFlagsCount = 0;
+		if(continuationFlags != null){
+			continuationFlagsCount = continuationFlags.length;
+			for(String flag : continuationFlags)
+				if(affParser.isTerminalAffix(flag))
+					continuationFlagsCount --;
+		}
+		return continuationFlagsCount;
 	}
 
 	public Map<String, Set<String>> collectFlagsFromCompound(AffixParser affParser){
@@ -48,8 +55,8 @@ public class Production extends DictionaryEntry{
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
 	}
 
-	public boolean hasContinuationFlags(){
-		return (getContinuationFlagsCount() > 0);
+	public boolean hasContinuationFlags(AffixParser affParser){
+		return (getContinuationFlagsCount(affParser) > 0);
 	}
 
 	public boolean hasMorphologicalFields(){
