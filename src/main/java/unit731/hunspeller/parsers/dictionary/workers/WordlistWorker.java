@@ -9,9 +9,10 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.FileService;
 
 
@@ -21,17 +22,18 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public WordlistWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
 		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyRules(line);
 
 			try{
-				for(RuleProductionEntry production : productions){
+				for(Production production : productions){
 					writer.write(production.getWord());
 					writer.newLine();
 				}
@@ -52,7 +54,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 				}
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, outputFile, body, done);
+		createWorker(WORKER_NAME, affParser, dicParser, outputFile, body, done);
 	}
 
 }

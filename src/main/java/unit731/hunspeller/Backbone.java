@@ -214,7 +214,7 @@ public class Backbone implements FileChangeListener{
 		return new File(affFile.toPath().getParent().toString() + File.separator + filename);
 	}
 
-	/** FIXME should be private!? */
+	/* FIXME should be private!? */
 	public File getDictionaryFile(){
 		return getFile(affParser.getLanguage() + EXTENSION_DIC);
 	}
@@ -273,7 +273,7 @@ public class Backbone implements FileChangeListener{
 
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
-		return (baseName.startsWith("hyph_") && path.endsWith(EXTENSION_DIC));
+		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));
 	}
 
 	private boolean hasAIDExtension(String path){

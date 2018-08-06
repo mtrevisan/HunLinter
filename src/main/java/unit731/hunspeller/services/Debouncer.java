@@ -48,7 +48,7 @@ public class Debouncer<T>{
 		private final Object lock = new Object();
 
 
-		public TimerTask(T key){
+		TimerTask(T key){
 			this.key = key;
 
 			extend();

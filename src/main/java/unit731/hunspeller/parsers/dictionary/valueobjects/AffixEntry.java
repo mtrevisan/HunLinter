@@ -1,10 +1,14 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -45,7 +49,6 @@ public class AffixEntry{
 	/** ID used to represent the affix */
 	@Getter
 	private final String flag;
-	@Getter
 	private final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	@Getter
@@ -98,6 +101,28 @@ public class AffixEntry{
 		}
 
 		entry = PatternService.clear(line, MATCHER_ENTRY);
+	}
+
+	public boolean containsContinuationFlag(String flag){
+		return ArrayUtils.contains(continuationFlags, flag);
+	}
+
+	public boolean containsUniqueContinuationFlags(){
+		if(continuationFlags == null)
+			return true;
+
+		Set<String> set = new HashSet<>();
+		return Arrays.stream(continuationFlags)
+			.allMatch(set::add);
+	}
+
+	public String[] combineContinuationFlags(Set<String> otherContinuationFlags){
+		Set<String> flags = new HashSet<>();
+		if(continuationFlags != null)
+			flags.addAll(Arrays.asList(continuationFlags));
+		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
+			flags.addAll(otherContinuationFlags);
+		return flags.toArray(new String[flags.size()]);
 	}
 
 	public final boolean isSuffix(){

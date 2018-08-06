@@ -26,7 +26,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
@@ -136,10 +136,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+						List<Production> productions = wordGenerator.applyRules(line);
 
 						productions.stream()
-							.map(RuleProductionEntry::toStringWithSignificantMorphologicalFields)
+							.map(Production::toStringWithSignificantMorphologicalFields)
 							.filter(text -> !bloomFilter.add(text))
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
@@ -191,9 +191,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
+							List<Production> productions = wordGenerator.applyRules(line);
 							String word = productions.get(0).getWord();
-							for(RuleProductionEntry production : productions){
+							for(Production production : productions){
 								String text = production.toStringWithSignificantMorphologicalFields();
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, word, lineIndex));

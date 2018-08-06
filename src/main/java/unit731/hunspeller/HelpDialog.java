@@ -43,7 +43,7 @@ public class HelpDialog extends JDialog{
 
 
 		try{
-			BufferedImage img = ImageIO.read(getClass().getResourceAsStream("/favicon.jpg"));
+			BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/favicon.jpg"));
 			ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
 			lblLogo.setIcon(icon);
 		}
@@ -52,9 +52,8 @@ public class HelpDialog extends JDialog{
 		String artifactID = null;
 		String version = null;
 		LocalDate buildTimestamp = null;
-		InputStream versionInfoStream = getClass().getResourceAsStream("/version.properties");
-		Properties prop = new Properties();
-		try{
+		try(InputStream versionInfoStream = HelpDialog.class.getResourceAsStream("/version.properties")){
+			Properties prop = new Properties();
 			prop.load(versionInfoStream);
 
 			artifactID = prop.getProperty("artifactId");

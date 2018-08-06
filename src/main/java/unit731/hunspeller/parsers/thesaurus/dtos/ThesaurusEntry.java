@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -21,6 +22,7 @@ import unit731.hunspeller.services.FileService;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(of = "synonym")
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
@@ -48,6 +50,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		meanings = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			String meaning = br.readLine();
+			if(meaning == null)
+				throw new IllegalArgumentException("Unexpected EOF while reading Thesaurus file");
+
 			//ignore any BOM marker on first line
 			if(i == 0)
 				meaning = FileService.clearBOMMarker(meaning);

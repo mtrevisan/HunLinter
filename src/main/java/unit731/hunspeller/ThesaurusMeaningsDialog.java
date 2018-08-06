@@ -4,6 +4,10 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -163,6 +167,15 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
 
 	public static void main(String args[]){
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

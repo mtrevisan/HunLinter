@@ -88,8 +88,6 @@ public class FileService{
 			builder = new ProcessBuilder("open", file.getAbsolutePath());
 
 		if(builder != null){
-			builder.redirectErrorStream();
-			builder.redirectOutput();
 			Process process = builder.start();
 			process.waitFor();
 		}

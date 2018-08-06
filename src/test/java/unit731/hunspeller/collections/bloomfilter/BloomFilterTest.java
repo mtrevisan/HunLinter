@@ -29,12 +29,12 @@ public class BloomFilterTest{
 		}
 
 		//now add to filter
-		for(String uuid : contained)
-			filter.add(uuid);
+		contained.forEach(filter::add);
 
 		//now start checking
-		for(String uuid : contained)
-			Assert.assertTrue(filter.contains(uuid));
+		contained.stream()
+			.map(filter::contains)
+			.forEach(Assert::assertTrue);
 		int fpp = 0;
 		for(String uuid : unused){
 			boolean present = filter.contains(uuid);
@@ -49,12 +49,12 @@ public class BloomFilterTest{
 		List<String> more = new ArrayList<>();
 		for(int index = 0; index < MAX; index ++)
 			more.add(UUID.randomUUID().toString());
-		for(String uuid : more)
-			filter.add(uuid);
+		more.forEach(filter::add);
 
 		//check again
-		for(String uuid : more)
-			Assert.assertTrue(filter.contains(uuid));
+		contained.stream()
+			.map(filter::contains)
+			.forEach(Assert::assertTrue);
 		for(int index = 0; index < MAX; index ++){
 			String uuid = UUID.randomUUID().toString();
 			boolean present = filter.contains(uuid);

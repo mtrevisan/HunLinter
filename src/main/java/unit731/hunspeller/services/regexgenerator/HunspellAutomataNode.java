@@ -1,6 +1,5 @@
 package unit731.hunspeller.services.regexgenerator;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +18,7 @@ public class HunspellAutomataNode{
 	@Getter
 	private long matchedWordCount = 0l;
 	@Setter
-	private List<HunspellAutomataNode> nextNodes = new ArrayList<>();
+	private List<HunspellAutomataNode> nextNodes;
 	private boolean matchedWordCountUpdated;
 
 
@@ -32,7 +31,7 @@ public class HunspellAutomataNode{
 		if(matchedWordCountUpdated)
 			return;
 
-		if(nextNodes.isEmpty())
+		if(nextNodes == null || nextNodes.isEmpty())
 			matchedWordCount = charCount;
 		else
 			for(HunspellAutomataNode childNode : nextNodes){

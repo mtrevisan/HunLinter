@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 
 
 @AllArgsConstructor
@@ -13,7 +13,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
 public class Duplicate{
 
 	@NonNull
-	private final RuleProductionEntry production;
+	private final Production production;
 	@NonNull
 	private final String word;
 	private final int lineIndex;

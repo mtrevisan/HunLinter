@@ -16,7 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import unit731.hunspeller.services.PatternService;
@@ -28,21 +28,18 @@ public class GUIUtils{
 	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+>");
 
 
-	public static JPopupMenu createCopyingPopupMenu(int iconSize){
+	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
 		JPopupMenu popupMenu = new JPopupMenu();
 
 		JMenuItem copyMenuItem = new JMenuItem("Copy", 'C');
-		try{
-			BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
-			ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-			copyMenuItem.setIcon(icon);
-		}
-		catch(IOException e){}
+		BufferedImage img = ImageIO.read(GUIUtils.class.getResourceAsStream("/popup_copy.png"));
+		ImageIcon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+		copyMenuItem.setIcon(icon);
 		copyMenuItem.addActionListener(e -> {
 			String textToCopy = null;
 			Component c = popupMenu.getInvoker();
-			if(c instanceof JTextField)
-				textToCopy = ((JTextField)c).getText();
+			if(c instanceof JTextComponent)
+				textToCopy = ((JTextComponent)c).getText();
 			else if(c instanceof JLabel)
 				textToCopy = ((JLabel)c).getText();
 

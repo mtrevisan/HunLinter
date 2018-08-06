@@ -1,9 +1,12 @@
 package unit731.hunspeller.languages.builders;
 
 import java.util.Comparator;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import unit731.hunspeller.languages.vec.WordVEC;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ComparatorBuilder{
 
 	private static final String LANGUAGE_VENETAN = "vec";

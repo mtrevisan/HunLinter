@@ -10,9 +10,10 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 
 
 @Slf4j
@@ -23,7 +24,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker){
+	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker){
+		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
@@ -33,9 +35,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
-			for(RuleProductionEntry production : productions)
-				bloomFilter.add(production.getWord());
+			List<Production> productions = wordGenerator.applyRules(line);
+			productions.forEach(production -> bloomFilter.add(production.getWord()));
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
@@ -47,7 +48,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, body, done);
+		createWorker(WORKER_NAME, affParser, dicParser, body, done);
 	}
 
 	@Override

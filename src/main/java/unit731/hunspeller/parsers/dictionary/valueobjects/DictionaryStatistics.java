@@ -125,12 +125,12 @@ public class DictionaryStatistics{
 			.collect(Collectors.toList());
 	}
 
-	/** Returns the countr of unique words */
+	/** @return	The count of unique words */
 	public int getUniqueWords(){
 		return bloomFilter.getAddedElements();
 	}
 
-	/** Returns the count of compound words */
+	/** @return	The count of compound words */
 	public int getCompoundWords(){
 		return compoundWords;
 	}

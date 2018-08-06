@@ -11,19 +11,22 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
 @AllArgsConstructor
-@Getter
 @EqualsAndHashCode(of = {"syllabes", "breakCharacter"})
 public class Hyphenation{
 
 	@NonNull
+	@Getter
 	private final List<String> syllabes;
 	@NonNull
+	@Getter
 	private final List<String> compounds;
 	@NonNull
+	@Getter
 	private final List<String> rules;
 	@NonNull
 	private final boolean[] errors;
 	@NonNull
+	@Getter
 	private final String breakCharacter;
 
 

@@ -38,7 +38,7 @@ public class HunspellRegexWordGenerator{
 	public static final long INFINITY = -1l;
 
 	@AllArgsConstructor
-	private class GeneratedElement{
+	private static class GeneratedElement{
 		private final String word;
 		private final State state;
 	}
@@ -248,7 +248,7 @@ public class HunspellRegexWordGenerator{
 			if(matchedWordCounter == limit)
 				break;
 
-			GeneratedElement elem = (GeneratedElement)deque.pop();
+			GeneratedElement elem = deque.pop();
 			String subword = elem.word;
 			State state = elem.state;
 			List<Transition> transitions = state.getSortedTransitions(true);

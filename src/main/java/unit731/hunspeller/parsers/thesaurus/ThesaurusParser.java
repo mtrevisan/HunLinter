@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -30,20 +28,19 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.ReadWriteLockable;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
 @Slf4j
 @Getter
-public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
+public class ThesaurusParser extends ReadWriteLockable implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
 
 	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
 	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
-
-	private final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
@@ -73,7 +70,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File theFile) throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			clearInternal();
 
@@ -98,40 +95,22 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		finally{
 			dictionary.resetModified();
 
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
 
 	public int getSynonymsCounter(){
-		READ_WRITE_LOCK.readLock().lock();
-		try{
-			return dictionary.size();
-		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		return dictionary.size();
 	}
 
 	public boolean isDictionaryModified(){
-		READ_WRITE_LOCK.readLock().lock();
-		try{
-			return dictionary.isModified();
-		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		return dictionary.isModified();
 	}
 
 	public List<ThesaurusEntry> getSynonymsDictionary(){
-		READ_WRITE_LOCK.readLock().lock();
-		try{
-			return dictionary.getSynonyms();
-		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		return dictionary.getSynonyms();
 	}
 
 	/**
@@ -141,7 +120,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
 			if(partOfSpeechAndMeanings.length != 2)
@@ -184,48 +163,42 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return duplicationResult;
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
 	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
 			throws IllegalArgumentException{
-		READ_WRITE_LOCK.readLock().lock();
+		boolean forcedInsertion = false;
+		List<ThesaurusEntry> duplicates = new ArrayList<>();
 		try{
-			boolean forcedInsertion = false;
-			List<ThesaurusEntry> duplicates = new ArrayList<>();
-			try{
-				List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-				for(String meaning : means)
-					for(ThesaurusEntry synonym : synonyms)
-						if(synonym.getSynonym().equals(meaning)){
-							List<MeaningEntry> meanings = synonym.getMeanings();
-							long countSamePartOfSpeech = meanings.stream()
-								.map(MeaningEntry::getPartOfSpeech)
-								.filter(pos -> pos.equals(partOfSpeech))
-								.map(m -> 1)
-								.reduce(0, (accumulator, m) -> accumulator + 1);
-							if(countSamePartOfSpeech > 0l)
-								throw new IllegalArgumentException("Duplicate detected for " + meaning);
-						}
-			}
-			catch(IllegalArgumentException e){
-				if(!duplicatesDiscriminator.get())
-					throw e;
+			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+			for(String meaning : means)
+				for(ThesaurusEntry synonym : synonyms)
+					if(synonym.getSynonym().equals(meaning)){
+						List<MeaningEntry> meanings = synonym.getMeanings();
+						long countSamePartOfSpeech = meanings.stream()
+							.map(MeaningEntry::getPartOfSpeech)
+							.filter(pos -> pos.equals(partOfSpeech))
+							.map(m -> 1)
+							.reduce(0, (accumulator, m) -> accumulator + 1);
+						if(countSamePartOfSpeech > 0l)
+							throw new IllegalArgumentException("Duplicate detected for " + meaning);
+					}
+		}
+		catch(IllegalArgumentException e){
+			if(!duplicatesDiscriminator.get())
+				throw e;
 
-				duplicates.clear();
-				forcedInsertion = true;
-			}
-			return new DuplicationResult(duplicates, forcedInsertion);
+			duplicates.clear();
+			forcedInsertion = true;
 		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		return new DuplicationResult(duplicates, forcedInsertion);
 	}
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			undoCaretaker.pushMemento(createMemento());
 
@@ -255,12 +228,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			log.warn("Error while modifying the meanings", e);
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			int count = selectedRowIDs.length;
 			if(count > 0){
@@ -279,18 +252,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public List<String> extractDuplicates(){
-		READ_WRITE_LOCK.readLock().lock();
-		try{
-			return dictionary.extractDuplicates();
-		}
-		finally{
-			READ_WRITE_LOCK.readLock().unlock();
-		}
+		return dictionary.extractDuplicates();
 	}
 
 	public static String prepareTextForThesaurusFilter(String text){
@@ -302,7 +269,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			//sort the synonyms
 			dictionary.sort();
@@ -353,17 +320,17 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			}
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public void clear(){
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			clearInternal();
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
@@ -372,27 +339,27 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public boolean canUndo(){
-		READ_WRITE_LOCK.readLock().lock();
+		acquireReadLock();
 		try{
 			return undoCaretaker.canUndo();
 		}
 		finally{
-			READ_WRITE_LOCK.readLock().unlock();
+			releaseReadLock();
 		}
 	}
 
 	public boolean canRedo(){
-		READ_WRITE_LOCK.readLock().lock();
+		acquireReadLock();
 		try{
 			return redoCaretaker.canUndo();
 		}
 		finally{
-			READ_WRITE_LOCK.readLock().unlock();
+			releaseReadLock();
 		}
 	}
 
 	public boolean restorePreviousSnapshot() throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			boolean restored = false;
 			if(canUndo()){
@@ -411,12 +378,12 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return restored;
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 
 	public boolean restoreNextSnapshot() throws IOException{
-		READ_WRITE_LOCK.writeLock().lock();
+		acquireWriteLock();
 		try{
 			boolean restored = false;
 			if(canRedo()){
@@ -435,7 +402,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			return restored;
 		}
 		finally{
-			READ_WRITE_LOCK.writeLock().unlock();
+			releaseWriteLock();
 		}
 	}
 

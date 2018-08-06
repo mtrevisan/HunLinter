@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private static final HashFunction DEFAULT_HASHER = new Murmur3HashFunction();
 
 	/** The default {@link Charset} is the platform encoding charset */
-	protected transient Charset currentCharset = Charset.defaultCharset();
+	protected Charset currentCharset = Charset.defaultCharset();
 
 
 	protected final BitArrayBuilder.Type type;
@@ -283,7 +282,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public double getTrueFalsePositiveProbability(int insertedElements){
 		//(1 - e^(-k * n / m)) ^ k
-		return Math.pow((1 - Math.exp(-hashFunctions * (double)insertedElements / (double)bitsRequired)), hashFunctions);
+		return Math.pow((1 - Math.exp(-hashFunctions * (double)insertedElements / bitsRequired)), hashFunctions);
 	}
 
 	/** Sets all bits to false in the Bloom filter. */
@@ -295,13 +294,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public void close(){
-		if(bitArray instanceof Closeable){
-			try{
-				((Closeable)bitArray).close();
-			}
-			catch(IOException e){
-				log.error("Error closing the Bloom filter", e);
-			}
+		try{
+			bitArray.close();
+		}
+		catch(IOException e){
+			log.error("Error closing the Bloom filter", e);
 		}
 	}
 

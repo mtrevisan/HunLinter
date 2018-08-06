@@ -41,6 +41,7 @@ public class Trie<S, H, V>{
 
 
 	private final TrieNode<S, H, V> root = TrieNode.makeRoot();
+
 	private TrieSequencerInterface<S, H> sequencer;
 
 
@@ -187,7 +188,7 @@ public class Trie<S, H, V>{
 
 			sequenceOffset += matches;
 
-			if(matches != max || matches == max && max != nodeLength)
+			if(matches != max || max != nodeLength)
 				//not found
 				node = null;
 			else if(sequenceOffset == sequenceLength || !node.hasChildren()){

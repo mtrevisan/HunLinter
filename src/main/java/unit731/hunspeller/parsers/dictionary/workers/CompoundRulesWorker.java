@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
@@ -16,7 +15,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -53,13 +52,10 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Map<String, Set<String>> compounds = new HashMap<>();
 		BiConsumer<String, Integer> body = (line, row) -> {
 			//collect words belonging to a compound rule
-			List<RuleProductionEntry> productions = wordGenerator.applyRules(line);
-			for(RuleProductionEntry production : productions)
+			List<Production> productions = wordGenerator.applyRules(line);
+			for(Production production : productions)
 				if(production.getWord().length() >= compoundMinimumLength){
-					Map<String, Set<String>> c = Arrays.stream(production.getContinuationFlags())
-						.filter(affParser::isManagedByCompoundRule)
-						.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> production.getWord(), Collectors.toSet())));
-
+					Map<String, Set<String>> c = production.collectFlagsFromCompound(affParser);
 					for(Map.Entry<String, Set<String>> entry: c.entrySet()){
 						String affix = entry.getKey();
 						Set<String> prods = entry.getValue();
@@ -83,7 +79,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 					extract();
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, body, done);
+		createWorker(WORKER_NAME, affParser, dicParser, body, done);
 	}
 
 	private void extract(){

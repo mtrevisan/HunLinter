@@ -1,5 +1,9 @@
 package unit731.hunspeller.gui;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
@@ -63,18 +67,28 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	@Override
 	public void setValueAt(Object value, int rowIndex, int columnIndex){
-		try{
-			String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
-			text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
+		if(synonyms != null){
+			try{
+				String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
+				text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
 
-			List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
-			meanings.clear();
+				List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
+				meanings.clear();
 
-			String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-			for(String line : lines)
-				meanings.add(new MeaningEntry(line));
+				String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
+				for(String line : lines)
+					meanings.add(new MeaningEntry(line));
+			}
+			catch(IllegalArgumentException e){}
 		}
-		catch(IllegalArgumentException e){}
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -23,13 +23,6 @@ public class FastBitArray implements BitArray{
 		data = new long[(int)(bits >>> 6) + 1];
 	}
 
-	public FastBitArray(long[] data){
-		if(data == null || data.length == 0)
-			throw new IllegalArgumentException("Data must be valued");
-
-		this.data = data;
-	}
-
 	@Override
 	public boolean get(int index){
 		return ((data[index >> 6] & (1l << index)) != 0l);

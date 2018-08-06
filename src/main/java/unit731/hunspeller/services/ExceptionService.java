@@ -1,8 +1,11 @@
 package unit731.hunspeller.services;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExceptionService{
 
 	public static String getMessage(Exception e){

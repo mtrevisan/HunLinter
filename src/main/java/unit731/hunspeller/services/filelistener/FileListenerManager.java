@@ -79,8 +79,11 @@ public class FileListenerManager implements FileListener, Runnable{
 			Path dir = (new File(pattern)).getParentFile().toPath();
 			File fil = dir.toFile();
 			//create directory if it doesn't exists
-			if(!fil.exists())
-				fil.mkdirs();
+			if(!fil.exists() && !fil.mkdirs()){
+				log.error("Exception while creating directory {}", dir);
+
+				continue;
+			}
 
 			if(!dirPathToListeners.containsKey(dir)){
 				try{

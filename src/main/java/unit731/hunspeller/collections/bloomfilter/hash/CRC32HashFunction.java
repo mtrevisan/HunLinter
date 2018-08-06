@@ -22,7 +22,7 @@ public class CRC32HashFunction implements HashFunction{
 
 	@Override
 	public long[] hashMultiple(byte[] bytes){
-		return null;
+		return new long[]{hash(bytes)};
 	}
 
 }

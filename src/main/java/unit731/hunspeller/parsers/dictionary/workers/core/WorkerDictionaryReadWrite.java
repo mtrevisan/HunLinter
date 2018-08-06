@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 
@@ -42,7 +43,8 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
+		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file"
+			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
@@ -53,6 +55,9 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 				BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
 			){
 			String line = br.readLine();
+			if(line == null)
+				throw new IllegalArgumentException("Dictionary file empty");
+
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
 				line = FileService.clearBOMMarker(line);

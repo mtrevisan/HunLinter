@@ -16,7 +16,7 @@ import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
@@ -129,7 +129,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			this.error = MessageFormat.format(pattern, args.toArray(new Object[args.size()]));
 		}
 
-		public void match(RuleProductionEntry production) throws IllegalArgumentException{
+		public void match(Production production) throws IllegalArgumentException{
 			for(String flag : continuationFlags)
 				if(production.containsContinuationFlag(flag))
 					throw new IllegalArgumentException(error + " for " + production.getWord());
@@ -369,20 +369,23 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		super(affParser, hyphenator);
 	}
 
+	@Override
 	public int getExpectedNumberOfElements(){
 		return EXPECTED_NUMBER_OF_ELEMENTS;
 	}
 
+	@Override
 	public double getFalsePositiveProbability(){
 		return FALSE_POSITIVE_PROBABILITY;
 	}
 
+	@Override
 	public double getGrowRatioWhenFull(){
 		return GROW_RATIO_WHEN_FULL;
 	}
 
 	@Override
-	public void checkProduction(RuleProductionEntry production) throws IllegalArgumentException{
+	public void checkProduction(Production production) throws IllegalArgumentException{
 //		if(!ENABLE_VERB_CHECK && production.isPartOfSpeech(POS_VERB))
 //			return;
 
@@ -425,24 +428,22 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private void morphologicalFieldCheck(RuleProductionEntry production) throws IllegalArgumentException{
-		String[] morphologicalFields = production.getMorphologicalFields();
-		if(morphologicalFields != null)
-			for(String morphologicalField : morphologicalFields){
-				if(morphologicalField.length() < 4)
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
+	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{
+		production.forEachMorphologicalField(morphologicalField -> {
+			if(morphologicalField.length() < 4)
+				throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
 
-				String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
-				if(!DATA_FIELDS.containsKey(morphologicalFieldPrefix))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
+			String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
+			if(!DATA_FIELDS.containsKey(morphologicalFieldPrefix))
+				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
 
-				Set<String> morphologicalFieldTypes = DATA_FIELDS.get(morphologicalFieldPrefix);
-				if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
-					throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
-			}
+			Set<String> morphologicalFieldTypes = DATA_FIELDS.get(morphologicalFieldPrefix);
+			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
+		});
 	}
 
-	private void vanishingElCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void vanishingElCheck(Production production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternService.find(derivedWord, NON_VANISHING_EL))
 			throw new IllegalArgumentException("Word with ƚ cannot contain non–ƚ, " + derivedWord);
@@ -456,7 +457,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
 	}
 
-	private void incompatibilityCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
 		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_CONTAINS_LH, GraphemeVEC.L_STROKE_GRAPHEME);
 		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH, GraphemeVEC.D_STROKE_GRAPHEME, GraphemeVEC.T_STROKE_GRAPHEME);
 
@@ -466,14 +467,14 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		continuationFlagIncompatibilityCheck(production, GUA_TO_VA_RULE, GUA_TO_VA_CHECKS);
 	}
 
-	private void continuationFlagIncompatibilityCheck(RuleProductionEntry production, String continuationFlag, Set<MatcherEntry> checks)
+	private void continuationFlagIncompatibilityCheck(Production production, String continuationFlag, Set<MatcherEntry> checks)
 			throws IllegalArgumentException{
 		if(production.containsContinuationFlag(continuationFlag))
 			for(MatcherEntry entry : checks)
 				entry.match(production);
 	}
 
-	private void metaphonesisCheck(RuleProductionEntry production, String line) throws IllegalArgumentException{
+	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
 			boolean hasMetaphonesisFlag = production.containsContinuationFlag(METAPHONESIS_RULE);
 			boolean hasPluralFlag = production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
@@ -492,7 +493,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private void northernPluralCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void northernPluralCheck(Production production) throws IllegalArgumentException{
 		String word = production.getWord();
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
@@ -510,18 +511,18 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private void mismatchCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void mismatchCheck(Production production) throws IllegalArgumentException{
 		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
 	}
 
-	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks, String... contains)
+	private void variantIncompatibilityCheck(Production production, Set<MatcherEntry> checks, String... contains)
 			throws IllegalArgumentException{
 		if(StringUtils.containsAny(production.getWord(), contains))
 			for(MatcherEntry entry : checks)
 				entry.match(production);
 	}
 
-	private void accentCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
+	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
 		int accents = WordVEC.countAccents(subword);
 		if(accents > 1 && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(subword))
 			throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
@@ -540,7 +541,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private void ciuiCheck(String subword, RuleProductionEntry production) throws IllegalArgumentException{
+	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN)){
 			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternService.find(phonemizedSubword, CIJJHNHIV))
@@ -548,7 +549,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private void syllabationCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void syllabationCheck(Production production) throws IllegalArgumentException{
 		if((ENABLE_VERB_CHECK || !production.isPartOfSpeech(POS_VERB)) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
 			if(!UNSYLLABABLE_INTERJECTIONS.contains(word) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(word)){
@@ -598,7 +599,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 //		return result;
 //	}
 
-	private void finalSonorizationCheck(RuleProductionEntry production) throws IllegalArgumentException{
+	private void finalSonorizationCheck(Production production) throws IllegalArgumentException{
 //		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
 //			boolean hasFinalSonorizationFlag = production.containsContinuationFlag(FINAL_SONORIZATION_RULE);
 //			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
@@ -618,7 +619,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	@Override
-	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
+	public boolean shouldBeProcessedForMinimalPair(Production production){
 		String word = production.getWord();
 		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 			&& word.indexOf('ƚ') < 0

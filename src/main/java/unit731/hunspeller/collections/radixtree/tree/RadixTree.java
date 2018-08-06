@@ -43,7 +43,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializable{
+public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	private static final long serialVersionUID = -5213027224293608217L;
 
@@ -340,8 +340,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<V> getValuesPrefixedBy(S prefix){
 		List<V> values = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			values.add(entry.getValue());
+		entries.forEach(entry -> values.add(entry.getValue()));
 		return values;
 	}
 
@@ -355,8 +354,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<S> getKeysPrefixedBy(S prefix){
 		List<S> keys = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			keys.add(entry.getKey());
+		entries.forEach(entry -> keys.add(entry.getKey()));
 		return keys;
 	}
 
@@ -403,8 +401,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<V> getValues(S prefix){
 		List<V> values = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntries(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			values.add(entry.getValue());
+		entries.forEach(entry -> values.add(entry.getValue()));
 		return values;
 	}
 
@@ -418,8 +415,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public List<S> getKeys(S prefix){
 		List<S> keys = new ArrayList<>();
 		List<Map.Entry<S, V>> entries = getEntries(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			keys.add(entry.getKey());
+		entries.forEach(entry -> keys.add(entry.getKey()));
 		return keys;
 	}
 
@@ -453,8 +449,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public Set<S> keySet(){
 		Set<S> keys = new HashSet<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		for(Map.Entry<S, V> entry : entries)
-			keys.add(entry.getKey());
+		entries.forEach(entry -> keys.add(entry.getKey()));
 		return keys;
 	}
 
@@ -462,8 +457,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>, Serializ
 	public Collection<V> values(){
 		Set<V> values = new HashSet<>();
 		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		for(Map.Entry<S, V> entry : entries)
-			values.add(entry.getValue());
+		entries.forEach(entry -> values.add(entry.getValue()));
 		return values;
 	}
 

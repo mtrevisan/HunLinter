@@ -1,6 +1,6 @@
 package unit731.hunspeller.languages;
 
-import unit731.hunspeller.parsers.dictionary.valueobjects.RuleProductionEntry;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ public class CorrectnessChecker{
 	}
 
 	//correctness worker:
-	public void checkProduction(RuleProductionEntry production) throws IllegalArgumentException{}
+	public void checkProduction(Production production) throws IllegalArgumentException{}
 
 	//minimal pairs worker:
 	public boolean isConsonant(char chr){
@@ -44,7 +44,7 @@ public class CorrectnessChecker{
 	}
 
 	//minimal pairs worker:
-	public boolean shouldBeProcessedForMinimalPair(RuleProductionEntry production){
+	public boolean shouldBeProcessedForMinimalPair(Production production){
 		return true;
 	}
 
