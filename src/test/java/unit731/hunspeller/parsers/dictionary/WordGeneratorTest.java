@@ -154,7 +154,7 @@ public class WordGeneratorTest{
 		String content = sj.add("SET UTF-8")
 			.add("FLAG long")
 			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2P1")
+			.add("SFX S1 0 s1/S2")
 			.add("SFX S2 Y 1")
 			.add("SFX S2 0 s2")
 			.add("PFX P1 Y 1")
@@ -164,82 +164,23 @@ public class WordGeneratorTest{
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
-		String line = "aa/P1";
+		String line = "aa/P1S1";
 		List<Production> stems = wordGenerator.applyRules(line);
 
-		Assert.assertEquals(2, stems.size());
+		Assert.assertEquals(6, stems.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "P1", strategy), stems.get(0));
+		Assert.assertEquals(new Production("aa", "P1S1", strategy), stems.get(0));
 		//onefold productions
+		Assert.assertEquals(new Production("aas1", "P1S2", strategy), stems.get(1));
+		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//twofold productions
+		Assert.assertEquals(new Production("p1aa", "S1", strategy), stems.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", "", strategy), stems.get(1));
+		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(5));
 	}
 
-//	@Test
-//	public void stems5() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("FLAG long")
-//			.add("SFX S1 Y 1")
-//			.add("SFX S1 0 s1/S2")
-//			.add("SFX S2 Y 1")
-//			.add("SFX S2 0 s2/P1")
-//			.add("PFX P1 Y 1")
-//			.add("PFX P1 0 p1")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/P1";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//		Assert.assertEquals(4, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "S1", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("as1", "S2", strategy), stems.get(1));
-//		//twofold productions
-//		//lastfold productions
-//		Assert.assertEquals(new Production("as1s2", "P1", strategy), stems.get(2));
-//		Assert.assertEquals(new Production("p1as1s2", "", strategy), stems.get(4));
-//	}
-//
-//	@Test
-//	public void stems6() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("FLAG long")
-//			.add("SFX S1 Y 1")
-//			.add("SFX S1 0 s1/S2")
-//			.add("SFX S2 Y 1")
-//			.add("SFX S2 0 s2")
-//			.add("PFX P1 Y 1")
-//			.add("PFX P1 0 p1")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/P1S1";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//		Assert.assertEquals(7, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "S1P1", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("as1", "P1S2", strategy), stems.get(1));
-//		//twofold productions
-//		Assert.assertEquals(new Production("p1a", "S1", strategy), stems.get(2));
-//		Assert.assertEquals(new Production("p1as1", "S2", strategy), stems.get(3));
-//		//lastfold productions
-//		Assert.assertEquals(new Production("as1s2", "P1", strategy), stems.get(4));
-//		Assert.assertEquals(new Production("p1as1", "S2", strategy), stems.get(5));
-//		Assert.assertEquals(new Production("p1as1s2", "", strategy), stems.get(6));
-//	}
-//
-//
+
 //	@Test
 //	public void stems() throws IOException{
 //		StringJoiner sj = new StringJoiner("\n");
