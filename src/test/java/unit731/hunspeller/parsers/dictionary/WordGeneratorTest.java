@@ -298,13 +298,13 @@ public class WordGeneratorTest{
 		String content = sj.add("SET UTF-8")
 			.add("NEEDAFFIX X")
 			.add("SFX A Y 2")
-			.add("SFX A 0 suf/B .")
-			.add("SFX A 0 pseudosuf/XB .")
+			.add("SFX A 0 -suf/B .")
+			.add("SFX A 0 -pseudosuf/XB .")
 			.add("SFX B Y 1")
-			.add("SFX B 0 bar .")
+			.add("SFX B 0 -bar .")
 			.add("PFX C Y 2")
-			.add("PFX C 0 pre .")
-			.add("PFX C 0 pseudopre/X .")
+			.add("PFX C 0 pre- .")
+			.add("PFX C 0 pseudopre-/X .")
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
@@ -312,20 +312,30 @@ public class WordGeneratorTest{
 		String line = "foo/AC";
 		List<Production> stems = wordGenerator.applyRules(line);
 
+		System.out.println(stems.size());
 		for(Production p : stems)
-			System.out.println(p.toString());
+			System.out.println(p.toString() + " : " + p.getRulesSequence());
 		Assert.assertEquals(11, stems.size());
+		//base production
 		Assert.assertEquals(new Production("foo", "AC", strategy), stems.get(0));
-		Assert.assertEquals(new Production("prefoo", null, strategy), stems.get(1));
-		Assert.assertEquals(new Production("foosuf", "BC", strategy), stems.get(2));
-		Assert.assertEquals(new Production("prefoosuf", null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("foosufbar", null, strategy), stems.get(4));
-		Assert.assertEquals(new Production("prefoosufbar", null, strategy), stems.get(5));
-		Assert.assertEquals(new Production("pseudoprefoosuf", null, strategy), stems.get(6));
-		Assert.assertEquals(new Production("pseudoprefoosufbar", null, strategy), stems.get(7));
-		Assert.assertEquals(new Production("pseudoprefoopseudosufbar", null, strategy), stems.get(8));
-		Assert.assertEquals(new Production("prefoopseudosuf", null, strategy), stems.get(9));
-		Assert.assertEquals(new Production("prefoopseudosufbar", null, strategy), stems.get(10));
+		//onefold productions
+		Assert.assertEquals(new Production("foo-suf", "BC", strategy), stems.get(1));
+//		Assert.assertEquals(new Production("foo-pseudosuf", "BCX", strategy), stems.get(2));
+		//twofold productions
+		Assert.assertEquals(new Production("pre-foo", null, strategy), stems.get(5));
+//		Assert.assertEquals(new Production("pseudopre-foo", "X", strategy), stems.get(6));
+		Assert.assertEquals(new Production("pre-foo-suf", null, strategy), stems.get(7));
+		Assert.assertEquals(new Production("pseudopre-foo-suf", "X", strategy), stems.get(8));
+		Assert.assertEquals(new Production("pre-foo-pseudosuf", "X", strategy), stems.get(9));
+		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf", "X", strategy), stems.get(10));
+		//lastfold productions
+		Assert.assertEquals(new Production("foo-suf-bar", null, strategy), stems.get(3));
+//		Assert.assertEquals(new Production("foo-pseudosuf-bar", "X", strategy), stems.get(4));
+
+//		Assert.assertEquals(new Production("pre-foo-suf-bar", null, strategy), stems.get(3));
+//		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", null, strategy), stems.get(3));
+//		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", null, strategy), stems.get(3));
+//		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", null, strategy), stems.get(3));
 	}
 
 }
