@@ -76,7 +76,10 @@ public class WordGeneratorTest{
 		String line = "a/ABCDE";
 		List<Production> stems = wordGenerator.applyRules(line);
 
-		Assert.assertEquals(12, stems.size());
+System.out.println(stems.size());
+for(Production p : stems)
+	System.out.println(p.toString() + " : " + p.getRulesSequence());
+		Assert.assertEquals(14, stems.size());
 		//base production
 		Assert.assertEquals(new Production("a", "ABCDE", strategy), stems.get(0));
 		//onefold productions
@@ -85,13 +88,16 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("ac", "E", strategy), stems.get(3));
 		Assert.assertEquals(new Production("ad", "AE", strategy), stems.get(4));
 		//twofold productions
-		Assert.assertEquals(new Production("aba", "", strategy), stems.get(5));
-		Assert.assertEquals(new Production("ada", "", strategy), stems.get(6));
+		Assert.assertEquals(new Production("ea", "A", strategy), stems.get(5));
+		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(6));
+		Assert.assertEquals(new Production("eab", "A", strategy), stems.get(7));
+		Assert.assertEquals(new Production("eac", "", strategy), stems.get(8));
+		Assert.assertEquals(new Production("ead", "A", strategy), stems.get(9));
 		//lastfold productions
-		Assert.assertEquals(new Production("ea", "", strategy), stems.get(7));
-		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(8));
-		Assert.assertEquals(new Production("eac", "", strategy), stems.get(10));
-		Assert.assertEquals(new Production("ead", "", strategy), stems.get(11));
+		Assert.assertEquals(new Production("aba", "", strategy), stems.get(10));
+		Assert.assertEquals(new Production("ada", "", strategy), stems.get(11));
+		Assert.assertEquals(new Production("eaba", "", strategy), stems.get(12));
+		Assert.assertEquals(new Production("eada", "", strategy), stems.get(13));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -312,9 +318,9 @@ public class WordGeneratorTest{
 		String line = "foo/AC";
 		List<Production> stems = wordGenerator.applyRules(line);
 
-		System.out.println(stems.size());
-		for(Production p : stems)
-			System.out.println(p.toString() + " : " + p.getRulesSequence());
+System.out.println(stems.size());
+for(Production p : stems)
+	System.out.println(p.toString() + " : " + p.getRulesSequence());
 		Assert.assertEquals(11, stems.size());
 		//base production
 		Assert.assertEquals(new Production("foo", "AC", strategy), stems.get(0));

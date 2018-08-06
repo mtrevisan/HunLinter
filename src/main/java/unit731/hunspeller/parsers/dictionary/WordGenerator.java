@@ -88,41 +88,43 @@ public class WordGenerator{
 			log.debug("   {}", baseProduction);
 		}
 
-		//extract onefold productions
+		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(dicEntry);
 		if(log.isDebugEnabled()){
 			log.debug("Onefold productions:");
 			onefoldProductions.forEach(production -> log.debug("   {} : {}", production, production.getRulesSequence()));
 		}
 
-		//extract twofold productions
+		//extract prefixed productions
 		List<Production> twofoldProductions = getTwofoldProductions(Arrays.asList(baseProduction));
 		twofoldProductions.addAll(getTwofoldProductions(onefoldProductions));
-		checkTwofoldCorrectness(twofoldProductions);
+//		checkTwofoldCorrectness(twofoldProductions);
 		if(log.isDebugEnabled()){
 			log.debug("Twofold productions:");
 			twofoldProductions.forEach(production -> log.debug("   {} : {}", production, production.getRulesSequence()));
 		}
 
-		//collect productions
-		List<Production> productions = new ArrayList<>();
-		productions.addAll(onefoldProductions);
-		productions.addAll(twofoldProductions);
-		//extract lastfold productions
-		List<Production> lastfoldProductions = getLastfoldProductions(productions);
-		checkTwofoldCorrectness(lastfoldProductions);
+		//extract second suffixed productions
+		List<Production> lastfoldProductions = new ArrayList<>();
+		lastfoldProductions.addAll(onefoldProductions);
+		lastfoldProductions.addAll(twofoldProductions);
+		lastfoldProductions = getLastfoldProductions(lastfoldProductions);
+//		checkTwofoldCorrectness(lastfoldProductions);
 		if(log.isDebugEnabled()){
 			log.debug("Lastfold productions:");
 			lastfoldProductions.forEach(production -> log.debug("   {} : {}", production, production.getRulesSequence()));
 		}
 
 		//remove rules that invalidate the onlyInCompound rule
-		removeRulesInvalidatingOnlyInCompound(productions);
+//		removeRulesInvalidatingOnlyInCompound(productions);
 
 		//remove rules that invalidate the circumfix rule
 		removeRulesInvalidatingCircumfix(lastfoldProductions);
 
+		List<Production> productions = new ArrayList<>();
 		productions.add(baseProduction);
+		productions.addAll(onefoldProductions);
+		productions.addAll(twofoldProductions);
 		productions.addAll(lastfoldProductions);
 
 		//remove rules with the need affix flag
@@ -131,8 +133,8 @@ public class WordGenerator{
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
-		if(log.isDebugEnabled())
-			productions.forEach(production -> log.debug("Produced word {}", production));
+		if(log.isTraceEnabled())
+			productions.forEach(production -> log.trace("Produced word {}", production));
 
 		return productions;
 	}
@@ -166,7 +168,7 @@ public class WordGenerator{
 		List<Production> twofoldProductions = new ArrayList<>();
 		for(Production production : onefoldProductions){
 			List<String[]> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
-			applyAffixes.set(1, null);
+//			applyAffixes.set(1, null);
 			List<Production> productions = applyAffixRules(production, applyAffixes);
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
