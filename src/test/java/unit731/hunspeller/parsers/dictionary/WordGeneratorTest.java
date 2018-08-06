@@ -172,97 +172,93 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("aa", "P1S1", strategy), stems.get(0));
 		//onefold productions
 		Assert.assertEquals(new Production("aas1", "P1S2", strategy), stems.get(1));
-		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//twofold productions
-		Assert.assertEquals(new Production("p1aa", "S1", strategy), stems.get(3));
+		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
+		Assert.assertEquals(new Production("p1aa", "S1", strategy), stems.get(3));
 		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(4));
 		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(5));
 	}
 
+	@Test
+	public void stems5() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 1")
+			.add("SFX A 0 a")
+			.add("SFX B Y 1")
+			.add("SFX B 0 b/A")
+			.add("SFX C Y 1")
+			.add("SFX C 0 c/E")
+			.add("SFX D Y 1")
+			.add("SFX D 0 d/AE")
+			.add("PFX E Y 1")
+			.add("PFX E 0 e")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
 
-//	@Test
-//	public void stems() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("SFX A Y 1")
-//			.add("SFX A 0 a")
-//			.add("SFX B Y 1")
-//			.add("SFX B 0 b/A")
-//			.add("SFX C Y 1")
-//			.add("SFX C 0 c/E")
-//			.add("SFX D Y 1")
-//			.add("SFX D 0 d/AE")
-//			.add("PFX E Y 1")
-//			.add("PFX E 0 e")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/ABCDE";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//System.out.println(stems.size());
-//for(Production p : stems)
-//	System.out.println(p.toString() + " : " + p.getRulesSequence());
-//		Assert.assertEquals(14, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "ABCDE", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("aa", "E", strategy), stems.get(1));
-//		Assert.assertEquals(new Production("ab", "AE", strategy), stems.get(2));
-//		Assert.assertEquals(new Production("ac", "E", strategy), stems.get(3));
-//		Assert.assertEquals(new Production("ad", "AE", strategy), stems.get(4));
-//		//twofold productions
-//		Assert.assertEquals(new Production("ea", "A", strategy), stems.get(5));
-//		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(6));
-//		Assert.assertEquals(new Production("eab", "A", strategy), stems.get(7));
-//		Assert.assertEquals(new Production("eac", "", strategy), stems.get(8));
-//		Assert.assertEquals(new Production("ead", "A", strategy), stems.get(9));
-//		//lastfold productions
-//		Assert.assertEquals(new Production("aba", "", strategy), stems.get(10));
-//		Assert.assertEquals(new Production("ada", "", strategy), stems.get(11));
-//		Assert.assertEquals(new Production("eaba", "", strategy), stems.get(12));
-//		Assert.assertEquals(new Production("eada", "", strategy), stems.get(13));
-//	}
-//
-//	@Test(expected = IllegalArgumentException.class)
-//	public void stemsInvalidFullstrip() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("SFX A Y 1")
-//			.add("SFX A a b a")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//
-//		String line = "a/A";
-//		wordGenerator.applyRules(line);
-//	}
-//
-//	@Test
-//	public void stemsValidFullstrip() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("FULLSTRIP")
-//			.add("SFX A Y 1")
-//			.add("SFX A a b a")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/A";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//		Assert.assertEquals(2, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "A", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("b", null, strategy), stems.get(1));
-//	}
-//
+		String line = "a/ABCDE";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(14, stems.size());
+		//base production
+		Assert.assertEquals(new Production("a", "ABCDE", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("aa", "E", strategy), stems.get(1));
+		Assert.assertEquals(new Production("ab", "AE", strategy), stems.get(2));
+		Assert.assertEquals(new Production("ac", "E", strategy), stems.get(3));
+		Assert.assertEquals(new Production("ad", "AE", strategy), stems.get(4));
+		//twofold productions
+		Assert.assertEquals(new Production("aba", "E", strategy), stems.get(5));
+		Assert.assertEquals(new Production("ada", "E", strategy), stems.get(6));
+		//lastfold productions
+		Assert.assertEquals(new Production("ea", "ABCD", strategy), stems.get(7));
+		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(8));
+		Assert.assertEquals(new Production("eab", "A", strategy), stems.get(9));
+		Assert.assertEquals(new Production("eac", "", strategy), stems.get(10));
+		Assert.assertEquals(new Production("ead", "A", strategy), stems.get(11));
+		Assert.assertEquals(new Production("eaba", "", strategy), stems.get(12));
+		Assert.assertEquals(new Production("eada", "", strategy), stems.get(13));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void stemsInvalidFullstrip() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 1")
+			.add("SFX A a b a")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+
+		String line = "a/A";
+		wordGenerator.applyRules(line);
+	}
+
+	@Test
+	public void stemsValidFullstrip() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("FULLSTRIP")
+			.add("SFX A Y 1")
+			.add("SFX A a b a")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "a/A";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(2, stems.size());
+		//base production
+		Assert.assertEquals(new Production("a", "A", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("b", null, strategy), stems.get(1));
+	}
+
 //	@Test(expected = IllegalArgumentException.class)
 //	public void stemsInvalidTwofold() throws IOException{
 //		StringJoiner sj = new StringJoiner("\n");
