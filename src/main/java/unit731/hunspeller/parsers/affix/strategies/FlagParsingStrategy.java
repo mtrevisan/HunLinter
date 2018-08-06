@@ -1,9 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -55,11 +52,6 @@ public interface FlagParsingStrategy{
 	 * @return Composed flags
 	 */
 	String joinFlags(String[] textFlags);
-
-	default String[] removeDuplicates(String[] continuationFlags){
-		Set<String> set = new HashSet<>(Arrays.asList(continuationFlags));
-		return set.toArray(new String[set.size()]);
-	}
 
 	/**
 	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])

@@ -14,7 +14,7 @@ public class ASCIIParsingStrategyTest{
 
 	@Test
 	public void ok(){
-		String[] flags = strategy.parseFlags("ba");
+		String[] flags = strategy.parseFlags("ab");
 
 		Assert.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
 	}

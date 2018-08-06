@@ -25,7 +25,7 @@ public class Production extends DictionaryEntry{
 		super(productable, strategy);
 	}
 
-	public Production(String word, AffixEntry appliedEntry, DictionaryEntry productable, Set<String> remainingContinuationFlags,
+	public Production(String word, AffixEntry appliedEntry, DictionaryEntry productable, String[] remainingContinuationFlags,
 			boolean combineable, FlagParsingStrategy strategy){
 		super(word, appliedEntry, productable, remainingContinuationFlags, combineable, strategy);
 

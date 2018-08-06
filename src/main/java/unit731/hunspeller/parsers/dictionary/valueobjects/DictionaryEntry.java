@@ -2,10 +2,8 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -66,7 +64,7 @@ public class DictionaryEntry{
 		combineable = true;
 	}
 
-	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry productable, Set<String> remainingContinuationFlags,
+	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry productable, String[] remainingContinuationFlags,
 			boolean combineable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(appliedEntry);
@@ -167,9 +165,9 @@ public class DictionaryEntry{
 	 * @return	An object with separated flags, one for each group
 	 */
 	public Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
-		Set<String> terminalAffixes = new HashSet<>();
-		Set<String> prefixes = new HashSet<>();
-		Set<String> suffixes = new HashSet<>();
+		List<String> terminalAffixes = new ArrayList<>();
+		List<String> prefixes = new ArrayList<>();
+		List<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null)
 			for(String affix : continuationFlags){
 				if(affParser.isTerminalAffix(affix)){
@@ -201,7 +199,7 @@ public class DictionaryEntry{
 					terminalAffixes.add(affix);
 			}
 
-		return new Affixes(terminalAffixes, prefixes, suffixes);
+		return new Affixes(terminalAffixes.toArray(new String[terminalAffixes.size()]), prefixes.toArray(new String[prefixes.size()]), suffixes.toArray(new String[suffixes.size()]));
 	}
 
 	@Override

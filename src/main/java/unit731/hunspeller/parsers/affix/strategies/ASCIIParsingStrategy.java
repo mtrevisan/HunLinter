@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +28,14 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);
 
 		int size = textFlags.length();
-		Set<String> flags = new HashSet<>(size);
+		String[] flags = new String[size];
 		for(int i = 0; i < size; i ++)
-			flags.add(Character.toString(textFlags.charAt(i)));
-		if(flags.size() < size)
+			flags[i] = Character.toString(textFlags.charAt(i));
+		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
+		if(unduplicatedFlags.size() < size)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
 
-		return flags.toArray(new String[size]);
+		return flags;
 	}
 
 	@Override

@@ -7,12 +7,10 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -140,14 +138,14 @@ public class WordGenerator{
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry productable) throws NoApplicableRuleException{
-		List<Set<String>> applyAffixes = extractAffixes(productable, !affParser.isComplexPrefixes());
+		List<String[]> applyAffixes = extractAffixes(productable, !affParser.isComplexPrefixes());
 		return applyAffixRules(productable, applyAffixes);
 	}
 
 	private List<Production> getTwofoldProductions(List<Production> onefoldProductions) throws NoApplicableRuleException{
 		List<Production> twofoldProductions = new ArrayList<>();
 		for(Production production : onefoldProductions){
-			List<Set<String>> applyAffixes = extractAffixes(production, !affParser.isComplexPrefixes());
+			List<String[]> applyAffixes = extractAffixes(production, !affParser.isComplexPrefixes());
 			applyAffixes.set(1, null);
 			List<Production> productions = applyAffixRules(production, applyAffixes);
 
@@ -165,7 +163,7 @@ public class WordGenerator{
 		List<Production> lastfoldProductions = new ArrayList<>();
 		for(Production production : productions)
 			if(production.isCombineable()){
-				List<Set<String>> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
+				List<String[]> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
 				applyAffixes.set(1, null);
 				List<Production> prods = applyAffixRules(production, applyAffixes);
 
@@ -179,10 +177,11 @@ public class WordGenerator{
 		return lastfoldProductions;
 	}
 
-	private List<Set<String>> extractAffixes(DictionaryEntry productable, boolean reverse){
+	private List<String[]> extractAffixes(DictionaryEntry productable, boolean reverse){
 		Affixes affixes = productable.separateAffixes(affParser);
-		List<Set<String>> applyAffixes = new ArrayList<>(3);
-		applyAffixes.addAll(Arrays.asList(affixes.getPrefixes(), affixes.getSuffixes()));
+		List<String[]> applyAffixes = new ArrayList<>(3);
+		applyAffixes.add(affixes.getPrefixes());
+		applyAffixes.add(affixes.getSuffixes());
 		if(reverse)
 			Collections.reverse(applyAffixes);
 		applyAffixes.add(affixes.getTerminalAffixes());
@@ -233,20 +232,21 @@ public class WordGenerator{
 	}
 
 	private void enforceNeedAffixFlag(List<Production> productions){
-		Iterator<Production> itr = productions.iterator();
-		while(itr.hasNext()){
-			Production production = itr.next();
-			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
-				itr.remove();
-		}
+//		Iterator<Production> itr = productions.iterator();
+//		while(itr.hasNext()){
+//			Production production = itr.next();
+//			if(production.containsContinuationFlag(affParser.getNeedAffixFlag()))
+//				itr.remove();
+//		}
 	}
 
-	private List<Production> applyAffixRules(DictionaryEntry productable, List<Set<String>> applyAffixes) throws NoApplicableRuleException{
-		Set<String> appliedAffixes = applyAffixes.get(0);
-		Set<String> postponedAffixes = applyAffixes.get(1);
+	private List<Production> applyAffixRules(DictionaryEntry productable, List<String[]> applyAffixes) throws NoApplicableRuleException{
+		String[] appliedAffixes = applyAffixes.get(0);
+		String[] postponedAffixes = applyAffixes.get(1);
+		String[] terminalAffixes = applyAffixes.get(2);
 
 		List<Production> productions = new ArrayList<>();
-		if(!appliedAffixes.isEmpty()){
+		if(appliedAffixes.length > 0){
 			String word = productable.getWord();
 
 			for(String affix : appliedAffixes){
@@ -302,6 +302,12 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
+//					Set<String> otherAffixes = (postponedAffixes != null || !terminalAffixes.isEmpty()? new HashSet<>(): null);
+//					if(postponedAffixes != null)
+//						otherAffixes.addAll(postponedAffixes);
+//					if(!terminalAffixes.isEmpty())
+//						otherAffixes.addAll(terminalAffixes);
+//					Production production = new Production(newWord, entry, productable, otherAffixes, rule.isCombineable(), getFlagParsingStrategy());
 					Production production = new Production(newWord, entry, productable, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
 
 					productions.add(production);

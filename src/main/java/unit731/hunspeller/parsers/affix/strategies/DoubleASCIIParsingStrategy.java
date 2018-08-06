@@ -31,12 +31,12 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
 		int size = (textFlags.length() >>> 1);
-		Set<String> flags = new HashSet<>(size);
-		flags.addAll(Arrays.asList(PatternService.split(textFlags, PATTERN)));
-		if(flags.size() < size)
+		String[] flags = PatternService.split(textFlags, PATTERN);
+		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
+		if(unduplicatedFlags.size() < size)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
 
-		return flags.toArray(new String[size]);
+		return flags;
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.dtos;
 
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,8 +8,8 @@ import lombok.Getter;
 @Getter
 public class Affixes{
 
-	private final Set<String> terminalAffixes;
-	private final Set<String> prefixes;
-	private final Set<String> suffixes;
+	private final String[] terminalAffixes;
+	private final String[] prefixes;
+	private final String[] suffixes;
 
 }

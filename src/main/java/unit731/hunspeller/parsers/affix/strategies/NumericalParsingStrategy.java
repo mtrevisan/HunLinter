@@ -1,7 +1,9 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
@@ -26,9 +28,9 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(textFlags))
 			return new String[0];
 
-		String[] originalFlags = StringUtils.split(textFlags, COMMA);
-		String[] flags = removeDuplicates(originalFlags);
-		if(flags.length < originalFlags.length)
+		String[] flags = StringUtils.split(textFlags, COMMA);
+		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
+		if(unduplicatedFlags.size() < flags.length)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
 
 		for(String flag : flags){

@@ -116,12 +116,12 @@ public class AffixEntry{
 			.allMatch(set::add);
 	}
 
-	public String[] combineContinuationFlags(Set<String> otherContinuationFlags){
+	public String[] combineContinuationFlags(String[] otherContinuationFlags){
 		Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)
 			flags.addAll(Arrays.asList(continuationFlags));
-		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
-			flags.addAll(otherContinuationFlags);
+		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
+			flags.addAll(Arrays.asList(otherContinuationFlags));
 		return flags.toArray(new String[flags.size()]);
 	}
 
