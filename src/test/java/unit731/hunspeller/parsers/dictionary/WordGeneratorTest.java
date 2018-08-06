@@ -79,9 +79,9 @@ public class WordGeneratorTest{
 		//onefold productions
 		Assert.assertEquals(new Production("aas1", "P1S2", strategy), stems.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(2));
+		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("aas1s2", "", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(3));
 		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(4));
 	}
 
@@ -112,7 +112,7 @@ public class WordGeneratorTest{
 		//twofold productions
 		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(3));
 	}
 
 	@Test

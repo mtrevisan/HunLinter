@@ -98,7 +98,6 @@ public class WordGenerator{
 		//extract prefixed productions
 		List<Production> twofoldProductions = getTwofoldProductions(Arrays.asList(baseProduction));
 		twofoldProductions.addAll(getTwofoldProductions(onefoldProductions));
-//		checkTwofoldCorrectness(twofoldProductions);
 		if(log.isDebugEnabled()){
 			log.debug("Twofold productions:");
 			twofoldProductions.forEach(production -> log.debug("   {} : {}", production, production.getRulesSequence()));
