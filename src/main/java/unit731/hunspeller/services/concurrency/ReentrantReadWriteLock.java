@@ -9,12 +9,12 @@ public class ReentrantReadWriteLock{
 
 	private final Map<Thread, Integer> readingThreads = new HashMap<>();
 
-	private int writeAccesses = 0;
-	private int writeRequests = 0;
-	private Thread writingThread = null;
+	private int writeAccesses;
+	private int writeRequests;
+	private Thread writingThread;
 
 
-	public synchronized void lockRead() throws InterruptedException{
+	public synchronized void readLock() throws InterruptedException{
 		Thread callingThread = Thread.currentThread();
 		while(!canGrantReadAccess(callingThread))
 			wait();
@@ -22,11 +22,7 @@ public class ReentrantReadWriteLock{
 		readingThreads.put(callingThread, (getReadAccessCount(callingThread) + 1));
 	}
 
-	private boolean canGrantReadAccess(Thread callingThread){
-		return (isWriter(callingThread) || !hasWriter() && (isReader(callingThread) || !hasWriteRequests()));
-	}
-
-	public synchronized void unlockRead(){
+	public synchronized void readUnlock(){
 		Thread callingThread = Thread.currentThread();
 		if(!isReader(callingThread))
 			throw new IllegalMonitorStateException("Calling Thread does not hold a read lock on this ReadWriteLock");
@@ -39,7 +35,7 @@ public class ReentrantReadWriteLock{
 		notifyAll();
 	}
 
-	public synchronized void lockWrite() throws InterruptedException{
+	public synchronized void writeLock() throws InterruptedException{
 		writeRequests ++;
 		Thread callingThread = Thread.currentThread();
 		while(!canGrantWriteAccess(callingThread))
@@ -49,7 +45,7 @@ public class ReentrantReadWriteLock{
 		writingThread = callingThread;
 	}
 
-	public synchronized void unlockWrite() throws InterruptedException{
+	public synchronized void writeUnlock() throws InterruptedException{
 		if(!isWriter(Thread.currentThread()))
 			throw new IllegalMonitorStateException("Calling Thread does not hold the write lock on this ReadWriteLock");
 
@@ -58,6 +54,10 @@ public class ReentrantReadWriteLock{
 			writingThread = null;
 
 		notifyAll();
+	}
+
+	private boolean canGrantReadAccess(Thread callingThread){
+		return (isWriter(callingThread) || !hasWriter() && (isReader(callingThread) || !hasWriteRequests()));
 	}
 
 	private boolean canGrantWriteAccess(Thread callingThread){
