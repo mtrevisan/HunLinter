@@ -42,8 +42,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/A";
 
+		String line = "a/A";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(4, stems.size());
@@ -72,8 +72,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/ABCDE";
 
+		String line = "a/ABCDE";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
@@ -103,8 +103,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/A";
 
+		String line = "a/A";
 		wordGenerator.applyRules(line);
 	}
 
@@ -118,8 +118,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/A";
 
+		String line = "a/A";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(2, stems.size());
@@ -152,8 +152,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/ABCDEFGH";
 
+		String line = "a/ABCDEFGH";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
@@ -208,8 +208,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/ABCDE";
 
+		String line = "a/ABCDE";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(12, stems.size());
@@ -254,8 +254,8 @@ public class WordGeneratorTest{
 			.toString();
 		File affFile = FileService.getTemporaryUTF8File(content);
 		affParser.parse(affFile);
-		String line = "a/ABCDEFGH";
 
+		String line = "a/ABCDEFGH";
 		List<Production> stems = wordGenerator.applyRules(line);
 
 		Assert.assertEquals(27, stems.size());
@@ -290,6 +290,29 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("daf", "A", strategy), stems.get(24));
 		Assert.assertEquals(new Production("dag", "E", strategy), stems.get(25));
 		Assert.assertEquals(new Production("dah", "AE", strategy), stems.get(26));
+	}
+
+	@Test
+	public void needaffix() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("NEEDAFFIX X")
+			.add("SFX A Y 1")
+			.add("SFX A 0 s/XB .")
+			.add("SFX B Y 1")
+			.add("SFX B 0 bar .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+
+		String line = "foo/A";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(2, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "A", strategy), stems.get(0));
+		//twofold productions
+		Assert.assertEquals(new Production("foosbar", null, strategy), stems.get(1));
 	}
 
 }

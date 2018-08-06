@@ -380,7 +380,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 			totalWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(totalWords));
 			uniqueWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")");
-			compoundWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")");
+			compoundWordsLabel.setEnabled(hasSyllabeStatistics);
+			compoundWordsOutputLabel.setEnabled(hasSyllabeStatistics);
+			compoundWordsOutputLabel.setText(hasSyllabeStatistics? DictionaryParser.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")": StringUtils.EMPTY);
 			contractedWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")");
 			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
 			syllabeLengthsModeLabel.setEnabled(hasSyllabeStatistics);
