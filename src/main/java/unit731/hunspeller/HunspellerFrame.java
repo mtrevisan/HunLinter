@@ -164,7 +164,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicExtractDuplicatesMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableMenuItemFromWorker.put(SorterWorker.WORKER_NAME, () -> {
+			dicSortDictionaryMenuItem.setEnabled(true);
+		});
 		enableMenuItemFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);

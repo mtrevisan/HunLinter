@@ -63,7 +63,7 @@ public enum AffixTag{
 //	COMPOUND_END("COMPOUNDEND"),
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	ONLY_IN_COMPOUND("ONLYINCOMPOUND"),
-//	/** Affixes with this flag may be inside of compounds (normally, prefixes are allowed at the beginning of compounds, suffixes are allowed at the end of compounds only). */
+//	/** Affixes with this flag may be inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and at the end of compounds only). */
 //	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
 //	/** Allow twofold suffixes within compounds */
 //	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
@@ -85,7 +85,7 @@ public enum AffixTag{
 //	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
 	CIRCUMFIX("CIRCUMFIX"),
-//	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from set of the accepted affixed and compound words) */
+//	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from the set of accepted affixed and compound words) */
 //	FORBIDDEN_WORD("FORBIDDENWORD"),
 
 	//Options for affix creation
