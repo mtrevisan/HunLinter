@@ -108,7 +108,7 @@ public class WordGenerator{
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getLastfoldProductions(lastfoldProductions);
-//		checkTwofoldCorrectness(lastfoldProductions);
+		checkTwofoldCorrectness(lastfoldProductions);
 		if(log.isDebugEnabled()){
 			log.debug("Lastfold productions:");
 			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production, production.getRulesSequence()));
@@ -185,7 +185,7 @@ public class WordGenerator{
 		for(Production production : productions)
 			if(production.isCombineable()){
 				List<String[]> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
-//				applyAffixes.set(1, null);
+				applyAffixes.set(1, null);
 				List<Production> prods = applyAffixRules(production, applyAffixes);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();

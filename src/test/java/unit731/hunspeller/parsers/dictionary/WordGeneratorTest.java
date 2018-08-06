@@ -82,7 +82,7 @@ public class WordGeneratorTest{
 		//twofold productions
 		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", "", strategy), stems.get(3));
 		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(4));
 	}
 
@@ -143,8 +143,8 @@ public class WordGeneratorTest{
 		//twofold productions
 		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", "S1", strategy), stems.get(3));
-		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aa", "", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", "", strategy), stems.get(4));
 		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(5));
 	}
 
@@ -175,8 +175,8 @@ public class WordGeneratorTest{
 		//twofold productions
 		Assert.assertEquals(new Production("aas1s2", "P1", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", "S1", strategy), stems.get(3));
-		Assert.assertEquals(new Production("p1aas1", "S2", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aa", "", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", "", strategy), stems.get(4));
 		Assert.assertEquals(new Production("p1aas1s2", "", strategy), stems.get(5));
 	}
 
@@ -214,11 +214,11 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("aba", "E", strategy), stems.get(5));
 		Assert.assertEquals(new Production("ada", "E", strategy), stems.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ea", "ABCD", strategy), stems.get(7));
+		Assert.assertEquals(new Production("ea", "", strategy), stems.get(7));
 		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(8));
-		Assert.assertEquals(new Production("eab", "A", strategy), stems.get(9));
+		Assert.assertEquals(new Production("eab", "", strategy), stems.get(9));
 		Assert.assertEquals(new Production("eac", "", strategy), stems.get(10));
-		Assert.assertEquals(new Production("ead", "A", strategy), stems.get(11));
+		Assert.assertEquals(new Production("ead", "", strategy), stems.get(11));
 		Assert.assertEquals(new Production("eaba", "", strategy), stems.get(12));
 		Assert.assertEquals(new Production("eada", "", strategy), stems.get(13));
 	}
@@ -259,67 +259,58 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("b", null, strategy), stems.get(1));
 	}
 
-//	@Test(expected = IllegalArgumentException.class)
-//	public void stemsInvalidTwofold() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("SFX A Y 1")
-//			.add("SFX A 0 a")
-//			.add("SFX B Y 1")
-//			.add("SFX B 0 b/A")
-//			.add("SFX C Y 1")
-//			.add("SFX C 0 c/E")
-//			.add("SFX D Y 1")
-//			.add("SFX D 0 d/AE")
-//			.add("PFX E Y 1")
-//			.add("PFX E 0 e")
-//			.add("PFX F Y 1")
-//			.add("PFX F 0 f/A")
-//			.add("PFX G Y 1")
-//			.add("PFX G 0 g/E")
-//			.add("PFX H Y 1")
-//			.add("PFX H 0 h/AE")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/ABCDEFGH";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//		Assert.assertEquals(27, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "ABCDEFGH", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("aa", "EFGH", strategy), stems.get(1));
-//		Assert.assertEquals(new Production("ab", "AEFGH", strategy), stems.get(2));
-//		Assert.assertEquals(new Production("ac", "EFGH", strategy), stems.get(3));
-//		Assert.assertEquals(new Production("ad", "AEFGH", strategy), stems.get(4));
-//		//twofold productions
-//		Assert.assertEquals(new Production("aba", "", strategy), stems.get(5));
-//		Assert.assertEquals(new Production("ada", "", strategy), stems.get(6));
-//		//lastfold productions
-//		Assert.assertEquals(new Production("ea", "", strategy), stems.get(7));
-//		Assert.assertEquals(new Production("fa", "A", strategy), stems.get(8));
-//		Assert.assertEquals(new Production("ga", "E", strategy), stems.get(9));
-//		Assert.assertEquals(new Production("ha", "AE", strategy), stems.get(10));
-//		Assert.assertEquals(new Production("eaa", "", strategy), stems.get(11));
-//		Assert.assertEquals(new Production("faa", "A", strategy), stems.get(12));
-//		Assert.assertEquals(new Production("gaa", "E", strategy), stems.get(13));
-//		Assert.assertEquals(new Production("haa", "AE", strategy), stems.get(14));
-//		Assert.assertEquals(new Production("eab", "", strategy), stems.get(15));
-//		Assert.assertEquals(new Production("fab", "A", strategy), stems.get(16));
-//		Assert.assertEquals(new Production("gab", "E", strategy), stems.get(17));
-//		Assert.assertEquals(new Production("hab", "AE", strategy), stems.get(18));
-//		Assert.assertEquals(new Production("eac", "", strategy), stems.get(19));
-//		Assert.assertEquals(new Production("fac", "A", strategy), stems.get(20));
-//		Assert.assertEquals(new Production("gac", "E", strategy), stems.get(21));
-//		Assert.assertEquals(new Production("hac", "AE", strategy), stems.get(22));
-//		Assert.assertEquals(new Production("ead", "", strategy), stems.get(23));
-//		Assert.assertEquals(new Production("fad", "A", strategy), stems.get(24));
-//		Assert.assertEquals(new Production("gad", "E", strategy), stems.get(25));
-//		Assert.assertEquals(new Production("had", "AE", strategy), stems.get(26));
-//	}
+	@Test(expected = IllegalArgumentException.class)
+	public void stemsInvalidTwofold1() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("FLAG long")
+			.add("SFX S1 Y 1")
+			.add("SFX S1 0 s1/S2P1")
+			.add("SFX S2 Y 1")
+			.add("SFX S2 0 s2/S3")
+			.add("SFX S3 Y 1")
+			.add("SFX S3 0 s3")
+			.add("PFX P1 Y 1")
+			.add("PFX P1 0 p1/P2")
+			.add("PFX P2 Y 1")
+			.add("PFX P2 0 p2")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "aa/S1";
+		wordGenerator.applyRules(line);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void stemsInvalidTwofold() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 1")
+			.add("SFX A 0 a")
+			.add("SFX B Y 1")
+			.add("SFX B 0 b/A")
+			.add("SFX C Y 1")
+			.add("SFX C 0 c/E")
+			.add("SFX D Y 1")
+			.add("SFX D 0 d/AE")
+			.add("PFX E Y 1")
+			.add("PFX E 0 e")
+			.add("PFX F Y 1")
+			.add("PFX F 0 f/A")
+			.add("PFX G Y 1")
+			.add("PFX G 0 g/E")
+			.add("PFX H Y 1")
+			.add("PFX H 0 h/AE")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "a/ABCDEFGH";
+		wordGenerator.applyRules(line);
+	}
 
 	@Test
 	public void stemsComplexPrefixes() throws IOException{
@@ -356,77 +347,44 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("aba", "E", strategy), stems.get(5));
 		Assert.assertEquals(new Production("ada", "E", strategy), stems.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ae", "ABCD", strategy), stems.get(7));
+		Assert.assertEquals(new Production("ae", "", strategy), stems.get(7));
 		Assert.assertEquals(new Production("aae", "", strategy), stems.get(8));
-		Assert.assertEquals(new Production("bae", "A", strategy), stems.get(9));
+		Assert.assertEquals(new Production("bae", "", strategy), stems.get(9));
 		Assert.assertEquals(new Production("cae", "", strategy), stems.get(10));
-		Assert.assertEquals(new Production("dae", "A", strategy), stems.get(11));
+		Assert.assertEquals(new Production("dae", "", strategy), stems.get(11));
 		Assert.assertEquals(new Production("abae", "", strategy), stems.get(12));
 		Assert.assertEquals(new Production("adae", "", strategy), stems.get(13));
 	}
 
-//	@Test(expected = IllegalArgumentException.class)
-//	public void stemsInvalidTwofoldComplexPrefixes() throws IOException{
-//		StringJoiner sj = new StringJoiner("\n");
-//		String content = sj.add("SET UTF-8")
-//			.add("COMPLEXPREFIXES")
-//			.add("PFX A Y 1")
-//			.add("PFX A 0 a")
-//			.add("PFX B Y 1")
-//			.add("PFX B 0 b/A")
-//			.add("PFX C Y 1")
-//			.add("PFX C 0 c/E")
-//			.add("PFX D Y 1")
-//			.add("PFX D 0 d/AE")
-//			.add("SFX E Y 1")
-//			.add("SFX E 0 e")
-//			.add("SFX F Y 1")
-//			.add("SFX F 0 f/A")
-//			.add("SFX G Y 1")
-//			.add("SFX G 0 g/E")
-//			.add("SFX H Y 1")
-//			.add("SFX H 0 h/AE")
-//			.toString();
-//		File affFile = FileService.getTemporaryUTF8File(content);
-//		affParser.parse(affFile);
-//		strategy = affParser.getFlagParsingStrategy();
-//
-//		String line = "a/ABCDEFGH";
-//		List<Production> stems = wordGenerator.applyRules(line);
-//
-//		Assert.assertEquals(27, stems.size());
-//		//base production
-//		Assert.assertEquals(new Production("a", "ABCDEFGH", strategy), stems.get(0));
-//		//onefold productions
-//		Assert.assertEquals(new Production("aa", "EFGH", strategy), stems.get(1));
-//		Assert.assertEquals(new Production("ba", "AEFGH", strategy), stems.get(2));
-//		Assert.assertEquals(new Production("ca", "EFGH", strategy), stems.get(3));
-//		Assert.assertEquals(new Production("da", "AEFGH", strategy), stems.get(4));
-//		//twofold productions
-//		Assert.assertEquals(new Production("aba", "", strategy), stems.get(5));
-//		Assert.assertEquals(new Production("ada", "", strategy), stems.get(6));
-//		//lastfold productions
-//		Assert.assertEquals(new Production("ae", "", strategy), stems.get(7));
-//		Assert.assertEquals(new Production("af", "A", strategy), stems.get(8));
-//		Assert.assertEquals(new Production("ag", "E", strategy), stems.get(9));
-//		Assert.assertEquals(new Production("ah", "AE", strategy), stems.get(10));
-//		Assert.assertEquals(new Production("aae", "", strategy), stems.get(11));
-//		Assert.assertEquals(new Production("aaf", "A", strategy), stems.get(12));
-//		Assert.assertEquals(new Production("aag", "E", strategy), stems.get(13));
-//		Assert.assertEquals(new Production("aah", "AE", strategy), stems.get(14));
-//		Assert.assertEquals(new Production("bae", "", strategy), stems.get(15));
-//		Assert.assertEquals(new Production("baf", "A", strategy), stems.get(16));
-//		Assert.assertEquals(new Production("bag", "E", strategy), stems.get(17));
-//		Assert.assertEquals(new Production("bah", "AE", strategy), stems.get(18));
-//		Assert.assertEquals(new Production("cae", "", strategy), stems.get(19));
-//		Assert.assertEquals(new Production("caf", "A", strategy), stems.get(20));
-//		Assert.assertEquals(new Production("cag", "E", strategy), stems.get(21));
-//		Assert.assertEquals(new Production("cah", "AE", strategy), stems.get(22));
-//		Assert.assertEquals(new Production("dae", "", strategy), stems.get(23));
-//		Assert.assertEquals(new Production("daf", "A", strategy), stems.get(24));
-//		Assert.assertEquals(new Production("dag", "E", strategy), stems.get(25));
-//		Assert.assertEquals(new Production("dah", "AE", strategy), stems.get(26));
-//	}
+	@Test(expected = IllegalArgumentException.class)
+	public void stemsInvalidTwofoldComplexPrefixes() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("COMPLEXPREFIXES")
+			.add("PFX A Y 1")
+			.add("PFX A 0 a")
+			.add("PFX B Y 1")
+			.add("PFX B 0 b/A")
+			.add("PFX C Y 1")
+			.add("PFX C 0 c/E")
+			.add("PFX D Y 1")
+			.add("PFX D 0 d/AE")
+			.add("SFX E Y 1")
+			.add("SFX E 0 e")
+			.add("SFX F Y 1")
+			.add("SFX F 0 f/A")
+			.add("SFX G Y 1")
+			.add("SFX G 0 g/E")
+			.add("SFX H Y 1")
+			.add("SFX H 0 h/AE")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "a/ABCDEFGH";
+		wordGenerator.applyRules(line);
+	}
 
 	@Test
 	public void needaffix() throws IOException{
@@ -449,9 +407,6 @@ public class WordGeneratorTest{
 		String line = "foo/AC";
 		List<Production> stems = wordGenerator.applyRules(line);
 
-System.out.println(stems.size());
-for(Production p : stems)
-	System.out.println(p.toString() + " : " + p.getRulesSequence());
 		Assert.assertEquals(15, stems.size());
 		//base production
 		Assert.assertEquals(new Production("foo", "AC", strategy), stems.get(0));
@@ -462,12 +417,12 @@ for(Production p : stems)
 		Assert.assertEquals(new Production("foo-suf-bar", "C", strategy), stems.get(3));
 		Assert.assertEquals(new Production("foo-pseudosuf-bar", "CX", strategy), stems.get(4));
 		//lastfold productions
-		Assert.assertEquals(new Production("pre-foo", "A", strategy), stems.get(5));
-		Assert.assertEquals(new Production("pseudopre-foo", "AX", strategy), stems.get(6));
-		Assert.assertEquals(new Production("pre-foo-suf", "B", strategy), stems.get(7));
-		Assert.assertEquals(new Production("pseudopre-foo-suf", "BX", strategy), stems.get(8));
-		Assert.assertEquals(new Production("pre-foo-pseudosuf", "BX", strategy), stems.get(9));
-		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf", "BX", strategy), stems.get(10));
+		Assert.assertEquals(new Production("pre-foo", "", strategy), stems.get(5));
+		Assert.assertEquals(new Production("pseudopre-foo", "X", strategy), stems.get(6));
+		Assert.assertEquals(new Production("pre-foo-suf", "", strategy), stems.get(7));
+		Assert.assertEquals(new Production("pseudopre-foo-suf", "X", strategy), stems.get(8));
+		Assert.assertEquals(new Production("pre-foo-pseudosuf", "X", strategy), stems.get(9));
+		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf", "X", strategy), stems.get(10));
 		Assert.assertEquals(new Production("pre-foo-suf-bar", "", strategy), stems.get(11));
 		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", strategy), stems.get(12));
 		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", "X", strategy), stems.get(13));
