@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -129,66 +130,40 @@ public class AffixEntry{
 	}
 
 	/**
+	 * FIXME is this documentation updated/true?
+	 * 
 	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 	 * Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 	 * 	removed by splitting rules
 	 */
 	public String[] combineMorphologicalFields(DictionaryEntry productable){
-		List<String> mf = (productable.morphologicalFields != null? Arrays.asList(productable.morphologicalFields): Collections.<String>emptyList());
+		List<String> mf = (productable.morphologicalFields != null? Arrays.asList(productable.morphologicalFields): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
 //		boolean containsNonTerminalSuffixes = amf.stream()
 //			.anyMatch(field -> field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX));
-		//remove inflectional and terminal suffixes
-		List<String> newMorphologicalFields = mf.stream()
+//		//remove inflectional and terminal suffixes
+//		mf = mf.stream()
 //			.filter(field -> !field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX))
 //			.filter(field -> !containsNonTerminalSuffixes || !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))
-			.collect(Collectors.toList());
+//			.collect(Collectors.toList());
 
 		//find stem
 		boolean stemFound = false;
-		for(String field : newMorphologicalFields)
+		for(String field : mf)
 			if(field.startsWith(WordGenerator.TAG_STEM)){
 				stemFound = true;
 				break;
 			}
-		//add stem
+		//add stem only if not present
 		if(!stemFound)
-			newMorphologicalFields.add(0, WordGenerator.TAG_STEM + productable.getWord());
+			mf.add(0, WordGenerator.TAG_STEM + productable.getWord());
 
-		newMorphologicalFields.addAll((isSuffix()? newMorphologicalFields.size(): 0), amf);
+		//add morphological fields from the applied affix
+		mf.addAll((isSuffix()? mf.size(): 0), amf);
 
-
-
-//		List<String> newMorphologicalFields = new ArrayList<>();
-//		String stem = null;
-//		if(morphologicalFields != null)
-//			for(String morphologicalField : morphologicalFields){
-//				if(morphologicalField.startsWith(WordGenerator.TAG_STEM))
-//					stem = morphologicalField;
-//				else if(morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX)){
-//					boolean overwrite = false;
-//					if(affixEntryMorphologicalFields != null)
-//						overwrite = Arrays.stream(affixEntryMorphologicalFields)
-//							.anyMatch(field -> field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX));
-//					if(overwrite)
-//						newMorphologicalFields.add(morphologicalField);
-//				}
-//				else{
-//					boolean is = (morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX));
-//					boolean pos = (!morphologicalField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || affixEntryMorphologicalFields == null || !Arrays.stream(affixEntryMorphologicalFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)));
-//					boolean ts = (!morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryMorphologicalFields == null || !Arrays.stream(affixEntryMorphologicalFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX)));
-//					if(!is && pos && ts)
-//						newMorphologicalFields.add(morphologicalField);
-//				}
-//			}
-//		newMorphologicalFields.add(0, (stem != null? stem: WordGenerator.TAG_STEM + originalWord));
-//		if(affixEntryMorphologicalFields != null)
-//			newMorphologicalFields.addAll(Arrays.asList(affixEntryMorphologicalFields));
-
-		int size = newMorphologicalFields.size();
-		return (size > 0? newMorphologicalFields.toArray(new String[size]): null);
+		return mf.toArray(new String[mf.size()]);
 	}
 
 	public final boolean isSuffix(){
