@@ -114,7 +114,7 @@ public class WordGenerator{
 		}
 
 		//remove rules that invalidate the circumfix rule
-		removeRulesInvalidatingCircumfix(lastfoldProductions);
+		enforceCircumfix(lastfoldProductions);
 
 		List<Production> productions = new ArrayList<>();
 		productions.add(baseProduction);
@@ -127,14 +127,15 @@ public class WordGenerator{
 //		enforceOnlyInCompound(productions);
 
 //FIXME
-		//remove rules with the need affix flag
+		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
+//productions.forEach(production -> log.info("Produced word: {}", production));
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
 		if(log.isTraceEnabled())
-			productions.forEach(production -> log.trace("Produced word {}", production));
+			productions.forEach(production -> log.trace("Produced word: {}", production));
 
 		return productions;
 	}
@@ -228,7 +229,7 @@ public class WordGenerator{
 		return productions;
 	}
 
-	private List<Production> removeRulesInvalidatingCircumfix(List<Production> lastfoldProductions){
+	private List<Production> enforceCircumfix(List<Production> lastfoldProductions){
 		String circumfixFlag = affParser.getCircumfixFlag();
 		Iterator<Production> itr = lastfoldProductions.iterator();
 		while(itr.hasNext()){
@@ -258,8 +259,14 @@ public class WordGenerator{
 		while(itr.hasNext()){
 			Production production = itr.next();
 
-			if(production.containsContinuationFlag(needAffixFlag))
-				itr.remove();
+			List<AffixEntry> appliedRules = production.getAppliedRules();
+			if(appliedRules != null){
+				long needAffixFlags = appliedRules.stream()
+					.filter(appliedRile -> appliedRile.containsContinuationFlag(needAffixFlag))
+					.count();
+				if(needAffixFlags == 1)
+					itr.remove();
+			}
 		}
 	}
 
