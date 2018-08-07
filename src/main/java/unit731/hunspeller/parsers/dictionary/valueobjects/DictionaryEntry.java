@@ -71,7 +71,7 @@ public class DictionaryEntry{
 
 		this.word = word;
 		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		this.morphologicalFields = appliedEntry.combineMorphologicalFields(productable.getWord(), productable.morphologicalFields);
+		this.morphologicalFields = AffixEntry.combineMorphologicalFields(productable.getWord(), productable.morphologicalFields, appliedEntry.getMorphologicalFields());
 		this.combineable = combineable;
 	}
 
