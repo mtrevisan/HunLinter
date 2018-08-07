@@ -579,7 +579,7 @@ public class WordGeneratorTest{
 		line = "eat/RQ	po:verb	al:ate	al:eaten	ts:present";
 		stems = wordGenerator.applyRules(line);
 
-		Assert.assertEquals(2, stems.size());
+		Assert.assertEquals(6, stems.size());
 		//base production
 		Assert.assertEquals(new Production("eat", "S", "st:eat po:verb", strategy), stems.get(0));
 		//onefold productions
