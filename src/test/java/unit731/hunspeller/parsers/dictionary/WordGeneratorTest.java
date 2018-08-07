@@ -541,7 +541,7 @@ public class WordGeneratorTest{
 			.add("PFX P Y 1")
 			.add("PFX P   0 un . dp:pfx_un sp:un")
 			.add("SFX S Y 1")
-			.add("SFX S   0 s . is:is:plur")
+			.add("SFX S   0 s . is:plur")
 			.add("SFX Q Y 1")
 			.add("SFX Q   0 s . is:sg_3")
 			.add("SFX R Y 1")
