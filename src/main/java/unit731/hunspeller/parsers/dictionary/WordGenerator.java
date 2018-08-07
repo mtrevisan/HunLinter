@@ -265,9 +265,10 @@ productions.forEach(production -> log.info("Produced word: {}", production));
 					itr.remove();
 			}
 			else{
-				long rulesWithNeedAffixFlag = appliedRules.stream()
-					.filter(appliedRule -> appliedRule.containsContinuationFlag(needAffixFlag))
-					.count();
+				long rulesWithNeedAffixFlag = 0l;
+				for(AffixEntry appliedRule : appliedRules)
+					if(appliedRule.containsContinuationFlag(needAffixFlag))
+						rulesWithNeedAffixFlag ++;
 				if(rulesWithNeedAffixFlag == appliedRules.size())
 					itr.remove();
 			}

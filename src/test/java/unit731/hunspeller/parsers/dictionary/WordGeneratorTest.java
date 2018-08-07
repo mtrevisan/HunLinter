@@ -446,7 +446,6 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("pre-foo-suf", "", strategy), stems.get(5));
 		Assert.assertEquals(new Production("pseudopre-foo-suf", "X", strategy), stems.get(6));
 		Assert.assertEquals(new Production("pre-foo-pseudosuf", "X", strategy), stems.get(7));
-
 		Assert.assertEquals(new Production("pre-foo-suf-bar", "", strategy), stems.get(8));
 		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", strategy), stems.get(9));
 		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", "X", strategy), stems.get(10));
