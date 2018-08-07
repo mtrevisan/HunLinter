@@ -142,7 +142,7 @@ public class AffixEntry{
 //			.anyMatch(field -> field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX));
 		//remove inflectional and terminal suffixes
 		List<String> newMorphologicalFields = mf.stream()
-			.filter(field -> !field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX))
+//			.filter(field -> !field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX))
 //			.filter(field -> !containsNonTerminalSuffixes || !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))
 			.collect(Collectors.toList());
 

@@ -570,22 +570,13 @@ public class WordGeneratorTest{
 		//base production
 		Assert.assertEquals(new Production("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("drinkable", "PS", "st:drink po:verb	al:drank	al:drunk	ts:present ds:der_able", strategy), stems.get(1));
+		Assert.assertEquals(new Production("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(1));
 		Assert.assertEquals(new Production("drinks", "", "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), stems.get(2));
 		//twofold productions
+		Assert.assertEquals(new Production("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(3));
 		//lastfold productions
-
-
-		line = "eat/RQ	po:verb	al:ate	al:eaten	ts:present";
-		stems = wordGenerator.applyRules(line);
-
-		Assert.assertEquals(6, stems.size());
-		//base production
-		Assert.assertEquals(new Production("eat", "S", "st:eat po:verb", strategy), stems.get(0));
-		//onefold productions
-		Assert.assertEquals(new Production("eats", "", "st:eat po:verb al:ate al:eaten ts:present is:singular_3rd", strategy), stems.get(1));
-		//twofold productions
-		//lastfold productions
+		Assert.assertEquals(new Production("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(4));
+		Assert.assertEquals(new Production("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(5));
 	}
 
 }
