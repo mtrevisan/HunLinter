@@ -29,7 +29,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 @Getter
 public class DictionaryParser{
 
-	private static final Matcher REGEX_COMMENT = PatternService.matcher("^\\s*[#\\/].*$");
+	private static final Matcher REGEX_COMMENT = PatternService.matcher("(^\\s*|\\s+)[#\\/].*$");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';

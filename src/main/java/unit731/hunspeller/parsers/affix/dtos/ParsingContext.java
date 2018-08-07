@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class ParsingContext{

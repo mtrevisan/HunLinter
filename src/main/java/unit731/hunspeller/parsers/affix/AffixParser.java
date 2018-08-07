@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -25,8 +24,8 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -40,8 +39,6 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 public class AffixParser extends ReadWriteLockable{
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
-
-	private static final Matcher COMMENT = PatternService.matcher("^$|^\\s*#.*$");
 
 
 	@AllArgsConstructor
@@ -94,6 +91,7 @@ public class AffixParser extends ReadWriteLockable{
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.toEnum(lineParts[0]);
@@ -138,8 +136,7 @@ public class AffixParser extends ReadWriteLockable{
 			List<AffixEntry> entries = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
-
-				line = removeComment(line);
+				line = DictionaryParser.cleanLine(line);
 
 				AffixEntry entry = new AffixEntry(line, strategy);
 				if(entry.getType() != ruleType)
@@ -187,6 +184,7 @@ public class AffixParser extends ReadWriteLockable{
 			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.toEnum(lineParts[0]);
@@ -225,6 +223,7 @@ public class AffixParser extends ReadWriteLockable{
 			Map<String, String> conversionTable = new HashMap<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				line = DictionaryParser.cleanLine(line);
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 3)
@@ -316,7 +315,7 @@ public class AffixParser extends ReadWriteLockable{
 					if(br.getLineNumber() == 1)
 						line = FileService.clearBOMMarker(line);
 
-					line = removeComment(line);
+					line = DictionaryParser.cleanLine(line);
 					if(line.isEmpty())
 						continue;
 
@@ -397,19 +396,6 @@ public class AffixParser extends ReadWriteLockable{
 
 	public void clear(){
 		clearData();
-	}
-
-	/**
-	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
-	 *
-	 * @param {String} data	The data from an affix file.
-	 * @return {String}		The cleaned-up data.
-	 */
-	private static String removeComment(String line){
-		//remove comments
-		line = PatternService.clear(line, COMMENT);
-		//trim the entire string
-		return StringUtils.strip(line);
 	}
 
 	private boolean containsData(AffixTag key){

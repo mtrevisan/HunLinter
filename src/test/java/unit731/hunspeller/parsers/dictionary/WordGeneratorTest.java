@@ -3,12 +3,15 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
 
@@ -26,6 +29,46 @@ public class WordGeneratorTest{
 		affParser = new AffixParser();
 		wordGenerator = new WordGenerator(affParser, null, null);
 	}
+
+
+	@Test
+	public void affFormat() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("# Testing also whitespace and comments.")
+			.add("OCONV 7 # space, space")
+			.add("OCONV	a A # tab, space, space")
+			.add("OCONV	á	Á # tab, tab, space")
+			.add("OCONV	b	B	# tab, tab, tab")
+			.add("OCONV  c  C		# 2xspace, 2xspace, 2xtab")
+			.add("OCONV	 d 	D # tab+space, space+tab, space")
+			.add("OCONV e E #")
+			.add("OCONV é É 	")
+			.add("# Only comment. Note that line above ends with space+tab.")
+			.add("")
+			.add(" # space")
+			.add("  # 2xspace")
+			.add("	# tab")
+			.add("		# 2xtab")
+			.add(" 	# space+tab")
+			.add("	 # tab+space")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+
+		Map<String, String> outputConversionTable = affParser.getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+
+		Map<String, String> expected = new HashMap<>();
+		expected.put("a", "A");
+		expected.put("á", "Á");
+		expected.put("b", "B");
+		expected.put("c", "C");
+		expected.put("d", "D");
+		expected.put("e", "E");
+		expected.put("é", "É");
+		Assert.assertEquals(expected, outputConversionTable);
+	}
+
 
 	@Test
 	public void conditions() throws IOException{
