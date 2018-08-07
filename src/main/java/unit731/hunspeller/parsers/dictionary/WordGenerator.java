@@ -127,7 +127,6 @@ public class WordGenerator{
 
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
-productions.forEach(production -> log.info("Produced word: {}", production));
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
