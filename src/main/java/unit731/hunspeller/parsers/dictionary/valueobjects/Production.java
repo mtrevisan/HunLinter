@@ -116,7 +116,6 @@ public class Production extends DictionaryEntry{
 //		return significant.toArray(new String[0]);
 		return Arrays.stream(morphologicalFields)
 			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
-			.sorted()
 			.collect(Collectors.toList());
 	}
 

@@ -60,7 +60,7 @@ public class DictionaryEntry{
 
 		word = productable.getWord();
 		continuationFlags = productable.continuationFlags;
-		morphologicalFields = productable.morphologicalFields;
+		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, productable.morphologicalFields);
 		combineable = true;
 	}
 
@@ -71,7 +71,7 @@ public class DictionaryEntry{
 
 		this.word = word;
 		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		this.morphologicalFields = combineMorphologicalFields(productable.morphologicalFields, appliedEntry.getMorphologicalFields());
+		this.morphologicalFields = combineMorphologicalFields(productable.getWord(), productable.morphologicalFields, appliedEntry.getMorphologicalFields());
 		this.combineable = combineable;
 	}
 
@@ -93,20 +93,25 @@ public class DictionaryEntry{
 				fun.accept(morphologicalField);
 	}
 
-	private String[] combineMorphologicalFields(String[] morphologicalFields, String[] affixEntryMorphologicalFields){
+	private String[] combineMorphologicalFields(String originalWord, String[] morphologicalFields, String[] affixEntryMorphologicalFields){
 		List<String> newMorphologicalFields = new ArrayList<>();
 		//Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 		//Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 		//Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 		//	removed by splitting rules
+		String stem = WordGenerator.TAG_STEM + originalWord;
 		if(morphologicalFields != null)
-			for(String morphologicalField : morphologicalFields)
-				if(!morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
+			for(String morphologicalField : morphologicalFields){
+				if(morphologicalField.startsWith(WordGenerator.TAG_STEM))
+					stem = morphologicalField;
+				else if(!morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX) && !morphologicalField.startsWith(WordGenerator.TAG_INFLECTIONAL_PREFIX)
 						&& (!morphologicalField.startsWith(WordGenerator.TAG_PART_OF_SPEECH) || affixEntryMorphologicalFields == null
 							|| !Arrays.stream(affixEntryMorphologicalFields).anyMatch(field -> field.startsWith(WordGenerator.TAG_PART_OF_SPEECH)))
 						&& (!morphologicalField.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX) || affixEntryMorphologicalFields == null
 							|| !Arrays.stream(affixEntryMorphologicalFields).allMatch(field -> !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))))
 					newMorphologicalFields.add(morphologicalField);
+			}
+		newMorphologicalFields.add(0, stem);
 		if(affixEntryMorphologicalFields != null)
 			newMorphologicalFields.addAll(Arrays.asList(affixEntryMorphologicalFields));
 		int size = newMorphologicalFields.size();

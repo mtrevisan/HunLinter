@@ -90,11 +90,11 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(4, stems.size());
 		//base production
-		Assert.assertEquals(new Production("a", "A", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("a", "A", "st:a", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", "", null, strategy), stems.get(1));
-		Assert.assertEquals(new Production("ac", "", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("ae", "", null, strategy), stems.get(3));
+		Assert.assertEquals(new Production("aa", null, "st:a", strategy), stems.get(1));
+		Assert.assertEquals(new Production("ac", null, "st:a", strategy), stems.get(2));
+		Assert.assertEquals(new Production("ae", null, "st:a", strategy), stems.get(3));
 	}
 
 
@@ -119,14 +119,14 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(5, stems.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("aa", "S1", "st:aa", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), stems.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", null, strategy), stems.get(2));
+		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aas1", "", null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("p1aas1s2", "", null, strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aas1", null, "st:aa", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), stems.get(4));
 	}
 
 	@Test
@@ -150,13 +150,13 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(4, stems.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("aa", "S1", "st:aa", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "S2", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("aas1", "S2", "st:aa", strategy), stems.get(1));
 		//twofold productions
 		//lastfold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("p1aas1s2", null, null, strategy), stems.get(3));
+		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), stems.get(2));
+		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), stems.get(3));
 	}
 
 	@Test
@@ -180,15 +180,15 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(6, stems.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1P1", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("aa", "S1P1", "st:aa", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), stems.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", null, strategy), stems.get(2));
+		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", null, null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("p1aas1", null, null, strategy), stems.get(4));
-		Assert.assertEquals(new Production("p1aas1s2", null, null, strategy), stems.get(5));
+		Assert.assertEquals(new Production("p1aa", null, "st:aa", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", null, "st:aa", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), stems.get(5));
 	}
 
 	@Test
@@ -212,15 +212,15 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(6, stems.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "P1S1", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("aa", "P1S1", "st:aa", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), stems.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", null, strategy), stems.get(2));
+		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), stems.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", null, null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("p1aas1", null, null, strategy), stems.get(4));
-		Assert.assertEquals(new Production("p1aas1s2", null, null, strategy), stems.get(5));
+		Assert.assertEquals(new Production("p1aa", null, "st:aa", strategy), stems.get(3));
+		Assert.assertEquals(new Production("p1aas1", null, "st:aa", strategy), stems.get(4));
+		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), stems.get(5));
 	}
 
 	@Test
@@ -247,23 +247,23 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(14, stems.size());
 		//base production
-		Assert.assertEquals(new Production("a", "ABCDE", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("a", "ABCDE", "st:a", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", "E", null, strategy), stems.get(1));
-		Assert.assertEquals(new Production("ab", "AE", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("ac", "E", null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("ad", "AE", null, strategy), stems.get(4));
+		Assert.assertEquals(new Production("aa", "E", "st:a", strategy), stems.get(1));
+		Assert.assertEquals(new Production("ab", "AE", "st:a", strategy), stems.get(2));
+		Assert.assertEquals(new Production("ac", "E", "st:a", strategy), stems.get(3));
+		Assert.assertEquals(new Production("ad", "AE", "st:a", strategy), stems.get(4));
 		//twofold productions
-		Assert.assertEquals(new Production("aba", "E", null, strategy), stems.get(5));
-		Assert.assertEquals(new Production("ada", "E", null, strategy), stems.get(6));
+		Assert.assertEquals(new Production("aba", "E", "st:a", strategy), stems.get(5));
+		Assert.assertEquals(new Production("ada", "E", "st:a", strategy), stems.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ea", null, null, strategy), stems.get(7));
-		Assert.assertEquals(new Production("eaa", null, null, strategy), stems.get(8));
-		Assert.assertEquals(new Production("eab", null, null, strategy), stems.get(9));
-		Assert.assertEquals(new Production("eac", null, null, strategy), stems.get(10));
-		Assert.assertEquals(new Production("ead", null, null, strategy), stems.get(11));
-		Assert.assertEquals(new Production("eaba", null, null, strategy), stems.get(12));
-		Assert.assertEquals(new Production("eada", null, null, strategy), stems.get(13));
+		Assert.assertEquals(new Production("ea", null, "st:a", strategy), stems.get(7));
+		Assert.assertEquals(new Production("eaa", null, "st:a", strategy), stems.get(8));
+		Assert.assertEquals(new Production("eab", null, "st:a", strategy), stems.get(9));
+		Assert.assertEquals(new Production("eac", null, "st:a", strategy), stems.get(10));
+		Assert.assertEquals(new Production("ead", null, "st:a", strategy), stems.get(11));
+		Assert.assertEquals(new Production("eaba", null, "st:a", strategy), stems.get(12));
+		Assert.assertEquals(new Production("eada", null, "st:a", strategy), stems.get(13));
 	}
 
 
@@ -298,9 +298,9 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(2, stems.size());
 		//base production
-		Assert.assertEquals(new Production("a", "A", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("a", "A", "st:a", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("b", null, null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("b", null, "st:a", strategy), stems.get(1));
 	}
 
 
@@ -382,23 +382,23 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(14, stems.size());
 		//base production
-		Assert.assertEquals(new Production("a", "ABCDE", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("a", "ABCDE", "st:a", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", "E", null, strategy), stems.get(1));
-		Assert.assertEquals(new Production("ba", "AE", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("ca", "E", null, strategy), stems.get(3));
-		Assert.assertEquals(new Production("da", "AE", null, strategy), stems.get(4));
+		Assert.assertEquals(new Production("aa", "E", "st:a", strategy), stems.get(1));
+		Assert.assertEquals(new Production("ba", "AE", "st:a", strategy), stems.get(2));
+		Assert.assertEquals(new Production("ca", "E", "st:a", strategy), stems.get(3));
+		Assert.assertEquals(new Production("da", "AE", "st:a", strategy), stems.get(4));
 		//twofold productions
-		Assert.assertEquals(new Production("aba", "E", null, strategy), stems.get(5));
-		Assert.assertEquals(new Production("ada", "E", null, strategy), stems.get(6));
+		Assert.assertEquals(new Production("aba", "E", "st:a", strategy), stems.get(5));
+		Assert.assertEquals(new Production("ada", "E", "st:a", strategy), stems.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ae", null, null, strategy), stems.get(7));
-		Assert.assertEquals(new Production("aae", null, null, strategy), stems.get(8));
-		Assert.assertEquals(new Production("bae", null, null, strategy), stems.get(9));
-		Assert.assertEquals(new Production("cae", null, null, strategy), stems.get(10));
-		Assert.assertEquals(new Production("dae", null, null, strategy), stems.get(11));
-		Assert.assertEquals(new Production("abae", null, null, strategy), stems.get(12));
-		Assert.assertEquals(new Production("adae", null, null, strategy), stems.get(13));
+		Assert.assertEquals(new Production("ae", null, "st:a", strategy), stems.get(7));
+		Assert.assertEquals(new Production("aae", null, "st:a", strategy), stems.get(8));
+		Assert.assertEquals(new Production("bae", null, "st:a", strategy), stems.get(9));
+		Assert.assertEquals(new Production("cae", null, "st:a", strategy), stems.get(10));
+		Assert.assertEquals(new Production("dae", null, "st:a", strategy), stems.get(11));
+		Assert.assertEquals(new Production("abae", null, "st:a", strategy), stems.get(12));
+		Assert.assertEquals(new Production("adae", null, "st:a", strategy), stems.get(13));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -451,10 +451,10 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(2, stems.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "A", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("foo", "A", "st:foo", strategy), stems.get(0));
 		//onefold productions
 		//twofold productions
-		Assert.assertEquals(new Production("foosbaz", "X", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("foosbaz", "X", "st:foo", strategy), stems.get(1));
 		//lastfold productions
 	}
 
@@ -481,21 +481,21 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(12, stems.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "AC", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("foo", "AC", "st:foo", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foo-suf", "BC", null, strategy), stems.get(1));
+		Assert.assertEquals(new Production("foo-suf", "BC", "st:foo", strategy), stems.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foo-suf-bar", "C", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("foo-pseudosuf-bar", "CX", null, strategy), stems.get(3));
+		Assert.assertEquals(new Production("foo-suf-bar", "C", "st:foo", strategy), stems.get(2));
+		Assert.assertEquals(new Production("foo-pseudosuf-bar", "CX", "st:foo", strategy), stems.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("pre-foo", null, null, strategy), stems.get(4));
-		Assert.assertEquals(new Production("pre-foo-suf", null, null, strategy), stems.get(5));
-		Assert.assertEquals(new Production("pseudopre-foo-suf", "X", null, strategy), stems.get(6));
-		Assert.assertEquals(new Production("pre-foo-pseudosuf", "X", null, strategy), stems.get(7));
-		Assert.assertEquals(new Production("pre-foo-suf-bar", null, null, strategy), stems.get(8));
-		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", null, strategy), stems.get(9));
-		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", "X", null, strategy), stems.get(10));
-		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", "X", null, strategy), stems.get(11));
+		Assert.assertEquals(new Production("pre-foo", null, "st:foo", strategy), stems.get(4));
+		Assert.assertEquals(new Production("pre-foo-suf", null, "st:foo", strategy), stems.get(5));
+		Assert.assertEquals(new Production("pseudopre-foo-suf", "X", "st:foo", strategy), stems.get(6));
+		Assert.assertEquals(new Production("pre-foo-pseudosuf", "X", "st:foo", strategy), stems.get(7));
+		Assert.assertEquals(new Production("pre-foo-suf-bar", null, "st:foo", strategy), stems.get(8));
+		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", "st:foo", strategy), stems.get(9));
+		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", "X", "st:foo", strategy), stems.get(10));
+		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", "X", "st:foo", strategy), stems.get(11));
 	}
 
 	
@@ -522,15 +522,15 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(6, stems.size());
 		//base production
-		Assert.assertEquals(new Production("nagy", "C", null, strategy), stems.get(0));
+		Assert.assertEquals(new Production("nagy", "C", "st:nagy", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("nagyobb", null, null, strategy), stems.get(1));
-		Assert.assertEquals(new Production("nagyobb", "AX", null, strategy), stems.get(2));
-		Assert.assertEquals(new Production("nagyobb", "BX", null, strategy), stems.get(3));
+		Assert.assertEquals(new Production("nagyobb", null, "st:nagy", strategy), stems.get(1));
+		Assert.assertEquals(new Production("nagyobb", "AX", "st:nagy", strategy), stems.get(2));
+		Assert.assertEquals(new Production("nagyobb", "BX", "st:nagy", strategy), stems.get(3));
 		//twofold productions
 		//lastfold productions
-		Assert.assertEquals(new Production("legnagyobb", "X", null, strategy), stems.get(4));
-		Assert.assertEquals(new Production("legeslegnagyobb", "X", null, strategy), stems.get(5));
+		Assert.assertEquals(new Production("legnagyobb", "X", "st:nagy", strategy), stems.get(4));
+		Assert.assertEquals(new Production("legeslegnagyobb", "X", "st:nagy", strategy), stems.get(5));
 	}
 
 	
@@ -541,7 +541,7 @@ public class WordGeneratorTest{
 			.add("PFX P Y 1")
 			.add("PFX P   0 un . dp:pfx_un sp:un")
 			.add("SFX S Y 1")
-			.add("SFX S   0 s . is:plural")
+			.add("SFX S   0 s . is:is:plur")
 			.add("SFX Q Y 1")
 			.add("SFX Q   0 s . is:sg_3")
 			.add("SFX R Y 1")
@@ -556,9 +556,34 @@ public class WordGeneratorTest{
 
 		Assert.assertEquals(2, stems.size());
 		//base production
-		Assert.assertEquals(new Production("drink", "S", "po:noun", strategy), stems.get(0));
+		Assert.assertEquals(new Production("drink", "S", "st:drink po:noun", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("drinks", "", "po:noun is:plural", strategy), stems.get(1));
+		Assert.assertEquals(new Production("drinks", "", "st:drink po:noun is:plur", strategy), stems.get(1));
+		//twofold productions
+		//lastfold productions
+
+
+		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
+		stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(6, stems.size());
+		//base production
+		Assert.assertEquals(new Production("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("drinkable", "PS", "st:drink po:verb	al:drank	al:drunk	ts:present ds:der_able", strategy), stems.get(1));
+		Assert.assertEquals(new Production("drinks", "", "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), stems.get(2));
+		//twofold productions
+		//lastfold productions
+
+
+		line = "eat/RQ	po:verb	al:ate	al:eaten	ts:present";
+		stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(2, stems.size());
+		//base production
+		Assert.assertEquals(new Production("eat", "S", "st:eat po:verb", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("eats", "", "st:eat po:verb al:ate al:eaten ts:present is:singular_3rd", strategy), stems.get(1));
 		//twofold productions
 		//lastfold productions
 	}
