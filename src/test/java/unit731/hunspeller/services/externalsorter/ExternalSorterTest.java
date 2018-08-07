@@ -20,7 +20,7 @@ public class ExternalSorterTest{
 
 	@Before
 	public void setUp() throws Exception{
-		inputFile = new File(getClass().getClassLoader().getResource("test-file.txt").toURI());
+		inputFile = new File(getClass().getClassLoader().getResource("external-sorter-test-file.txt").toURI());
 
 		outputFile = File.createTempFile("sort", ".out");
 		outputFile.deleteOnExit();
