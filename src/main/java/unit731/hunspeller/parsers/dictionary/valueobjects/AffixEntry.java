@@ -138,7 +138,7 @@ public class AffixEntry{
 	 * 	removed by splitting rules
 	 */
 	public String[] combineMorphologicalFields(DictionaryEntry productable){
-		List<String> mf = (productable.morphologicalFields != null? Arrays.asList(productable.morphologicalFields): new ArrayList<>());
+		List<String> mf = (productable.morphologicalFields != null? new ArrayList<>(Arrays.asList(productable.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
 //		boolean containsNonTerminalSuffixes = amf.stream()
