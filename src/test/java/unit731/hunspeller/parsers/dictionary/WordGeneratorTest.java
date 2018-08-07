@@ -44,7 +44,6 @@ public class WordGeneratorTest{
 			.add("OCONV	 d 	D # tab+space, space+tab, space")
 			.add("OCONV e E #")
 			.add("OCONV é É 	")
-			.add("# Only comment. Note that line above ends with space+tab.")
 			.add("")
 			.add(" # space")
 			.add("  # 2xspace")
