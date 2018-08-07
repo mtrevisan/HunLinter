@@ -51,7 +51,7 @@ public class DictionaryEntry{
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(dicFlags);
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): new String[0]);
+		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): null);
 		combineable = true;
 	}
 
@@ -109,14 +109,15 @@ public class DictionaryEntry{
 					newMorphologicalFields.add(morphologicalField);
 		if(affixEntryMorphologicalFields != null)
 			newMorphologicalFields.addAll(Arrays.asList(affixEntryMorphologicalFields));
-		return newMorphologicalFields.toArray(new String[newMorphologicalFields.size()]);
+		int size = newMorphologicalFields.size();
+		return (size > 0? newMorphologicalFields.toArray(new String[size]): null);
 	}
 
 	/** NOTE: used for testing purposes */
-	protected DictionaryEntry(String word, String continuationFlags, FlagParsingStrategy strategy){
+	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
-		morphologicalFields = new String[0];
+		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
 		combineable = false;
 	}
 
@@ -204,7 +205,9 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		return word + (continuationFlags != null && continuationFlags.length > 0? AffixEntry.SLASH + StringUtils.join(continuationFlags, ", "): StringUtils.EMPTY);
+		return word
+			+ (continuationFlags != null && continuationFlags.length > 0? AffixEntry.SLASH + StringUtils.join(continuationFlags, ", "): StringUtils.EMPTY)
+			+ (morphologicalFields != null && morphologicalFields.length > 0? "\t" + StringUtils.join(morphologicalFields, " "): StringUtils.EMPTY);
 	}
 
 }
