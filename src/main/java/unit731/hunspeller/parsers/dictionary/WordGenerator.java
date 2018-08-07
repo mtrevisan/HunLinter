@@ -127,6 +127,7 @@ public class WordGenerator{
 
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
+productions.forEach(production -> log.info("Produced word: {}", production));
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
@@ -258,11 +259,16 @@ public class WordGenerator{
 			Production production = itr.next();
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null){
-				long needAffixFlags = appliedRules.stream()
-					.filter(appliedRile -> appliedRile.containsContinuationFlag(needAffixFlag))
+			if(appliedRules == null){
+				boolean hasNeedAffixFlag = production.containsContinuationFlag(needAffixFlag);
+				if(hasNeedAffixFlag)
+					itr.remove();
+			}
+			else{
+				long rulesWithNeedAffixFlag = appliedRules.stream()
+					.filter(appliedRule -> appliedRule.containsContinuationFlag(needAffixFlag))
 					.count();
-				if(needAffixFlags == 1)
+				if(rulesWithNeedAffixFlag == appliedRules.size())
 					itr.remove();
 			}
 		}
