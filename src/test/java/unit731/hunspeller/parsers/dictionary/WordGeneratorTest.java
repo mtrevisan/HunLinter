@@ -55,6 +55,7 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("ae", "", strategy), stems.get(3));
 	}
 
+
 	@Test
 	public void stems1() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
@@ -223,6 +224,7 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("eada", "", strategy), stems.get(13));
 	}
 
+
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidFullstrip() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
@@ -258,6 +260,7 @@ public class WordGeneratorTest{
 		//onefold productions
 		Assert.assertEquals(new Production("b", null, strategy), stems.get(1));
 	}
+
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold1() throws IOException{
@@ -386,6 +389,7 @@ public class WordGeneratorTest{
 		wordGenerator.applyRules(line);
 	}
 
+
 	@Test
 	public void needAffix3() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
@@ -450,6 +454,41 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", strategy), stems.get(9));
 		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", "X", strategy), stems.get(10));
 		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", "X", strategy), stems.get(11));
+	}
+
+	
+	@Test
+	public void circumfix() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("CIRCUMFIX X")
+			.add("PFX A Y 1")
+			.add("PFX A 0 leg/X .")
+			.add("PFX B Y 1")
+			.add("PFX B 0 legesleg/X .")
+			.add("SFX C Y 3")
+			.add("SFX C 0 obb .")
+			.add("SFX C 0 obb/AX .")
+			.add("SFX C 0 obb/BX .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "nagy/C";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(6, stems.size());
+		//base production
+		Assert.assertEquals(new Production("nagy", "C", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("nagyobb", "", strategy), stems.get(1));
+		Assert.assertEquals(new Production("nagyobb", "AX", strategy), stems.get(2));
+		Assert.assertEquals(new Production("nagyobb", "BX", strategy), stems.get(3));
+		//twofold productions
+		//lastfold productions
+		Assert.assertEquals(new Production("legnagyobb", "X", strategy), stems.get(4));
+		Assert.assertEquals(new Production("legeslegnagyobb", "X", strategy), stems.get(5));
 	}
 
 }
