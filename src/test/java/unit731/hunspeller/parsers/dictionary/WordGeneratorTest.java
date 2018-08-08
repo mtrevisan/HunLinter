@@ -814,35 +814,31 @@ public class WordGeneratorTest{
 		waiter.await(2_000l);
 	}
 
-//	@Test
+	@Test
 	public void compoundRule0() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
+			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
-			"COMPOUNDRULE vw",
-			"SFX A Y 5",
-			"SFX A 0 e .",
-			"SFX A 0 er .",
-			"SFX A 0 en .",
-			"SFX A 0 em .",
-			"SFX A 0 es .");
+			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
 			"3",
-			"arbeits/v",
-			"scheu/Aw",
-			"farbig/A");
+			"a/A",
+			"b/B",
+			"c/BC");
 		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
 
 		Waiter waiter = new Waiter();
 		String line = "vw";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
-			waiter.assertEquals(1, words.size());
-			waiter.assertEquals(1l, wordCount);
-			waiter.assertEquals("arbeitsscheu", words.get(0));
+			waiter.assertEquals(2, words.size());
+			waiter.assertEquals(2l, wordCount);
+			waiter.assertEquals("abc", words.get(0));
+			waiter.assertEquals("acc", words.get(1));
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
 
