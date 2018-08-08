@@ -68,7 +68,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 				dialog.setVisible(true);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, lineaReader, done);
+		createWorker(WORKER_NAME, dicParser, lineaReader, done, affParser);
 	}
 
 	@Override

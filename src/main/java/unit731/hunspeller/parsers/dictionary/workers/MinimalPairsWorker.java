@@ -29,6 +29,7 @@ import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.TimeWatch;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -42,32 +43,37 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 	private final Comparator<String> comparator;
+	private final ReadWriteLockable lockable;
 
 
-	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile){
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile, ReadWriteLockable lockable){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(lockable);
 
 		this.dicParser = dicParser;
 		this.checker = checker;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
+		this.lockable = lockable;
 
 		comparator = ComparatorBuilder.getComparator(language);
 	}
 
 	@Override
 	protected Void doInBackground() throws Exception{
+		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
+
+		watch = TimeWatch.start();
+
+		lockable.acquireReadLock();
+
+		setProgress(0);
 		boolean stopped = false;
 		try{
-			log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
-
-			watch = TimeWatch.start();
-
-			setProgress(0);
 			File dicFile = dicParser.getDicFile();
 			try(
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()));
@@ -232,6 +238,9 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				String message = ExceptionService.getMessage(e);
 				log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
 			}
+		}
+		finally{
+			lockable.releaseReadLock();
 		}
 		if(stopped)
 			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");

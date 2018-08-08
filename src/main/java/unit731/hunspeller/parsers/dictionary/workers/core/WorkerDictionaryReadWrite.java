@@ -17,6 +17,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -26,19 +27,21 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 	private final File outputFile;
 
 
-	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineaReader, Runnable done){
+	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineReader, Runnable done, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(lineaReader);
+		Objects.requireNonNull(lineReader);
+		Objects.requireNonNull(lockable);
 
 		this.workerName = workerName;
 		this.dicFile = dicFile;
 		this.outputFile = outputFile;
 		this.charset = charset;
-		this.lineaReader = lineaReader;
+		this.lineReader = lineReader;
 		this.done = done;
+		this.lockable = lockable;
 	}
 
 	@Override
@@ -47,6 +50,8 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
 
 		watch.reset();
+
+		lockable.acquireReadLock();
 
 		setProgress(0);
 		long totalSize = dicFile.length();
@@ -71,7 +76,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						lineaReader.accept(writer, line);
+						lineReader.accept(writer, line);
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
@@ -100,6 +105,9 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			}
 
 			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+		}
+		finally{
+			lockable.releaseReadLock();
 		}
 
 		return null;

@@ -776,7 +776,7 @@ public class WordGeneratorTest{
 	}
 
 
-//	@Test
+	@Test
 	public void compoundRule_BjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
@@ -806,13 +806,6 @@ public class WordGeneratorTest{
 			Assert.assertEquals("arbeitsscheu", words.get(0));
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
-
-//		try{
-//			Thread.sleep(10_000l);
-//		}
-//		catch(InterruptedException ex){
-//			Logger.getLogger(WordGeneratorTest.class.getName()).log(Level.SEVERE, null, ex);
-//		}
 	}
 
 //	@Test

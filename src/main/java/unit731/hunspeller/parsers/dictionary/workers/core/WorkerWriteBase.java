@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WorkerWriteBase<T>{
@@ -14,8 +15,8 @@ public class WorkerWriteBase<T>{
 	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
-		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, body, done);
+	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineWriter, Runnable done, ReadWriteLockable lockable){
+		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, lineWriter, done, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

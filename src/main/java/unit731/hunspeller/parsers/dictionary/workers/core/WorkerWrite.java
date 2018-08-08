@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -22,19 +23,21 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 	private final File outputFile;
 
 
-	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineaReader, Runnable done){
+	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineReader, Runnable done, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(entries);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(lineaReader);
+		Objects.requireNonNull(lineReader);
+		Objects.requireNonNull(lockable);
 
 		this.workerName = workerName;
 		this.entries = entries;
 		this.outputFile = outputFile;
 		this.charset = charset;
-		this.lineaReader = lineaReader;
+		this.lineReader = lineReader;
 		this.done = done;
+		this.lockable = lockable;
 	}
 
 	@Override
@@ -43,15 +46,25 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
 		watch.reset();
 
+		lockable.acquireReadLock();
+
 		setProgress(0);
 		int writtenSoFar = 0;
 		long totalSize = entries.size();
 		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(T entry : entries){
-				lineaReader.accept(writer, entry);
+				lineReader.accept(writer, entry);
 
 				writtenSoFar ++;
 				setProgress((int)((writtenSoFar * 100.) / totalSize));
+			}
+
+			if(!isCancelled()){
+				watch.stop();
+
+				setProgress(100);
+
+				log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes " + watch.toStringMinuteSeconds() + ")");
 			}
 		}
 		catch(Exception e){
@@ -64,13 +77,8 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
-
-		if(!isCancelled()){
-			watch.stop();
-
-			setProgress(100);
-
-			log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+		finally{
+			lockable.releaseReadLock();
 		}
 
 		return null;

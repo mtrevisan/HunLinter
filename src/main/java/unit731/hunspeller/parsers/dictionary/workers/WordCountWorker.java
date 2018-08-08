@@ -13,6 +13,7 @@ import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -23,9 +24,10 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker){
+	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(lockable);
 
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
 			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
@@ -46,7 +48,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, lineaReader, done);
+		createWorker(WORKER_NAME, dicParser, lineaReader, done, lockable);
 	}
 
 	@Override

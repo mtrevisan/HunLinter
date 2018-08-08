@@ -16,6 +16,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -24,17 +25,19 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 	private final File dicFile;
 
 
-	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineaReader, Runnable done){
+	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(lineaReader);
+		Objects.requireNonNull(lineReader);
+		Objects.requireNonNull(lockable);
 
 		this.workerName = workerName;
 		this.dicFile = dicFile;
 		this.charset = charset;
-		this.lineaReader = lineaReader;
+		this.lineReader = lineReader;
 		this.done = done;
+		this.lockable = lockable;
 	}
 
 	@Override
@@ -43,6 +46,8 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
 
 		watch.reset();
+
+		lockable.acquireReadLock();
 
 		setProgress(0);
 		long totalSize = dicFile.length();
@@ -64,7 +69,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						lineaReader.accept(line, br.getLineNumber());
+						lineReader.accept(line, br.getLineNumber());
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
@@ -93,6 +98,9 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			}
 
 			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+		}
+		finally{
+			lockable.releaseReadLock();
 		}
 
 		return null;

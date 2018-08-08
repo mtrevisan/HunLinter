@@ -13,6 +13,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -21,10 +22,11 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(lockable);
 
 
 		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
@@ -52,7 +54,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 				}
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, outputFile, body, done);
+		createWorker(WORKER_NAME, dicParser, outputFile, body, done, lockable);
 	}
 
 }

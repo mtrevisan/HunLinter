@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WorkerDictionaryReadWriteBase{
@@ -13,8 +14,8 @@ public class WorkerDictionaryReadWriteBase{
 	private WorkerDictionaryReadWrite worker;
 
 
-	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> body, Runnable done){
-		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), body, done);
+	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> lineReader, Runnable done, ReadWriteLockable lockable){
+		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader, done, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
