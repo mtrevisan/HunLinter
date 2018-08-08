@@ -252,7 +252,7 @@ public class HunspellRegexWordGenerator{
 			String subword = elem.word;
 			State state = elem.state;
 			List<Transition> transitions = state.getSortedTransitions(true);
-			if(transitions.isEmpty() || state.isAccept()){
+			if(!subword.isEmpty() && (transitions.isEmpty() || state.isAccept())){
 				matchedWords.add(subword);
 				matchedWordCounter ++;
 

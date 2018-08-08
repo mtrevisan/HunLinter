@@ -833,12 +833,13 @@ public class WordGeneratorTest{
 		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
 
 		Waiter waiter = new Waiter();
-		String line = "vw";
+		String line = "ABC";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
 			waiter.assertEquals(2, words.size());
 			waiter.assertEquals(2l, wordCount);
 			waiter.assertEquals("abc", words.get(0));
 			waiter.assertEquals("acc", words.get(1));
+			waiter.resume();
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
 
