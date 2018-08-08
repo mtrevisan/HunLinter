@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -68,7 +69,7 @@ public class AffixEntry{
 	private final String entry;
 
 
-	public AffixEntry(String line, FlagParsingStrategy strategy){
+	public AffixEntry(String line, List<String> aliasesFlag, List<String> aliasesMorphologicaField, FlagParsingStrategy strategy){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -79,10 +80,10 @@ public class AffixEntry{
 		String[] additionParts = StringUtils.split(lineParts[3], SLASH);
 		String addition = additionParts[0];
 		String cond = (lineParts.length > 4? lineParts[4]: DOT);
-		morphologicalFields = (lineParts.length > 5? StringUtils.split(lineParts[5]): new String[0]);
+		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
 		type = Type.toEnum(ruleType);
-		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));
+		String[] classes = strategy.parseFlags((additionParts.length > 1? expandAliases(additionParts[1], aliasesFlag): null));
 		continuationFlags = (classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -106,6 +107,12 @@ public class AffixEntry{
 		}
 
 		entry = PatternService.clear(line, MATCHER_ENTRY);
+	}
+
+	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+		if(NumberUtils.isCreatable(part) && aliases != null && !aliases.isEmpty())
+			part = aliases.get(Integer.valueOf(part) - 1);
+		return part;
 	}
 
 	public boolean containsContinuationFlag(String flag){

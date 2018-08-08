@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -39,7 +40,7 @@ public class DictionaryEntry{
 	private final boolean combineable;
 
 
-	public DictionaryEntry(String line, FlagParsingStrategy strategy){
+	public DictionaryEntry(String line, List<String> aliasesFlag, List<String> aliasesMorphologicaField, FlagParsingStrategy strategy){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -49,10 +50,16 @@ public class DictionaryEntry{
 
 		word = m.group(PARAM_WORD);
 		String dicFlags = m.group(PARAM_FLAGS);
-		continuationFlags = strategy.parseFlags(dicFlags);
+		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): null);
+		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null);
 		combineable = true;
+	}
+
+	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+		if(NumberUtils.isCreatable(part) && aliases != null && !aliases.isEmpty())
+			part = aliases.get(Integer.valueOf(part) - 1);
+		return part;
 	}
 
 	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){

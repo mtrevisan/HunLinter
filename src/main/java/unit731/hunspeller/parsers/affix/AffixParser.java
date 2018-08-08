@@ -157,12 +157,14 @@ public class AffixParser extends ReadWriteLockable{
 
 //List<AffixEntry> prefixEntries = new ArrayList<>();
 //List<AffixEntry> suffixEntries = new ArrayList<>();
+			List<String> aliasesFlag = getData(AffixTag.ALIASES_FLAG);
+			List<String> aliasesMorphologicalField = getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 			List<AffixEntry> entries = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 				line = DictionaryParser.cleanLine(line);
 
-				AffixEntry entry = new AffixEntry(line, strategy);
+				AffixEntry entry = new AffixEntry(line, aliasesFlag, aliasesMorphologicalField, strategy);
 				if(entry.getType() != ruleType)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ ruleType + ")");
@@ -175,6 +177,7 @@ public class AffixParser extends ReadWriteLockable{
 				boolean inserted = entries.add(entry);
 				if(!inserted)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
 //List<AffixEntry> lst = new ArrayList<>();

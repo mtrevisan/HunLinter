@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 
@@ -64,7 +65,9 @@ public class WordGenerator{
 
 	public List<Production> applyRules(String line){
 		FlagParsingStrategy strategy = getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy);
+		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
+		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		DictionaryEntry dicEntry = new DictionaryEntry(line, aliasesFlag, aliasesMorphologicalField, strategy);
 		return applyRules(dicEntry);
 	}
 
