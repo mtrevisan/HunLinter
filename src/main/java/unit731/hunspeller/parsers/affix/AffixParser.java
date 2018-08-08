@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
@@ -26,20 +28,42 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 /**
  * Managed options:
- *		SET, FLAG, COMPLEXPREFIXES, LANG
+ *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
  *		COMPOUNDRULE, COMPOUNDMIN, ONLYINCOMPOUND, CIRCUMFIX
  *		PFX, SFX
  *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
  */
 public class AffixParser extends ReadWriteLockable{
 
+	private static final Matcher MATCHER_ISO639_1 = PatternService.matcher("([a-z]{2})");
+	private static final Matcher MATCHER_ISO639_2 = PatternService.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
+
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
+
+	@AllArgsConstructor
+	private static enum AliasesType{
+		FLAG(AffixTag.ALIASES_FLAG),
+		MORPHOLOGICAL_FIELD(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+
+
+		@Getter
+		private final AffixTag flag;
+
+		public static AliasesType toEnum(String flag){
+			AliasesType[] types = AliasesType.values();
+			for(AliasesType type : types)
+				if(type.getFlag().getCode().equals(flag))
+					return type;
+			return null;
+		}
+	}
 
 	@AllArgsConstructor
 	private static enum ConversionTableType{
@@ -208,6 +232,40 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
+	private final Consumer<ParsingContext> FUN_ALIASES = context -> {
+		try{
+			AliasesType aliasesType = AliasesType.toEnum(context.getRuleType());
+			BufferedReader br = context.getReader();
+			if(!NumberUtils.isCreatable(context.getFirstParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ "\": The first parameter is not a number");
+			int numEntries = Integer.parseInt(context.getFirstParameter());
+			if(numEntries <= 0)
+				throw new IllegalArgumentException("Error reading line \"" + context.toString()
+					+ ": Bad number of entries, it must be a positive integer");
+
+			List<String> aliases = new ArrayList<>(numEntries);
+			for(int i = 0; i < numEntries; i ++){
+				String line = br.readLine();
+				line = DictionaryParser.cleanLine(line);
+
+				String[] parts = StringUtils.split(line);
+				if(parts.length != 2)
+					throw new IllegalArgumentException("Error reading line \"" + context.toString()
+						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
+				if(!aliasesType.getFlag().getCode().equals(parts[0]))
+					throw new IllegalArgumentException("Error reading line \"" + context.toString()
+						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
+
+				aliases.add(parts[1]);
+			}
+
+			addData(aliasesType.getFlag(), aliases);
+		}
+		catch(IOException e){
+			throw new RuntimeException(e.getMessage());
+		}
+	};
 	private final Consumer<ParsingContext> FUN_CONVERSION_TABLE = context -> {
 		try{
 			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
@@ -229,6 +287,9 @@ public class AffixParser extends ReadWriteLockable{
 				if(parts.length != 3)
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
+				if(!conversionTableType.getFlag().getCode().equals(parts[0]))
+					throw new IllegalArgumentException("Error reading line \"" + context.toString()
+						+ ": Bad tag, it must be " + conversionTableType.getFlag().getCode());
 
 				conversionTable.put(parts[1], parts[2]);
 			}
@@ -253,6 +314,8 @@ public class AffixParser extends ReadWriteLockable{
 		RULE_FUNCTION.put(AffixTag.COMPLEX_PREFIXES, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.LANGUAGE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.IGNORE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.ALIASES_FLAG, FUN_ALIASES);
+		RULE_FUNCTION.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, FUN_ALIASES);
 		//Options for suggestions
 //		RULE_FUNCTION.put(AffixTag.KEY, FUN_COPY_OVER);
 //		RULE_FUNCTION.put("TRY", FUN_COPY_OVER);
@@ -356,9 +419,15 @@ public class AffixParser extends ReadWriteLockable{
 			//apply default charset
 			if(!containsData(AffixTag.CHARACTER_SET))
 				addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
-			if(!containsData(AffixTag.LANGUAGE))
+			if(!containsData(AffixTag.LANGUAGE)){
 				//try to infer language from filename
-				addData(AffixTag.LANGUAGE, affFile.getName().replaceFirst("\\..+$", StringUtils.EMPTY));
+				String filename = FilenameUtils.removeExtension(affFile.getName());
+				List<String> languages = PatternService.extract(filename, MATCHER_ISO639_2);
+				if(languages.isEmpty())
+					languages = PatternService.extract(filename, MATCHER_ISO639_1);
+				String language = (!languages.isEmpty()? languages.get(0): "xxx");
+				addData(AffixTag.LANGUAGE, language);
+			}
 			if(!containsData(AffixTag.BREAK)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
@@ -366,17 +435,18 @@ public class AffixParser extends ReadWriteLockable{
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + "$");
 				addData(AffixTag.BREAK, wordBreakCharacters);
 			}
-//			if(isComplexPrefixes()){
+			//swap tags:
+			if(isComplexPrefixes()){
 //				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN);
 //				String compoundEnd = getData(AffixTag.COMPOUND_END);
 //				addData(AffixTag.COMPOUND_BEGIN, compoundEnd);
 //				addData(AffixTag.COMPOUND_END, compoundBegin);
-//
-//				RuleEntry prefixes = getData(AffixTag.PREFIX);
-//				RuleEntry suffixes = getData(AffixTag.SUFFIX);
-//				addData(AffixTag.PREFIX, suffixes);
-//				addData(AffixTag.SUFFIX, prefixes);
-//			}
+
+				RuleEntry prefixes = getData(AffixTag.PREFIX);
+				RuleEntry suffixes = getData(AffixTag.SUFFIX);
+				addData(AffixTag.PREFIX, suffixes);
+				addData(AffixTag.SUFFIX, prefixes);
+			}
 //			if(!containsData(AffixTag.KEY))
 //				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 
@@ -462,11 +532,12 @@ public class AffixParser extends ReadWriteLockable{
 	public boolean isManagedByCompoundRule(String flag){
 		boolean found = false;
 		Set<String> compoundRules = getCompoundRules();
-		for(String rule : compoundRules)
-			if(isManagedByCompoundRule(rule, flag)){
-				found = true;
-				break;
-			}
+		if(compoundRules != null)
+			for(String rule : compoundRules)
+				if(isManagedByCompoundRule(rule, flag)){
+					found = true;
+					break;
+				}
 		return found;
 	}
 

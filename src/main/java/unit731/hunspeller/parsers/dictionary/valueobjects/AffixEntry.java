@@ -25,7 +25,7 @@ public class AffixEntry{
 	public static final String SLASH = "/";
 	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
 
-	private static final String DOT = ".";
+	public static final String DOT = ".";
 	private static final String ZERO = "0";
 
 

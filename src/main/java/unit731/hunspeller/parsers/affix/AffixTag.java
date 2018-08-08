@@ -26,8 +26,8 @@ public enum AffixTag{
 	LANGUAGE("LANG"),
 //	/** Sets characters to ignore in dictionary words, affixes and input words */
 //	IGNORE("IGNORE"),
-//	AF("AF"),
-//	AM("AM"),
+	ALIASES_FLAG("AF"),
+	ALIASES_MORPHOLOGICAL_FIELD("AM"),
 
 	//Options for suggestions
 //	/** Search and suggest words with one different character replaced by a neighbor character */

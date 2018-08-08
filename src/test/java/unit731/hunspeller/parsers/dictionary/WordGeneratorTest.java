@@ -732,8 +732,7 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("legeslegnagyobb", "X", "st:nagy", strategy), stems.get(5));
 	}
 
-	
-	@Test
+
 	public void morphologicalAnalisys() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
@@ -757,7 +756,7 @@ public class WordGeneratorTest{
 		//base production
 		Assert.assertEquals(new Production("drink", "S", "st:drink po:noun", strategy), stems.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("drinks", "", "st:drink po:noun is:plur", strategy), stems.get(1));
+		Assert.assertEquals(new Production("drinks", null, "st:drink po:noun is:plur", strategy), stems.get(1));
 		//twofold productions
 		//lastfold productions
 
@@ -770,12 +769,43 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present", strategy), stems.get(0));
 		//onefold productions
 		Assert.assertEquals(new Production("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(1));
-		Assert.assertEquals(new Production("drinks", "", "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), stems.get(2));
+		Assert.assertEquals(new Production("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), stems.get(2));
 		//twofold productions
 		Assert.assertEquals(new Production("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(3));
 		//lastfold productions
 		Assert.assertEquals(new Production("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(4));
 		Assert.assertEquals(new Production("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(5));
+	}
+
+
+	@Test
+	public void alias1() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("AF 2")
+			.add("AF AB")
+			.add("AF A")
+			.add("SFX A Y 1")
+			.add("SFX A 0 x .")
+			.add("SFX B Y 1")
+			.add("SFX B 0 y/2 .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "foo/1";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(4, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "AB", "st:foo", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foox", null, "st:foo", strategy), stems.get(1));
+		Assert.assertEquals(new Production("fooy", "A", "st:foo", strategy), stems.get(2));
+		//twofold productions
+		Assert.assertEquals(new Production("fooyx", null, "st:foo", strategy), stems.get(3));
+		//lastfold productions
 	}
 
 }

@@ -8,6 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExceptionService{
 
+	private static final String DOT = ".";
+
+
 	public static String getMessage(Exception e){
 		String message = e.getMessage();
 		if(message == null){
@@ -21,7 +24,7 @@ public class ExceptionService{
 					break;
 				}
 			message = stackTrace0.getFileName();
-			message = String.join(StringUtils.EMPTY, message.substring(0, message.indexOf('.')), ".", stackTrace0.getMethodName(), ":", Integer.toString(stackTrace0.getLineNumber()));
+			message = String.join(StringUtils.EMPTY, message.substring(0, message.indexOf('.')), DOT, stackTrace0.getMethodName(), ":", Integer.toString(stackTrace0.getLineNumber()));
 		}
 		return message;
 	}
