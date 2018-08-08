@@ -18,7 +18,7 @@ public class HunspellRegexWordGeneratorTest{
 		Matcher m = Pattern.compile(regex).matcher(StringUtils.EMPTY);
 
 		Random random = new Random();
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
 		boolean infinite = generator.isInfinite();
 		Assert.assertFalse(infinite);
 		for(int i = 0; i < 100; i ++){
@@ -32,7 +32,7 @@ public class HunspellRegexWordGeneratorTest{
 	public void shouldGenerateAllWords(){
 		String regex = "[abc]c[de]?";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
 		boolean infinite = generator.isInfinite();
 		long wordCount = generator.wordCount();
 		List<String> words = generator.generateAll();
@@ -46,12 +46,36 @@ public class HunspellRegexWordGeneratorTest{
 	public void shouldGenerateInfiniteWords(){
 		String regex = "[abc]c[de]*";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
 		boolean infinite = generator.isInfinite();
 		long wordCount = generator.wordCount();
 
 		Assert.assertTrue(infinite);
 		Assert.assertEquals(HunspellRegexWordGenerator.INFINITY, wordCount);
+	}
+
+	@Test
+	public void shouldGenerateEmptyWord(){
+		String regex = "a?b?c?";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, false);
+		boolean infinite = generator.isInfinite();
+		long wordCount = generator.wordCount();
+
+		Assert.assertFalse(infinite);
+		Assert.assertEquals(10l, wordCount);
+	}
+
+	@Test
+	public void shouldNotGenerateEmptyWord(){
+		String regex = "a?b?c?";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
+		boolean infinite = generator.isInfinite();
+		long wordCount = generator.wordCount();
+
+		Assert.assertFalse(infinite);
+		Assert.assertEquals(9l, wordCount);
 	}
 
 }

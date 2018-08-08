@@ -871,7 +871,7 @@ public class WordGeneratorTest{
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
 			waiter.assertEquals(37, words.size());
 			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
-			List<String> expected = Arrays.asList("", "a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc");
+			List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc", "acbb");
 			waiter.assertEquals(expected, words);
 			waiter.resume();
 		};
@@ -902,9 +902,9 @@ public class WordGeneratorTest{
 		String line = "A?B?C?";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
 words.forEach(word -> System.out.println("'"+word+"'"));
-			waiter.assertEquals(10, words.size());
-			waiter.assertEquals(10l, wordTrueCount);
-			List<String> expected = Arrays.asList("", "a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+			waiter.assertEquals(9, words.size());
+			waiter.assertEquals(9l, wordTrueCount);
+			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 			waiter.assertEquals(expected, words);
 			waiter.resume();
 		};

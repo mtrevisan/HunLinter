@@ -56,6 +56,7 @@ public class HunspellRegexWordGenerator{
 	}
 
 	private final Automaton automaton;
+	private final boolean ignoreEmptyWord;
 
 	@Getter
 	private final List<String> matchedWords = new ArrayList<>(0);
@@ -66,7 +67,11 @@ public class HunspellRegexWordGenerator{
 	private int preparedTransactionNode;
 
 
-	public HunspellRegexWordGenerator(String regex){
+	/**
+	 * @param regex	Regex used to generate the set
+	 * @param ignoreEmptyWord	Does not consider ε as a valid response if set
+	 */
+	public HunspellRegexWordGenerator(String regex, boolean ignoreEmptyWord){
 		Objects.requireNonNull(regex);
 
 		regex = StringUtils.replaceEach(requote(regex),
@@ -74,6 +79,7 @@ public class HunspellRegexWordGenerator{
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		RegExp re = new RegExp(regex);
 		automaton = re.toAutomaton();
+		this.ignoreEmptyWord = ignoreEmptyWord;
 	}
 
 	/**
@@ -119,6 +125,9 @@ public class HunspellRegexWordGenerator{
 				buildRootNode();
 
 				count = rootNode.getMatchedWordCount();
+
+				if(ignoreEmptyWord && automaton.getShortestExample(true).isEmpty())
+					count --;
 			}
 		}
 		catch(StackOverflowError e){}
@@ -252,7 +261,7 @@ public class HunspellRegexWordGenerator{
 			String subword = elem.word;
 			State state = elem.state;
 			List<Transition> transitions = state.getSortedTransitions(true);
-			if(transitions.isEmpty() || state.isAccept()){
+			if((!ignoreEmptyWord || !subword.isEmpty()) && (transitions.isEmpty() || state.isAccept())){
 				matchedWords.add(subword);
 				matchedWordCounter ++;
 
