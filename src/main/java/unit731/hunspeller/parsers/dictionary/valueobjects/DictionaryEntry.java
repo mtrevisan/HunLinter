@@ -57,9 +57,7 @@ public class DictionaryEntry{
 	}
 
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
-		if(NumberUtils.isCreatable(part) && aliases != null && !aliases.isEmpty())
-			part = aliases.get(Integer.valueOf(part) - 1);
-		return part;
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.valueOf(part) - 1): part);
 	}
 
 	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){
