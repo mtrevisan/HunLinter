@@ -114,21 +114,24 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	}
 
 	public void extractCompounds(String compoundRule, BiConsumer<List<String>, Long> fnDeferring){
+		clear();
+
 		this.compoundRule = compoundRule;
 		this.fnDeferring = fnDeferring;
-		clear();
 
 		super.execute();
 	}
 
 	@Override
 	public void execute(){
-		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds instead");
+		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds(String, BiConsumer<List<String>, Long>) instead");
 	}
 
 	public void clear(){
 		if(rules != null)
 			rules.clear();
+		compoundRule = null;
+		fnDeferring = null;
 	}
 
 }

@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -778,7 +776,7 @@ public class WordGeneratorTest{
 	}
 
 
-	@Test
+//	@Test
 	public void compoundRule_BjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
