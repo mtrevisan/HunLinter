@@ -199,7 +199,8 @@ public class HunspellRegexWordGenerator{
 		return (max > min? random.nextInt(max - min): 0) + min;
 	}
 
-	private String generate(State initialState, Function<Integer, Integer> fnTransition, BiFunction<Character, Character, Character> fnCharIntoTransition){
+	private String generate(State initialState, Function<Integer, Integer> fnTransition,
+			BiFunction<Character, Character, Character> fnCharIntoTransition){
 		State state = initialState;
 		StringBuilder sb = new StringBuilder();
 		Map<State, Set<Integer>> automatonSelectedTransitions = new HashMap<>();
@@ -262,11 +263,12 @@ public class HunspellRegexWordGenerator{
 			State state = elem.state;
 //FIXME not so sorted?
 			List<Transition> transitions = state.getSortedTransitions(true);
-			if((!ignoreEmptyWord || !subword.isEmpty()) && (transitions.isEmpty() || state.isAccept())){
+			boolean emptyTransitions = transitions.isEmpty();
+			if((!ignoreEmptyWord || !subword.isEmpty()) && (emptyTransitions || state.isAccept())){
 				matchedWords.add(subword);
 				matchedWordCounter ++;
 
-				if(transitions.isEmpty())
+				if(emptyTransitions)
 					continue;
 			}
 

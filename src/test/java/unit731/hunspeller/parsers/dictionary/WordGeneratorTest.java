@@ -873,7 +873,9 @@ public class WordGeneratorTest{
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
 			waiter.assertEquals(37, words.size());
 			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
-			Set<String> expected = new HashSet<>(Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc", "acbb"));
+			Set<String> expected = new HashSet<>(Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
+				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
+				"abbb", "abbc", "abcb", "abcc", "acbb"));
 			waiter.assertEquals(expected, new HashSet<>(words));
 			waiter.resume();
 		};
