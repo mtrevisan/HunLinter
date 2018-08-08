@@ -86,7 +86,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 				setProgress(100);
 
-				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){

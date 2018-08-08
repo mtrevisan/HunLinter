@@ -93,7 +93,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 
 				setProgress(100);
 
-				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){

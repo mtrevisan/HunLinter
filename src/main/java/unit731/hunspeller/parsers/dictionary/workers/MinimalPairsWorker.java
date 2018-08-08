@@ -43,7 +43,6 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 	private final Comparator<String> comparator;
-	private final ReadWriteLockable lockable;
 
 
 	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile, ReadWriteLockable lockable){
@@ -109,7 +108,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " on line " + lineIndex + ": " + line);
+							log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
 						}
 					}
 
@@ -181,7 +180,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			}
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: " + DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
+			log.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
 			log.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (pass 3/3)");
@@ -219,8 +218,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "File written: " + outputFile.getAbsolutePath());
-			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes {})", watch.toStringMinuteSeconds());
 
 			try{
 				FileService.openFileWithChoosenEditor(outputFile);
@@ -236,7 +235,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				log.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.info(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
+				log.info(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 		finally{

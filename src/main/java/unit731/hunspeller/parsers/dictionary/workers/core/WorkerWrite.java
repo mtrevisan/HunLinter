@@ -42,7 +42,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening output file" + (workerName != null? " - " + workerName: StringUtils.EMPTY));
+		log.info(Backbone.MARKER_APPLICATION, "Opening output file{}", (workerName != null? " - " + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
@@ -64,7 +64,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
 				setProgress(100);
 
-				log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+				log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){

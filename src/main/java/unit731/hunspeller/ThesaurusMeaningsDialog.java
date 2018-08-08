@@ -144,7 +144,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			okButtonAction.accept(meanings, text);
 		}
 		catch(IllegalArgumentException e){
-			log.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"" + synonym.getSynonym() + "\": " + e.getMessage());
+			log.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
 		}
 
 		dispose();
@@ -183,8 +183,8 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex){
-			log.error(null, ex);
+		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
+			log.error(null, e);
 		}
 		//</editor-fold>
 
@@ -206,8 +206,8 @@ public class ThesaurusMeaningsDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException ex){
-				log.error(null, ex);
+			catch(IllegalArgumentException e){
+				log.error(null, e);
 			}
 		});
 	}

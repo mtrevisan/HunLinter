@@ -287,7 +287,7 @@ public class Backbone implements FileChangeListener{
 
 		//package entire folder with ZIP
 		if(basePath != null){
-			log.info(Backbone.MARKER_APPLICATION, "Found base path on " + basePath.toString());
+			log.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
 
 			try{
 				String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
@@ -300,7 +300,7 @@ public class Backbone implements FileChangeListener{
 					Desktop.getDesktop().open(new File(basePath.toString()));
 			}
 			catch(IOException e){
-				log.info(Backbone.MARKER_APPLICATION, "Package error: " + e.getMessage());
+				log.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
 				log.error("Something very bad happend while creating package", e);
 			}

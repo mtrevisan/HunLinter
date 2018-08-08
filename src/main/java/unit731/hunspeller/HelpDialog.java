@@ -163,8 +163,8 @@ public class HelpDialog extends JDialog{
 			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex){
-			log.error(null, ex);
+		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
+			log.error(null, e);
 		}
 		//</editor-fold>
 
@@ -181,8 +181,8 @@ public class HelpDialog extends JDialog{
 				});
 				dialog.setVisible(true);
 			}
-			catch(IllegalArgumentException ex){
-				log.error(null, ex);
+			catch(IllegalArgumentException e){
+				log.error(null, e);
 			}
 		});
 	}

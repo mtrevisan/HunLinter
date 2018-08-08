@@ -81,7 +81,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			watch.stop();
 
-			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes " + watch.toStringMinuteSeconds() + ")");
+			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes {})", watch.toStringMinuteSeconds());
 
 			if(!duplicates.isEmpty()){
 				try{
@@ -99,7 +99,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 		if(stopped)
@@ -144,7 +144,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							.forEachOrdered(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						log.error(Backbone.MARKER_APPLICATION, e.getMessage() + " on line " + lineIndex + ": " + line);
+						log.error(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
 
@@ -156,9 +156,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		int totalProductions = bloomFilter.getAddedElements();
 		double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 		int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-		log.info(Backbone.MARKER_APPLICATION, "Total productions: " + DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		log.info(Backbone.MARKER_APPLICATION, "False positive probability is " + DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability)
-			+ " (overall duplicates ≲ " + falsePositiveCount + ")");
+		log.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+		log.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		bloomFilter.close();
 		bloomFilter.clear();
@@ -211,10 +211,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-			log.info(Backbone.MARKER_APPLICATION, "Total duplicates: " + DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			log.info(Backbone.MARKER_APPLICATION, "False positive probability is "
-				+ DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability) + " (overall duplicates ≲ "
-				+ (int)Math.ceil(totalDuplicates * falsePositiveProbability) + ")");
+			log.info(Backbone.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
+			log.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
@@ -254,7 +253,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "File written: " + outputFile.getAbsolutePath());
+			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		}
 	}
 

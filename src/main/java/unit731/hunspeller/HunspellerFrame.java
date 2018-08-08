@@ -1025,7 +1025,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				frame.totalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
 			catch(IllegalArgumentException e){
-				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
+				log.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else{
@@ -1148,7 +1148,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, "Insertion error: " + message);
+			log.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
@@ -1199,7 +1199,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(Exception e){
 			String message = ExceptionService.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, "Deletion error: " + message);
+			log.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
 		}
 	}
 
@@ -1264,7 +1264,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			log.info(Backbone.MARKER_APPLICATION, "Duplicated rule found (" + foundRule + "), cannot insert " + newRule);
+			log.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
@@ -1302,7 +1302,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);
 			}
 			catch(IllegalArgumentException e){
-				log.info(Backbone.MARKER_APPLICATION, e.getMessage() + " for input " + inputText);
+				log.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else{

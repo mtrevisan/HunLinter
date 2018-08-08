@@ -95,7 +95,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionService.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, e.getClass().getSimpleName() + ": " + message);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 		if(stopped)

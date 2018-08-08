@@ -153,8 +153,8 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 					if(undoable != null)
 						undoable.onUndoChange(true);
 				}
-				catch(IOException ex){
-					log.warn("Error while storing a memento", ex);
+				catch(IOException e){
+					log.warn("Error while storing a memento", e);
 				}
 
 				dictionary.add(partOfSpeech, meanings);
@@ -243,8 +243,8 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 					if(undoable != null)
 						undoable.onUndoChange(true);
 				}
-				catch(IOException ex){
-					log.warn("Error while storing a memento", ex);
+				catch(IOException e){
+					log.warn("Error while storing a memento", e);
 				}
 
 				for(int i = 0; i < count; i ++)
