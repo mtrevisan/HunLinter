@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import net.jodah.concurrentunit.Waiter;
@@ -871,8 +873,8 @@ public class WordGeneratorTest{
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
 			waiter.assertEquals(37, words.size());
 			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc", "acbb");
-			waiter.assertEquals(expected, words);
+			Set<String> expected = new HashSet<>(Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc", "acbb"));
+			waiter.assertEquals(expected, new HashSet<>(words));
 			waiter.resume();
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
@@ -904,8 +906,8 @@ public class WordGeneratorTest{
 words.forEach(word -> System.out.println("'"+word+"'"));
 			waiter.assertEquals(9, words.size());
 			waiter.assertEquals(9l, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-			waiter.assertEquals(expected, words);
+			Set<String> expected = new HashSet<>(Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc"));
+			waiter.assertEquals(expected, new HashSet<>(words));
 			waiter.resume();
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
