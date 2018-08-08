@@ -20,6 +20,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 @Slf4j
@@ -138,6 +139,17 @@ public class WordGenerator{
 			productions.forEach(production -> log.trace("Produced word: {}", production));
 
 		return productions;
+	}
+
+	/**
+	 * Generates all the stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
+	 * 
+	 * @param compoundRule	Rule used to generate the productions for
+	 * @param fnDeferring	Function to be called whenever the list of production is ready
+	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
+	 */
+	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
+		applyCompoundRules(compoundRule, fnDeferring, HunspellRegexWordGenerator.INFINITY);
 	}
 
 	/**

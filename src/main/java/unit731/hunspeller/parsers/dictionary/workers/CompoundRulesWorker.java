@@ -42,7 +42,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
-		if(limit <= 0)
+		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		this.wordGenerator = wordGenerator;
