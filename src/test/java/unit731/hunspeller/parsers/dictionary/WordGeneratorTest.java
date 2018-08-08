@@ -142,6 +142,41 @@ public class WordGeneratorTest{
 	}
 
 	@Test
+	public void flagASCII() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("SFX A Y 1")
+			.add("SFX A 0 s/123 .")
+			.add("SFX 1 Y 1")
+			.add("SFX 1 0 bar .")
+			.add("SFX 2 Y 1")
+			.add("SFX 2 0 baz .")
+			.add("PFX 3 Y 1")
+			.add("PFX 3 0 un .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "foo/A3";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(8, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "A3", "st:foo", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foos", "123", "st:foo", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("foosbar", "3", "st:foo", strategy), stems.get(2));
+		Assert.assertEquals(new Production("foosbaz", "3", "st:foo", strategy), stems.get(3));
+		//lastfold productions
+		Assert.assertEquals(new Production("unfoo", null, "st:foo", strategy), stems.get(4));
+		Assert.assertEquals(new Production("unfoos", null, "st:foo", strategy), stems.get(5));
+		Assert.assertEquals(new Production("unfoosbar", null, "st:foo", strategy), stems.get(6));
+		Assert.assertEquals(new Production("unfoosbaz", null, "st:foo", strategy), stems.get(7));
+	}
+
+	@Test
 	public void flagDoubleASCII() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
