@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 //https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > circumfix.aff upward
@@ -815,7 +817,7 @@ public class WordGeneratorTest{
 	}
 
 	@Test
-	public void compoundRule0() throws IOException, TimeoutException{
+	public void compoundRuleSimple() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -842,6 +844,71 @@ public class WordGeneratorTest{
 			waiter.resume();
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
+
+		waiter.await(2_000l);
+	}
+
+	@Test
+	public void compoundRuleInfinite() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE A*B*C*");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"3",
+			"a/A",
+			"b/B",
+			"c/BC");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		Waiter waiter = new Waiter();
+		String line = "A*B*C*";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
+			waiter.assertEquals(37, words.size());
+			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
+			List<String> expected = Arrays.asList("", "a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb", "abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc", "abbb", "abbc", "abcb", "abcc");
+			waiter.assertEquals(expected, words);
+			waiter.resume();
+		};
+		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
+
+		waiter.await(2_000l);
+	}
+
+	@Test
+	public void compoundRuleZeroOrOne() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE A?B?C?");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"3",
+			"a/A",
+			"b/B",
+			"c/BC");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		Waiter waiter = new Waiter();
+		String line = "A?B?C?";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
+words.forEach(word -> System.out.println("'"+word+"'"));
+			waiter.assertEquals(10, words.size());
+			waiter.assertEquals(10l, wordTrueCount);
+			List<String> expected = Arrays.asList("", "a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+			waiter.assertEquals(expected, words);
+			waiter.resume();
+		};
+		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
 
 		waiter.await(2_000l);
 	}

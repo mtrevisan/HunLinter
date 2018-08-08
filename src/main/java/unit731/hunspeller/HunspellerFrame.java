@@ -1287,16 +1287,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			try{
 				dicSortDictionaryMenuItem.setEnabled(false);
 
-				BiConsumer<List<String>, Long> filler = (words, wordCount) -> {
+				BiConsumer<List<String>, Long> filler = (words, wordTrueCount) -> {
 					dicSortDictionaryMenuItem.setEnabled(true);
 
-					if(wordCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordCount)
+					if(wordTrueCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordTrueCount)
 						words.add("\u2026");
 
 					CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 					dm.setProductions(words);
 
-					totalCompoundsOutputLabel.setText(wordCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(wordCount));
+					totalCompoundsOutputLabel.setText(wordTrueCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(wordTrueCount));
 				};
 				long limit = Long.parseLong(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
 				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);

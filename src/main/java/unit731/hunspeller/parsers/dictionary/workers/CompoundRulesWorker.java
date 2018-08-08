@@ -105,12 +105,12 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		}
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString());
-		long wordCount = regexWordGenerator.wordCount();
+		long wordTrueCount = regexWordGenerator.wordCount();
 		//generate all the words that matches the given regex
-		long wordPrintedCount = (wordCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordCount, limit));
+		long wordPrintedCount = (wordTrueCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordTrueCount, limit));
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
 
-		fnDeferring.accept(words, wordCount);
+		fnDeferring.accept(words, wordTrueCount);
 	}
 
 	public void extractCompounds(String compoundRule, BiConsumer<List<String>, Long> fnDeferring){
