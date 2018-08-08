@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
@@ -54,6 +55,15 @@ public class FileService{
 
 		throw new IllegalArgumentException("The file is not in an ammissible charset ("
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
+	}
+
+	public static File getTemporaryUTF8File(String... lines){
+		StringJoiner sj = new StringJoiner("\n");
+		for(String line : lines)
+			sj.add(line);
+		String content = sj.toString();
+
+		return getTemporaryUTF8File(content);
 	}
 
 	public static File getTemporaryUTF8File(String content){

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,26 +32,24 @@ public class WordGeneratorTest{
 
 	@Test
 	public void affFormat() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("# Testing also whitespace and comments.")
-			.add("OCONV 7 # space, space")
-			.add("OCONV	a A # tab, space, space")
-			.add("OCONV	á	Á # tab, tab, space")
-			.add("OCONV	b	B	# tab, tab, tab")
-			.add("OCONV  c  C		# 2xspace, 2xspace, 2xtab")
-			.add("OCONV	 d 	D # tab+space, space+tab, space")
-			.add("OCONV e E #")
-			.add("OCONV é É 	")
-			.add("")
-			.add(" # space")
-			.add("  # 2xspace")
-			.add("	# tab")
-			.add("		# 2xtab")
-			.add(" 	# space+tab")
-			.add("	 # tab+space")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"# Testing also whitespace and comments.",
+			"OCONV 7 # space, space",
+			"OCONV	a A # tab, space, space",
+			"OCONV	á	Á # tab, tab, space",
+			"OCONV	b	B	# tab, tab, tab",
+			"OCONV  c  C		# 2xspace, 2xspace, 2xtab",
+			"OCONV	 d 	D # tab+space, space+tab, space",
+			"OCONV e E #",
+			"OCONV é É 	",
+			"",
+			" # space",
+			"  # 2xspace",
+			"	# tab",
+			"		# 2xtab",
+			" 	# space+tab",
+			"	 # tab+space");
 		affParser.parse(affFile);
 
 		Map<String, String> outputConversionTable = affParser.getData(AffixTag.OUTPUT_CONVERSION_TABLE);
@@ -71,19 +68,17 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagUTF8() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG UTF-8")
-			.add("SFX A Y 1")
-			.add("SFX A 0 s/ÖüÜ .")
-			.add("SFX Ö Y 1")
-			.add("SFX Ö 0 bar .")
-			.add("SFX ü Y 1")
-			.add("SFX ü 0 baz .")
-			.add("PFX Ü Y 1")
-			.add("PFX Ü 0 un .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG UTF-8",
+			"SFX A Y 1",
+			"SFX A 0 s/ÖüÜ .",
+			"SFX Ö Y 1",
+			"SFX Ö 0 bar .",
+			"SFX ü Y 1",
+			"SFX ü 0 baz .",
+			"PFX Ü Y 1",
+			"PFX Ü 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -107,19 +102,17 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagNumerical() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG num")
-			.add("SFX 999 Y 1")
-			.add("SFX 999 0 s/214,216,54321 .")
-			.add("SFX 214 Y 1")
-			.add("SFX 214 0 bar .")
-			.add("SFX 216 Y 1")
-			.add("SFX 216 0 baz .")
-			.add("PFX 54321 Y 1")
-			.add("PFX 54321 0 un .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG num",
+			"SFX 999 Y 1",
+			"SFX 999 0 s/214,216,54321 .",
+			"SFX 214 Y 1",
+			"SFX 214 0 bar .",
+			"SFX 216 Y 1",
+			"SFX 216 0 baz .",
+			"PFX 54321 Y 1",
+			"PFX 54321 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -143,18 +136,16 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagASCII() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 1")
-			.add("SFX A 0 s/123 .")
-			.add("SFX 1 Y 1")
-			.add("SFX 1 0 bar .")
-			.add("SFX 2 Y 1")
-			.add("SFX 2 0 baz .")
-			.add("PFX 3 Y 1")
-			.add("PFX 3 0 un .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"SFX A Y 1",
+			"SFX A 0 s/123 .",
+			"SFX 1 Y 1",
+			"SFX 1 0 bar .",
+			"SFX 2 Y 1",
+			"SFX 2 0 baz .",
+			"PFX 3 Y 1",
+			"PFX 3 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -178,19 +169,17 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagDoubleASCII() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX zx Y 1")
-			.add("SFX zx 0 s/g?1G09 .")
-			.add("SFX g? Y 1")
-			.add("SFX g? 0 bar .")
-			.add("SFX 1G Y 1")
-			.add("SFX 1G 0 baz .")
-			.add("PFX 09 Y 1")
-			.add("PFX 09 0 un .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX zx Y 1",
+			"SFX zx 0 s/g?1G09 .",
+			"SFX g? Y 1",
+			"SFX g? 0 bar .",
+			"SFX 1G Y 1",
+			"SFX 1G 0 baz .",
+			"PFX 09 Y 1",
+			"PFX 09 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -215,17 +204,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void conditions() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 6")
-			.add("SFX A 0 a .")
-			.add("SFX A 0 b b")
-			.add("SFX A 0 c [ab]")
-			.add("SFX A 0 d [^ab]")
-			.add("SFX A 0 e [^c]")
-			.add("SFX A 0 f a[^ab]b")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"SFX A Y 6",
+			"SFX A 0 a .",
+			"SFX A 0 b b",
+			"SFX A 0 c [ab]",
+			"SFX A 0 d [^ab]",
+			"SFX A 0 e [^c]",
+			"SFX A 0 f a[^ab]b");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -244,17 +231,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems1() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2P1")
-			.add("SFX S2 Y 1")
-			.add("SFX S2 0 s2")
-			.add("PFX P1 Y 1")
-			.add("PFX P1 0 p1")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX S1 Y 1",
+			"SFX S1 0 s1/S2P1",
+			"SFX S2 Y 1",
+			"SFX S2 0 s2",
+			"PFX P1 Y 1",
+			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -275,17 +260,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems2() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2")
-			.add("SFX S2 Y 1")
-			.add("SFX S2 0 s2/P1")
-			.add("PFX P1 Y 1")
-			.add("PFX P1 0 p1")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX S1 Y 1",
+			"SFX S1 0 s1/S2",
+			"SFX S2 Y 1",
+			"SFX S2 0 s2/P1",
+			"PFX P1 Y 1",
+			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -305,17 +288,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems3() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2")
-			.add("SFX S2 Y 1")
-			.add("SFX S2 0 s2")
-			.add("PFX P1 Y 1")
-			.add("PFX P1 0 p1")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX S1 Y 1",
+			"SFX S1 0 s1/S2",
+			"SFX S2 Y 1",
+			"SFX S2 0 s2",
+			"PFX P1 Y 1",
+			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -337,17 +318,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems4() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2")
-			.add("SFX S2 Y 1")
-			.add("SFX S2 0 s2")
-			.add("PFX P1 Y 1")
-			.add("PFX P1 0 p1")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX S1 Y 1",
+			"SFX S1 0 s1/S2",
+			"SFX S2 Y 1",
+			"SFX S2 0 s2",
+			"PFX P1 Y 1",
+			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -369,20 +348,18 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems5() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 1")
-			.add("SFX A 0 a")
-			.add("SFX B Y 1")
-			.add("SFX B 0 b/A")
-			.add("SFX C Y 1")
-			.add("SFX C 0 c/E")
-			.add("SFX D Y 1")
-			.add("SFX D 0 d/AE")
-			.add("PFX E Y 1")
-			.add("PFX E 0 e")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"SFX A Y 1",
+			"SFX A 0 a",
+			"SFX B Y 1",
+			"SFX B 0 b/A",
+			"SFX C Y 1",
+			"SFX C 0 c/E",
+			"SFX D Y 1",
+			"SFX D 0 d/AE",
+			"PFX E Y 1",
+			"PFX E 0 e");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -413,12 +390,10 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidFullstrip() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 1")
-			.add("SFX A a b a")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"SFX A Y 1",
+			"SFX A a b a");
 		affParser.parse(affFile);
 
 		String line = "a/A";
@@ -427,13 +402,11 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stemsValidFullstrip() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FULLSTRIP")
-			.add("SFX A Y 1")
-			.add("SFX A a b a")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FULLSTRIP",
+			"SFX A Y 1",
+			"SFX A a b a");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -450,21 +423,19 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold1() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("FLAG long")
-			.add("SFX S1 Y 1")
-			.add("SFX S1 0 s1/S2P1")
-			.add("SFX S2 Y 1")
-			.add("SFX S2 0 s2/S3")
-			.add("SFX S3 Y 1")
-			.add("SFX S3 0 s3")
-			.add("PFX P1 Y 1")
-			.add("PFX P1 0 p1/P2")
-			.add("PFX P2 Y 1")
-			.add("PFX P2 0 p2")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"FLAG long",
+			"SFX S1 Y 1",
+			"SFX S1 0 s1/S2P1",
+			"SFX S2 Y 1",
+			"SFX S2 0 s2/S3",
+			"SFX S3 Y 1",
+			"SFX S3 0 s3",
+			"PFX P1 Y 1",
+			"PFX P1 0 p1/P2",
+			"PFX P2 Y 1",
+			"PFX P2 0 p2");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -474,26 +445,24 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("SFX A Y 1")
-			.add("SFX A 0 a")
-			.add("SFX B Y 1")
-			.add("SFX B 0 b/A")
-			.add("SFX C Y 1")
-			.add("SFX C 0 c/E")
-			.add("SFX D Y 1")
-			.add("SFX D 0 d/AE")
-			.add("PFX E Y 1")
-			.add("PFX E 0 e")
-			.add("PFX F Y 1")
-			.add("PFX F 0 f/A")
-			.add("PFX G Y 1")
-			.add("PFX G 0 g/E")
-			.add("PFX H Y 1")
-			.add("PFX H 0 h/AE")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"SFX A Y 1",
+			"SFX A 0 a",
+			"SFX B Y 1",
+			"SFX B 0 b/A",
+			"SFX C Y 1",
+			"SFX C 0 c/E",
+			"SFX D Y 1",
+			"SFX D 0 d/AE",
+			"PFX E Y 1",
+			"PFX E 0 e",
+			"PFX F Y 1",
+			"PFX F 0 f/A",
+			"PFX G Y 1",
+			"PFX G 0 g/E",
+			"PFX H Y 1",
+			"PFX H 0 h/AE");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -504,21 +473,19 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixes1() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("COMPLEXPREFIXES")
-			.add("PFX A Y 1")
-			.add("PFX A 0 a")
-			.add("PFX B Y 1")
-			.add("PFX B 0 b/A")
-			.add("PFX C Y 1")
-			.add("PFX C 0 c/E")
-			.add("PFX D Y 1")
-			.add("PFX D 0 d/AE")
-			.add("SFX E Y 1")
-			.add("SFX E 0 e")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"COMPLEXPREFIXES",
+			"PFX A Y 1",
+			"PFX A 0 a",
+			"PFX B Y 1",
+			"PFX B 0 b/A",
+			"PFX C Y 1",
+			"PFX C 0 c/E",
+			"PFX D Y 1",
+			"PFX D 0 d/AE",
+			"SFX E Y 1",
+			"SFX E 0 e");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -548,15 +515,13 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixes() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("COMPLEXPREFIXES")
-			.add("PFX A Y 1")
-			.add("PFX A 0 tek .")
-			.add("PFX B Y 1")
-			.add("PFX B 0 met/A .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"COMPLEXPREFIXES",
+			"PFX A Y 1",
+			"PFX A 0 tek .",
+			"PFX B Y 1",
+			"PFX B 0 met/A .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -575,15 +540,13 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixesUTF8() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("COMPLEXPREFIXES")
-			.add("PFX A Y 1")
-			.add("PFX A 0 ⲧⲉⲕ .")
-			.add("PFX B Y 1")
-			.add("PFX B 0 ⲙⲉⲧ/A .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"COMPLEXPREFIXES",
+			"PFX A Y 1",
+			"PFX A 0 ⲧⲉⲕ .",
+			"PFX B Y 1",
+			"PFX B 0 ⲙⲉⲧ/A .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -602,27 +565,25 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void complexPrefixesInvalidTwofold() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("COMPLEXPREFIXES")
-			.add("PFX A Y 1")
-			.add("PFX A 0 a")
-			.add("PFX B Y 1")
-			.add("PFX B 0 b/A")
-			.add("PFX C Y 1")
-			.add("PFX C 0 c/E")
-			.add("PFX D Y 1")
-			.add("PFX D 0 d/AE")
-			.add("SFX E Y 1")
-			.add("SFX E 0 e")
-			.add("SFX F Y 1")
-			.add("SFX F 0 f/A")
-			.add("SFX G Y 1")
-			.add("SFX G 0 g/E")
-			.add("SFX H Y 1")
-			.add("SFX H 0 h/AE")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"COMPLEXPREFIXES",
+			"PFX A Y 1",
+			"PFX A 0 a",
+			"PFX B Y 1",
+			"PFX B 0 b/A",
+			"PFX C Y 1",
+			"PFX C 0 c/E",
+			"PFX D Y 1",
+			"PFX D 0 d/AE",
+			"SFX E Y 1",
+			"SFX E 0 e",
+			"SFX F Y 1",
+			"SFX F 0 f/A",
+			"SFX G Y 1",
+			"SFX G 0 g/E",
+			"SFX H Y 1",
+			"SFX H 0 h/AE");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -633,15 +594,13 @@ public class WordGeneratorTest{
 
 	@Test
 	public void needAffix3() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("NEEDAFFIX X")
-			.add("SFX A Y 1")
-			.add("SFX A 0 s/XB .")
-			.add("SFX B Y 1")
-			.add("SFX B 0 baz .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"NEEDAFFIX X",
+			"SFX A Y 1",
+			"SFX A 0 s/XB .",
+			"SFX B Y 1",
+			"SFX B 0 baz .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -659,19 +618,17 @@ public class WordGeneratorTest{
 
 	@Test
 	public void needAffix5() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("NEEDAFFIX X")
-			.add("SFX A Y 2")
-			.add("SFX A 0 -suf/B .")
-			.add("SFX A 0 -pseudosuf/XB .")
-			.add("SFX B Y 1")
-			.add("SFX B 0 -bar .")
-			.add("PFX C Y 2")
-			.add("PFX C 0 pre- .")
-			.add("PFX C 0 pseudopre-/X .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"NEEDAFFIX X",
+			"SFX A Y 2",
+			"SFX A 0 -suf/B .",
+			"SFX A 0 -pseudosuf/XB .",
+			"SFX B Y 1",
+			"SFX B 0 -bar .",
+			"PFX C Y 2",
+			"PFX C 0 pre- .",
+			"PFX C 0 pseudopre-/X .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -700,19 +657,17 @@ public class WordGeneratorTest{
 	
 	@Test
 	public void circumfix() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("CIRCUMFIX X")
-			.add("PFX A Y 1")
-			.add("PFX A 0 leg/X .")
-			.add("PFX B Y 1")
-			.add("PFX B 0 legesleg/X .")
-			.add("SFX C Y 3")
-			.add("SFX C 0 obb .")
-			.add("SFX C 0 obb/AX .")
-			.add("SFX C 0 obb/BX .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"CIRCUMFIX X",
+			"PFX A Y 1",
+			"PFX A 0 leg/X .",
+			"PFX B Y 1",
+			"PFX B 0 legesleg/X .",
+			"SFX C Y 3",
+			"SFX C 0 obb .",
+			"SFX C 0 obb/AX .",
+			"SFX C 0 obb/BX .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -734,18 +689,16 @@ public class WordGeneratorTest{
 
 
 	public void morphologicalAnalisys() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("PFX P Y 1")
-			.add("PFX P   0 un . dp:pfx_un sp:un")
-			.add("SFX S Y 1")
-			.add("SFX S   0 s . is:plur")
-			.add("SFX Q Y 1")
-			.add("SFX Q   0 s . is:sg_3")
-			.add("SFX R Y 1")
-			.add("SFX R   0 able/PS . ds:der_able")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"PFX P Y 1",
+			"PFX P   0 un . dp:pfx_un sp:un",
+			"SFX S Y 1",
+			"SFX S   0 s . is:plur",
+			"SFX Q Y 1",
+			"SFX Q   0 s . is:sg_3",
+			"SFX R Y 1",
+			"SFX R   0 able/PS . ds:der_able");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -780,17 +733,15 @@ public class WordGeneratorTest{
 
 	@Test
 	public void alias1() throws IOException{
-		StringJoiner sj = new StringJoiner("\n");
-		String content = sj.add("SET UTF-8")
-			.add("AF 2")
-			.add("AF AB")
-			.add("AF A")
-			.add("SFX A Y 1")
-			.add("SFX A 0 x .")
-			.add("SFX B Y 1")
-			.add("SFX B 0 y/2 .")
-			.toString();
-		File affFile = FileService.getTemporaryUTF8File(content);
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"AF 2",
+			"AF AB",
+			"AF A",
+			"SFX A Y 1",
+			"SFX A 0 x .",
+			"SFX B Y 1",
+			"SFX B 0 y/2 .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 
@@ -805,6 +756,36 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("fooy", "A", "st:foo", strategy), stems.get(2));
 		//twofold productions
 		Assert.assertEquals(new Production("fooyx", null, "st:foo", strategy), stems.get(3));
+		//lastfold productions
+	}
+
+
+	@Test
+	public void compoundRule() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File(
+			"SET UTF-8",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw",
+			"SFX A Y 5",
+			"SFX A 0 e .",
+			"SFX A 0 er .",
+			"SFX A 0 en .",
+			"SFX A 0 em .",
+			"SFX A 0 es .");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+//		String line = "foo/1";
+//		List<Production> stems = wordGenerator.applyRules(line);
+//
+//		Assert.assertEquals(4, stems.size());
+//		//base production
+//		Assert.assertEquals(new Production("foo", "AB", "st:foo", strategy), stems.get(0));
+//		//onefold productions
+//		Assert.assertEquals(new Production("foox", null, "st:foo", strategy), stems.get(1));
+//		Assert.assertEquals(new Production("fooy", "A", "st:foo", strategy), stems.get(2));
+//		//twofold productions
+//		Assert.assertEquals(new Production("fooyx", null, "st:foo", strategy), stems.get(3));
 		//lastfold productions
 	}
 
