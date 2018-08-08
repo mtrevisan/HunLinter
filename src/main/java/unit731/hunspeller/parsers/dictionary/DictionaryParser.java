@@ -48,21 +48,20 @@ public class DictionaryParser{
 
 
 	private final File dicFile;
-	private final Charset charset;
 	private final String language;
+	private final Charset charset;
 	private final ExternalSorter sorter = new ExternalSorter();
 
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, Charset charset){
+	public DictionaryParser(File dicFile, String language, Charset charset){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
+		this.language = language;
 		this.charset = charset;
-		String filename = dicFile.getName();
-		language = filename.substring(0, filename.indexOf(".dic"));
 	}
 
 

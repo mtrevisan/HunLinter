@@ -4,26 +4,15 @@ import java.beans.PropertyChangeListener;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WorkerDictionaryReadBase{
 
-	private ReadWriteLockable lockable;
 	private WorkerDictionaryRead worker;
 
 
-	public final void createWorker(String workerName, ReadWriteLockable lockable, DictionaryParser dicParser, BiConsumer<String, Integer> body,
-			Runnable done){
-		this.lockable = lockable;
-
-		Runnable wrappedDone = () -> {
-			lockable.releaseReadLock();
-
-			if(done != null)
-				done.run();
-		};
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), body, wrappedDone);
+	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> body, Runnable done){
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), body, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
@@ -31,8 +20,6 @@ public class WorkerDictionaryReadBase{
 	}
 
 	public void execute(){
-		lockable.acquireReadLock();
-
 		worker.execute();
 	}
 

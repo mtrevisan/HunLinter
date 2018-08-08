@@ -79,7 +79,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 					extract();
 			}
 		};
-		createWorker(WORKER_NAME, affParser, dicParser, body, done);
+		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	private void extract(){

@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,6 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -44,11 +44,11 @@ public class DictionaryStatistics{
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(AffixParser affParser, CorrectnessChecker checker){
+	public DictionaryStatistics(String language, Charset charset, CorrectnessChecker checker){
 		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
 			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
-		bloomFilter.setCharset(affParser.getCharset());
-		orthography = OrthographyBuilder.getOrthography(affParser.getLanguage());
+		bloomFilter.setCharset(charset);
+		orthography = OrthographyBuilder.getOrthography(language);
 	}
 
 	public void addData(String word){

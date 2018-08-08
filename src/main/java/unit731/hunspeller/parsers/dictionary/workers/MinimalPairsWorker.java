@@ -8,6 +8,7 @@ import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,9 +41,11 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
+	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile){
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile){
+		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
@@ -52,6 +55,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		this.checker = checker;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
+
+		comparator = ComparatorBuilder.getComparator(language);
 	}
 
 	@Override
@@ -110,7 +115,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(dicParser.getCharset())
-				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(ComparatorBuilder.getComparator(dicParser.getLanguage())))
+				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(comparator))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();
@@ -198,7 +203,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
 				.charset(dicParser.getCharset())
-				.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+				.comparator(comparator)
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();

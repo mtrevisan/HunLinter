@@ -76,10 +76,4 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 		return null;
 	}
 
-	@Override
-	protected void done(){
-		if(done != null)
-			done.run();
-	}
-
 }

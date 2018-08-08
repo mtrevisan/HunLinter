@@ -22,7 +22,6 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
@@ -42,27 +41,28 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
 
 
-	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 	private final CorrectnessChecker checker;
 	private final File outputFile;
+	private final Comparator<String> comparator;
 
 
-	public DuplicatesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker,
+	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker,
 			File outputFile){
-		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(outputFile);
 
-		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
 		this.checker = checker;
 		this.outputFile = outputFile;
 		workerName = WORKER_NAME;
+
+		comparator = ComparatorBuilder.getComparator(language);
 	}
 
 	@Override
@@ -219,7 +219,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
-			Comparator<String> comparator = ComparatorBuilder.getComparator(affParser.getLanguage());
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
@@ -272,7 +271,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					return oldValue;
 				}));
 
-		Comparator<String> comparator = ComparatorBuilder.getComparator(dicParser.getLanguage());
 		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));

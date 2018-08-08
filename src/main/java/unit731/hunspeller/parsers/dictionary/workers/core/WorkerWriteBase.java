@@ -14,8 +14,7 @@ public class WorkerWriteBase<T>{
 	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body,
-			Runnable done){
+	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
 		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, body, done);
 	}
 

@@ -105,10 +105,4 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 		return null;
 	}
 
-	@Override
-	protected void done(){
-		if(done != null)
-			done.run();
-	}
-
 }

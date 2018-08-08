@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,6 +29,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	private final DictionaryParser dicParser;
 	private final int lineIndex;
 
+	private final Comparator<String> comparator;
+
 
 	public SorterWorker(Backbone backbone, int lineIndex){
 		Objects.requireNonNull(backbone);
@@ -37,6 +40,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		dicParser = backbone.getDicParser();
 		this.lineIndex = lineIndex;
 		workerName = WORKER_NAME;
+
+		comparator  = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
 	}
 
 	@Override
@@ -134,7 +139,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		File sortSection = chunks.get(1);
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(dicParser.getCharset())
-			.comparator(ComparatorBuilder.getComparator(dicParser.getLanguage()))
+			.comparator(comparator)
 			.useZip(true)
 			.removeDuplicates(true)
 			.build();

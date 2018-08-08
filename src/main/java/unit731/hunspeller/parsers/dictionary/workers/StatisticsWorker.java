@@ -29,7 +29,6 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
 			CorrectnessChecker checker, boolean performHyphenationStatistics, Frame parent){
-		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
@@ -38,7 +37,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
-		dicStatistics = new DictionaryStatistics(affParser, checker);
+		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), affParser.getCharset(), checker);
 
 
 		BiConsumer<String, Integer> body = (line, row) -> {
@@ -69,7 +68,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 				dialog.setVisible(true);
 			}
 		};
-		createWorker(WORKER_NAME, affParser, dicParser, body, done);
+		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	@Override

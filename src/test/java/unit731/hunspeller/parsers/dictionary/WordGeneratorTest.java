@@ -3,11 +3,12 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -19,7 +20,7 @@ import unit731.hunspeller.services.FileService;
 //https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > circumfix.aff upward
 public class WordGeneratorTest{
 
-	private AffixParser affParser = new AffixParser();
+	private final AffixParser affParser = new AffixParser();
 	private FlagParsingStrategy strategy;
 	private DictionaryParser dicParser;
 
@@ -778,8 +779,9 @@ public class WordGeneratorTest{
 
 
 	@Test
-	public void compoundRule() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+	public void compoundRule_BjörnJacke() throws IOException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw",
@@ -791,12 +793,51 @@ public class WordGeneratorTest{
 			"SFX A 0 es .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File("xxx", ".dic",
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
 			"3",
 			"arbeits/v",
 			"scheu/Aw",
 			"farbig/A");
-		dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		String line = "vw";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
+			Assert.assertEquals(1, words.size());
+			Assert.assertEquals(new Long(1l), wordCount);
+			Assert.assertEquals("arbeitsscheu", words.get(0));
+		};
+		wordGenerator.applyCompoundRules(line, fnDeferring);
+
+//		try{
+//			Thread.sleep(10_000l);
+//		}
+//		catch(InterruptedException ex){
+//			Logger.getLogger(WordGeneratorTest.class.getName()).log(Level.SEVERE, null, ex);
+//		}
+	}
+
+//	@Test
+	public void compoundRule0() throws IOException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw",
+			"SFX A Y 5",
+			"SFX A 0 e .",
+			"SFX A 0 er .",
+			"SFX A 0 en .",
+			"SFX A 0 em .",
+			"SFX A 0 es .");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"3",
+			"arbeits/v",
+			"scheu/Aw",
+			"farbig/A");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
 
 		String line = "vw";

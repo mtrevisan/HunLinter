@@ -159,8 +159,9 @@ public class Backbone implements FileChangeListener{
 
 	private void prepareDictionaryFile(File dicFile, PropertyChangeListener listener){
 		if(dicFile.exists()){
+			String language = affParser.getLanguage();
 			Charset charset = affParser.getCharset();
-			dicParser = new DictionaryParser(dicFile, charset);
+			dicParser = new DictionaryParser(dicFile, language, charset);
 			wordGenerator = new WordGenerator(affParser, dicParser, listener);
 
 			hunspellable.clearDictionaryParser();

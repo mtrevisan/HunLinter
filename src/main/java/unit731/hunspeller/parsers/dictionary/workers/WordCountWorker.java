@@ -10,7 +10,6 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
@@ -24,8 +23,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> bloomFilter;
 
 
-	public WordCountWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker){
-		Objects.requireNonNull(affParser);
+	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
@@ -48,7 +46,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker(WORKER_NAME, affParser, dicParser, body, done);
+		createWorker(WORKER_NAME, dicParser, body, done);
 	}
 
 	@Override
