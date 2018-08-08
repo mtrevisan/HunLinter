@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class WordGeneratorTest{
 	private AffixParser affParser;
 	private FlagParsingStrategy strategy;
 	private WordGenerator wordGenerator;
+	private DictionaryParser dicParser;
 
 
 	@Before
@@ -32,7 +34,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void affFormat() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"# Testing also whitespace and comments.",
 			"OCONV 7 # space, space",
@@ -68,7 +70,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagUTF8() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG UTF-8",
 			"SFX A Y 1",
@@ -102,7 +104,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagNumerical() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"SFX 999 Y 1",
@@ -136,7 +138,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagASCII() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 s/123 .",
@@ -169,7 +171,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void flagDoubleASCII() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX zx Y 1",
@@ -204,7 +206,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void conditions() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 6",
 			"SFX A 0 a .",
@@ -231,7 +233,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems1() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -260,7 +262,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems2() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -288,7 +290,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems3() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -318,7 +320,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems4() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -348,7 +350,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stems5() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 a",
@@ -390,7 +392,7 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidFullstrip() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A a b a");
@@ -402,7 +404,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void stemsValidFullstrip() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FULLSTRIP",
 			"SFX A Y 1",
@@ -423,7 +425,7 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold1() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"SFX S1 Y 1",
@@ -445,7 +447,7 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void stemsInvalidTwofold() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A 0 a",
@@ -473,7 +475,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixes1() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -515,7 +517,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixes() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -540,7 +542,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void complexPrefixesUTF8() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -565,7 +567,7 @@ public class WordGeneratorTest{
 
 	@Test(expected = IllegalArgumentException.class)
 	public void complexPrefixesInvalidTwofold() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
 			"PFX A Y 1",
@@ -594,7 +596,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void needAffix3() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 1",
@@ -618,7 +620,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void needAffix5() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
 			"SFX A Y 2",
@@ -657,7 +659,7 @@ public class WordGeneratorTest{
 	
 	@Test
 	public void circumfix() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
 			"PFX A Y 1",
@@ -689,7 +691,7 @@ public class WordGeneratorTest{
 
 
 	public void morphologicalAnalisys() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"PFX P Y 1",
 			"PFX P   0 un . dp:pfx_un sp:un",
@@ -733,7 +735,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void alias1() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"AF 2",
 			"AF AB",
@@ -762,7 +764,7 @@ public class WordGeneratorTest{
 
 	@Test
 	public void compoundRule() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File(
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw",
@@ -774,6 +776,9 @@ public class WordGeneratorTest{
 			"SFX A 0 es .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File("xxx", ".dic",
+			"SFX A 0 es .");
+		dicParser = new DictionaryParser(dicFile, StandardCharsets.UTF_8);
 
 //		String line = "foo/1";
 //		List<Production> stems = wordGenerator.applyRules(line);

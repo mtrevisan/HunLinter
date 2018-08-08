@@ -57,22 +57,14 @@ public class FileService{
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
 	}
 
-	public static File getTemporaryUTF8File(String... lines){
+	public static File getTemporaryUTF8File(String prefix, String extension, String... lines){
 		StringJoiner sj = new StringJoiner("\n");
 		for(String line : lines)
 			sj.add(line);
 		String content = sj.toString();
 
-		return getTemporaryUTF8File(content);
-	}
-
-	public static File getTemporaryUTF8File(String content){
-		return getTemporaryUTF8File(content, ".tmp");
-	}
-
-	public static File getTemporaryUTF8File(String content, String extension){
 		try{
-			File tmpFile = File.createTempFile("test", extension);
+			File tmpFile = File.createTempFile((prefix != null? prefix: "test"), extension);
 			Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
 			tmpFile.deleteOnExit();
 			return tmpFile;
