@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
+import net.jodah.concurrentunit.Waiter;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -777,7 +779,7 @@ public class WordGeneratorTest{
 
 
 	@Test
-	public void compoundRule_BjörnJacke() throws IOException{
+	public void compoundRule_BjörnJacke() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -799,17 +801,21 @@ public class WordGeneratorTest{
 		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
 
+		Waiter waiter = new Waiter();
 		String line = "vw";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
-			Assert.assertEquals(1, words.size());
-			Assert.assertEquals(new Long(1l), wordCount);
-			Assert.assertEquals("arbeitsscheu", words.get(0));
+			waiter.assertEquals(1, words.size());
+			waiter.assertEquals(1l, wordCount);
+			waiter.assertEquals("arbeitsscheu", words.get(0));
+			waiter.resume();
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
+
+		waiter.await(2_000l);
 	}
 
 //	@Test
-	public void compoundRule0() throws IOException{
+	public void compoundRule0() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -831,13 +837,16 @@ public class WordGeneratorTest{
 		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
 
+		Waiter waiter = new Waiter();
 		String line = "vw";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
-			Assert.assertEquals(1, words.size());
-			Assert.assertEquals(new Long(1l), wordCount);
-			Assert.assertEquals("arbeitsscheu", words.get(0));
+			waiter.assertEquals(1, words.size());
+			waiter.assertEquals(1l, wordCount);
+			waiter.assertEquals("arbeitsscheu", words.get(0));
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring);
+
+		waiter.await(2_000l);
 	}
 
 }

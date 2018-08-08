@@ -106,4 +106,10 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		return null;
 	}
 
+	@Override
+	protected void done(){
+		if(done != null)
+			done.run();
+	}
+
 }

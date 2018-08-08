@@ -192,6 +192,8 @@
 
 		<!-- JUnit -->
 		<junit.version>4.12</junit.version>
+		<!-- ConcurrentUnit -->
+		<concurrent.unit.version>0.4.3</concurrent.unit.version>
 	</properties>
 
 	<dependencies>
@@ -271,6 +273,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- ConcurrentUnit -->
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>concurrentunit</artifactId>
+			<version>${concurrent.unit.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
