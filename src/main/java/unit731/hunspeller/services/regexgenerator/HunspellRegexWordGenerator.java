@@ -260,6 +260,7 @@ public class HunspellRegexWordGenerator{
 			GeneratedElement elem = deque.pop();
 			String subword = elem.word;
 			State state = elem.state;
+//FIXME not so sorted?
 			List<Transition> transitions = state.getSortedTransitions(true);
 			if((!ignoreEmptyWord || !subword.isEmpty()) && (transitions.isEmpty() || state.isAccept())){
 				matchedWords.add(subword);
