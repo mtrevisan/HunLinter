@@ -76,29 +76,11 @@ public class DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
-	protected DictionaryEntry(DictionaryEntry productable, String continuationFlags, FlagParsingStrategy strategy){
-		Objects.requireNonNull(productable);
-		Objects.requireNonNull(continuationFlags);
-		Objects.requireNonNull(strategy);
-
-		word = productable.getWord();
-		this.continuationFlags = strategy.parseFlags(continuationFlags);
-		morphologicalFields = productable.morphologicalFields;
-		combineable = productable.isCombineable();
-	}
-
-	public void forEachMorphologicalField(Consumer<String> fun){
-		if(morphologicalFields != null)
-			for(String morphologicalField : morphologicalFields)
-				fun.accept(morphologicalField);
-	}
-
-	/** NOTE: used for testing purposes */
 	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
-		combineable = false;
+		combineable = true;
 	}
 
 	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
@@ -133,6 +115,12 @@ public class DictionaryEntry{
 				if(field.startsWith(typePrefix))
 					return field;
 		return null;
+	}
+
+	public void forEachMorphologicalField(Consumer<String> fun){
+		if(morphologicalFields != null)
+			for(String morphologicalField : morphologicalFields)
+				fun.accept(morphologicalField);
 	}
 
 	public boolean isPartOfSpeech(String partOfSpeech){

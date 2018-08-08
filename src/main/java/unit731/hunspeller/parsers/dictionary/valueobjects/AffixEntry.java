@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -59,10 +58,11 @@ public class AffixEntry{
 	@Getter
 	private final AffixCondition condition;
 	/** string to strip */
-//	private final String removing;
-	private final int removeLength;
+	private final String removing;
+	private final int removingLength;
 	/** string to append */
 	private final String appending;
+	private final int appendingLength;
 	private final String[] morphologicalFields;
 
 	private final String entry;
@@ -85,11 +85,12 @@ public class AffixEntry{
 		String[] classes = strategy.parseFlags((additionParts.length > 1? additionParts[1]: null));
 		continuationFlags = (classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
-		removeLength = (!ZERO.equals(removal)? removal.length(): 0);
-//		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
+		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
+		removingLength = removing.length();
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
+		appendingLength = appending.length();
 
-		if(removeLength > 0){
+		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
 					throw new IllegalArgumentException("This line has the condition part that not ends with the removal part: " + line);
@@ -175,16 +176,15 @@ public class AffixEntry{
 	}
 
 	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
-		if(!isFullstrip && word.length() == removeLength)
+		if(!isFullstrip && word.length() == removingLength)
 			throw new IllegalArgumentException("Cannot strip full words without the flag FULLSTRIP");
 
-		return (isSuffix()? word.substring(0, word.length() - removeLength) + appending: appending + word.substring(removeLength));
+		return (isSuffix()? word.substring(0, word.length() - removingLength) + appending: appending + word.substring(removingLength));
 	}
 
-//	public String undoRule(String word) throws IllegalArgumentException{
-//		int stripLength = appending.length();
-//		return (isSuffix()? word.substring(0, word.length() - stripLength) + removing: removing + word.substring(stripLength));
-//	}
+	public String undoRule(String word) throws IllegalArgumentException{
+		return (isSuffix()? word.substring(0, word.length() - appendingLength) + removing: removing + word.substring(appendingLength));
+	}
 
 	@Override
 	public String toString(){
