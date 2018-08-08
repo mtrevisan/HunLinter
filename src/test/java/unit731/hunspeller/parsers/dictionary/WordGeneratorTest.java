@@ -16,7 +16,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
 
 
-//https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > morph.aff upward
+//https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > circumfix.aff upward
 public class WordGeneratorTest{
 
 	private AffixParser affParser;
@@ -501,8 +501,9 @@ public class WordGeneratorTest{
 		wordGenerator.applyRules(line);
 	}
 
+
 	@Test
-	public void stemsComplexPrefixes() throws IOException{
+	public void complexPrefixes1() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
 			.add("COMPLEXPREFIXES")
@@ -545,8 +546,62 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("adae", null, "st:a", strategy), stems.get(13));
 	}
 
+	@Test
+	public void complexPrefixes() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("COMPLEXPREFIXES")
+			.add("PFX A Y 1")
+			.add("PFX A 0 tek .")
+			.add("PFX B Y 1")
+			.add("PFX B 0 met/A .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "ouro/B";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(3, stems.size());
+		//base production
+		Assert.assertEquals(new Production("ouro", "B", "st:ouro", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("metouro", "A", "st:ouro", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("tekmetouro", null, "st:ouro", strategy), stems.get(2));
+		//lastfold productions
+	}
+
+	@Test
+	public void complexPrefixesUTF8() throws IOException{
+		StringJoiner sj = new StringJoiner("\n");
+		String content = sj.add("SET UTF-8")
+			.add("COMPLEXPREFIXES")
+			.add("PFX A Y 1")
+			.add("PFX A 0 ⲧⲉⲕ .")
+			.add("PFX B Y 1")
+			.add("PFX B 0 ⲙⲉⲧ/A .")
+			.toString();
+		File affFile = FileService.getTemporaryUTF8File(content);
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+
+		String line = "ⲟⲩⲣⲟ/B";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(3, stems.size());
+		//base production
+		Assert.assertEquals(new Production("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ", strategy), stems.get(2));
+		//lastfold productions
+	}
+
 	@Test(expected = IllegalArgumentException.class)
-	public void stemsInvalidTwofoldComplexPrefixes() throws IOException{
+	public void complexPrefixesInvalidTwofold() throws IOException{
 		StringJoiner sj = new StringJoiner("\n");
 		String content = sj.add("SET UTF-8")
 			.add("COMPLEXPREFIXES")
