@@ -11,8 +11,8 @@ public class WorkerDictionaryReadBase{
 	private WorkerDictionaryRead worker;
 
 
-	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> body, Runnable done){
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), body, done);
+	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineaReader, Runnable done){
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineaReader, done);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

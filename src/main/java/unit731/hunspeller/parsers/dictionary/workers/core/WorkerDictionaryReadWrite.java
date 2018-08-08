@@ -26,18 +26,18 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 	private final File outputFile;
 
 
-	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> body, Runnable done){
+	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineaReader, Runnable done){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(body);
+		Objects.requireNonNull(lineaReader);
 
 		this.workerName = workerName;
 		this.dicFile = dicFile;
 		this.outputFile = outputFile;
 		this.charset = charset;
-		this.body = body;
+		this.lineaReader = lineaReader;
 		this.done = done;
 	}
 
@@ -71,7 +71,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						body.accept(writer, line);
+						lineaReader.accept(writer, line);
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);

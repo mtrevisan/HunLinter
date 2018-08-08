@@ -22,18 +22,18 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 	private final File outputFile;
 
 
-	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> body, Runnable done){
+	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineaReader, Runnable done){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(entries);
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(body);
+		Objects.requireNonNull(lineaReader);
 
 		this.workerName = workerName;
 		this.entries = entries;
 		this.outputFile = outputFile;
 		this.charset = charset;
-		this.body = body;
+		this.lineaReader = lineaReader;
 		this.done = done;
 	}
 
@@ -48,7 +48,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 		long totalSize = entries.size();
 		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(T entry : entries){
-				body.accept(writer, entry);
+				lineaReader.accept(writer, entry);
 
 				writtenSoFar ++;
 				setProgress((int)((writtenSoFar * 100.) / totalSize));

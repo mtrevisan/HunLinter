@@ -50,7 +50,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 		Map<String, Set<String>> compounds = new HashMap<>();
-		BiConsumer<String, Integer> body = (line, row) -> {
+		BiConsumer<String, Integer> lineaReader = (line, row) -> {
 			//collect words belonging to a compound rule
 			List<Production> productions = wordGenerator.applyRules(line);
 			for(Production production : productions)
@@ -79,7 +79,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 					extract();
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, body, done);
+		createWorker(WORKER_NAME, dicParser, lineaReader, done);
 	}
 
 	private void extract(){

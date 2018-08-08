@@ -32,7 +32,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		bloomFilter.setCharset(dicParser.getCharset());
 
 
-		BiConsumer<String, Integer> body = (line, row) -> {
+		BiConsumer<String, Integer> lineaReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
 			productions.forEach(production -> bloomFilter.add(production.getWord()));
 		};
@@ -46,7 +46,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 					falsePositiveCount);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, body, done);
+		createWorker(WORKER_NAME, dicParser, lineaReader, done);
 	}
 
 	@Override

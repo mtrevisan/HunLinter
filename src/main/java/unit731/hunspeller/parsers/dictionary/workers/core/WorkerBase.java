@@ -15,7 +15,7 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 
 	protected Charset charset;
 
-	protected BiConsumer<S, T> body;
+	protected BiConsumer<S, T> lineaReader;
 	protected Runnable done;
 //	protected ReadWriteLockable lockable;
 
