@@ -903,7 +903,7 @@ public class WordGeneratorTest{
 		Waiter waiter = new Waiter();
 		String line = "A?B?C?";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-words.forEach(word -> System.out.println("'"+word+"'"));
+//words.forEach(word -> System.out.println("'"+word+"'"));
 			waiter.assertEquals(9, words.size());
 			waiter.assertEquals(9l, wordTrueCount);
 			Set<String> expected = new HashSet<>(Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc"));
