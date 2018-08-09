@@ -70,7 +70,7 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 //		fnDeferring.accept(words, wordTrueCount);
 	}
 
-	public void extractCompounds(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring){
+	public void execute(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring){
 		clear();
 
 		this.compoundFlag = compoundFlag;
@@ -81,7 +81,7 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 
 	@Override
 	public void execute(){
-		throw new UnsupportedOperationException("Invalid call to execute, call extractCompounds(String, BiConsumer<List<String>, Long>) instead");
+		throw new UnsupportedOperationException("Invalid call to execute, call execute(String, BiConsumer<List<String>, Long>) instead");
 	}
 
 	public void clear(){

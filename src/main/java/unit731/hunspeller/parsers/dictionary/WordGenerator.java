@@ -168,7 +168,7 @@ public class WordGenerator{
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
 
-		compoundRulesWorker.extractCompounds(compoundRule, fnDeferring);
+		compoundRulesWorker.execute(compoundRule, fnDeferring);
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class WordGenerator{
 		if(listener != null)
 			compoundFlagWorker.addPropertyChangeListener(listener);
 
-		compoundFlagWorker.extractCompounds(compoundFlag, fnDeferring);
+		compoundFlagWorker.execute(compoundFlag, fnDeferring);
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){
