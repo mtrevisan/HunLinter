@@ -266,9 +266,9 @@ public class HyphenationParser extends ReadWriteLockable{
 //103 352 B compact trie
 //106 800 B basic trie
 		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
-			throw new IllegalArgumentException(e.getClass().getSimpleName() + ": " + message);
+		catch(Throwable t){
+			String message = ExceptionService.getMessage(t);
+			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
 		}
 		finally{
 			for(Level level : Level.values())

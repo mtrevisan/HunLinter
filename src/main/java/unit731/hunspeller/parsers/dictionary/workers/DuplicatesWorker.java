@@ -92,14 +92,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				}
 			}
 		}
-		catch(Exception e){
+		catch(Throwable t){
 			stopped = true;
 
-			if(e instanceof ClosedChannelException)
+			if(t instanceof ClosedChannelException)
 				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				String message = ExceptionService.getMessage(t);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		if(stopped)

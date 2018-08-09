@@ -67,14 +67,14 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 				log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
-		catch(Exception e){
+		catch(Throwable t){
 			log.info(Backbone.MARKER_APPLICATION, "Stopped writing output file");
 
-			if(e instanceof ClosedChannelException)
+			if(t instanceof ClosedChannelException)
 				log.warn("Thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				String message = ExceptionService.getMessage(t);
+				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		finally{

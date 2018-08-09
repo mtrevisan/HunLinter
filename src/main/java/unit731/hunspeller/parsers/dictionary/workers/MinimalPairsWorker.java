@@ -228,14 +228,14 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				log.warn("Exception while opening the resulting file", e);
 			}
 		}
-		catch(Exception e){
+		catch(Throwable t){
 			stopped = true;
 
-			if(e instanceof ClosedChannelException)
+			if(t instanceof ClosedChannelException)
 				log.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(e);
-				log.info(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				String message = ExceptionService.getMessage(t);
+				log.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		finally{

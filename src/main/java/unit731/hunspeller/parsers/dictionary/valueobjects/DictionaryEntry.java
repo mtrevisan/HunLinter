@@ -57,7 +57,7 @@ public class DictionaryEntry{
 	}
 
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.valueOf(part) - 1): part);
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
 	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){
@@ -173,7 +173,7 @@ public class DictionaryEntry{
 					terminalAffixes.add(affix);
 			}
 
-		return new Affixes(terminalAffixes.toArray(new String[terminalAffixes.size()]), prefixes.toArray(new String[prefixes.size()]), suffixes.toArray(new String[suffixes.size()]));
+		return new Affixes(terminalAffixes, prefixes, suffixes);
 	}
 
 	@Override

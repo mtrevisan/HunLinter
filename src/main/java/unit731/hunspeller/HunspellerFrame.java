@@ -1146,8 +1146,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
-		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
+		catch(Throwable t){
+			String message = ExceptionService.getMessage(t);
 			log.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed

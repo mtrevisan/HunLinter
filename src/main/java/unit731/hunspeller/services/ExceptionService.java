@@ -11,11 +11,11 @@ public class ExceptionService{
 	private static final String DOT = ".";
 
 
-	public static String getMessage(Exception e){
-		String message = e.getMessage();
+	public static String getMessage(Throwable t){
+		String message = t.getMessage();
 		if(message == null){
-			StackTraceElement[] stackTrace = e.getStackTrace();
-			StackTraceElement stackTrace0 = e.getStackTrace()[0];
+			StackTraceElement[] stackTrace = t.getStackTrace();
+			StackTraceElement stackTrace0 = t.getStackTrace()[0];
 			String classPackage = ExceptionService.class.getName();
 			classPackage = classPackage.substring(0, classPackage.indexOf('.') + 1);
 			for(StackTraceElement trace : stackTrace)

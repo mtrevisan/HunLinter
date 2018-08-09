@@ -7,7 +7,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -197,7 +196,8 @@ public class WordGenerator{
 		List<Production> lastfoldProductions = new ArrayList<>();
 		for(Production production : productions)
 			if(production.isCombineable()){
-				List<String[]> applyAffixes = extractAffixes(production, affParser.isComplexPrefixes());
+				Affixes affixes = production.separateAffixes(affParser);
+				List<String[]> applyAffixes = affixes.extractAffixes(affParser.isComplexPrefixes());
 				applyAffixes.set(1, null);
 				List<Production> prods = applyAffixRules(production, applyAffixes);
 
@@ -213,13 +213,7 @@ public class WordGenerator{
 
 	private List<String[]> extractAffixes(DictionaryEntry productable, boolean reverse){
 		Affixes affixes = productable.separateAffixes(affParser);
-		List<String[]> applyAffixes = new ArrayList<>(3);
-		applyAffixes.add(affixes.getPrefixes());
-		applyAffixes.add(affixes.getSuffixes());
-		if(reverse)
-			Collections.reverse(applyAffixes);
-		applyAffixes.add(affixes.getTerminalAffixes());
-		return applyAffixes;
+		return affixes.extractAffixes(reverse);
 	}
 
 	private void checkTwofoldCorrectness(List<Production> twofoldProductions) throws IllegalArgumentException{
