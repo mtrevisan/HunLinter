@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Component;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
@@ -1007,6 +1008,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
 
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Called via reflection through the Debouncer")
 	private void calculateProductions(HunspellerFrame frame){
 		String inputText = frame.dicInputTextField.getText();
 
@@ -1034,6 +1036,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Called via reflection through the Debouncer")
 	private void calculateCompoundProductions(HunspellerFrame frame){
 		String inputText = (String)frame.cmpInputComboBox.getEditor().getItem();
 
@@ -1159,6 +1162,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Called via reflection through the Debouncer")
 	private void filterThesaurus(HunspellerFrame frame){
 		String text = StringUtils.strip(frame.theMeaningsTextField.getText());
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
@@ -1571,6 +1575,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		frame.hypAddRuleSyllabesCountOutputLabel.setText(null);
 	}
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Called via reflection through the Debouncer")
 	private void hyphenateAddRule(HunspellerFrame frame){
 		String language = frame.backbone.getAffParser().getLanguage();
 		Orthography orthography = OrthographyBuilder.getOrthography(language);

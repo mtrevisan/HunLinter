@@ -1,5 +1,6 @@
 package unit731.hunspeller.services.externalsorter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -120,6 +121,7 @@ public class ExternalSorter{
 	 *
 	 * @return estimated available memory
 	 */
+	@SuppressFBWarnings(value = "DM_GC", justification = "Deliberate")
 	private long estimateAvailableMemory(){
 		System.gc();
 

@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -357,6 +358,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		});
 	}
 
+	@SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST", justification = "It really is a XChartPanel")
 	private void fillStatisticDatas(){
 		long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){

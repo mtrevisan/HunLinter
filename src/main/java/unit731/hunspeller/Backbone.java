@@ -1,5 +1,6 @@
 package unit731.hunspeller;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Desktop;
 import java.beans.PropertyChangeListener;
 import unit731.hunspeller.interfaces.Hunspellable;
@@ -272,6 +273,7 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
 		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));

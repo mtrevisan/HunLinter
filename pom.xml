@@ -119,6 +119,12 @@
 							</includes>
 						</filter>
 						<filter>
+							<artifact>com.google.code.findbugs:annotations</artifact>
+							<excludes>
+								<exclude>**</exclude>
+							</excludes>
+						</filter>
+						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
 								<exclude>AUTHORS</exclude>
@@ -194,6 +200,8 @@
 		<junit.version>4.12</junit.version>
 		<!-- ConcurrentUnit -->
 		<concurrent.unit.version>0.4.3</concurrent.unit.version>
+		<!-- FindBugs -->
+		<com.google.code.findbugs.version>2.0.3</com.google.code.findbugs.version>
 	</properties>
 
 	<dependencies>
@@ -281,6 +289,12 @@
 			<artifactId>concurrentunit</artifactId>
 			<version>${concurrent.unit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<!-- FindBugs -->
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>${com.google.code.findbugs.version}</version>
 		</dependency>
 	</dependencies>
 </project>
