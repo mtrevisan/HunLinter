@@ -84,9 +84,6 @@ public class HunspellRegexWordGenerator{
 	 * character one by one. <br> this is done by setting the part to be interpreted as normal characters (thus, quote
 	 * all meta-characters) between \Q and \E , ex : <br> <code> minion_\d{3}\Q@gru.evil\E </code> <br> will be
 	 * transformed to : <br> <code> minion_\d{3}\@gru\.evil </code>
-	 *
-	 * @param regex
-	 * @return
 	 */
 	private String requote(String regex){
 		//http://stackoverflow.com/questions/399078/what-special-characters-must-be-escaped-in-regular-expressions
@@ -128,18 +125,17 @@ public class HunspellRegexWordGenerator{
 	}
 
 	private void buildRootNode(){
-		if(rootNode != null)
-			return;
-
-		rootNode = new HunspellAutomataNode();
-		rootNode.setCharCount(1);
-		List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(automaton.getInitialState());
-		rootNode.setNextNodes(nextNodes);
-		rootNode.updateMatchedWordCount();
+		if(rootNode == null){
+			rootNode = new HunspellAutomataNode();
+			rootNode.setCharCount(1);
+			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(automaton.getInitialState());
+			rootNode.setNextNodes(nextNodes);
+			rootNode.updateMatchedWordCount();
+		}
 	}
 
 	/**
-	 * Build list of nodes that represent all the possible transactions from the <code>state</code>.
+	 * Build list of nodes that represent all the possible transactions from the given <code>state</code>.
 	 */
 	private List<HunspellAutomataNode> prepareTransactionNodes(State state){
 		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
