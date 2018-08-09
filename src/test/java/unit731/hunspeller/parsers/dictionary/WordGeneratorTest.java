@@ -911,7 +911,7 @@ public class WordGeneratorTest{
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
 
-		waiter.await(200_000l);
+		waiter.await(2_000l);
 	}
 
 	@Test
@@ -944,7 +944,7 @@ public class WordGeneratorTest{
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
 
-		waiter.await(200_000l);
+		waiter.await(2_000l);
 	}
 
 	@Test
@@ -969,7 +969,6 @@ public class WordGeneratorTest{
 		Waiter waiter = new Waiter();
 		String line = "(1)?(2)?(3)?";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-//words.forEach(word -> System.out.println(" \""+word+"\","));
 			waiter.assertEquals(9, words.size());
 			waiter.assertEquals(9l, wordTrueCount);
 			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
@@ -978,7 +977,41 @@ public class WordGeneratorTest{
 		};
 		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
 
-		waiter.await(200_000l);
+		waiter.await(2_000l);
+	}
+
+
+	@Test
+	public void compoundFlag() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 3",
+			"COMPOUNDFLAG A");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"4",
+			"foo/A",
+			"bar/A",
+			"xy/A",
+			"yz/A");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		Waiter waiter = new Waiter();
+		String line = "A";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
+words.forEach(word -> System.out.println(" \""+word+"\","));
+			waiter.assertEquals(10, words.size());
+			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
+			List<String> expected = Arrays.asList("foobar", "barfoo", "foobarfoo");
+			waiter.assertEquals(expected, words);
+			waiter.resume();
+		};
+		wordGenerator.applyCompoundFlag(line, fnDeferring, 10);
+
+		waiter.await(2_000l);
 	}
 
 }

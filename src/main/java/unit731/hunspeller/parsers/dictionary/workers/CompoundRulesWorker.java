@@ -55,7 +55,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			List<Production> productions = wordGenerator.applyRules(line);
 			for(Production production : productions)
 				if(production.getWord().length() >= compoundMinimumLength){
-					Map<String, Set<String>> c = production.collectFlagsFromCompound(affParser);
+					Map<String, Set<String>> c = production.collectFlagsFromCompoundRule(affParser);
 					for(Map.Entry<String, Set<String>> entry: c.entrySet()){
 						String affix = entry.getKey();
 						Set<String> prods = entry.getValue();

@@ -51,7 +51,7 @@ public class Production extends DictionaryEntry{
 		return continuationFlagsCount;
 	}
 
-	public Map<String, Set<String>> collectFlagsFromCompound(AffixParser affParser){
+	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
 		return Arrays.stream(continuationFlags)
 			.filter(affParser::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
