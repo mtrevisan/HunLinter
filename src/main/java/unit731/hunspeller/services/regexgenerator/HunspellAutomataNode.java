@@ -14,7 +14,8 @@ import lombok.Setter;
  */
 public class HunspellAutomataNode{
 
-	private int charCount = 1;
+	@Setter
+	private int transitionCount = 1;
 	@Getter
 	private long matchedWordCount = 0l;
 	@Setter
@@ -32,17 +33,13 @@ public class HunspellAutomataNode{
 			return;
 
 		if(nextNodes == null || nextNodes.isEmpty())
-			matchedWordCount = charCount;
+			matchedWordCount = transitionCount;
 		else
 			for(HunspellAutomataNode childNode : nextNodes){
 				childNode.updateMatchedWordCount();
-				matchedWordCount += charCount * childNode.matchedWordCount;
+				matchedWordCount += transitionCount * childNode.matchedWordCount;
 			}
 		matchedWordCountUpdated = true;
-	}
-
-	public void setCharCount(int charCount){
-		this.charCount = charCount;
 	}
 
 }

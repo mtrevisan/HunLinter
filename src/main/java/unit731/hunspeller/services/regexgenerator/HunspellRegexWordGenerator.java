@@ -106,6 +106,10 @@ public class HunspellRegexWordGenerator{
 	}
 
 	/**
+	 * @see <a href="https://cs.stackexchange.com/questions/71371/why-isnt-it-simple-to-count-the-number-of-words-in-a-regular-language">Why isn't it simple to count the number of words in a regular language?</a>
+	 * @see <a href="https://cs.stackexchange.com/questions/1045/number-of-words-of-a-given-length-in-a-regular-language">Number of words of a given length in a regular language</a>
+	 * @see <a href="https://cstheory.stackexchange.com/questions/8200/counting-words-accepted-by-a-regular-grammar">Counting words accepted by a regular grammar</a>
+	 * 
 	 * @return	The number of words that are matched by the given pattern, or {@value #INFINITY} if infinite.
 	 */
 	public long wordCount(){
@@ -116,7 +120,7 @@ public class HunspellRegexWordGenerator{
 
 				count = rootNode.getMatchedWordCount();
 
-				if(ignoreEmptyWord && automaton.getShortestExample(true).isEmpty())
+				if(ignoreEmptyWord && automaton.getInitialState().isAccept())
 					count --;
 			}
 		}
@@ -127,7 +131,7 @@ public class HunspellRegexWordGenerator{
 	private void buildRootNode(){
 		if(rootNode == null){
 			rootNode = new HunspellAutomataNode();
-			rootNode.setCharCount(1);
+			rootNode.setTransitionCount(1);
 			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(automaton.getInitialState());
 			rootNode.setNextNodes(nextNodes);
 			rootNode.updateMatchedWordCount();
@@ -146,14 +150,14 @@ public class HunspellRegexWordGenerator{
 
 		if(state.isAccept()){
 			HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
-			acceptedNode.setCharCount(1);
+			acceptedNode.setTransitionCount(1);
 			transactionNodes.add(acceptedNode);
 		}
 		List<Transition> transitions = state.getSortedTransitions(true);
 		for(Transition transition : transitions){
 			HunspellAutomataNode transactionNode = new HunspellAutomataNode();
-			int nbrChar = transition.getMax() - transition.getMin() + 1;
-			transactionNode.setCharCount(nbrChar);
+			int transitionsCount = transition.getMax() - transition.getMin() + 1;
+			transactionNode.setTransitionCount(transitionsCount);
 			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(transition.getDest());
 			transactionNode.setNextNodes(nextNodes);
 
