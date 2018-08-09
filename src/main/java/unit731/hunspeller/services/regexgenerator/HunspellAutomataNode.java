@@ -15,9 +15,9 @@ import lombok.Setter;
 public class HunspellAutomataNode{
 
 	@Setter
-	private int transitionCount = 1;
+	private int transitionCount;
 	@Getter
-	private long matchedWordCount = 0l;
+	private long matchedWordCount;
 	@Setter
 	private List<HunspellAutomataNode> nextNodes;
 	private boolean matchedWordCountUpdated;
