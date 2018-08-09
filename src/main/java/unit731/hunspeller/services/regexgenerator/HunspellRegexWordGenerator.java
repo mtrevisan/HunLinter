@@ -6,13 +6,13 @@ import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -20,7 +20,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -58,12 +57,7 @@ public class HunspellRegexWordGenerator{
 	private final Automaton automaton;
 	private final boolean ignoreEmptyWord;
 
-	@Getter
-	private final List<String> matchedWords = new ArrayList<>(0);
-	private long matchedWordCounter;
-
 	private HunspellAutomataNode rootNode;
-
 	private int preparedTransactionNode;
 
 
@@ -249,20 +243,19 @@ public class HunspellRegexWordGenerator{
 	 * @return	The list of words that matcher the given regex
 	 */
 	public List<String> generateAll(long limit){
-		matchedWords.clear();
-		matchedWordCounter = 0l;
+		List<String> matchedWords = new ArrayList<>(0);
+		long matchedWordCounter = 0l;
 
-		Deque<GeneratedElement> deque = new LinkedList<>();
-		deque.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
-		while(!deque.isEmpty()){
+		Queue<GeneratedElement> queue = new LinkedList<>();
+		queue.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
+		while(!queue.isEmpty()){
 			if(matchedWordCounter == limit)
 				break;
 
-			GeneratedElement elem = deque.pop();
+			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
 			State state = elem.state;
-//FIXME not so sorted?
-			List<Transition> transitions = state.getSortedTransitions(true);
+			List<Transition> transitions = state.getSortedTransitions(false);
 			boolean emptyTransitions = transitions.isEmpty();
 			if((!ignoreEmptyWord || !subword.isEmpty()) && (emptyTransitions || state.isAccept())){
 				matchedWords.add(subword);
@@ -274,7 +267,7 @@ public class HunspellRegexWordGenerator{
 
 			for(Transition transition : transitions)
 				for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
-					deque.add(new GeneratedElement(subword + chr, transition.getDest()));
+					queue.add(new GeneratedElement(subword + chr, transition.getDest()));
 		}
 
 		return matchedWords;
