@@ -61,7 +61,7 @@ public class TrieNode<S, H, V>{
 	 * 
 	 * @param value	The value to add
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public void addValue(V value){
 		if(this.value != null && List.class.isAssignableFrom(value.getClass()))
 			((Collection)this.value).addAll((List<?>)value);

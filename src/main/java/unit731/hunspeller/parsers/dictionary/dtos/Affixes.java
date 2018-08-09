@@ -18,11 +18,11 @@ public class Affixes{
 		this.suffixes = suffixes.toArray(new String[suffixes.size()]);
 	}
 
-	public List<String[]> extractAffixes(boolean reverse){
+	public List<String[]> extractAffixes(boolean reverseAffixes){
 		List<String[]> applyAffixes = new ArrayList<>(3);
 		applyAffixes.add(prefixes);
 		applyAffixes.add(suffixes);
-		if(reverse)
+		if(reverseAffixes)
 			Collections.reverse(applyAffixes);
 		applyAffixes.add(terminalAffixes);
 		return applyAffixes;
