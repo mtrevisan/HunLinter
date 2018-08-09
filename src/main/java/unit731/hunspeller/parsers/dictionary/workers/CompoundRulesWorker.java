@@ -29,6 +29,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	private static final String RIGHT_PARENTHESIS = ")";
 
 
+//	private final AffixParser affParser;
 	private final WordGenerator wordGenerator;
 	private final long limit;
 
@@ -45,6 +46,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+//		this.affParser = affParser;
 		this.wordGenerator = wordGenerator;
 		this.limit = limit;
 
@@ -109,6 +111,11 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		//generate all the words that matches the given regex
 		long wordPrintedCount = (wordTrueCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordTrueCount, limit));
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
+
+		//remove compounds with triples if forbidden
+//		if(affParser.isForbidTriplesInCompound()){
+//			//TODO
+//		}
 
 		fnDeferring.accept(words, wordTrueCount);
 	}

@@ -575,6 +575,10 @@ public class AffixParser extends ReadWriteLockable{
 		return isSuffix;
 	}
 
+//	public boolean isForbidTriplesInCompound(){
+//		return containsData(AffixTag.CHECK_COMPOUND_TRIPLE);
+//	}
+
 	public Set<String> getProductiveAffixes(){
 		//keeps only items with RuleEntry as value
 		Set<String> affixes = new HashSet<>();
