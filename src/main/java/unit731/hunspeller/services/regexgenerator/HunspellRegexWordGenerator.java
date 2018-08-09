@@ -1,7 +1,6 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import dk.brics.automaton.Automaton;
-import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternService;
 
 
 /**
@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @see <a href="https://github.com/mifmif/Generex">Generex</a>
  * @see <a href="https://github.com/bluezio/xeger">Xeger</a>
+ * @see <a href="http://www.brics.dk/automaton/index.html">dk.brics.automaton</a>
  */
 public class HunspellRegexWordGenerator{
 
@@ -71,8 +72,7 @@ public class HunspellRegexWordGenerator{
 		regex = StringUtils.replaceEach(requote(regex),
 			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
-		RegExp re = new RegExp(regex);
-		automaton = re.toAutomaton();
+		automaton = PatternService.automaton(regex);
 		this.ignoreEmptyWord = ignoreEmptyWord;
 	}
 

@@ -1,5 +1,7 @@
 package unit731.hunspeller.services;
 
+import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,6 +16,11 @@ public class PatternService{
 
 	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
 
+
+	public static Automaton automaton(String pattern){
+		RegExp re = new RegExp(pattern);
+		return re.toAutomaton();
+	}
 
 	public static Pattern pattern(String pattern){
 		return Pattern.compile(pattern);
