@@ -903,6 +903,72 @@ public class WordGeneratorTest{
 		Waiter waiter = new Waiter();
 		String line = "A?B?C?";
 		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
+			waiter.assertEquals(9, words.size());
+			waiter.assertEquals(9l, wordTrueCount);
+			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+			waiter.assertEquals(expected, words);
+			waiter.resume();
+		};
+		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
+
+		waiter.await(200_000l);
+	}
+
+	@Test
+	public void compoundRuleLongFlag() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FLAG long",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE (aa)?(bb)?(cc)?");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"3",
+			"a/aa",
+			"b/bb",
+			"c/bbcc");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		Waiter waiter = new Waiter();
+		String line = "(aa)?(bb)?(cc)?";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
+			waiter.assertEquals(9, words.size());
+			waiter.assertEquals(9l, wordTrueCount);
+			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+			waiter.assertEquals(expected, words);
+			waiter.resume();
+		};
+		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
+
+		waiter.await(200_000l);
+	}
+
+	@Test
+	public void compoundRuleNumericalFlag() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FLAG num",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE (1)?(2)?(3)?");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
+			"3",
+			"a/1",
+			"b/2",
+			"c/2,3");
+		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
+		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
+
+		Waiter waiter = new Waiter();
+		String line = "(1)?(2)?(3)?";
+		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
 //words.forEach(word -> System.out.println(" \""+word+"\","));
 			waiter.assertEquals(9, words.size());
 			waiter.assertEquals(9l, wordTrueCount);
