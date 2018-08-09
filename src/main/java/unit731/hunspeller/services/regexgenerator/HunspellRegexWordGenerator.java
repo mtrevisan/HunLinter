@@ -62,7 +62,6 @@ public class HunspellRegexWordGenerator{
 	private final boolean ignoreEmptyWord;
 
 	private HunspellAutomataNode rootNode;
-	private int preparedTransactionNode;
 
 
 	/**
@@ -144,24 +143,20 @@ public class HunspellRegexWordGenerator{
 	private void prepareTransactionNodes(State state, HunspellAutomataNode node){
 		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
 		node.setNextNodes(transactionNodes);
-		if(preparedTransactionNode < Integer.MAX_VALUE / 2){
-			node.setNextNodes(transactionNodes);
-			preparedTransactionNode ++;
 
-			if(state.isAccept()){
-				HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
-				acceptedNode.setTransitionCount(1);
-				transactionNodes.add(acceptedNode);
-			}
-			List<Transition> transitions = state.getSortedTransitions(true);
-			for(Transition transition : transitions){
-				HunspellAutomataNode tn = new HunspellAutomataNode();
-				int transitionsCount = transition.getMax() - transition.getMin() + 1;
-				tn.setTransitionCount(transitionsCount);
-				transactionNodes.add(tn);
+		if(state.isAccept()){
+			HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
+			acceptedNode.setTransitionCount(1);
+			transactionNodes.add(acceptedNode);
+		}
+		List<Transition> transitions = state.getSortedTransitions(true);
+		for(Transition transition : transitions){
+			HunspellAutomataNode tn = new HunspellAutomataNode();
+			int transitionsCount = transition.getMax() - transition.getMin() + 1;
+			tn.setTransitionCount(transitionsCount);
+			transactionNodes.add(tn);
 
-				prepareTransactionNodes(transition.getDest(), tn);
-			}
+			prepareTransactionNodes(transition.getDest(), tn);
 		}
 	}
 
