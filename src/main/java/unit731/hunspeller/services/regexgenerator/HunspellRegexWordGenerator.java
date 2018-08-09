@@ -143,9 +143,9 @@ public class HunspellRegexWordGenerator{
 	 */
 	private void prepareTransactionNodes(State state, HunspellAutomataNode node){
 		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
-		if(preparedTransactionNode == Integer.MAX_VALUE / 2)
+		node.setNextNodes(transactionNodes);
+		if(preparedTransactionNode < Integer.MAX_VALUE / 2){
 			node.setNextNodes(transactionNodes);
-		else{
 			preparedTransactionNode ++;
 
 			if(state.isAccept()){
@@ -158,11 +158,10 @@ public class HunspellRegexWordGenerator{
 				HunspellAutomataNode tn = new HunspellAutomataNode();
 				int transitionsCount = transition.getMax() - transition.getMin() + 1;
 				tn.setTransitionCount(transitionsCount);
-				prepareTransactionNodes(transition.getDest(), tn);
-
 				transactionNodes.add(tn);
+
+				prepareTransactionNodes(transition.getDest(), tn);
 			}
-			node.setNextNodes(transactionNodes);
 		}
 	}
 
