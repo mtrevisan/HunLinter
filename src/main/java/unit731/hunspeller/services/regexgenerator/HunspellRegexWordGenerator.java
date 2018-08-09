@@ -132,8 +132,8 @@ public class HunspellRegexWordGenerator{
 		if(rootNode == null){
 			rootNode = new HunspellAutomataNode();
 			rootNode.setTransitionCount(1);
-			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(automaton.getInitialState());
-			rootNode.setNextNodes(nextNodes);
+			prepareTransactionNodes(automaton.getInitialState(), rootNode);
+
 			rootNode.updateMatchedWordCount();
 		}
 	}
@@ -141,29 +141,29 @@ public class HunspellRegexWordGenerator{
 	/**
 	 * Build list of nodes that represent all the possible transactions from the given <code>state</code>.
 	 */
-	private List<HunspellAutomataNode> prepareTransactionNodes(State state){
+	private void prepareTransactionNodes(State state, HunspellAutomataNode node){
 		List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
 		if(preparedTransactionNode == Integer.MAX_VALUE / 2)
-			return transactionNodes;
+			node.setNextNodes(transactionNodes);
+		else{
+			preparedTransactionNode ++;
 
-		preparedTransactionNode ++;
+			if(state.isAccept()){
+				HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
+				acceptedNode.setTransitionCount(1);
+				transactionNodes.add(acceptedNode);
+			}
+			List<Transition> transitions = state.getSortedTransitions(true);
+			for(Transition transition : transitions){
+				HunspellAutomataNode tn = new HunspellAutomataNode();
+				int transitionsCount = transition.getMax() - transition.getMin() + 1;
+				tn.setTransitionCount(transitionsCount);
+				prepareTransactionNodes(transition.getDest(), tn);
 
-		if(state.isAccept()){
-			HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
-			acceptedNode.setTransitionCount(1);
-			transactionNodes.add(acceptedNode);
+				transactionNodes.add(tn);
+			}
+			node.setNextNodes(transactionNodes);
 		}
-		List<Transition> transitions = state.getSortedTransitions(true);
-		for(Transition transition : transitions){
-			HunspellAutomataNode transactionNode = new HunspellAutomataNode();
-			int transitionsCount = transition.getMax() - transition.getMin() + 1;
-			transactionNode.setTransitionCount(transitionsCount);
-			List<HunspellAutomataNode> nextNodes = prepareTransactionNodes(transition.getDest());
-			transactionNode.setNextNodes(nextNodes);
-
-			transactionNodes.add(transactionNode);
-		}
-		return transactionNodes;
 	}
 
 
