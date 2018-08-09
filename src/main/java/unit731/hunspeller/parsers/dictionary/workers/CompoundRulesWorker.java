@@ -107,8 +107,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString(), true);
 		long wordTrueCount = regexWordGenerator.wordCount();
 		//generate all the words that matches the given regex
-		long wordPrintedCount = (wordTrueCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordTrueCount, limit));
-		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
+		List<String> words = regexWordGenerator.generateAll(limit);
 
 		fnDeferring.accept(words, wordTrueCount);
 	}

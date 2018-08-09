@@ -59,20 +59,15 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 
 	private void extract(){
 		//TODO
-		//compose compound rule
-		StringBuilder expandedCompoundRule = new StringBuilder();
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule.toString(), true);
-		long wordTrueCount = regexWordGenerator.wordCount();
 		//generate all the words that matches the given regex
-		long wordPrintedCount = (wordTrueCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordTrueCount, limit));
-		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
+//		List<String> words = regexWordGenerator.generateAll(limit);
 
 		//remove compounds with triples if forbidden
 		if(affParser.isForbidTriplesInCompound()){
 			//TODO
 		}
 
-		fnDeferring.accept(words, wordTrueCount);
+//		fnDeferring.accept(words, wordTrueCount);
 	}
 
 	public void extractCompounds(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring){
