@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternService;
@@ -55,6 +54,10 @@ public class HunspellRegexWordGenerator{
 		PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
 	}
 
+	private static final Matcher MATCHER_REQUOTE_SPECIAL_CHARS = PatternService.matcher("[.^$*+?(){|\\[\\\\@]");
+	private static final Matcher MATCHER_REQUOTE = PatternService.matcher("\\\\Q(.*?)\\\\E");
+
+
 	private final Automaton automaton;
 	private final boolean ignoreEmptyWord;
 
@@ -88,14 +91,10 @@ public class HunspellRegexWordGenerator{
 	private String requote(String regex){
 		//http://stackoverflow.com/questions/399078/what-special-characters-must-be-escaped-in-regular-expressions
 		//adding "@" prevents StackOverflowError inside generex: https://github.com/mifmif/Generex/issues/21
-		Pattern patternSpecial = Pattern.compile("[.^$*+?(){|\\[\\\\@]");
 		StringBuilder sb = new StringBuilder(regex);
-		Matcher matcher = Pattern.compile("\\\\Q(.*?)\\\\E")
-			.matcher(sb);
-		while(matcher.find()){
-			sb.replace(matcher.start(), matcher.end(), patternSpecial.matcher(matcher.group(1)).replaceAll("\\\\$0"));
-			//matcher.reset();
-		}
+		Matcher matcher = MATCHER_REQUOTE.reset(regex);
+		while(matcher.find())
+			sb.replace(matcher.start(), matcher.end(), MATCHER_REQUOTE_SPECIAL_CHARS.reset(matcher.group(1)).replaceAll("\\\\$0"));
 		return sb.toString();
 	}
 
