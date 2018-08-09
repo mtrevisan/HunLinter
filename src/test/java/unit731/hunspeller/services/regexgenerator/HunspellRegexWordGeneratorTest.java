@@ -63,7 +63,7 @@ public class HunspellRegexWordGeneratorTest{
 		long wordCount = generator.wordCount();
 
 		Assert.assertFalse(infinite);
-		Assert.assertEquals(10l, wordCount);
+		Assert.assertEquals(8l, wordCount);
 	}
 
 	@Test
@@ -75,7 +75,7 @@ public class HunspellRegexWordGeneratorTest{
 		long wordCount = generator.wordCount();
 
 		Assert.assertFalse(infinite);
-		Assert.assertEquals(9l, wordCount);
+		Assert.assertEquals(7l, wordCount);
 	}
 
 }
