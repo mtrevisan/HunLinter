@@ -67,6 +67,7 @@ public interface FlagParsingStrategy{
 			.collect(Collectors.toList());
 	}
 
+	/** Leave only the flag, removes any parenthesys, star, or question mark */
 	default String cleanCompoundRuleComponent(String component){
 		int firstCharIndex = 0;
 		int lastCharIndex = component.length() - 1;

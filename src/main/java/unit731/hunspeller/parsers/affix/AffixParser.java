@@ -35,7 +35,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 /**
  * Managed options:
  *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
- *		COMPOUNDRULE, COMPOUNDMIN, ONLYINCOMPOUND, CIRCUMFIX
+ *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, CIRCUMFIX, CHECKCOMPOUNDTRIPLE
  *		PFX, SFX
  *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
  */
@@ -331,7 +331,7 @@ public class AffixParser extends ReadWriteLockable{
 		RULE_FUNCTION.put(AffixTag.BREAK, FUN_WORD_BREAK_TABLE);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_RULE, FUN_COMPOUND_RULE);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_BEGIN, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
@@ -344,7 +344,7 @@ public class AffixParser extends ReadWriteLockable{
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.CIRCUMFIX, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.FORBIDDEN_WORD, FUN_COPY_OVER);
@@ -575,9 +575,9 @@ public class AffixParser extends ReadWriteLockable{
 		return isSuffix;
 	}
 
-//	public boolean isForbidTriplesInCompound(){
-//		return containsData(AffixTag.CHECK_COMPOUND_TRIPLE);
-//	}
+	public boolean isForbidTriplesInCompound(){
+		return containsData(AffixTag.CHECK_COMPOUND_TRIPLE);
+	}
 
 	public Set<String> getProductiveAffixes(){
 		//keeps only items with RuleEntry as value
@@ -648,6 +648,10 @@ public class AffixParser extends ReadWriteLockable{
 
 	public int getCompoundMinimumLength(){
 		return getData(AffixTag.COMPOUND_MIN);
+	}
+
+	public String getCompoundFlag(){
+		return getData(AffixTag.COMPOUND_FLAG);
 	}
 
 	public String getCircumfixFlag(){

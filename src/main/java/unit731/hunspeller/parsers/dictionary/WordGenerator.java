@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.workers.CompoundFlagWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
@@ -49,6 +50,8 @@ public class WordGenerator{
 
 	@Getter
 	private CompoundRulesWorker compoundRulesWorker;
+	@Getter
+	private CompoundFlagWorker compoundFlagWorker;
 
 
 	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, PropertyChangeListener listener){
@@ -152,19 +155,37 @@ public class WordGenerator{
 	}
 
 	/**
-	 * Generates a list of stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
+	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
 	 * 
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @param limit	Limit results
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException, NoApplicableRuleException{
+	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException,
+			NoApplicableRuleException{
 		compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, limit);
 		if(listener != null)
 			compoundRulesWorker.addPropertyChangeListener(listener);
 
 		compoundRulesWorker.extractCompounds(compoundRule, fnDeferring);
+	}
+
+	/**
+	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_FLAG
+	 * 
+	 * @param compoundFlag	Flag used to generate the productions for
+	 * @param fnDeferring	Function to be called whenever the list of production is ready
+	 * @param limit	Limit results
+	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
+	 */
+	public void applyCompoundFlag(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException,
+			NoApplicableRuleException{
+		compoundFlagWorker = new CompoundFlagWorker(affParser, dicParser, this, limit);
+		if(listener != null)
+			compoundFlagWorker.addPropertyChangeListener(listener);
+
+		compoundFlagWorker.extractCompounds(compoundFlag, fnDeferring);
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){

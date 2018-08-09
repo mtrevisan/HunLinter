@@ -59,7 +59,7 @@ public enum AffixTag{
 	 * Words with this flag may be in compound words (except when word shorter than COMPOUNDMIN).
 	 * Affixes with COMPOUNDFLAG also permits compounding of affixed words.
 	 */
-//	COMPOUND_FLAG("COMPOUNDFLAG"),
+	COMPOUND_FLAG("COMPOUNDFLAG"),
 	/** Words signed with this flag (or with a signed affix) may be first elements in compound words */
 //	COMPOUND_BEGIN("COMPOUNDBEGIN"),
 	/** Words signed with this flag (or with a signed affix) may be middle elements in compound words */
@@ -85,7 +85,7 @@ public enum AffixTag{
 	/** Forbid upper case characters at word bound in compounds */
 //	CHECK_COMPOUND_CASE("CHECKCOMPOUNDCASE"),
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
-//	CHECK_COMPOUND_TRIPLE("CHECKCOMPOUNDTRIPLE"),
+	CHECK_COMPOUND_TRIPLE("CHECKCOMPOUNDTRIPLE"),
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
 //	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */

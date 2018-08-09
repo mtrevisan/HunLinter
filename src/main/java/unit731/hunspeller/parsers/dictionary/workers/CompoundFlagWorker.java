@@ -20,31 +20,33 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 @Slf4j
-public class CompoundRulesWorker extends WorkerDictionaryReadBase{
+public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 
-	public static final String WORKER_NAME = "Compound rules extraction";
+	public static final String WORKER_NAME = "Compound flag extraction";
 
 	private static final String PIPE = "|";
 	private static final String LEFT_PARENTHESIS = "(";
 	private static final String RIGHT_PARENTHESIS = ")";
 
 
+	private final AffixParser affParser;
 	private final WordGenerator wordGenerator;
 	private final long limit;
 
 	private Map<String, String> rules;
 
-	private String compoundRule;
+	private String compoundFlag;
 	private BiConsumer<List<String>, Long> fnDeferring;
 
 
-	public CompoundRulesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, long limit){
+	public CompoundFlagWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, long limit){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+		this.affParser = affParser;
 		this.wordGenerator = wordGenerator;
 		this.limit = limit;
 
@@ -83,22 +85,23 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	}
 
 	private void extract(){
+		//TODO
 		//compose compound rule
 		FlagParsingStrategy strategy = wordGenerator.getFlagParsingStrategy();
-		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundFlag);
 		StringBuilder expandedCompoundRule = new StringBuilder();
 		for(String component : compoundRuleComponents){
 			String flag = strategy.cleanCompoundRuleComponent(component);
 			String expandedComponent = rules.get(flag);
 			if(expandedComponent == null)
-				log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+				log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {}", compoundFlag);
 			else{
 				char lastChar = component.charAt(component.length() - 1);
 				if(lastChar == '*' || lastChar == '?')
 					expandedComponent += lastChar;
 
 				if(expandedComponent.equals(component))
-					log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+					log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {}", compoundFlag);
 				else
 					expandedCompoundRule.append(expandedComponent);
 			}
@@ -110,13 +113,18 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		long wordPrintedCount = (wordTrueCount == HunspellRegexWordGenerator.INFINITY? limit: Math.min(wordTrueCount, limit));
 		List<String> words = regexWordGenerator.generateAll(wordPrintedCount);
 
+		//remove compounds with triples if forbidden
+		if(affParser.isForbidTriplesInCompound()){
+			//TODO
+		}
+
 		fnDeferring.accept(words, wordTrueCount);
 	}
 
-	public void extractCompounds(String compoundRule, BiConsumer<List<String>, Long> fnDeferring){
+	public void extractCompounds(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring){
 		clear();
 
-		this.compoundRule = compoundRule;
+		this.compoundFlag = compoundFlag;
 		this.fnDeferring = fnDeferring;
 
 		super.execute();
@@ -130,7 +138,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	public void clear(){
 		if(rules != null)
 			rules.clear();
-		compoundRule = null;
+		compoundFlag = null;
 		fnDeferring = null;
 	}
 
