@@ -55,6 +55,11 @@ public enum AffixTag{
 	COMPOUND_RULE("COMPOUNDRULE"),
 	/** Minimum length of words in compound words */
 	COMPOUND_MIN("COMPOUNDMIN"),
+	/**
+	 * Words with this flag may be in compound words (except when word shorter than COMPOUNDMIN).
+	 * Affixes with COMPOUNDFLAG also permits compounding of affixed words.
+	 */
+//	COMPOUND_FLAG("COMPOUNDFLAG"),
 	/** Words signed with this flag (or with a signed affix) may be first elements in compound words */
 //	COMPOUND_BEGIN("COMPOUNDBEGIN"),
 	/** Words signed with this flag (or with a signed affix) may be middle elements in compound words */
