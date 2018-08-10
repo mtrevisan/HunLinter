@@ -190,6 +190,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		});
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
 			dicSortDictionaryMenuItem.setEnabled(true);
+			cmpInputComboBox.setEnabled(true);
+			limitComboBox.setEnabled(true);
+			cmpInputTextArea.setEnabled(true);
 			cmpLoadInputButton.setEnabled(true);
 		});
 	}
@@ -1771,8 +1774,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void extractCompoundRulesInputs(){
 		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
 			dicSortDictionaryMenuItem.setEnabled(false);
+			cmpInputComboBox.setEnabled(false);
+			limitComboBox.setEnabled(false);
+			cmpInputTextArea.setEnabled(false);
 			cmpLoadInputButton.setEnabled(false);
 
+			cmpInputTextArea.setText(null);
 			mainProgressBar.setValue(0);
 
 			AffixParser affParser = backbone.getAffParser();
@@ -1780,7 +1787,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
 				String word = production.getWord();
-				if(word.length() >= compoundMinimumLength)
+				if(word.length() >= compoundMinimumLength && !production.collectFlagsFromCompoundRule(affParser).isEmpty())
 					compounds.add(production);
 			};
 			Runnable done = () -> {
