@@ -204,14 +204,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpLayeredPane = new javax.swing.JLayeredPane();
       cmpInputLabel = new javax.swing.JLabel();
       cmpInputComboBox = new javax.swing.JComboBox<>();
+      limitLabel = new javax.swing.JLabel();
+      limitComboBox = new javax.swing.JComboBox<>();
       cmpRuleTagsAidLabel = new javax.swing.JLabel();
       cmpRuleTagsAidComboBox = new javax.swing.JComboBox<>();
-      dicScrollPane1 = new javax.swing.JScrollPane();
+      cmpScrollPane = new javax.swing.JScrollPane();
       cmpTable = new javax.swing.JTable();
-      limitComboBox = new javax.swing.JComboBox<>();
-      limitLabel = new javax.swing.JLabel();
       totalCompoundsLabel = new javax.swing.JLabel();
       totalCompoundsOutputLabel = new javax.swing.JLabel();
+      jScrollPane1 = new javax.swing.JScrollPane();
+      cmpInputTextArea = new javax.swing.JTextArea();
+      cmpLoadInputButton = new javax.swing.JButton();
       theLayeredPane = new javax.swing.JLayeredPane();
       theMeaningsLabel = new javax.swing.JLabel();
       theMeaningsTextField = new javax.swing.JTextField();
@@ -367,6 +370,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      limitLabel.setLabelFor(limitComboBox);
+      limitLabel.setText("Limit:");
+
+      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
+      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            limitComboBoxActionPerformed(evt);
+         }
+      });
+
       cmpRuleTagsAidLabel.setLabelFor(cmpRuleTagsAidComboBox);
       cmpRuleTagsAidLabel.setText("Rule tags aid:");
 
@@ -377,32 +390,30 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       cmpTable.setRowSelectionAllowed(true);
-      dicScrollPane1.setViewportView(cmpTable);
-
-      limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            limitComboBoxActionPerformed(evt);
-         }
-      });
-
-      limitLabel.setLabelFor(limitComboBox);
-      limitLabel.setText("Limit:");
+      cmpScrollPane.setViewportView(cmpTable);
 
       totalCompoundsLabel.setLabelFor(totalCompoundsOutputLabel);
       totalCompoundsLabel.setText("Total productions:");
 
       totalCompoundsOutputLabel.setText("...");
 
+      cmpInputTextArea.setColumns(20);
+      cmpInputTextArea.setRows(5);
+      jScrollPane1.setViewportView(cmpInputTextArea);
+
+      cmpLoadInputButton.setText("Load input from dictionary");
+
       cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(dicScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(limitComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
-      cmpLayeredPane.setLayer(limitLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(totalCompoundsLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(totalCompoundsOutputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      cmpLayeredPane.setLayer(cmpLoadInputButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout cmpLayeredPaneLayout = new javax.swing.GroupLayout(cmpLayeredPane);
       cmpLayeredPane.setLayout(cmpLayeredPaneLayout);
@@ -411,7 +422,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
             .addContainerGap()
             .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(dicScrollPane1)
                .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
                   .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(cmpInputLabel)
@@ -425,11 +435,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         .addComponent(limitLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(limitComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-               .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
-                  .addComponent(totalCompoundsLabel)
-                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(totalCompoundsOutputLabel)
-                  .addGap(0, 0, Short.MAX_VALUE)))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cmpLayeredPaneLayout.createSequentialGroup()
+                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                     .addComponent(jScrollPane1)
+                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                        .addComponent(cmpLoadInputButton)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                  .addGap(18, 18, 18)
+                  .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                     .addGroup(cmpLayeredPaneLayout.createSequentialGroup()
+                        .addComponent(totalCompoundsLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(totalCompoundsOutputLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
+                     .addComponent(cmpScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 443, javax.swing.GroupLayout.PREFERRED_SIZE))))
             .addContainerGap())
       );
       cmpLayeredPaneLayout.setVerticalGroup(
@@ -446,11 +464,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                .addComponent(cmpRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(cmpRuleTagsAidLabel))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(dicScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-               .addComponent(totalCompoundsLabel)
-               .addComponent(totalCompoundsOutputLabel))
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addComponent(cmpScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+               .addComponent(jScrollPane1))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addGroup(cmpLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                  .addComponent(totalCompoundsLabel)
+                  .addComponent(totalCompoundsOutputLabel))
+               .addComponent(cmpLoadInputButton, javax.swing.GroupLayout.Alignment.TRAILING))
             .addContainerGap())
       );
 
@@ -770,7 +792,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       fileMenu.add(fileOpenAFFMenuItem);
 
-      fileCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/file_package.png"))); // NOI18N
+      fileCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
       fileCreatePackageMenuItem.setMnemonic('p');
       fileCreatePackageMenuItem.setText("Create package");
       fileCreatePackageMenuItem.setEnabled(false);
@@ -783,7 +805,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       fileMenu.add(recentFilesFileSeparator);
       fileMenu.add(fileSeparator);
 
-      fileExitMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/file_exit.png"))); // NOI18N
+      fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
       fileExitMenuItem.setMnemonic('x');
       fileExitMenuItem.setText("Exit");
       fileExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -806,7 +828,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.setToolTipText("");
       dicMenu.setEnabled(false);
 
-      dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_correctness.png"))); // NOI18N
+      dicCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
       dicCheckCorrectnessMenuItem.setMnemonic('c');
       dicCheckCorrectnessMenuItem.setText("Check correctness");
       dicCheckCorrectnessMenuItem.setToolTipText("");
@@ -817,7 +839,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicCheckCorrectnessMenuItem);
 
-      dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_sort.png"))); // NOI18N
+      dicSortDictionaryMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_sort.png"))); // NOI18N
       dicSortDictionaryMenuItem.setMnemonic('s');
       dicSortDictionaryMenuItem.setText("Sort dictionary...");
       dicSortDictionaryMenuItem.setToolTipText("");
@@ -829,7 +851,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicSortDictionaryMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
-      dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_count.png"))); // NOI18N
+      dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
       dicWordCountMenuItem.setMnemonic('w');
       dicWordCountMenuItem.setText("Word count");
       dicWordCountMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -839,7 +861,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicWordCountMenuItem);
 
-      dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_statistics.png"))); // NOI18N
+      dicStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
       dicStatisticsMenuItem.setMnemonic('t');
       dicStatisticsMenuItem.setText("Statistics");
       dicStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -859,7 +881,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(disStatisticsNoHyphenationMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-      dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_duplicates.png"))); // NOI18N
+      dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates...");
       dicExtractDuplicatesMenuItem.setToolTipText("");
@@ -870,7 +892,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
-      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_wordlist.png"))); // NOI18N
+      dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
       dicExtractWordlistMenuItem.setMnemonic('l');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
       dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -896,7 +918,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theMenu.setToolTipText("");
       theMenu.setEnabled(false);
 
-      theFindDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/dictionary_duplicates.png"))); // NOI18N
+      theFindDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
       theFindDuplicatesMenuItem.setMnemonic('d');
       theFindDuplicatesMenuItem.setText("Find duplicates");
       theFindDuplicatesMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -911,7 +933,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
-      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(HunspellerFrame.class.getResource("/about.png"))); // NOI18N
+      hlpAboutMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/about.png"))); // NOI18N
       hlpAboutMenuItem.setMnemonic('a');
       hlpAboutMenuItem.setText("About");
       hlpAboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1866,9 +1888,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JComboBox<String> cmpInputComboBox;
    private javax.swing.JLabel cmpInputLabel;
+   private javax.swing.JTextArea cmpInputTextArea;
    private javax.swing.JLayeredPane cmpLayeredPane;
+   private javax.swing.JButton cmpLoadInputButton;
    private javax.swing.JComboBox<String> cmpRuleTagsAidComboBox;
    private javax.swing.JLabel cmpRuleTagsAidLabel;
+   private javax.swing.JScrollPane cmpScrollPane;
    private javax.swing.JTable cmpTable;
    private javax.swing.JMenuItem dicCheckCorrectnessMenuItem;
    private javax.swing.JPopupMenu.Separator dicDuplicatesSeparator;
@@ -1882,7 +1907,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
    private javax.swing.JScrollPane dicScrollPane;
-   private javax.swing.JScrollPane dicScrollPane1;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
@@ -1913,6 +1937,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel hypSyllabesCountOutputLabel;
    private javax.swing.JLabel hypWordLabel;
    private javax.swing.JTextField hypWordTextField;
+   private javax.swing.JScrollPane jScrollPane1;
    private javax.swing.JComboBox<String> limitComboBox;
    private javax.swing.JLabel limitLabel;
    private javax.swing.JMenuBar mainMenuBar;
