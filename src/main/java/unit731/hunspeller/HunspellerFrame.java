@@ -194,7 +194,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			cmpInputComboBox.setEnabled(true);
 			limitComboBox.setEnabled(true);
 			cmpInputTextArea.setEnabled(true);
-			cmpLoadInputButton.setEnabled(true);
+			if(compoundRulesExtractorWorker.isCancelled())
+				cmpLoadInputButton.setEnabled(true);
 		});
 	}
 
@@ -1570,6 +1571,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			log.error("A bad error occurred", e);
 		}
+	}
+
+	@Override
+	public void dictionaryFileModified(){
+		cmpLoadInputButton.setEnabled(true);
 	}
 
 	private void updateSynonymsCounter(){

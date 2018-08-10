@@ -191,9 +191,8 @@ public class DictionaryEntry{
 
 	public String toString(FlagParsingStrategy strategy){
 		String cf = (strategy != null? strategy.joinFlags(continuationFlags): (continuationFlags != null && continuationFlags.length > 0? AffixEntry.SLASH + StringUtils.join(continuationFlags, ", "): StringUtils.EMPTY));
-		return word
-			+ cf
-			+ (morphologicalFields != null && morphologicalFields.length > 0? "\t" + StringUtils.join(morphologicalFields, " "): StringUtils.EMPTY);
+		String mf = (morphologicalFields != null && morphologicalFields.length > 0? "\t" + StringUtils.join(morphologicalFields, " "): StringUtils.EMPTY);
+		return word + cf + mf;
 	}
 
 }
