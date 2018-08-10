@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
@@ -71,18 +72,17 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 	}
 
 	//https://textmechanic.com/text-tools/combination-permutation-tools/combination-generator/
-	public static ArrayList<String> getCombinations(String text) {
-    ArrayList<String> results = new ArrayList<String>();
-    for (int i = 0; i < text.length(); i++) {
-        // Record size as the list will change
-        int resultsLength = results.size();
-        for (int j = 0; j < resultsLength; j++) {
-            results.add(text.charAt(i) + results.get(j));
-        }
-        results.add(Character.toString(text.charAt(i)));
-    }
-    return results;
-}
+	public static ArrayList<String> getCombinations(String text){
+		ArrayList<String> results = new ArrayList<>();
+		for(int i = 0; i < text.length(); i ++){
+			//record size as the list will change
+			int resultsLength = results.size();
+			for(int j = 0; j < resultsLength; j ++)
+				results.add(text.charAt(i) + results.get(j));
+			results.add(Character.toString(text.charAt(i)));
+		}
+		return results;
+	}
 
 	public void execute(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring){
 		clear();
