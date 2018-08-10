@@ -67,6 +67,7 @@ import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
@@ -1783,6 +1784,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainProgressBar.setValue(0);
 
 			AffixParser affParser = backbone.getAffParser();
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			int compoundMinimumLength = affParser.getCompoundMinimumLength();
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
@@ -1793,7 +1795,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			Runnable done = () -> {
 				if(!compoundRulesExtractorWorker.isCancelled()){
 					StringJoiner sj = new StringJoiner("\n");
-					compounds.forEach(compound -> sj.add(compound.toString()));
+					compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 					cmpInputTextArea.setText(sj.toString());
 				}
 			};
