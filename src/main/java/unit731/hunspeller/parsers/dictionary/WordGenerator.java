@@ -257,15 +257,24 @@ public class WordGenerator{
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		//TODO
-List<String> words = null;
-long wordTrueCount = 0l;
+List<String> words = getPermutations(inputCompounds, 4);
+long wordTrueCount = getPermutations(inputCompounds.length, 4);
 
 		return Pair.of(words, wordTrueCount);
 	}
 
+	private List<String> getPermutations(String[] words, int maxLength){
+		return null;
+	}
+
+	private long getPermutations(int n, int k){
+		//n! / (n - k)!
+		return 0l;
+	}
+
 	//https://textmechanic.com/text-tools/combination-permutation-tools/combination-generator/
-	public ArrayList<String> getCombinations(String text){
-		ArrayList<String> results = new ArrayList<>();
+	public List<String> getCombinations(String text){
+		List<String> results = new ArrayList<>();
 		for(int i = 0; i < text.length(); i ++){
 			//record size as the list will change
 			int resultsLength = results.size();
