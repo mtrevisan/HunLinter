@@ -18,6 +18,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Compound rules extraction";
 
+
 	private final Map<String, String> inputs = new HashMap<>();
 
 

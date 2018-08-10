@@ -168,7 +168,7 @@ public class WordGenerator{
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param limit	Limit results
-	 * @return	The list of productions for the given rule
+	 * @return	The list of productions for the given rule and the total productions resulting from the application of the rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule, long limit) throws IllegalArgumentException,
@@ -185,9 +185,9 @@ public class WordGenerator{
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
-		long wordTrueCount = regexWordGenerator.wordCount();
 		//generate all the words that matches the given regex
 		List<String> words = regexWordGenerator.generateAll(limit);
+		long wordTrueCount = regexWordGenerator.wordCount();
 
 		return Pair.of(words, wordTrueCount);
 	}
@@ -241,20 +241,39 @@ public class WordGenerator{
 	}
 
 	/**
-	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_FLAG
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_FLAG
 	 * 
+	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundFlag	Flag used to generate the productions for
-	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @param limit	Limit results
+	 * @return	The list of productions for the given rule and the total productions resulting from the application of the rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public void applyCompoundFlag(String compoundFlag, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException,
+	public Pair<List<String>, Long> applyCompoundFlag(String[] inputCompounds, String compoundFlag, long limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
-		compoundFlagWorker = new CompoundFlagWorker(affParser, dicParser, this, limit);
-		if(listener != null)
-			compoundFlagWorker.addPropertyChangeListener(listener);
+		Objects.requireNonNull(inputCompounds);
+		Objects.requireNonNull(compoundFlag);
+		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
+			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		compoundFlagWorker.execute(compoundFlag, fnDeferring);
+		//TODO
+List<String> words = null;
+long wordTrueCount = 0l;
+
+		return Pair.of(words, wordTrueCount);
+	}
+
+	//https://textmechanic.com/text-tools/combination-permutation-tools/combination-generator/
+	public ArrayList<String> getCombinations(String text){
+		ArrayList<String> results = new ArrayList<>();
+		for(int i = 0; i < text.length(); i ++){
+			//record size as the list will change
+			int resultsLength = results.size();
+			for(int j = 0; j < resultsLength; j ++)
+				results.add(text.charAt(i) + results.get(j));
+			results.add(Character.toString(text.charAt(i)));
+		}
+		return results;
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){

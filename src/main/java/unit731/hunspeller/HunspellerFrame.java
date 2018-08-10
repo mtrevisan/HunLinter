@@ -1500,11 +1500,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//affix file:
 			Set<String> compoundRules = backbone.getAffParser().getCompoundRules();
-			cmpInputComboBox.removeAllItems();
-			compoundRules.forEach(cmpInputComboBox::addItem);
-			cmpInputComboBox.setEnabled(true);
-			cmpInputComboBox.setSelectedItem(null);
-			dicInputTextField.requestFocusInWindow();
+			if(compoundRules != null && !compoundRules.isEmpty()){
+				cmpInputComboBox.removeAllItems();
+				compoundRules.forEach(cmpInputComboBox::addItem);
+				cmpInputComboBox.setEnabled(true);
+				cmpInputComboBox.setSelectedItem(null);
+				dicInputTextField.requestFocusInWindow();
+			}
 
 
 			//hyphenation file:
@@ -1535,7 +1537,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			fileCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
-			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !backbone.getAffParser().getCompoundRules().isEmpty());
+			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, (compoundRules != null && !compoundRules.isEmpty()));
 			mainTabbedPane.setSelectedIndex(index);
 
 
@@ -1575,7 +1577,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void dictionaryFileModified(){
-		cmpLoadInputButton.setEnabled(true);
+		int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
+		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !backbone.getAffParser().getCompoundRules().isEmpty());
+		mainTabbedPane.setSelectedIndex(index);
 	}
 
 	private void updateSynonymsCounter(){
@@ -1803,6 +1807,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					StringJoiner sj = new StringJoiner("\n");
 					compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 					cmpInputTextArea.setText(sj.toString());
+					cmpInputTextArea.setCaretPosition(0);
 				}
 			};
 			compoundRulesExtractorWorker = new CompoundRulesWorker(affParser, backbone.getDicParser(), backbone.getWordGenerator(), productionReader, done);
@@ -1867,6 +1872,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		formerInputText = null;
 		dicInputTextField.setText(null);
+
+		cmpInputComboBox.setEnabled(true);
+		limitComboBox.setEnabled(true);
+		cmpInputTextArea.setText(null);
+		cmpInputTextArea.setEnabled(true);
+		cmpLoadInputButton.setEnabled(true);
 	}
 
 	public void clearOutputTable(JTable table){
