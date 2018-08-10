@@ -40,7 +40,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), affParser.getCharset(), checker);
 
 
-		BiConsumer<String, Integer> lineaReader = (line, row) -> {
+		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
 
 			for(Production production : productions){
@@ -68,7 +68,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 				dialog.setVisible(true);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, lineaReader, done, affParser);
+		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
 	}
 
 	@Override

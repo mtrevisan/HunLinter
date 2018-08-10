@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import net.jodah.concurrentunit.Waiter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -24,7 +23,6 @@ public class WordGeneratorTest{
 
 	private final AffixParser affParser = new AffixParser();
 	private FlagParsingStrategy strategy;
-	private DictionaryParser dicParser;
 
 
 	@Test
@@ -795,25 +793,21 @@ public class WordGeneratorTest{
 			"SFX A 0 es .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "vw";
+		String[] inputCompounds = new String[]{
 			"arbeits/v",
 			"scheu/Aw",
-			"farbig/A");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "vw";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
-			waiter.assertEquals(1, words.size());
-			waiter.assertEquals(1l, wordCount);
-			waiter.assertEquals("arbeitsscheu", words.get(0));
-			waiter.resume();
+			"farbig/A"
 		};
-		wordGenerator.applyCompoundRules(line, fnDeferring);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(1, words.size());
+		Assert.assertEquals(new Long(1l), trueWordCount);
+		List<String> expected = Arrays.asList("arbeitsscheu");
+		Assert.assertEquals(expected, words);
 	}
 
 	@Test
@@ -826,26 +820,21 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "ABC";
+		String[] inputCompounds = new String[]{
 			"a/A",
 			"b/B",
-			"c/BC");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "ABC";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordCount) -> {
-			waiter.assertEquals(2, words.size());
-			waiter.assertEquals(2l, wordCount);
-			waiter.assertEquals("abc", words.get(0));
-			waiter.assertEquals("acc", words.get(1));
-			waiter.resume();
+			"c/BC"
 		};
-		wordGenerator.applyCompoundRules(line, fnDeferring);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(2, words.size());
+		Assert.assertEquals(new Long(2l), trueWordCount);
+		List<String> expected = Arrays.asList("abc", "acc");
+		Assert.assertEquals(expected, words);
 	}
 
 	@Test
@@ -858,28 +847,23 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE A*B*C*");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "A*B*C*";
+		String[] inputCompounds = new String[]{
 			"a/A",
 			"b/B",
-			"c/BC");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "A*B*C*";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-			waiter.assertEquals(37, words.size());
-			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
+			"c/BC"
+		};
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(37, words.size());
+		Assert.assertEquals(new Long(HunspellRegexWordGenerator.INFINITY), trueWordCount);
+		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
-			waiter.assertEquals(expected, words);
-			waiter.resume();
-		};
-		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
-
-		waiter.await(2_000l);
+		Assert.assertEquals(expected, words);
 	}
 
 	@Test
@@ -892,26 +876,21 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE A?B?C?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "A?B?C?";
+		String[] inputCompounds = new String[]{
 			"a/A",
 			"b/B",
-			"c/BC");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "A?B?C?";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-			waiter.assertEquals(9, words.size());
-			waiter.assertEquals(9l, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-			waiter.assertEquals(expected, words);
-			waiter.resume();
+			"c/BC"
 		};
-		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(9, words.size());
+		Assert.assertEquals(new Long(9l), trueWordCount);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected, words);
 	}
 
 	@Test
@@ -925,26 +904,21 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "(aa)?(bb)?(cc)?";
+		String[] inputCompounds = new String[]{
 			"a/aa",
 			"b/bb",
-			"c/bbcc");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "(aa)?(bb)?(cc)?";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-			waiter.assertEquals(9, words.size());
-			waiter.assertEquals(9l, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-			waiter.assertEquals(expected, words);
-			waiter.resume();
+			"c/bbcc"
 		};
-		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(9, words.size());
+		Assert.assertEquals(new Long(9l), trueWordCount);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected, words);
 	}
 
 	@Test
@@ -958,26 +932,21 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE (1)?(2)?(3)?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"3",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "(1)?(2)?(3)?";
+		String[] inputCompounds = new String[]{
 			"a/1",
 			"b/2",
-			"c/2,3");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "(1)?(2)?(3)?";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-			waiter.assertEquals(9, words.size());
-			waiter.assertEquals(9l, wordTrueCount);
-			List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-			waiter.assertEquals(expected, words);
-			waiter.resume();
+			"c/2,3"
 		};
-		wordGenerator.applyCompoundRules(line, fnDeferring, 37);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(9, words.size());
+		Assert.assertEquals(new Long(9l), trueWordCount);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected, words);
 	}
 
 
@@ -990,28 +959,22 @@ public class WordGeneratorTest{
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		File dicFile = FileService.getTemporaryUTF8File(language, ".dic",
-			"4",
+		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+
+		String line = "A";
+		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"xy/A",
-			"yz/A");
-		dicParser = new DictionaryParser(dicFile, affParser.getLanguage(), affParser.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affParser, dicParser, null);
-
-		Waiter waiter = new Waiter();
-		String line = "A";
-		BiConsumer<List<String>, Long> fnDeferring = (words, wordTrueCount) -> {
-words.forEach(word -> System.out.println(" \""+word+"\","));
-			waiter.assertEquals(10, words.size());
-			waiter.assertEquals(HunspellRegexWordGenerator.INFINITY, wordTrueCount);
-			List<String> expected = Arrays.asList("foobar", "barfoo", "foobarfoo");
-			waiter.assertEquals(expected, words);
-			waiter.resume();
+			"yz/A"
 		};
-		wordGenerator.applyCompoundFlag(line, fnDeferring, 10);
-
-		waiter.await(2_000l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 10l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(10, words.size());
+		Assert.assertEquals(new Long(HunspellRegexWordGenerator.INFINITY), trueWordCount);
+		List<String> expected = Arrays.asList("foobar", "barfoo", "foobarfoo");
+		Assert.assertEquals(expected, words);
 	}
 
 }

@@ -3,8 +3,6 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
@@ -49,12 +47,6 @@ public class Production extends DictionaryEntry{
 					continuationFlagsCount --;
 		}
 		return continuationFlagsCount;
-	}
-
-	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
-		return Arrays.stream(continuationFlags)
-			.filter(affParser::isManagedByCompoundRule)
-			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
 	}
 
 	public boolean hasContinuationFlags(AffixParser affParser){

@@ -7,19 +7,24 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundFlagWorker;
-import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -43,13 +48,15 @@ public class WordGenerator{
 	private static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
+	private static final String PIPE = "|";
+	private static final String LEFT_PARENTHESIS = "(";
+	private static final String RIGHT_PARENTHESIS = ")";
+
 
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
 	private final PropertyChangeListener listener;
 
-	@Getter
-	private CompoundRulesWorker compoundRulesWorker;
 	@Getter
 	private CompoundFlagWorker compoundFlagWorker;
 
@@ -146,29 +153,91 @@ public class WordGenerator{
 	/**
 	 * Generates all the stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
 	 * 
+	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
-	 * @param fnDeferring	Function to be called whenever the list of production is ready
+	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring) throws IllegalArgumentException, NoApplicableRuleException{
-		applyCompoundRules(compoundRule, fnDeferring, HunspellRegexWordGenerator.INFINITY);
+	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException, NoApplicableRuleException{
+		return applyCompoundRules(inputCompounds, compoundRule, HunspellRegexWordGenerator.INFINITY);
 	}
 
 	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
 	 * 
+	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
-	 * @param fnDeferring	Function to be called whenever the list of production is ready
 	 * @param limit	Limit results
+	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public void applyCompoundRules(String compoundRule, BiConsumer<List<String>, Long> fnDeferring, long limit) throws IllegalArgumentException,
+	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule, long limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
-		compoundRulesWorker = new CompoundRulesWorker(affParser, dicParser, this, limit);
-		if(listener != null)
-			compoundRulesWorker.addPropertyChangeListener(listener);
+		Objects.requireNonNull(inputCompounds);
+		Objects.requireNonNull(compoundRule);
+		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
+			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		compoundRulesWorker.execute(compoundRule, fnDeferring);
+		//extract map flag -> regex of compounds
+		Map<String, String> inputs = extractCompoundRules(inputCompounds);
+
+		//compose true compound rule
+		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
+
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
+		long wordTrueCount = regexWordGenerator.wordCount();
+		//generate all the words that matches the given regex
+		List<String> words = regexWordGenerator.generateAll(limit);
+
+		return Pair.of(words, wordTrueCount);
+	}
+
+	private Map<String, String> extractCompoundRules(String[] inputCompounds){
+		//extract map flag -> compounds
+		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		Map<String, Set<String>> compoundRules = new HashMap<>();
+		for(String inputCompound : inputCompounds){
+			DictionaryEntry production = new DictionaryEntry(inputCompound, null, null, strategy);
+			Map<String, Set<String>> c = production.collectFlagsFromCompoundRule(affParser);
+			for(Map.Entry<String, Set<String>> entry: c.entrySet()){
+				String affix = entry.getKey();
+				Set<String> prods = entry.getValue();
+
+				Set<String> sub = compoundRules.get(affix);
+				if(sub == null)
+					compoundRules.put(affix, prods);
+				else
+					sub.addAll(prods);
+			}
+		}
+
+		//transform map into flag -> regex of compounds
+		return compoundRules.entrySet().stream()
+			.filter(entry -> affParser.isManagedByCompoundRule(entry.getKey()))
+			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
+	}
+
+	private String composeTrueCompoundRule(Map<String, String> inputs, String compoundRule){
+		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		StringBuilder expandedCompoundRule = new StringBuilder();
+		for(String component : compoundRuleComponents){
+			String flag = strategy.cleanCompoundRuleComponent(component);
+			String expandedComponent = inputs.get(flag);
+			if(expandedComponent == null)
+				log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+			else{
+				char lastChar = component.charAt(component.length() - 1);
+				if(lastChar == '*' || lastChar == '?')
+					expandedComponent += lastChar;
+
+				if(expandedComponent.equals(component))
+					log.info(Backbone.MARKER_APPLICATION, "Missing word(s) for rule {} in compound rule {}", flag, compoundRule);
+				else
+					expandedCompoundRule.append(expandedComponent);
+			}
+		}
+		return expandedCompoundRule.toString();
 	}
 
 	/**

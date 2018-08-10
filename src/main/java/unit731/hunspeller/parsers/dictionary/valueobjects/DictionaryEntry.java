@@ -3,7 +3,9 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -108,6 +110,12 @@ public class DictionaryEntry{
 	public String getContinuationFlags(){
 		return Arrays.stream(continuationFlags)
 			.collect(Collectors.joining(", "));
+	}
+
+	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
+		return Arrays.stream(continuationFlags)
+			.filter(affParser::isManagedByCompoundRule)
+			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
 	}
 
 	public boolean containsMorphologicalField(String morphologicalField){

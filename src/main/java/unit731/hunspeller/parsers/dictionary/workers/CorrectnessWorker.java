@@ -20,12 +20,12 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
-		BiConsumer<String, Integer> lineaReader = (line, row) -> {
+		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};
-		createWorker(WORKER_NAME, dicParser, lineaReader, null, lockable);
+		createWorker(WORKER_NAME, dicParser, lineReader, null, lockable);
 	}
 
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.gui.CompoundTableModel;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
@@ -64,8 +66,10 @@ import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -131,7 +135,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
-	private final Map<String, Runnable> enableMenuItemFromWorker = new HashMap<>();
+	private CompoundRulesWorker compoundRulesExtractorWorker;
+	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 
 
 	public HunspellerFrame(){
@@ -157,31 +162,35 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableMenuItemFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
 			dicExtractDuplicatesMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(SorterWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				dicStatisticsMenuItem.setEnabled(true);
 			else
 				disStatisticsNoHyphenationMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
-		enableMenuItemFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
+		});
+		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
+			dicSortDictionaryMenuItem.setEnabled(true);
+			cmpLoadInputButton.setEnabled(true);
 		});
 	}
 
@@ -402,6 +411,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       jScrollPane1.setViewportView(cmpInputTextArea);
 
       cmpLoadInputButton.setText("Load input from dictionary");
+      cmpLoadInputButton.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            cmpLoadInputButtonActionPerformed(evt);
+         }
+      });
 
       cmpLayeredPane.setLayer(cmpInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       cmpLayeredPane.setLayer(cmpInputComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -1308,24 +1322,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
 		String inputText = (String)cmpInputComboBox.getEditor().getItem();
+		long limit = Long.parseLong(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
+		String inputCompounds = (String)cmpInputTextArea.getText();
+
 		inputText = StringUtils.strip(inputText);
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				dicSortDictionaryMenuItem.setEnabled(false);
 
-				BiConsumer<List<String>, Long> filler = (words, wordTrueCount) -> {
-					dicSortDictionaryMenuItem.setEnabled(true);
+				Pair<List<String>, Long> result = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
+				List<String> words = result.getLeft();
+				Long trueWordCount = result.getRight();
 
-					if(wordTrueCount == HunspellRegexWordGenerator.INFINITY || words.size() < wordTrueCount)
-						words.add("\u2026");
+				if(trueWordCount == HunspellRegexWordGenerator.INFINITY || words.size() < trueWordCount)
+					words.add("\u2026");
 
-					CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
-					dm.setProductions(words);
+				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
+				dm.setProductions(words);
 
-					totalCompoundsOutputLabel.setText(wordTrueCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(wordTrueCount));
-				};
-				long limit = Long.parseLong(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
-				backbone.getWordGenerator().applyCompoundRules(inputText, filler, limit);
+				totalCompoundsOutputLabel.setText(trueWordCount == HunspellRegexWordGenerator.INFINITY? "\u221E": Long.toString(trueWordCount));
+
+				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 			catch(IllegalArgumentException e){
 				log.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
@@ -1336,6 +1353,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			totalCompoundsOutputLabel.setText(StringUtils.EMPTY);
 		}
    }//GEN-LAST:event_limitComboBoxActionPerformed
+
+   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+		extractCompoundRulesInputs();
+   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
 
 	@Override
@@ -1426,12 +1447,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
-			if(backbone.getWordGenerator().getCompoundRulesWorker() != null && backbone.getWordGenerator().getCompoundRulesWorker().getState() == SwingWorker.StateValue.STARTED){
+			if(compoundRulesExtractorWorker != null && compoundRulesExtractorWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
 				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the compound extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
-					backbone.getWordGenerator().getCompoundRulesWorker().cancel();
+					compoundRulesExtractorWorker.cancel();
 
 					dicSortDictionaryMenuItem.setEnabled(true);
 					log.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
@@ -1747,6 +1768,34 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
+	private void extractCompoundRulesInputs(){
+		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
+			dicSortDictionaryMenuItem.setEnabled(false);
+			cmpLoadInputButton.setEnabled(false);
+
+			mainProgressBar.setValue(0);
+
+			AffixParser affParser = backbone.getAffParser();
+			int compoundMinimumLength = affParser.getCompoundMinimumLength();
+			List<Production> compounds = new ArrayList<>();
+			BiConsumer<Production, Integer> productionReader = (production, row) -> {
+				String word = production.getWord();
+				if(word.length() >= compoundMinimumLength)
+					compounds.add(production);
+			};
+			Runnable done = () -> {
+				if(!compoundRulesExtractorWorker.isCancelled()){
+					StringJoiner sj = new StringJoiner("\n");
+					compounds.forEach(compound -> sj.add(compound.toString()));
+					cmpInputTextArea.setText(sj.toString());
+				}
+			};
+			compoundRulesExtractorWorker = new CompoundRulesWorker(affParser, backbone.getDicParser(), backbone.getWordGenerator(), productionReader, done);
+			compoundRulesExtractorWorker.addPropertyChangeListener(this);
+			compoundRulesExtractorWorker.execute();
+		}
+	}
+
 
 	private void updateSynonyms(){
 		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
@@ -1851,7 +1900,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			case "state":
 				SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					Runnable menuItemEnabler = enableMenuItemFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
+					Runnable menuItemEnabler = enableComponentFromWorker.get(((WorkerBase<?, ?>)evt.getSource()).getWorkerName());
 					if(menuItemEnabler != null)
 						menuItemEnabler.run();
 				}

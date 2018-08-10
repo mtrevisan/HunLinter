@@ -43,7 +43,7 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 		Set<String> originators = new HashSet<>();
-		BiConsumer<String, Integer> lineaReader = (line, row) -> {
+		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			//collect words that has the compound flag as continuation flag
 			List<Production> productions = wordGenerator.applyRules(line);
 			for(Production production : productions)
@@ -55,7 +55,7 @@ public class CompoundFlagWorker extends WorkerDictionaryReadBase{
 				if(!originators.isEmpty())
 					extract();
 		};
-		createWorker(WORKER_NAME, dicParser, lineaReader, done, affParser);
+		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
 	}
 
 	private void extract(){
