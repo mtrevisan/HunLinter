@@ -23,14 +23,14 @@ public class UTF8ParsingStrategyTest{
 	public void empty(){
 		String[] flags = strategy.parseFlags("");
 
-		Assert.assertEquals(0, flags.length);
+		Assert.assertNull(flags);
 	}
 
 	@Test
 	public void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
-		Assert.assertEquals(0, flags.length);
+		Assert.assertNull(flags);
 	}
 
 	@Test

@@ -7,7 +7,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -261,17 +260,58 @@ public class WordGenerator{
 		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+		int size = inputCompounds.length;
+		for(int i = 0; i < size; i ++){
+			int index = inputCompounds[i].indexOf('/');
+			if(index >= 0)
+				inputCompounds[i] = inputCompounds[i].substring(0, index);
+		}
+
+		boolean forbidTriplesInCompound = affParser.isForbidTriplesInCompound();
 		Permutations p = new Permutations(inputCompounds.length);
 		List<String> words = new ArrayList<>();
 		long wordTrueCount = p.totalCount();
 		List<int[]> permutations = p.totalPermutations();
 		for(int[] permutation : permutations){
-			System.out.println(Arrays.toString(permutation));
-			//TODO
 			//compose compound
+			StringBuilder sb = new StringBuilder();
+			for(int index = 0; index < permutation.length; index ++){
+				//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
+				String nextCompound = inputCompounds[permutation[index]];
+				if(forbidTriplesInCompound && containsTriple(sb, nextCompound)){
+					sb.setLength(0);
+					break;
+				}
+
+				sb.append(nextCompound);
+			}
+			if(sb.length() > 0)
+				words.add(sb.toString());
+
+			if(words.size() == limit)
+				break;
 		}
 
 		return Pair.of(words, wordTrueCount);
+	}
+
+	private boolean containsTriple(StringBuilder sb, String compound){
+		int size = sb.length() - 1;
+		String interCompounds = sb.substring(Math.max(size - 2, 0), size).concat(compound.substring(0, Math.min(compound.length(), 2)));
+
+		char lastChar = 0;
+		int count = 0;
+		int len = interCompounds.length();
+		for(int i = 0; i < len; i ++){
+			char chr = interCompounds.charAt(i);
+			if(chr != lastChar){
+				lastChar = chr;
+				count = 0;
+			}
+			else
+				count ++;
+		}
+		return (count == 3);
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){

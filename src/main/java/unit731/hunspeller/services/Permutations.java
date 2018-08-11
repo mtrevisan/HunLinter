@@ -62,20 +62,20 @@ public class Permutations implements Iterator<int[]>{
 	}
 
 	/**
-	 * Returns the total count of permutations of <code>n</code> elements taken <code>1…k</code> at a time, that is
+	 * Returns the total count of permutations of <code>n</code> elements taken <code>2…k</code> at a time, that is
 	 * <code>sum for i = 1…k of nPk</code>
 	 */
 	public long totalCount(){
 		long ret = 0l;
-		for(int kk = 1; kk <= n; kk ++)
+		for(int kk = 2; kk <= n; kk ++)
 			ret += count(kk);
 		return ret;
 	}
 
-	/** Returns the total permutations of <code>n</code> elements taken <code>1…k</code> at a time */
+	/** Returns the total permutations of <code>n</code> elements taken <code>2…k</code> at a time */
 	public List<int[]> totalPermutations(){
 		List<int[]> all = new ArrayList<>(n);
-		for(int kk = 1; kk <= n; kk ++){
+		for(int kk = 2; kk <= n; kk ++){
 			Permutations p = new Permutations(n, kk);
 			while(p.hasNext())
 				all.add(p.next());
