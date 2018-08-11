@@ -159,7 +159,8 @@ public class WordGenerator{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException, NoApplicableRuleException{
+	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException,
+			NoApplicableRuleException{
 		return applyCompoundRules(inputCompounds, compoundRule, HunspellRegexWordGenerator.INFINITY);
 	}
 
@@ -215,7 +216,8 @@ public class WordGenerator{
 		//transform map into flag -> regex of compounds
 		return compoundRules.entrySet().stream()
 			.filter(entry -> affParser.isManagedByCompoundRule(entry.getKey()))
-			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE) + RIGHT_PARENTHESIS));
+			.collect(Collectors.toMap(entry -> entry.getKey(), entry -> LEFT_PARENTHESIS + StringUtils.join(entry.getValue(), PIPE)
+				+ RIGHT_PARENTHESIS));
 	}
 
 	private String composeTrueCompoundRule(Map<String, String> inputs, String compoundRule){
@@ -409,7 +411,8 @@ long wordTrueCount = 0l;
 						if(!appliedRules.isEmpty())
 							parentFlag = appliedRules.get(0).getFlag();
 					}
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+					throw new IllegalArgumentException("Non–existent rule " + affix + " found"
+						+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
 				List<AffixEntry> applicableAffixes = AffixParser.extractListOfApplicableAffixes(word, rule.getEntries());

@@ -968,7 +968,7 @@ public class WordGeneratorTest{
 			"xy/A",
 			"yz/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 10l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 10l);
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(10, words.size());
