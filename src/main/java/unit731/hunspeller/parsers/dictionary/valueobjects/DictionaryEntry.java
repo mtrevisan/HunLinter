@@ -36,7 +36,7 @@ public class DictionaryEntry{
 	@Getter
 	@Setter
 	protected String word;
-	protected final String[] continuationFlags;
+	protected String[] continuationFlags;
 	protected final String[] morphologicalFields;
 	@Getter
 	private final boolean combineable;
@@ -83,9 +83,8 @@ public class DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
-	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
+	protected DictionaryEntry(String word, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;
-		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
 		combineable = true;
 	}
@@ -108,8 +107,9 @@ public class DictionaryEntry{
 	}
 
 	public String getContinuationFlags(){
-		return Arrays.stream(continuationFlags)
-			.collect(Collectors.joining(", "));
+		return (continuationFlags != null? Arrays.stream(continuationFlags)
+			.collect(Collectors.joining(", ")):
+			null);
 	}
 
 	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){

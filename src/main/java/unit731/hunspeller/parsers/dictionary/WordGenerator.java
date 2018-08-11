@@ -13,11 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
@@ -144,6 +142,9 @@ public class WordGenerator{
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
 
+		//remove continuation flags
+		productions.forEach(production -> production.clearContinuationFlags());
+
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
 
@@ -257,32 +258,10 @@ public class WordGenerator{
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		//TODO
-List<String> words = getPermutations(inputCompounds, 4);
-long wordTrueCount = getPermutations(inputCompounds.length, 4);
+List<String> words = null;
+long wordTrueCount = 0l;
 
 		return Pair.of(words, wordTrueCount);
-	}
-
-	private List<String> getPermutations(String[] words, int maxLength){
-		return null;
-	}
-
-	private long getPermutations(int n, int k){
-		//n! / (n - k)!
-		return 0l;
-	}
-
-	//https://textmechanic.com/text-tools/combination-permutation-tools/combination-generator/
-	public List<String> getCombinations(String text){
-		List<String> results = new ArrayList<>();
-		for(int i = 0; i < text.length(); i ++){
-			//record size as the list will change
-			int resultsLength = results.size();
-			for(int j = 0; j < resultsLength; j ++)
-				results.add(text.charAt(i) + results.get(j));
-			results.add(Character.toString(text.charAt(i)));
-		}
-		return results;
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){
@@ -384,27 +363,35 @@ long wordTrueCount = getPermutations(inputCompounds.length, 4);
 		while(itr.hasNext()){
 			Production production = itr.next();
 
+			boolean hasNeedAffixFlag = false;
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules == null){
-				boolean hasNeedAffixFlag = production.containsContinuationFlag(needAffixFlag);
-				if(hasNeedAffixFlag)
-					itr.remove();
+			if(appliedRules != null){
+				//check that last suffix and last prefix shouldn't have the needaffix flag
+				boolean lastSuffix = false;
+				boolean lastPrefix = false;
+				boolean lastSuffixNeedAffix = false;
+				boolean lastPrefixNeedAffix = false;
+				for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
+					AffixEntry appliedRule = appliedRules.get(i);
+					if(!lastSuffix && appliedRule.isSuffix()){
+						lastSuffix = true;
+						lastSuffixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+					}
+					else if(!lastPrefix && !appliedRule.isSuffix()){
+						lastPrefix = true;
+						lastPrefixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+					}
+				}
+				hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
 			}
-			else{
-				long rulesWithNeedAffixFlag = 0l;
-				for(AffixEntry appliedRule : appliedRules)
-					if(appliedRule.containsContinuationFlag(needAffixFlag))
-						rulesWithNeedAffixFlag ++;
-				if(rulesWithNeedAffixFlag == appliedRules.size())
-					itr.remove();
-			}
+			if(hasNeedAffixFlag)
+				itr.remove();
 		}
 	}
 
 	private List<Production> applyAffixRules(DictionaryEntry productable, List<String[]> applyAffixes) throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
 		String[] postponedAffixes = applyAffixes.get(1);
-		String[] terminalAffixes = applyAffixes.get(2);
 
 		List<Production> productions = new ArrayList<>();
 		if(appliedAffixes.length > 0){
@@ -463,8 +450,7 @@ long wordTrueCount = getPermutations(inputCompounds.length, 4);
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					String[] otherAffixes = ArrayUtils.addAll(postponedAffixes, terminalAffixes);
-					Production production = new Production(newWord, entry, productable, (otherAffixes.length > 0? otherAffixes: null), rule.isCombineable(), getFlagParsingStrategy());
+					Production production = new Production(newWord, entry, productable, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
 
 					productions.add(production);
 				}

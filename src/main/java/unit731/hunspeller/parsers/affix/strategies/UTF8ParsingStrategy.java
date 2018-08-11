@@ -22,7 +22,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
-			return new String[0];
+			return null;
 
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);

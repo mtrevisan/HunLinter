@@ -22,7 +22,7 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
-			return new String[0];
+			return null;
 
 		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);

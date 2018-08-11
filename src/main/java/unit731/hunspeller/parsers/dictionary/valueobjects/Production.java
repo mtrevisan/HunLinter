@@ -34,8 +34,8 @@ public class Production extends DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
-	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
-		super(word, continuationFlags, morphologicalFields, strategy);
+	public Production(String word, String morphologicalFields, FlagParsingStrategy strategy){
+		super(word, morphologicalFields, strategy);
 	}
 
 	public int getContinuationFlagsCount(AffixParser affParser){
@@ -51,6 +51,10 @@ public class Production extends DictionaryEntry{
 
 	public boolean hasContinuationFlags(AffixParser affParser){
 		return (getContinuationFlagsCount(affParser) > 0);
+	}
+
+	public void clearContinuationFlags(){
+		continuationFlags = null;
 	}
 
 	public boolean hasMorphologicalFields(){

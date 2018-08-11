@@ -26,7 +26,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
-			return new String[0];
+			return null;
 
 		String[] flags = StringUtils.split(textFlags, COMMA);
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));

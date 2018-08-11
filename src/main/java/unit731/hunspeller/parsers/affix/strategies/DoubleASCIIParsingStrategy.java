@@ -25,7 +25,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
-			return new String[0];
+			return null;
 
 		if(textFlags.length() % 2 != 0)
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);

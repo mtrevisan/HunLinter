@@ -84,7 +84,7 @@ public class AffixEntry{
 
 		type = Type.toEnum(ruleType);
 		String[] classes = strategy.parseFlags((additionParts.length > 1? expandAliases(additionParts[1], aliasesFlag): null));
-		continuationFlags = (classes.length > 0? classes: null);
+		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		removingLength = removing.length();
