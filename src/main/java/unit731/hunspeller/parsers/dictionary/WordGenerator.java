@@ -7,6 +7,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundFlagWorker;
+import unit731.hunspeller.services.Permutations;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -259,9 +261,15 @@ public class WordGenerator{
 		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		//TODO
-List<String> words = null;
-long wordTrueCount = 0l;
+		Permutations p = new Permutations(inputCompounds.length);
+		List<String> words = new ArrayList<>();
+		long wordTrueCount = p.totalCount();
+		List<int[]> permutations = p.totalPermutations();
+		for(int[] permutation : permutations){
+			System.out.println(Arrays.toString(permutation));
+			//TODO
+			//compose compound
+		}
 
 		return Pair.of(words, wordTrueCount);
 	}

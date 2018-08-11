@@ -1,5 +1,6 @@
 package unit731.hunspeller.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +19,7 @@ public class Permutations implements Iterator<int[]>{
 	private final int n;
 	private final int k;
 	private final int[] a;
-	private boolean hasNext = true;
+	private boolean hasNext;
 
 
 	/**
@@ -27,13 +28,59 @@ public class Permutations implements Iterator<int[]>{
 	 */
 	public Permutations(int n, int k){
 		if(n < 1)
-			throw new IllegalArgumentException("Need at least 1 element!");
-		if(k < 0 || k > n)
-			throw new IllegalArgumentException("0 < k <= n");
+			throw new IllegalArgumentException("At least one element needed");
+		if(k <= 0 || k > n)
+			throw new IllegalArgumentException("The number of elements taken should be between 0 and the total number of elements inclusive");
 
 		this.n = n;
 		this.k = k;
 		a = identityPermutation(n);
+		hasNext = true;
+	}
+
+	/**
+	 * @param n	the number of elements
+	 */
+	public Permutations(int n){
+		this(n, n);
+	}
+
+	/** Returns the count of permutations of <code>n</code> elements taken <code>k</code> at a time, that is <code>nPk</code> */
+	public long count(){
+		return count(k);
+	}
+
+	private long count(int kk){
+		long ret = 2l;
+		for(int i = n; i > Math.max(n - kk, 2); i --){
+			if(i > Long.MAX_VALUE / ret)
+				throw new IllegalArgumentException(String.format("Overflow. Too big numbers are used %sP%s: %d * %d", n, kk, ret, i));
+
+			ret *= i;
+		}
+		return ret;
+	}
+
+	/**
+	 * Returns the total count of permutations of <code>n</code> elements taken <code>1…k</code> at a time, that is
+	 * <code>sum for i = 1…k of nPk</code>
+	 */
+	public long totalCount(){
+		long ret = 0l;
+		for(int kk = 1; kk <= n; kk ++)
+			ret += count(kk);
+		return ret;
+	}
+
+	/** Returns the total permutations of <code>n</code> elements taken <code>1…k</code> at a time */
+	public List<int[]> totalPermutations(){
+		List<int[]> all = new ArrayList<>(n);
+		for(int kk = 1; kk <= n; kk ++){
+			Permutations p = new Permutations(n, kk);
+			while(p.hasNext())
+				all.add(p.next());
+		}
+		return all;
 	}
 
 	@Override
@@ -96,10 +143,10 @@ public class Permutations implements Iterator<int[]>{
 	 * @return the initialized array
 	 */
 	private int[] identityPermutation(int n){
-		int[] a = new int[n];
-		for(int i = a.length - 1; i >= 0; i --)
-			a[i] = i;
-		return a;
+		int[] aa = new int[n];
+		for(int i = aa.length - 1; i >= 0; i --)
+			aa[i] = i;
+		return aa;
 	}
 
 	private void swap(int[] a, int i, int j){
@@ -109,94 +156,13 @@ public class Permutations implements Iterator<int[]>{
 	}
 
 	public static void main(String[] args){
-		Permutations p = new Permutations(3, 3);
-		while(p.hasNext())
-			System.out.println(Arrays.toString(p.next()));
+//		Permutations p = new Permutations(3, 3);
+//		while(p.hasNext())
+//			System.out.println(Arrays.toString(p.next()));
+		Permutations p = new Permutations(3);
+		List<int[]> result = p.totalPermutations();
+		for(int[] res : result)
+			System.out.println(Arrays.toString(res));
 	}
-
-//	public static List<int[]> permutations(int n){
-//		List<int[]> all = new ArrayList<>(n);
-//		for(int k = 1; k <= n; k ++){
-//			int[] kPermutations = permutations(n, k);
-//			all.add(kPermutations);
-//		}
-//		return all;
-//	}
-//
-//	public static int[] permutations(int n, int k){
-//		if(n < 1)
-//			throw new IllegalArgumentException("Need at least 1 element!");
-//		if(k < 0 || k > n)
-//			throw new IllegalArgumentException("0 < k <= n");
-//
-//		int[] a = identityPermutation(n);
-//
-//		//find j in (k…n-1) where a[j] > a[edge]
-//		int edge = k - 1;
-//		int j = k;
-//		while(j < n && a[edge] >= a[j])
-//			j ++;
-//
-//		if(j < n)
-//			//swap a[edge] with a[j]
-//			swap(a, edge, j);
-//		else{
-//			//reverse a[k] to a[n-1]
-//			ArrayUtils.reverse(a, k, n);
-//
-//			//find rightmost ascent to left of edge
-//			int i = edge - 1;
-//			while(i >= 0 && a[i] >= a[i + 1])
-//				i --;
-//
-//			if(i < 0)
-//				//no more permutations
-//				return null;
-//
-//			//find j in (n-1…i+1) where a[j] > a[i]
-//			j = n - 1;
-//			while(j > i && a[i] >= a[j])
-//				j --;
-//
-//			//swap a[i] with a[j]
-//			swap(a, i, j);
-//			//reverse a[i+1] to a[n-1]
-//			ArrayUtils.reverse(a, i + 1, n);
-//		}
-//
-//		return Arrays.copyOfRange(a, 0, k);
-//	}
-//
-//	public static long factorial(int n, int k){
-//		if(n < 0 || n > 20)
-//			throw new IllegalArgumentException(n + " is out of range");
-//
-//		return LongStream.rangeClosed(Math.max(k, 2), n)
-//			.reduce(1, (a, b) -> a * b);
-//	}
-//
-//	public static <T> List<T> permutation(long index, List<T> items){
-//		Objects.requireNonNull(items);
-//
-//		return permutationHelper(index, new LinkedList<>(items), new ArrayList<>());
-//
-//	}
-//
-//	private static <T> List<T> permutationHelper(long index, LinkedList<T> in, List<T> out){
-//		if(in.isEmpty())
-//			return out;
-//
-//		long subFactorial = factorial(in.size() - 1, 0);
-//		out.add(in.remove((int)(index / subFactorial)));
-//		return permutationHelper((int)(index % subFactorial), in, out);
-//	}
-//
-//	@SafeVarargs
-//	@SuppressWarnings("varargs")
-//	public static <T> Stream<Stream<T>> of(T... items){
-//		List<T> itemList = Arrays.asList(items);
-//		return LongStream.range(0, factorial(items.length, 0))
-//			.mapToObj(index -> permutation(index, itemList).stream());
-//	}
 
 }
