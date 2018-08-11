@@ -972,7 +972,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(10, words.size());
-		Assert.assertEquals(new Long(72l), trueWordCount);
+		Assert.assertEquals(new Long(60l), trueWordCount);
 		List<String> expected = Arrays.asList("foobar", "fooxy", "fooyz", "barfoo", "barxy", "baryz", "xyfoo", "xybar", "xyyz", "yzfoo");
 		Assert.assertEquals(expected, words);
 	}

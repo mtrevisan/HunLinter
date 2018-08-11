@@ -51,8 +51,8 @@ public class Permutations implements Iterator<int[]>{
 	}
 
 	private long count(int kk){
-		long ret = 2l;
-		for(int i = n; i > Math.max(n - kk, 2); i --){
+		long ret = 1l;
+		for(int i = n; i > n - kk; i --){
 			if(i > Long.MAX_VALUE / ret)
 				throw new IllegalArgumentException(String.format("Overflow. Too big numbers are used %sP%s: %d * %d", n, kk, ret, i));
 
