@@ -90,7 +90,7 @@ public class DictionaryEntry{
 	}
 
 	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
-		return Arrays.stream(continuationFlags)
+		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(rf -> {
 				RuleEntry r = ruleEntryExtractor.apply(rf);
 				return (r != null && !r.isSuffix());
@@ -113,7 +113,7 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
-		return Arrays.stream(continuationFlags)
+		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affParser::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
 	}

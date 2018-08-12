@@ -741,10 +741,13 @@ public class WordGeneratorTest{
 		Assert.assertEquals(new Production("drinkable", "st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(1));
 		Assert.assertEquals(new Production("drinks", "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), stems.get(2));
 		//twofold productions
-		Assert.assertEquals(new Production("drinkables", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(3));
+		Assert.assertEquals(new Production("drinkables", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy),
+			stems.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("undrinkable", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), stems.get(4));
-		Assert.assertEquals(new Production("undrinkables", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy), stems.get(5));
+		Assert.assertEquals(new Production("undrinkable", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy),
+			stems.get(4));
+		Assert.assertEquals(new Production("undrinkables", "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur",
+			strategy), stems.get(5));
 	}
 
 
@@ -974,6 +977,34 @@ public class WordGeneratorTest{
 		Assert.assertEquals(10, words.size());
 		Assert.assertEquals(new Long(60l), trueWordCount);
 		List<String> expected = Arrays.asList("foobar", "fooxy", "fooyz", "barfoo", "barxy", "baryz", "xyfoo", "xybar", "xyyz", "yzfoo");
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void checkCompoundTriple() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"CHECKCOMPOUNDTRIPLE",
+			"COMPOUNDFLAG A");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+		String line = "A";
+		String[] inputCompounds = new String[]{
+			"foo/A",
+			"opera/A",
+			"eel/A",
+			"bare/A"
+		};
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 12l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(12, words.size());
+		Assert.assertEquals(new Long(60l), trueWordCount);
+		List<String> expected = Arrays.asList("fooeel", "foobare", "operafoo", "operaeel", "operabare", "eelfoo", "eelopera", "eelbare", "barefoo",
+			"bareopera", "fooeelopera", "fooeelbare");
 		Assert.assertEquals(expected, words);
 	}
 
