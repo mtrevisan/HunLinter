@@ -49,7 +49,10 @@ public enum AffixTag{
 //	FORBID_WARN("FORBIDWARN"),
 
 	//Options for compounding
-	/** Define new break points for breaking words and checking word parts separately (use ^ and $ to delete characters at end and start of the word) */
+	/**
+	 * Define new break points for breaking words and checking word parts separately (use ^ and $ to delete characters at end
+	 * and start of the word)
+	 */
 	BREAK("BREAK"),
 	/** Define custom compound patterns */
 	COMPOUND_RULE("COMPOUNDRULE"),
@@ -68,19 +71,23 @@ public enum AffixTag{
 //	COMPOUND_END("COMPOUNDEND"),
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	ONLY_IN_COMPOUND("ONLYINCOMPOUND"),
-	/** Affixes with this flag may be inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and at the end of compounds only). */
+	/**
+	 * Affixes with this flag may be inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
+	 * at the end of compounds only).
+	 */
 //	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
 	/** Allow twofold suffixes within compounds */
 //	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
-	/** Signs the compounds in the dictionary (now it is used only in the Hungarian language specific code) */
-//	COMPOUND_ROOT("COMPOUNDROOT"),
 	/** Suffixes with this flag forbid compounding of the affixed word */
 //	COMPOUND_FORBID_FLAG("COMPOUNDFORBIDFLAG"),
 	/** Set maximum word count in a compound word (default is unlimited) */
 //	COMPOUND_WORD_MAX("COMPOUNDWORDMAX"),
 	/** Forbid word duplication in compounds */
 //	CHECK_COMPOUND_DUPLICATION("CHECKCOMPOUNDDUP"),
-	/** Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with 'compound friendly' orthography) */
+	/**
+	 * Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with
+	 * 'compound friendly' orthography)
+	 */
 //	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
 	/** Forbid upper case characters at word bound in compounds */
 //	CHECK_COMPOUND_CASE("CHECKCOMPOUNDCASE"),
@@ -90,7 +97,10 @@ public enum AffixTag{
 	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
 	CIRCUMFIX("CIRCUMFIX"),
-	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from the set of accepted affixed and compound words) */
+	/**
+	 * Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from the set of accepted affixed
+	 * and compound words)
+	 */
 //	FORBIDDEN_WORD("FORBIDDENWORD"),
 
 	//Options for affix creation

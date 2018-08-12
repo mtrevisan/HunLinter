@@ -205,13 +205,14 @@ public class WordGenerator{
 
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-			Permutations p = new Permutations(inputCompoundsFlag.size());
+			Permutations perm = new Permutations(inputCompoundsFlag.size());
 			words = new ArrayList<>();
-			wordTrueCount = p.totalCount();
-			List<int[]> permutations = p.totalPermutations();
+			wordTrueCount = perm.totalCount();
+			StringBuilder sb = new StringBuilder();
+			List<int[]> permutations = perm.totalPermutations();
 			for(int[] permutation : permutations){
 				//compose compound
-				StringBuilder sb = new StringBuilder();
+				sb.setLength(0);
 				for(int index = 0; index < permutation.length; index ++){
 					String nextCompound = inputCompoundsFlag.get(permutation[index]);
 
@@ -234,7 +235,6 @@ public class WordGenerator{
 				if(words.size() == limit)
 					break;
 			}
-			//TODO
 		}
 
 		return Pair.of(words, wordTrueCount);
