@@ -92,15 +92,17 @@ public class WordGenerator{
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(dicEntry);
 		if(log.isDebugEnabled()){
+			FlagParsingStrategy strategy = affParser.getStrategy();
 			log.debug("Onefold productions:");
-			onefoldProductions.forEach(production -> log.debug("   {} from {}", production, production.getRulesSequence()));
+			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
 		//extract prefixed productions
 		List<Production> twofoldProductions = getTwofoldProductions(onefoldProductions);
 		if(log.isDebugEnabled()){
+			FlagParsingStrategy strategy = affParser.getStrategy();
 			log.debug("Twofold productions:");
-			twofoldProductions.forEach(production -> log.debug("   {} from {}", production, production.getRulesSequence()));
+			twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
 		//extract second suffixed productions
@@ -111,8 +113,9 @@ public class WordGenerator{
 		lastfoldProductions = getLastfoldProductions(lastfoldProductions);
 		checkTwofoldCorrectness(lastfoldProductions);
 		if(log.isDebugEnabled()){
+			FlagParsingStrategy strategy = affParser.getStrategy();
 			log.debug("Lastfold productions:");
-			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production, production.getRulesSequence()));
+			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
 		//remove rules that invalidate the circumfix rule
@@ -132,9 +135,6 @@ public class WordGenerator{
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
-
-		//remove continuation flags
-		productions.forEach(production -> production.clearContinuationFlags());
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));

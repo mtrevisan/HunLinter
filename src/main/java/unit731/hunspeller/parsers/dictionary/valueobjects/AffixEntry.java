@@ -132,7 +132,8 @@ public class AffixEntry{
 			flags.addAll(Arrays.asList(continuationFlags));
 		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(Arrays.asList(otherContinuationFlags));
-		return flags.toArray(new String[flags.size()]);
+		int size = flags.size();
+		return (size > 0? flags.toArray(new String[size]): null);
 	}
 
 	/**

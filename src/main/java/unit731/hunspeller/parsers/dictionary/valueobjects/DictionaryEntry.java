@@ -83,8 +83,9 @@ public class DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
-	protected DictionaryEntry(String word, String morphologicalFields, FlagParsingStrategy strategy){
+	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;
+		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
 		combineable = true;
 	}
@@ -190,9 +191,14 @@ public class DictionaryEntry{
 	}
 
 	public String toString(FlagParsingStrategy strategy){
-		String cf = (strategy != null? strategy.joinFlags(continuationFlags): (continuationFlags != null && continuationFlags.length > 0? AffixEntry.SLASH + StringUtils.join(continuationFlags, ", "): StringUtils.EMPTY));
-		String mf = (morphologicalFields != null && morphologicalFields.length > 0? "\t" + StringUtils.join(morphologicalFields, " "): StringUtils.EMPTY);
-		return word + cf + mf;
+		StringBuilder sb = new StringBuilder(word);
+		if(strategy != null)
+			sb.append(strategy.joinFlags(continuationFlags));
+		else if(continuationFlags != null && continuationFlags.length > 0)
+			sb.append(AffixEntry.SLASH).append(StringUtils.join(continuationFlags, ", "));
+		if(morphologicalFields != null && morphologicalFields.length > 0)
+			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));
+		return sb.toString();
 	}
 
 }

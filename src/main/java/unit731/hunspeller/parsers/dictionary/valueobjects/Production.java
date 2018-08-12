@@ -34,8 +34,8 @@ public class Production extends DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
-	public Production(String word, String morphologicalFields, FlagParsingStrategy strategy){
-		super(word, morphologicalFields, strategy);
+	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
+		super(word, continuationFlags, morphologicalFields, strategy);
 	}
 
 	public int getContinuationFlagsCount(AffixParser affParser){

@@ -1081,6 +1081,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void calculateCompoundProductions(HunspellerFrame frame){
 		String inputText = (String)frame.cmpInputComboBox.getEditor().getItem();
 
+		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
+
 		inputText = StringUtils.strip(inputText);
 		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
 			return;
@@ -1786,7 +1788,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
 			dicSortDictionaryMenuItem.setEnabled(false);
 			cmpInputComboBox.setEnabled(false);
-			limitComboBox.setEnabled(false);
 			cmpInputTextArea.setEnabled(false);
 			cmpLoadInputButton.setEnabled(false);
 
@@ -1854,6 +1855,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void clearDictionaryParser(){
 		clearDictionaryFields();
+		clearDictionaryCompoundFields();
 
 		setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
@@ -1872,9 +1874,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		formerInputText = null;
 		dicInputTextField.setText(null);
+	}
 
+	private void clearDictionaryCompoundFields(){
 		cmpInputComboBox.setEnabled(true);
-		limitComboBox.setEnabled(true);
 		cmpInputTextArea.setText(null);
 		cmpInputTextArea.setEnabled(true);
 		cmpLoadInputButton.setEnabled(true);
