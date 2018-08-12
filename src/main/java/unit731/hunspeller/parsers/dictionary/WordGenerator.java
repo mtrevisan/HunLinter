@@ -258,6 +258,7 @@ public class WordGenerator{
 		}
 
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
+		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		Permutations p = new Permutations(inputCompounds.length);
 		List<String> words = new ArrayList<>();
 		long wordTrueCount = p.totalCount();
@@ -266,11 +267,17 @@ public class WordGenerator{
 			//compose compound
 			StringBuilder sb = new StringBuilder();
 			for(int index = 0; index < permutation.length; index ++){
-				//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
 				String nextCompound = inputCompounds[permutation[index]];
-				if(forbidTriples && containsTriple(sb, nextCompound)){
-					sb.setLength(0);
-					break;
+
+				if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
+					//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+					if(simplifyTriples)
+						nextCompound = nextCompound.substring(1);
+					//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
+					else if(forbidTriples){
+						sb.setLength(0);
+						break;
+					}
 				}
 
 				sb.append(nextCompound);

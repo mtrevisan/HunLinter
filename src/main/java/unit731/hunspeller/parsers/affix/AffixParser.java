@@ -35,7 +35,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 /**
  * Managed options:
  *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
- *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, CIRCUMFIX, CHECKCOMPOUNDTRIPLE
+ *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, CIRCUMFIX, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE
  *		PFX, SFX
  *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
  */
@@ -345,7 +345,7 @@ public class AffixParser extends ReadWriteLockable{
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.CIRCUMFIX, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.FORBIDDEN_WORD, FUN_COPY_OVER);
 		//Options for affix creation
@@ -577,6 +577,10 @@ public class AffixParser extends ReadWriteLockable{
 
 	public boolean isForbidTriplesInCompound(){
 		return containsData(AffixTag.CHECK_COMPOUND_TRIPLE);
+	}
+
+	public boolean isSimplifyTriplesInCompound(){
+		return containsData(AffixTag.SIMPLIFIED_TRIPLE);
 	}
 
 	public Set<String> getProductiveAffixes(){

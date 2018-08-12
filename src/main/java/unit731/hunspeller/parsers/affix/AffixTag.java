@@ -87,7 +87,7 @@ public enum AffixTag{
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
 	CHECK_COMPOUND_TRIPLE("CHECKCOMPOUNDTRIPLE"),
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
-//	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
+	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
 	CIRCUMFIX("CIRCUMFIX"),
 	/** Signs forbidden word form (because affixed forms are also forbidden, we can subtract a subset from the set of accepted affixed and compound words) */

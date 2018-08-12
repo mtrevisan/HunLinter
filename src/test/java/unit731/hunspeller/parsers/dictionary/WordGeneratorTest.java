@@ -1008,4 +1008,31 @@ public class WordGeneratorTest{
 		Assert.assertEquals(expected, words);
 	}
 
+	@Test
+	public void simplifiedTriple() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"CHECKCOMPOUNDTRIPLE",
+			"SIMPLIFIEDTRIPLE",
+			"COMPOUNDMIN 2",
+			"COMPOUNDFLAG A");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+		String line = "A";
+		String[] inputCompounds = new String[]{
+			"glass/A",
+			"sko/A"
+		};
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 3l);
+		List<String> words = result.getLeft();
+		Long trueWordCount = result.getRight();
+		Assert.assertEquals(2, words.size());
+		Assert.assertEquals(new Long(2l), trueWordCount);
+		List<String> expected = Arrays.asList("glassko", "skoglass");
+		Assert.assertEquals(expected, words);
+	}
+
 }
