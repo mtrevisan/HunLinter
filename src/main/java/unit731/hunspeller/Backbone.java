@@ -2,7 +2,6 @@ package unit731.hunspeller;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Desktop;
-import java.beans.PropertyChangeListener;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -90,14 +89,14 @@ public class Backbone implements FileChangeListener{
 		flm = new FileListenerManager();
 	}
 
-	public void loadFile(String filePath, PropertyChangeListener listener) throws FileNotFoundException, IOException{
+	public void loadFile(String filePath) throws FileNotFoundException, IOException{
 		openAffixFile(filePath);
 
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
 		File dicFile = getDictionaryFile();
-		prepareDictionaryFile(dicFile, listener);
+		prepareDictionaryFile(dicFile);
 
 		File aidFile = getAidFile();
 		openAidFile(aidFile);
@@ -148,6 +147,8 @@ public class Backbone implements FileChangeListener{
 			String language = affParser.getLanguage();
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
+
+			wordGenerator = new WordGenerator(affParser);
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 			checker = CorrectnessCheckerBuilder.getParser(language, affParser, hyphenator);
 
@@ -159,12 +160,11 @@ public class Backbone implements FileChangeListener{
 			hypParser.clear();
 	}
 
-	private void prepareDictionaryFile(File dicFile, PropertyChangeListener listener){
+	private void prepareDictionaryFile(File dicFile){
 		if(dicFile.exists()){
 			String language = affParser.getLanguage();
 			Charset charset = affParser.getCharset();
 			dicParser = new DictionaryParser(dicFile, language, charset);
-			wordGenerator = new WordGenerator(affParser, dicParser, listener);
 
 			hunspellable.clearDictionaryParser();
 		}

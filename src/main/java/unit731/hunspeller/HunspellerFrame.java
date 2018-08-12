@@ -1491,7 +1491,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void loadFileInternal(String filePath){
 		try{
-			backbone.loadFile(filePath, this);
+			backbone.loadFile(filePath);
 
 
 			dicCheckCorrectnessMenuItem.setEnabled(true);

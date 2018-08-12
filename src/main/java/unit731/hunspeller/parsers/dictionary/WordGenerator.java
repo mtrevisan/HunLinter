@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.beans.PropertyChangeListener;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -53,19 +52,15 @@ public class WordGenerator{
 
 
 	private final AffixParser affParser;
-	private final DictionaryParser dicParser;
-	private final PropertyChangeListener listener;
 
 	@Getter
 	private CompoundFlagWorker compoundFlagWorker;
 
 
-	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, PropertyChangeListener listener){
+	public WordGenerator(AffixParser affParser){
 		Objects.requireNonNull(affParser);
 
 		this.affParser = affParser;
-		this.dicParser = dicParser;
-		this.listener = listener;
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){

@@ -76,7 +76,7 @@ public class WordGeneratorTest{
 			"PFX Ü 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/AÜ";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -111,7 +111,7 @@ public class WordGeneratorTest{
 			"PFX 54321 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/999,54321";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -145,7 +145,7 @@ public class WordGeneratorTest{
 			"PFX 3 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/A3";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -180,7 +180,7 @@ public class WordGeneratorTest{
 			"PFX 09 0 un .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/zx09";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -214,7 +214,7 @@ public class WordGeneratorTest{
 			"SFX A 0 f a[^ab]b");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/A";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -242,7 +242,7 @@ public class WordGeneratorTest{
 			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "aa/S1";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -272,7 +272,7 @@ public class WordGeneratorTest{
 			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "aa/S1";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -301,7 +301,7 @@ public class WordGeneratorTest{
 			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "aa/S1P1";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -332,7 +332,7 @@ public class WordGeneratorTest{
 			"PFX P1 0 p1");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "aa/P1S1";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -366,7 +366,7 @@ public class WordGeneratorTest{
 			"PFX E 0 e");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/ABCDE";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -400,7 +400,7 @@ public class WordGeneratorTest{
 			"SFX A Y 1",
 			"SFX A a b a");
 		affParser.parse(affFile);
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/A";
 		wordGenerator.applyRules(line);
@@ -415,7 +415,7 @@ public class WordGeneratorTest{
 			"SFX A a b a");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/A";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -445,7 +445,7 @@ public class WordGeneratorTest{
 			"PFX P2 0 p2");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "aa/S1";
 		wordGenerator.applyRules(line);
@@ -473,7 +473,7 @@ public class WordGeneratorTest{
 			"PFX H 0 h/AE");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/ABCDEFGH";
 		wordGenerator.applyRules(line);
@@ -497,7 +497,7 @@ public class WordGeneratorTest{
 			"SFX E 0 e");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/ABCDE";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -534,7 +534,7 @@ public class WordGeneratorTest{
 			"PFX B 0 met/A .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "ouro/B";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -560,7 +560,7 @@ public class WordGeneratorTest{
 			"PFX B 0 ⲙⲉⲧ/A .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "ⲟⲩⲣⲟ/B";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -598,7 +598,7 @@ public class WordGeneratorTest{
 			"SFX H 0 h/AE");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "a/ABCDEFGH";
 		wordGenerator.applyRules(line);
@@ -616,7 +616,7 @@ public class WordGeneratorTest{
 			"SFX B 0 baz .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/A";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -645,7 +645,7 @@ public class WordGeneratorTest{
 			"PFX C 0 pseudopre-/X .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/AC";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -685,7 +685,7 @@ public class WordGeneratorTest{
 			"SFX C 0 obb/BX .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "nagy/C";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -717,7 +717,7 @@ public class WordGeneratorTest{
 			"SFX R   0 able/PS . ds:der_able");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "drink/S	po:noun";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -761,7 +761,7 @@ public class WordGeneratorTest{
 			"SFX B 0 y/2 .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "foo/1";
 		List<Production> stems = wordGenerator.applyRules(line);
@@ -793,7 +793,7 @@ public class WordGeneratorTest{
 			"SFX A 0 es .");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "vw";
 		String[] inputCompounds = new String[]{
@@ -820,7 +820,7 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "ABC";
 		String[] inputCompounds = new String[]{
@@ -847,7 +847,7 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE A*B*C*");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A*B*C*";
 		String[] inputCompounds = new String[]{
@@ -876,7 +876,7 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE A?B?C?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A?B?C?";
 		String[] inputCompounds = new String[]{
@@ -904,7 +904,7 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(aa)?(bb)?(cc)?";
 		String[] inputCompounds = new String[]{
@@ -932,7 +932,7 @@ public class WordGeneratorTest{
 			"COMPOUNDRULE (1)?(2)?(3)?");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(1)?(2)?(3)?";
 		String[] inputCompounds = new String[]{
@@ -959,7 +959,7 @@ public class WordGeneratorTest{
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser, null, null);
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
 		String[] inputCompounds = new String[]{
