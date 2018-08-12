@@ -971,7 +971,7 @@ public class WordGeneratorTest{
 			"xy/A",
 			"yz/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 10l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 10l);
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(10, words.size());
@@ -998,7 +998,7 @@ public class WordGeneratorTest{
 			"eel/A",
 			"bare/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 12l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 12l);
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(12, words.size());
@@ -1026,7 +1026,7 @@ public class WordGeneratorTest{
 			"glass/A",
 			"sko/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundFlag(inputCompounds, line, 3l);
+		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 3l);
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(2, words.size());

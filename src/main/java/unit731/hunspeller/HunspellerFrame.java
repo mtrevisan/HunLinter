@@ -1330,7 +1330,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
 		String inputText = (String)cmpInputComboBox.getEditor().getItem();
 		long limit = Long.parseLong(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
-		String inputCompounds = (String)cmpInputTextArea.getText();
+		String inputCompounds = cmpInputTextArea.getText();
 
 		inputText = StringUtils.strip(inputText);
 		if(StringUtils.isNotBlank(inputText)){
@@ -1505,6 +1505,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(compoundRules != null && !compoundRules.isEmpty()){
 				cmpInputComboBox.removeAllItems();
 				compoundRules.forEach(cmpInputComboBox::addItem);
+				String compoundFlag = backbone.getAffParser().getCompoundFlag();
+				if(compoundFlag != null)
+					cmpInputComboBox.addItem(compoundFlag);
 				cmpInputComboBox.setEnabled(true);
 				cmpInputComboBox.setSelectedItem(null);
 				dicInputTextField.requestFocusInWindow();

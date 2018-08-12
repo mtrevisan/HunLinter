@@ -156,7 +156,7 @@ public class WordGenerator{
 	}
 
 	/**
-	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
+	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE or AffixTag.COMPOUND_FLAG
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
@@ -177,10 +177,65 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
-		//generate all the words that matches the given regex
-		List<String> words = regexWordGenerator.generateAll(limit);
-		long wordTrueCount = regexWordGenerator.wordCount();
+		List<String> words = null;
+		long wordTrueCount = 0l;
+		if(expandedCompoundRule != null){
+			//compound rule applies
+
+			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
+			//generate all the words that matches the given regex
+			words = regexWordGenerator.generateAll(limit);
+			wordTrueCount = regexWordGenerator.wordCount();
+		}
+		else{
+			//compound flag applies
+
+			//clean input compounds
+			FlagParsingStrategy strategy = getFlagParsingStrategy();
+			List<String> inputCompoundsFlag = new ArrayList<>();
+			int size = inputCompounds.length;
+			for(int i = 0; i < size; i ++){
+				//filter for words with the given compound flag
+				DictionaryEntry production = new DictionaryEntry(inputCompounds[i], null, null, strategy);
+				if(production.containsContinuationFlag(compoundRule)){
+					int index = inputCompounds[i].indexOf('/');
+					inputCompoundsFlag.add(index >= 0? inputCompounds[i].substring(0, index): inputCompounds[i]);
+				}
+			}
+
+			boolean forbidTriples = affParser.isForbidTriplesInCompound();
+			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
+			Permutations p = new Permutations(inputCompoundsFlag.size());
+			words = new ArrayList<>();
+			wordTrueCount = p.totalCount();
+			List<int[]> permutations = p.totalPermutations();
+			for(int[] permutation : permutations){
+				//compose compound
+				StringBuilder sb = new StringBuilder();
+				for(int index = 0; index < permutation.length; index ++){
+					String nextCompound = inputCompoundsFlag.get(permutation[index]);
+
+					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
+						//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+						if(simplifyTriples)
+							nextCompound = nextCompound.substring(1);
+						//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
+						else if(forbidTriples){
+							sb.setLength(0);
+							break;
+						}
+					}
+
+					sb.append(nextCompound);
+				}
+				if(sb.length() > 0)
+					words.add(sb.toString());
+
+				if(words.size() == limit)
+					break;
+			}
+			//TODO
+		}
 
 		return Pair.of(words, wordTrueCount);
 	}
@@ -231,65 +286,7 @@ public class WordGenerator{
 					expandedCompoundRule.append(expandedComponent);
 			}
 		}
-		return expandedCompoundRule.toString();
-	}
-
-	/**
-	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_FLAG
-	 * 
-	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
-	 * @param compoundFlag	Flag used to generate the productions for
-	 * @param limit	Limit results
-	 * @return	The list of productions for the given rule and the total productions resulting from the application of the rule
-	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
-	 */
-	public Pair<List<String>, Long> applyCompoundFlag(String[] inputCompounds, String compoundFlag, long limit) throws IllegalArgumentException,
-			NoApplicableRuleException{
-		Objects.requireNonNull(inputCompounds);
-		Objects.requireNonNull(compoundFlag);
-		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
-			throw new IllegalArgumentException("Limit cannot be non-positive");
-
-		int size = inputCompounds.length;
-		for(int i = 0; i < size; i ++){
-			int index = inputCompounds[i].indexOf('/');
-			if(index >= 0)
-				inputCompounds[i] = inputCompounds[i].substring(0, index);
-		}
-
-		boolean forbidTriples = affParser.isForbidTriplesInCompound();
-		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-		Permutations p = new Permutations(inputCompounds.length);
-		List<String> words = new ArrayList<>();
-		long wordTrueCount = p.totalCount();
-		List<int[]> permutations = p.totalPermutations();
-		for(int[] permutation : permutations){
-			//compose compound
-			StringBuilder sb = new StringBuilder();
-			for(int index = 0; index < permutation.length; index ++){
-				String nextCompound = inputCompounds[permutation[index]];
-
-				if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
-					//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
-					if(simplifyTriples)
-						nextCompound = nextCompound.substring(1);
-					//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
-					else if(forbidTriples){
-						sb.setLength(0);
-						break;
-					}
-				}
-
-				sb.append(nextCompound);
-			}
-			if(sb.length() > 0)
-				words.add(sb.toString());
-
-			if(words.size() == limit)
-				break;
-		}
-
-		return Pair.of(words, wordTrueCount);
+		return (expandedCompoundRule.length() > 0? expandedCompoundRule.toString(): null);
 	}
 
 	private boolean containsTriple(StringBuilder sb, String compound){

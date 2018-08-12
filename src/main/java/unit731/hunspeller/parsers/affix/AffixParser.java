@@ -458,6 +458,7 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getNeedAffixFlag());
 			terminalAffixes.add(getOnlyInCompoundFlag());
+			terminalAffixes.add(getCompoundFlag());
 		}
 		finally{
 			releaseWriteLock();
