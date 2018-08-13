@@ -185,7 +185,7 @@
 		<com.github.mifmif.version>1.0.2</com.github.mifmif.version>
 
 		<!-- Lombok -->
-		<org.projectlombok.version>1.18.0</org.projectlombok.version>
+		<org.projectlombok.version>1.18.2</org.projectlombok.version>
 
 		<!-- Jackson -->
 		<com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
@@ -199,9 +199,9 @@
 		<!-- JUnit -->
 		<junit.version>4.12</junit.version>
 		<!-- ConcurrentUnit -->
-		<concurrent.unit.version>0.4.3</concurrent.unit.version>
+		<!--<concurrent.unit.version>0.4.3</concurrent.unit.version>-->
 		<!-- FindBugs -->
-		<com.google.code.findbugs.version>2.0.3</com.google.code.findbugs.version>
+		<com.google.code.findbugs.version>3.0.1</com.google.code.findbugs.version>
 	</properties>
 
 	<dependencies>
@@ -284,12 +284,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- ConcurrentUnit -->
-		<dependency>
+<!--		<dependency>
 			<groupId>net.jodah</groupId>
 			<artifactId>concurrentunit</artifactId>
 			<version>${concurrent.unit.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 		<!-- FindBugs -->
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>

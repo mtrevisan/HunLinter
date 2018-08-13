@@ -123,9 +123,9 @@ public class StringRadixTreeTest{
 
 		Assert.assertEquals(4, tree.size());
 		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values()));
-		assertEqualsWithSort(tree.getValuesPrefixedBy("t").toArray(new Integer[0]), new Integer[]{1, 2, 4});
-		assertEqualsWithSort(tree.getValuesPrefixedBy("te").toArray(new Integer[0]), new Integer[]{1, 2});
-		assertEqualsWithSort(tree.getValuesPrefixedBy("asd").toArray(new Integer[0]), new Integer[0]);
+		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
+		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
+		Assert.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class StringRadixTreeTest{
 		tree.put("spook", 2);
 
 		Assert.assertEquals(2, tree.size());
-		assertEqualsWithSort(tree.keySet().toArray(new String[0]), new String[]{
+		assertEqualsWithSort(tree.keySet().toArray(new String[2]), new String[]{
 			"pook",
 			"spook"
 		});

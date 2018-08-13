@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,6 +127,7 @@ public class AffixEntry{
 			.allMatch(set::add);
 	}
 
+	@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "Deliberate")
 	public String[] combineContinuationFlags(String[] otherContinuationFlags){
 		Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)

@@ -808,7 +808,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(1, words.size());
-		Assert.assertEquals(new Long(1l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(1l), trueWordCount);
 		List<String> expected = Arrays.asList("arbeitsscheu");
 		Assert.assertEquals(expected, words);
 	}
@@ -835,7 +835,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(2, words.size());
-		Assert.assertEquals(new Long(2l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(2l), trueWordCount);
 		List<String> expected = Arrays.asList("abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -862,7 +862,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(37, words.size());
-		Assert.assertEquals(new Long(HunspellRegexWordGenerator.INFINITY), trueWordCount);
+		Assert.assertEquals(Long.valueOf(HunspellRegexWordGenerator.INFINITY), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
@@ -891,7 +891,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(new Long(9l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -919,7 +919,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(new Long(9l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -947,7 +947,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(new Long(9l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -975,7 +975,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(10, words.size());
-		Assert.assertEquals(new Long(60l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(60l), trueWordCount);
 		List<String> expected = Arrays.asList("foobar", "fooxy", "fooyz", "barfoo", "barxy", "baryz", "xyfoo", "xybar", "xyyz", "yzfoo");
 		Assert.assertEquals(expected, words);
 	}
@@ -1002,7 +1002,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(12, words.size());
-		Assert.assertEquals(new Long(60l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(60l), trueWordCount);
 		List<String> expected = Arrays.asList("fooeel", "foobare", "operafoo", "operaeel", "operabare", "eelfoo", "eelopera", "eelbare", "barefoo",
 			"bareopera", "fooeelopera", "fooeelbare");
 		Assert.assertEquals(expected, words);
@@ -1030,7 +1030,7 @@ public class WordGeneratorTest{
 		List<String> words = result.getLeft();
 		Long trueWordCount = result.getRight();
 		Assert.assertEquals(2, words.size());
-		Assert.assertEquals(new Long(2l), trueWordCount);
+		Assert.assertEquals(Long.valueOf(2l), trueWordCount);
 		List<String> expected = Arrays.asList("glassko", "skoglass");
 		Assert.assertEquals(expected, words);
 	}

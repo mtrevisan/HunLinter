@@ -91,9 +91,9 @@ public class RegExpRadixTreeTest{
 
 		Assert.assertEquals(4, tree.size());
 		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values()));
-		assertEqualsWithSort(tree.getValuesPrefixedBy("t").toArray(new Integer[0]), new Integer[]{1, 2, 4});
-		assertEqualsWithSort(tree.getValuesPrefixedBy("te").toArray(new Integer[0]), new Integer[]{1, 2});
-		assertEqualsWithSort(tree.getValuesPrefixedBy("asd").toArray(new Integer[0]), new Integer[0]);
+		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
+		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
+		Assert.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
 	}
 
 	@Test
@@ -812,12 +812,8 @@ public class RegExpRadixTreeTest{
 		tree.put("cd", 4);
 		tree.put("aec", 5);
 
-		Integer[] datas = tree.getValues("abcd")
-			.toArray(new Integer[0]);
-		Assert.assertArrayEquals(new Integer[]{1, 2}, datas);
-		datas = tree.getValues("ec")
-			.toArray(new Integer[0]);
-		Assert.assertArrayEquals(new Integer[]{3}, datas);
+		Assert.assertArrayEquals(new Integer[]{1, 2}, tree.getValues("abcd").toArray(new Integer[2]));
+		Assert.assertArrayEquals(new Integer[]{3}, tree.getValues("ec").toArray(new Integer[1]));
 	}
 
 }

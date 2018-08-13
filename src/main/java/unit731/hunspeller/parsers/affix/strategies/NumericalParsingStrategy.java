@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +25,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 
 	@Override
+	@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "Deliberate")
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
 			return null;
