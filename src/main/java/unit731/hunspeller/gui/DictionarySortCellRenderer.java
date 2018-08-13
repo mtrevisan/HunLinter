@@ -45,11 +45,11 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(getClass().getName());
+		throw new NotSerializableException(DictionarySortCellRenderer.class.getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
-		throw new NotSerializableException(getClass().getName());
+		throw new NotSerializableException(DictionarySortCellRenderer.class.getName());
 	}
 
 }

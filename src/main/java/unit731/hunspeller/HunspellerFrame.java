@@ -281,7 +281,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
       setTitle("Hunspeller");
-      setIconImage(Toolkit.getDefaultToolkit().getImage(HunspellerFrame.class.getResource("/favicon.jpg")));
+      setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
@@ -835,7 +835,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       fileMenu.add(fileExitMenuItem);
 
       mainMenuBar.add(fileMenu);
-      Preferences preferences = Preferences.userNodeForPackage(HunspellerFrame.class);
+      Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
       rfm = new RecentFileMenu(recentItems, this::loadFile);
       rfm.setText("Recent files");
