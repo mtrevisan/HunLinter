@@ -41,6 +41,8 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
  */
 public class AffixParser extends ReadWriteLockable{
 
+	private static final String NO_LANGUAGE = "xxx";
+
 	private static final Matcher MATCHER_ISO639_1 = PatternService.matcher("([a-z]{2})");
 	private static final Matcher MATCHER_ISO639_2 = PatternService.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
@@ -428,7 +430,7 @@ public class AffixParser extends ReadWriteLockable{
 				List<String> languages = PatternService.extract(filename, MATCHER_ISO639_2);
 				if(languages.isEmpty())
 					languages = PatternService.extract(filename, MATCHER_ISO639_1);
-				String language = (!languages.isEmpty()? languages.get(0): "xxx");
+				String language = (!languages.isEmpty()? languages.get(0): NO_LANGUAGE);
 				addData(AffixTag.LANGUAGE, language);
 			}
 			if(!containsData(AffixTag.BREAK)){
