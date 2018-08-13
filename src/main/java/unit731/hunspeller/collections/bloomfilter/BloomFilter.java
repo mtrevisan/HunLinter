@@ -102,7 +102,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
 	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
 	 */
-	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher){
+	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer,
+			HashFunction hasher){
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)

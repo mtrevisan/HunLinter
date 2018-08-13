@@ -84,23 +84,17 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 		return (addedElements >= expectedElements / 2);
 	}
 
-	// P = 1 - Prod(i = 0 to l - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
+	//P = 1 - Prod(i = 0 to n - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
 	@Override
 	public double getTrueFalsePositiveProbability(){
-//		double p = 1.;
-//		int size = filters.size();
-//		for(int i = 0; i < size; i ++){
-//			BloomFilter<T> filter = filters.get(size - i - 1);
-//			p *= 1 - filter.getFalsePositiveProbability() * Math.pow(tighteningRatio, i);
-//		}
-//		return 1. - p;
 		int size = filters.size();
-		double probability = 0.;
-		if(size > 0){
-			BloomFilterInterface<T> filter = filters.get(size - 1);
-			probability = filter.getFalsePositiveProbability() / (1. - tighteningRatio);
-		}
-		return probability;
+		double p0 = filters.get(size - 1).getFalsePositiveProbability();
+		double probability = 1.;
+		for(int i = 0; i < size; i ++)
+			probability *= 1 - p0 * Math.pow(tighteningRatio, i);
+		return 1. - probability;
+//		double p0 = filters.get(filters.size() - 1).getFalsePositiveProbability();
+//		return p0 / (1. - tighteningRatio);
 	}
 
 	@Override

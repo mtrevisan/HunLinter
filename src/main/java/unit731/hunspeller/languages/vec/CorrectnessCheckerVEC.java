@@ -27,8 +27,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
 
-	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
-	private static final double FALSE_POSITIVE_PROBABILITY = 0.000_000_01;
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 50_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
 	private static final double GROW_RATIO_WHEN_FULL = 1.3;
 
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
