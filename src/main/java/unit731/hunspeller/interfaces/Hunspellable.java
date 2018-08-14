@@ -4,8 +4,6 @@ public interface Hunspellable{
 
 	void loadFileInternal(String filePath);
 
-	void dictionaryFileModified();
-
 	void clearAffixParser();
 
 	void clearHyphenationParser();

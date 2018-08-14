@@ -1580,13 +1580,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	@Override
-	public void dictionaryFileModified(){
-		int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
-		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !backbone.getAffParser().getCompoundRules().isEmpty());
-		mainTabbedPane.setSelectedIndex(index);
-	}
-
 	private void updateSynonymsCounter(){
 		theSynonymsRecordedOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(backbone.getTheParser().getSynonymsCounter()));
 	}

@@ -106,10 +106,9 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void registerFileListener() throws IOException{
-		File dicFile = getDictionaryFile();
 		File hypFile = getHyphenationFile();
 		File aidFile = getAidFile();
-		flm.register(this, affFile.getAbsolutePath(), dicFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
+		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
 	}
 
 	public void startFileListener(){
@@ -267,10 +266,7 @@ public class Backbone implements FileChangeListener{
 	public void fileModified(Path path){
 		log.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
-		if(hasDICExtension(path.toFile().getAbsolutePath()))
-			hunspellable.dictionaryFileModified();
-		else
-			hunspellable.loadFileInternal(affFile.getAbsolutePath());
+		hunspellable.loadFileInternal(affFile.getAbsolutePath());
 	}
 
 	private boolean hasAFFExtension(String path){
