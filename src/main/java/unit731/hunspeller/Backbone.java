@@ -122,8 +122,6 @@ public class Backbone implements FileChangeListener{
 	private void openAffixFile(String filePath) throws IOException{
 		affFile = new File(filePath);
 
-		log.info(Backbone.MARKER_APPLICATION, "Loading file {}", affFile.getName());
-
 		if(!affFile.exists()){
 			affParser.clear();
 
