@@ -55,7 +55,6 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.gui.CompoundTableModel;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
@@ -90,7 +89,6 @@ import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.PatternService;
 import unit731.hunspeller.services.RecentItems;
-import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 /**
@@ -1319,8 +1317,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			try{
 				dicSortDictionaryMenuItem.setEnabled(false);
 
-				List<String> words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
-				words.add("\u2026");
+				List<Production> words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
 
 				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 				dm.setProductions(words);

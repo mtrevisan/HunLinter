@@ -6,6 +6,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -172,7 +173,7 @@ public class WordGenerator{
 			//FIXME
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
-				.map(word -> new Production(word))
+				.map(word -> new Production(word, Collections.<String>emptyList()))
 				.collect(Collectors.toList());
 		}
 		else{
