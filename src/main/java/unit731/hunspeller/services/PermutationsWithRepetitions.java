@@ -40,11 +40,14 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @return	Total permutations with repetitions of <code>n</code> elements taken <code>1…</code> at a time
 	 */
 	public List<int[]> permutations(int limit){
+		int size = 0;
 		List<int[]> all = new ArrayList<>();
-		for(int kk = 1; all.size() < limit; kk ++){
+		for(int kk = 2; size < limit; kk ++){
 			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk);
-			while(pr.hasNext() && all.size() < limit)
+			while(pr.hasNext() && size < limit){
 				all.add(pr.next());
+				size ++;
+			}
 		}
 		return all;
 	}

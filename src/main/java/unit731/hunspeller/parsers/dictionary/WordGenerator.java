@@ -163,15 +163,13 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
-		List<String> words = null;
-		long wordTrueCount = 0l;
+		List<String> words;
 		if(expandedCompoundRule != null){
 			//compound rule applies
 
 			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 			//generate all the words that matches the given regex
 			words = regexWordGenerator.generateAll(limit);
-			wordTrueCount = regexWordGenerator.wordCount();
 		}
 		else{
 			//compound flag applies

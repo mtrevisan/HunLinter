@@ -953,7 +953,7 @@ public class WordGeneratorTest{
 		};
 		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 		Assert.assertEquals(10, words.size());
-		List<String> expected = Arrays.asList("foobar", "fooxy", "fooyz", "barfoo", "barxy", "baryz", "xyfoo", "xybar", "xyyz", "yzfoo");
+		List<String> expected = Arrays.asList("foofoo", "foobar", "fooxy", "fooyz", "barfoo", "barbar", "barxy", "baryz", "xyfoo", "xybar");
 		Assert.assertEquals(expected, words);
 	}
 
@@ -976,9 +976,9 @@ public class WordGeneratorTest{
 			"bare/A"
 		};
 		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 12);
-		Assert.assertEquals(12, words.size());
-		List<String> expected = Arrays.asList("fooeel", "foobare", "operafoo", "operaeel", "operabare", "eelfoo", "eelopera", "eelbare", "barefoo",
-			"bareopera", "fooeelopera", "fooeelbare");
+		Assert.assertEquals(11, words.size());
+		List<String> expected = Arrays.asList("foofoo", "fooeel", "foobare", "operafoo", "operaopera", "operaeel", "operabare", "eelfoo",
+			"eelopera", "eeleel", "eelbare");
 		Assert.assertEquals(expected, words);
 	}
 
@@ -1001,8 +1001,8 @@ public class WordGeneratorTest{
 			"sko/A"
 		};
 		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 3);
-		Assert.assertEquals(2, words.size());
-		List<String> expected = Arrays.asList("glassko", "skoglass");
+		Assert.assertEquals(3, words.size());
+		List<String> expected = Arrays.asList("glassglass", "glassko", "skoglass");
 		Assert.assertEquals(expected, words);
 	}
 
