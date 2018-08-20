@@ -82,6 +82,15 @@ public class DictionaryEntry{
 		this.combineable = combineable;
 	}
 
+	protected DictionaryEntry(String word, List<String> compounds){
+		Objects.requireNonNull(word);
+
+		this.word = word;
+		continuationFlags = null;
+		this.morphologicalFields = AffixEntry.extractMorphologicalFields(compounds);
+		this.combineable = true;
+	}
+
 	/** NOTE: used for testing purposes */
 	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;

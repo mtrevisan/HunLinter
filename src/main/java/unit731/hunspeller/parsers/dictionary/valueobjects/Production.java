@@ -33,6 +33,10 @@ public class Production extends DictionaryEntry{
 		appliedRules.add(appliedEntry);
 	}
 
+	public Production(String word, List<String> compounds){
+		super(word, compounds);
+	}
+
 	/** NOTE: used for testing purposes */
 	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		super(word, continuationFlags, morphologicalFields, strategy);

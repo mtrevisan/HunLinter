@@ -40,7 +40,7 @@ public class WordGenerator{
 	private static final String TAG_FREQUENCY = "fr:";
 	public static final String TAG_PHONETIC = "ph:";
 	private static final String TAG_HYPHENATION = "hy:";
-	private static final String TAG_PART = "pa:";
+	public static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
 
 	private static final String PIPE = "|";
@@ -150,7 +150,7 @@ public class WordGenerator{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<String> applyCompoundRules(String[] inputCompounds, String compoundRule, int limit) throws IllegalArgumentException,
+	public List<Production> applyCompoundRules(String[] inputCompounds, String compoundRule, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
@@ -163,13 +163,17 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
-		List<String> words;
+		List<Production> words;
 		if(expandedCompoundRule != null){
 			//compound rule applies
 
 			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 			//generate all the words that matches the given regex
-			words = regexWordGenerator.generateAll(limit);
+			//FIXME
+			List<String> generatedWords = regexWordGenerator.generateAll(limit);
+			words = generatedWords.stream()
+				.map(word -> new Production(word))
+				.collect(Collectors.toList());
 		}
 		else{
 			//compound flag applies
@@ -192,10 +196,13 @@ public class WordGenerator{
 			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), inputCompoundsFlag.size());
 			words = new ArrayList<>();
 			StringBuilder sb = new StringBuilder();
+			List<String> compounds = new ArrayList<>();
 			List<int[]> permutations = perm.permutations(limit);
 			for(int[] permutation : permutations){
-				//compose compound
 				sb.setLength(0);
+				compounds.clear();
+
+				//compose compound
 				for(int index = 0; index < permutation.length; index ++){
 					String nextCompound = inputCompoundsFlag.get(permutation[index]);
 
@@ -211,9 +218,12 @@ public class WordGenerator{
 					}
 
 					sb.append(nextCompound);
+					compounds.add(nextCompound);
 				}
-				if(sb.length() > 0)
-					words.add(sb.toString());
+				if(sb.length() > 0){
+					String newWord = sb.toString();
+					words.add(new Production(newWord, compounds));
+				}
 			}
 		}
 

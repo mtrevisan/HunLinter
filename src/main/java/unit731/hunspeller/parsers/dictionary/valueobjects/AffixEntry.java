@@ -175,6 +175,16 @@ public class AffixEntry{
 		return mf.toArray(new String[mf.size()]);
 	}
 
+	public static String[] extractMorphologicalFields(List<String> compounds){
+		int i = 0;
+		String[] mf = new String[compounds.size() * 2];
+		for(String compound : compounds){
+			mf[i ++] = WordGenerator.TAG_PART + compound;
+			mf[i ++] = WordGenerator.TAG_STEM + compound;
+		}
+		return mf;
+	}
+
 	public final boolean isSuffix(){
 		return (type == Type.SUFFIX);
 	}
