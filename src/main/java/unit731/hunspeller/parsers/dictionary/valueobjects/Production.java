@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -31,6 +32,10 @@ public class Production extends DictionaryEntry{
 
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
+	}
+
+	public Production(String word){
+		super(word, Collections.<String>emptyList());
 	}
 
 	public Production(String word, List<String> compounds){

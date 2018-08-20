@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -804,10 +805,8 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 		Assert.assertEquals(1, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("arbeitsscheu", Arrays.asList("arbeits", "scheu"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("arbeitsscheu");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -830,11 +829,8 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(2, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("abc", Arrays.asList("a", "b", "c")),
-			new Production("acc", Arrays.asList("a", "c", "c"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("abc", "acc");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -857,46 +853,10 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(37, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("a", Arrays.asList("a")),
-			new Production("b", Arrays.asList("b")),
-			new Production("c", Arrays.asList("c")),
-			new Production("aa", Arrays.asList("a", "a")),
-			new Production("ab", Arrays.asList("a", "b")),
-			new Production("ac", Arrays.asList("a", "c")),
-			new Production("bb", Arrays.asList("b", "b")),
-			new Production("bc", Arrays.asList("b", "c")),
-			new Production("cb", Arrays.asList("c", "b")),
-			new Production("cc", Arrays.asList("c", "c")),
-			new Production("aaa", Arrays.asList("a", "a", "a")),
-			new Production("aab", Arrays.asList("a", "a", "b")),
-			new Production("aac", Arrays.asList("a", "a", "c")),
-			new Production("abb", Arrays.asList("a", "b", "b")),
-			new Production("abc", Arrays.asList("a", "b", "c")),
-			new Production("acb", Arrays.asList("a", "c", "b")),
-			new Production("acc", Arrays.asList("a", "c", "c")),
-			new Production("bbb", Arrays.asList("b", "b", "b")),
-			new Production("bbc", Arrays.asList("b", "b", "c")),
-			new Production("bcb", Arrays.asList("b", "c", "b")),
-			new Production("bcc", Arrays.asList("b", "c", "c")),
-			new Production("cbb", Arrays.asList("c", "b", "b")),
-			new Production("cbc", Arrays.asList("c", "b", "c")),
-			new Production("ccb", Arrays.asList("c", "c", "b")),
-			new Production("ccc", Arrays.asList("c", "c", "c")),
-			new Production("aaaa", Arrays.asList("a", "a", "a", "a")),
-			new Production("aaab", Arrays.asList("a", "a", "a", "b")),
-			new Production("aaac", Arrays.asList("a", "a", "a", "c")),
-			new Production("aabb", Arrays.asList("a", "a", "b", "b")),
-			new Production("aabc", Arrays.asList("a", "a", "b", "c")),
-			new Production("aacb", Arrays.asList("a", "a", "c", "b")),
-			new Production("aacc", Arrays.asList("a", "a", "c", "c")),
-			new Production("abbb", Arrays.asList("a", "b", "b", "b")),
-			new Production("abbc", Arrays.asList("a", "b", "b", "c")),
-			new Production("abcb", Arrays.asList("a", "b", "c", "b")),
-			new Production("abcc", Arrays.asList("a", "b", "c", "c")),
-			new Production("acbb", Arrays.asList("a", "c", "b", "b"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
+				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
+				"abbb", "abbc", "abcb", "abcc", "acbb");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -919,18 +879,8 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("a", Arrays.asList("a")),
-			new Production("b", Arrays.asList("b")),
-			new Production("c", Arrays.asList("c")),
-			new Production("ab", Arrays.asList("a", "b")),
-			new Production("ac", Arrays.asList("a", "c")),
-			new Production("bc", Arrays.asList("b", "c")),
-			new Production("cc", Arrays.asList("c", "c")),
-			new Production("abc", Arrays.asList("a", "b", "c")),
-			new Production("acc", Arrays.asList("a", "c", "c"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -954,18 +904,8 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("a", Arrays.asList("a")),
-			new Production("b", Arrays.asList("b")),
-			new Production("c", Arrays.asList("c")),
-			new Production("ab", Arrays.asList("a", "b")),
-			new Production("ac", Arrays.asList("a", "c")),
-			new Production("bc", Arrays.asList("b", "c")),
-			new Production("cc", Arrays.asList("c", "c")),
-			new Production("abc", Arrays.asList("a", "b", "c")),
-			new Production("acc", Arrays.asList("a", "c", "c"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -989,18 +929,8 @@ public class WordGeneratorTest{
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		List<Production> expected = Arrays.asList(
-			new Production("a", Arrays.asList("a")),
-			new Production("b", Arrays.asList("b")),
-			new Production("c", Arrays.asList("c")),
-			new Production("ab", Arrays.asList("a", "b")),
-			new Production("ac", Arrays.asList("a", "c")),
-			new Production("bc", Arrays.asList("b", "c")),
-			new Production("cc", Arrays.asList("c", "c")),
-			new Production("abc", Arrays.asList("a", "b", "c")),
-			new Production("acc", Arrays.asList("a", "c", "c"))
-		);
-		Assert.assertEquals(expected, words);
+		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
+		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
 	}
 
 
@@ -1033,7 +963,7 @@ public class WordGeneratorTest{
 			new Production("barbar", Arrays.asList("bar", "bar")),
 			new Production("barxy", Arrays.asList("bar", "xy")),
 			new Production("baryz", Arrays.asList("bar", "yz")),
-			new Production("bxyfoo", Arrays.asList("xy", "foo")),
+			new Production("xyfoo", Arrays.asList("xy", "foo")),
 			new Production("xybar", Arrays.asList("xy", "bar"))
 		);
 		Assert.assertEquals(expected, words);

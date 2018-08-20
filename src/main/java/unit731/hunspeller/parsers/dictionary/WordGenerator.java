@@ -206,6 +206,7 @@ public class WordGenerator{
 				//compose compound
 				for(int index = 0; index < permutation.length; index ++){
 					String nextCompound = inputCompoundsFlag.get(permutation[index]);
+					compounds.add(nextCompound);
 
 					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
 						//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
@@ -219,7 +220,6 @@ public class WordGenerator{
 					}
 
 					sb.append(nextCompound);
-					compounds.add(nextCompound);
 				}
 				if(sb.length() > 0){
 					String newWord = sb.toString();
