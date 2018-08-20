@@ -59,7 +59,7 @@ public class Permutations implements Iterator<int[]>{
 	 */
 	public List<int[]> permutations(int limit){
 		List<int[]> all = new ArrayList<>(n);
-		for(int kk = 1; kk <= n && all.size() < limit; kk ++){
+		for(int kk = 1; kk <= k && all.size() < limit; kk ++){
 			Permutations p = new Permutations(n, kk);
 			while(p.hasNext() && all.size() < limit)
 				all.add(p.next());

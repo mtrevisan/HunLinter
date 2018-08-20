@@ -204,7 +204,7 @@ public class WordGenerator{
 
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size());
+			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), inputCompoundsFlag.size());
 			words = new ArrayList<>();
 			StringBuilder sb = new StringBuilder();
 			List<int[]> permutations = perm.permutations(limit);

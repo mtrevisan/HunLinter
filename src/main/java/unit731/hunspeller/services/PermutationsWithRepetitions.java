@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 /**
@@ -14,22 +16,25 @@ import java.util.List;
 public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	private final int n;
+	private final int k;
 
 	private long currentIndex;
-	private int[] a;
 
 
 	/**
 	 * @param n	the number of elements
+	 * @param k	taken k at a time
 	 */
-	public PermutationsWithRepetitions(int n){
+	public PermutationsWithRepetitions(int n, int k){
 		if(n < 1)
 			throw new IllegalArgumentException("At least one element needed");
+		if(k <= 0)
+			throw new IllegalArgumentException("The number of elements taken should be positive");
 
 		this.n = n;
+		this.k = k;
 
 		currentIndex = 0l;
-		a = new int[n];
 	}
 
 	/**
@@ -38,35 +43,26 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 */
 	public List<int[]> permutations(int limit){
 		List<int[]> all = new ArrayList<>();
-		for(int kk = 2; kk <= n && all.size() < limit; kk ++){
-			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(kk);
-			while(pr.hasNext() && all.size() < limit)
-				all.add(pr.next());
-		}
+		for(int i = 0; i < n && i < limit; i ++)
+			all.add(new int[]{i});
+		if(n < limit || limit == HunspellRegexWordGenerator.INFINITY)
+			for(int kk = 2; kk <= k && all.size() < limit; kk ++){
+				PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk);
+				while(pr.hasNext() && all.size() < limit)
+					all.add(pr.next());
+			}
 		return all;
 	}
 
 	@Override
 	public boolean hasNext(){
-		boolean hasNext = false;
-		int[] keys = convertBase(currentIndex + 1, n);
-		for(int i = 0; i < keys.length; i ++)
-			if(keys[i] != 0){
-				hasNext = true;
-				break;
-			}
-		return hasNext;
+		int size = (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1);
+		return (size <= k);
 	}
 
 	@Override
 	public int[] next(){
-		int[] result = new int[n];
-		System.arraycopy(a, 0, result, 0, n);
-
-		int[] keys = convertBase(currentIndex ++, n);
-		for(int i = 0; i < keys.length; i ++)
-			result[i] = a[keys[i]];
-		return result;
+		return convertBase(currentIndex ++, n);
 	}
 
 	/**
@@ -76,14 +72,16 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param base	the desired new number base
 	 * @return	The array of integers representing decimal number on new base
 	 */
-	private int[] convertBase(long decimalNumber, int base){
-		int[] result = new int[n];
-		int i = n;
-		while(decimalNumber >= base){
-			result[-- i] = (int)(decimalNumber % base);
-			decimalNumber /= base;
+	private int[] convertBase(long decimalNumber, int radix) throws IllegalArgumentException{
+long dn = decimalNumber;
+		int[] result = new int[k];
+		int i = 0;
+		while(decimalNumber != 0l){
+			result[i ++] = (int)(decimalNumber % radix);
+			decimalNumber /= radix;
 		}
-		result[-- i] = (int)decimalNumber;
+		ArrayUtils.reverse(result);
+System.out.println(dn + " in base " + radix + " is: " + ArrayUtils.toString(result) + ", k = " + k);
 		return result;
 	}
 
@@ -93,8 +91,8 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 //		while(pr.hasNext())
 //			System.out.println(Arrays.toString(pr.next()));
 
-		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(3);
-		List<int[]> result = pr.permutations(10);
+		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(3, 2);
+		List<int[]> result = pr.permutations(50);
 		for(int[] res : result)
 			System.out.println(Arrays.toString(res));
 	}
