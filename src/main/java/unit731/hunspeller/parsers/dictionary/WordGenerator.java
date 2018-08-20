@@ -142,19 +142,6 @@ public class WordGenerator{
 	}
 
 	/**
-	 * Generates all the stems for the provided word using only the AffixParser.TAG_COMPOUND_RULES
-	 * 
-	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
-	 * @param compoundRule	Rule used to generate the productions for
-	 * @return	The list of productions for the given rule
-	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
-	 */
-	public List<String> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException,
-			NoApplicableRuleException{
-		return applyCompoundRules(inputCompounds, compoundRule, HunspellRegexWordGenerator.INFINITY);
-	}
-
-	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE or AffixTag.COMPOUND_FLAG
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
@@ -167,7 +154,7 @@ public class WordGenerator{
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
-		if(limit <= 0 && limit != HunspellRegexWordGenerator.INFINITY)
+		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		//extract map flag -> regex of compounds

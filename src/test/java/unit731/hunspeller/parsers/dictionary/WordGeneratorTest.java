@@ -802,7 +802,7 @@ public class WordGeneratorTest{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line);
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 		Assert.assertEquals(1, words.size());
 		List<String> expected = Arrays.asList("arbeitsscheu");
 		Assert.assertEquals(expected, words);

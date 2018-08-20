@@ -35,7 +35,7 @@ public class HunspellRegexWordGeneratorTest{
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
 		boolean infinite = generator.isInfinite();
 		long wordCount = generator.wordCount();
-		List<String> words = generator.generateAll();
+		List<String> words = generator.generateAll(10);
 
 		Assert.assertFalse(infinite);
 		Assert.assertEquals(9l, wordCount);
@@ -48,10 +48,8 @@ public class HunspellRegexWordGeneratorTest{
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
 		boolean infinite = generator.isInfinite();
-		long wordCount = generator.wordCount();
 
 		Assert.assertTrue(infinite);
-		Assert.assertEquals(HunspellRegexWordGenerator.INFINITY, wordCount);
 	}
 
 	@Test

@@ -34,8 +34,6 @@ import unit731.hunspeller.services.PatternService;
  */
 public class HunspellRegexWordGenerator{
 
-	public static final int INFINITY = -1;
-
 	@AllArgsConstructor
 	private static class GeneratedElement{
 		private final String word;
@@ -119,7 +117,7 @@ public class HunspellRegexWordGenerator{
 	 * @return	The number of words that are matched by the given pattern, or {@value #INFINITY} if infinite.
 	 */
 	public long wordCount(){
-		long count = INFINITY;
+		long count = 0l;
 		try{
 			if(!isInfinite()){
 				buildRootNode();
@@ -227,15 +225,6 @@ public class HunspellRegexWordGenerator{
 			state = transition.getDest();
 		}
 		return sb.toString();
-	}
-
-	/**
-	 * Generate all strings that matches the given regex.
-	 *
-	 * @return	All the words that will be matcher by the given regex
-	 */
-	public List<String> generateAll(){
-		return generateAll(INFINITY);
 	}
 
 	/**
