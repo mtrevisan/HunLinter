@@ -1,7 +1,12 @@
 package unit731.hunspeller.gui;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import unit731.hunspeller.DictionarySortDialog;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 
 
@@ -58,6 +63,14 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 	@Override
 	public void clear(){
 		setProductions(null);
+	}
+
+	private void writeObject(ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(DictionarySortDialog.class.getName());
+	}
+
+	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 
 }

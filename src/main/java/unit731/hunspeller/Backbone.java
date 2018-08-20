@@ -271,6 +271,7 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
+	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean hasDICExtension(String path){
 		return path.endsWith(EXTENSION_DIC);
 	}

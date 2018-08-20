@@ -3,6 +3,7 @@ package unit731.hunspeller.services;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.apache.commons.lang3.ArrayUtils;
 
 
@@ -51,13 +52,20 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		int size = (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1);
-		return (size <= k);
+		return hasNextElement(currentIndex);
 	}
 
 	@Override
 	public int[] next(){
+		if(!hasNextElement(currentIndex + 1))
+			throw new NoSuchElementException("No permutations left");
+	
 		return convertBase(currentIndex ++, n);
+	}
+
+	private boolean hasNextElement(long index){
+		int size = (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1);
+		return (size <= k);
 	}
 
 	/**
