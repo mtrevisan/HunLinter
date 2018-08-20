@@ -34,7 +34,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class HunspellRegexWordGenerator{
 
-	public static final long INFINITY = -1l;
+	public static final int INFINITY = -1;
 
 	@AllArgsConstructor
 	private static class GeneratedElement{
@@ -246,9 +246,9 @@ public class HunspellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<String> generateAll(long limit){
+	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(0);
-		long matchedWordCounter = 0l;
+		int matchedWordCounter = 0;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));

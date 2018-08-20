@@ -8,14 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 //https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline > circumfix.aff upward
@@ -804,11 +802,8 @@ public class WordGeneratorTest{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line);
 		Assert.assertEquals(1, words.size());
-		Assert.assertEquals(Long.valueOf(1l), trueWordCount);
 		List<String> expected = Arrays.asList("arbeitsscheu");
 		Assert.assertEquals(expected, words);
 	}
@@ -831,11 +826,8 @@ public class WordGeneratorTest{
 			"b/B",
 			"c/BC"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(2, words.size());
-		Assert.assertEquals(Long.valueOf(2l), trueWordCount);
 		List<String> expected = Arrays.asList("abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -858,11 +850,8 @@ public class WordGeneratorTest{
 			"b/B",
 			"c/BC"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(37, words.size());
-		Assert.assertEquals(Long.valueOf(HunspellRegexWordGenerator.INFINITY), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
@@ -887,11 +876,8 @@ public class WordGeneratorTest{
 			"b/B",
 			"c/BC"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -915,11 +901,8 @@ public class WordGeneratorTest{
 			"b/bb",
 			"c/bbcc"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -943,11 +926,8 @@ public class WordGeneratorTest{
 			"b/2",
 			"c/2,3"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 37l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
-		Assert.assertEquals(Long.valueOf(9l), trueWordCount);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected, words);
 	}
@@ -971,11 +951,8 @@ public class WordGeneratorTest{
 			"xy/A",
 			"yz/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 10l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10);
 		Assert.assertEquals(10, words.size());
-		Assert.assertEquals(Long.valueOf(60l), trueWordCount);
 		List<String> expected = Arrays.asList("foobar", "fooxy", "fooyz", "barfoo", "barxy", "baryz", "xyfoo", "xybar", "xyyz", "yzfoo");
 		Assert.assertEquals(expected, words);
 	}
@@ -998,11 +975,8 @@ public class WordGeneratorTest{
 			"eel/A",
 			"bare/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 12l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 12);
 		Assert.assertEquals(12, words.size());
-		Assert.assertEquals(Long.valueOf(60l), trueWordCount);
 		List<String> expected = Arrays.asList("fooeel", "foobare", "operafoo", "operaeel", "operabare", "eelfoo", "eelopera", "eelbare", "barefoo",
 			"bareopera", "fooeelopera", "fooeelbare");
 		Assert.assertEquals(expected, words);
@@ -1026,11 +1000,8 @@ public class WordGeneratorTest{
 			"glass/A",
 			"sko/A"
 		};
-		Pair<List<String>, Long> result = wordGenerator.applyCompoundRules(inputCompounds, line, 3l);
-		List<String> words = result.getLeft();
-		Long trueWordCount = result.getRight();
+		List<String> words = wordGenerator.applyCompoundRules(inputCompounds, line, 3);
 		Assert.assertEquals(2, words.size());
-		Assert.assertEquals(Long.valueOf(2l), trueWordCount);
 		List<String> expected = Arrays.asList("glassko", "skoglass");
 		Assert.assertEquals(expected, words);
 	}

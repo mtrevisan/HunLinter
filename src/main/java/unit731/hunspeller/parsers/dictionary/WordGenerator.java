@@ -15,12 +15,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.services.Permutations;
+import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -150,7 +149,7 @@ public class WordGenerator{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException,
+	public List<String> applyCompoundRules(String[] inputCompounds, String compoundRule) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		return applyCompoundRules(inputCompounds, compoundRule, HunspellRegexWordGenerator.INFINITY);
 	}
@@ -161,10 +160,10 @@ public class WordGenerator{
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param compoundRule	Rule used to generate the productions for
 	 * @param limit	Limit results
-	 * @return	The list of productions for the given rule and the total productions resulting from the application of the rule
+	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public Pair<List<String>, Long> applyCompoundRules(String[] inputCompounds, String compoundRule, long limit) throws IllegalArgumentException,
+	public List<String> applyCompoundRules(String[] inputCompounds, String compoundRule, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);
@@ -205,11 +204,10 @@ public class WordGenerator{
 
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-			Permutations perm = new Permutations(inputCompoundsFlag.size());
+			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size());
 			words = new ArrayList<>();
-			wordTrueCount = perm.totalCount();
 			StringBuilder sb = new StringBuilder();
-			List<int[]> permutations = perm.totalPermutations();
+			List<int[]> permutations = perm.permutations(limit);
 			for(int[] permutation : permutations){
 				//compose compound
 				sb.setLength(0);
@@ -231,13 +229,10 @@ public class WordGenerator{
 				}
 				if(sb.length() > 0)
 					words.add(sb.toString());
-
-				if(words.size() == limit)
-					break;
 			}
 		}
 
-		return Pair.of(words, wordTrueCount);
+		return words;
 	}
 
 	private Map<String, String> extractCompoundRules(String[] inputCompounds){

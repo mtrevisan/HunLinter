@@ -1,14 +1,13 @@
 package unit731.hunspeller.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 
 /**
- * Generates permutations of <code>n</code> items taken <code>k</code> at a time, in lexicographic order
+ * Generates permutations without repetitions of <code>n</code> items taken <code>1…k</code> at a time, in lexicographic order
  * 
  * @see <a href="https://dzone.com/articles/java-8-master-permutations">Java 8: Master Permutations</a>
  * @see <a href="https://alistairisrael.wordpress.com/2009/09/22/simple-efficient-pnk-algorithm/">A simple, efficient P(n, k) algorithm </a>
@@ -18,8 +17,8 @@ public class Permutations implements Iterator<int[]>{
 
 	private final int n;
 	private final int k;
-	private final int[] a;
-	private boolean hasNext;
+
+	private int[] a;
 
 
 	/**
@@ -34,50 +33,35 @@ public class Permutations implements Iterator<int[]>{
 
 		this.n = n;
 		this.k = k;
+
 		a = identityPermutation(n);
-		hasNext = true;
 	}
 
 	/**
-	 * @param n	the number of elements
+	 * @return	The total count of permutations of <code>n</code> elements taken <code>1…k</code> at a time, that is <code>sum for i = 1…k of nPk</code>
 	 */
-	public Permutations(int n){
-		this(n, n);
-	}
-
-	/** Returns the count of permutations of <code>n</code> elements taken <code>k</code> at a time, that is <code>nPk</code> */
 	public long count(){
-		return count(k);
-	}
+		long total = 0l;
+		long partial = 1l;
+		for(int i = n; i > 0; i --){
+			if(i > Long.MAX_VALUE / partial)
+				throw new IllegalArgumentException(String.format("Overflow. Too big numbers are used %sP%s: %d * %d", n, k, partial, i));
 
-	private long count(int kk){
-		long ret = 1l;
-		for(int i = n; i > n - kk; i --){
-			if(i > Long.MAX_VALUE / ret)
-				throw new IllegalArgumentException(String.format("Overflow. Too big numbers are used %sP%s: %d * %d", n, kk, ret, i));
-
-			ret *= i;
+			partial *= i;
+			total += partial;
 		}
-		return ret;
+		return total;
 	}
 
 	/**
-	 * Returns the total count of permutations of <code>n</code> elements taken <code>2…k</code> at a time, that is
-	 * <code>sum for i = 1…k of nPk</code>
+	 * @param limit	Count limit for the results
+	 * @return	Total permutations of <code>n</code> elements taken <code>1…k</code> at a time
 	 */
-	public long totalCount(){
-		long ret = 0l;
-		for(int kk = 2; kk <= n; kk ++)
-			ret += count(kk);
-		return ret;
-	}
-
-	/** Returns the total permutations of <code>n</code> elements taken <code>2…k</code> at a time */
-	public List<int[]> totalPermutations(){
+	public List<int[]> permutations(int limit){
 		List<int[]> all = new ArrayList<>(n);
-		for(int kk = 2; kk <= n; kk ++){
+		for(int kk = 1; kk <= n && all.size() < limit; kk ++){
 			Permutations p = new Permutations(n, kk);
-			while(p.hasNext())
+			while(p.hasNext() && all.size() < limit)
 				all.add(p.next());
 		}
 		return all;
@@ -85,7 +69,7 @@ public class Permutations implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		return hasNext;
+		return (a != null);
 	}
 
 	@Override
@@ -119,7 +103,7 @@ public class Permutations implements Iterator<int[]>{
 
 			if(i < 0){
 				//no more permutations
-				hasNext = false;
+				a = null;
 				return;
 			}
 
@@ -153,16 +137,6 @@ public class Permutations implements Iterator<int[]>{
 		int t = a[i];
 		a[i] = a[j];
 		a[j] = t;
-	}
-
-	public static void main(String[] args){
-//		Permutations p = new Permutations(3, 3);
-//		while(p.hasNext())
-//			System.out.println(Arrays.toString(p.next()));
-		Permutations p = new Permutations(3);
-		List<int[]> result = p.totalPermutations();
-		for(int[] res : result)
-			System.out.println(Arrays.toString(res));
 	}
 
 }
