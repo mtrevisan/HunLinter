@@ -1093,8 +1093,103 @@ public class WordGeneratorTest{
 		Assert.assertEquals(expected, words);
 	}
 
+//	@Test
+	public void compoundFlagWithAffixes() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"PFX P Y 1",
+			"PFX P 0 pre .",
+			"SFX S Y 1",
+			"SFX S 0 suf .");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-	@Test
+
+		String line = "foo/XPS";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(4, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foosuf", "P", "st:foo", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("prefoo", null, "st:foo", strategy), stems.get(2));
+		Assert.assertEquals(new Production("prefoosuf", null, "st:foo", strategy), stems.get(3));
+		//lastfold productions
+
+
+		line = "X";
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
+		Assert.assertEquals(4, words.size());
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", "PS", Arrays.asList("foo", "foo"), strategy),
+			new Production("foobar", "PS", Arrays.asList("foo", "bar"), strategy),
+			new Production("barfoo", "PS", Arrays.asList("bar", "foo"), strategy),
+			new Production("barbar", "PS", Arrays.asList("bar", "bar"), strategy)
+		);
+		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
+		Assert.assertEquals(expected, words);
+
+		//good: foo, foofoo, prefoo, foosuf, prefoosuf, prefoobarsuf
+	}
+
+//	@Test
+	public void compoundPermitFlag() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"COMPOUNDPERMITFLAG Y",
+			"PFX P Y 1",
+			"PFX P 0 pre/Y .",
+			"SFX S Y 1",
+			"SFX S 0 suf/Y .");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+
+		String line = "foo/XPS";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(4, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foosuf", "PY", "st:foo", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("prefoo", "Y", "st:foo", strategy), stems.get(2));
+		Assert.assertEquals(new Production("prefoosuf", "Y", "st:foo", strategy), stems.get(3));
+		//lastfold productions
+
+
+		line = "X";
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
+		Assert.assertEquals(4, words.size());
+		//good: foo, prefoo, foosuf, prefoosuf, prefoobarsuf, foosufbar, fooprebarsuf, prefooprebarsuf
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", "PS", Arrays.asList("foo", "foo"), strategy),
+			new Production("foobar", "PS", Arrays.asList("foo", "bar"), strategy),
+			new Production("barfoo", "PS", Arrays.asList("bar", "foo"), strategy),
+			new Production("barbar", "PS", Arrays.asList("bar", "bar"), strategy)
+		);
+		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
+		Assert.assertEquals(expected, words);
+	}
+
+//	@Test
 	public void compoundForbidFlag() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -1137,7 +1232,7 @@ words.forEach(stem -> System.out.println(stem));
 			new Production("barfoo", "PS", Arrays.asList("bar", "foo"), strategy),
 			new Production("barbar", "PS", Arrays.asList("bar", "bar"), strategy)
 		);
-		//wrong: prefoobarsuf
+		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
 	}
 

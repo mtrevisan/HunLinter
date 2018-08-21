@@ -205,16 +205,10 @@ public class WordGenerator{
 					DictionaryEntry next = inputCompoundsFlag.get(permutation[index]);
 					String nextCompound = next.getWord();
 					compounds.add(nextCompound);
-					if(compounds.size() == 1){
-						//record prefixes
+					if(compounds.size() == 1)
+						//remember prefixes
 						prefixes = next;
-
-						if(prefixes.containsContinuationFlag(forbidCompoundFlag)){
-							sb.setLength(0);
-							break;
-						}
-					}
-					//record suffixes
+					//remember suffixes
 					suffixes = next;
 
 					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
@@ -230,7 +224,7 @@ public class WordGenerator{
 
 					sb.append(nextCompound);
 				}
-				if(sb.length() > 0 && (suffixes == null || !suffixes.containsContinuationFlag(forbidCompoundFlag))){
+				if(sb.length() > 0){
 					String newWord = sb.toString();
 					String[] pre = (prefixes != null? extractAffixes(prefixes, false).get(0): new String[0]);
 					String[] suf = (suffixes != null? extractAffixes(suffixes, false).get(1): new String[0]);
