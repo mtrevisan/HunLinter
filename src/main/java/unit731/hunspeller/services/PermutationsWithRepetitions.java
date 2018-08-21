@@ -14,6 +14,9 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class PermutationsWithRepetitions implements Iterator<int[]>{
 
+	public static final int MAX_COMPOUNDS_INFINITY = -1;
+
+
 	private final int n;
 	private final int k;
 
@@ -22,13 +25,13 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	/**
 	 * @param n	the number of elements
-	 * @param k	taken k at a time
+	 * @param k	taken at most k at a time
 	 */
 	public PermutationsWithRepetitions(int n, int k){
 		if(n < 1)
 			throw new IllegalArgumentException("At least one element needed");
-		if(k <= 0)
-			throw new IllegalArgumentException("The number of elements taken should be positive");
+		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
+			throw new IllegalArgumentException("Maximum number of maximum compounds must be greater than one or -1 (infinity)");
 
 		this.n = n;
 		this.k = k;
@@ -38,11 +41,14 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	/**
 	 * @param limit	Count limit for the results
-	 * @return	Total permutations with repetitions of <code>n</code> elements taken <code>1…</code> at a time
+	 * @return	Total permutations with repetitions of <code>n</code> elements taken <code>2…maxCompounds</code> at a time
 	 */
 	public List<int[]> permutations(int limit){
+		if(limit < 1)
+			throw new IllegalArgumentException("Output count must be greater than one");
+
 		List<int[]> all = new ArrayList<>();
-		for(int kk = 2; all.size() < limit; kk ++){
+		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++){
 			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk);
 			while(pr.hasNext() && all.size() < limit)
 				all.add(pr.next());
@@ -52,20 +58,15 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		return hasNextElement(currentIndex);
+		return (k == MAX_COMPOUNDS_INFINITY || (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1) <= k);
 	}
 
 	@Override
 	public int[] next(){
-		if(!hasNextElement(currentIndex + 1))
+		if(!hasNext())
 			throw new NoSuchElementException("No permutations left");
 	
 		return convertBase(currentIndex ++, n);
-	}
-
-	private boolean hasNextElement(long index){
-		int size = (index > 0l? (int)Math.floor(Math.log(index) / Math.log(n)) + 1: 1);
-		return (size <= k);
 	}
 
 	/**

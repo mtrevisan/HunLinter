@@ -88,6 +88,7 @@ import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.RecentItems;
 
 
@@ -1317,7 +1318,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			try{
 				dicSortDictionaryMenuItem.setEnabled(false);
 
-				List<Production> words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
+				Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
+				List<Production> words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit,
+					(maxCompounds != null? maxCompounds: PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY));
 
 				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 				dm.setProductions(words);
