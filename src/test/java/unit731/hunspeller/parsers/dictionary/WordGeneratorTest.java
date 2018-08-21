@@ -807,7 +807,7 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(1, words.size());
 		List<String> expected = Arrays.asList("arbeitsscheu");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -831,7 +831,7 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(2, words.size());
 		List<String> expected = Arrays.asList("abc", "acc");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -857,7 +857,7 @@ public class WordGeneratorTest{
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -881,7 +881,7 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -906,7 +906,7 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -931,7 +931,7 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(Production::new).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<String>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 
@@ -956,16 +956,16 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(10, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList("foo", "foo")),
-			new Production("foobar", Arrays.asList("foo", "bar")),
-			new Production("fooxy", Arrays.asList("foo", "xy")),
-			new Production("fooyz", Arrays.asList("foo", "yz")),
-			new Production("barfoo", Arrays.asList("bar", "foo")),
-			new Production("barbar", Arrays.asList("bar", "bar")),
-			new Production("barxy", Arrays.asList("bar", "xy")),
-			new Production("baryz", Arrays.asList("bar", "yz")),
-			new Production("xyfoo", Arrays.asList("xy", "foo")),
-			new Production("xybar", Arrays.asList("xy", "bar"))
+			new Production("foofoo", null, Arrays.asList("foo", "foo"), strategy),
+			new Production("foobar", null, Arrays.asList("foo", "bar"), strategy),
+			new Production("fooxy", null, Arrays.asList("foo", "xy"), strategy),
+			new Production("fooyz", null, Arrays.asList("foo", "yz"), strategy),
+			new Production("barfoo", null, Arrays.asList("bar", "foo"), strategy),
+			new Production("barbar", null, Arrays.asList("bar", "bar"), strategy),
+			new Production("barxy", null, Arrays.asList("bar", "xy"), strategy),
+			new Production("baryz", null, Arrays.asList("bar", "yz"), strategy),
+			new Production("xyfoo", null, Arrays.asList("xy", "foo"), strategy),
+			new Production("xybar", null, Arrays.asList("xy", "bar"), strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -990,10 +990,10 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 100, 2);
 		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList("foo", "foo")),
-			new Production("foobar", Arrays.asList("foo", "bar")),
-			new Production("barfoo", Arrays.asList("bar", "foo")),
-			new Production("barbar", Arrays.asList("bar", "bar"))
+			new Production("foofoo", null, Arrays.asList("foo", "foo"), strategy),
+			new Production("foobar", null, Arrays.asList("foo", "bar"), strategy),
+			new Production("barfoo", null, Arrays.asList("bar", "foo"), strategy),
+			new Production("barbar", null, Arrays.asList("bar", "bar"), strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1019,17 +1019,17 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(11, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList("foo", "foo")),
-			new Production("fooeel", Arrays.asList("foo", "eel")),
-			new Production("foobare", Arrays.asList("foo", "bare")),
-			new Production("operafoo", Arrays.asList("opera", "foo")),
-			new Production("operaopera", Arrays.asList("opera", "opera")),
-			new Production("operaeel", Arrays.asList("opera", "eel")),
-			new Production("operabare", Arrays.asList("opera", "bare")),
-			new Production("eelfoo", Arrays.asList("eel", "foo")),
-			new Production("eelopera", Arrays.asList("eel", "opera")),
-			new Production("eeleel", Arrays.asList("eel", "eel")),
-			new Production("eelbare", Arrays.asList("eel", "bare"))
+			new Production("foofoo", null, Arrays.asList("foo", "foo"), strategy),
+			new Production("fooeel", null, Arrays.asList("foo", "eel"), strategy),
+			new Production("foobare", null, Arrays.asList("foo", "bare"), strategy),
+			new Production("operafoo", null, Arrays.asList("opera", "foo"), strategy),
+			new Production("operaopera", null, Arrays.asList("opera", "opera"), strategy),
+			new Production("operaeel", null, Arrays.asList("opera", "eel"), strategy),
+			new Production("operabare", null, Arrays.asList("opera", "bare"), strategy),
+			new Production("eelfoo", null, Arrays.asList("eel", "foo"), strategy),
+			new Production("eelopera", null, Arrays.asList("eel", "opera"), strategy),
+			new Production("eeleel", null, Arrays.asList("eel", "eel"), strategy),
+			new Production("eelbare", null, Arrays.asList("eel", "bare"), strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1055,9 +1055,9 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(3, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("glassglass", Arrays.asList("glass", "glass")),
-			new Production("glassko", Arrays.asList("glass", "sko")),
-			new Production("skoglass", Arrays.asList("sko", "glass"))
+			new Production("glassglass", null, Arrays.asList("glass", "glass"), strategy),
+			new Production("glassko", null, Arrays.asList("glass", "sko"), strategy),
+			new Production("skoglass", null, Arrays.asList("sko", "glass"), strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1083,18 +1083,18 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 100, 2);
 		Assert.assertEquals(6, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foobar", Arrays.asList("foo", "bar")),
-			new Production("fooyz", Arrays.asList("foo", "yz")),
-			new Production("barfoo", Arrays.asList("bar", "foo")),
-			new Production("baryz", Arrays.asList("bar", "yz")),
-			new Production("yzfoo", Arrays.asList("yz", "foo")),
-			new Production("yzbar", Arrays.asList("yz", "bar"))
+			new Production("foobar", null, Arrays.asList("foo", "bar"), strategy),
+			new Production("fooyz", null, Arrays.asList("foo", "yz"), strategy),
+			new Production("barfoo", null, Arrays.asList("bar", "foo"), strategy),
+			new Production("baryz", null, Arrays.asList("bar", "yz"), strategy),
+			new Production("yzfoo", null, Arrays.asList("yz", "foo"), strategy),
+			new Production("yzbar", null, Arrays.asList("yz", "bar"), strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
 
 
-//	@Test
+	@Test
 	public void compoundForbidFlag() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -1128,9 +1128,9 @@ public class WordGeneratorTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 4, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 words.forEach(stem -> System.out.println(stem));
-		Assert.assertEquals(10, words.size());
+		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", Arrays.asList("foo", "foo"), strategy),
 			new Production("prefoo", "PS", Arrays.asList("foo", "bar"), strategy),

@@ -159,6 +159,8 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
 		//extract map flag -> regex of compounds
 		Map<String, String> inputs = extractCompoundRules(inputCompounds);
 
@@ -173,7 +175,7 @@ public class WordGenerator{
 			//generate all the words that matches the given regex
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
-				.map(word -> new Production(word, Collections.<String>emptyList()))
+				.map(word -> new Production(word, null, (List<String>)null, strategy))
 				.collect(Collectors.toList());
 		}
 		else{
@@ -213,7 +215,8 @@ public class WordGenerator{
 				}
 				if(sb.length() > 0){
 					String newWord = sb.toString();
-					words.add(new Production(newWord, compounds));
+//FIXME remove null
+					words.add(new Production(newWord, null, compounds, strategy));
 				}
 			}
 		}

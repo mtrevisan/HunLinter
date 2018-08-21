@@ -176,11 +176,14 @@ public class AffixEntry{
 	}
 
 	public static String[] extractMorphologicalFields(List<String> compounds){
-		int i = 0;
-		String[] mf = new String[compounds.size() * 2];
-		for(String compound : compounds){
-			mf[i ++] = WordGenerator.TAG_PART + compound;
-			mf[i ++] = WordGenerator.TAG_STEM + compound;
+		String[] mf = null;
+		if(compounds != null){
+			int i = 0;
+			mf = new String[compounds.size() * 2];
+			for(String compound : compounds){
+				mf[i ++] = WordGenerator.TAG_PART + compound;
+				mf[i ++] = WordGenerator.TAG_STEM + compound;
+			}
 		}
 		return mf;
 	}
