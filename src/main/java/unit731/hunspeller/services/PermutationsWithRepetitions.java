@@ -39,7 +39,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		this.k = k;
 		this.forbidDuplications = forbidDuplications;
 
-		currentIndex = 0l;
+		currentIndex = (forbidDuplications? 1l: 0l);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < Math.pow(n, k));
+		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < Math.pow(n, k) - (forbidDuplications? 1l: 0l));
 	}
 
 	@Override
@@ -69,7 +69,24 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		if(!hasNext())
 			throw new NoSuchElementException("No permutations left");
 	
-		return convertBase(currentIndex ++, n);
+		int[] result = convertBase(currentIndex, n);
+
+		if(forbidDuplications){
+			boolean consecutiveDuplicates = true;
+			while(consecutiveDuplicates && currentIndex < Math.pow(n, k) - 1){
+				currentIndex ++;
+				int[] next = convertBase(currentIndex, n);
+				//if next does not contains consecutive duplicates, break
+				consecutiveDuplicates = false;
+				for(int i = 1; !consecutiveDuplicates && i < next.length; i ++)
+					if(next[i] == next[i - 1])
+						consecutiveDuplicates = true;
+			}
+		}
+		else
+			currentIndex ++;
+
+		return result;
 	}
 
 	/**
