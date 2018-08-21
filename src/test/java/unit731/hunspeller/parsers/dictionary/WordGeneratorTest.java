@@ -1138,6 +1138,7 @@ public class WordGeneratorTest{
 		);
 		Assert.assertEquals(expected, words);
 
+
 		words = wordGenerator.applyRules(foofoo);
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -1197,7 +1198,7 @@ words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(expected, words);
 	}
 
-//	@Test
+	@Test
 	public void compoundForbidFlag() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -1232,16 +1233,28 @@ words.forEach(stem -> System.out.println(stem));
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(4, words.size());
+		Production foofoo = new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy)));
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
+			foofoo,
 			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy))),
 			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
 			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy)))
 		);
 		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
+
+
+		words = wordGenerator.applyRules(foofoo);
+		Assert.assertEquals(4, words.size());
+		//base production
+		Assert.assertEquals(new Production("foofoo", "PS", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foofoosuf", "PZ", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(1));
+		//twofold productions
+		//lastfold productions
+		Assert.assertEquals(new Production("prefoofoo", "Z", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(2));
+		Assert.assertEquals(new Production("prefoofoosuf", "Z", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(3));
 	}
 
 }
