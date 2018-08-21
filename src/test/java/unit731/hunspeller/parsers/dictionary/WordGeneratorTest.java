@@ -1128,16 +1128,16 @@ public class WordGeneratorTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 4, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 4, 2);
 words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", Arrays.asList("foo", "foo"), strategy),
-			new Production("prefoo", "PS", Arrays.asList("foo", "bar"), strategy),
-			new Production("foosuf", "P", Arrays.asList("foo", "xy"), strategy),
-			new Production("prefoosuf", null, Arrays.asList("foo", "yz"), strategy)
+			new Production("foobar", "PS", Arrays.asList("foo", "bar"), strategy),
+			new Production("barfoo", "PS", Arrays.asList("bar", "foo"), strategy),
+			new Production("barbar", "PS", Arrays.asList("bar", "bar"), strategy)
 		);
-		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
+		//wrong: prefoobarsuf
 		Assert.assertEquals(expected, words);
 	}
 
