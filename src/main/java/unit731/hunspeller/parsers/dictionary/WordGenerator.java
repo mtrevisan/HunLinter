@@ -170,7 +170,6 @@ public class WordGenerator{
 
 			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 			//generate all the words that matches the given regex
-			//FIXME
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
 				.map(word -> new Production(word, Collections.<String>emptyList()))

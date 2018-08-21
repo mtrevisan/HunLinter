@@ -64,7 +64,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	}
 
 	private boolean hasNextElement(long index){
-		int size = (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1);
+		int size = (index > 0l? (int)Math.floor(Math.log(index) / Math.log(n)) + 1: 1);
 		return (size <= k);
 	}
 
