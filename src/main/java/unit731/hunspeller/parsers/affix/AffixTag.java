@@ -79,7 +79,7 @@ public enum AffixTag{
 	/** Allow twofold suffixes within compounds */
 //	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
 	/** Affixes with this flag forbid compounding of the affixed word */
-//	COMPOUND_FORBID_FLAG("COMPOUNDFORBIDFLAG"),
+	COMPOUND_FORBID_FLAG("COMPOUNDFORBIDFLAG"),
 	/** Set maximum word count in a compound word (default is unlimited) */
 	COMPOUND_WORD_MAX("COMPOUNDWORDMAX"),
 	/** Forbid word duplication in compounds */

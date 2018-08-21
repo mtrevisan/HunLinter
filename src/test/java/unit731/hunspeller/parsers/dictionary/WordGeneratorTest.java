@@ -1108,12 +1108,28 @@ public class WordGeneratorTest{
 		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "X";
+
+		String line = "foo/XPS";
+		List<Production> stems = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(4, stems.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), stems.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foosuf", "PZ", "st:foo", strategy), stems.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("prefoo", "Z", "st:foo", strategy), stems.get(2));
+		Assert.assertEquals(new Production("prefoosuf", "Z", "st:foo", strategy), stems.get(3));
+		//lastfold productions
+
+
+		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(10, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", Arrays.asList("foo", "foo")),

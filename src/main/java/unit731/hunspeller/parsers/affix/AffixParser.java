@@ -38,6 +38,8 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
  *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CIRCUMFIX, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE
  *		PFX, SFX
  *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
+ * Todo:
+ *		COMPOUNDFORBIDFLAG
  */
 public class AffixParser extends ReadWriteLockable{
 
@@ -341,7 +343,7 @@ public class AffixParser extends ReadWriteLockable{
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_ROOT, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
 		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
@@ -456,11 +458,12 @@ public class AffixParser extends ReadWriteLockable{
 //				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 
 
-			terminalAffixes.add(getKeepCaseFlag());
-			terminalAffixes.add(getCircumfixFlag());
-			terminalAffixes.add(getNeedAffixFlag());
-			terminalAffixes.add(getOnlyInCompoundFlag());
 			terminalAffixes.add(getCompoundFlag());
+			terminalAffixes.add(getOnlyInCompoundFlag());
+			terminalAffixes.add(getForbidCompoundFlag());
+			terminalAffixes.add(getCircumfixFlag());
+			terminalAffixes.add(getKeepCaseFlag());
+			terminalAffixes.add(getNeedAffixFlag());
 		}
 		finally{
 			releaseWriteLock();
@@ -651,6 +654,10 @@ public class AffixParser extends ReadWriteLockable{
 
 	public String getOnlyInCompoundFlag(){
 		return getData(AffixTag.ONLY_IN_COMPOUND);
+	}
+
+	public String getForbidCompoundFlag(){
+		return getData(AffixTag.COMPOUND_FORBID_FLAG);
 	}
 
 	public int getCompoundMaxWordCount(){
