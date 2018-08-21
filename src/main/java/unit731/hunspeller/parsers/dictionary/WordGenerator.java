@@ -165,13 +165,11 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
-		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
-
 		List<Production> words;
 		if(expandedCompoundRule != null){
 			//compound rule applies
 
-			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true, forbidDuplications);
+			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 			//generate all the words that matches the given regex
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
@@ -181,19 +179,9 @@ public class WordGenerator{
 		else{
 			//compound flag applies
 
-			//clean input compounds
-			FlagParsingStrategy strategy = getFlagParsingStrategy();
-			List<String> inputCompoundsFlag = new ArrayList<>();
-			int size = inputCompounds.length;
-			for(int i = 0; i < size; i ++){
-				//filter for words with the given compound flag
-				DictionaryEntry production = new DictionaryEntry(inputCompounds[i], null, null, strategy);
-				if(production.containsContinuationFlag(compoundRule)){
-					int index = inputCompounds[i].indexOf('/');
-					inputCompoundsFlag.add(index >= 0? inputCompounds[i].substring(0, index): inputCompounds[i]);
-				}
-			}
+			List<String> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
 
+			boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
@@ -234,11 +222,18 @@ public class WordGenerator{
 	}
 
 	private Map<String, String> extractCompoundRules(String[] inputCompounds){
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+
 		//extract map flag -> compounds
 		FlagParsingStrategy strategy = getFlagParsingStrategy();
 		Map<String, Set<String>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
 			DictionaryEntry production = new DictionaryEntry(inputCompound, null, null, strategy);
+
+			//filter input set by minimum length
+			if(production.getWord().length() < compoundMinimumLength)
+				continue;
+
 			Map<String, Set<String>> c = production.collectFlagsFromCompoundRule(affParser);
 			for(Map.Entry<String, Set<String>> entry: c.entrySet()){
 				String affix = entry.getKey();
@@ -301,6 +296,27 @@ public class WordGenerator{
 			}
 		}
 		return (count >= 3);
+	}
+
+	private List<String> extractCompoundFlags(String[] inputCompounds, String compoundRule){
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+
+		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		List<String> result = new ArrayList<>();
+		for(String inputCompound : inputCompounds){
+			//filter for words with the given compound flag
+			DictionaryEntry production = new DictionaryEntry(inputCompound, null, null, strategy);
+
+			//filter input set by minimum length
+			if(production.getWord().length() < compoundMinimumLength)
+				continue;
+
+			if(production.containsContinuationFlag(compoundRule)){
+				int index = inputCompound.indexOf('/');
+				result.add(index >= 0? inputCompound.substring(0, index): inputCompound);
+			}
+		}
+		return result;
 	}
 
 	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){

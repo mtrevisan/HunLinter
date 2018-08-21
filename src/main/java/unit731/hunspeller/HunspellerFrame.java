@@ -1766,13 +1766,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			AffixParser affParser = backbone.getAffParser();
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			int compoundMinimumLength = affParser.getCompoundMinimumLength();
 			String compoundFlag = affParser.getCompoundFlag();
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
 				String word = production.getWord();
-				if(word.length() >= compoundMinimumLength
-						&& (!production.collectFlagsFromCompoundRule(affParser).isEmpty() || production.containsContinuationFlag(compoundFlag)))
+				if(!production.collectFlagsFromCompoundRule(affParser).isEmpty() || production.containsContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
 			Runnable done = () -> {
