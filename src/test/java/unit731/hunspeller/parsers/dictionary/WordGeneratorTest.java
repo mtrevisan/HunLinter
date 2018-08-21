@@ -1132,10 +1132,10 @@ public class WordGeneratorTest{
 words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(10, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList("foo", "foo")),
-			new Production("prefoo", Arrays.asList("foo", "bar")),
-			new Production("foosuf", Arrays.asList("foo", "xy")),
-			new Production("prefoosuf", Arrays.asList("foo", "yz"))
+			new Production("foofoo", "PS", Arrays.asList("foo", "foo"), strategy),
+			new Production("prefoo", "PS", Arrays.asList("foo", "bar"), strategy),
+			new Production("foosuf", "P", Arrays.asList("foo", "xy"), strategy),
+			new Production("prefoosuf", null, Arrays.asList("foo", "yz"), strategy)
 		);
 		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);

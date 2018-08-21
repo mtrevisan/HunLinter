@@ -92,6 +92,14 @@ public class DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
+	protected DictionaryEntry(String word, String continuationFlags, List<String> compounds, FlagParsingStrategy strategy){
+		this.word = word;
+		this.continuationFlags = strategy.parseFlags(continuationFlags);
+		this.morphologicalFields = AffixEntry.extractMorphologicalFields(compounds);
+		combineable = true;
+	}
+
+	/** NOTE: used for testing purposes */
 	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		this.word = word;
 		this.continuationFlags = strategy.parseFlags(continuationFlags);

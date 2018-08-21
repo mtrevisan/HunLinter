@@ -80,7 +80,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 			boolean consecutiveDuplicates = true;
 			while(consecutiveDuplicates && currentIndex < maximumIndex)
 				//if next does not contains consecutive duplicates, break
-				consecutiveDuplicates = hasConsecutiveDuplicates(++ currentIndex);
+				consecutiveDuplicates = hasConsecutiveDuplicates(++ currentIndex, n);
 		}
 		else
 			currentIndex ++;
@@ -105,13 +105,17 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	}
 
 	/** In num = sum(i=0..k, a[i] * b^i), check if a[i] is equals to a[i - 1] for i = 1..k */
-	private boolean hasConsecutiveDuplicates(long index){
-		boolean consecutiveDuplicates = false;
-		int[] next = convertBase(index, n);
-		for(int i = 1; !consecutiveDuplicates && i < next.length; i ++)
-			if(next[i - 1] == next[i])
-				consecutiveDuplicates = true;
-		return consecutiveDuplicates;
+	private boolean hasConsecutiveDuplicates(long decimalNumber, int radix){
+		int digit = -1;
+		while(decimalNumber != 0l){
+			int newDigit = (int)(decimalNumber % radix);
+			if(newDigit == digit)
+				return true;
+
+			decimalNumber /= radix;
+			digit = newDigit;
+		}
+		return false;
 	}
 
 }

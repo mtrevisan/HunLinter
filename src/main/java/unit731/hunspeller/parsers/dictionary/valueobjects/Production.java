@@ -43,6 +43,11 @@ public class Production extends DictionaryEntry{
 	}
 
 	/** NOTE: used for testing purposes */
+	public Production(String word, String continuationFlags, List<String> compounds, FlagParsingStrategy strategy){
+		super(word, continuationFlags, compounds, strategy);
+	}
+
+	/** NOTE: used for testing purposes */
 	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		super(word, continuationFlags, morphologicalFields, strategy);
 	}
