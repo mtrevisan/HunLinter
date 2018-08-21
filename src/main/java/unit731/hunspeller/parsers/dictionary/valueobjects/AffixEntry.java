@@ -175,12 +175,13 @@ public class AffixEntry{
 		return mf.toArray(new String[mf.size()]);
 	}
 
-	public static String[] extractMorphologicalFields(List<String> compounds){
+	public static String[] extractMorphologicalFields(List<DictionaryEntry> compoundEntries){
 		String[] mf = null;
-		if(compounds != null){
+		if(compoundEntries != null){
 			int i = 0;
-			mf = new String[compounds.size() * 2];
-			for(String compound : compounds){
+			mf = new String[compoundEntries.size() * 2];
+			for(DictionaryEntry compoundEntry : compoundEntries){
+				String compound = compoundEntry.getWord();
 				mf[i ++] = WordGenerator.TAG_PART + compound;
 				mf[i ++] = WordGenerator.TAG_STEM + compound;
 			}

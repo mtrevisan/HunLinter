@@ -33,9 +33,8 @@ public class Production extends DictionaryEntry{
 		appliedRules.add(appliedEntry);
 	}
 
-	/** NOTE: used for testing purposes */
-	public Production(String word, String continuationFlags, List<String> compounds, FlagParsingStrategy strategy){
-		super(word, continuationFlags, compounds, strategy);
+	public Production(String word, List<DictionaryEntry> compoundEntries){
+		super(word, compoundEntries);
 	}
 
 	/** NOTE: used for testing purposes */

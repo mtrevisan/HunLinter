@@ -36,7 +36,11 @@ public class CorrectnessChecker{
 	}
 
 	//correctness worker:
-	public void checkProduction(Production production) throws IllegalArgumentException{}
+	public void checkProduction(Production production) throws IllegalArgumentException{
+		String forbidCompoundFlag = affParser.getForbidCompoundFlag();
+		if(!production.hasProductionRules() && production.containsContinuationFlag(forbidCompoundFlag))
+			throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
+	}
 
 	//minimal pairs worker:
 	public boolean isConsonant(char chr){

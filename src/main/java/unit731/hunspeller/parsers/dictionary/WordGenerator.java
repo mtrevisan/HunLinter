@@ -6,7 +6,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -161,8 +159,6 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-
 		//extract map flag -> regex of compounds
 		Map<String, String> inputs = extractCompoundRules(inputCompounds);
 
@@ -177,7 +173,7 @@ public class WordGenerator{
 			//generate all the words that matches the given regex
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
-				.map(word -> new Production(word, null, (List<String>)null, strategy))
+				.map(word -> new Production(word, (List<DictionaryEntry>)null))
 				.collect(Collectors.toList());
 		}
 		else{
@@ -185,32 +181,24 @@ public class WordGenerator{
 
 			List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
 
-			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
+//			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 			boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 			words = new ArrayList<>();
 			StringBuilder sb = new StringBuilder();
-			List<String> compounds = new ArrayList<>();
 			List<int[]> permutations = perm.permutations(limit);
 			for(int[] permutation : permutations){
 				sb.setLength(0);
-				compounds.clear();
 
 				//compose compound
-				DictionaryEntry prefixes = null;
-				DictionaryEntry suffixes = null;
+				List<DictionaryEntry> compoundEntries = new ArrayList<>();
 				for(int index = 0; index < permutation.length; index ++){
 					DictionaryEntry next = inputCompoundsFlag.get(permutation[index]);
-					String nextCompound = next.getWord();
-					compounds.add(nextCompound);
-					if(compounds.size() == 1)
-						//remember prefixes
-						prefixes = next;
-					//remember suffixes
-					suffixes = next;
+					compoundEntries.add(next);
 
+					String nextCompound = next.getWord();
 					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
 						//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
 						if(simplifyTriples)
@@ -226,11 +214,7 @@ public class WordGenerator{
 				}
 				if(sb.length() > 0){
 					String newWord = sb.toString();
-					String[] pre = (prefixes != null? extractAffixes(prefixes, false).get(0): new String[0]);
-					String[] suf = (suffixes != null? extractAffixes(suffixes, false).get(1): new String[0]);
-					String continuationFlags = Arrays.stream(ArrayUtils.addAll(pre, suf))
-						.collect(Collectors.joining());
-					words.add(new Production(newWord, continuationFlags, compounds, strategy));
+					words.add(new Production(newWord, compoundEntries));
 				}
 			}
 		}

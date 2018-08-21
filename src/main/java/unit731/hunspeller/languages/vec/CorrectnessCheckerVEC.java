@@ -393,6 +393,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			if(!production.hasMorphologicalFields())
 				throw new IllegalArgumentException("Line does not contains any morphological fields");
 
+			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
+			if(!production.hasProductionRules() && production.containsContinuationFlag(forbidCompoundFlag))
+				throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
+
 			morphologicalFieldCheck(production);
 
 			vanishingElCheck(production);
