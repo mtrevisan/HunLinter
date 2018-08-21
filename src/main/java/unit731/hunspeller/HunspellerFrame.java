@@ -1318,9 +1318,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			try{
 				dicSortDictionaryMenuItem.setEnabled(false);
 
-				Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
-				List<Production> words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit,
-					(maxCompounds != null? maxCompounds: PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY));
+				List<Production> words;
+				if(backbone.getAffParser().getCompoundFlag().equals(inputText)){
+					Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
+					if(maxCompounds == null)
+						maxCompounds = PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY;
+					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), inputText, limit, maxCompounds);
+				}
+				else
+					words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
 
 				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 				dm.setProductions(words);
