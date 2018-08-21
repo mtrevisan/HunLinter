@@ -57,12 +57,8 @@ public class WordGenerator{
 		this.affParser = affParser;
 	}
 
-	public FlagParsingStrategy getFlagParsingStrategy(){
-		return affParser.getFlagParsingStrategy();
-	}
-
 	public List<Production> applyRules(String line){
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 		DictionaryEntry dicEntry = new DictionaryEntry(line, aliasesFlag, aliasesMorphologicalField, strategy);
@@ -82,7 +78,7 @@ public class WordGenerator{
 		dicEntry.setWord(word);
 
 		//extract base production
-		Production baseProduction = getBaseProduction(dicEntry, getFlagParsingStrategy());
+		Production baseProduction = getBaseProduction(dicEntry, affParser.getFlagParsingStrategy());
 		if(log.isDebugEnabled()){
 			log.debug("Base productions:");
 			log.debug("   {}", baseProduction);
@@ -163,7 +159,7 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 		if(expandedCompoundRule == null)
-			throw new IllegalArgumentException("Cannot complete compound rule, some words are missing");
+			throw new NoApplicableRuleException("Cannot complete compound rule, some words are missing");
 
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 		//generate all the words that matches the given regex
@@ -178,7 +174,7 @@ public class WordGenerator{
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 
 		//extract map flag -> compounds
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		Map<String, Set<String>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
 			DictionaryEntry production = new DictionaryEntry(inputCompound, null, null, strategy);
@@ -208,7 +204,7 @@ public class WordGenerator{
 	}
 
 	private String composeTrueCompoundRule(Map<String, String> inputs, String compoundRule){
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 		StringBuilder expandedCompoundRule = new StringBuilder();
 		for(String component : compoundRuleComponents){
@@ -314,7 +310,7 @@ public class WordGenerator{
 	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds, String compoundRule){
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<DictionaryEntry> result = new ArrayList<>();
 		for(String inputCompound : inputCompounds){
 			//filter for words with the given compound flag
@@ -511,11 +507,12 @@ public class WordGenerator{
 				//	.flatMap(List::stream)
 				//	.collect(Collectors.toList());
 
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 				for(AffixEntry entry : applicableAffixes){
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					Production production = new Production(newWord, entry, productable, postponedAffixes, rule.isCombineable(), getFlagParsingStrategy());
+					Production production = new Production(newWord, entry, productable, postponedAffixes, rule.isCombineable(), strategy);
 
 					productions.add(production);
 				}
