@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.apache.commons.lang3.ArrayUtils;
 
 
 /**
@@ -98,12 +97,11 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 */
 	private int[] convertBase(long decimalNumber, int radix) throws IllegalArgumentException{
 		int[] result = new int[k];
-		int i = 0;
+		int i = k;
 		while(decimalNumber != 0l){
-			result[i ++] = (int)(decimalNumber % radix);
+			result[-- i] = (int)(decimalNumber % radix);
 			decimalNumber /= radix;
 		}
-		ArrayUtils.reverse(result);
 		return result;
 	}
 
