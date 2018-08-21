@@ -815,7 +815,6 @@ public class WordGeneratorTest{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
@@ -839,7 +838,6 @@ public class WordGeneratorTest{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A*B*C*");
 		affParser.parse(affFile);
@@ -865,7 +863,6 @@ public class WordGeneratorTest{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A?B?C?");
 		affParser.parse(affFile);
@@ -890,7 +887,6 @@ public class WordGeneratorTest{
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
-			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
 		affParser.parse(affFile);
@@ -915,7 +911,6 @@ public class WordGeneratorTest{
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
-			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (1)?(2)?(3)?");
 		affParser.parse(affFile);
@@ -940,7 +935,6 @@ public class WordGeneratorTest{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
@@ -975,7 +969,6 @@ public class WordGeneratorTest{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
-			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
@@ -1046,7 +1039,6 @@ public class WordGeneratorTest{
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"SIMPLIFIEDTRIPLE",
-			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
@@ -1063,6 +1055,36 @@ public class WordGeneratorTest{
 			new Production("glassglass", Arrays.asList("glass", "glass")),
 			new Production("glassko", Arrays.asList("glass", "sko")),
 			new Production("skoglass", Arrays.asList("sko", "glass"))
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void compoundFlagForbidWordDuplication() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"CHECKCOMPOUNDDUP",
+			"COMPOUNDFLAG A");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+		String line = "A";
+		String[] inputCompounds = new String[]{
+			"foo/A",
+			"bar/A",
+			"yz/A"
+		};
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 100, 2);
+		Assert.assertEquals(6, words.size());
+		List<Production> expected = Arrays.asList(
+			new Production("foobar", Arrays.asList("foo", "bar")),
+			new Production("fooyz", Arrays.asList("foo", "yz")),
+			new Production("barfoo", Arrays.asList("bar", "foo")),
+			new Production("baryz", Arrays.asList("bar", "yz")),
+			new Production("yzfoo", Arrays.asList("yz", "foo")),
+			new Production("yzbar", Arrays.asList("yz", "bar"))
 		);
 		Assert.assertEquals(expected, words);
 	}

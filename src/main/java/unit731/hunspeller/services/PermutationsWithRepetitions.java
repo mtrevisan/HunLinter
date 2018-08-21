@@ -19,6 +19,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	private final int n;
 	private final int k;
+	private final boolean forbidDuplications;
 
 	private long currentIndex;
 
@@ -26,8 +27,9 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	/**
 	 * @param n	the number of elements
 	 * @param k	taken at most k at a time
+	 * @param forbidDuplications	Forbid duplications
 	 */
-	public PermutationsWithRepetitions(int n, int k){
+	public PermutationsWithRepetitions(int n, int k, boolean forbidDuplications){
 		if(n < 1)
 			throw new IllegalArgumentException("At least one element needed");
 		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
@@ -35,6 +37,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 		this.n = n;
 		this.k = k;
+		this.forbidDuplications = forbidDuplications;
 
 		currentIndex = 0l;
 	}
@@ -49,7 +52,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 		List<int[]> all = new ArrayList<>();
 		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++){
-			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk);
+			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplications);
 			while(pr.hasNext() && all.size() < limit)
 				all.add(pr.next());
 		}

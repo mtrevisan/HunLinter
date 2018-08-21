@@ -165,11 +165,13 @@ public class WordGenerator{
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 
+		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
+
 		List<Production> words;
 		if(expandedCompoundRule != null){
 			//compound rule applies
 
-			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
+			HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true, forbidDuplications);
 			//generate all the words that matches the given regex
 			List<String> generatedWords = regexWordGenerator.generateAll(limit);
 			words = generatedWords.stream()
@@ -194,7 +196,7 @@ public class WordGenerator{
 
 			boolean forbidTriples = affParser.isForbidTriplesInCompound();
 			boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds);
+			PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 			words = new ArrayList<>();
 			StringBuilder sb = new StringBuilder();
 			List<String> compounds = new ArrayList<>();

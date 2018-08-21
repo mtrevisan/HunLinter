@@ -65,6 +65,7 @@ public class HunspellRegexWordGenerator{
 
 	private final Automaton automaton;
 	private final boolean ignoreEmptyWord;
+	private final boolean forbidDuplications;
 
 	private HunspellAutomataNode rootNode;
 
@@ -72,8 +73,9 @@ public class HunspellRegexWordGenerator{
 	/**
 	 * @param regex	Regex used to generate the set
 	 * @param ignoreEmptyWord	Does not consider ε as a valid response if set
+	 * @param forbidDuplications	Forbid duplications
 	 */
-	public HunspellRegexWordGenerator(String regex, boolean ignoreEmptyWord){
+	public HunspellRegexWordGenerator(String regex, boolean ignoreEmptyWord, boolean forbidDuplications){
 		Objects.requireNonNull(regex);
 
 		regex = StringUtils.replaceEach(requote(regex),
@@ -81,6 +83,7 @@ public class HunspellRegexWordGenerator{
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		automaton = PatternService.automaton(regex);
 		this.ignoreEmptyWord = ignoreEmptyWord;
+		this.forbidDuplications = forbidDuplications;
 	}
 
 	/**
