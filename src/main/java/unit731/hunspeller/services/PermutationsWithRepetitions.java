@@ -104,6 +104,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		return result;
 	}
 
+	/** In num = sum(i=0..k, a[i] * b^i), check if a[i] is equals to a[i - 1] for i = 1..k */
 	private boolean hasConsecutiveDuplicates(long index){
 		boolean consecutiveDuplicates = false;
 		int[] next = convertBase(index, n);
