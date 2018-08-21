@@ -708,13 +708,13 @@ public class WordGeneratorTest{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"PFX P Y 1",
-			"PFX P   0 un . dp:pfx_un sp:un",
+			"PFX P 0 un . dp:pfx_un sp:un",
 			"SFX S Y 1",
-			"SFX S   0 s . is:plur",
+			"SFX S 0 s . is:plur",
 			"SFX Q Y 1",
-			"SFX Q   0 s . is:sg_3",
+			"SFX Q 0 s . is:sg_3",
 			"SFX R Y 1",
-			"SFX R   0 able/PS . ds:der_able");
+			"SFX R 0 able/PS . ds:der_able");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
@@ -1090,6 +1090,38 @@ public class WordGeneratorTest{
 			new Production("yzfoo", Arrays.asList("yz", "foo")),
 			new Production("yzbar", Arrays.asList("yz", "bar"))
 		);
+		Assert.assertEquals(expected, words);
+	}
+
+
+//	@Test
+	public void compoundForbidFlag() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"COMPOUNDFORBIDFLAG Z",
+			"PFX P Y 1",
+			"PFX P 0 pre/Z .",
+			"SFX S Y 1",
+			"SFX S 0 suf/Z .");
+		affParser.parse(affFile);
+		strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+		String line = "X";
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		Assert.assertEquals(10, words.size());
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", Arrays.asList("foo", "foo")),
+			new Production("prefoo", Arrays.asList("foo", "bar")),
+			new Production("foosuf", Arrays.asList("foo", "xy")),
+			new Production("prefoosuf", Arrays.asList("foo", "yz"))
+		);
+		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
 	}
 

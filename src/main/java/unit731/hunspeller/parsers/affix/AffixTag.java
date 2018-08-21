@@ -78,14 +78,14 @@ public enum AffixTag{
 //	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
 	/** Allow twofold suffixes within compounds */
 //	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
-	/** Suffixes with this flag forbid compounding of the affixed word */
+	/** Affixes with this flag forbid compounding of the affixed word */
 //	COMPOUND_FORBID_FLAG("COMPOUNDFORBIDFLAG"),
 	/** Set maximum word count in a compound word (default is unlimited) */
 	COMPOUND_WORD_MAX("COMPOUNDWORDMAX"),
 	/** Forbid word duplication in compounds */
 	CHECK_COMPOUND_DUPLICATION("CHECKCOMPOUNDDUP"),
 	/**
-	 * Forbid compounding, if the (usually bad) compound word may be a non compound word with a REP fault (useful for languages with
+	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP fault (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
 //	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
