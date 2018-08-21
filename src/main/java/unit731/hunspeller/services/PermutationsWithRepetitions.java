@@ -97,9 +97,8 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 */
 	private int[] convertBase(long decimalNumber, int radix) throws IllegalArgumentException{
 		int[] result = new int[k];
-		int i = k;
-		while(decimalNumber != 0l){
-			result[-- i] = (int)(decimalNumber % radix);
+		for(int i = k - 1; decimalNumber != 0l; i --){
+			result[i] = (int)(decimalNumber % radix);
 			decimalNumber /= radix;
 		}
 		return result;
