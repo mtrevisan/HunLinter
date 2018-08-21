@@ -61,7 +61,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		return (k == MAX_COMPOUNDS_INFINITY || (currentIndex > 0l? (int)Math.floor(Math.log(currentIndex) / Math.log(n)) + 1: 1) <= k);
+		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < Math.pow(n, k));
 	}
 
 	@Override
