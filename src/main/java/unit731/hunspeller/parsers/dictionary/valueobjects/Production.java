@@ -20,9 +20,13 @@ public class Production extends DictionaryEntry{
 
 	private List<AffixEntry> appliedRules;
 
+	private final List<DictionaryEntry> compoundEntries;
+
 
 	public Production(DictionaryEntry productable, FlagParsingStrategy strategy){
 		super(productable, strategy);
+
+		compoundEntries = null;
 	}
 
 	public Production(String word, AffixEntry appliedEntry, DictionaryEntry productable, String[] remainingContinuationFlags,
@@ -31,15 +35,21 @@ public class Production extends DictionaryEntry{
 
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
+
+		compoundEntries = null;
 	}
 
 	public Production(String word, List<DictionaryEntry> compoundEntries){
 		super(word, compoundEntries);
+
+		this.compoundEntries = compoundEntries;
 	}
 
 	/** NOTE: used for testing purposes */
 	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
 		super(word, continuationFlags, morphologicalFields, strategy);
+
+		compoundEntries = null;
 	}
 
 	public int getContinuationFlagsCount(AffixParser affParser){
@@ -95,6 +105,24 @@ public class Production extends DictionaryEntry{
 
 	public String getMorphologicalFields(){
 		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
+	}
+
+	public String[] getCompoundPrefixes(AffixParser affParser){
+		String[] prefixes = null;
+		if(compoundEntries != null){
+			DictionaryEntry entry = compoundEntries.get(0);
+			prefixes = entry.extractAffixes(affParser, false).get(0);
+		}
+		return prefixes;
+	}
+
+	public String[] getCompoundSuffixes(AffixParser affParser){
+		String[] suffixes = null;
+		if(compoundEntries != null){
+			DictionaryEntry entry = compoundEntries.get(compoundEntries.size() - 1);
+			suffixes = entry.extractAffixes(affParser, false).get(1);
+		}
+		return suffixes;
 	}
 
 	public String toStringWithSignificantMorphologicalFields(){

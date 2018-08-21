@@ -957,16 +957,16 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(10, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("bar", null, null, strategy))),
-			new Production("fooxy", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("xy", null, null, strategy))),
-			new Production("fooyz", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("yz", null, null, strategy))),
-			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("bar", null, null, strategy))),
-			new Production("barxy", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("xy", null, null, strategy))),
-			new Production("baryz", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("yz", null, null, strategy))),
-			new Production("xyfoo", Arrays.asList(new DictionaryEntry("xy", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("xybar", Arrays.asList(new DictionaryEntry("xy", null, null, strategy), new DictionaryEntry("bar", null, null, strategy)))
+			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
+			new Production("fooxy", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("xy", strategy))),
+			new Production("fooyz", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("yz", strategy))),
+			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("bar", strategy))),
+			new Production("barxy", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("xy", strategy))),
+			new Production("baryz", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("yz", strategy))),
+			new Production("xyfoo", Arrays.asList(new DictionaryEntry("xy", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("xybar", Arrays.asList(new DictionaryEntry("xy", strategy), new DictionaryEntry("bar", strategy)))
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -991,10 +991,10 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
 		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("bar", null, null, strategy))),
-			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("bar", null, null, strategy)))
+			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
+			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("bar", strategy)))
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1020,17 +1020,17 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(11, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("fooeel", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("eel", null, null, strategy))),
-			new Production("foobare", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("bare", null, null, strategy))),
-			new Production("operafoo", Arrays.asList(new DictionaryEntry("opera", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("operaopera", Arrays.asList(new DictionaryEntry("opera", null, null, strategy), new DictionaryEntry("opera", null, null, strategy))),
-			new Production("operaeel", Arrays.asList(new DictionaryEntry("opera", null, null, strategy), new DictionaryEntry("eel", null, null, strategy))),
-			new Production("operabare", Arrays.asList(new DictionaryEntry("opera", null, null, strategy), new DictionaryEntry("bare", null, null, strategy))),
-			new Production("eelfoo", Arrays.asList(new DictionaryEntry("eel", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("eelopera", Arrays.asList(new DictionaryEntry("eel", null, null, strategy), new DictionaryEntry("opera", null, null, strategy))),
-			new Production("eeleel", Arrays.asList(new DictionaryEntry("eel", null, null, strategy), new DictionaryEntry("eel", null, null, strategy))),
-			new Production("eelbare", Arrays.asList(new DictionaryEntry("eel", null, null, strategy), new DictionaryEntry("bare", null, null, strategy)))
+			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("fooeel", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("eel", strategy))),
+			new Production("foobare", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bare", strategy))),
+			new Production("operafoo", Arrays.asList(new DictionaryEntry("opera", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("operaopera", Arrays.asList(new DictionaryEntry("opera", strategy), new DictionaryEntry("opera", strategy))),
+			new Production("operaeel", Arrays.asList(new DictionaryEntry("opera", strategy), new DictionaryEntry("eel", strategy))),
+			new Production("operabare", Arrays.asList(new DictionaryEntry("opera", strategy), new DictionaryEntry("bare", strategy))),
+			new Production("eelfoo", Arrays.asList(new DictionaryEntry("eel", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("eelopera", Arrays.asList(new DictionaryEntry("eel", strategy), new DictionaryEntry("opera", strategy))),
+			new Production("eeleel", Arrays.asList(new DictionaryEntry("eel", strategy), new DictionaryEntry("eel", strategy))),
+			new Production("eelbare", Arrays.asList(new DictionaryEntry("eel", strategy), new DictionaryEntry("bare", strategy)))
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1056,9 +1056,9 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		Assert.assertEquals(3, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("glassglass", Arrays.asList(new DictionaryEntry("glass", null, null, strategy), new DictionaryEntry("glass", null, null, strategy))),
-			new Production("glassko", Arrays.asList(new DictionaryEntry("glass", null, null, strategy), new DictionaryEntry("sko", null, null, strategy))),
-			new Production("skoglass", Arrays.asList(new DictionaryEntry("sko", null, null, strategy), new DictionaryEntry("glass", null, null, strategy)))
+			new Production("glassglass", Arrays.asList(new DictionaryEntry("glass", strategy), new DictionaryEntry("glass", strategy))),
+			new Production("glassko", Arrays.asList(new DictionaryEntry("glass", strategy), new DictionaryEntry("sko", strategy))),
+			new Production("skoglass", Arrays.asList(new DictionaryEntry("sko", strategy), new DictionaryEntry("glass", strategy)))
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1084,12 +1084,12 @@ public class WordGeneratorTest{
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
 		Assert.assertEquals(6, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("bar", null, null, strategy))),
-			new Production("fooyz", Arrays.asList(new DictionaryEntry("foo", null, null, strategy), new DictionaryEntry("yz", null, null, strategy))),
-			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("baryz", Arrays.asList(new DictionaryEntry("bar", null, null, strategy), new DictionaryEntry("yz", null, null, strategy))),
-			new Production("yzfoo", Arrays.asList(new DictionaryEntry("yz", null, null, strategy), new DictionaryEntry("foo", null, null, strategy))),
-			new Production("yzbar", Arrays.asList(new DictionaryEntry("yz", null, null, strategy), new DictionaryEntry("bar", null, null, strategy)))
+			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
+			new Production("fooyz", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("yz", strategy))),
+			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("baryz", Arrays.asList(new DictionaryEntry("bar", strategy), new DictionaryEntry("yz", strategy))),
+			new Production("yzfoo", Arrays.asList(new DictionaryEntry("yz", strategy), new DictionaryEntry("foo", strategy))),
+			new Production("yzbar", Arrays.asList(new DictionaryEntry("yz", strategy), new DictionaryEntry("bar", strategy)))
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -1136,10 +1136,10 @@ words.forEach(stem -> System.out.println(stem));
 			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy), new DictionaryEntry("foo", Arrays.asList("X", "P", "S"), null, strategy))),
 			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy), new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy)))
 		);
-		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
+		//wrong: foosufbar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
 
-		//good: foo, foofoo, prefoo, foosuf, prefoosuf, prefoobarsuf
+		//good: foofoo, prefoobarsuf
 	}
 
 //	@Test
@@ -1186,7 +1186,6 @@ words.forEach(stem -> System.out.println(stem));
 			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy), new DictionaryEntry("foo", Arrays.asList("X", "P", "S"), null, strategy))),
 			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy), new DictionaryEntry("bar", Arrays.asList("X", "P", "S"), null, strategy)))
 		);
-		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
 	}
 

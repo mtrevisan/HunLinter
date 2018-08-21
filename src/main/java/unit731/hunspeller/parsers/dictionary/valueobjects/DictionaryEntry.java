@@ -62,8 +62,10 @@ public class DictionaryEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
+	/** Used to generate base production */
 	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(productable);
+		Objects.requireNonNull(strategy);
 
 		word = productable.getWord();
 		continuationFlags = productable.continuationFlags;
@@ -83,14 +85,34 @@ public class DictionaryEntry{
 	}
 
 	protected DictionaryEntry(String word, List<DictionaryEntry> compoundEntries){
+		Objects.requireNonNull(word);
+
 		this.word = word;
-		this.continuationFlags = null;
+		continuationFlags = null;
 		this.morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		combineable = true;
 	}
 
-	/** NOTE: used for testing purposes */
-	protected DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
+	public DictionaryEntry(String line, FlagParsingStrategy strategy){
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(strategy);
+
+		Matcher m = ENTRY_PATTERN.reset(line);
+		if(!m.find())
+			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
+
+		word = m.group(PARAM_WORD);
+		String dicFlags = m.group(PARAM_FLAGS);
+		continuationFlags = strategy.parseFlags(dicFlags);
+		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
+		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): null);
+		combineable = true;
+	}
+
+	public DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
+		Objects.requireNonNull(word);
+		Objects.requireNonNull(strategy);
+
 		this.word = word;
 		this.continuationFlags = strategy.parseFlags(continuationFlags);
 		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
@@ -146,6 +168,11 @@ public class DictionaryEntry{
 
 	public boolean isPartOfSpeech(String partOfSpeech){
 		return containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
+	}
+
+	public List<String[]> extractAffixes(AffixParser affParser, boolean reverse){
+		Affixes affixes = separateAffixes(affParser);
+		return affixes.extractAffixes(reverse);
 	}
 
 	/**
