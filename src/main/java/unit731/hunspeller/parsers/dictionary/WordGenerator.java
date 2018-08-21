@@ -86,7 +86,7 @@ public class WordGenerator{
 		}
 
 		//extract suffixed productions
-		List<Production> onefoldProductions = getOnefoldProductions(dicEntry);
+		List<Production> onefoldProductions = getOnefoldProductions(baseProduction);
 		if(log.isDebugEnabled()){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Onefold productions:");
@@ -487,6 +487,8 @@ public class WordGenerator{
 
 		List<Production> productions = new ArrayList<>();
 		if(appliedAffixes.length > 0){
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
 			String word = productable.getWord();
 
 			for(String affix : appliedAffixes){
@@ -539,7 +541,6 @@ public class WordGenerator{
 				//	.flatMap(List::stream)
 				//	.collect(Collectors.toList());
 
-				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 				for(AffixEntry entry : applicableAffixes){
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());

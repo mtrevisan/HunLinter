@@ -1139,7 +1139,6 @@ public class WordGeneratorTest{
 		Assert.assertEquals(expected, words);
 
 		words = wordGenerator.applyRules(foofoo);
-words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(4, words.size());
 		//base production
 		Assert.assertEquals(new Production("foofoo", "PS", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(0));
@@ -1149,9 +1148,6 @@ words.forEach(stem -> System.out.println(stem));
 		//lastfold productions
 		Assert.assertEquals(new Production("prefoofoo", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(2));
 		Assert.assertEquals(new Production("prefoofoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(3));
-		//good: foofoo, prefoobarsuf
-		//wrong: foosufbar, fooprebarsuf, prefooprebarsuf
-		Assert.assertEquals(expected, words);
 	}
 
 //	@Test
