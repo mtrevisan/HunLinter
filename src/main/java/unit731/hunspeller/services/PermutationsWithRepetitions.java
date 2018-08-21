@@ -22,6 +22,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	private final boolean forbidDuplications;
 
 	private long currentIndex;
+	private long maximumIndex;
 
 
 	/**
@@ -39,7 +40,12 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		this.k = k;
 		this.forbidDuplications = forbidDuplications;
 
-		currentIndex = (forbidDuplications? 1l: 0l);
+		currentIndex = 0l;
+		maximumIndex = (long)Math.pow(n, k);
+		if(forbidDuplications){
+			currentIndex ++;
+			maximumIndex --;
+		}
 	}
 
 	/**
@@ -61,7 +67,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	@Override
 	public boolean hasNext(){
-		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < Math.pow(n, k) - (forbidDuplications? 1l: 0l));
+		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < maximumIndex);
 	}
 
 	@Override
@@ -73,15 +79,9 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 		if(forbidDuplications){
 			boolean consecutiveDuplicates = true;
-			while(consecutiveDuplicates && currentIndex < Math.pow(n, k) - 1){
-				currentIndex ++;
-				int[] next = convertBase(currentIndex, n);
+			while(consecutiveDuplicates && currentIndex < maximumIndex)
 				//if next does not contains consecutive duplicates, break
-				consecutiveDuplicates = false;
-				for(int i = 1; !consecutiveDuplicates && i < next.length; i ++)
-					if(next[i] == next[i - 1])
-						consecutiveDuplicates = true;
-			}
+				consecutiveDuplicates = hasConsecutiveDuplicates(++ currentIndex);
 		}
 		else
 			currentIndex ++;
@@ -105,6 +105,15 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		}
 		ArrayUtils.reverse(result);
 		return result;
+	}
+
+	private boolean hasConsecutiveDuplicates(long index){
+		boolean consecutiveDuplicates = false;
+		int[] next = convertBase(index, n);
+		for(int i = 1; !consecutiveDuplicates && i < next.length; i ++)
+			if(next[i - 1] == next[i])
+				consecutiveDuplicates = true;
+		return consecutiveDuplicates;
 	}
 
 }
