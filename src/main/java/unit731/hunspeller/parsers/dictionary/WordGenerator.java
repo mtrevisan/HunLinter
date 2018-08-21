@@ -88,7 +88,7 @@ public class WordGenerator{
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(dicEntry);
 		if(log.isDebugEnabled()){
-			FlagParsingStrategy strategy = affParser.getStrategy();
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Onefold productions:");
 			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
@@ -96,7 +96,7 @@ public class WordGenerator{
 		//extract prefixed productions
 		List<Production> twofoldProductions = getTwofoldProductions(onefoldProductions);
 		if(log.isDebugEnabled()){
-			FlagParsingStrategy strategy = affParser.getStrategy();
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Twofold productions:");
 			twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
@@ -109,7 +109,7 @@ public class WordGenerator{
 		lastfoldProductions = getLastfoldProductions(lastfoldProductions);
 		checkTwofoldCorrectness(lastfoldProductions);
 		if(log.isDebugEnabled()){
-			FlagParsingStrategy strategy = affParser.getStrategy();
+			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Lastfold productions:");
 			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
@@ -146,13 +146,12 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<Production> applyRules(Production entry) throws IllegalArgumentException, NoApplicableRuleException{
-//TODO TOTEST
 		String[] compoundPrefixes = entry.getCompoundPrefixes(affParser);
 		String[] compoundSuffixes = entry.getCompoundSuffixes(affParser);
 		String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
 			.collect(Collectors.joining());
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(entry.getWord(), continuationFlags, null, strategy);
+		DictionaryEntry dicEntry = new DictionaryEntry(entry.getWord(), continuationFlags, entry.getMorphologicalFields(), strategy);
 		return applyRules(dicEntry);
 	}
 

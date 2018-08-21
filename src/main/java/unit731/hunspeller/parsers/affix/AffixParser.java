@@ -90,7 +90,6 @@ public class AffixParser extends ReadWriteLockable{
 
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
-	@Getter
 	private FlagParsingStrategy strategy = new ASCIIParsingStrategy();
 
 	private final Set<String> terminalAffixes = new HashSet<>();
