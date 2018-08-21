@@ -1062,13 +1062,13 @@ public class WordGeneratorTest{
 		Assert.assertEquals(expected, words);
 	}
 
-//	@Test
+	@Test
 	public void compoundFlagForbidWordDuplication() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDDUP",
-			"COMPOUNDMIN 3",
+			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
 		strategy = affParser.getFlagParsingStrategy();
