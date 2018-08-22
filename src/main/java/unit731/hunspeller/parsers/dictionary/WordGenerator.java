@@ -308,6 +308,19 @@ public class WordGenerator{
 				productions.addAll(applyRules(dicEntry));
 			}
 		}
+//		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+//
+//		//apply affixes to inner compounds
+//		//TODO
+//		if(dicEntry.isCompound() && permitCompoundFlag != null && dicEntry instanceof Production){
+//			production = (Production)dicEntry;
+//			List<String> compoundAffixes = production.getCompoundAffixes(strategy);
+//			for(String compoundAffix : compoundAffixes)
+//				if(entry.containsContinuationFlag(permitCompoundFlag)){
+//					DictionaryEntry de = new Production(production, compoundAffix, strategy);
+//					productions.addAll(applyRules(de));
+//				}
+//		}
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
@@ -540,7 +553,6 @@ public class WordGenerator{
 				//	.flatMap(List::stream)
 				//	.collect(Collectors.toList());
 
-				String permitCompoundFlag = affParser.getPermitCompoundFlag();
 				for(AffixEntry entry : applicableAffixes){
 					if(dicEntry.isCompound() && entry.containsContinuationFlag(forbidCompoundFlag))
 						continue;
@@ -552,19 +564,6 @@ public class WordGenerator{
 					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable(), strategy);
 
 					productions.add(production);
-
-
-					//apply affixes to inner compounds
-					//TODO
-//					if(dicEntry.isCompound() && permitCompoundFlag != null && dicEntry instanceof Production){
-//						production = (Production)dicEntry;
-//						List<String> compoundAffixes = production.getCompoundAffixes(strategy);
-//						for(String compoundAffix : compoundAffixes)
-//							if(compoundAffix.contains(permitCompoundFlag)){
-//								DictionaryEntry de = new Production(production, compoundAffix, strategy);
-//								productions.addAll(applyRules(de));
-//							}
-//					}
 				}
 			}
 		}
