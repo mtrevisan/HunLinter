@@ -118,6 +118,14 @@ public class Production extends DictionaryEntry{
 		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 	}
 
+	public List<String> getCompoundAffixes(){
+		List<String> affixes = new ArrayList<>();
+		if(compoundEntries != null)
+			for(DictionaryEntry entry : compoundEntries)
+				affixes.add(entry.getContinuationFlags());
+		return affixes;
+	}
+
 	public String[] getCompoundPrefixes(AffixParser affParser){
 		String[] prefixes = null;
 		if(compoundEntries != null){
@@ -138,7 +146,7 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public boolean isCompound(){
-		return (compoundEntries != null && !compoundEntries.isEmpty());
+		return (compoundEntries != null);
 	}
 
 	public String toStringWithSignificantMorphologicalFields(){

@@ -292,8 +292,8 @@ public class WordGenerator{
 			}
 		}
 
-		//TODO
-		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
 		//apply affixes
 		List<Production> productions = new ArrayList<>();
 		for(Production compound : compounds){
@@ -304,11 +304,22 @@ public class WordGenerator{
 			else{
 				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
 					.collect(Collectors.joining());
-				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
 				productions.addAll(applyRules(dicEntry));
 			}
 		}
+
+		//apply affixes to inner compounds
+		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+		if(permitCompoundFlag != null)
+			for(Production compound : compounds){
+				List<String> compoundAffixes = compound.getCompoundAffixes();
+				for(String compoundAffix : compoundAffixes)
+					if(compoundAffix.contains(permitCompoundFlag)){
+						DictionaryEntry dicEntry = new Production(compound, compoundAffix, strategy);
+						productions.addAll(applyRules(dicEntry));
+					}
+			}
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
