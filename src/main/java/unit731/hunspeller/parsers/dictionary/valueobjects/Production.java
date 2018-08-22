@@ -63,21 +63,6 @@ public class Production extends DictionaryEntry{
 		compoundEntries = null;
 	}
 
-	public int getContinuationFlagsCount(AffixParser affParser){
-		int continuationFlagsCount = 0;
-		if(continuationFlags != null){
-			continuationFlagsCount = continuationFlags.length;
-			for(String flag : continuationFlags)
-				if(affParser.isTerminalAffix(flag))
-					continuationFlagsCount --;
-		}
-		return continuationFlagsCount;
-	}
-
-	public boolean hasContinuationFlags(AffixParser affParser){
-		return (getContinuationFlagsCount(affParser) > 0);
-	}
-
 	public void clearContinuationFlags(){
 		continuationFlags = null;
 	}

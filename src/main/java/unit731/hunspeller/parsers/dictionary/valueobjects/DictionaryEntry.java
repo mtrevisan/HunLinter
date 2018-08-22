@@ -131,6 +131,21 @@ public class DictionaryEntry{
 			.collect(Collectors.toList());
 	}
 
+	public int getContinuationFlagsCount(AffixParser affParser){
+		int continuationFlagsCount = 0;
+		if(continuationFlags != null){
+			continuationFlagsCount = continuationFlags.length;
+			for(String flag : continuationFlags)
+				if(affParser.isTerminalAffix(flag))
+					continuationFlagsCount --;
+		}
+		return continuationFlagsCount;
+	}
+
+	public boolean hasContinuationFlags(AffixParser affParser){
+		return (getContinuationFlagsCount(affParser) > 0);
+	}
+
 	public boolean containsContinuationFlag(String ... continuationFlags){
 		if(this.continuationFlags != null)
 			for(String flag : this.continuationFlags)

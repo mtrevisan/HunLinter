@@ -296,31 +296,48 @@ public class WordGenerator{
 
 		//apply affixes
 		List<Production> productions = new ArrayList<>();
-		for(Production compound : compounds){
-			String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
-			String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
-			if(compoundPrefixes.length == 0 && compoundSuffixes.length == 0)
-				productions.add(compound);
-			else{
-				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
-					.collect(Collectors.joining());
-				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
-				productions.addAll(applyRules(dicEntry));
+		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+		if(permitCompoundFlag == null)
+			for(Production compound : compounds){
+				String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
+				String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
+				if(compoundPrefixes.length == 0 && compoundSuffixes.length == 0)
+					productions.add(compound);
+				else{
+					String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
+						.collect(Collectors.joining());
+					DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
+					productions.addAll(applyRules(dicEntry));
+				}
 			}
-		}
-//		String permitCompoundFlag = affParser.getPermitCompoundFlag();
-//
-//		//apply affixes to inner compounds
-//		//TODO
-//		if(dicEntry.isCompound() && permitCompoundFlag != null && dicEntry instanceof Production){
-//			production = (Production)dicEntry;
-//			List<String> compoundAffixes = production.getCompoundAffixes(strategy);
-//			for(String compoundAffix : compoundAffixes)
-//				if(entry.containsContinuationFlag(permitCompoundFlag)){
-//					DictionaryEntry de = new Production(production, compoundAffix, strategy);
-//					productions.addAll(applyRules(de));
-//				}
-//		}
+		else
+			for(Production compound : compounds){
+				for(DictionaryEntry compoundEntry : compound.getCompoundEntries()){
+					if(compoundEntry.hasContinuationFlags(affParser)){
+						if(compoundEntry.containsContinuationFlag(permitCompoundFlag)){
+							//TODO
+						}
+						else{
+							//TODO
+						}
+					}
+					else{
+						//TODO
+					}
+//					//apply affixes to inner compounds
+//					//TODO
+//					if(dicEntry.isCompound() && permitCompoundFlag != null && dicEntry instanceof Production){
+//						production = (Production)dicEntry;
+//						List<String> compoundAffixes = production.getCompoundAffixes(strategy);
+//						for(String compoundAffix : compoundAffixes)
+//							if(entry.containsContinuationFlag(permitCompoundFlag)){
+//								DictionaryEntry de = new Production(production, compoundAffix, strategy);
+//								productions.addAll(applyRules(de));
+//							}
+//					}
+				}
+			}
+
 
 		//convert using output table
 		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));

@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
  * Generates permutations of <code>n</code> items taken <code>k</code> at a time, in lexicographic order, with repetitions
  * 
  * @see <a href="https://github.com/dasanjos/java-examples/blob/master/src/main/java/com/dasanjos/java/util/math/PermutationWithRepetitionIterator.java">dasanjos/java-examples</a>
+ * @see <a href="https://stackoverflow.com/questions/51946590/sequence-of-numbers-without-repeating-subsequent-digits">Sequence of numbers without repeating adjacent digits</a>
  */
 public class PermutationsWithRepetitions implements Iterator<int[]>{
 
