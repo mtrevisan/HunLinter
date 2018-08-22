@@ -19,18 +19,17 @@ import unit731.hunspeller.services.PermutationsWithRepetitions;
 public class WordGeneratorCompoundFlagTest{
 
 	private final AffixParser affParser = new AffixParser();
-	private FlagParsingStrategy strategy;
 
 
 	@Test
-	public void compoundFlagSimple() throws IOException, TimeoutException{
+	public void simple() throws IOException, TimeoutException{
 		String language = "xxx";
 		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
@@ -65,7 +64,7 @@ public class WordGeneratorCompoundFlagTest{
 			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
@@ -93,7 +92,7 @@ public class WordGeneratorCompoundFlagTest{
 			"CHECKCOMPOUNDTRIPLE",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
@@ -131,7 +130,7 @@ public class WordGeneratorCompoundFlagTest{
 			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
@@ -158,7 +157,7 @@ public class WordGeneratorCompoundFlagTest{
 			"COMPOUNDMIN 2",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A";
@@ -181,7 +180,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void compoundFlagWithAffixes() throws IOException{
+	public void withAffixes() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -190,7 +189,7 @@ public class WordGeneratorCompoundFlagTest{
 			"SFX S Y 1",
 			"SFX S 0 suf .");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 
@@ -248,7 +247,7 @@ public class WordGeneratorCompoundFlagTest{
 			"SFX S Y 1",
 			"SFX S 0 suf/Y .");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 
@@ -318,7 +317,7 @@ words.forEach(stem -> System.out.println(stem));
 			"SFX S Y 1",
 			"SFX S 0 suf/Z .");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 

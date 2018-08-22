@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.services.FileService;
 
@@ -19,7 +18,6 @@ import unit731.hunspeller.services.FileService;
 public class WordGeneratorCompoundRuleTest{
 
 	private final AffixParser affParser = new AffixParser();
-	private FlagParsingStrategy strategy;
 
 
 	@Test
@@ -36,7 +34,6 @@ public class WordGeneratorCompoundRuleTest{
 			"SFX A 0 em .",
 			"SFX A 0 es .");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "vw";
@@ -60,7 +57,6 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "ABC";
@@ -84,7 +80,6 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A*B*C*");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A*B*C*";
@@ -110,7 +105,6 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A?B?C?");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A?B?C?";
@@ -135,7 +129,6 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(aa)?(bb)?(cc)?";
@@ -160,7 +153,6 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (1)?(2)?(3)?");
 		affParser.parse(affFile);
-		strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(1)?(2)?(3)?";
