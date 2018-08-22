@@ -313,7 +313,7 @@ public class WordGenerator{
 		String permitCompoundFlag = affParser.getPermitCompoundFlag();
 		if(permitCompoundFlag != null)
 			for(Production compound : compounds){
-				List<String> compoundAffixes = compound.getCompoundAffixes();
+				List<String> compoundAffixes = compound.getCompoundAffixes(strategy);
 				for(String compoundAffix : compoundAffixes)
 					if(compoundAffix.contains(permitCompoundFlag)){
 						DictionaryEntry dicEntry = new Production(compound, compoundAffix, strategy);

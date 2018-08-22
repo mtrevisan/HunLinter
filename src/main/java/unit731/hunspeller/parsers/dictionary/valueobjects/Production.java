@@ -118,11 +118,11 @@ public class Production extends DictionaryEntry{
 		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
 	}
 
-	public List<String> getCompoundAffixes(){
+	public List<String> getCompoundAffixes(FlagParsingStrategy strategy){
 		List<String> affixes = new ArrayList<>();
 		if(compoundEntries != null)
 			for(DictionaryEntry entry : compoundEntries)
-				affixes.add(entry.getContinuationFlags());
+				affixes.add(entry.getContinuationFlags(strategy));
 		return affixes;
 	}
 

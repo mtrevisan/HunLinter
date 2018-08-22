@@ -139,6 +139,10 @@ public class DictionaryEntry{
 		return false;
 	}
 
+	public String getContinuationFlags(FlagParsingStrategy strategy){
+		return strategy.joinFlags(continuationFlags);
+	}
+
 	public String getContinuationFlags(){
 		return (continuationFlags != null? Arrays.stream(continuationFlags)
 			.collect(Collectors.joining(", ")):
@@ -234,7 +238,7 @@ public class DictionaryEntry{
 	public String toString(FlagParsingStrategy strategy){
 		StringBuilder sb = new StringBuilder(word);
 		if(strategy != null)
-			sb.append(strategy.joinFlags(continuationFlags));
+			sb.append(AffixEntry.SLASH).append(strategy.joinFlags(continuationFlags));
 		else if(continuationFlags != null && continuationFlags.length > 0)
 			sb.append(AffixEntry.SLASH).append(StringUtils.join(continuationFlags, ", "));
 		if(morphologicalFields != null && morphologicalFields.length > 0)

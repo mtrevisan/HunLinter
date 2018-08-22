@@ -64,7 +64,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 			}
 		}
 
-		return AffixEntry.SLASH + String.join(COMMA, textFlags);
+		return String.join(COMMA, textFlags);
 	}
 
 	@Override

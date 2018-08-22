@@ -269,8 +269,8 @@ words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PY", "pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("prefoofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("prefoofoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", "Y", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosuf", "Y", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("foobarsuf", "PY", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("prefoobar", "Y", "pa:foo st:foo pa:bar st:bar", strategy),

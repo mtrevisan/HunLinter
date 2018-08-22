@@ -49,7 +49,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 			if(flag == null || flag.length() != 2)
 				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
 
-		return AffixEntry.SLASH + String.join(StringUtils.EMPTY, textFlags);
+		return String.join(StringUtils.EMPTY, textFlags);
 	}
 
 	@Override

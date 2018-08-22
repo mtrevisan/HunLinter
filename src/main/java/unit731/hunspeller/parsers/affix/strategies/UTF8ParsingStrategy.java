@@ -52,7 +52,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
 		}
 
-		return AffixEntry.SLASH + String.join(StringUtils.EMPTY, textFlags);
+		return String.join(StringUtils.EMPTY, textFlags);
 	}
 
 	@Override
