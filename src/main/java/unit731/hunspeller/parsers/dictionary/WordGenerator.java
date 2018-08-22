@@ -139,23 +139,6 @@ public class WordGenerator{
 	}
 
 	/**
-	 * Generates a list of stems for the provided word
-	 * 
-	 * @param entry	Compound {@link Production production} used to generate the productions for
-	 * @return	The list of productions for the given word
-	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
-	 */
-	public List<Production> applyRules(Production entry) throws IllegalArgumentException, NoApplicableRuleException{
-		String[] compoundPrefixes = entry.getCompoundPrefixes(affParser);
-		String[] compoundSuffixes = entry.getCompoundSuffixes(affParser);
-		String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
-			.collect(Collectors.joining());
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new Production(entry, continuationFlags, strategy);
-		return applyRules(dicEntry);
-	}
-
-	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
@@ -277,7 +260,7 @@ public class WordGenerator{
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
-		List<Production> productions = new ArrayList<>();
+		List<Production> compounds = new ArrayList<>();
 		StringBuilder sb = new StringBuilder();
 		List<int[]> permutations = perm.permutations(limit);
 		for(int[] permutation : permutations){
@@ -305,7 +288,25 @@ public class WordGenerator{
 			}
 			if(sb.length() > 0){
 				String newWord = sb.toString();
-				productions.add(new Production(newWord, compoundEntries));
+				compounds.add(new Production(newWord, compoundEntries));
+			}
+		}
+
+		//TODO
+		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+		//apply affixes
+		List<Production> productions = new ArrayList<>();
+		for(Production compound : compounds){
+			String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
+			String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
+			if(compoundPrefixes.length == 0 && compoundSuffixes.length == 0)
+				productions.add(compound);
+			else{
+				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
+					.collect(Collectors.joining());
+				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
+				productions.addAll(applyRules(dicEntry));
 			}
 		}
 

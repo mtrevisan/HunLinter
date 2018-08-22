@@ -69,7 +69,10 @@ public class DictionaryEntry{
 
 		word = dicEntry.getWord();
 		continuationFlags = dicEntry.continuationFlags;
-		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, dicEntry.morphologicalFields);
+		if(dicEntry instanceof Production && ((Production)dicEntry).isCompound())
+			morphologicalFields = Arrays.copyOf(dicEntry.morphologicalFields, dicEntry.morphologicalFields.length);
+		else
+			morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, dicEntry.morphologicalFields);
 		combineable = true;
 	}
 

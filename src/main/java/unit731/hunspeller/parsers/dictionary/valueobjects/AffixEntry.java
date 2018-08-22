@@ -165,6 +165,12 @@ public class AffixEntry{
 				stemFound = true;
 				break;
 			}
+		if(!stemFound)
+			for(String field : amf)
+				if(field.startsWith(WordGenerator.TAG_STEM)){
+					stemFound = true;
+					break;
+				}
 		//add stem only if not present
 		if(!stemFound)
 			mf.add(0, WordGenerator.TAG_STEM + dicEntry.getWord());
