@@ -40,7 +40,6 @@ public class WordGeneratorCompoundFlagTest{
 			"yz/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
-		Assert.assertEquals(10, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
 			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
@@ -74,7 +73,6 @@ public class WordGeneratorCompoundFlagTest{
 			"yz/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
-		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
 			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
@@ -103,8 +101,6 @@ public class WordGeneratorCompoundFlagTest{
 			"bare/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
-words.forEach(stem -> System.out.println(stem));
-		Assert.assertEquals(11, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("foo", strategy))),
 			new Production("fooeel", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("eel", strategy))),
@@ -140,7 +136,6 @@ words.forEach(stem -> System.out.println(stem));
 			"sko/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
-		Assert.assertEquals(3, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("glassglass", Arrays.asList(new DictionaryEntry("glass", strategy), new DictionaryEntry("glass", strategy))),
 			new Production("glassko", Arrays.asList(new DictionaryEntry("glass", strategy), new DictionaryEntry("sko", strategy))),
@@ -168,7 +163,6 @@ words.forEach(stem -> System.out.println(stem));
 			"yz/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
-		Assert.assertEquals(6, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("bar", strategy))),
 			new Production("fooyz", Arrays.asList(new DictionaryEntry("foo", strategy), new DictionaryEntry("yz", strategy))),
@@ -214,26 +208,25 @@ words.forEach(stem -> System.out.println(stem));
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
-			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy))),
-			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
-			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy)))
+			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosuf", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobarsuf", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoo", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoosuf", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbar", null, "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar", strategy)
 		);
 		Assert.assertEquals(expected, words);
-
-
-//		words = wordGenerator.applyRules(foofoo);
-		Assert.assertEquals(4, words.size());
-		//base production
-		Assert.assertEquals(new Production("foofoo", "PS", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(0));
-		//onefold productions
-		Assert.assertEquals(new Production("foofoosuf", "P", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(1));
-		//twofold productions
-		//lastfold productions
-		Assert.assertEquals(new Production("prefoofoo", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("prefoofoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(3));
 	}
 
 	@Test
@@ -272,37 +265,42 @@ words.forEach(stem -> System.out.println(stem));
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
 words.forEach(stem -> System.out.println(stem));
-		Assert.assertEquals(4, words.size());
-		//good: foo, prefoo, foosuf, prefoosuf, prefoobarsuf, foosufbar, fooprebarsuf, prefooprebarsuf
+		//missing: foosufbar, fooprebarsuf, ...
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
-			new Production("foobar", Arrays.asList(new DictionaryEntry("foo", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy))),
-			new Production("barfoo", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("foo", "XPS", null, strategy))),
-			new Production("barbar", Arrays.asList(new DictionaryEntry("bar", "XPS", null, strategy), new DictionaryEntry("bar", "XPS", null, strategy)))
+			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foosuffoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foosuffoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foosufprefoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foosufprefoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefooprefoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefooprefoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoosuffoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoosuffoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoosufprefoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoosufprefoosuf", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofoosuf", "PY", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("foobarsuf", "PY", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobar", "Y", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobarsuf", "Y", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefooprebar", "Y", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefooprebarsuf", "Y", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barfoosuf", "PY", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoo", "Y", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoosuf", "Y", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarprefoo", "Y", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarprefoosuf", "Y", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barbar", "PS", "	pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("barbarsuf", "PY", "	pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbar", "Y", "	pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbarsuf", "Y", "	pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarprebar", "Y", "	pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarprebarsuf", "Y", "	pa:bar st:bar pa:bar st:bar", strategy)
 		);
 		Assert.assertEquals(expected, words);
-
-
-//		words = wordGenerator.applyRules(foofoo);
-		Assert.assertEquals(13, words.size());
-		//base production
-		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), words.get(0));
-		//onefold productions
-		Assert.assertEquals(new Production("foosuf", "PY", "st:foo", strategy), words.get(1));
-		//twofold productions
-		Assert.assertEquals(new Production("prefoo", "Y", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("prefoosuf", "Y", "st:foo", strategy), words.get(3));
-		//lastfold productions
-		//compound productions
-		Assert.assertEquals(new Production("foosuffoo", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("prefoofoo", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("prefoosuffoo", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("foosuffoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(7));
-		Assert.assertEquals(new Production("prefoofoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(8));
-		Assert.assertEquals(new Production("prefoosuffoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(9));
-		Assert.assertEquals(new Production("foosufprefoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(10));
-		Assert.assertEquals(new Production("prefooprefoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(11));
-		Assert.assertEquals(new Production("prefoosufprefoosuf", null, "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(12));
 }
 
 	@Test
@@ -340,14 +338,12 @@ words.forEach(stem -> System.out.println(stem));
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-		Assert.assertEquals(4, words.size());
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy)
 		);
-		//wrong: prefoobarsuf, foosufbar, fooprebar, foosufprebar, fooprebarsuf, prefooprebarsuf
 		Assert.assertEquals(expected, words);
 	}
 
