@@ -75,7 +75,7 @@ public enum AffixTag{
 	 * Affixes with this flag may be inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
 	 * at the end of compounds only).
 	 */
-//	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
+	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
 	/** Allow twofold suffixes within compounds */
 //	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
 	/** Affixes with this flag forbid compounding of the affixed word */

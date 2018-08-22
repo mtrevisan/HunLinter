@@ -35,13 +35,17 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 /**
  * Managed options:
  *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
- *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDFORBIDFLAG, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CIRCUMFIX, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE
+ *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP,
+ *			CIRCUMFIX, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE
  *		PFX, SFX
  *		FULLSTRIP, KEEPCASE, NEEDAFFIX, ICONV, OCONV
  */
 public class AffixParser extends ReadWriteLockable{
 
 	private static final String NO_LANGUAGE = "xxx";
+
+	private static final String START = "^";
+	private static final String END = "$";
 
 	private static final Matcher MATCHER_ISO639_1 = PatternService.matcher("([a-z]{2})");
 	private static final Matcher MATCHER_ISO639_2 = PatternService.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
@@ -337,7 +341,7 @@ public class AffixParser extends ReadWriteLockable{
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.ONLY_IN_COMPOUND, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.COMPOUND_ROOT, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
@@ -435,8 +439,8 @@ public class AffixParser extends ReadWriteLockable{
 			if(!containsData(AffixTag.BREAK)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
-				wordBreakCharacters.add("^" + HyphenationParser.MINUS_SIGN);
-				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + "$");
+				wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
+				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
 				addData(AffixTag.BREAK, wordBreakCharacters);
 			}
 			//swap tags:
@@ -457,6 +461,7 @@ public class AffixParser extends ReadWriteLockable{
 
 			terminalAffixes.add(getCompoundFlag());
 			terminalAffixes.add(getOnlyInCompoundFlag());
+			terminalAffixes.add(getPermitCompoundFlag());
 			terminalAffixes.add(getForbidCompoundFlag());
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getKeepCaseFlag());
@@ -651,6 +656,10 @@ public class AffixParser extends ReadWriteLockable{
 
 	public String getOnlyInCompoundFlag(){
 		return getData(AffixTag.ONLY_IN_COMPOUND);
+	}
+
+	public String getPermitCompoundFlag(){
+		return getData(AffixTag.COMPOUND_PERMIT_FLAG);
 	}
 
 	public String getForbidCompoundFlag(){
