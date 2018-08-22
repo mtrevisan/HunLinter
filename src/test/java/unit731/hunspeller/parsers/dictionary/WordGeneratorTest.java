@@ -1246,15 +1246,12 @@ words.forEach(stem -> System.out.println(stem));
 
 
 		words = wordGenerator.applyRules(foofoo);
-		Assert.assertEquals(4, words.size());
+		Assert.assertEquals(1, words.size());
 		//base production
 		Assert.assertEquals(new Production("foofoo", "PS", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foofoosuf", "PZ", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(1));
 		//twofold productions
 		//lastfold productions
-		Assert.assertEquals(new Production("prefoofoo", "Z", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("prefoofoosuf", "Z", "st:foofoo pa:foo st:foo pa:foo st:foo", strategy), words.get(3));
 	}
 
 }

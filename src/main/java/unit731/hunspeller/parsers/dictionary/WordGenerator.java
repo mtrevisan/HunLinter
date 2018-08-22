@@ -151,7 +151,7 @@ public class WordGenerator{
 		String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
 			.collect(Collectors.joining());
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(entry.getWord(), continuationFlags, entry.getMorphologicalFields(), strategy);
+		DictionaryEntry dicEntry = new Production(entry, continuationFlags, strategy);
 		return applyRules(dicEntry);
 	}
 
@@ -273,8 +273,6 @@ public class WordGenerator{
 
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
 
-//TODO
-//		String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
@@ -362,13 +360,13 @@ public class WordGenerator{
 		return result;
 	}
 
-	private Production getBaseProduction(DictionaryEntry productable, FlagParsingStrategy strategy){
-		return new Production(productable, strategy);
+	private Production getBaseProduction(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
+		return new Production(dicEntry, strategy);
 	}
 
-	private List<Production> getOnefoldProductions(DictionaryEntry productable) throws NoApplicableRuleException{
-		List<String[]> applyAffixes = productable.extractAffixes(affParser, !affParser.isComplexPrefixes());
-		return applyAffixRules(productable, applyAffixes);
+	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry) throws NoApplicableRuleException{
+		List<String[]> applyAffixes = dicEntry.extractAffixes(affParser, !affParser.isComplexPrefixes());
+		return applyAffixRules(dicEntry, applyAffixes);
 	}
 
 	private List<Production> getTwofoldProductions(List<Production> onefoldProductions) throws NoApplicableRuleException{
@@ -481,15 +479,16 @@ public class WordGenerator{
 		}
 	}
 
-	private List<Production> applyAffixRules(DictionaryEntry productable, List<String[]> applyAffixes) throws NoApplicableRuleException{
+	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes) throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
 		String[] postponedAffixes = applyAffixes.get(1);
 
 		List<Production> productions = new ArrayList<>();
 		if(appliedAffixes.length > 0){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 
-			String word = productable.getWord();
+			String word = dicEntry.getWord();
 
 			for(String affix : appliedAffixes){
 				RuleEntry rule = affParser.getData(affix);
@@ -498,8 +497,8 @@ public class WordGenerator{
 						continue;
 
 					String parentFlag = null;
-					if(productable instanceof Production){
-						List<AffixEntry> appliedRules = ((Production)productable).getAppliedRules();
+					if(dicEntry instanceof Production){
+						List<AffixEntry> appliedRules = ((Production)dicEntry).getAppliedRules();
 						if(!appliedRules.isEmpty())
 							parentFlag = appliedRules.get(0).getFlag();
 					}
@@ -509,7 +508,7 @@ public class WordGenerator{
 
 				List<AffixEntry> applicableAffixes = AffixParser.extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + productable.toString());
+					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + dicEntry.toString());
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
@@ -542,10 +541,13 @@ public class WordGenerator{
 				//	.collect(Collectors.toList());
 
 				for(AffixEntry entry : applicableAffixes){
+					if(dicEntry.isCompound() && entry.containsContinuationFlag(forbidCompoundFlag))
+						continue;
+
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					Production production = new Production(newWord, entry, productable, postponedAffixes, rule.isCombineable(), strategy);
+					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable(), strategy);
 
 					productions.add(production);
 				}

@@ -63,24 +63,24 @@ public class DictionaryEntry{
 	}
 
 	/** Used to generate base production */
-	protected DictionaryEntry(DictionaryEntry productable, FlagParsingStrategy strategy){
-		Objects.requireNonNull(productable);
+	protected DictionaryEntry(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
+		Objects.requireNonNull(dicEntry);
 		Objects.requireNonNull(strategy);
 
-		word = productable.getWord();
-		continuationFlags = productable.continuationFlags;
-		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, productable.morphologicalFields);
+		word = dicEntry.getWord();
+		continuationFlags = dicEntry.continuationFlags;
+		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, dicEntry.morphologicalFields);
 		combineable = true;
 	}
 
-	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry productable, String[] remainingContinuationFlags,
+	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags,
 			boolean combineable, FlagParsingStrategy strategy){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(appliedEntry);
 
 		this.word = word;
 		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		this.morphologicalFields = appliedEntry.combineMorphologicalFields(productable);
+		this.morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		this.combineable = combineable;
 	}
 
@@ -217,6 +217,10 @@ public class DictionaryEntry{
 			}
 
 		return new Affixes(terminalAffixes, prefixes, suffixes);
+	}
+
+	public boolean isCompound(){
+		return false;
 	}
 
 	@Override

@@ -146,8 +146,8 @@ public class AffixEntry{
 	 * Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 	 * 	removed by splitting rules
 	 */
-	public String[] combineMorphologicalFields(DictionaryEntry productable){
-		List<String> mf = (productable.morphologicalFields != null? new ArrayList<>(Arrays.asList(productable.morphologicalFields)): new ArrayList<>());
+	public String[] combineMorphologicalFields(DictionaryEntry dicEntry){
+		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
 //		boolean containsNonTerminalSuffixes = amf.stream()
@@ -167,7 +167,7 @@ public class AffixEntry{
 			}
 		//add stem only if not present
 		if(!stemFound)
-			mf.add(0, WordGenerator.TAG_STEM + productable.getWord());
+			mf.add(0, WordGenerator.TAG_STEM + dicEntry.getWord());
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
