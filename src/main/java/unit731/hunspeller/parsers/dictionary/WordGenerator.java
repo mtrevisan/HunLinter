@@ -311,6 +311,7 @@ public class WordGenerator{
 				}
 			}
 		else
+			//apply affixes, if permitted, inside compounds
 			for(Production compound : compounds){
 				for(DictionaryEntry compoundEntry : compound.getCompoundEntries()){
 					if(compoundEntry.hasContinuationFlags(affParser)){
