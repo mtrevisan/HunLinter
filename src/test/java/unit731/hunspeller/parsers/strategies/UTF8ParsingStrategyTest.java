@@ -38,7 +38,7 @@ public class UTF8ParsingStrategyTest{
 		String[] flags = new String[]{"è", "ŧ"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/èŧ", continuationFlags);
+		Assert.assertEquals("èŧ", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

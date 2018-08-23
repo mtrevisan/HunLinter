@@ -48,7 +48,7 @@ public class NumericalParsingStrategyTest{
 		String[] flags = new String[]{"1", "2"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/1,2", continuationFlags);
+		Assert.assertEquals("1,2", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -43,7 +43,7 @@ public class DoubleCharParsingStrategyTest{
 		String[] flags = new String[]{"ab", "cd"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/abcd", continuationFlags);
+		Assert.assertEquals("abcd", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

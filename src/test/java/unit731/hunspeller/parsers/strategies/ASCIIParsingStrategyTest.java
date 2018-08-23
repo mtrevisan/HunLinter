@@ -38,7 +38,7 @@ public class ASCIIParsingStrategyTest{
 		String[] flags = new String[]{"a", "b"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("/ab", continuationFlags);
+		Assert.assertEquals("ab", continuationFlags);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

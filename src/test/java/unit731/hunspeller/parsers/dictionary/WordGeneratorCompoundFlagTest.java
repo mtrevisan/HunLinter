@@ -207,7 +207,6 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo", strategy),

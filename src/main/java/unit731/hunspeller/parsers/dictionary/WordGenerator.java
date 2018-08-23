@@ -262,6 +262,7 @@ public class WordGenerator{
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
+		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
@@ -306,7 +307,13 @@ public class WordGenerator{
 				if(sb.length() > 0){
 					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
 					String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
-					productions.add(new Production(sb.toString(), flags, compoundEntries, strategy));
+					if(hasForbidCompoundFlag || hasPermitCompoundFlag)
+						productions.add(new Production(sb.toString(), flags, compoundEntries, strategy));
+					else{
+						//add boundary affixes
+						List<Production> prods = applyRules(new Production(sb.toString(), flags, compoundEntries, strategy), false);
+						productions.addAll(prods);
+					}
 				}
 
 
@@ -321,28 +328,7 @@ public class WordGenerator{
 						completed = true;
 				}
 			}
-
-if(!hasPermitCompoundFlag){
-	//add boundary affixes
-	//TODO
-}
 		}
-
-
-//		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-//		String permitCompoundFlag = affParser.getPermitCompoundFlag();
-//
-//		//apply affixes
-//		List<Production> compounds = new ArrayList<>();
-//		if(permitCompoundFlag == null)
-//			for(Production compound : compounds){
-//				String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
-//				String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
-//				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
-//					.collect(Collectors.joining());
-//				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
-//				productions.addAll(applyRules(dicEntry));
-//			}
 
 
 		//convert using output table
