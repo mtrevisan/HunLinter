@@ -305,7 +305,8 @@ public class WordGenerator{
 				}
 				if(sb.length() > 0){
 					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
-					productions.add(new Production(sb.toString(), String.join(StringUtils.EMPTY, continuationFlags), compoundEntries, strategy));
+					String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
+					productions.add(new Production(sb.toString(), flags, compoundEntries, strategy));
 				}
 
 
@@ -320,6 +321,11 @@ public class WordGenerator{
 						completed = true;
 				}
 			}
+
+if(!hasPermitCompoundFlag){
+	//add boundary affixes
+	//TODO
+}
 		}
 
 
@@ -589,8 +595,8 @@ public class WordGenerator{
 
 				for(AffixEntry entry : applicableAffixes){
 					boolean hasForbidFlag = (forbidCompoundFlag != null && entry.containsContinuationFlag(forbidCompoundFlag));
-					boolean hasNotPermitFlag = (permitCompoundFlag != null && !entry.containsContinuationFlag(permitCompoundFlag));
-					if(isCompound && (hasForbidFlag || hasNotPermitFlag))
+					boolean hasPermitFlag = (permitCompoundFlag != null && entry.containsContinuationFlag(permitCompoundFlag));
+					if(isCompound && (hasForbidFlag || !hasPermitFlag))
 						continue;
 
 
