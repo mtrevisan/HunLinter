@@ -89,6 +89,26 @@ public class Production extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
+	public boolean isTwofolded(){
+		boolean twofolded = false;
+		if(appliedRules != null){
+			int suffixes = 0;
+			int prefixes = 0;
+			for(AffixEntry appliedRule : appliedRules){
+				if(appliedRule.isSuffix())
+					suffixes ++;
+				else
+					prefixes ++;
+
+				if(suffixes > 1 || prefixes > 1){
+					twofolded = true;
+					break;
+				}
+			}
+		}
+		return twofolded;
+	}
+
 	public String getRulesSequence(){
 		StringJoiner sj = new StringJoiner(" > ");
 		if(appliedRules != null)

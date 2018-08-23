@@ -6,6 +6,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,7 +16,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -101,7 +101,7 @@ public class WordGenerator{
 			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
-		List<Production> twofoldProductions;
+		List<Production> twofoldProductions = Collections.<Production>emptyList();
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound);
@@ -111,9 +111,6 @@ public class WordGenerator{
 				twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 			}
 		}
-		else
-			//remove twofold rules
-			twofoldProductions = clearTwofoldRules(onefoldProductions);
 
 		//extract lastfold productions
 		List<Production> lastfoldProductions = new ArrayList<>();
@@ -320,6 +317,15 @@ public class WordGenerator{
 					else{
 						//add boundary affixes
 						List<Production> prods = applyRules(new Production(sb.toString(), flags, compoundEntries, strategy), false);
+
+						//remove twofold because they're not allowed in compounds
+						if(!affParser.allowTwofoldAffixesInCompound()){
+							Iterator<Production> itr = prods.iterator();
+							while(itr.hasNext())
+								if(itr.next().isTwofolded())
+									itr.remove();
+						}
+
 						productions.addAll(prods);
 					}
 				}
@@ -427,20 +433,6 @@ public class WordGenerator{
 				prod.prependAppliedRules(appliedRules);
 
 			twofoldProductions.addAll(productions);
-		}
-		return twofoldProductions;
-	}
-
-	private List<Production> clearTwofoldRules(List<Production> onefoldProductions) throws NoApplicableRuleException{
-		List<Production> twofoldProductions = new ArrayList<>();
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		for(Production production : onefoldProductions){
-			List<String[]> applyAffixes = production.extractAffixes(affParser, !affParser.isComplexPrefixes());
-			String newAffixes = String.join(StringUtils.EMPTY, ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(2)));
-
-			Production prod = new Production(production, newAffixes, strategy);
-
-			twofoldProductions.add(prod);
 		}
 		return twofoldProductions;
 	}
