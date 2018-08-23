@@ -229,6 +229,133 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
+	public void withAffixesOnefold() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"PFX P Y 1",
+			"PFX P 0 pre/R .",
+			"PFX R Y 1",
+			"PFX R 0 pre .",
+			"SFX S Y 1",
+			"SFX S 0 sff .");
+		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+
+		String line = "foo/XPS";
+		List<Production> words = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(4, words.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), words.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foosuf", "P", "st:foo", strategy), words.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("prefoo", null, "st:foo", strategy), words.get(2));
+		Assert.assertEquals(new Production("prefoosuf", null, "st:foo", strategy), words.get(3));
+		//lastfold productions
+
+
+		line = "X";
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosuf", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobarsuf", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoo", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoosuf", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbar", null, "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar", strategy)
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void withAffixesTwofold() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"COMPOUNDFLAG X",
+			"COMPOUNDMORESUFFIXES",
+			"PFX P Y 1",
+			"PFX P 0 pre .",
+			"SFX S Y 1",
+			"SFX S 0 suf/T .",
+			"SFX T Y 1",
+			"SFX T 0 sff .");
+		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+
+		String line = "foo/XPS";
+		List<Production> words = wordGenerator.applyRules(line);
+
+		Assert.assertEquals(6, words.size());
+		//base production
+		Assert.assertEquals(new Production("foo", "XPS", "st:foo", strategy), words.get(0));
+		//onefold productions
+		Assert.assertEquals(new Production("foosuf", "PT", "st:foo", strategy), words.get(1));
+		//twofold productions
+		Assert.assertEquals(new Production("foosufsff", "P", "st:foo", strategy), words.get(2));
+		//lastfold productions
+		Assert.assertEquals(new Production("prefoo", null, "st:foo", strategy), words.get(3));
+		Assert.assertEquals(new Production("prefoosuf", null, "st:foo", strategy), words.get(4));
+		Assert.assertEquals(new Production("prefoosufsff", null, "st:foo", strategy), words.get(5));
+
+
+		line = "X";
+		String[] inputCompounds = new String[]{
+			"foo/XPS",
+			"bar/XPS"
+		};
+		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofoosufsff", "P", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosuf", "T", "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoosufsff", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("foobarsuf", "PT", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("foobarsufsff", "P", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobarsuf", "T", "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobarsufsff", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barfoosuf", "PT", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barfoosufsff", "P", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoo", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoosuf", "T", "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoosufsff", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("barbarsufsff", "P", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbar", null, "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbarsufsff", null, "pa:bar st:bar pa:bar st:bar", strategy)
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
 	public void permitFlag() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
