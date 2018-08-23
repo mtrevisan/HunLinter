@@ -369,10 +369,10 @@ public class WordGeneratorCompoundFlagTest{
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
 		List<Production> expected = Arrays.asList(
-			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
-			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
-			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy)
+			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("barfoo", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("barbar", null, "pa:bar st:bar pa:bar st:bar", strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
