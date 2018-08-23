@@ -446,7 +446,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void stemsInvalidTwofold() throws IOException{
+	public void stemsInvalidTwofold2() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
@@ -517,7 +517,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void complexPrefixes() throws IOException{
+	public void complexPrefixes2() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",

@@ -204,7 +204,7 @@ public class DictionaryEntry{
 	 * @param affParser	The {@link AffixParser}
 	 * @return	An object with separated flags, one for each group
 	 */
-	public Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
+	private Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
 		List<String> terminalAffixes = new ArrayList<>();
 		List<String> prefixes = new ArrayList<>();
 		List<String> suffixes = new ArrayList<>();

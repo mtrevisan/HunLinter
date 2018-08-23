@@ -6,7 +6,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -102,7 +101,7 @@ public class WordGenerator{
 			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
-		List<Production> twofoldProductions = Collections.<Production>emptyList();
+		List<Production> twofoldProductions;
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound);
@@ -451,7 +450,6 @@ public class WordGenerator{
 		for(Production production : productions)
 			if(production.isCombineable()){
 				List<String[]> applyAffixes = production.extractAffixes(affParser, affParser.isComplexPrefixes());
-//				applyAffixes.set(1, null);
 				List<Production> prods = applyAffixRules(production, applyAffixes, isCompound);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
@@ -465,10 +463,20 @@ public class WordGenerator{
 	}
 
 	private void checkTwofoldCorrectness(List<Production> twofoldProductions) throws IllegalArgumentException{
-		for(Production prod : twofoldProductions)
-			if(prod.hasContinuationFlags(affParser))
+		boolean complexPrefixes = affParser.isComplexPrefixes();
+		for(Production prod : twofoldProductions){
+			List<String[]> affixes = prod.extractAffixes(affParser, false);
+
+			String overabundantAffixes = null;
+			if(complexPrefixes && affixes.get(1).length > 0)
+				overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(affixes.get(1));
+			if(!complexPrefixes && affixes.get(0).length > 0)
+				overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(affixes.get(0));
+
+			if(overabundantAffixes != null)
 				throw new IllegalArgumentException("Twofold rule violated for '" + prod + " from " + prod.getRulesSequence()
-					+ "' (" + prod.getRulesSequence() + " still has rules " + prod.getContinuationFlags() + ")");
+					+ "' (" + prod.getRulesSequence() + " still has rules " + overabundantAffixes + ")");
+		}
 	}
 
 	private List<Production> enforceOnlyInCompound(List<Production> productions){
