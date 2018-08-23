@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.services.FileService;
 
@@ -34,6 +35,7 @@ public class WordGeneratorCompoundRuleTest{
 			"SFX A 0 em .",
 			"SFX A 0 es .");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "vw";
@@ -45,7 +47,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
 		Assert.assertEquals(1, words.size());
 		List<String> expected = Arrays.asList("arbeitsscheu");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -57,6 +59,7 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE ABC");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "ABC";
@@ -68,7 +71,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(2, words.size());
 		List<String> expected = Arrays.asList("abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -80,6 +83,7 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A*B*C*");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A*B*C*";
@@ -93,7 +97,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -105,6 +109,7 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE A?B?C?");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "A?B?C?";
@@ -116,7 +121,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -129,6 +134,7 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (aa)?(bb)?(cc)?");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(aa)?(bb)?(cc)?";
@@ -140,7 +146,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -153,6 +159,7 @@ public class WordGeneratorCompoundRuleTest{
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE (1)?(2)?(3)?");
 		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
 		String line = "(1)?(2)?(3)?";
@@ -164,7 +171,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
 		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, (List<DictionaryEntry>)null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
 
 }

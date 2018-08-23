@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -157,6 +158,8 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
 		//extract map flag -> regex of compounds
 		Map<String, String> inputs = extractCompoundRules(inputCompounds);
 
@@ -169,7 +172,7 @@ public class WordGenerator{
 		//generate all the words that matches the given regex
 		List<String> generatedWords = regexWordGenerator.generateAll(limit);
 		List<Production> productions = generatedWords.stream()
-			.map(word -> new Production(word, (List<DictionaryEntry>)null))
+			.map(word -> new Production(word, null, (List<DictionaryEntry>)null, strategy))
 			.collect(Collectors.toList());
 
 		//convert using output table
@@ -259,6 +262,7 @@ public class WordGenerator{
 
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
 
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
@@ -297,8 +301,13 @@ public class WordGenerator{
 					}
 					sb.append(nextCompound);
 				}
-				if(sb.length() > 0)
-					productions.add(new Production(sb.toString(), compoundEntries));
+				if(sb.length() > 0){
+					String[] compoundPrefixes = compoundEntries.get(0).extractAffixes(affParser, false).get(0);
+					String[] compoundSuffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false).get(1);
+					String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
+						.collect(Collectors.joining());
+					productions.add(new Production(sb.toString(), continuationFlags, compoundEntries, strategy));
+				}
 
 
 				//obtain next tuple

@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 
@@ -50,8 +49,8 @@ public class Production extends DictionaryEntry{
 		return (entries != null? new ArrayList<>(entries): null);
 	}
 
-	public Production(String word, List<DictionaryEntry> compoundEntries){
-		super(word, compoundEntries);
+	public Production(String word, String continuationFlags, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
+		super(word, continuationFlags, compoundEntries, strategy);
 
 		this.compoundEntries = compoundEntries;
 	}
@@ -101,32 +100,6 @@ public class Production extends DictionaryEntry{
 
 	public String getMorphologicalFields(){
 		return (morphologicalFields != null? String.join(StringUtils.SPACE, morphologicalFields): StringUtils.EMPTY);
-	}
-
-	public List<String> getCompoundAffixes(FlagParsingStrategy strategy){
-		List<String> affixes = new ArrayList<>();
-		if(compoundEntries != null)
-			for(DictionaryEntry entry : compoundEntries)
-				affixes.add(entry.getContinuationFlags(strategy));
-		return affixes;
-	}
-
-	public String[] getCompoundPrefixes(AffixParser affParser){
-		String[] prefixes = null;
-		if(compoundEntries != null){
-			DictionaryEntry entry = compoundEntries.get(0);
-			prefixes = entry.extractAffixes(affParser, false).get(0);
-		}
-		return prefixes;
-	}
-
-	public String[] getCompoundSuffixes(AffixParser affParser){
-		String[] suffixes = null;
-		if(compoundEntries != null){
-			DictionaryEntry entry = compoundEntries.get(compoundEntries.size() - 1);
-			suffixes = entry.extractAffixes(affParser, false).get(1);
-		}
-		return suffixes;
 	}
 
 	@Override
