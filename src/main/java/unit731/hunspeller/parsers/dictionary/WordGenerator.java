@@ -99,6 +99,7 @@ public class WordGenerator{
 			log.debug("Onefold productions:");
 			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
+//		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 
 		//extract prefixed productions
 		List<Production> twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound);
@@ -108,18 +109,19 @@ public class WordGenerator{
 			twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
 
-		//extract second suffixed productions
+		//extract second suffixed/prefixed productions
 		List<Production> lastfoldProductions = new ArrayList<>();
 		lastfoldProductions.add(baseProduction);
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getLastfoldProductions(lastfoldProductions, isCompound);
-		checkTwofoldCorrectness(lastfoldProductions);
 		if(log.isDebugEnabled()){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Lastfold productions:");
 			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
 		}
+
+		checkTwofoldCorrectness(lastfoldProductions);
 
 		//remove rules that invalidate the circumfix rule
 		enforceCircumfix(lastfoldProductions);
