@@ -314,8 +314,31 @@ public class WordGenerator{
 				for(DictionaryEntry compoundEntry : compoundEntries)
 					expandedCompound.add(applyRules(compoundEntry));
 
-				//TODO compose results
-System.out.println("");
+				//compose results
+				boolean completed = false;
+				int[] indexes = new int[expandedCompound.size()];
+				while(!completed){
+					sb.setLength(0);
+					List<DictionaryEntry> ce = new ArrayList<>();
+					for(int i = 0; i < indexes.length; i ++){
+						Production exp = expandedCompound.get(i).get(indexes[i]);
+						ce.add(exp);
+						//TODO check for triples
+						sb.append(exp.getWord());
+					}
+
+					for(int i = indexes.length - 1; i >= 0; i --){
+						indexes[i] ++;
+						if(indexes[i] < expandedCompound.get(i).size())
+							break;
+
+						indexes[i] = 0;
+						if(i == 0)
+							completed = true;
+					}
+
+					productions.add(new Production(sb.toString(), ce));
+				}
 			}
 		}
 
