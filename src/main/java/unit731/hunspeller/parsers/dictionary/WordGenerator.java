@@ -260,96 +260,72 @@ public class WordGenerator{
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
-		List<Production> compounds = new ArrayList<>();
+
 		StringBuilder sb = new StringBuilder();
+		List<Production> productions = new ArrayList<>();
 		List<int[]> permutations = perm.permutations(limit);
 		for(int[] permutation : permutations){
-			sb.setLength(0);
+			//expand permutation
+			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
+				.mapToObj(inputCompoundsFlag::get)
+				.map(this::applyRules)
+				.collect(Collectors.toList());
 
-			//compose compound
-			List<DictionaryEntry> compoundEntries = new ArrayList<>();
-			for(int index = 0; index < permutation.length; index ++){
-				DictionaryEntry next = inputCompoundsFlag.get(permutation[index]);
-				compoundEntries.add(next);
+			//compose compounds:
+			boolean completed = false;
+			int[] indexes = new int[permutation.length];
+			while(!completed){
+				sb.setLength(0);
+				List<DictionaryEntry> compoundEntries = new ArrayList<>();
+				for(int i = 0; i < indexes.length; i ++){
+					Production next = expandedPermutationEntries.get(i).get(indexes[i]);
+					compoundEntries.add(next);
 
-				String nextCompound = next.getWord();
-				if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
-					//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
-					if(simplifyTriples)
-						nextCompound = nextCompound.substring(1);
-					//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
-					else if(forbidTriples){
-						sb.setLength(0);
-						break;
-					}
-				}
-				sb.append(nextCompound);
-			}
-			if(sb.length() > 0)
-				compounds.add(new Production(sb.toString(), compoundEntries));
-		}
-
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		String permitCompoundFlag = affParser.getPermitCompoundFlag();
-
-		//apply affixes
-		List<Production> productions = new ArrayList<>();
-		if(permitCompoundFlag == null)
-			for(Production compound : compounds){
-				String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
-				String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
-				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
-					.collect(Collectors.joining());
-				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
-				productions.addAll(applyRules(dicEntry));
-			}
-		else{
-			//apply affixes, if permitted, inside compounds
-			for(Production compound : compounds){
-				List<DictionaryEntry> compoundEntries = compound.getCompoundEntries();
-				List<List<Production>> expandedCompound = new ArrayList<>(compoundEntries.size());
-				for(DictionaryEntry compoundEntry : compoundEntries)
-					expandedCompound.add(applyRules(compoundEntry));
-
-				//compose results
-				boolean completed = false;
-				int[] indexes = new int[expandedCompound.size()];
-				while(!completed){
-					sb.setLength(0);
-					compoundEntries = new ArrayList<>();
-					for(int i = 0; i < indexes.length; i ++){
-						Production next = expandedCompound.get(i).get(indexes[i]);
-						compoundEntries.add(next);
-
-						String nextCompound = next.getWord();
-						if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
-							//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
-							if(simplifyTriples)
-								nextCompound = nextCompound.substring(1);
-							//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
-							else if(forbidTriples){
-								sb.setLength(0);
-								break;
-							}
-						}
-						sb.append(nextCompound);
-					}
-
-					//obtain next tuple
-					for(int i = indexes.length - 1; i >= 0; i --){
-						indexes[i] ++;
-						if(indexes[i] < expandedCompound.get(i).size())
+					String nextCompound = next.getWord();
+					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
+						//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+						if(simplifyTriples)
+							nextCompound = nextCompound.substring(1);
+						//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
+						else if(forbidTriples){
+							sb.setLength(0);
 							break;
-
-						indexes[i] = 0;
-						if(i == 0)
-							completed = true;
+						}
 					}
-
+					sb.append(nextCompound);
+				}
+				if(sb.length() > 0)
 					productions.add(new Production(sb.toString(), compoundEntries));
+
+
+				//obtain next tuple
+				for(int i = indexes.length - 1; i >= 0; i --){
+					indexes[i] ++;
+					if(indexes[i] < expandedPermutationEntries.get(i).size())
+						break;
+
+					indexes[i] = 0;
+					if(i == 0)
+						completed = true;
 				}
 			}
 		}
+
+
+//		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+//		String permitCompoundFlag = affParser.getPermitCompoundFlag();
+//
+//		//apply affixes
+//		List<Production> compounds = new ArrayList<>();
+//		if(permitCompoundFlag == null)
+//			for(Production compound : compounds){
+//				String[] compoundPrefixes = compound.getCompoundPrefixes(affParser);
+//				String[] compoundSuffixes = compound.getCompoundSuffixes(affParser);
+//				String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
+//					.collect(Collectors.joining());
+//				DictionaryEntry dicEntry = new Production(compound, continuationFlags, strategy);
+//				productions.addAll(applyRules(dicEntry));
+//			}
 
 
 		//convert using output table
