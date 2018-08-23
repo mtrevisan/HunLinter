@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -263,6 +262,7 @@ public class WordGenerator{
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
+		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
@@ -304,8 +304,8 @@ public class WordGenerator{
 					sb.append(nextCompound);
 				}
 				if(sb.length() > 0){
-					String continuationFlags = extractPrePostTerminalAffixes(compoundEntries, compoundFlag);
-					productions.add(new Production(sb.toString(), continuationFlags, compoundEntries, strategy));
+					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
+					productions.add(new Production(sb.toString(), String.join(StringUtils.EMPTY, continuationFlags), compoundEntries, strategy));
 				}
 
 
@@ -390,7 +390,8 @@ public class WordGenerator{
 		return result;
 	}
 
-	private String extractPrePostTerminalAffixes(List<DictionaryEntry> compoundEntries, String compoundFlag){
+	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
+	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
 		List<String[]> prefixes = compoundEntries.get(0).extractAffixes(affParser, false);
 		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false);
 		Set<String> terminals = new HashSet<>();
@@ -399,12 +400,10 @@ public class WordGenerator{
 		for(String t : suffixes.get(2))
 			terminals.add(t);
 		terminals.remove(compoundFlag);
-		String[] compoundPrefixes = prefixes.get(0);
-		String[] compoundSuffixes = suffixes.get(1);
-		String[] compoundTerminals = terminals.toArray(new String[terminals.size()]);
-		String continuationFlags = Arrays.stream(ArrayUtils.addAll(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes), compoundTerminals))
-			.collect(Collectors.joining());
-		return continuationFlags;
+		String compoundPrefixes = String.join(StringUtils.EMPTY, prefixes.get(0));
+		String compoundSuffixes = String.join(StringUtils.EMPTY, suffixes.get(1));
+		String compoundTerminals = String.join(StringUtils.EMPTY, terminals);
+		return Arrays.asList(compoundPrefixes, compoundSuffixes, compoundTerminals);
 	}
 
 	private Production getBaseProduction(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
@@ -589,7 +588,9 @@ public class WordGenerator{
 				//	.collect(Collectors.toList());
 
 				for(AffixEntry entry : applicableAffixes){
-					if(isCompound && (forbidCompoundFlag != null && entry.containsContinuationFlag(forbidCompoundFlag) || permitCompoundFlag != null && !entry.containsContinuationFlag(permitCompoundFlag)))
+					boolean hasForbidFlag = (forbidCompoundFlag != null && entry.containsContinuationFlag(forbidCompoundFlag));
+					boolean hasNotPermitFlag = (permitCompoundFlag != null && !entry.containsContinuationFlag(permitCompoundFlag));
+					if(isCompound && (hasForbidFlag || hasNotPermitFlag))
 						continue;
 
 
