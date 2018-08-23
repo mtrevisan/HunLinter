@@ -589,7 +589,7 @@ public class WordGenerator{
 				//	.collect(Collectors.toList());
 
 				for(AffixEntry entry : applicableAffixes){
-					if(isCompound && (entry.containsContinuationFlag(forbidCompoundFlag) || !entry.containsContinuationFlag(permitCompoundFlag)))
+					if(isCompound && (forbidCompoundFlag != null && entry.containsContinuationFlag(forbidCompoundFlag) || permitCompoundFlag != null && !entry.containsContinuationFlag(permitCompoundFlag)))
 						continue;
 
 
