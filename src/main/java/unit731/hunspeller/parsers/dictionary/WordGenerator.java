@@ -7,6 +7,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -260,12 +261,13 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
-
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		String compoundFlag = affParser.getCompoundFlag();
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
+
+		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 
 		StringBuilder sb = new StringBuilder();
@@ -302,10 +304,7 @@ public class WordGenerator{
 					sb.append(nextCompound);
 				}
 				if(sb.length() > 0){
-					String[] compoundPrefixes = compoundEntries.get(0).extractAffixes(affParser, false).get(0);
-					String[] compoundSuffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false).get(1);
-					String continuationFlags = Arrays.stream(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes))
-						.collect(Collectors.joining());
+					String continuationFlags = extractPrePostTerminalAffixes(compoundEntries, compoundFlag);
 					productions.add(new Production(sb.toString(), continuationFlags, compoundEntries, strategy));
 				}
 
@@ -389,6 +388,23 @@ public class WordGenerator{
 			result.add(production);
 		}
 		return result;
+	}
+
+	private String extractPrePostTerminalAffixes(List<DictionaryEntry> compoundEntries, String compoundFlag){
+		List<String[]> prefixes = compoundEntries.get(0).extractAffixes(affParser, false);
+		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false);
+		Set<String> terminals = new HashSet<>();
+		for(String t : prefixes.get(2))
+			terminals.add(t);
+		for(String t : suffixes.get(2))
+			terminals.add(t);
+		terminals.remove(compoundFlag);
+		String[] compoundPrefixes = prefixes.get(0);
+		String[] compoundSuffixes = suffixes.get(1);
+		String[] compoundTerminals = terminals.toArray(new String[terminals.size()]);
+		String continuationFlags = Arrays.stream(ArrayUtils.addAll(ArrayUtils.addAll(compoundPrefixes, compoundSuffixes), compoundTerminals))
+			.collect(Collectors.joining());
+		return continuationFlags;
 	}
 
 	private Production getBaseProduction(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
