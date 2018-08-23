@@ -283,13 +283,10 @@ public class WordGenerator{
 						break;
 					}
 				}
-
 				sb.append(nextCompound);
 			}
-			if(sb.length() > 0){
-				String newWord = sb.toString();
-				compounds.add(new Production(newWord, compoundEntries));
-			}
+			if(sb.length() > 0)
+				compounds.add(new Production(sb.toString(), compoundEntries));
 		}
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -319,14 +316,26 @@ public class WordGenerator{
 				int[] indexes = new int[expandedCompound.size()];
 				while(!completed){
 					sb.setLength(0);
-					List<DictionaryEntry> ce = new ArrayList<>();
+					compoundEntries = new ArrayList<>();
 					for(int i = 0; i < indexes.length; i ++){
-						Production exp = expandedCompound.get(i).get(indexes[i]);
-						ce.add(exp);
-						//TODO check for triples
-						sb.append(exp.getWord());
+						Production next = expandedCompound.get(i).get(indexes[i]);
+						compoundEntries.add(next);
+
+						String nextCompound = next.getWord();
+						if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
+							//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+							if(simplifyTriples)
+								nextCompound = nextCompound.substring(1);
+							//enforce compound word not contains a triple if CHECKCOMPOUNDTRIPLE is set
+							else if(forbidTriples){
+								sb.setLength(0);
+								break;
+							}
+						}
+						sb.append(nextCompound);
 					}
 
+					//obtain next tuple
 					for(int i = indexes.length - 1; i >= 0; i --){
 						indexes[i] ++;
 						if(indexes[i] < expandedCompound.get(i).size())
@@ -337,7 +346,7 @@ public class WordGenerator{
 							completed = true;
 					}
 
-					productions.add(new Production(sb.toString(), ce));
+					productions.add(new Production(sb.toString(), compoundEntries));
 				}
 			}
 		}
