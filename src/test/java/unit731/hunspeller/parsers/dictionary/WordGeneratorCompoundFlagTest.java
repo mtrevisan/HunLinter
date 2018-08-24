@@ -497,6 +497,7 @@ public class WordGeneratorCompoundFlagTest{
 	public void checkCompoundCase() throws IOException{
 		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
+			"COMPOUNDMIN 1",
 			"CHECKCOMPOUNDCASE",
 			"COMPOUNDFLAG A");
 		affParser.parse(affFile);
@@ -510,45 +511,49 @@ public class WordGeneratorCompoundFlagTest{
 			"BAZ/A",
 			"-/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
 words.forEach(stem -> System.out.println(stem));
+//good: Barfoo, foo-Bar, foo-BAZ, BAZ-foo, BAZ-Bar
+//wrong: fooBar, BAZBar, BAZfoo
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("fooBar", null, "pa:foo st:foo pa:Bar st:Bar", strategy),
-			new Production("fooBAZ", null, "pa:foo st:foo pa:BAZ st:BAZ", strategy),
+			new Production("foo-", null, "pa:foo st:foo pa:- st:-", strategy),
 			new Production("Barfoo", null, "pa:Bar st:Bar pa:foo st:foo", strategy),
-			new Production("BarBar", null, "pa:Bar st:Bar pa:Bar st:Bar", strategy),
-			new Production("BarBAZ", null, "pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
-			new Production("BAZfoo", null, "pa:BAZ st:BAZ pa:foo st:foo", strategy),
-			new Production("BAZBar", null, "pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
+			new Production("Bar-", null, "pa:Bar st:Bar pa:- st:-", strategy),
 			new Production("BAZBAZ", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("BAZ-", null, "pa:BAZ st:BAZ pa:- st:-", strategy),
+			new Production("-foo", null, "pa:- st:- pa:foo st:foo", strategy),
+			new Production("-Bar", null, "pa:- st:- pa:Bar st:Bar", strategy),
+			new Production("-BAZ", null, "pa:- st:- pa:BAZ st:BAZ", strategy),
+			new Production("--", null, "pa:- st:- pa:- st:-", strategy),
 			new Production("foofoofoo", null, "pa:foo st:foo pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("foofooBar", null, "pa:foo st:foo pa:foo st:foo pa:Bar st:Bar", strategy),
-			new Production("foofooBAZ", null, "pa:foo st:foo pa:foo st:foo pa:BAZ st:BAZ", strategy),
-			new Production("fooBarfoo", null, "pa:foo st:foo pa:Bar st:Bar pa:foo st:foo", strategy),
-			new Production("fooBarBar", null, "pa:foo st:foo pa:Bar st:Bar pa:Bar st:Bar", strategy),
-			new Production("fooBarBAZ", null, "pa:foo st:foo pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
-			new Production("fooBAZfoo", null, "pa:foo st:foo pa:BAZ st:BAZ pa:foo st:foo", strategy),
-			new Production("fooBAZBar", null, "pa:foo st:foo pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
-			new Production("fooBAZBAZ", null, "pa:foo st:foo pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("foofoo-", null, "pa:foo st:foo pa:foo st:foo pa:- st:-", strategy),
+			new Production("foo-foo", null, "pa:foo st:foo pa:- st:- pa:foo st:foo", strategy),
+			new Production("foo-Bar", null, "pa:foo st:foo pa:- st:- pa:Bar st:Bar", strategy),
+			new Production("foo-BAZ", null, "pa:foo st:foo pa:- st:- pa:BAZ st:BAZ", strategy),
+			new Production("foo--", null, "pa:foo st:foo pa:- st:- pa:- st:-", strategy),
 			new Production("Barfoofoo", null, "pa:Bar st:Bar pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("BarfooBar", null, "pa:Bar st:Bar pa:foo st:foo pa:Bar st:Bar", strategy),
-			new Production("BarfooBAZ", null, "pa:Bar st:Bar pa:foo st:foo pa:BAZ st:BAZ", strategy),
-			new Production("BarBarfoo", null, "pa:Bar st:Bar pa:Bar st:Bar pa:foo st:foo", strategy),
-			new Production("BarBarBar", null, "pa:Bar st:Bar pa:Bar st:Bar pa:Bar st:Bar", strategy),
-			new Production("BarBarBAZ", null, "pa:Bar st:Bar pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
-			new Production("BarBAZfoo", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:foo st:foo", strategy),
-			new Production("BarBAZBar", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
-			new Production("BarBAZBAZ", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
-			new Production("BAZfoofoo", null, "pa:BAZ st:BAZ pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("BAZfooBar", null, "pa:BAZ st:BAZ pa:foo st:foo pa:Bar st:Bar", strategy),
-			new Production("BAZfooBAZ", null, "pa:BAZ st:BAZ pa:foo st:foo pa:BAZ st:BAZ", strategy),
-			new Production("BAZBarfoo", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:foo st:foo", strategy),
-			new Production("BAZBarBar", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:Bar st:Bar", strategy),
-			new Production("BAZBarBAZ", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
-			new Production("BAZBAZfoo", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:foo st:foo", strategy),
-			new Production("BAZBAZBar", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
-			new Production("BAZBAZBAZ", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy)
+			new Production("Barfoo-", null, "pa:Bar st:Bar pa:foo st:foo pa:- st:-", strategy),
+			new Production("Bar-foo", null, "pa:Bar st:Bar pa:- st:- pa:foo st:foo", strategy),
+			new Production("Bar-Bar", null, "pa:Bar st:Bar pa:- st:- pa:Bar st:Bar", strategy),
+			new Production("Bar-BAZ", null, "pa:Bar st:Bar pa:- st:- pa:BAZ st:BAZ", strategy),
+			new Production("Bar--", null, "pa:Bar st:Bar pa:- st:- pa:- st:-", strategy),
+			new Production("BAZBAZBAZ", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("BAZBAZ-", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:- st:-", strategy),
+			new Production("BAZ-foo", null, "pa:BAZ st:BAZ pa:- st:- pa:foo st:foo", strategy),
+			new Production("BAZ-Bar", null, "pa:BAZ st:BAZ pa:- st:- pa:Bar st:Bar", strategy),
+			new Production("BAZ-BAZ", null, "pa:BAZ st:BAZ pa:- st:- pa:BAZ st:BAZ", strategy),
+			new Production("BAZ--", null, "pa:BAZ st:BAZ pa:- st:- pa:- st:-", strategy),
+			new Production("-foofoo", null, "pa:- st:- pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("-foo-", null, "pa:- st:- pa:foo st:foo pa:- st:-", strategy),
+			new Production("-Barfoo", null, "pa:- st:- pa:Bar st:Bar pa:foo st:foo", strategy),
+			new Production("-Bar-", null, "pa:- st:- pa:Bar st:Bar pa:- st:-", strategy),
+			new Production("-BAZBAZ", null, "pa:- st:- pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("-BAZ-", null, "pa:- st:- pa:BAZ st:BAZ pa:- st:-", strategy),
+			new Production("--foo", null, "pa:- st:- pa:- st:- pa:foo st:foo", strategy),
+			new Production("--Bar", null, "pa:- st:- pa:- st:- pa:Bar st:Bar", strategy),
+			new Production("--BAZ", null, "pa:- st:- pa:- st:- pa:BAZ st:BAZ", strategy),
+			new Production("---", null, "pa:- st:- pa:- st:- pa:- st:-", strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
