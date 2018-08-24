@@ -177,7 +177,7 @@ public class HunspellRegexWordGenerator{
 	 * @return	A random word
 	 */
 	public String generate(Random random){
-		Function<Integer, Integer> fnTransition = (max) -> getRandomInt(random, 0, max);
+		Function<Integer, Integer> fnTransition = max -> getRandomInt(random, 0, max);
 		BiFunction<Character, Character, Character> fnCharIntoTransition = (min, max) -> (char)getRandomInt(random, min, max);
 		return generate(automaton.getInitialState(), fnTransition, fnCharIntoTransition);
 	}
