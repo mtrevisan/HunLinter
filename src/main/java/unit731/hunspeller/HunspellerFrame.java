@@ -88,7 +88,6 @@ import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
 import unit731.hunspeller.services.ExceptionService;
 import unit731.hunspeller.services.PatternService;
-import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.RecentItems;
 
 
@@ -1321,9 +1320,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				List<Production> words;
 				if(backbone.getAffParser().getCompoundFlag().equals(inputText)){
 					Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
-					if(maxCompounds == null)
-						maxCompounds = PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY;
-					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), inputText, limit, maxCompounds);
+					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
 				}
 				else
 					words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);

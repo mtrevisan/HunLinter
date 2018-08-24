@@ -348,7 +348,7 @@ public class AffixParser extends ReadWriteLockable{
 		RULE_FUNCTION.put(AffixTag.COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
 		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.CIRCUMFIX, FUN_COPY_OVER);
@@ -581,6 +581,10 @@ public class AffixParser extends ReadWriteLockable{
 		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
 			isSuffix = ((RuleEntry)affix).isSuffix();
 		return isSuffix;
+	}
+
+	public boolean isForbidDifferentCasesInCompound(){
+		return containsData(AffixTag.CHECK_COMPOUND_CASE);
 	}
 
 	public boolean isForbidTriplesInCompound(){

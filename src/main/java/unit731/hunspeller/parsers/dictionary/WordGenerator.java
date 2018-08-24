@@ -252,16 +252,14 @@ public class WordGenerator{
 	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_FLAG
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
-	 * @param compoundRule	Rule used to generate the productions for
 	 * @param limit	Limit result count
 	 * @param maxCompounds	Maximum compound count
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<Production> applyCompoundFlag(String[] inputCompounds, String compoundRule, int limit, int maxCompounds) throws IllegalArgumentException,
+	public List<Production> applyCompoundFlag(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
-		Objects.requireNonNull(compoundRule);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
@@ -273,7 +271,7 @@ public class WordGenerator{
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 
-		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundRule);
+		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundFlag);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 
 		StringBuilder sb = new StringBuilder();

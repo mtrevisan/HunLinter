@@ -31,14 +31,13 @@ public class WordGeneratorCompoundFlagTest{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "A";
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"xy/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
@@ -65,13 +64,12 @@ public class WordGeneratorCompoundFlagTest{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "A";
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
@@ -92,14 +90,13 @@ public class WordGeneratorCompoundFlagTest{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "A";
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"opera/A",
 			"eel/A",
 			"bare/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("fooeel", null, "pa:foo st:foo pa:eel st:eel", strategy),
@@ -129,12 +126,11 @@ public class WordGeneratorCompoundFlagTest{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "A";
 		String[] inputCompounds = new String[]{
 			"glass/A",
 			"sko/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 		List<Production> expected = Arrays.asList(
 			new Production("glassglass", null, "pa:glass st:glass pa:glass st:glass", strategy),
 			new Production("glassko", null, "pa:glass st:glass pa:sko st:sko", strategy),
@@ -155,13 +151,12 @@ public class WordGeneratorCompoundFlagTest{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		WordGenerator wordGenerator = new WordGenerator(affParser);
 
-		String line = "A";
 		String[] inputCompounds = new String[]{
 			"foo/A",
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, line, 100, 2);
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("fooyz", null, "pa:foo st:foo pa:yz st:yz", strategy),
@@ -201,12 +196,11 @@ public class WordGeneratorCompoundFlagTest{
 		//lastfold productions
 
 
-		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo", strategy),
@@ -260,12 +254,11 @@ public class WordGeneratorCompoundFlagTest{
 		Assert.assertEquals(new Production("prefoosufsff", null, "st:foo", strategy), words.get(5));
 
 
-		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo", strategy),
@@ -320,12 +313,11 @@ public class WordGeneratorCompoundFlagTest{
 		Assert.assertEquals(new Production("prefoosufsff", null, "st:foo", strategy), words.get(5));
 
 
-		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo", strategy),
@@ -384,13 +376,11 @@ public class WordGeneratorCompoundFlagTest{
 		//lastfold productions
 
 
-		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-//words.forEach(stem -> System.out.println(stem));
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PY", "pa:foo st:foo pa:foosuf st:foosuf", strategy),
@@ -458,7 +448,7 @@ public class WordGeneratorCompoundFlagTest{
 			new Production("prebarsufprebarsuf", "Y", "pa:prebarsuf st:prebarsuf pa:prebarsuf st:prebarsuf", strategy)
 		);
 		Assert.assertEquals(expected, words);
-}
+	}
 
 	@Test
 	public void forbidFlag() throws IOException{
@@ -489,17 +479,76 @@ public class WordGeneratorCompoundFlagTest{
 		//lastfold productions
 
 
-		line = "X";
 		String[] inputCompounds = new String[]{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+		words = wordGenerator.applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy)
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void checkCompoundCase() throws IOException{
+		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"CHECKCOMPOUNDCASE",
+			"COMPOUNDFLAG A");
+		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+
+		String[] inputCompounds = new String[]{
+			"foo/A",
+			"Bar/A",
+			"BAZ/A",
+			"-/A"
+		};
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
+words.forEach(stem -> System.out.println(stem));
+		List<Production> expected = Arrays.asList(
+			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("fooBar", null, "pa:foo st:foo pa:Bar st:Bar", strategy),
+			new Production("fooBAZ", null, "pa:foo st:foo pa:BAZ st:BAZ", strategy),
+			new Production("Barfoo", null, "pa:Bar st:Bar pa:foo st:foo", strategy),
+			new Production("BarBar", null, "pa:Bar st:Bar pa:Bar st:Bar", strategy),
+			new Production("BarBAZ", null, "pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
+			new Production("BAZfoo", null, "pa:BAZ st:BAZ pa:foo st:foo", strategy),
+			new Production("BAZBar", null, "pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
+			new Production("BAZBAZ", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("foofoofoo", null, "pa:foo st:foo pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("foofooBar", null, "pa:foo st:foo pa:foo st:foo pa:Bar st:Bar", strategy),
+			new Production("foofooBAZ", null, "pa:foo st:foo pa:foo st:foo pa:BAZ st:BAZ", strategy),
+			new Production("fooBarfoo", null, "pa:foo st:foo pa:Bar st:Bar pa:foo st:foo", strategy),
+			new Production("fooBarBar", null, "pa:foo st:foo pa:Bar st:Bar pa:Bar st:Bar", strategy),
+			new Production("fooBarBAZ", null, "pa:foo st:foo pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
+			new Production("fooBAZfoo", null, "pa:foo st:foo pa:BAZ st:BAZ pa:foo st:foo", strategy),
+			new Production("fooBAZBar", null, "pa:foo st:foo pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
+			new Production("fooBAZBAZ", null, "pa:foo st:foo pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("Barfoofoo", null, "pa:Bar st:Bar pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("BarfooBar", null, "pa:Bar st:Bar pa:foo st:foo pa:Bar st:Bar", strategy),
+			new Production("BarfooBAZ", null, "pa:Bar st:Bar pa:foo st:foo pa:BAZ st:BAZ", strategy),
+			new Production("BarBarfoo", null, "pa:Bar st:Bar pa:Bar st:Bar pa:foo st:foo", strategy),
+			new Production("BarBarBar", null, "pa:Bar st:Bar pa:Bar st:Bar pa:Bar st:Bar", strategy),
+			new Production("BarBarBAZ", null, "pa:Bar st:Bar pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
+			new Production("BarBAZfoo", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:foo st:foo", strategy),
+			new Production("BarBAZBar", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
+			new Production("BarBAZBAZ", null, "pa:Bar st:Bar pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy),
+			new Production("BAZfoofoo", null, "pa:BAZ st:BAZ pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("BAZfooBar", null, "pa:BAZ st:BAZ pa:foo st:foo pa:Bar st:Bar", strategy),
+			new Production("BAZfooBAZ", null, "pa:BAZ st:BAZ pa:foo st:foo pa:BAZ st:BAZ", strategy),
+			new Production("BAZBarfoo", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:foo st:foo", strategy),
+			new Production("BAZBarBar", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:Bar st:Bar", strategy),
+			new Production("BAZBarBAZ", null, "pa:BAZ st:BAZ pa:Bar st:Bar pa:BAZ st:BAZ", strategy),
+			new Production("BAZBAZfoo", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:foo st:foo", strategy),
+			new Production("BAZBAZBar", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:Bar st:Bar", strategy),
+			new Production("BAZBAZBAZ", null, "pa:BAZ st:BAZ pa:BAZ st:BAZ pa:BAZ st:BAZ", strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
