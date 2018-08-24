@@ -16,6 +16,11 @@ public class WorkerDictionaryReadBase{
 		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader, done, lockable);
 	}
 
+	public final void createWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader, done, lockable);
+		worker.preventExceptionRelaunch = true;
+	}
+
 	public void addPropertyChangeListener(PropertyChangeListener listener){
 		worker.addPropertyChangeListener(listener);
 	}

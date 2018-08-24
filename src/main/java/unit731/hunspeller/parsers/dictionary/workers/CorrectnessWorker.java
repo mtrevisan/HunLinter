@@ -25,7 +25,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, null, lockable);
+		createWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineReader, null, lockable);
 	}
 
 }

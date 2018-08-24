@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -23,6 +24,9 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 	private final File dicFile;
+
+	@Getter
+	protected boolean preventExceptionRelaunch;
 
 
 	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
@@ -73,8 +77,9 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 					}
 					catch(Exception e){
 						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
-						
-						throw e;
+
+						if(!preventExceptionRelaunch)
+							throw e;
 					}
 				}
 
