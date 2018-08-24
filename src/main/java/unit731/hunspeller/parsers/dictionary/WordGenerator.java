@@ -271,7 +271,7 @@ public class WordGenerator{
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 
-		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds, compoundFlag);
+		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 
 		StringBuilder sb = new StringBuilder();
@@ -373,7 +373,7 @@ public class WordGenerator{
 		return (count >= 3);
 	}
 
-	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds, String compoundRule){
+	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
