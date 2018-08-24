@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -511,10 +512,9 @@ public class WordGeneratorCompoundFlagTest{
 			"BAZ/A",
 			"-/A"
 		};
+
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
-words.forEach(stem -> System.out.println(stem));
-//good: Barfoo, foo-Bar, foo-BAZ, BAZ-foo, BAZ-Bar
-//wrong: fooBar, BAZBar, BAZfoo
+//words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foo-", null, "pa:foo st:foo pa:- st:-", strategy),

@@ -7,6 +7,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
+import unit731.hunspeller.services.StringService;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -48,6 +50,17 @@ public class WordGenerator{
 	private static final String PIPE = "|";
 	private static final String LEFT_PARENTHESIS = "(";
 	private static final String RIGHT_PARENTHESIS = ")";
+
+	private static final Map<StringService.Casing, Set<StringService.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringService.Casing.class);
+	static{
+		Set<StringService.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringService.Casing.TITLE_CASE, StringService.Casing.ALL_CAPS,
+			StringService.Casing.CAMEL_CASE, StringService.Casing.PASCAL_CASE));
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.LOWER_CASE, lowerOrTitleCase);
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.TITLE_CASE, lowerOrTitleCase);
+		Set<StringService.Casing> allCaps = new HashSet<>(Arrays.asList(StringService.Casing.LOWER_CASE, StringService.Casing.TITLE_CASE,
+			StringService.Casing.CAMEL_CASE, StringService.Casing.PASCAL_CASE));
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.ALL_CAPS, allCaps);
+	}
 
 
 	private final AffixParser affParser;
@@ -267,6 +280,7 @@ public class WordGenerator{
 		String compoundFlag = affParser.getCompoundFlag();
 		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
+		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
@@ -290,6 +304,7 @@ public class WordGenerator{
 			while(!completed){
 				sb.setLength(0);
 				List<DictionaryEntry> compoundEntries = new ArrayList<>();
+				StringService.Casing lastWordCasing = null;
 				for(int i = 0; i < indexes.length; i ++){
 					Production next = expandedPermutationEntries.get(i).get(indexes[i]);
 					compoundEntries.add(next);
@@ -304,6 +319,23 @@ public class WordGenerator{
 							sb.setLength(0);
 							break;
 						}
+					}
+					if(forbidDifferentCasesInCompound && sb.length() > 0){
+						if(lastWordCasing == null)
+							lastWordCasing = StringService.classifyCasing(sb.toString());
+						StringService.Casing nextWord = StringService.classifyCasing(nextCompound);
+
+						char lastChar = sb.charAt(sb.length() - 1);
+						char nextChar = nextCompound.charAt(0);
+						if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
+							Set<StringService.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
+							if(collisions != null && collisions.contains(nextWord)){
+								sb.setLength(0);
+								break;
+							}
+						}
+
+						lastWordCasing = nextWord;
 					}
 					sb.append(nextCompound);
 				}
