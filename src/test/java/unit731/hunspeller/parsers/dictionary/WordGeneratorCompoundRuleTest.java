@@ -45,7 +45,6 @@ public class WordGeneratorCompoundRuleTest{
 			"farbig/A"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 5);
-		Assert.assertEquals(1, words.size());
 		List<String> expected = Arrays.asList("arbeitsscheu");
 		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
@@ -69,7 +68,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-		Assert.assertEquals(2, words.size());
 		List<String> expected = Arrays.asList("abc", "acc");
 		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
@@ -93,7 +91,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-		Assert.assertEquals(37, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
@@ -119,7 +116,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
@@ -144,7 +140,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/bbcc"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}
@@ -169,7 +164,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/2,3"
 		};
 		List<Production> words = wordGenerator.applyCompoundRules(inputCompounds, line, 37);
-		Assert.assertEquals(9, words.size());
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, strategy)).collect(Collectors.toList()), words);
 	}

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.services.PatternService;
 
 
