@@ -207,6 +207,7 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo", strategy),
@@ -326,30 +327,29 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
-words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PT", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosufsff", "P", "pa:foo st:foo pa:foo st:foo", strategy),
-			new Production("prefoofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
+			new Production("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("prefoofoosuf", "T", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("prefoofoosufsff", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foobar", "PS", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("foobarsuf", "PT", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("foobarsufsff", "P", "pa:foo st:foo pa:bar st:bar", strategy),
-			new Production("prefoobar", null, "pa:foo st:foo pa:bar st:bar", strategy),
+			new Production("prefoobar", "S", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("prefoobarsuf", "T", "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("prefoobarsufsff", null, "pa:foo st:foo pa:bar st:bar", strategy),
 			new Production("barfoo", "PS", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("barfoosuf", "PT", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("barfoosufsff", "P", "pa:bar st:bar pa:foo st:foo", strategy),
-			new Production("prebarfoo", null, "pa:bar st:bar pa:foo st:foo", strategy),
+			new Production("prebarfoo", "S", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("prebarfoosuf", "T", "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("prebarfoosufsff", null, "pa:bar st:bar pa:foo st:foo", strategy),
 			new Production("barbar", "PS", "pa:bar st:bar pa:bar st:bar", strategy),
 			new Production("barbarsuf", "PT", "pa:bar st:bar pa:bar st:bar", strategy),
 			new Production("barbarsufsff", "P", "pa:bar st:bar pa:bar st:bar", strategy),
-			new Production("prebarbar", null, "pa:bar st:bar pa:bar st:bar", strategy),
+			new Production("prebarbar", "S", "pa:bar st:bar pa:bar st:bar", strategy),
 			new Production("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar", strategy),
 			new Production("prebarbarsufsff", null, "pa:bar st:bar pa:bar st:bar", strategy)
 		);
@@ -391,6 +391,7 @@ words.forEach(stem -> System.out.println(stem));
 			"bar/XPS"
 		};
 		words = wordGenerator.applyCompoundFlag(inputCompounds, line, 4, 2);
+words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", "PS", "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foofoosuf", "PY", "pa:foo st:foo pa:foosuf st:foosuf", strategy),
