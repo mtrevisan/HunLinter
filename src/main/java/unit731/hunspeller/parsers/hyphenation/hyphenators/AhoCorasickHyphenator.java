@@ -28,13 +28,13 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options){
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		int leftMin = options.getLeftMin();
 		int rightMin = options.getRightMin();
-		Iterator<SearchResult<String, String>> itr = patterns.get(level).search(HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY);
+		Iterator<SearchResult<String, String>> itr = patterns.search(HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
 			String rule = r.getNode().getValue();

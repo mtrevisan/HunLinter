@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
-import java.util.Map;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
@@ -27,7 +26,7 @@ public class EmptyHyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options){
 		return HyphenationBreak.getEmptyInstance();
 	}
 	

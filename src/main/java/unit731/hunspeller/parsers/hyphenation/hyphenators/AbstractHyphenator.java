@@ -149,12 +149,12 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			//ignore short words (early out):
 			hyphBreak = new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), wordSize);
 		else
-			hyphBreak = calculateBreakpoints(word, patterns, level, options);
+			hyphBreak = calculateBreakpoints(word, patterns.get(level), options);
 
 		return hyphBreak;
 	}
 
-	protected abstract HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options);
+	protected abstract HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options);
 
 	@Override
 	public List<String> splitIntoCompounds(String word){

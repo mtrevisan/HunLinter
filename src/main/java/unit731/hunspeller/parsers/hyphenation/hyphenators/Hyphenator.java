@@ -19,7 +19,7 @@ public class Hyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options){
 		String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
 
 		int wordSize = word.length();
@@ -30,7 +30,7 @@ public class Hyphenator extends AbstractHyphenator{
 		int rightMin = options.getRightMin();
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.get(level).getValues(w.substring(i).toLowerCase(Locale.ROOT));
+			List<String> prefixes = patterns.getValues(w.substring(i).toLowerCase(Locale.ROOT));
 
 			for(String rule : prefixes){
 				int j = -1;
