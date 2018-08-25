@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -59,8 +59,8 @@ public class HunspellRegexWordGenerator{
 		PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
 	}
 
-	private static final Matcher MATCHER_REQUOTE_SPECIAL_CHARS = PatternService.matcher("[.^$*+?(){|\\[\\\\@]");
-	private static final Matcher MATCHER_REQUOTE = PatternService.matcher("\\\\Q(.*?)\\\\E");
+	private static final Matcher MATCHER_REQUOTE_SPECIAL_CHARS = PatternHelper.matcher("[.^$*+?(){|\\[\\\\@]");
+	private static final Matcher MATCHER_REQUOTE = PatternHelper.matcher("\\\\Q(.*?)\\\\E");
 
 
 	private final Automaton automaton;
@@ -79,7 +79,7 @@ public class HunspellRegexWordGenerator{
 		regex = StringUtils.replaceEach(requote(regex),
 			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
 			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
-		automaton = PatternService.automaton(regex);
+		automaton = PatternHelper.automaton(regex);
 		this.ignoreEmptyWord = ignoreEmptyWord;
 	}
 

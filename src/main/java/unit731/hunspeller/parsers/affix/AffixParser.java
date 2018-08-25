@@ -27,8 +27,8 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -47,8 +47,8 @@ public class AffixParser extends ReadWriteLockable{
 	private static final String START = "^";
 	private static final String END = "$";
 
-	private static final Matcher MATCHER_ISO639_1 = PatternService.matcher("([a-z]{2})");
-	private static final Matcher MATCHER_ISO639_2 = PatternService.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
+	private static final Matcher MATCHER_ISO639_1 = PatternHelper.matcher("([a-z]{2})");
+	private static final Matcher MATCHER_ISO639_2 = PatternHelper.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
@@ -378,13 +378,13 @@ public class AffixParser extends ReadWriteLockable{
 			clearData();
 
 			boolean encodingRead = false;
-			charset = FileService.determineCharset(affFile.toPath());
+			charset = FileHelper.determineCharset(affFile.toPath());
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
 				String line;
 				while((line = br.readLine()) != null){
 					//ignore any BOM marker on first line
 					if(br.getLineNumber() == 1)
-						line = FileService.clearBOMMarker(line);
+						line = FileHelper.clearBOMMarker(line);
 
 					line = DictionaryParser.cleanLine(line);
 					if(line.isEmpty())
@@ -430,9 +430,9 @@ public class AffixParser extends ReadWriteLockable{
 			if(!containsData(AffixTag.LANGUAGE)){
 				//try to infer language from filename
 				String filename = FilenameUtils.removeExtension(affFile.getName());
-				List<String> languages = PatternService.extract(filename, MATCHER_ISO639_2);
+				List<String> languages = PatternHelper.extract(filename, MATCHER_ISO639_2);
 				if(languages.isEmpty())
-					languages = PatternService.extract(filename, MATCHER_ISO639_1);
+					languages = PatternHelper.extract(filename, MATCHER_ISO639_1);
 				String language = (!languages.isEmpty()? languages.get(0): NO_LANGUAGE);
 				addData(AffixTag.LANGUAGE, language);
 			}

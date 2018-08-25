@@ -166,10 +166,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	/**
-	 * NOTE: use the trick mentioned in "Less Hashing, Same Performance: Building a Better Bloom Filter" by Kirsch et.al.
-	 * From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
-	 * asymptotic false positive probability'.
-	 * Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
+	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
+	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
+	 *		asymptotic false positive probability'.
+	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
 	private boolean calculateIndexes(byte[] bytes, Consumer<Integer> callback){
 		boolean bitsChanged = false;
@@ -181,6 +181,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
+
 			int index = nextHash % bitArray.size();
 			bitsChanged |= bitArray.set(index);
 
@@ -189,12 +190,13 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		return bitsChanged;
 	}
 
+	/**
+	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
+	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
+	 *		asymptotic false positive probability'.
+	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
+	 */
 	public boolean contains(byte[] bytes){
-		//NOTE: use the trick mentioned in "Less Hashing, Same Performance: Building a Better Bloom Filter"
-		//by Kirsch et.al. From abstract 'only two hash functions are necessary to effectively
-		//implement a Bloom filter without any loss in the asymptotic false positive probability'
-		//Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned
-		//in the above paper
 		long hash64 = getLongHash64(bytes);
 		int hash1 = (int)hash64;
 		int hash2 = (int)(hash64 >>> 32);
@@ -203,6 +205,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
+
 			int index = nextHash % bitArray.size();
 			if(!bitArray.get(index))
 				return false;

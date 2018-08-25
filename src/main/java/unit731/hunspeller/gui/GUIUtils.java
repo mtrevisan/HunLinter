@@ -19,13 +19,13 @@ import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GUIUtils{
 
-	private static final Matcher MATCHER_HTML_CODE = PatternService.matcher("</?[^>]+>");
+	private static final Matcher MATCHER_HTML_CODE = PatternHelper.matcher("</?[^>]+>");
 
 
 	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
@@ -56,7 +56,7 @@ public class GUIUtils{
 	}
 
 	private static String removeHTMLCode(String text){
-		return PatternService.clear(text, MATCHER_HTML_CODE);
+		return PatternHelper.clear(text, MATCHER_HTML_CODE);
 	}
 
 	/**

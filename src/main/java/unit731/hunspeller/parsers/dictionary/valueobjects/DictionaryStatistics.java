@@ -45,7 +45,7 @@ public class DictionaryStatistics{
 
 
 	public DictionaryStatistics(String language, Charset charset, CorrectnessChecker checker){
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.FAST,
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.JAVA,
 			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
 		bloomFilter.setCharset(charset);
 		orthography = OrthographyBuilder.getOrthography(language);

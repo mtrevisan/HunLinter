@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -16,7 +16,7 @@ import unit731.hunspeller.services.PatternService;
  */
 public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
-	private static final Matcher COMPOUND_RULE = PatternService.matcher(".[*?]?");
+	private static final Matcher COMPOUND_RULE = PatternHelper.matcher(".[*?]?");
 
 
 	@Override
@@ -59,7 +59,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		if(!StandardCharsets.UTF_8.newEncoder().canEncode(compoundRule))
 			throw new IllegalArgumentException("Compound rule must be in UTF-8 encoding: " + compoundRule);
 
-		return PatternService.extract(compoundRule, COMPOUND_RULE);
+		return PatternHelper.extract(compoundRule, COMPOUND_RULE);
 	}
 
 }

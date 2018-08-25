@@ -20,7 +20,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-public class FileService{
+public class FileHelper{
 
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
 	private static final String BOM_MARKER = "\uFEFF";

@@ -18,14 +18,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
 	public static final String SLASH = "/";
-	private static final Matcher MATCHER_ENTRY = PatternService.matcher("\t.*$");
+	private static final Matcher MATCHER_ENTRY = PatternHelper.matcher("\t.*$");
 
 	public static final String DOT = ".";
 	private static final String ZERO = "0";
@@ -107,7 +107,7 @@ public class AffixEntry{
 			}
 		}
 
-		entry = PatternService.clear(line, MATCHER_ENTRY);
+		entry = PatternHelper.clear(line, MATCHER_ENTRY);
 	}
 
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{

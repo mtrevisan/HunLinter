@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,30 +29,29 @@ class GraphemeVEC{
 	public static final String T_STROKE_GRAPHEME = "ŧ";
 	public static final String X_GRAPHEME = "x";
 
-	private static final Matcher DIPHTONG = PatternService.matcher("[iu][íú]|[àèéòó][iu]");
-	private static final Matcher HYATUS = PatternService.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
+	private static final Matcher DIPHTONG = PatternHelper.matcher("[iu][íú]|[àèéòó][iu]");
+	private static final Matcher HYATUS = PatternHelper.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
 //	private static final Matcher HYATUS = PatternService.matcher("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
 
-	private static final Matcher ETEROPHONIC_SEQUENCE = PatternService.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
-	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternService.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
-	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternService.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
-	private static final List<Matcher> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(
-		PatternService.matcher("^(c)i(uí)$"),
-		PatternService.matcher("^(teñ|ko[" + JJH_PHONEME + "ɉñ])i([ou]r)"),
-		PatternService.matcher("^([d" + JJH_PHONEME + "ɉ])i(aspr)")
+	private static final Matcher ETEROPHONIC_SEQUENCE = PatternHelper.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
+	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternHelper.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
+	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternHelper.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
+	private static final List<Matcher> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.matcher("^(c)i(uí)$"),
+		PatternHelper.matcher("^(teñ|ko[" + JJH_PHONEME + "ɉñ])i([ou]r)"),
+		PatternHelper.matcher("^([d" + JJH_PHONEME + "ɉ])i(aspr)")
 	);
 
 
 	public static boolean isDiphtong(String group){
-		return PatternService.find(group, DIPHTONG);
+		return PatternHelper.find(group, DIPHTONG);
 	}
 
 	public static boolean isHyatus(String group){
-		return PatternService.find(group, HYATUS);
+		return PatternHelper.find(group, HYATUS);
 	}
 
 	public static boolean isEterophonicSequence(String group){
-		return PatternService.find(group, ETEROPHONIC_SEQUENCE);
+		return PatternHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
 
@@ -75,14 +74,14 @@ class GraphemeVEC{
 			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
 		if(word.contains(I_GRAPHEME))
 			for(Matcher m : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
-				word = PatternService.replaceAll(word, m, "$1" + I_UMLAUT_PHONEME + "$2");
+				word = PatternHelper.replaceAll(word, m, "$1" + I_UMLAUT_PHONEME + "$2");
 
 
 		//phonize etherophonic sequences
 		if(word.contains(U_GRAPHEME))
-			word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
+			word = PatternHelper.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
 		if(word.contains(I_GRAPHEME))
-			word = PatternService.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
+			word = PatternHelper.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
 		return word;
 	}
 

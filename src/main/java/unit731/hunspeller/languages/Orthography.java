@@ -5,13 +5,13 @@ import java.util.regex.Matcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	private static final Matcher MATCHER_APOSTROPHE = PatternService.matcher("['‘ʼ]");
+	private static final Matcher MATCHER_APOSTROPHE = PatternHelper.matcher("['‘ʼ]");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
@@ -28,7 +28,7 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternService.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.APOSTROPHE);
+		return PatternHelper.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){

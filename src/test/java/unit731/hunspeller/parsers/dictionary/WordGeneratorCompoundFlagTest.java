@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 
@@ -24,7 +24,7 @@ public class WordGeneratorCompoundFlagTest{
 	@Test
 	public void simple() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDFLAG A");
@@ -57,7 +57,7 @@ public class WordGeneratorCompoundFlagTest{
 	@Test
 	public void compoundMinLength() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 3",
 			"COMPOUNDFLAG A");
@@ -83,7 +83,7 @@ public class WordGeneratorCompoundFlagTest{
 	@Test
 	public void checkCompoundTriple() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"COMPOUNDFLAG A");
@@ -117,7 +117,7 @@ public class WordGeneratorCompoundFlagTest{
 	@Test
 	public void simplifiedTriple() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDTRIPLE",
 			"SIMPLIFIEDTRIPLE",
@@ -143,7 +143,7 @@ public class WordGeneratorCompoundFlagTest{
 	@Test
 	public void forbidWordDuplication() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CHECKCOMPOUNDDUP",
 			"COMPOUNDMIN 2",
@@ -171,7 +171,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void withAffixes() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -225,7 +225,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void withAffixesOnefold() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
@@ -283,7 +283,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void withAffixesTwofold() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDMORESUFFIXES",
@@ -350,7 +350,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void permitFlag() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDPERMITFLAG Y",
@@ -453,7 +453,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void forbidFlag() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"COMPOUNDFORBIDFLAG Z",
@@ -496,7 +496,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	@Test
 	public void checkCompoundCase() throws IOException{
-		File affFile = FileService.getTemporaryUTF8File("xxx", ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"CHECKCOMPOUNDCASE",

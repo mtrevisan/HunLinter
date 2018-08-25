@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
@@ -37,10 +37,10 @@ import unit731.hunspeller.services.memento.OriginatorInterface;
 @Getter
 public class ThesaurusParser extends ReadWriteLockable implements OriginatorInterface<ThesaurusParser.Memento>{
 
-	private static final Matcher REGEX_PARENTHESIS = PatternService.matcher("\\([^)]+\\)");
+	private static final Matcher REGEX_PARENTHESIS = PatternHelper.matcher("\\([^)]+\\)");
 
-	private static final Matcher REGEX_FILTER_EMPTY = PatternService.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
-	private static final Matcher REGEX_FILTER_OR = PatternService.matcher("\\|{2,}");
+	private static final Matcher REGEX_FILTER_EMPTY = PatternHelper.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Matcher REGEX_FILTER_OR = PatternHelper.matcher("\\|{2,}");
 
 	//NOTE: All members are private and accessible only by Originator
 	@AllArgsConstructor
@@ -74,12 +74,12 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 		try{
 			clearInternal();
 
-			Charset charset = FileService.determineCharset(theFile.toPath());
+			Charset charset = FileHelper.determineCharset(theFile.toPath());
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
-					line = FileService.clearBOMMarker(line);
+					line = FileHelper.clearBOMMarker(line);
 
 				//line should be a charset
 				try{ Charsets.toCharset(line); }
@@ -262,9 +262,9 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 
 	public static String prepareTextForThesaurusFilter(String text){
 		text = StringUtils.strip(text);
-		text = PatternService.clear(text, REGEX_FILTER_EMPTY);
-		text = PatternService.replaceAll(text, REGEX_FILTER_OR, "|");
-		text = PatternService.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
+		text = PatternHelper.clear(text, REGEX_FILTER_EMPTY);
+		text = PatternHelper.replaceAll(text, REGEX_FILTER_OR, "|");
+		text = PatternHelper.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
 		return "(?iu)(" + text + ")";
 	}
 

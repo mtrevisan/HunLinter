@@ -12,7 +12,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -47,7 +47,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
 				try{
-					FileService.openFileWithChoosenEditor(outputFile);
+					FileHelper.openFileWithChoosenEditor(outputFile);
 				}
 				catch(IOException | InterruptedException e){
 					log.warn("Exception while opening the resulting file", e);

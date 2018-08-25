@@ -14,13 +14,13 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @Getter
 public class ThesaurusDictionary{
 
-	private static final Matcher PART_OF_SPEECH = PatternService.matcher("\\([^)]+\\)");
+	private static final Matcher PART_OF_SPEECH = PatternHelper.matcher("\\([^)]+\\)");
 
 
 	@JsonProperty
@@ -40,7 +40,7 @@ public class ThesaurusDictionary{
 				.forEachOrdered(sj::add);
 			String mm = sj.toString();
 
-			String mean = PatternService.replaceAll(meaning, PART_OF_SPEECH, StringUtils.EMPTY);
+			String mean = PatternHelper.replaceAll(meaning, PART_OF_SPEECH, StringUtils.EMPTY);
 			ThesaurusEntry foundSynonym = findByMeaning(mean);
 
 			MeaningEntry entry = new MeaningEntry(mm);

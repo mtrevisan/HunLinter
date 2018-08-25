@@ -25,8 +25,8 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.TimeWatch;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
@@ -84,7 +84,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
-					line = FileService.clearBOMMarker(line);
+					line = FileHelper.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
@@ -222,7 +222,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes {})", watch.toStringMinuteSeconds());
 
 			try{
-				FileService.openFileWithChoosenEditor(outputFile);
+				FileHelper.openFileWithChoosenEditor(outputFile);
 			}
 			catch(IOException | InterruptedException e){
 				log.warn("Exception while opening the resulting file", e);
@@ -234,7 +234,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			if(t instanceof ClosedChannelException)
 				log.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(t);
+				String message = ExceptionHelper.getMessage(t);
 				log.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}

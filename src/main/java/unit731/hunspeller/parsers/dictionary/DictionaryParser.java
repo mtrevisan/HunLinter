@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
 
@@ -29,7 +29,7 @@ import unit731.hunspeller.services.externalsorter.ExternalSorter;
 @Getter
 public class DictionaryParser{
 
-	private static final Matcher REGEX_COMMENT = PatternService.matcher("(^\\s*|\\s+)[#\\/].*$");
+	private static final Matcher REGEX_COMMENT = PatternHelper.matcher("(^\\s*|\\s+)[#\\/].*$");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
@@ -145,7 +145,7 @@ public class DictionaryParser{
 
 
 	private boolean isComment(String line){
-		return PatternService.find(line, REGEX_COMMENT);
+		return PatternHelper.find(line, REGEX_COMMENT);
 	}
 
 	public final void clear(){
@@ -161,7 +161,7 @@ public class DictionaryParser{
 	 */
 	public static String cleanLine(String line){
 		//remove comments
-		line = PatternService.clear(line, REGEX_COMMENT);
+		line = PatternHelper.clear(line, REGEX_COMMENT);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;

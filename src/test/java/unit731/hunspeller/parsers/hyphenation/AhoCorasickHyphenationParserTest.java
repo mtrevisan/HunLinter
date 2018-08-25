@@ -13,12 +13,12 @@ import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsParser;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class AhoCorasickHyphenationParserTest{
 
-	private static final Matcher REGEX_CLEANER = PatternService.matcher("\\d|/.+$");
+	private static final Matcher REGEX_CLEANER = PatternHelper.matcher("\\d|/.+$");
 
 
 	@Test
@@ -554,7 +554,7 @@ public class AhoCorasickHyphenationParserTest{
 	}
 
 	private String getKeyFromData(String rule){
-		return PatternService.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
+		return PatternHelper.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){

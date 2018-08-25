@@ -16,7 +16,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.FileHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,7 +55,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 			//ignore any BOM marker on first line
 			if(i == 0)
-				meaning = FileService.clearBOMMarker(meaning);
+				meaning = FileHelper.clearBOMMarker(meaning);
 
 			meanings.add(new MeaningEntry(meaning));
 		}

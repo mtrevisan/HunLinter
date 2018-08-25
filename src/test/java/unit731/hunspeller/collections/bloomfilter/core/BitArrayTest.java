@@ -8,21 +8,8 @@ import org.junit.Test;
 
 public class BitArrayTest{
 
-	private static final int MAX = 100 * 100;
+	private static final int MAX = 10_000;
 
-
-	@Test
-	public void fast() throws IOException{
-		try(FastBitArray bits = new FastBitArray(MAX)){
-			for(int i = 0; i < MAX; i ++){
-				Assert.assertFalse(bits.get(i));
-				bits.set(i);
-				Assert.assertTrue(bits.get(i));
-				bits.clear(i);
-				Assert.assertFalse(bits.get(i));
-			}
-		}
-	}
 
 	@Test
 	public void java() throws IOException{

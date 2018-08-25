@@ -4,18 +4,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import unit731.hunspeller.collections.trie.TrieNode;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class RegExpTrieSequencer implements TrieSequencerInterface<String[], String>{
 
-	private static final Pattern PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN = PatternHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String NEGATED_CLASS_START = "[^";
 
 
 	public static String[] extractCharacters(String sequence){
-		return PatternService.split(sequence, PATTERN);
+		return PatternHelper.split(sequence, PATTERN);
 	}
 
 	@Override

@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -73,7 +73,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 			if(t instanceof ClosedChannelException)
 				log.warn("Thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(t);
+				String message = ExceptionHelper.getMessage(t);
 				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}

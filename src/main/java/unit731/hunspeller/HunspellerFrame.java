@@ -86,8 +86,8 @@ import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 import unit731.hunspeller.services.ApplicationLogAppender;
 import unit731.hunspeller.services.Debouncer;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.RecentItems;
 
 
@@ -108,7 +108,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final long serialVersionUID = 6772959670167531135L;
 
 	private static final int DEBOUNCER_INTERVAL = 600;
-	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternService.matcher("[.\\d=-]");
+	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.matcher("[.\\d=-]");
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -523,7 +523,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         backbone.storeThesaurusFiles();
                      }
                      catch(IllegalArgumentException | IOException ex){
-                        log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(ex));
+                        log.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(ex));
                      }
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
@@ -1173,7 +1173,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		}
 		catch(Throwable t){
-			String message = ExceptionService.getMessage(t);
+			String message = ExceptionHelper.getMessage(t);
 			log.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
@@ -1225,7 +1225,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			backbone.storeThesaurusFiles();
 		}
 		catch(Exception e){
-			String message = ExceptionService.getMessage(e);
+			String message = ExceptionHelper.getMessage(e);
 			log.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
 		}
 	}
@@ -1308,7 +1308,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			extractWordCount();
 		}
 		catch(Exception e){
-			log.error(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(e));
+			log.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
@@ -1553,10 +1553,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			log.info(Backbone.MARKER_APPLICATION, "The file does not exists");
 		}
 		catch(IllegalArgumentException e){
-			log.info(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(e));
+			log.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
 		catch(IOException e){
-			log.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionService.getMessage(e));
+			log.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));
 
 			log.error("A bad error occurred", e);
 		}
@@ -1626,7 +1626,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
 			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(PatternService.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
+				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
 					Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);

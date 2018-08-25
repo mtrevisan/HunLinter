@@ -3,19 +3,19 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class AffixCondition{
 
-	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN_CONDITION_SPLITTER = PatternHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 
 	private final String[] condition;
 
 
 	public AffixCondition(String condition, AffixEntry.Type affixType){
-		this.condition = PatternService.split(condition, PATTERN_CONDITION_SPLITTER);
+		this.condition = PatternHelper.split(condition, PATTERN_CONDITION_SPLITTER);
 
 		if(affixType == AffixEntry.Type.SUFFIX)
 			//invert condition

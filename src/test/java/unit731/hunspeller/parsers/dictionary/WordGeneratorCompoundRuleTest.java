@@ -12,7 +12,7 @@ import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
@@ -24,7 +24,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRule_BjörnJacke() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDRULE 1",
 			"COMPOUNDRULE vw",
@@ -52,7 +52,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRuleSimple() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -75,7 +75,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRuleInfinite() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -100,7 +100,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRuleZeroOrOne() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
 			"COMPOUNDRULE 1",
@@ -123,7 +123,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRuleLongFlag() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG long",
 			"COMPOUNDMIN 1",
@@ -147,7 +147,7 @@ public class WordGeneratorCompoundRuleTest{
 	@Test
 	public void compoundRuleNumericalFlag() throws IOException, TimeoutException{
 		String language = "xxx";
-		File affFile = FileService.getTemporaryUTF8File(language, ".aff",
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"FLAG num",
 			"COMPOUNDMIN 1",

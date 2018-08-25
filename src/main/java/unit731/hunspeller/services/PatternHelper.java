@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PatternService{
+public class PatternHelper{
 
 	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
 

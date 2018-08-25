@@ -35,7 +35,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		if(backingFile.exists() && !backingFile.isFile())
 			throw new IllegalArgumentException("Backing file does not represent a valid file");
 		if(bits <= 0)
-			throw new IllegalArgumentException("Number of bits must be strict positive");
+			throw new IllegalArgumentException("Number of bits must be strictly positive");
 
 		//we open in "rwd" mode, to save one i/o operation than in "rws" mode
 		this.backingFile = new RandomAccessFile(backingFile, "rwd");
@@ -101,7 +101,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 
 	@Override
 	public int size(){
-		return numberOfBytes;
+		return numberOfBytes * Byte.SIZE;
 	}
 
 	@Override

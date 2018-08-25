@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BitArrayBuilder{
 
-	public static enum Type{FAST, JAVA, MEMORY_MAPPED_FILE}
+	public static enum Type{JAVA, MEMORY_MAPPED_FILE}
 
 
 	@SuppressWarnings("fallthrough")
@@ -21,8 +21,8 @@ public class BitArrayBuilder{
 
 		BitArray ba = null;
 		switch(type){
-			case FAST:
-				ba = new FastBitArray(bits);
+			case JAVA:
+				ba = new JavaBitArray(bits);
 				break;
 
 			case MEMORY_MAPPED_FILE:
@@ -36,10 +36,6 @@ public class BitArrayBuilder{
 
 					log.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);
 				}
-				break;
-
-			case JAVA:
-				ba = new JavaBitArray(bits);
 		}
 		return ba;
 	}

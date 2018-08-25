@@ -5,17 +5,17 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.Memoizer;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class RegExpSequencer implements SequencerInterface<String[]>{
 
-	private static final Pattern PATTERN = PatternService.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
+	private static final Pattern PATTERN = PatternHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternService.split(seq, PATTERN)));
+	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternHelper.split(seq, PATTERN)));
 
 
 	public static String[] splitSequence(String sequence){

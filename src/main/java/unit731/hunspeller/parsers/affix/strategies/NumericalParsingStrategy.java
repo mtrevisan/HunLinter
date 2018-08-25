@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -20,7 +20,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Matcher COMPOUND_RULE = PatternService.matcher("\\(\\d+\\)[*?]?");
+	private static final Matcher COMPOUND_RULE = PatternHelper.matcher("\\(\\d+\\)[*?]?");
 
 
 	@Override
@@ -68,7 +68,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public List<String> extractCompoundRule(String compoundRule){
-		return PatternService.extract(compoundRule, COMPOUND_RULE);
+		return PatternHelper.extract(compoundRule, COMPOUND_RULE);
 	}
 
 }

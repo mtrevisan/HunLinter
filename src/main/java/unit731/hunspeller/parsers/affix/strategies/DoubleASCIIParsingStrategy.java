@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -17,9 +17,9 @@ import unit731.hunspeller.services.PatternService;
  */
 public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
-	private static final Pattern PATTERN = PatternService.pattern("(?<=\\G.{2})");
+	private static final Pattern PATTERN = PatternHelper.pattern("(?<=\\G.{2})");
 
-	private static final Matcher COMPOUND_RULE = PatternService.matcher("\\(..\\)[*?]?");
+	private static final Matcher COMPOUND_RULE = PatternHelper.matcher("\\(..\\)[*?]?");
 
 
 	@Override
@@ -32,7 +32,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 
 		int size = (textFlags.length() >>> 1);
-		String[] flags = PatternService.split(textFlags, PATTERN);
+		String[] flags = PatternHelper.split(textFlags, PATTERN);
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(unduplicatedFlags.size() < size)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
@@ -53,7 +53,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public List<String> extractCompoundRule(String compoundRule){
-		return PatternService.extract(compoundRule, COMPOUND_RULE);
+		return PatternHelper.extract(compoundRule, COMPOUND_RULE);
 	}
 
 }

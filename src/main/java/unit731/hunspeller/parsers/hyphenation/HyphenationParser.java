@@ -33,9 +33,9 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.languages.builders.OrthographyBuilder;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsParser;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.FileService;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.FileHelper;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -76,11 +76,11 @@ public class HyphenationParser extends ReadWriteLockable{
 
 	private static final String COMMA = ",";
 
-	private static final Matcher MATCHER_VALID_RULE = PatternService.matcher("^\\.?[^.]+\\.?$");
-	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternService.matcher("[\\d]");
-	private static final Matcher MATCHER_INVALID_RULE_START = PatternService.matcher("^\\.[\\d]");
-	private static final Matcher MATCHER_INVALID_RULE_END = PatternService.matcher("[\\d]\\.$");
-	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternService.matcher("[13579]");
+	private static final Matcher MATCHER_VALID_RULE = PatternHelper.matcher("^\\.?[^.]+\\.?$");
+	private static final Matcher MATCHER_VALID_RULE_BREAK_POINTS = PatternHelper.matcher("[\\d]");
+	private static final Matcher MATCHER_INVALID_RULE_START = PatternHelper.matcher("^\\.[\\d]");
+	private static final Matcher MATCHER_INVALID_RULE_END = PatternHelper.matcher("[\\d]\\.$");
+	private static final Matcher MATCHER_AUGMENTED_RULE_HYPHEN_INDEX = PatternHelper.matcher("[13579]");
 
 	public static final int PARAM_RULE = 1;
 	public static final int PARAM_ADD_BEFORE = 2;
@@ -88,18 +88,18 @@ public class HyphenationParser extends ReadWriteLockable{
 	public static final int PARAM_ADD_AFTER = 4;
 	public static final int PARAM_START = 5;
 	public static final int PARAM_CUT = 6;
-	public static final Matcher MATCHER_AUGMENTED_RULE = PatternService.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	public static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternService.matcher("[.\\d]");
-	public static final Matcher MATCHER_WORD_INITIAL = PatternService.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Matcher MATCHER_AUGMENTED_RULE = PatternHelper.matcher("^(?<rule>[^/]+)/(?<addBefore>.*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	public static final Matcher MATCHER_POINTS_AND_NUMBERS = PatternHelper.matcher("[.\\d]");
+	public static final Matcher MATCHER_WORD_INITIAL = PatternHelper.matcher("^" + Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
-	public static final Matcher MATCHER_WORD_BOUNDARIES = PatternService.matcher(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
+	public static final Matcher MATCHER_WORD_BOUNDARIES = PatternHelper.matcher(Pattern.quote(HyphenationParser.WORD_BOUNDARY));
 
-	private static final Matcher MATCHER_EQUALS = PatternService.matcher(HYPHEN_EQUALS);
-	private static final Matcher MATCHER_KEY = PatternService.matcher("\\d|/.+$");
-	private static final Matcher MATCHER_HYPHENATION_POINT = PatternService.matcher("[^13579]|/.+$");
+	private static final Matcher MATCHER_EQUALS = PatternHelper.matcher(HYPHEN_EQUALS);
+	private static final Matcher MATCHER_KEY = PatternHelper.matcher("\\d|/.+$");
+	private static final Matcher MATCHER_HYPHENATION_POINT = PatternHelper.matcher("[^13579]|/.+$");
 
-	public static final Matcher MATCHER_REDUCE = PatternService.matcher("/.+$");
-	private static final Matcher MATCHER_COMMENT = PatternService.matcher("^$|\\s*[%#].*$");
+	public static final Matcher MATCHER_REDUCE = PatternHelper.matcher("/.+$");
+	private static final Matcher MATCHER_COMMENT = PatternHelper.matcher("^$|\\s*[%#].*$");
 
 	public static enum Level{NON_COMPOUND, COMPOUND}
 
@@ -192,12 +192,12 @@ public class HyphenationParser extends ReadWriteLockable{
 			Level level = Level.NON_COMPOUND;
 
 			Path hypPath = hypFile.toPath();
-			Charset charset = FileService.determineCharset(hypPath);
+			Charset charset = FileHelper.determineCharset(hypPath);
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(hypPath, charset))){
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
-					line = FileService.clearBOMMarker(line);
+					line = FileHelper.clearBOMMarker(line);
 				if(Charset.forName(line) != charset)
 					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 
@@ -221,7 +221,7 @@ public class HyphenationParser extends ReadWriteLockable{
 								REDUCED_PATTERNS.get(level).clear();
 							}
 							else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-								String key = PatternService.clear(line, MATCHER_EQUALS);
+								String key = PatternHelper.clear(line, MATCHER_EQUALS);
 								if(customHyphenations.get(level).containsKey(key))
 									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
@@ -248,7 +248,7 @@ public class HyphenationParser extends ReadWriteLockable{
 					if(charset == StandardCharsets.UTF_8)
 						retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
-					patternNoHyphen = PatternService.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, StringUtils.EMPTY) + "]");
+					patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, StringUtils.EMPTY) + "]");
 
 					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 
@@ -265,9 +265,27 @@ public class HyphenationParser extends ReadWriteLockable{
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
 		}
 		catch(Throwable t){
-			String message = ExceptionService.getMessage(t);
+			String message = ExceptionHelper.getMessage(t);
 			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
 		}
 		finally{
@@ -286,8 +304,8 @@ public class HyphenationParser extends ReadWriteLockable{
 		boolean duplicatedRule = false;
 		String foundNodeValue = patterns.get(level).get(key);
 		if(foundNodeValue != null){
-			String clearedLine = PatternService.clear(line, MATCHER_REDUCE);
-			String clearedFoundNodeValue = PatternService.clear(foundNodeValue, MATCHER_REDUCE);
+			String clearedLine = PatternHelper.clear(line, MATCHER_REDUCE);
+			String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, MATCHER_REDUCE);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
 		return duplicatedRule;
@@ -301,7 +319,7 @@ public class HyphenationParser extends ReadWriteLockable{
 	 */
 	private static String removeComment(String line){
 		//remove comments
-		line = PatternService.clear(line, MATCHER_COMMENT);
+		line = PatternHelper.clear(line, MATCHER_COMMENT);
 		//trim the entire string
 		return StringUtils.strip(line);
 	}
@@ -349,18 +367,18 @@ public class HyphenationParser extends ReadWriteLockable{
 	 * @param level	Level to add the rule to
 	 */
 	public static void validateRule(String rule, Level level){
-		if(!PatternService.find(rule, MATCHER_VALID_RULE))
+		if(!PatternHelper.find(rule, MATCHER_VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
-		if(!PatternService.find(rule, MATCHER_VALID_RULE_BREAK_POINTS))
+		if(!PatternHelper.find(rule, MATCHER_VALID_RULE_BREAK_POINTS))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
-		if(PatternService.find(rule, MATCHER_INVALID_RULE_START) || PatternService.find(rule, MATCHER_INVALID_RULE_END))
+		if(PatternHelper.find(rule, MATCHER_INVALID_RULE_START) || PatternHelper.find(rule, MATCHER_INVALID_RULE_END))
 			throw new IllegalArgumentException("Rule " + rule + " is invalid, the hyphenation point should not be adjacent to a dot");
 
 		String cleanedRule = rule;
 		int augmentedIndex = rule.indexOf('/');
 		if(augmentedIndex >= 0){
 			cleanedRule = rule.substring(0, augmentedIndex);
-			int count = PatternService.clear(cleanedRule, MATCHER_HYPHENATION_POINT).length();
+			int count = PatternHelper.clear(cleanedRule, MATCHER_HYPHENATION_POINT).length();
 			if(count != 1)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
 
@@ -457,7 +475,7 @@ public class HyphenationParser extends ReadWriteLockable{
 	}
 
 	public static String getKeyFromData(String rule){
-		return PatternService.clear(rule, MATCHER_KEY);
+		return PatternHelper.clear(rule, MATCHER_KEY);
 	}
 
 }

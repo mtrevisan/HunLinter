@@ -15,8 +15,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -65,7 +65,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
-				line = FileService.clearBOMMarker(line);
+				line = FileHelper.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
@@ -100,7 +100,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			if(e instanceof ClosedChannelException)
 				log.warn("Thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(e);
+				String message = ExceptionHelper.getMessage(e);
 				log.error("{}: {}", e.getClass().getSimpleName(), message);
 			}
 

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,10 +51,10 @@ public class WordVEC{
 	}
 
 //	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
-	private static final Matcher FIRST_STRESSED_VOWEL = PatternService.matcher("[aeiouàèéíòóú].*$");
-	private static final Matcher LAST_VOWEL = PatternService.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
+	private static final Matcher FIRST_STRESSED_VOWEL = PatternHelper.matcher("[aeiouàèéíòóú].*$");
+	private static final Matcher LAST_VOWEL = PatternHelper.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
-	private static final Matcher DEFAULT_STRESS_GROUP = PatternService.matcher("(fr|[ln]|st)au$");
+	private static final Matcher DEFAULT_STRESS_GROUP = PatternHelper.matcher("(fr|[ln]|st)au$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[ei])?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -73,7 +73,7 @@ public class WordVEC{
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER)
 			.add(NO_STRESS_WORDS);
-		PREVENT_UNMARK_STRESS = PatternService.matcher(sj.toString());
+		PREVENT_UNMARK_STRESS = PatternHelper.matcher(sj.toString());
 	}
 
 	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
@@ -195,7 +195,7 @@ public class WordVEC{
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
 				idx = getLastUnstressedVowelIndex(phones, lastChar);
-			if(idx >= 0 && PatternService.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
+			if(idx >= 0 && PatternHelper.find(phones.substring(0, idx + 1), DEFAULT_STRESS_GROUP))
 				idx --;
 			if(idx < 0)
 				idx = lastChar;
@@ -213,7 +213,7 @@ public class WordVEC{
 		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
 			String subword = word.substring(idx, idx + 2);
 //FIXME is there a way to optimize this PatternService.find?
-			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternService.find(word, PREVENT_UNMARK_STRESS)){
+			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
 				String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 					word = tmp;

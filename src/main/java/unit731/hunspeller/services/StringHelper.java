@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StringService{
+public class StringHelper{
 
 	public static enum Casing{
 		/** All lower case or neutral case, e.g. "lowercase" or "123" */

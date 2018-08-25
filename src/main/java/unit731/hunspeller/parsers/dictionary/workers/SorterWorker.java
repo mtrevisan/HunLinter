@@ -16,7 +16,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.services.ExceptionService;
+import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -94,7 +94,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			if(e instanceof ClosedChannelException)
 				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(e);
+				String message = ExceptionHelper.getMessage(e);
 				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}

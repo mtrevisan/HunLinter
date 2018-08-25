@@ -27,8 +27,8 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
-import unit731.hunspeller.services.ExceptionService;
-import unit731.hunspeller.services.FileService;
+import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.TimeWatch;
 
 
@@ -85,7 +85,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			if(!duplicates.isEmpty()){
 				try{
-					FileService.openFileWithChoosenEditor(outputFile);
+					FileHelper.openFileWithChoosenEditor(outputFile);
 				}
 				catch(IOException | InterruptedException e){
 					log.warn("Exception while opening the resulting file", e);
@@ -98,7 +98,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			if(t instanceof ClosedChannelException)
 				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionService.getMessage(t);
+				String message = ExceptionHelper.getMessage(t);
 				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
@@ -109,7 +109,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.FAST;
+		BitArrayBuilder.Type bloomFilterType = BitArrayBuilder.Type.JAVA;
 		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(bloomFilterType,
 			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
 		bloomFilter.setCharset(dicParser.getCharset());
@@ -123,7 +123,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			String line = br.readLine();
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
-				line = FileService.clearBOMMarker(line);
+				line = FileHelper.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
@@ -178,7 +178,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				String line = br.readLine();
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
-					line = FileService.clearBOMMarker(line);
+					line = FileHelper.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 

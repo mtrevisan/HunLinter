@@ -20,7 +20,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class CorrectnessCheckerVEC extends CorrectnessChecker{
@@ -96,11 +96,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String FINAL_SONORIZATION_RULE = "FS";
 	private static final String GUA_TO_VA_RULE = "gv";
 
-	private static final Matcher NON_VANISHING_EL = PatternService.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternService.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
+	private static final Matcher NON_VANISHING_EL = PatternHelper.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
+	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternHelper.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
 
-	private static final Matcher L_BETWEEN_VOWELS = PatternService.matcher("l i l$");
-	private static final Matcher CIJJHNHIV = PatternService.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
+	private static final Matcher L_BETWEEN_VOWELS = PatternHelper.matcher("l i l$");
+	private static final Matcher CIJJHNHIV = PatternHelper.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
 
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 //	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
@@ -272,7 +272,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD, PEJORATIVE_ASO_RULE_VANISHING_EL, PEJORATIVE_ASO_RULE_NON_VANISHING_EL));
 	}
 
-	private static final Matcher MATCHER_NORTHERN_PLURAL = PatternService.matcher("[èò][ln]$");
+	private static final Matcher MATCHER_NORTHERN_PLURAL = PatternHelper.matcher("[èò][ln]$");
 	private static final String MAN = "man";
 
 	private static final Set<MatcherEntry> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
@@ -449,12 +449,12 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternService.find(derivedWord, NON_VANISHING_EL))
+		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternHelper.find(derivedWord, NON_VANISHING_EL))
 			throw new IllegalArgumentException("Word with ƚ cannot contain non–ƚ, " + derivedWord);
 		if(StringUtils.contains(production.getWord(), GraphemeVEC.L_STROKE_GRAPHEME)
 				&& (StringUtils.contains(production.getWord(), GraphemeVEC.D_STROKE_GRAPHEME) || StringUtils.contains(production.getWord(), GraphemeVEC.T_STROKE_GRAPHEME)))
 			throw new IllegalArgumentException("Word with ƚ cannot contain đ or ŧ, " + derivedWord);
-		if(PatternService.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
+		if(PatternHelper.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
 			throw new IllegalArgumentException("Word with ƚ near a consonant, " + derivedWord);
 		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsContinuationFlag(NORTHERN_PLURAL_RULE))
 			throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
@@ -502,7 +502,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
 			List<String> subwords = hyphenator.splitIntoCompounds(word);
-			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternService.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
@@ -536,7 +536,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			List<AffixEntry> appliedRules = production.getAppliedRules();
 			if(appliedRules != null)
 				for(AffixEntry appliedRule : appliedRules)
-					if(PatternService.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
+					if(PatternHelper.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
 						elBetweenVowelsRemoval = true;
 						break;
 					}
@@ -548,7 +548,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
 		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN)){
 			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
-			if(PatternService.find(phonemizedSubword, CIJJHNHIV))
+			if(PatternHelper.find(phonemizedSubword, CIJJHNHIV))
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
 		}
 	}

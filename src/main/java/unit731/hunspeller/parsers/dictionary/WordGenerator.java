@@ -23,7 +23,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
-import unit731.hunspeller.services.StringService;
+import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
@@ -51,15 +51,15 @@ public class WordGenerator{
 	private static final String LEFT_PARENTHESIS = "(";
 	private static final String RIGHT_PARENTHESIS = ")";
 
-	private static final Map<StringService.Casing, Set<StringService.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringService.Casing.class);
+	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
-		Set<StringService.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringService.Casing.TITLE_CASE, StringService.Casing.ALL_CAPS,
-			StringService.Casing.CAMEL_CASE, StringService.Casing.PASCAL_CASE));
-		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.LOWER_CASE, lowerOrTitleCase);
-		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.TITLE_CASE, lowerOrTitleCase);
-		Set<StringService.Casing> allCaps = new HashSet<>(Arrays.asList(StringService.Casing.LOWER_CASE, StringService.Casing.TITLE_CASE,
-			StringService.Casing.CAMEL_CASE, StringService.Casing.PASCAL_CASE));
-		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringService.Casing.ALL_CAPS, allCaps);
+		Set<StringHelper.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
+			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE));
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.LOWER_CASE, lowerOrTitleCase);
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.TITLE_CASE, lowerOrTitleCase);
+		Set<StringHelper.Casing> allCaps = new HashSet<>(Arrays.asList(StringHelper.Casing.LOWER_CASE, StringHelper.Casing.TITLE_CASE,
+			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE));
+		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.ALL_CAPS, allCaps);
 	}
 
 
@@ -304,7 +304,7 @@ public class WordGenerator{
 			while(!completed){
 				sb.setLength(0);
 				List<DictionaryEntry> compoundEntries = new ArrayList<>();
-				StringService.Casing lastWordCasing = null;
+				StringHelper.Casing lastWordCasing = null;
 				for(int i = 0; i < indexes.length; i ++){
 					Production next = expandedPermutationEntries.get(i).get(indexes[i]);
 					compoundEntries.add(next);
@@ -322,13 +322,13 @@ public class WordGenerator{
 					}
 					if(forbidDifferentCasesInCompound && sb.length() > 0){
 						if(lastWordCasing == null)
-							lastWordCasing = StringService.classifyCasing(sb.toString());
-						StringService.Casing nextWord = StringService.classifyCasing(nextCompound);
+							lastWordCasing = StringHelper.classifyCasing(sb.toString());
+						StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
 
 						char lastChar = sb.charAt(sb.length() - 1);
 						char nextChar = nextCompound.charAt(0);
 						if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
-							Set<StringService.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
+							Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
 							if(collisions != null && collisions.contains(nextWord)){
 								sb.setLength(0);
 								break;

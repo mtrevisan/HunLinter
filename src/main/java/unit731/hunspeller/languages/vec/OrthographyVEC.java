@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.services.PatternService;
+import unit731.hunspeller.services.PatternHelper;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -23,23 +23,22 @@ public class OrthographyVEC extends Orthography{
 	private static final String[] MB_MP = new String[]{"mb", "mp"};
 	private static final String[] NB_NP = new String[]{"nb", "np"};
 
-	private static final Matcher REGEX_REMOVE_H_FROM_NOT_FH = PatternService.matcher("(?<!f)h(?!aeeioouàéèíóòú)");
+	private static final Matcher REGEX_REMOVE_H_FROM_NOT_FH = PatternHelper.matcher("(?<!f)h(?!aeeioouàéèíóòú)");
 
-	private static final Matcher REGEX_J_INTO_I = PatternService.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéí" + GraphemeVEC.I_UMLAUT_PHONEME + "òóúh])");
-	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternService.matcher("^i(?=[aeiouàèéíòóú])");
-	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternService.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
-	private static final List<Matcher> REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
-		PatternService.matcher("b[ae]roi[aeèi]r")
+	private static final Matcher REGEX_J_INTO_I = PatternHelper.matcher("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéí" + GraphemeVEC.I_UMLAUT_PHONEME + "òóúh])");
+	private static final Matcher REGEX_I_INITIAL_INTO_J = PatternHelper.matcher("^i(?=[aeiouàèéíòóú])");
+	private static final Matcher REGEX_I_INSIDE_INTO_J = PatternHelper.matcher("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
+	private static final List<Matcher> REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.matcher("b[ae]roi[aeèi]r")
 	);
-	private static final Matcher REGEX_I_INSIDE_INTO_J_EXCLUSIONS = PatternService.matcher("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
-	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternService.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
-	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternService.matcher("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
-	private static final Matcher REGEX_X_INTO_S = PatternService.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
-	private static final Matcher REGEX_S_INTO_X = PatternService.matcher(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
+	private static final Matcher REGEX_I_INSIDE_INTO_J_EXCLUSIONS = PatternHelper.matcher("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
+	private static final Matcher REGEX_LH_INITIAL_INTO_L = PatternHelper.matcher("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
+	private static final Matcher REGEX_LH_INSIDE_INTO_L = PatternHelper.matcher("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
+	private static final Matcher REGEX_X_INTO_S = PatternHelper.matcher(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
+	private static final Matcher REGEX_S_INTO_X = PatternHelper.matcher(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
 
-	private static final Matcher REGEX_MORPHOLOGICAL = PatternService.matcher("([c" + GraphemeVEC.JJH_PHONEME + "ñ])i([aeiou])");
+	private static final Matcher REGEX_MORPHOLOGICAL = PatternHelper.matcher("([c" + GraphemeVEC.JJH_PHONEME + "ñ])i([aeiou])");
 
-	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternService.matcher("([^aeiou]){1}\\1+");
+	private static final Matcher REGEX_CONSONANT_GEMINATES = PatternHelper.matcher("([^aeiou]){1}\\1+");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
@@ -60,7 +59,7 @@ public class OrthographyVEC extends Orthography{
 
 		//remove other occurrences of h not into fhV
 		if(!GraphemeVEC.H_GRAPHEME.equals(word))
-			word = PatternService.replaceAll(word, REGEX_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
+			word = PatternHelper.replaceAll(word, REGEX_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
 		word = StringUtils.replaceEach(word, MB_MP, NB_NP);
@@ -70,20 +69,20 @@ public class OrthographyVEC extends Orthography{
 		word = correctIJOccurrences(word);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = PatternService.replaceAll(word, REGEX_LH_INITIAL_INTO_L, GraphemeVEC.L_GRAPHEME);
-		word = PatternService.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
+		word = PatternHelper.replaceAll(word, REGEX_LH_INITIAL_INTO_L, GraphemeVEC.L_GRAPHEME);
+		word = PatternHelper.replaceAll(word, REGEX_LH_INSIDE_INTO_L, "$1l");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
-		word = PatternService.replaceAll(word, REGEX_X_INTO_S, GraphemeVEC.S_GRAPHEME);
-		word = PatternService.replaceAll(word, REGEX_S_INTO_X, GraphemeVEC.X_GRAPHEME);
+		word = PatternHelper.replaceAll(word, REGEX_X_INTO_S, GraphemeVEC.S_GRAPHEME);
+		word = PatternHelper.replaceAll(word, REGEX_S_INTO_X, GraphemeVEC.X_GRAPHEME);
 
 		//correct morphological errors
-		word = PatternService.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
+		word = PatternHelper.replaceAll(word, REGEX_MORPHOLOGICAL, "$1$2");
 
 		word = GraphemeVEC.rollbackJHJWIUmlautPhonemes(word);
 
 		//eliminate consonant geminates
-		word = PatternService.replaceAll(word, REGEX_CONSONANT_GEMINATES, "$1");
+		word = PatternHelper.replaceAll(word, REGEX_CONSONANT_GEMINATES, "$1");
 
 		word = correctApostrophes(word);
 
@@ -92,16 +91,16 @@ public class OrthographyVEC extends Orthography{
 
 	private String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
-		word = PatternService.replaceAll(word, REGEX_J_INTO_I, GraphemeVEC.I_GRAPHEME);
-		word = PatternService.replaceAll(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
+		word = PatternHelper.replaceAll(word, REGEX_J_INTO_I, GraphemeVEC.I_GRAPHEME);
+		word = PatternHelper.replaceAll(word, REGEX_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
 		boolean iInsideIntoJFalsePositive = false;
 		for(Matcher m : REGEX_I_INSIDE_INTO_J_FALSE_POSITIVES)
-			if(PatternService.find(word, m)){
+			if(PatternHelper.find(word, m)){
 				iInsideIntoJFalsePositive = true;
 				break;
 			}
-		if(!iInsideIntoJFalsePositive && !PatternService.find(word, REGEX_I_INSIDE_INTO_J_EXCLUSIONS))
-			word = PatternService.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
+		if(!iInsideIntoJFalsePositive && !PatternHelper.find(word, REGEX_I_INSIDE_INTO_J_EXCLUSIONS))
+			word = PatternHelper.replaceAll(word, REGEX_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
 		return word;
 	}
 
