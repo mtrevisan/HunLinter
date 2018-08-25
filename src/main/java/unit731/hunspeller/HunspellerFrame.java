@@ -1304,7 +1304,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		extractWordCount();
+		try{
+			extractWordCount();
+		}
+		catch(Exception e){
+			log.error(Backbone.MARKER_APPLICATION, ExceptionService.getMessage(e));
+		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
