@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
+import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -18,6 +21,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Word count";
 
+	private final BloomFilterInterface<String> bloomFilter;
 	private long totalProductions;
 
 
@@ -26,20 +30,32 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
 
+		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.JAVA,
+			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
+		bloomFilter.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
+			productions.forEach(production -> bloomFilter.add(production.getWord()));
 			totalProductions += productions.size();
 		};
 		Runnable done = () -> {
-			if(!isCancelled())
-				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+			if(!isCancelled()){
+				int totalUniqueProductions = bloomFilter.getAddedElements();
+				double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+				int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
+				log.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+					DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
+					falsePositiveCount);
+			}
 		};
 		createWorker(WORKER_NAME, dicParser, lineReader, done, lockable);
 	}
 
 	@Override
 	public void execute(){
+		bloomFilter.clear();
 		totalProductions = 0l;
 
 		super.execute();

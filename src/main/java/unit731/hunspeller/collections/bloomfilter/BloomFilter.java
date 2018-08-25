@@ -173,11 +173,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	private boolean calculateIndexes(byte[] bytes, Consumer<Integer> callback){
 		boolean bitsChanged = false;
-		long hash64 = getLongHash64(bytes);
-		int hash1 = (int)hash64;
-		int hash2 = (int)(hash64 >>> 32);
+		long hash = getLongHash64(bytes);
+		int lowHash = (int)hash;
+		int highHash = (int)(hash >>> 32);
 		for(int i = 1; i <= hashFunctions; i ++){
-			int nextHash = hash1 + i * hash2;
+			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
@@ -197,11 +197,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
 	public boolean contains(byte[] bytes){
-		long hash64 = getLongHash64(bytes);
-		int hash1 = (int)hash64;
-		int hash2 = (int)(hash64 >>> 32);
+		long hash = getLongHash64(bytes);
+		int lowHash = (int)hash;
+		int highHash = (int)(hash >>> 32);
 		for(int i = 1; i <= hashFunctions; i ++){
-			int nextHash = hash1 + i * hash2;
+			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
