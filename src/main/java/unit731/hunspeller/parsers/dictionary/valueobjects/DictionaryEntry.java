@@ -7,12 +7,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,23 +25,29 @@ import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
 import unit731.hunspeller.services.PatternHelper;
 
 
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class DictionaryEntry{
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
+	//FIXME manage valid \/ inside word
 	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
 
 
+	@NonNull
 	@Getter
-	@Setter
 	protected String word;
 	protected String[] continuationFlags;
 	protected final String[] morphologicalFields;
 	@Getter
 	private final boolean combineable;
 
+
+	public DictionaryEntry(String line, FlagParsingStrategy strategy){
+		this(line, null, null, strategy);
+	}
 
 	public DictionaryEntry(String line, List<String> aliasesFlag, List<String> aliasesMorphologicaField, FlagParsingStrategy strategy){
 		Objects.requireNonNull(line);
@@ -54,7 +61,11 @@ public class DictionaryEntry{
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null);
+		if(dicMorphologicalFields != null){
+			dicMorphologicalFields = WordGenerator.TAG_STEM + word + StringUtils.SPACE + dicMorphologicalFields;
+		}
+		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word},
+			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
 		combineable = true;
 	}
 
@@ -62,80 +73,27 @@ public class DictionaryEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	/** Used to generate base production */
-	protected DictionaryEntry(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
+	/* clone method */
+	public DictionaryEntry(String word, DictionaryEntry dicEntry){
+		Objects.requireNonNull(word);
 		Objects.requireNonNull(dicEntry);
-		Objects.requireNonNull(strategy);
 
-		word = dicEntry.getWord();
+		this.word = word;
 		continuationFlags = dicEntry.continuationFlags;
-		if(dicEntry instanceof Production && ((Production)dicEntry).isCompound())
-			morphologicalFields = Arrays.copyOf(dicEntry.morphologicalFields, dicEntry.morphologicalFields.length);
-		else
-			morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word}, dicEntry.morphologicalFields);
+		morphologicalFields = dicEntry.morphologicalFields;
 		combineable = true;
 	}
 
-	protected DictionaryEntry(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags,
-			boolean combineable, FlagParsingStrategy strategy){
-		Objects.requireNonNull(word);
-		Objects.requireNonNull(appliedEntry);
-
-		this.word = word;
-		continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		this.morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
-		this.combineable = combineable;
+	public String getContinuationFlags(FlagParsingStrategy strategy){
+		return strategy.joinFlags(continuationFlags);
 	}
 
-	protected DictionaryEntry(String word, String continuationFlags, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
-		Objects.requireNonNull(word);
-		Objects.requireNonNull(strategy);
-
-		this.word = word;
-		this.continuationFlags = strategy.parseFlags(continuationFlags);
-		this.morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
-		combineable = true;
-	}
-
-	public DictionaryEntry(String line, FlagParsingStrategy strategy){
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(strategy);
-
-		Matcher m = ENTRY_PATTERN.reset(line);
-		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
-
-		word = m.group(PARAM_WORD);
-		String dicFlags = m.group(PARAM_FLAGS);
-		continuationFlags = strategy.parseFlags(dicFlags);
-		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = (dicMorphologicalFields != null? StringUtils.split(dicMorphologicalFields): null);
-		combineable = true;
-	}
-
-	public DictionaryEntry(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
-		Objects.requireNonNull(word);
-		Objects.requireNonNull(strategy);
-
-		this.word = word;
-		this.continuationFlags = strategy.parseFlags(continuationFlags);
-		this.morphologicalFields = (morphologicalFields != null? StringUtils.split(morphologicalFields): null);
-		combineable = true;
-	}
-
-	public List<String> getPrefixes(Function<String, RuleEntry> ruleEntryExtractor){
-		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
-			.filter(rf -> {
-				RuleEntry r = ruleEntryExtractor.apply(rf);
-				return (r != null && !r.isSuffix());
-			})
-			.collect(Collectors.toList());
-	}
-
+	/** Returns the count of the continuation flags without the terminal affixes */
 	public int getContinuationFlagsCount(AffixParser affParser){
 		int continuationFlagsCount = 0;
 		if(continuationFlags != null){
 			continuationFlagsCount = continuationFlags.length;
+			//remove terminal affixes
 			for(String flag : continuationFlags)
 				if(affParser.isTerminalAffix(flag))
 					continuationFlagsCount --;
@@ -155,16 +113,6 @@ public class DictionaryEntry{
 		return false;
 	}
 
-	public String getContinuationFlags(FlagParsingStrategy strategy){
-		return strategy.joinFlags(continuationFlags);
-	}
-
-	public String getContinuationFlags(){
-		return (continuationFlags != null? Arrays.stream(continuationFlags)
-			.collect(Collectors.joining(", ")):
-			null);
-	}
-
 	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affParser::isManagedByCompoundRule)
@@ -173,14 +121,6 @@ public class DictionaryEntry{
 
 	public boolean containsMorphologicalField(String morphologicalField){
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
-	}
-
-	public String getMorphologicalFieldPrefixedBy(String typePrefix){
-		if(morphologicalFields != null)
-			for(String field : morphologicalFields)
-				if(field.startsWith(typePrefix))
-					return field;
-		return null;
 	}
 
 	public void forEachMorphologicalField(Consumer<String> fun){
@@ -226,7 +166,8 @@ public class DictionaryEntry{
 						if(!appliedRules.isEmpty())
 							parentFlag = appliedRules.get(0).getFlag();
 					}
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
+						StringUtils.EMPTY));
 				}
 
 				if(rule instanceof RuleEntry){

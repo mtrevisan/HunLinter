@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -289,7 +290,7 @@ public class AffixParser extends ReadWriteLockable{
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
 					+ ": Bad number of entries, it must be a positive integer");
 
-			Map<String, String> conversionTable = new HashMap<>(numEntries);
+			List<Pair<String, String>> conversionTable = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
 				line = DictionaryParser.cleanLine(line);
@@ -301,26 +302,8 @@ public class AffixParser extends ReadWriteLockable{
 				if(!tag.getCode().equals(parts[0]))
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad tag, it must be " + tag.getCode());
-				if(conversionTable.containsKey(parts[1]))
-					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Repeated entry, it already has '" + parts[1] + "' > '" + conversionTable.get(parts[1]) + "'");
 
-				conversionTable.put(parts[1], StringUtils.replaceChars(parts[2], '_', ' '));
-			}
-
-			//check for collisions
-			for(String key : conversionTable.keySet()){
-				String value = conversionTable.get(key);
-				key = StringUtils.removeStart(key, "^");
-				key = StringUtils.removeEnd(key, "$");
-				for(String subkey : conversionTable.keySet()){
-					String subvalue = conversionTable.get(subkey);
-					subkey = StringUtils.removeStart(subkey, "^");
-					subkey = StringUtils.removeEnd(subkey, "$");
-					if(!key.equals(subkey) && (key.contains(subkey) || subkey.contains(key)))
-						throw new IllegalArgumentException("Error reading line \"" + context.toString()
-							+ ": Repeated entry, '" + key + "' > '" + value + "' already has '" + subkey + "' > '" + subvalue + "'");
-				}
+				conversionTable.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
 
 			addData(tag, conversionTable);
@@ -671,9 +654,9 @@ public class AffixParser extends ReadWriteLockable{
 		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 	}
 
-	private String applyConversionTable(String word, Map<String, String> table){
+	private String applyConversionTable(String word, List<Pair<String, String>> table){
 		if(table != null){
-			for(Map.Entry<String, String> entry : table.entrySet()){
+			for(Pair<String, String> entry : table){
 				String key = entry.getKey();
 				int keyLength = key.length();
 				String value = entry.getValue();

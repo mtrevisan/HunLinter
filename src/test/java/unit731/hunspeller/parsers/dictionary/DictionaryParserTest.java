@@ -2,8 +2,9 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -27,13 +28,13 @@ public class DictionaryParserTest{
 			"REP alot a_lot");
 		affParser.parse(affFile);
 
-		Map<String, String> replacementTable = affParser.getData(AffixTag.REPLACEMENT_TABLE);
+		List<Pair<String, String>> replacementTable = affParser.getData(AffixTag.REPLACEMENT_TABLE);
 
-		Map<String, String> expected = new HashMap<>();
-		expected.put("^b", "bb");
-		expected.put("e$", "ee");
-		expected.put("ij", "IJ");
-		expected.put("alot", "a lot");
+		List<Pair<String, String>> expected = new ArrayList<>();
+		expected.add(Pair.of("^b", "bb"));
+		expected.add(Pair.of("e$", "ee"));
+		expected.add(Pair.of("ij", "IJ"));
+		expected.add(Pair.of("alot", "a lot"));
 		Assert.assertEquals(expected, replacementTable);
 
 		String replaced = affParser.applyReplacementTable("clea");

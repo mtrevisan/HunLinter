@@ -22,21 +22,23 @@ public class Production extends DictionaryEntry{
 	private final List<DictionaryEntry> compoundEntries;
 
 
-	public Production(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
-		super(dicEntry, strategy);
+	public Production(String word, DictionaryEntry dicEntry){
+		super(word, dicEntry);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
 	public Production(Production production, String continuationFlags, FlagParsingStrategy strategy){
-		super(production.word, continuationFlags, production.getMorphologicalFields(), strategy);
+		super(production.word, strategy.parseFlags(continuationFlags),
+			(production.getMorphologicalFields() != null? StringUtils.split(production.getMorphologicalFields()): null), true);
 
 		compoundEntries = extractCompoundEntries(production);
 	}
 
 	public Production(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags,
 			boolean combineable, FlagParsingStrategy strategy){
-		super(word, appliedEntry, dicEntry, remainingContinuationFlags, combineable, strategy);
+		super(word, appliedEntry.combineContinuationFlags(remainingContinuationFlags), appliedEntry.combineMorphologicalFields(dicEntry),
+			combineable);
 
 		appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
@@ -50,14 +52,14 @@ public class Production extends DictionaryEntry{
 	}
 
 	public Production(String word, String continuationFlags, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
-		super(word, continuationFlags, compoundEntries, strategy);
+		super(word, strategy.parseFlags(continuationFlags), AffixEntry.extractMorphologicalFields(compoundEntries), true);
 
 		this.compoundEntries = compoundEntries;
 	}
 
 	/** NOTE: used for testing purposes */
 	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
-		super(word, continuationFlags, morphologicalFields, strategy);
+		super(word, strategy.parseFlags(continuationFlags), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		compoundEntries = null;
 	}

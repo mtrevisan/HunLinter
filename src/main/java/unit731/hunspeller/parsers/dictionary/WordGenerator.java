@@ -80,12 +80,17 @@ public class WordGenerator{
 
 		//convert using input table
 		String word = affParser.applyInputConversionTable(dicEntry.getWord());
-		dicEntry.setWord(word);
+		dicEntry = new DictionaryEntry(word, dicEntry);
 
 		List<Production> productions = applyRules(dicEntry, false);
 
 		//convert using output table
-		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+		int size = productions.size();
+		for(int i = 0; i < size; i ++){
+			Production production = productions.get(i);
+			word = affParser.applyOutputConversionTable(production.getWord());
+			productions.set(i, new Production(word, production));
+		}
 
 		return productions;
 	}
@@ -100,7 +105,7 @@ public class WordGenerator{
 	 */
 	private List<Production> applyRules(DictionaryEntry dicEntry, boolean isCompound) throws IllegalArgumentException, NoApplicableRuleException{
 		//extract base production
-		Production baseProduction = getBaseProduction(dicEntry, affParser.getFlagParsingStrategy());
+		Production baseProduction = getBaseProduction(dicEntry);
 		if(log.isDebugEnabled()){
 			log.debug("Base productions:");
 			log.debug("   {}", baseProduction);
@@ -194,7 +199,12 @@ public class WordGenerator{
 			.collect(Collectors.toList());
 
 		//convert using output table
-		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+		int size = productions.size();
+		for(int i = 0; i < size; i ++){
+			Production production = productions.get(i);
+			String word = affParser.applyOutputConversionTable(production.getWord());
+			productions.set(i, new Production(word, production));
+		}
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
@@ -376,7 +386,12 @@ public class WordGenerator{
 
 
 		//convert using output table
-		productions.forEach(production -> production.setWord(affParser.applyOutputConversionTable(production.getWord())));
+		int size = productions.size();
+		for(int i = 0; i < size; i ++){
+			Production production = productions.get(i);
+			String word = affParser.applyOutputConversionTable(production.getWord());
+			productions.set(i, new Production(word, production));
+		}
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
@@ -442,8 +457,8 @@ public class WordGenerator{
 		return Arrays.asList(compoundPrefixes, compoundSuffixes, compoundTerminals);
 	}
 
-	private Production getBaseProduction(DictionaryEntry dicEntry, FlagParsingStrategy strategy){
-		return new Production(dicEntry, strategy);
+	private Production getBaseProduction(DictionaryEntry dicEntry){
+		return new Production(dicEntry.getWord(), dicEntry);
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound) throws NoApplicableRuleException{

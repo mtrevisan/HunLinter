@@ -3,9 +3,9 @@ package unit731.hunspeller.parsers.dictionary;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -42,16 +42,16 @@ public class WordGeneratorAffixTest{
 			"	 # tab+space");
 		affParser.parse(affFile);
 
-		Map<String, String> outputConversionTable = affParser.getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		List<Pair<String, String>> outputConversionTable = affParser.getData(AffixTag.OUTPUT_CONVERSION_TABLE);
 
-		Map<String, String> expected = new HashMap<>();
-		expected.put("a", "A");
-		expected.put("á", "Á");
-		expected.put("b", "B");
-		expected.put("c", "C");
-		expected.put("d", "D");
-		expected.put("e", "E");
-		expected.put("é", "É");
+		List<Pair<String, String>> expected = new ArrayList<>();
+		expected.add(Pair.of("a", "A"));
+		expected.add(Pair.of("á", "Á"));
+		expected.add(Pair.of("b", "B"));
+		expected.add(Pair.of("c", "C"));
+		expected.add(Pair.of("d", "D"));
+		expected.add(Pair.of("e", "E"));
+		expected.add(Pair.of("é", "É"));
 		Assert.assertEquals(expected, outputConversionTable);
 	}
 
