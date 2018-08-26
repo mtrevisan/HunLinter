@@ -42,6 +42,7 @@ public enum AffixTag{
 //	MAX_NGRAM_SIMILARITY_FACTOR("MAXDIFF"),
 //	ONLY_MAX_NGRAM_SIMILARITY_FACTOR("ONLYMAXDIFF"),
 //	SUGGESTIONS_WITH_DOTS("SUGSWITHDOTS"),
+	/** If space is used then all the words must be present in the dictionary */
 	REPLACEMENT_TABLE("REP"),
 //	MAP_TABLE("MAP"),
 //	PHONE_TABLE("PHONE"),

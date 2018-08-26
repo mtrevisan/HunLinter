@@ -640,21 +640,7 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	public String applyReplacementTable(String word){
-		Map<String, String> table = getData(AffixTag.INPUT_CONVERSION_TABLE);
-		StringBuilder sb = new StringBuilder();
-		int size = word.length();
-		for(int i = 0; i < size; i ++){
-			String w = word.substring(i);
-			int m = find(w);
-			String rep = replace(w, m, (i == 0));
-			if(!rep.isEmpty()){
-				sb.append(rep);
-				i += table[m].pattern.length() - 1;
-			}
-			else
-				sb.append(word.charAt(i));
-		}
-		return sb.toString();
+		return applyConversionTable(word, getData(AffixTag.REPLACEMENT_TABLE));
 	}
 
 	public String applyInputConversionTable(String word){

@@ -661,7 +661,7 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", "X", "st:foo", strategy), words.get(11));
 	}
 
-	
+
 	@Test
 	public void circumfix() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
