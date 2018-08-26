@@ -21,7 +21,7 @@ public class DictionaryParserTest{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"REP 4",
-			"REP ^a aa",
+			"REP ^b bb",
 			"REP e$ ee",
 			"REP ij IJ",
 			"REP alot a_lot");
@@ -30,20 +30,20 @@ public class DictionaryParserTest{
 		Map<String, String> replacementTable = affParser.getData(AffixTag.REPLACEMENT_TABLE);
 
 		Map<String, String> expected = new HashMap<>();
-		expected.put("^a", "aa");
+		expected.put("^b", "bb");
 		expected.put("e$", "ee");
 		expected.put("ij", "IJ");
 		expected.put("alot", "a lot");
 		Assert.assertEquals(expected, replacementTable);
 
-		String replaced = affParser.applyReplacementTable("blea");
-		Assert.assertEquals("blea", replaced);
+		String replaced = affParser.applyReplacementTable("clea");
+		Assert.assertEquals("clea", replaced);
 
-		replaced = affParser.applyReplacementTable("abcijde");
-		Assert.assertEquals("aabcIJdee", replaced);
+		replaced = affParser.applyReplacementTable("bcijde");
+		Assert.assertEquals("bbcIJdee", replaced);
 
 		replaced = affParser.applyReplacementTable("alot");
-		Assert.assertEquals("aa lot", replaced);
+		Assert.assertEquals("a lot", replaced);
 	}
 
 }

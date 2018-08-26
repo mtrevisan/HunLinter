@@ -303,12 +303,25 @@ public class AffixParser extends ReadWriteLockable{
 						+ ": Bad tag, it must be " + tag.getCode());
 				if(conversionTable.containsKey(parts[1]))
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Repeated entry, it already was REP " + parts[1] + " " + conversionTable.get(parts[1]));
+						+ ": Repeated entry, it already has '" + parts[1] + "' > '" + conversionTable.get(parts[1]) + "'");
 
 				conversionTable.put(parts[1], StringUtils.replaceChars(parts[2], '_', ' '));
 			}
 
-			//TODO check foir collisions
+			//check for collisions
+			for(String key : conversionTable.keySet()){
+				String value = conversionTable.get(key);
+				key = StringUtils.removeStart(key, "^");
+				key = StringUtils.removeEnd(key, "$");
+				for(String subkey : conversionTable.keySet()){
+					String subvalue = conversionTable.get(subkey);
+					subkey = StringUtils.removeStart(subkey, "^");
+					subkey = StringUtils.removeEnd(subkey, "$");
+					if(!key.equals(subkey) && (key.contains(subkey) || subkey.contains(key)))
+						throw new IllegalArgumentException("Error reading line \"" + context.toString()
+							+ ": Repeated entry, '" + key + "' > '" + value + "' already has '" + subkey + "' > '" + subvalue + "'");
+				}
+			}
 
 			addData(tag, conversionTable);
 		}
