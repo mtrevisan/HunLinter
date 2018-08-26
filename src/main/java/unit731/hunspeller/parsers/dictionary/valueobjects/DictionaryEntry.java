@@ -34,7 +34,8 @@ public class DictionaryEntry{
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
 	//FIXME allow \/ inside words
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
+//???	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>(?:(?!\\/).)+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
+	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>(?:(?!\\/).)+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
 
 
 	@NonNull
