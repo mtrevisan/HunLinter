@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -652,13 +653,26 @@ public class AffixParser extends ReadWriteLockable{
 		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 	}
 
-	private String applyConversionTable(String word, Map<String, String> table){
+	private String applyConversionTable(final String word, Map<String, String> table){
+		String replacing = word;
 		if(table != null){
-			int size = table.size();
-			//TODO manage ^ and $
-			word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
+			String starting = table.entrySet().stream()
+				.filter(entry -> entry.getKey().charAt(0) == '^' && word.startsWith(entry.getKey().substring(1)))
+				.map(entry -> entry.getValue() + word.substring(entry.getKey().length() - 1))
+				.findFirst()
+				.orElse(word);
+			String startingEnding = table.entrySet().stream()
+				.filter(entry -> entry.getKey().charAt(entry.getKey().length() - 1) == '$' && starting.endsWith(entry.getKey().substring(0, entry.getKey().length() - 1)))
+				.map(entry -> starting.substring(0, starting.length() - entry.getKey().length() + 1) + entry.getValue())
+				.findFirst()
+				.orElse(starting);
+			Map<String, String> innnerEntries = table.entrySet().stream()
+				.filter(entry -> entry.getKey().charAt(0) != '^' && entry.getKey().charAt(entry.getKey().length() - 1) != '$')
+				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+			int size = innnerEntries.size();
+			replacing = StringUtils.replaceEach(startingEnding, innnerEntries.keySet().toArray(new String[size]), innnerEntries.values().toArray(new String[size]));
 		}
-		return word;
+		return replacing;
 	}
 
 	public Set<String> getWordBreakCharacters(){

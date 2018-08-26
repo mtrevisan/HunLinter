@@ -36,14 +36,14 @@ public class DictionaryParserTest{
 		expected.put("alot", "a lot");
 		Assert.assertEquals(expected, replacementTable);
 
-		String replaced = affParser.applyReplacementTable("bla");
-		Assert.assertEquals("bla", replaced);
+		String replaced = affParser.applyReplacementTable("blea");
+		Assert.assertEquals("blea", replaced);
 
 		replaced = affParser.applyReplacementTable("abcijde");
 		Assert.assertEquals("aabcIJdee", replaced);
 
 		replaced = affParser.applyReplacementTable("alot");
-		Assert.assertEquals("a lot", replaced);
+		Assert.assertEquals("aa lot", replaced);
 	}
 
 }
