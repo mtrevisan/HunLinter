@@ -73,6 +73,7 @@ public class AffixParser extends ReadWriteLockable{
 
 	@AllArgsConstructor
 	private static enum ConversionTableType{
+		REPLACEMENT(AffixTag.REPLACEMENT_TABLE),
 		INPUT(AffixTag.INPUT_CONVERSION_TABLE),
 		OUTPUT(AffixTag.OUTPUT_CONVERSION_TABLE);
 
@@ -300,7 +301,7 @@ public class AffixParser extends ReadWriteLockable{
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad tag, it must be " + tag.getCode());
 
-				conversionTable.put(parts[1], parts[2]);
+				conversionTable.put(parts[1], StringUtils.replaceChars(parts[2], '_', ' '));
 			}
 
 			addData(tag, conversionTable);
@@ -654,7 +655,7 @@ public class AffixParser extends ReadWriteLockable{
 	private String applyConversionTable(String word, Map<String, String> table){
 		if(table != null){
 			int size = table.size();
-			//TODO manage ^, $, and _
+			//TODO manage ^ and $
 			word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
 		}
 		return word;
