@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -46,10 +47,10 @@ public class DictionaryEntry{
 
 
 	public DictionaryEntry(String line, FlagParsingStrategy strategy){
-		this(line, null, null, strategy);
+		this(line, strategy, null, null);
 	}
 
-	public DictionaryEntry(String line, List<String> aliasesFlag, List<String> aliasesMorphologicaField, FlagParsingStrategy strategy){
+	public DictionaryEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -79,17 +80,17 @@ public class DictionaryEntry{
 		Objects.requireNonNull(dicEntry);
 
 		this.word = word;
-		continuationFlags = dicEntry.continuationFlags;
-		morphologicalFields = dicEntry.morphologicalFields;
-		combineable = true;
+		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
+		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
+		combineable = dicEntry.combineable;
 	}
 
 	public String getContinuationFlags(FlagParsingStrategy strategy){
 		return strategy.joinFlags(continuationFlags);
 	}
 
-	/** Returns the count of the continuation flags without the terminal affixes */
-	public int getContinuationFlagsCount(AffixParser affParser){
+	/** Returns whether there are continuation flags not terminal affixes */
+	public boolean hasContinuationFlags(AffixParser affParser){
 		int continuationFlagsCount = 0;
 		if(continuationFlags != null){
 			continuationFlagsCount = continuationFlags.length;
@@ -98,11 +99,7 @@ public class DictionaryEntry{
 				if(affParser.isTerminalAffix(flag))
 					continuationFlagsCount --;
 		}
-		return continuationFlagsCount;
-	}
-
-	public boolean hasContinuationFlags(AffixParser affParser){
-		return (getContinuationFlagsCount(affParser) > 0);
+		return (continuationFlagsCount > 0);
 	}
 
 	public boolean containsContinuationFlag(String ... continuationFlags){

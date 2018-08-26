@@ -76,7 +76,7 @@ public class WordGenerator{
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		DictionaryEntry dicEntry = new DictionaryEntry(line, aliasesFlag, aliasesMorphologicalField, strategy);
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
 		//convert using input table
 		String word = affParser.applyInputConversionTable(dicEntry.getWord());
