@@ -301,6 +301,9 @@ public class AffixParser extends ReadWriteLockable{
 				if(!tag.getCode().equals(parts[0]))
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad tag, it must be " + tag.getCode());
+				if(conversionTable.containsKey(parts[1]))
+					throw new IllegalArgumentException("Error reading line \"" + context.toString()
+						+ ": Repeated entry, it already was REP " + parts[1] + " " + conversionTable.get(parts[1]));
 
 				conversionTable.put(parts[1], StringUtils.replaceChars(parts[2], '_', ' '));
 			}
