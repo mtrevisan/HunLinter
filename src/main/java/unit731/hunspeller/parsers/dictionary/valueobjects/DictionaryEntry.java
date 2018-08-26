@@ -33,7 +33,8 @@ public class DictionaryEntry{
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+[^\\])(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
+	//FIXME allow \/ inside words
+	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
 
 
 	@NonNull
@@ -188,7 +189,7 @@ public class DictionaryEntry{
 			if(strategy != null)
 				sb.append(strategy.joinFlags(continuationFlags));
 			else
-				sb.append(StringUtils.join(continuationFlags, ", "));
+				sb.append(StringUtils.join(continuationFlags, ","));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));
