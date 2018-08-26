@@ -653,26 +653,26 @@ public class AffixParser extends ReadWriteLockable{
 		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 	}
 
-	private String applyConversionTable(final String word, Map<String, String> table){
-		String replacing = word;
+	private String applyConversionTable(String word, Map<String, String> table){
 		if(table != null){
-			String starting = table.entrySet().stream()
-				.filter(entry -> entry.getKey().charAt(0) == '^' && word.startsWith(entry.getKey().substring(1)))
-				.map(entry -> entry.getValue() + word.substring(entry.getKey().length() - 1))
-				.findFirst()
-				.orElse(word);
-			String startingEnding = table.entrySet().stream()
-				.filter(entry -> entry.getKey().charAt(entry.getKey().length() - 1) == '$' && starting.endsWith(entry.getKey().substring(0, entry.getKey().length() - 1)))
-				.map(entry -> starting.substring(0, starting.length() - entry.getKey().length() + 1) + entry.getValue())
-				.findFirst()
-				.orElse(starting);
-			Map<String, String> innnerEntries = table.entrySet().stream()
-				.filter(entry -> entry.getKey().charAt(0) != '^' && entry.getKey().charAt(entry.getKey().length() - 1) != '$')
-				.collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
-			int size = innnerEntries.size();
-			replacing = StringUtils.replaceEach(startingEnding, innnerEntries.keySet().toArray(new String[size]), innnerEntries.values().toArray(new String[size]));
+			for(Map.Entry<String, String> entry : table.entrySet()){
+				String key = entry.getKey();
+				int keyLength = key.length();
+				String value = entry.getValue();
+
+				if(key.charAt(0) == '^'){
+					if(word.startsWith(key.substring(1)))
+						word = value + word.substring(keyLength - 1);
+				}
+				else if(key.charAt(keyLength - 1) == '$'){
+					if(word.endsWith(key.substring(0, keyLength - 1)))
+						word = word.substring(0, word.length() - keyLength + 1) + value;
+				}
+				else
+					word = StringUtils.replace(word, key, value);
+			}
 		}
-		return replacing;
+		return word;
 	}
 
 	public Set<String> getWordBreakCharacters(){
