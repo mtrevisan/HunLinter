@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -36,6 +35,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 /**
  * Managed options:
  *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
+ *		REP
  *		COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDMORESUFFIXES, COMPOUNDFORBIDFLAG, COMPOUNDWORDMAX,
  *			CHECKCOMPOUNDDUP, CIRCUMFIX, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE
  *		PFX, SFX
@@ -304,6 +304,8 @@ public class AffixParser extends ReadWriteLockable{
 
 				conversionTable.put(parts[1], StringUtils.replaceChars(parts[2], '_', ' '));
 			}
+
+			//TODO check foir collisions
 
 			addData(tag, conversionTable);
 		}
