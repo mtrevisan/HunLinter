@@ -84,10 +84,6 @@ public class DictionaryEntry{
 		combineable = dicEntry.combineable;
 	}
 
-	public String getContinuationFlags(FlagParsingStrategy strategy){
-		return strategy.joinFlags(continuationFlags);
-	}
-
 	/** Returns whether there are continuation flags that are not terminal affixes */
 	public boolean hasContinuationFlags(AffixParser affParser){
 		int continuationFlagsCount = 0;
