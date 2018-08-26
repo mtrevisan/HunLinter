@@ -33,8 +33,7 @@ public class DictionaryEntry{
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	//FIXME manage valid \/ inside word
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
+	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\t\\s\\/]+[^\\])(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
 
 
 	@NonNull
@@ -89,16 +88,13 @@ public class DictionaryEntry{
 		return strategy.joinFlags(continuationFlags);
 	}
 
-	/** Returns whether there are continuation flags not terminal affixes */
+	/** Returns whether there are continuation flags that are not terminal affixes */
 	public boolean hasContinuationFlags(AffixParser affParser){
 		int continuationFlagsCount = 0;
-		if(continuationFlags != null){
-			continuationFlagsCount = continuationFlags.length;
-			//remove terminal affixes
+		if(continuationFlags != null)
 			for(String flag : continuationFlags)
-				if(affParser.isTerminalAffix(flag))
-					continuationFlagsCount --;
-		}
+				if(!affParser.isTerminalAffix(flag))
+					continuationFlagsCount ++;
 		return (continuationFlagsCount > 0);
 	}
 

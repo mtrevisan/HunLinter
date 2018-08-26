@@ -403,6 +403,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 			incompatibilityCheck(production);
 
+//FIXME move this in super?
 			String derivedWordWithoutMorphologicalFields = production.toString();
 			if(production.hasContinuationFlags(affParser) && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
