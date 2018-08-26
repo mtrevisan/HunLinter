@@ -277,6 +277,7 @@ public class AffixParser extends ReadWriteLockable{
 	private final Consumer<ParsingContext> FUN_CONVERSION_TABLE = context -> {
 		try{
 			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
+			AffixTag tag = conversionTableType.getFlag();
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context.toString()
@@ -295,14 +296,14 @@ public class AffixParser extends ReadWriteLockable{
 				if(parts.length != 3)
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
-				if(!conversionTableType.getFlag().getCode().equals(parts[0]))
+				if(!tag.getCode().equals(parts[0]))
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Bad tag, it must be " + conversionTableType.getFlag().getCode());
+						+ ": Bad tag, it must be " + tag.getCode());
 
 				conversionTable.put(parts[1], parts[2]);
 			}
 
-			addData(conversionTableType.getFlag(), conversionTable);
+			addData(tag, conversionTable);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
@@ -326,11 +327,11 @@ public class AffixParser extends ReadWriteLockable{
 		RULE_FUNCTION.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, FUN_ALIASES);
 		//Options for suggestions
 //		RULE_FUNCTION.put(AffixTag.KEY, FUN_COPY_OVER);
-//		RULE_FUNCTION.put("TRY", FUN_COPY_OVER);
+//		RULE_FUNCTION.put(AffixTag.TRY, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.NO_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.NO_NGRAM_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put("REP", FUN_COPY_OVER);
-//		RULE_FUNCTION.put("MAP", FUN_MAP);
+		RULE_FUNCTION.put(AffixTag.REPLACEMENT_TABLE, FUN_CONVERSION_TABLE);
+//		RULE_FUNCTION.put(AffixTag.MAP_TABLE, FUN_MAP);
 		//Options for compounding
 		//default break table contains: "-", "^-", and "-$"
 		RULE_FUNCTION.put(AffixTag.BREAK, FUN_WORD_BREAK_TABLE);
@@ -638,6 +639,24 @@ public class AffixParser extends ReadWriteLockable{
 		return applicableAffixes;
 	}
 
+	public String applyReplacementTable(String word){
+		Map<String, String> table = getData(AffixTag.INPUT_CONVERSION_TABLE);
+		StringBuilder sb = new StringBuilder();
+		int size = word.length();
+		for(int i = 0; i < size; i ++){
+			String w = word.substring(i);
+			int m = find(w);
+			String rep = replace(w, m, (i == 0));
+			if(!rep.isEmpty()){
+				sb.append(rep);
+				i += table[m].pattern.length() - 1;
+			}
+			else
+				sb.append(word.charAt(i));
+		}
+		return sb.toString();
+	}
+
 	public String applyInputConversionTable(String word){
 		return applyConversionTable(word, getData(AffixTag.INPUT_CONVERSION_TABLE));
 	}
@@ -649,6 +668,7 @@ public class AffixParser extends ReadWriteLockable{
 	private String applyConversionTable(String word, Map<String, String> table){
 		if(table != null){
 			int size = table.size();
+			//TODO manage ^, $, and _
 			word = StringUtils.replaceEach(word, table.keySet().toArray(new String[size]), table.values().toArray(new String[size]));
 		}
 		return word;
