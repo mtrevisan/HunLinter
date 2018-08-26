@@ -13,7 +13,7 @@
 			<!-- Maven Source Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
+					<artifactId>maven-source-plugin</artifactId>
 				<version>3.0.1</version>
 				<executions>
 					<execution>
@@ -29,7 +29,7 @@
 <!--			<plugin>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok-maven-plugin</artifactId>
-				<version>1.18.0</version>
+				<version>1.18.0.0</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -170,7 +170,7 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 
 		<!-- Apache -->
-		<org.apache.commons.lang3.version>3.7</org.apache.commons.lang3.version>
+		<org.apache.commons.lang3.version>3.8</org.apache.commons.lang3.version>
 		<org.apache.commons.text.version>1.4</org.apache.commons.text.version>
 		<org.apache.commons.math3.version>3.6.1</org.apache.commons.math3.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
@@ -198,8 +198,6 @@
 
 		<!-- JUnit -->
 		<junit.version>4.12</junit.version>
-		<!-- ConcurrentUnit -->
-		<!--<concurrent.unit.version>0.4.3</concurrent.unit.version>-->
 		<!-- FindBugs -->
 		<com.google.code.findbugs.version>3.0.1</com.google.code.findbugs.version>
 	</properties>
