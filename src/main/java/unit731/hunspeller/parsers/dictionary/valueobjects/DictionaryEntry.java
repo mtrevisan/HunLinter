@@ -129,10 +129,10 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * Separate the prefixes from the suffixes
+	 * Separate the prefixes from the suffixes and from the terminals
 	 * 
 	 * @param affParser	The {@link AffixParser}
-	 * @return	An object with separated flags, one for each group
+	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
 	private Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
 		List<String> terminalAffixes = new ArrayList<>();
