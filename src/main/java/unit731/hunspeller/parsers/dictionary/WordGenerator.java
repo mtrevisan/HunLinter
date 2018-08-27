@@ -426,12 +426,11 @@ public class WordGenerator{
 	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
 		List<String[]> prefixes = compoundEntries.get(0).extractAffixes(affParser, false);
 		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false);
-		Set<String> terminals = new HashSet<>();
-		for(String t : prefixes.get(2))
-			terminals.add(t);
-		for(String t : suffixes.get(2))
-			terminals.add(t);
+
+		Set<String> terminals = new HashSet<>(Arrays.asList(prefixes.get(2)));
+		terminals.addAll(Arrays.asList(suffixes.get(2)));
 		terminals.remove(compoundFlag);
+
 		String compoundPrefixes = String.join(StringUtils.EMPTY, prefixes.get(0));
 		String compoundSuffixes = String.join(StringUtils.EMPTY, suffixes.get(1));
 		String compoundTerminals = String.join(StringUtils.EMPTY, terminals);
