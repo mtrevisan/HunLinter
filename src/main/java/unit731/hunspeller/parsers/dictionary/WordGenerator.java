@@ -410,7 +410,6 @@ public class WordGenerator{
 			//convert using input table
 			inputCompound = affParser.applyInputConversionTable(inputCompound);
 
-			//filter for words with the given compound flag
 			DictionaryEntry production = new DictionaryEntry(inputCompound, strategy);
 
 			//filter input set by minimum length
