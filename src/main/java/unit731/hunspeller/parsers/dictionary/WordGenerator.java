@@ -93,7 +93,7 @@ public class WordGenerator{
 		}
 
 		//extract suffixed productions
-		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound);
+		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
 		if(log.isDebugEnabled()){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Onefold productions:");
@@ -103,7 +103,7 @@ public class WordGenerator{
 		List<Production> twofoldProductions = Collections.<Production>emptyList();
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
-			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound);
+			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
 			if(log.isDebugEnabled()){
 				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 				log.debug("Twofold productions:");
@@ -116,7 +116,7 @@ public class WordGenerator{
 		lastfoldProductions.add(baseProduction);
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
-		lastfoldProductions = getLastfoldProductions(lastfoldProductions, isCompound);
+		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
 		if(log.isDebugEnabled()){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			log.debug("Lastfold productions:");
@@ -442,42 +442,25 @@ public class WordGenerator{
 		return new Production(dicEntry.getWord(), dicEntry);
 	}
 
-	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound) throws NoApplicableRuleException{
-		List<String[]> applyAffixes = dicEntry.extractAffixes(affParser, !affParser.isComplexPrefixes());
+	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
+		List<String[]> applyAffixes = dicEntry.extractAffixes(affParser, reverse);
 		return applyAffixRules(dicEntry, applyAffixes, isCompound);
 	}
 
-	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound) throws NoApplicableRuleException{
+	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
 		List<Production> twofoldProductions = new ArrayList<>();
-		for(Production production : onefoldProductions){
-			List<String[]> applyAffixes = production.extractAffixes(affParser, !affParser.isComplexPrefixes());
-			List<Production> productions = applyAffixRules(production, applyAffixes, isCompound);
-
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			for(Production prod : productions)
-				//add parent derivations
-				prod.prependAppliedRules(appliedRules);
-
-			twofoldProductions.addAll(productions);
-		}
-		return twofoldProductions;
-	}
-
-	private List<Production> getLastfoldProductions(List<Production> productions, boolean isCompound) throws NoApplicableRuleException{
-		List<Production> lastfoldProductions = new ArrayList<>();
-		for(Production production : productions)
+		for(Production production : onefoldProductions)
 			if(production.isCombineable()){
-				List<String[]> applyAffixes = production.extractAffixes(affParser, affParser.isComplexPrefixes());
-				List<Production> prods = applyAffixRules(production, applyAffixes, isCompound);
+				List<Production> prods = getOnefoldProductions(production, isCompound, reverse);
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
 				for(Production prod : prods)
 					//add parent derivations
 					prod.prependAppliedRules(appliedRules);
 
-				lastfoldProductions.addAll(prods);
+				twofoldProductions.addAll(prods);
 			}
-		return lastfoldProductions;
+		return twofoldProductions;
 	}
 
 	private void checkTwofoldCorrectness(List<Production> twofoldProductions) throws IllegalArgumentException{
