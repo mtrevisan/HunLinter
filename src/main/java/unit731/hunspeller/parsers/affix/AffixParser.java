@@ -176,7 +176,7 @@ public class AffixParser extends ReadWriteLockable{
 				String line = br.readLine();
 				line = DictionaryParser.cleanLine(line);
 
-				AffixEntry entry = new AffixEntry(line, aliasesFlag, aliasesMorphologicalField, strategy);
+				AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 				if(entry.getType() != ruleType)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
 						+ ruleType + ")");

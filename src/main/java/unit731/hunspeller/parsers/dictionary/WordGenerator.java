@@ -484,21 +484,18 @@ public class WordGenerator{
 		boolean complexPrefixes = affParser.isComplexPrefixes();
 		for(Production prod : twofoldProductions){
 			List<String[]> affixes = prod.extractAffixes(affParser, false);
-
-			String overabundantAffixes = null;
-			if(complexPrefixes && affixes.get(1).length > 0)
-				overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(affixes.get(1));
-			if(!complexPrefixes && affixes.get(0).length > 0)
-				overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(affixes.get(0));
-
-			if(overabundantAffixes != null)
+			String[] aff = affixes.get(complexPrefixes? 1: 0);
+			if(aff.length > 0){
+				String overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(aff);
 				throw new IllegalArgumentException("Twofold rule violated for '" + prod + " from " + prod.getRulesSequence()
 					+ "' (" + prod.getRulesSequence() + " still has rules " + overabundantAffixes + ")");
+			}
 		}
 	}
 
 	private List<Production> enforceOnlyInCompound(List<Production> productions){
 		String onlyInCompoundFlag = affParser.getOnlyInCompoundFlag();
+
 		Iterator<Production> itr = productions.iterator();
 		while(itr.hasNext()){
 			Production production = itr.next();

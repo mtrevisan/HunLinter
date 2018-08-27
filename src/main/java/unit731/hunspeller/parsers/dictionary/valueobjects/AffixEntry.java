@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -70,7 +69,7 @@ public class AffixEntry{
 	private final String entry;
 
 
-	public AffixEntry(String line, List<String> aliasesFlag, List<String> aliasesMorphologicaField, FlagParsingStrategy strategy){
+	public AffixEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
