@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -332,8 +333,9 @@ public class WordGenerator{
 
 							lastWordCasing = nextWord;
 						}
-						if(checkCompoundReplacement){
-							//TODO
+						if(checkCompoundReplacement && existsCompoundAsReplacement(sb.toString())){
+							sb.setLength(0);
+							break;
 						}
 					}
 					sb.append(nextCompound);
@@ -391,6 +393,26 @@ public class WordGenerator{
 		return productions;
 	}
 
+	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		List<DictionaryEntry> result = new ArrayList<>();
+		for(String inputCompound : inputCompounds){
+			//convert using input table
+			inputCompound = affParser.applyInputConversionTable(inputCompound);
+
+			DictionaryEntry production = new DictionaryEntry(inputCompound, strategy);
+
+			//filter input set by minimum length
+			if(production.getWord().length() < compoundMinimumLength)
+				continue;
+
+			result.add(production);
+		}
+		return result;
+	}
+
 	private boolean containsTriple(StringBuilder sb, String compound){
 		int count = 0;
 		int size = sb.length() - 1;
@@ -412,24 +434,29 @@ public class WordGenerator{
 		return (count >= 3);
 	}
 
-	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
-		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+	//is word a non compound with a REP substitution (see checkcompoundrep)?
+	private boolean existsCompoundAsReplacement(String word){
+		List<Pair<String, String>> replacementTable = affParser.getReplacementTable();
+		if(word.length() < 2 || replacementTable == null || replacementTable.isEmpty())
+			return false;
 
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		List<DictionaryEntry> result = new ArrayList<>();
-		for(String inputCompound : inputCompounds){
-			//convert using input table
-			inputCompound = affParser.applyInputConversionTable(inputCompound);
-
-			DictionaryEntry production = new DictionaryEntry(inputCompound, strategy);
-
-			//filter input set by minimum length
-			if(production.getWord().length() < compoundMinimumLength)
-				continue;
-
-			result.add(production);
+		for(Pair<String, String> entry : replacementTable){
+//			char* r = word;
+			int patternLentgh = entry.getKey().length();
+			//search every occurence of the pattern in the word
+//			while((r = strstr(r, entry.getKey().c_str())) != NULL){
+//				String candidate(word);
+//				int type = (r == word && langnum != LANG_hu? 1: 0);
+//				if(r - word + entry.getKey().size() == patternLentgh && langnum != LANG_hu)
+//					type += 2;
+//				candidate.replace(r - word, patternLentgh, entry.getValue()[type]);
+//				if(candidate_check(candidate.c_str(), candidate.size()))
+//					return true;
+//				r ++;  // search for the next letter
+//			}
 		}
-		return result;
+
+		return false;
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */

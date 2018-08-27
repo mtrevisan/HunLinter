@@ -646,6 +646,11 @@ public class AffixParser extends ReadWriteLockable{
 		return applicableAffixes;
 	}
 
+	//FIXME to remove?
+	public List<Pair<String, String>> getReplacementTable(){
+		return getData(AffixTag.REPLACEMENT_TABLE);
+	}
+
 	public String applyReplacementTable(String word){
 		return applyConversionTable(word, getData(AffixTag.REPLACEMENT_TABLE));
 	}

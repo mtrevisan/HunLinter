@@ -86,7 +86,7 @@ public enum AffixTag{
 	/** Forbid word duplication in compounds */
 	CHECK_COMPOUND_DUPLICATION("CHECKCOMPOUNDDUP"),
 	/**
-	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP fault (useful for languages with
+	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP substitution (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
 	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
