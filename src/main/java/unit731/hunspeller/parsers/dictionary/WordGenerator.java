@@ -274,6 +274,7 @@ public class WordGenerator{
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
+		boolean checkCompoundReplacement = affParser.isCheckCompoundReplacement();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		boolean allowTwofoldAffixesInCompound = affParser.allowTwofoldAffixesInCompound();
@@ -313,25 +314,31 @@ public class WordGenerator{
 							break;
 						}
 					}
-					if(forbidDifferentCasesInCompound && sb.length() > 0){
-						if(lastWordCasing == null)
-							lastWordCasing = StringHelper.classifyCasing(sb.toString());
-						StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
+					if(sb.length() > 0){
+						if(forbidDifferentCasesInCompound){
+							if(lastWordCasing == null)
+								lastWordCasing = StringHelper.classifyCasing(sb.toString());
+							StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
 
-						char lastChar = sb.charAt(sb.length() - 1);
-						char nextChar = nextCompound.charAt(0);
-						if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
-							Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
-							if(collisions != null && collisions.contains(nextWord)){
-								sb.setLength(0);
-								break;
+							char lastChar = sb.charAt(sb.length() - 1);
+							char nextChar = nextCompound.charAt(0);
+							if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
+								Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
+								if(collisions != null && collisions.contains(nextWord)){
+									sb.setLength(0);
+									break;
+								}
 							}
-						}
 
-						lastWordCasing = nextWord;
+							lastWordCasing = nextWord;
+						}
+						if(checkCompoundReplacement){
+							//TODO
+						}
 					}
 					sb.append(nextCompound);
 				}
+
 				if(sb.length() > 0){
 					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
 					String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);

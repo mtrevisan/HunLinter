@@ -89,7 +89,7 @@ public enum AffixTag{
 	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP fault (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
-//	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
+	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
 	/** Forbid upper case characters at word bound in compounds */
 	CHECK_COMPOUND_CASE("CHECKCOMPOUNDCASE"),
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
