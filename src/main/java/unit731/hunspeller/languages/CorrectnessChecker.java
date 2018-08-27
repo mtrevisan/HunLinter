@@ -38,7 +38,7 @@ public class CorrectnessChecker{
 	//correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
 		String forbidCompoundFlag = affParser.getForbidCompoundFlag();
-		if(!production.hasProductionRules() && production.containsContinuationFlag(forbidCompoundFlag))
+		if(!production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
 			throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
 	}
 

@@ -131,7 +131,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 		public void match(Production production) throws IllegalArgumentException{
 			for(String flag : continuationFlags)
-				if(production.containsContinuationFlag(flag))
+				if(production.hasContinuationFlag(flag))
 					throw new IllegalArgumentException(error + " for " + production.getWord());
 		}
 	}
@@ -394,7 +394,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				throw new IllegalArgumentException("Line does not contains any morphological fields");
 
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
-			if(!production.hasProductionRules() && production.containsContinuationFlag(forbidCompoundFlag))
+			if(!production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
 				throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
 
 			morphologicalFieldCheck(production);
@@ -405,7 +405,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 //FIXME move this in super?
 			String derivedWordWithoutMorphologicalFields = production.toString();
-			if(production.hasContinuationFlags(affParser) && !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_ADVERB)){
+			if(production.hasContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
 				northernPluralCheck(production);
@@ -457,7 +457,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			throw new IllegalArgumentException("Word with ƚ cannot contain đ or ŧ, " + derivedWord);
 		if(PatternHelper.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
 			throw new IllegalArgumentException("Word with ƚ near a consonant, " + derivedWord);
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.containsContinuationFlag(NORTHERN_PLURAL_RULE))
+		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 			throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
 				+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
 	}
@@ -474,15 +474,15 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void continuationFlagIncompatibilityCheck(Production production, String continuationFlag, Set<MatcherEntry> checks)
 			throws IllegalArgumentException{
-		if(production.containsContinuationFlag(continuationFlag))
+		if(production.hasContinuationFlag(continuationFlag))
 			for(MatcherEntry entry : checks)
 				entry.match(production);
 	}
 
 	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_PROPER_NOUN) && !production.isPartOfSpeech(POS_ARTICLE)){
-			boolean hasMetaphonesisFlag = production.containsContinuationFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
+		if(!production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_ARTICLE)){
+			boolean hasMetaphonesisFlag = production.hasContinuationFlag(METAPHONESIS_RULE);
+			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
 				ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
@@ -500,12 +500,12 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void northernPluralCheck(Production production) throws IllegalArgumentException{
 		String word = production.getWord();
-		if(!production.isPartOfSpeech(POS_ARTICLE) && !production.isPartOfSpeech(POS_PRONOUN) && !production.isPartOfSpeech(POS_PROPER_NOUN)
+		if(!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
 			List<String> subwords = hyphenator.splitIntoCompounds(word);
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
-			boolean hasNorthernPluralFlag = production.containsContinuationFlag(rule);
-			boolean canHaveNorthernPlural = (production.containsContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
+			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
+			boolean canHaveNorthernPlural = (production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
 				if(canHaveNorthernPlural)
@@ -547,7 +547,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
-		if(!production.isPartOfSpeech(POS_NUMERAL_LATIN)){
+		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternHelper.find(phonemizedSubword, CIJJHNHIV))
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
@@ -555,7 +555,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((ENABLE_VERB_CHECK || !production.isPartOfSpeech(POS_VERB)) && !production.isPartOfSpeech(POS_NUMERAL_LATIN) && !production.isPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if((ENABLE_VERB_CHECK || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
 			if(!UNSYLLABABLE_INTERJECTIONS.contains(word) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(word)){
 				word = word.toLowerCase(Locale.ROOT);
@@ -629,17 +629,17 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 			&& word.indexOf('ƚ') < 0
 			&& word.indexOf('ɉ') < 0
-			&& (production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_NOUN)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_POSSESSIVE)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_DEMONSTRATIVE)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_IDENTIFICATIVE)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADJECTIVE_INTERROGATIVE)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_QUANTIFIER)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_PRONOUN)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_PREPOSITION)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_ADVERB)
-			|| production.containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + POS_CONJUNCTION)));
+			&& (production.hasPartOfSpeech(POS_NOUN)
+			|| production.hasPartOfSpeech(POS_ADJECTIVE)
+			|| production.hasPartOfSpeech(POS_ADJECTIVE_POSSESSIVE)
+			|| production.hasPartOfSpeech(POS_ADJECTIVE_DEMONSTRATIVE)
+			|| production.hasPartOfSpeech(POS_ADJECTIVE_IDENTIFICATIVE)
+			|| production.hasPartOfSpeech(POS_ADJECTIVE_INTERROGATIVE)
+			|| production.hasPartOfSpeech(POS_QUANTIFIER)
+			|| production.hasPartOfSpeech(POS_PRONOUN)
+			|| production.hasPartOfSpeech(POS_PREPOSITION)
+			|| production.hasPartOfSpeech(POS_ADVERB)
+			|| production.hasPartOfSpeech(POS_CONJUNCTION)));
 	}
 
 }

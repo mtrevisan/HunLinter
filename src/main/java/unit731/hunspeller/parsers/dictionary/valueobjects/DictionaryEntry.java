@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -81,7 +80,10 @@ public class DictionaryEntry{
 		combineable = dicEntry.combineable;
 	}
 
-	/** Returns whether there are continuation flags that are not terminal affixes */
+	/**
+	 * @param affParser	The Affix Parser used to determine if a flag is a terminal
+	 * @return	Whether there are continuation flags that are not terminal affixes
+	 */
 	public boolean hasContinuationFlags(AffixParser affParser){
 		int continuationFlagsCount = 0;
 		if(continuationFlags != null)
@@ -91,7 +93,7 @@ public class DictionaryEntry{
 		return (continuationFlagsCount > 0);
 	}
 
-	public boolean containsContinuationFlag(String ... continuationFlags){
+	public boolean hasContinuationFlag(String ... continuationFlags){
 		if(this.continuationFlags != null)
 			for(String flag : this.continuationFlags)
 				if(ArrayUtils.contains(continuationFlags, flag))
@@ -105,7 +107,11 @@ public class DictionaryEntry{
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
 	}
 
-	public boolean containsMorphologicalField(String morphologicalField){
+	public boolean hasPartOfSpeech(String partOfSpeech){
+		return hasMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
+	}
+
+	private boolean hasMorphologicalField(String morphologicalField){
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
@@ -113,10 +119,6 @@ public class DictionaryEntry{
 		if(morphologicalFields != null)
 			for(String morphologicalField : morphologicalFields)
 				fun.accept(morphologicalField);
-	}
-
-	public boolean isPartOfSpeech(String partOfSpeech){
-		return containsMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
 	}
 
 	public List<String[]> extractAffixes(AffixParser affParser, boolean reverse){
