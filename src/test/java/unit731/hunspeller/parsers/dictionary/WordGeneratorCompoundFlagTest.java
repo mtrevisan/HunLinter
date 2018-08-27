@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -514,7 +513,6 @@ public class WordGeneratorCompoundFlagTest{
 		};
 
 		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 100, 3);
-//words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			new Production("foofoo", null, "pa:foo st:foo pa:foo st:foo", strategy),
 			new Production("foo-", null, "pa:foo st:foo pa:- st:-", strategy),
@@ -554,6 +552,67 @@ public class WordGeneratorCompoundFlagTest{
 			new Production("--Bar", null, "pa:- st:- pa:- st:- pa:Bar st:Bar", strategy),
 			new Production("--BAZ", null, "pa:- st:- pa:- st:- pa:BAZ st:BAZ", strategy),
 			new Production("---", null, "pa:- st:- pa:- st:- pa:- st:-", strategy)
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void compoundReplacement() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"CHECKCOMPOUNDREP",
+			"COMPOUNDFLAG A",
+			"REP 1",
+			"REP í i");
+		affParser.parse(affFile);
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		WordGenerator wordGenerator = new WordGenerator(affParser);
+
+		String[] inputCompounds = new String[]{
+			"szer/A",
+			"víz/A",
+			"kocsi/A",
+			"szerviz"
+		};
+		List<Production> words = wordGenerator.applyCompoundFlag(inputCompounds, 40, 3);
+words.forEach(stem -> System.out.println(stem));
+		//good: vízszer, szerkocsi
+		//bad: szervíz, szervízkocsi, kocsiszervíz
+		List<Production> expected = Arrays.asList(
+			new Production("szerszer", null, "pa:szer st:szer pa:szer st:szer", strategy),
+			new Production("szerkocsi", null, "pa:szer st:szer pa:kocsi st:kocsi", strategy),
+			new Production("szerszerviz", null, "pa:szer st:szer pa:szerviz st:szerviz", strategy),
+			new Production("vízszer", null, "pa:víz st:víz pa:szer st:szer", strategy),
+			new Production("vízvíz", null, "pa:víz st:víz pa:víz st:víz", strategy),
+			new Production("vízkocsi", null, "pa:víz st:víz pa:kocsi st:kocsi", strategy),
+			new Production("vízszerviz", null, "pa:víz st:víz pa:szerviz st:szerviz", strategy),
+			new Production("kocsiszer", null, "pa:kocsi st:kocsi pa:szer st:szer", strategy),
+			new Production("kocsivíz", null, "pa:kocsi st:kocsi pa:víz st:víz", strategy),
+			new Production("kocsikocsi", null, "pa:kocsi st:kocsi pa:kocsi st:kocsi", strategy),
+			new Production("kocsiszerviz", null, "pa:kocsi st:kocsi pa:szerviz st:szerviz", strategy),
+			new Production("szervizszer", null, "pa:szerviz st:szerviz pa:szer st:szer", strategy),
+			new Production("szervizvíz", null, "pa:szerviz st:szerviz pa:víz st:víz", strategy),
+			new Production("szervizkocsi", null, "pa:szerviz st:szerviz pa:kocsi st:kocsi", strategy),
+			new Production("szervizszerviz", null, "pa:szerviz st:szerviz pa:szerviz st:szerviz", strategy),
+			new Production("szerszerszer", null, "pa:szer st:szer pa:szer st:szer pa:szer st:szer", strategy),
+			new Production("szerszerkocsi", null, "pa:szer st:szer pa:szer st:szer pa:kocsi st:kocsi", strategy),
+			new Production("szerszerszerviz", null, "pa:szer st:szer pa:szer st:szer pa:szerviz st:szerviz", strategy),
+			new Production("szerkocsiszer", null, "pa:szer st:szer pa:kocsi st:kocsi pa:szer st:szer", strategy),
+			new Production("szerkocsivíz", null, "pa:szer st:szer pa:kocsi st:kocsi pa:víz st:víz", strategy),
+			new Production("szerkocsikocsi", null, "pa:szer st:szer pa:kocsi st:kocsi pa:kocsi st:kocsi", strategy),
+			new Production("szerkocsiszerviz", null, "pa:szer st:szer pa:kocsi st:kocsi pa:szerviz st:szerviz", strategy),
+			new Production("szerszervizszer", null, "pa:szer st:szer pa:szerviz st:szerviz pa:szer st:szer", strategy),
+			new Production("szerszervizvíz", null, "pa:szer st:szer pa:szerviz st:szerviz pa:víz st:víz", strategy),
+			new Production("szerszervizkocsi", null, "pa:szer st:szer pa:szerviz st:szerviz pa:kocsi st:kocsi", strategy),
+			new Production("szerszervizszerviz", null, "pa:szer st:szer pa:szerviz st:szerviz pa:szerviz st:szerviz", strategy),
+			new Production("vízszerszer", null, "pa:víz st:víz pa:szer st:szer pa:szer st:szer", strategy),
+			new Production("vízszerkocsi", null, "pa:víz st:víz pa:szer st:szer pa:kocsi st:kocsi", strategy),
+			new Production("vízszerszerviz", null, "pa:víz st:víz pa:szer st:szer pa:szerviz st:szerviz", strategy),
+			new Production("vízvízszer", null, "pa:víz st:víz pa:víz st:víz pa:szer st:szer", strategy),
+			new Production("vízvízvíz", null, "pa:víz st:víz pa:víz st:víz pa:víz st:víz", strategy),
+			new Production("vízvízkocsi", null, "pa:víz st:víz pa:víz st:víz pa:kocsi st:kocsi", strategy),
+			new Production("vízvízszerviz", null, "pa:víz st:víz pa:víz st:víz pa:szerviz st:szerviz", strategy)
 		);
 		Assert.assertEquals(expected, words);
 	}
