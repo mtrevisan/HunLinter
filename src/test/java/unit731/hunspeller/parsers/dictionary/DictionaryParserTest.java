@@ -53,11 +53,11 @@ public class DictionaryParserTest{
 			"SET UTF-8",
 			"REP 3",
 			"REP b 1",
-			"REP bbb 3",
-			"REP bb 2");
+			"REP bac 3",
+			"REP ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("abbbc");
+		String replaced = affParser.applyReplacementTable("abacc");
 		Assert.assertEquals("a3c", replaced);
 	}
 
@@ -67,11 +67,11 @@ public class DictionaryParserTest{
 			"SET UTF-8",
 			"REP 3",
 			"REP ^b 1",
-			"REP ^bbb 3",
-			"REP ^bb 2");
+			"REP ^bac 3",
+			"REP ^ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("bbbc");
+		String replaced = affParser.applyReplacementTable("bacc");
 		Assert.assertEquals("3c", replaced);
 	}
 
@@ -81,11 +81,11 @@ public class DictionaryParserTest{
 			"SET UTF-8",
 			"REP 3",
 			"REP b$ 1",
-			"REP bbb$ 3",
-			"REP bb$ 2");
+			"REP cab$ 3",
+			"REP ab$ 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("cbbb");
+		String replaced = affParser.applyReplacementTable("ccab");
 		Assert.assertEquals("c3", replaced);
 	}
 
