@@ -22,17 +22,11 @@ public class Production extends DictionaryEntry{
 	private final List<DictionaryEntry> compoundEntries;
 
 
+	/* Clone constructor */
 	public Production(String word, DictionaryEntry dicEntry){
 		super(word, dicEntry);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
-	}
-
-	public Production(Production production, String continuationFlags, FlagParsingStrategy strategy){
-		super(production.word, strategy.parseFlags(continuationFlags),
-			(production.getMorphologicalFields() != null? StringUtils.split(production.getMorphologicalFields()): null), true);
-
-		compoundEntries = extractCompoundEntries(production);
 	}
 
 	public Production(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags,
@@ -64,10 +58,6 @@ public class Production extends DictionaryEntry{
 		compoundEntries = null;
 	}
 
-	public void clearContinuationFlags(){
-		continuationFlags = null;
-	}
-
 	public boolean hasMorphologicalFields(){
 		return (morphologicalFields != null && morphologicalFields.length > 0);
 	}
@@ -93,7 +83,7 @@ public class Production extends DictionaryEntry{
 
 	public boolean isTwofolded(){
 		boolean twofolded = false;
-		if(appliedRules != null){
+		if(hasProductionRules()){
 			int suffixes = 0;
 			int prefixes = 0;
 			for(AffixEntry appliedRule : appliedRules){
@@ -112,12 +102,10 @@ public class Production extends DictionaryEntry{
 	}
 
 	public String getRulesSequence(){
-		StringJoiner sj = new StringJoiner(" > ");
-		if(appliedRules != null)
-			appliedRules.stream()
-				.map(AffixEntry::getFlag)
-				.forEach(sj::add);
-		return sj.toString();
+		return (appliedRules != null? appliedRules.stream()
+			.map(AffixEntry::getFlag)
+			.collect(Collectors.joining(" > ")):
+			StringUtils.EMPTY);
 	}
 
 	public String getMorphologicalFields(){
@@ -126,45 +114,41 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public boolean isCompound(){
-		return (compoundEntries != null);
+		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public String toStringWithSignificantMorphologicalFields(){
+	public String toStringWithPartOfSpeechFields(){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		List<String> significantMorphologicalFields = getSignificantMorphologicalFields();
-		if(!significantMorphologicalFields.isEmpty())
-			sj.add(String.join(StringUtils.SPACE, significantMorphologicalFields));
+		String partOfSpeechFields = getPartOfSpeechFields();
+		if(StringUtils.isNotBlank(partOfSpeechFields))
+			sj.add(partOfSpeechFields);
 		return sj.toString();
 	}
 
-//	Comparator<String> comparator = ComparatorBuilder.getComparator("vec");
-	private List<String> getSignificantMorphologicalFields(){
-//		List<String> significant = new ArrayList<>();
-//		if(morphologicalFields != null)
-//			for(String morphologicalField : morphologicalFields)
-//				if(!morphologicalField.startsWith(WordGenerator.TAG_PHONETIC) && !morphologicalField.startsWith(WordGenerator.TAG_STEM)
-//						&& !morphologicalField.startsWith(WordGenerator.TAG_ALLOMORPH))
-//					significant.add(morphologicalField);
-//		Collections.sort(significant, comparator);
-//		return significant.toArray(new String[0]);
+	private String getPartOfSpeechFields(){
 		return Arrays.stream(morphologicalFields)
 			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
-			.collect(Collectors.toList());
+			.sorted()
+			.collect(Collectors.joining(StringUtils.SPACE));
 	}
 
-//	@Override
-//	public String toString(){
-//		StringJoiner sj = (new StringJoiner(StringUtils.EMPTY))
-//			.add(word)
-//			.add(AffixEntry.joinFlags(continuationFlags, flag));
-//		if(morphologicalFields != null && morphologicalFields.length > 0)
-//			sj.add("\t")
-//				.add(String.join(StringUtils.SPACE, morphologicalFields));
-//		if(rules != null && rules.size() > 0)
-//			sj.add(" from ")
-//				.add(String.join(" > ", rules));
-//		return sj.toString();
-//	}
+	@Override
+	public String toString(){
+		return toString(null);
+	}
+
+	@Override
+	public String toString(FlagParsingStrategy strategy){
+		StringJoiner sj = new StringJoiner("\t");
+		sj.add(super.toString(strategy));
+		if(hasProductionRules()){
+			sj.add(" from ");
+			sj.add(appliedRules.stream()
+				.map(AffixEntry::getFlag)
+				.collect(Collectors.joining(" > ")));
+		}
+		return sj.toString();
+	}
 
 }

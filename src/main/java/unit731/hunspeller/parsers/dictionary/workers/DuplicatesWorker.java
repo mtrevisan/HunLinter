@@ -139,9 +139,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						List<Production> productions = wordGenerator.applyRules(line);
 
 						productions.stream()
-							.map(Production::toStringWithSignificantMorphologicalFields)
+							.map(Production::toStringWithPartOfSpeechFields)
 							.filter(text -> !bloomFilter.add(text))
-							.forEachOrdered(duplicatesBloomFilter::add);
+							.forEach(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
 						log.error(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
@@ -194,7 +194,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							List<Production> productions = wordGenerator.applyRules(line);
 							String word = productions.get(0).getWord();
 							for(Production production : productions){
-								String text = production.toStringWithSignificantMorphologicalFields();
+								String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, word, lineIndex));
 							}

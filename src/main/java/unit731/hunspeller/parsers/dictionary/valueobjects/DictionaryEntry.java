@@ -69,7 +69,7 @@ public class DictionaryEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	/* clone method */
+	/* Clone constructor */
 	public DictionaryEntry(String word, DictionaryEntry dicEntry){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(dicEntry);
