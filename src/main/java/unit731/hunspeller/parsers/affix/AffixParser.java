@@ -10,13 +10,17 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
@@ -657,23 +661,16 @@ public class AffixParser extends ReadWriteLockable{
 	private String applyConversionTable(String word, List<Pair<String, String>> table){
 		if(table != null){
 			//collect input patterns that matches the given word
-			Map<String, String> appliablePatterns = collectInputPatterns(table, word);
+			List<Pair<String, String>> appliablePatterns = collectInputPatterns(table, word);
 
-			//consider only the longer input patterns
-			for(Map.Entry<String, String> entry : appliablePatterns.entrySet()){
-				//TODO
-			}
-
-			//TODO
-			for(Map.Entry<String, String> entry : appliablePatterns.entrySet()){
+			for(Pair<String, String> entry : appliablePatterns){
 				String key = entry.getKey();
-				int keyLength = key.length();
 				String value = entry.getValue();
 
 				if(key.charAt(0) == '^')
-					word = value + word.substring(keyLength - 1);
-				else if(key.charAt(keyLength - 1) == '$')
-					word = word.substring(0, word.length() - keyLength + 1) + value;
+					word = value + word.substring(key.length() - 1);
+				else if(key.charAt(key.length() - 1) == '$')
+					word = word.substring(0, word.length() - key.length() + 1) + value;
 				else
 					word = StringUtils.replace(word, key, value);
 			}
@@ -681,24 +678,65 @@ public class AffixParser extends ReadWriteLockable{
 		return word;
 	}
 
-	private Map<String, String> collectInputPatterns(List<Pair<String, String>> table, String word){
-		Map<String, String> appliablePatterns = new HashMap<>();
+	private List<Pair<String, String>> collectInputPatterns(List<Pair<String, String>> table, String word){
+		List<Pair<String, String>> startPatterns = new ArrayList<>();
+		List<Pair<String, String>> insidePatterns = new ArrayList<>();
+		List<Pair<String, String>> endPatterns = new ArrayList<>();
 		for(Pair<String, String> entry : table){
 			String key = entry.getKey();
 			String value = entry.getValue();
 			
 			if(key.charAt(0) == '^'){
-				if(word.startsWith(key.substring(1)))
-					appliablePatterns.put(key, value);
+				key = key.substring(1);
+				if(word.startsWith(key))
+					startPatterns.add(Pair.of(key, value));
 			}
 			else if(key.charAt(key.length() - 1) == '$'){
-				if(word.endsWith(key.substring(0, key.length() - 1)))
-					appliablePatterns.put(key, value);
+				key = key.substring(0, key.length() - 1);
+				if(word.endsWith(key))
+					endPatterns.add(Pair.of(new StringBuilder(key).reverse().toString(), value));
 			}
 			else if(word.contains(key))
-				appliablePatterns.put(key, value);
+				insidePatterns.add(Pair.of(key, value));
 		}
-		return appliablePatterns;
+
+		//keep only the longest input pattern
+		startPatterns = keepLongestInputPattern(startPatterns, key -> "^" + key);
+		insidePatterns = keepLongestInputPattern(insidePatterns, Function.identity());
+		endPatterns = keepLongestInputPattern(endPatterns, key -> new StringBuilder(key).reverse().append('$').toString());
+
+		startPatterns.addAll(insidePatterns);
+		startPatterns.addAll(endPatterns);
+		return startPatterns;
+	}
+
+	private List<Pair<String, String>> keepLongestInputPattern(List<Pair<String, String>> table, Function<String, String> keyRemapper){
+		List<Pair<String, String>> result = table;
+		if(!table.isEmpty()){
+			table.sort(Comparator.comparing(entry -> entry.getKey().length()));
+
+			int size = table.size();
+			for(int i = 0; i < size; i ++){
+				Pair<String, String> entry = table.get(i);
+				if(entry != null){
+					String key = entry.getKey();
+					for(int j = i + 1; j < size; j ++){
+						Pair<String, String> entry2 = table.get(j);
+						if(entry2 != null){
+							String key2 = entry2.getKey();
+							if(key2.startsWith(key))
+								table.set(i, null);
+						}
+					}
+				}
+			}
+
+			result = table.stream()
+				.filter(Objects::nonNull)
+				.map(entry -> Pair.of(keyRemapper.apply(entry.getKey()), entry.getValue()))
+				.collect(Collectors.toList());
+		}
+		return result;
 	}
 
 	public Set<String> getWordBreakCharacters(){
