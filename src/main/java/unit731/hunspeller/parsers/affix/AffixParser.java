@@ -682,6 +682,7 @@ public class AffixParser extends ReadWriteLockable{
 		List<Pair<String, String>> startPatterns = new ArrayList<>();
 		List<Pair<String, String>> insidePatterns = new ArrayList<>();
 		List<Pair<String, String>> endPatterns = new ArrayList<>();
+		StringBuilder sb = new StringBuilder();
 		for(Pair<String, String> entry : table){
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -693,17 +694,28 @@ public class AffixParser extends ReadWriteLockable{
 			}
 			else if(key.charAt(key.length() - 1) == '$'){
 				key = key.substring(0, key.length() - 1);
-				if(word.endsWith(key))
-					endPatterns.add(Pair.of(new StringBuilder(key).reverse().toString(), value));
+				if(word.endsWith(key)){
+					sb.setLength(0);
+					key = sb.append(key)
+						.reverse()
+						.toString();
+					endPatterns.add(Pair.of(key, value));
+				}
 			}
 			else if(word.contains(key))
 				insidePatterns.add(Pair.of(key, value));
 		}
 
 		//keep only the longest input pattern
-		startPatterns = keepLongestInputPattern(startPatterns, key -> "^" + key);
+		startPatterns = keepLongestInputPattern(startPatterns, key -> {
+			sb.setLength(0);
+			return sb.append('^').append(key).toString();
+		});
 		insidePatterns = keepLongestInputPattern(insidePatterns, Function.identity());
-		endPatterns = keepLongestInputPattern(endPatterns, key -> new StringBuilder(key).reverse().append('$').toString());
+		endPatterns = keepLongestInputPattern(endPatterns, key -> {
+			sb.setLength(0);
+			return sb.append(key).reverse().append('$').toString();
+		});
 
 		startPatterns.addAll(insidePatterns);
 		startPatterns.addAll(endPatterns);
