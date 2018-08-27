@@ -193,6 +193,7 @@ public class WordGenerator{
 		return productions;
 	}
 
+	/** Extract a map of flag > regex-of-compounds from input compounds */
 	private Map<String, String> extractCompoundRules(String[] inputCompounds){
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 
@@ -275,7 +276,8 @@ public class WordGenerator{
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
-
+		boolean allowTwofoldAffixesInCompound = affParser.allowTwofoldAffixesInCompound();
+	
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 
@@ -337,10 +339,12 @@ public class WordGenerator{
 						productions.add(new Production(sb.toString(), flags, compoundEntries, strategy));
 					else{
 						//add boundary affixes
-						List<Production> prods = applyRules(new Production(sb.toString(), flags, compoundEntries, strategy), false);
+						Production p = new Production(sb.toString(), flags, compoundEntries, strategy);
+						List<Production> prods = applyRules(p, false);
 
+						//FIXME remove this piece of code, pass allowTwofoldAffixesInCompound inside applyRules
 						//remove twofold because they're not allowed in compounds
-						if(!affParser.allowTwofoldAffixesInCompound()){
+						if(!allowTwofoldAffixesInCompound){
 							Iterator<Production> itr = prods.iterator();
 							while(itr.hasNext())
 								if(itr.next().isTwofolded())
