@@ -47,4 +47,46 @@ public class DictionaryParserTest{
 		Assert.assertEquals("a lot", replaced);
 	}
 
+	@Test
+	public void applyLongest() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"REP 3",
+			"REP b 1",
+			"REP bbb 3",
+			"REP bb 2");
+		affParser.parse(affFile);
+
+		String replaced = affParser.applyReplacementTable("abbbc");
+		Assert.assertEquals("a3c", replaced);
+	}
+
+	@Test
+	public void applyLongestOnStart() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"REP 3",
+			"REP ^b 1",
+			"REP ^bbb 3",
+			"REP ^bb 2");
+		affParser.parse(affFile);
+
+		String replaced = affParser.applyReplacementTable("bbbc");
+		Assert.assertEquals("3c", replaced);
+	}
+
+	@Test
+	public void applyLongestOnEnd() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"REP 3",
+			"REP b$ 1",
+			"REP bbb$ 3",
+			"REP bb$ 2");
+		affParser.parse(affFile);
+
+		String replaced = affParser.applyReplacementTable("cbbb");
+		Assert.assertEquals("c3", replaced);
+	}
+
 }
