@@ -80,7 +80,7 @@ public class WordGeneratorAffixTest{
 		//base production
 		Assert.assertEquals(new Production("foo", "AÜ", "st:foo", strategy), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foos", "ÖüÜ", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(new Production("foos", "ÖÜü", "st:foo", strategy), words.get(1));
 		//twofold productions
 		Assert.assertEquals(new Production("foosbar", "Ü", "st:foo", strategy), words.get(2));
 		Assert.assertEquals(new Production("foosbaz", "Ü", "st:foo", strategy), words.get(3));

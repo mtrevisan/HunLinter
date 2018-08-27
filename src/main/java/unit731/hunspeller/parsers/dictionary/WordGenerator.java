@@ -512,23 +512,25 @@ public class WordGenerator{
 
 	private List<Production> enforceCircumfix(List<Production> lastfoldProductions){
 		String circumfixFlag = affParser.getCircumfixFlag();
-		Iterator<Production> itr = lastfoldProductions.iterator();
-		while(itr.hasNext()){
-			Production production = itr.next();
+		if(circumfixFlag != null){
+			Iterator<Production> itr = lastfoldProductions.iterator();
+			while(itr.hasNext()){
+				Production production = itr.next();
 
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			boolean rulesContainsCircumfixFlag = appliedRules.stream()
-				.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
-			if(rulesContainsCircumfixFlag){
-				//check if at least one SFX and one PFX have the circumfix flag
-				boolean suffixWithCircumfix = appliedRules.stream()
-					.filter(rule -> rule.isSuffix())
+				List<AffixEntry> appliedRules = production.getAppliedRules();
+				boolean rulesContainsCircumfixFlag = appliedRules.stream()
 					.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
-				boolean prefixWithCircumfix = appliedRules.stream()
-					.filter(rule -> !rule.isSuffix())
-					.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
-				if(suffixWithCircumfix ^ prefixWithCircumfix)
-					itr.remove();
+				if(rulesContainsCircumfixFlag){
+					//check if at least one SFX and one PFX have the circumfix flag
+					boolean suffixWithCircumfix = appliedRules.stream()
+						.filter(rule -> rule.isSuffix())
+						.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
+					boolean prefixWithCircumfix = appliedRules.stream()
+						.filter(rule -> !rule.isSuffix())
+						.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
+					if(suffixWithCircumfix ^ prefixWithCircumfix)
+						itr.remove();
+				}
 			}
 		}
 		return lastfoldProductions;
@@ -536,33 +538,35 @@ public class WordGenerator{
 
 	private void enforceNeedAffixFlag(List<Production> productions){
 		String needAffixFlag = affParser.getNeedAffixFlag();
-		Iterator<Production> itr = productions.iterator();
-		while(itr.hasNext()){
-			Production production = itr.next();
+		if(needAffixFlag != null){
+			Iterator<Production> itr = productions.iterator();
+			while(itr.hasNext()){
+				Production production = itr.next();
 
-			boolean hasNeedAffixFlag = false;
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null){
-				//check that last suffix and last prefix shouldn't have the needaffix flag
-				boolean lastSuffix = false;
-				boolean lastPrefix = false;
-				boolean lastSuffixNeedAffix = false;
-				boolean lastPrefixNeedAffix = false;
-				for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
-					AffixEntry appliedRule = appliedRules.get(i);
-					if(!lastSuffix && appliedRule.isSuffix()){
-						lastSuffix = true;
-						lastSuffixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+				boolean hasNeedAffixFlag = false;
+				List<AffixEntry> appliedRules = production.getAppliedRules();
+				if(appliedRules != null){
+					//check that last suffix and last prefix shouldn't have the needaffix flag
+					boolean lastSuffix = false;
+					boolean lastPrefix = false;
+					boolean lastSuffixNeedAffix = false;
+					boolean lastPrefixNeedAffix = false;
+					for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
+						AffixEntry appliedRule = appliedRules.get(i);
+						if(!lastSuffix && appliedRule.isSuffix()){
+							lastSuffix = true;
+							lastSuffixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+						}
+						else if(!lastPrefix && !appliedRule.isSuffix()){
+							lastPrefix = true;
+							lastPrefixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+						}
 					}
-					else if(!lastPrefix && !appliedRule.isSuffix()){
-						lastPrefix = true;
-						lastPrefixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
-					}
+					hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
 				}
-				hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
+				if(hasNeedAffixFlag)
+					itr.remove();
 			}
-			if(hasNeedAffixFlag)
-				itr.remove();
 		}
 	}
 

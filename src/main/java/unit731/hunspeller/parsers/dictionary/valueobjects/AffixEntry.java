@@ -92,6 +92,8 @@ public class AffixEntry{
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
 		appendingLength = appending.length();
 
+		if(continuationFlags != null)
+			Arrays.sort(continuationFlags);
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
@@ -115,7 +117,7 @@ public class AffixEntry{
 	}
 
 	public boolean containsContinuationFlag(String flag){
-		return ArrayUtils.contains(continuationFlags, flag);
+		return (continuationFlags != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
 	public boolean containsUniqueContinuationFlags(){
