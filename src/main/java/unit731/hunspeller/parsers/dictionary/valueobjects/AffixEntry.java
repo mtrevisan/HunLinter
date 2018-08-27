@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -161,19 +161,19 @@ public class AffixEntry{
 		//find stem
 		boolean stemFound = false;
 		for(String field : mf)
-			if(field.startsWith(WordGenerator.TAG_STEM)){
+			if(field.startsWith(MorphologicalTag.TAG_STEM)){
 				stemFound = true;
 				break;
 			}
 		if(!stemFound)
 			for(String field : amf)
-				if(field.startsWith(WordGenerator.TAG_STEM)){
+				if(field.startsWith(MorphologicalTag.TAG_STEM)){
 					stemFound = true;
 					break;
 				}
 		//add stem only if not present
 		if(!stemFound)
-			mf.add(0, WordGenerator.TAG_STEM + dicEntry.getWord());
+			mf.add(0, MorphologicalTag.TAG_STEM + dicEntry.getWord());
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
@@ -188,8 +188,8 @@ public class AffixEntry{
 			mf = new String[compoundEntries.size() * 2];
 			for(DictionaryEntry compoundEntry : compoundEntries){
 				String compound = compoundEntry.getWord();
-				mf[i ++] = WordGenerator.TAG_PART + compound;
-				mf[i ++] = WordGenerator.TAG_STEM + compound;
+				mf[i ++] = MorphologicalTag.TAG_PART + compound;
+				mf[i ++] = MorphologicalTag.TAG_STEM + compound;
 			}
 		}
 		return mf;

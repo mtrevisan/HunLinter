@@ -17,7 +17,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.services.PatternHelper;
@@ -349,11 +349,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private static final Map<String, Set<String>> DATA_FIELDS = new HashMap<>();
 	static{
-		DATA_FIELDS.put(WordGenerator.TAG_PART_OF_SPEECH, PART_OF_SPEECH);
-		DATA_FIELDS.put(WordGenerator.TAG_INFLECTIONAL_SUFFIX, INFLECTIONAL_SUFFIX);
-		DATA_FIELDS.put(WordGenerator.TAG_TERMINAL_SUFFIX, TERMINAL_SUFFIX);
-		DATA_FIELDS.put(WordGenerator.TAG_STEM, null);
-		DATA_FIELDS.put(WordGenerator.TAG_ALLOMORPH, null);
+		DATA_FIELDS.put(MorphologicalTag.TAG_PART_OF_SPEECH, PART_OF_SPEECH);
+		DATA_FIELDS.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, INFLECTIONAL_SUFFIX);
+		DATA_FIELDS.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, TERMINAL_SUFFIX);
+		DATA_FIELDS.put(MorphologicalTag.TAG_STEM, null);
+		DATA_FIELDS.put(MorphologicalTag.TAG_ALLOMORPH, null);
 	}
 
 	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ii", "iii", "mm", "mmm", "ss", "sss", "iu");

@@ -9,8 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 
 
 @Getter
@@ -128,7 +128,7 @@ public class Production extends DictionaryEntry{
 
 	private String getPartOfSpeechFields(){
 		return Arrays.stream(morphologicalFields)
-			.filter(df -> df.startsWith(WordGenerator.TAG_PART_OF_SPEECH))
+			.filter(df -> df.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH))
 			.sorted()
 			.collect(Collectors.joining(StringUtils.SPACE));
 	}

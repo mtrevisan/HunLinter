@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.Backbone;
@@ -27,25 +29,9 @@ import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
+@AllArgsConstructor
 @Slf4j
 public class WordGenerator{
-
-	//default morphological fields:
-	public static final String TAG_STEM = "st:";
-	public static final String TAG_ALLOMORPH = "al:";
-	public static final String TAG_PART_OF_SPEECH = "po:";
-	private static final String TAG_DERIVATIONAL_PREFIX = "dp:";
-	public static final String TAG_INFLECTIONAL_PREFIX = "ip:";
-	private static final String TAG_TERMINAL_PREFIX = "tp:";
-	private static final String TAG_DERIVATIONAL_SUFFIX = "ds:";
-	public static final String TAG_INFLECTIONAL_SUFFIX = "is:";
-	public static final String TAG_TERMINAL_SUFFIX = "ts:";
-	private static final String TAG_SURFACE_PREFIX = "sp:";
-	private static final String TAG_FREQUENCY = "fr:";
-	public static final String TAG_PHONETIC = "ph:";
-	private static final String TAG_HYPHENATION = "hy:";
-	public static final String TAG_PART = "pa:";
-	private static final String TAG_FLAG = "fl:";
 
 	private static final String PIPE = "|";
 	private static final String LEFT_PARENTHESIS = "(";
@@ -63,14 +49,9 @@ public class WordGenerator{
 	}
 
 
+	@NonNull
 	private final AffixParser affParser;
 
-
-	public WordGenerator(AffixParser affParser){
-		Objects.requireNonNull(affParser);
-
-		this.affParser = affParser;
-	}
 
 	public List<Production> applyRules(String line){
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);

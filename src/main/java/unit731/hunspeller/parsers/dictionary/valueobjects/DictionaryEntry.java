@@ -20,8 +20,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
+import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -60,7 +60,7 @@ public class DictionaryEntry{
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word},
+		morphologicalFields = ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word},
 			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
 		combineable = true;
 	}
@@ -108,7 +108,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(String partOfSpeech){
-		return hasMorphologicalField(WordGenerator.TAG_PART_OF_SPEECH + partOfSpeech);
+		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH + partOfSpeech);
 	}
 
 	private boolean hasMorphologicalField(String morphologicalField){
