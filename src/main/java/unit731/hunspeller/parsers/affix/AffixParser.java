@@ -656,24 +656,49 @@ public class AffixParser extends ReadWriteLockable{
 
 	private String applyConversionTable(String word, List<Pair<String, String>> table){
 		if(table != null){
-			for(Pair<String, String> entry : table){
+			//collect input patterns that matches the given word
+			Map<String, String> appliablePatterns = collectInputPatterns(table, word);
+
+			//consider only the longer input patterns
+			for(Map.Entry<String, String> entry : appliablePatterns.entrySet()){
+				//TODO
+			}
+
+			//TODO
+			for(Map.Entry<String, String> entry : appliablePatterns.entrySet()){
 				String key = entry.getKey();
 				int keyLength = key.length();
 				String value = entry.getValue();
 
-				if(key.charAt(0) == '^'){
-					if(word.startsWith(key.substring(1)))
-						word = value + word.substring(keyLength - 1);
-				}
-				else if(key.charAt(keyLength - 1) == '$'){
-					if(word.endsWith(key.substring(0, keyLength - 1)))
-						word = word.substring(0, word.length() - keyLength + 1) + value;
-				}
+				if(key.charAt(0) == '^')
+					word = value + word.substring(keyLength - 1);
+				else if(key.charAt(keyLength - 1) == '$')
+					word = word.substring(0, word.length() - keyLength + 1) + value;
 				else
 					word = StringUtils.replace(word, key, value);
 			}
 		}
 		return word;
+	}
+
+	private Map<String, String> collectInputPatterns(List<Pair<String, String>> table, String word){
+		Map<String, String> appliablePatterns = new HashMap<>();
+		for(Pair<String, String> entry : table){
+			String key = entry.getKey();
+			String value = entry.getValue();
+			
+			if(key.charAt(0) == '^'){
+				if(word.startsWith(key.substring(1)))
+					appliablePatterns.put(key, value);
+			}
+			else if(key.charAt(key.length() - 1) == '$'){
+				if(word.endsWith(key.substring(0, key.length() - 1)))
+					appliablePatterns.put(key, value);
+			}
+			else if(word.contains(key))
+				appliablePatterns.put(key, value);
+		}
+		return appliablePatterns;
 	}
 
 	public Set<String> getWordBreakCharacters(){
