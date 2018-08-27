@@ -33,9 +33,7 @@ public class DictionaryEntry{
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	//FIXME allow \/ inside words
-//???	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>(?:(?!\\/).)+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>(?:(?!\\/).)+)(?:\\/(?<flags>[^\\t\\s]+))?(?:[\\t\\s]+(?<morphologicalFields>.+))?$");
+	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
 
 
 	@NonNull
@@ -63,9 +61,6 @@ public class DictionaryEntry{
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		if(dicMorphologicalFields != null){
-			dicMorphologicalFields = WordGenerator.TAG_STEM + word + StringUtils.SPACE + dicMorphologicalFields;
-		}
 		morphologicalFields = ArrayUtils.addAll(new String[]{WordGenerator.TAG_STEM + word},
 			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
 		combineable = true;
