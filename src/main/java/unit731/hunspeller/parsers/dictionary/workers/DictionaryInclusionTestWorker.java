@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
@@ -53,9 +54,20 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 
 	@Override
 	public void execute(){
-		dictionary.clear();
+		clear();
 
 		super.execute();
+	}
+
+	@Override
+	public void waitForCompletion() throws InterruptedException, ExecutionException{
+		clear();
+
+		super.waitForCompletion();
+	}
+
+	public void clear(){
+		dictionary.clear();
 	}
 
 	public boolean isInDictionary(String word){

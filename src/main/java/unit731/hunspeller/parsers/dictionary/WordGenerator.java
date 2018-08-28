@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -470,62 +471,20 @@ System.out.println(candidate);
 	}
 
 	private boolean candidatePresentInDictionary(String word){
-		DictionaryEntry rv = dictionaryLookup(word);
-		if(rv != null)
-			return true;
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(checker);
 
-//		int len = word.length();
-//		rv = affix_check(word, len);
-//		return (rv != null);
-return false;
-	}
-
-	// utility method to look up root words in hash table
-	private DictionaryEntry dictionaryLookup(String word){
-		if(dicInclusionTestWorker == null && dicParser != null && checker != null){
+		if(dicInclusionTestWorker == null){
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, checker, affParser);
-			dicInclusionTestWorker.execute();
+			try{
+				dicInclusionTestWorker.waitForCompletion();
+			}
+			catch(InterruptedException | ExecutionException e){
+				log.error("Exception while extracting the dictionary", e);
+			}
 		}
-//		DictionaryEntry dp;
-//		if(tableptr){
-//			dp = tableptr[hash(word)];
-//			if(dp == null)
-//				return null;
-//
-//			for(; dp != null; dp = dp->next)
-//				if(word.equals(dp->word))
-//					return dp;
-//		}
-		return null;
+		return dicInclusionTestWorker.isInDictionary(word);
 	}
-
-//// check if word with affixes is correctly spelled
-//private struct hentry* AffixMgr::affix_check(const char* word, int len, const FLAG needflag, char in_compound) {
-//  //check all prefixes (also crossed with suffixes if allowed)
-//  struct hentry* rv = prefix_check(word, len, in_compound, needflag);
-//  if(rv)
-//    return rv;
-//
-//  //if still not found check all suffixes
-//  rv = suffix_check(word, len, 0, NULL, FLAG_NULL, needflag, in_compound);
-//
-//  if(havecontclass){
-//    sfx = null;
-//    pfx = null;
-//
-//    if(rv)
-//      return rv;
-//    //if still not found check all two-level suffixes
-//    rv = suffix_check_twosfx(word, len, 0, NULL, needflag);
-//
-//    if(rv)
-//      return rv;
-//    //if still not found check all two-level suffixes
-//    rv = prefix_check_twosfx(word, len, IN_CPD_NOT, needflag);
-//  }
-//
-//  return rv;
-//}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
 	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
