@@ -22,7 +22,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	public static final String WORKER_NAME = "Word count";
 
 	private long totalProductions;
-	private final BloomFilterInterface<String> bloomFilter;
+	private final BloomFilterInterface<String> dictionary;
 
 
 	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker, ReadWriteLockable lockable){
@@ -30,20 +30,20 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
 
-		bloomFilter = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.JAVA,
+		dictionary = new ScalableInMemoryBloomFilter<>(BitArrayBuilder.Type.JAVA,
 			checker.getExpectedNumberOfElements(), checker.getFalsePositiveProbability(), checker.getGrowRatioWhenFull());
-		bloomFilter.setCharset(dicParser.getCharset());
+		dictionary.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
 
 			totalProductions += productions.size();
-			productions.forEach(production -> bloomFilter.add(production.getWord()));
+			productions.forEach(production -> dictionary.add(production.getWord()));
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
-				int totalUniqueProductions = bloomFilter.getAddedElements();
-				double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+				int totalUniqueProductions = dictionary.getAddedElements();
+				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
 				int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
 				log.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
 				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
@@ -57,7 +57,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	@Override
 	public void execute(){
 		totalProductions = 0l;
-		bloomFilter.clear();
+		dictionary.clear();
 
 		super.execute();
 	}
