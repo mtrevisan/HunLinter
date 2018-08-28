@@ -21,8 +21,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Word count";
 
-	private final BloomFilterInterface<String> bloomFilter;
 	private long totalProductions;
+	private final BloomFilterInterface<String> bloomFilter;
 
 
 	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, CorrectnessChecker checker, ReadWriteLockable lockable){
@@ -36,8 +36,9 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
-			productions.forEach(production -> bloomFilter.add(production.getWord()));
+
 			totalProductions += productions.size();
+			productions.forEach(production -> bloomFilter.add(production.getWord()));
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
@@ -55,8 +56,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	@Override
 	public void execute(){
-		bloomFilter.clear();
 		totalProductions = 0l;
+		bloomFilter.clear();
 
 		super.execute();
 	}

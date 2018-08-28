@@ -55,9 +55,9 @@ public class WordGenerator{
 
 
 	public List<Production> applyRules(String line){
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
 		//convert using input table
@@ -333,15 +333,11 @@ public class WordGenerator{
 
 							lastWordCasing = nextWord;
 						}
-						if(checkCompoundReplacement && existsCompoundAsReplacement(sb.toString())){
-							sb.setLength(0);
-							break;
-						}
 					}
 					sb.append(nextCompound);
 				}
 
-				if(sb.length() > 0){
+				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
 					String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
 					if(hasForbidCompoundFlag || hasPermitCompoundFlag)
@@ -441,23 +437,81 @@ public class WordGenerator{
 			return false;
 
 		for(Pair<String, String> entry : replacementTable){
-//			char* r = word;
-			int patternLentgh = entry.getKey().length();
+			String pattern = entry.getKey();
+			String value = entry.getValue();
+
+			int idx = -1;
+			int patternLength = pattern.length();
+			StringBuilder sb = new StringBuilder();
 			//search every occurence of the pattern in the word
-//			while((r = strstr(r, entry.getKey().c_str())) != NULL){
-//				String candidate(word);
-//				int type = (r == word && langnum != LANG_hu? 1: 0);
-//				if(r - word + entry.getKey().size() == patternLentgh && langnum != LANG_hu)
-//					type += 2;
-//				candidate.replace(r - word, patternLentgh, entry.getValue()[type]);
-//				if(candidate_check(candidate.c_str(), candidate.size()))
-//					return true;
-//				r ++;  // search for the next letter
-//			}
+			while((idx = word.indexOf(pattern, idx + 1)) >= 0){
+				sb.setLength(0);
+				sb.append(word);
+				sb.replace(idx, idx + patternLength, value);
+				String candidate = sb.toString();
+				if(candidatePresentInDictionary(candidate))
+					return true;
+
+System.out.println(candidate);
+			}
 		}
 
 		return false;
 	}
+
+	private boolean candidatePresentInDictionary(String word){
+		DictionaryEntry rv = dictionaryLookup(word);
+		if(rv != null)
+			return true;
+
+//		int len = word.length();
+//		rv = affix_check(word, len);
+//		return (rv != null);
+return false;
+	}
+
+	// utility method to look up root words in hash table
+	private DictionaryEntry dictionaryLookup(String word){
+//		DictionaryEntry dp;
+//		if(tableptr){
+//			dp = tableptr[hash(word)];
+//			if(dp == null)
+//				return null;
+//
+//			for(; dp != null; dp = dp->next)
+//				if(word.equals(dp->word))
+//					return dp;
+//		}
+		return null;
+	}
+
+//// check if word with affixes is correctly spelled
+//private struct hentry* AffixMgr::affix_check(const char* word, int len, const FLAG needflag, char in_compound) {
+//  //check all prefixes (also crossed with suffixes if allowed)
+//  struct hentry* rv = prefix_check(word, len, in_compound, needflag);
+//  if(rv)
+//    return rv;
+//
+//  //if still not found check all suffixes
+//  rv = suffix_check(word, len, 0, NULL, FLAG_NULL, needflag, in_compound);
+//
+//  if(havecontclass){
+//    sfx = null;
+//    pfx = null;
+//
+//    if(rv)
+//      return rv;
+//    //if still not found check all two-level suffixes
+//    rv = suffix_check_twosfx(word, len, 0, NULL, needflag);
+//
+//    if(rv)
+//      return rv;
+//    //if still not found check all two-level suffixes
+//    rv = prefix_check_twosfx(word, len, IN_CPD_NOT, needflag);
+//  }
+//
+//  return rv;
+//}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
 	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
