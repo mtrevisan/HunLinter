@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -52,17 +52,17 @@ public class WordGenerator{
 
 	private final AffixParser affParser;
 	private final DictionaryParser dicParser;
-	private final CorrectnessChecker checker;
+	private final DictionaryBaseData dictionaryBaseData;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
 
 
-	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, CorrectnessChecker checker){
+	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
 		Objects.requireNonNull(affParser);
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
-		this.checker = checker;
+		this.dictionaryBaseData = dictionaryBaseData;
 	}
 
 	public List<Production> applyRules(String line){
@@ -472,10 +472,10 @@ System.out.println(candidate);
 
 	private boolean candidatePresentInDictionary(String word){
 		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(checker);
+		Objects.requireNonNull(dictionaryBaseData);
 
 		if(dicInclusionTestWorker == null){
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, checker, affParser);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
 			try{
 				dicInclusionTestWorker.waitForCompletion();
 			}

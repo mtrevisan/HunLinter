@@ -530,7 +530,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
 				Backbone backbone = new Backbone(null, null);
-				DictionaryStatistics stats = new DictionaryStatistics(backbone.getAffParser().getLanguage(), backbone.getAffParser().getCharset(), backbone.getChecker());
+				DictionaryStatistics stats = new DictionaryStatistics(backbone.getAffParser().getLanguage(), backbone.getAffParser().getCharset(), backbone.getDictionaryBaseData());
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));

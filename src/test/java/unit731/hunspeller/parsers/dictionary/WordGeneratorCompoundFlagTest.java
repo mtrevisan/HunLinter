@@ -24,6 +24,10 @@ public class WordGeneratorCompoundFlagTest{
 		backbone.loadFile(affixFilePath);
 	}
 
+	private void loadData(String affixFilePath, String dictionaryFilePath) throws IOException{
+		backbone.loadFile(affixFilePath, dictionaryFilePath);
+	}
+
 	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
 		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
 		return new Production(word, continuationFlags, morphologicalFields, strategy);
@@ -552,7 +556,13 @@ public class WordGeneratorCompoundFlagTest{
 			"COMPOUNDFLAG A",
 			"REP 1",
 			"REP í i");
-		loadData(affFile.getAbsolutePath());
+		File dicFile = FileHelper.getTemporaryUTF8File(language, ".dic",
+			"4",
+			"szer/A",
+			"víz/A",
+			"kocsi/A",
+			"szerviz");
+		loadData(affFile.getAbsolutePath(), dicFile.getAbsolutePath());
 
 		String[] inputCompounds = new String[]{
 			"szer/A",

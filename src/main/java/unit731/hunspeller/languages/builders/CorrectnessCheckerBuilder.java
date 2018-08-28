@@ -11,9 +11,9 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CorrectnessCheckerBuilder{
 
-	public static CorrectnessChecker getParser(String language, AffixParser affParser, AbstractHyphenator hyphenator){
+	public static CorrectnessChecker getParser(AffixParser affParser, AbstractHyphenator hyphenator){
 		CorrectnessChecker checker;
-		switch(language){
+		switch(affParser.getLanguage()){
 			case CorrectnessCheckerVEC.LANGUAGE:
 				checker = new CorrectnessCheckerVEC(affParser, hyphenator);
 				break;

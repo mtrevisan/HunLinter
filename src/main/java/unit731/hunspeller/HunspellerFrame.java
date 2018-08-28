@@ -1690,7 +1690,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffParser().getLanguage(), backbone.getDicParser(), backbone.getWordGenerator(),
-					backbone.getChecker(), outputFile);
+					backbone.getDictionaryBaseData(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1704,7 +1704,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getChecker(), backbone.getAffParser());
+			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getDictionaryBaseData(), backbone.getAffParser());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1721,7 +1721,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainProgressBar.setValue(0);
 
 			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
-				backbone.getWordGenerator(), backbone.getChecker(), performHyphenationStatistics, this);
+				backbone.getWordGenerator(), backbone.getDictionaryBaseData(), performHyphenationStatistics, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
