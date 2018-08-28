@@ -70,11 +70,11 @@ public class Backbone implements FileChangeListener{
 	private HyphenationParser hypParser;
 
 	@Getter
-	private WordGenerator wordGenerator;
+	private AbstractHyphenator hyphenator;
 	@Getter
 	private CorrectnessChecker checker;
 	@Getter
-	private AbstractHyphenator hyphenator;
+	private WordGenerator wordGenerator;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -89,8 +89,8 @@ public class Backbone implements FileChangeListener{
 		flm = new FileListenerManager();
 	}
 
-	public void loadFile(String filePath) throws FileNotFoundException, IOException{
-		openAffixFile(filePath);
+	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
+		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
@@ -119,8 +119,8 @@ public class Backbone implements FileChangeListener{
 		flm.stop();
 	}
 
-	private void openAffixFile(String filePath) throws IOException{
-		affFile = new File(filePath);
+	private void openAffixFile(String affixFilePath) throws IOException{
+		affFile = new File(affixFilePath);
 
 		if(!affFile.exists()){
 			affParser.clear();
@@ -145,7 +145,6 @@ public class Backbone implements FileChangeListener{
 			hypParser = new HyphenationParser(language);
 			hypParser.parse(hypFile);
 
-			wordGenerator = new WordGenerator(affParser);
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 			checker = CorrectnessCheckerBuilder.getParser(language, affParser, hyphenator);
 
@@ -165,8 +164,10 @@ public class Backbone implements FileChangeListener{
 
 			hunspellable.clearDictionaryParser();
 		}
-		else
+		else if(dicParser != null)
 			dicParser.clear();
+
+		wordGenerator = new WordGenerator(affParser, dicParser, checker);
 	}
 
 	private void openAidFile(File aidFile) throws IOException{

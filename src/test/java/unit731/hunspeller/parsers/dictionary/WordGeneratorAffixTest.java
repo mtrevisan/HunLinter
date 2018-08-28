@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.services.FileHelper;
@@ -17,8 +17,17 @@ import unit731.hunspeller.services.FileHelper;
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
 public class WordGeneratorAffixTest{
 
-	private final AffixParser affParser = new AffixParser();
+	private final Backbone backbone = new Backbone(null, null);
 
+
+	private void loadData(String affixFilePath) throws IOException{
+		backbone.loadFile(affixFilePath);
+	}
+
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
+		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
+		return new Production(word, continuationFlags, morphologicalFields, strategy);
+	}
 
 	@Test
 	public void affFormat() throws IOException{
@@ -40,9 +49,9 @@ public class WordGeneratorAffixTest{
 			"		# 2xtab",
 			" 	# space+tab",
 			"	 # tab+space");
-		affParser.parse(affFile);
+		loadData(affFile.getAbsolutePath());
 
-		List<Pair<String, String>> outputConversionTable = affParser.getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		List<Pair<String, String>> outputConversionTable = backbone.getAffParser().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
 
 		List<Pair<String, String>> expected = new ArrayList<>();
 		expected.add(Pair.of("a", "A"));
@@ -69,26 +78,24 @@ public class WordGeneratorAffixTest{
 			"SFX ü 0 baz .",
 			"PFX Ü Y 1",
 			"PFX Ü 0 un .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/AÜ";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "AÜ", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "AÜ", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foos", "ÖÜü", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foos", "ÖÜü", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foosbar", "Ü", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("foosbaz", "Ü", "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("foosbar", "Ü", "st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("foosbaz", "Ü", "st:foo"), words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("unfoo", "A", "st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("unfoos", "Öü", "st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("unfoosbar", null, "st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("unfoosbaz", null, "st:foo", strategy), words.get(7));
+		Assert.assertEquals(createProduction("unfoo", "A", "st:foo"), words.get(4));
+		Assert.assertEquals(createProduction("unfoos", "Öü", "st:foo"), words.get(5));
+		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
+		Assert.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words.get(7));
 	}
 
 	@Test
@@ -104,26 +111,24 @@ public class WordGeneratorAffixTest{
 			"SFX 216 0 baz .",
 			"PFX 54321 Y 1",
 			"PFX 54321 0 un .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/999,54321";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "999,54321", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "999,54321", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foos", "54321,214,216", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foos", "54321,214,216", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foosbar", "54321", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("foosbaz", "54321", "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("foosbar", "54321", "st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("foosbaz", "54321", "st:foo"), words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("unfoo", "999", "st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("unfoos", "214,216", "st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("unfoosbar", null, "st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("unfoosbaz", null, "st:foo", strategy), words.get(7));
+		Assert.assertEquals(createProduction("unfoo", "999", "st:foo"), words.get(4));
+		Assert.assertEquals(createProduction("unfoos", "214,216", "st:foo"), words.get(5));
+		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
+		Assert.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words.get(7));
 	}
 
 	@Test
@@ -138,26 +143,24 @@ public class WordGeneratorAffixTest{
 			"SFX 2 0 baz .",
 			"PFX 3 Y 1",
 			"PFX 3 0 un .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/A3";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "A3", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "A3", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foos", "123", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foos", "123", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foosbar", "3", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("foosbaz", "3", "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("foosbar", "3", "st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("foosbaz", "3", "st:foo"), words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("unfoo", "A", "st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("unfoos", "12", "st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("unfoosbar", null, "st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("unfoosbaz", null, "st:foo", strategy), words.get(7));
+		Assert.assertEquals(createProduction("unfoo", "A", "st:foo"), words.get(4));
+		Assert.assertEquals(createProduction("unfoos", "12", "st:foo"), words.get(5));
+		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
+		Assert.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words.get(7));
 	}
 
 	@Test
@@ -173,26 +176,24 @@ public class WordGeneratorAffixTest{
 			"SFX 1G 0 baz .",
 			"PFX 09 Y 1",
 			"PFX 09 0 un .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/zx09";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "zx09", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "zx09", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foos", "1Gg?09", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foos", "1Gg?09", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foosbaz", "09", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("foosbar", "09", "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("foosbaz", "09", "st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("foosbar", "09", "st:foo"), words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("unfoo", "zx", "st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("unfoos", "1Gg?", "st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("unfoosbaz", null, "st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("unfoosbar", null, "st:foo", strategy), words.get(7));
+		Assert.assertEquals(createProduction("unfoo", "zx", "st:foo"), words.get(4));
+		Assert.assertEquals(createProduction("unfoos", "1Gg?", "st:foo"), words.get(5));
+		Assert.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words.get(6));
+		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(7));
 	}
 
 
@@ -207,20 +208,18 @@ public class WordGeneratorAffixTest{
 			"SFX A 0 d [^ab]",
 			"SFX A 0 e [^c]",
 			"SFX A 0 f a[^ab]b");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(new Production("a", "A", "st:a", strategy), words.get(0));
+		Assert.assertEquals(createProduction("a", "A", "st:a"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", null, "st:a", strategy), words.get(1));
-		Assert.assertEquals(new Production("ac", null, "st:a", strategy), words.get(2));
-		Assert.assertEquals(new Production("ae", null, "st:a", strategy), words.get(3));
+		Assert.assertEquals(createProduction("aa", null, "st:a"), words.get(1));
+		Assert.assertEquals(createProduction("ac", null, "st:a"), words.get(2));
+		Assert.assertEquals(createProduction("ae", null, "st:a"), words.get(3));
 	}
 
 
@@ -235,23 +234,21 @@ public class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(5, words.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1", "st:aa", strategy), words.get(0));
+		Assert.assertEquals(createProduction("aa", "S1", "st:aa"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), words.get(1));
+		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), words.get(2));
+		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aas1", "S2", "st:aa", strategy), words.get(3));
-		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), words.get(4));
+		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(3));
+		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(4));
 	}
 
 	@Test
@@ -265,22 +262,20 @@ public class WordGeneratorAffixTest{
 			"SFX S2 0 s2/P1",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1", "st:aa", strategy), words.get(0));
+		Assert.assertEquals(createProduction("aa", "S1", "st:aa"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "S2", "st:aa", strategy), words.get(1));
+		Assert.assertEquals(createProduction("aas1", "S2", "st:aa"), words.get(1));
 		//twofold productions
 		//lastfold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), words.get(2));
-		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), words.get(3));
+		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
+		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(3));
 	}
 
 	@Test
@@ -294,24 +289,22 @@ public class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1P1";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "S1P1", "st:aa", strategy), words.get(0));
+		Assert.assertEquals(createProduction("aa", "S1P1", "st:aa"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), words.get(1));
+		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), words.get(2));
+		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", "S1", "st:aa", strategy), words.get(3));
-		Assert.assertEquals(new Production("p1aas1", "S2", "st:aa", strategy), words.get(4));
-		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), words.get(5));
+		Assert.assertEquals(createProduction("p1aa", "S1", "st:aa"), words.get(3));
+		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(4));
+		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(5));
 	}
 
 	@Test
@@ -325,24 +318,22 @@ public class WordGeneratorAffixTest{
 			"SFX S2 0 s2",
 			"PFX P1 Y 1",
 			"PFX P1 0 p1");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/P1S1";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(new Production("aa", "P1S1", "st:aa", strategy), words.get(0));
+		Assert.assertEquals(createProduction("aa", "P1S1", "st:aa"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aas1", "P1S2", "st:aa", strategy), words.get(1));
+		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("aas1s2", "P1", "st:aa", strategy), words.get(2));
+		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
 		//lastfold productions
-		Assert.assertEquals(new Production("p1aa", "S1", "st:aa", strategy), words.get(3));
-		Assert.assertEquals(new Production("p1aas1", "S2", "st:aa", strategy), words.get(4));
-		Assert.assertEquals(new Production("p1aas1s2", null, "st:aa", strategy), words.get(5));
+		Assert.assertEquals(createProduction("p1aa", "S1", "st:aa"), words.get(3));
+		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(4));
+		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(5));
 	}
 
 	@Test
@@ -359,32 +350,30 @@ public class WordGeneratorAffixTest{
 			"SFX D 0 d/AE",
 			"PFX E Y 1",
 			"PFX E 0 e");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDE";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(14, words.size());
 		//base production
-		Assert.assertEquals(new Production("a", "ABCDE", "st:a", strategy), words.get(0));
+		Assert.assertEquals(createProduction("a", "ABCDE", "st:a"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", "E", "st:a", strategy), words.get(1));
-		Assert.assertEquals(new Production("ab", "AE", "st:a", strategy), words.get(2));
-		Assert.assertEquals(new Production("ac", "E", "st:a", strategy), words.get(3));
-		Assert.assertEquals(new Production("ad", "AE", "st:a", strategy), words.get(4));
+		Assert.assertEquals(createProduction("aa", "E", "st:a"), words.get(1));
+		Assert.assertEquals(createProduction("ab", "AE", "st:a"), words.get(2));
+		Assert.assertEquals(createProduction("ac", "E", "st:a"), words.get(3));
+		Assert.assertEquals(createProduction("ad", "AE", "st:a"), words.get(4));
 		//twofold productions
-		Assert.assertEquals(new Production("aba", "E", "st:a", strategy), words.get(5));
-		Assert.assertEquals(new Production("ada", "E", "st:a", strategy), words.get(6));
+		Assert.assertEquals(createProduction("aba", "E", "st:a"), words.get(5));
+		Assert.assertEquals(createProduction("ada", "E", "st:a"), words.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ea", "ABCD", "st:a", strategy), words.get(7));
-		Assert.assertEquals(new Production("eaa", null, "st:a", strategy), words.get(8));
-		Assert.assertEquals(new Production("eab", "A", "st:a", strategy), words.get(9));
-		Assert.assertEquals(new Production("eac", null, "st:a", strategy), words.get(10));
-		Assert.assertEquals(new Production("ead", "A", "st:a", strategy), words.get(11));
-		Assert.assertEquals(new Production("eaba", null, "st:a", strategy), words.get(12));
-		Assert.assertEquals(new Production("eada", null, "st:a", strategy), words.get(13));
+		Assert.assertEquals(createProduction("ea", "ABCD", "st:a"), words.get(7));
+		Assert.assertEquals(createProduction("eaa", null, "st:a"), words.get(8));
+		Assert.assertEquals(createProduction("eab", "A", "st:a"), words.get(9));
+		Assert.assertEquals(createProduction("eac", null, "st:a"), words.get(10));
+		Assert.assertEquals(createProduction("ead", "A", "st:a"), words.get(11));
+		Assert.assertEquals(createProduction("eaba", null, "st:a"), words.get(12));
+		Assert.assertEquals(createProduction("eada", null, "st:a"), words.get(13));
 	}
 
 
@@ -394,11 +383,10 @@ public class WordGeneratorAffixTest{
 			"SET UTF-8",
 			"SFX A Y 1",
 			"SFX A a b a");
-		affParser.parse(affFile);
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		wordGenerator.applyRules(line);
+		backbone.getWordGenerator().applyRules(line);
 	}
 
 	@Test
@@ -408,18 +396,16 @@ public class WordGeneratorAffixTest{
 			"FULLSTRIP",
 			"SFX A Y 1",
 			"SFX A a b a");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
-		Assert.assertEquals(new Production("a", "A", "st:a", strategy), words.get(0));
+		Assert.assertEquals(createProduction("a", "A", "st:a"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("b", null, "st:a", strategy), words.get(1));
+		Assert.assertEquals(createProduction("b", null, "st:a"), words.get(1));
 	}
 
 
@@ -438,11 +424,10 @@ public class WordGeneratorAffixTest{
 			"PFX P1 0 p1/P2",
 			"PFX P2 Y 1",
 			"PFX P2 0 p2");
-		affParser.parse(affFile);
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		wordGenerator.applyRules(line);
+		backbone.getWordGenerator().applyRules(line);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -465,11 +450,10 @@ public class WordGeneratorAffixTest{
 			"PFX G 0 g/E",
 			"PFX H Y 1",
 			"PFX H 0 h/AE");
-		affParser.parse(affFile);
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDEFGH";
-		wordGenerator.applyRules(line);
+		backbone.getWordGenerator().applyRules(line);
 	}
 
 
@@ -488,32 +472,30 @@ public class WordGeneratorAffixTest{
 			"PFX D 0 d/AE",
 			"SFX E Y 1",
 			"SFX E 0 e");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDE";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(14, words.size());
 		//base production
-		Assert.assertEquals(new Production("a", "ABCDE", "st:a", strategy), words.get(0));
+		Assert.assertEquals(createProduction("a", "ABCDE", "st:a"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("aa", "E", "st:a", strategy), words.get(1));
-		Assert.assertEquals(new Production("ba", "AE", "st:a", strategy), words.get(2));
-		Assert.assertEquals(new Production("ca", "E", "st:a", strategy), words.get(3));
-		Assert.assertEquals(new Production("da", "AE", "st:a", strategy), words.get(4));
+		Assert.assertEquals(createProduction("aa", "E", "st:a"), words.get(1));
+		Assert.assertEquals(createProduction("ba", "AE", "st:a"), words.get(2));
+		Assert.assertEquals(createProduction("ca", "E", "st:a"), words.get(3));
+		Assert.assertEquals(createProduction("da", "AE", "st:a"), words.get(4));
 		//twofold productions
-		Assert.assertEquals(new Production("aba", "E", "st:a", strategy), words.get(5));
-		Assert.assertEquals(new Production("ada", "E", "st:a", strategy), words.get(6));
+		Assert.assertEquals(createProduction("aba", "E", "st:a"), words.get(5));
+		Assert.assertEquals(createProduction("ada", "E", "st:a"), words.get(6));
 		//lastfold productions
-		Assert.assertEquals(new Production("ae", "ABCD", "st:a", strategy), words.get(7));
-		Assert.assertEquals(new Production("aae", null, "st:a", strategy), words.get(8));
-		Assert.assertEquals(new Production("bae", "A", "st:a", strategy), words.get(9));
-		Assert.assertEquals(new Production("cae", null, "st:a", strategy), words.get(10));
-		Assert.assertEquals(new Production("dae", "A", "st:a", strategy), words.get(11));
-		Assert.assertEquals(new Production("abae", null, "st:a", strategy), words.get(12));
-		Assert.assertEquals(new Production("adae", null, "st:a", strategy), words.get(13));
+		Assert.assertEquals(createProduction("ae", "ABCD", "st:a"), words.get(7));
+		Assert.assertEquals(createProduction("aae", null, "st:a"), words.get(8));
+		Assert.assertEquals(createProduction("bae", "A", "st:a"), words.get(9));
+		Assert.assertEquals(createProduction("cae", null, "st:a"), words.get(10));
+		Assert.assertEquals(createProduction("dae", "A", "st:a"), words.get(11));
+		Assert.assertEquals(createProduction("abae", null, "st:a"), words.get(12));
+		Assert.assertEquals(createProduction("adae", null, "st:a"), words.get(13));
 	}
 
 	@Test
@@ -525,20 +507,18 @@ public class WordGeneratorAffixTest{
 			"PFX A 0 tek .",
 			"PFX B Y 1",
 			"PFX B 0 met/A .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "ouro/B";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(3, words.size());
 		//base production
-		Assert.assertEquals(new Production("ouro", "B", "st:ouro", strategy), words.get(0));
+		Assert.assertEquals(createProduction("ouro", "B", "st:ouro"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("metouro", "A", "st:ouro", strategy), words.get(1));
+		Assert.assertEquals(createProduction("metouro", "A", "st:ouro"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("tekmetouro", null, "st:ouro", strategy), words.get(2));
+		Assert.assertEquals(createProduction("tekmetouro", null, "st:ouro"), words.get(2));
 		//lastfold productions
 	}
 
@@ -551,20 +531,18 @@ public class WordGeneratorAffixTest{
 			"PFX A 0 ⲧⲉⲕ .",
 			"PFX B Y 1",
 			"PFX B 0 ⲙⲉⲧ/A .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "ⲟⲩⲣⲟ/B";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(3, words.size());
 		//base production
-		Assert.assertEquals(new Production("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ", strategy), words.get(0));
+		Assert.assertEquals(createProduction("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ", strategy), words.get(1));
+		Assert.assertEquals(createProduction("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ", strategy), words.get(2));
+		Assert.assertEquals(createProduction("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ"), words.get(2));
 		//lastfold productions
 	}
 
@@ -589,11 +567,10 @@ public class WordGeneratorAffixTest{
 			"SFX G 0 g/E",
 			"SFX H Y 1",
 			"SFX H 0 h/AE");
-		affParser.parse(affFile);
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDEFGH";
-		wordGenerator.applyRules(line);
+		backbone.getWordGenerator().applyRules(line);
 	}
 
 
@@ -606,19 +583,17 @@ public class WordGeneratorAffixTest{
 			"SFX A 0 s/XB .",
 			"SFX B Y 1",
 			"SFX B 0 baz .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/A";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "A", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "A", "st:foo"), words.get(0));
 		//onefold productions
 		//twofold productions
-		Assert.assertEquals(new Production("foosbaz", null, "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foosbaz", null, "st:foo"), words.get(1));
 		//lastfold productions
 	}
 
@@ -635,30 +610,28 @@ public class WordGeneratorAffixTest{
 			"PFX C Y 2",
 			"PFX C 0 pre- .",
 			"PFX C 0 pseudopre-/X .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/AC";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(12, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "AC", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "AC", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foo-suf", "BC", "st:foo", strategy), words.get(1));
+		Assert.assertEquals(createProduction("foo-suf", "BC", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(new Production("foo-suf-bar", "C", "st:foo", strategy), words.get(2));
-		Assert.assertEquals(new Production("foo-pseudosuf-bar", "C", "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("foo-suf-bar", "C", "st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("foo-pseudosuf-bar", "C", "st:foo"), words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("pre-foo", "A", "st:foo", strategy), words.get(4));
-		Assert.assertEquals(new Production("pre-foo-suf", "B", "st:foo", strategy), words.get(5));
-		Assert.assertEquals(new Production("pseudopre-foo-suf", "BX", "st:foo", strategy), words.get(6));
-		Assert.assertEquals(new Production("pre-foo-pseudosuf", "B", "st:foo", strategy), words.get(7));
-		Assert.assertEquals(new Production("pre-foo-suf-bar", null, "st:foo", strategy), words.get(8));
-		Assert.assertEquals(new Production("pseudopre-foo-suf-bar", "X", "st:foo", strategy), words.get(9));
-		Assert.assertEquals(new Production("pre-foo-pseudosuf-bar", null, "st:foo", strategy), words.get(10));
-		Assert.assertEquals(new Production("pseudopre-foo-pseudosuf-bar", "X", "st:foo", strategy), words.get(11));
+		Assert.assertEquals(createProduction("pre-foo", "A", "st:foo"), words.get(4));
+		Assert.assertEquals(createProduction("pre-foo-suf", "B", "st:foo"), words.get(5));
+		Assert.assertEquals(createProduction("pseudopre-foo-suf", "BX", "st:foo"), words.get(6));
+		Assert.assertEquals(createProduction("pre-foo-pseudosuf", "B", "st:foo"), words.get(7));
+		Assert.assertEquals(createProduction("pre-foo-suf-bar", null, "st:foo"), words.get(8));
+		Assert.assertEquals(createProduction("pseudopre-foo-suf-bar", "X", "st:foo"), words.get(9));
+		Assert.assertEquals(createProduction("pre-foo-pseudosuf-bar", null, "st:foo"), words.get(10));
+		Assert.assertEquals(createProduction("pseudopre-foo-pseudosuf-bar", "X", "st:foo"), words.get(11));
 	}
 
 
@@ -675,24 +648,22 @@ public class WordGeneratorAffixTest{
 			"SFX C 0 obb .",
 			"SFX C 0 obb/AX .",
 			"SFX C 0 obb/BX .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "nagy/C";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(new Production("nagy", "C", "st:nagy", strategy), words.get(0));
+		Assert.assertEquals(createProduction("nagy", "C", "st:nagy"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("nagyobb", null, "st:nagy", strategy), words.get(1));
-		Assert.assertEquals(new Production("nagyobb", "AX", "st:nagy", strategy), words.get(2));
-		Assert.assertEquals(new Production("nagyobb", "BX", "st:nagy", strategy), words.get(3));
+		Assert.assertEquals(createProduction("nagyobb", null, "st:nagy"), words.get(1));
+		Assert.assertEquals(createProduction("nagyobb", "AX", "st:nagy"), words.get(2));
+		Assert.assertEquals(createProduction("nagyobb", "BX", "st:nagy"), words.get(3));
 		//twofold productions
 		//lastfold productions
-		Assert.assertEquals(new Production("legnagyobb", "X", "st:nagy", strategy), words.get(4));
-		Assert.assertEquals(new Production("legeslegnagyobb", "X", "st:nagy", strategy), words.get(5));
+		Assert.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(4));
+		Assert.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(5));
 	}
 
 
@@ -707,39 +678,36 @@ public class WordGeneratorAffixTest{
 			"SFX Q 0 s . is:sg_3",
 			"SFX R Y 1",
 			"SFX R 0 able/PS . ds:der_able");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
 
 		String line = "drink/S	po:noun";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
-		Assert.assertEquals(new Production("drink", "S", "st:drink po:noun", strategy), words.get(0));
+		Assert.assertEquals(createProduction("drink", "S", "st:drink po:noun"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("drinks", null, "st:drink po:noun is:plur", strategy), words.get(1));
+		Assert.assertEquals(createProduction("drinks", null, "st:drink po:noun is:plur"), words.get(1));
 		//twofold productions
 		//lastfold productions
 
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
-		words = wordGenerator.applyRules(line);
+		words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(new Production("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present", strategy), words.get(0));
+		Assert.assertEquals(createProduction("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy), words.get(1));
-		Assert.assertEquals(new Production("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3", strategy), words.get(2));
+		Assert.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words.get(1));
+		Assert.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words.get(2));
 		//twofold productions
-		Assert.assertEquals(new Production("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur", strategy),
+		Assert.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words.get(3));
 		//lastfold productions
-		Assert.assertEquals(new Production("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able", strategy),
+		Assert.assertEquals(createProduction("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
 			words.get(4));
-		Assert.assertEquals(new Production("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur",
-			strategy), words.get(5));
+		Assert.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"), words.get(5));
 	}
 
 
@@ -754,21 +722,20 @@ public class WordGeneratorAffixTest{
 			"SFX A 0 x .",
 			"SFX B Y 1",
 			"SFX B 0 y/2 .");
-		affParser.parse(affFile);
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		WordGenerator wordGenerator = new WordGenerator(affParser);
+		loadData(affFile.getAbsolutePath());
+
 
 		String line = "foo/1";
-		List<Production> words = wordGenerator.applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(new Production("foo", "AB", "st:foo", strategy), words.get(0));
+		Assert.assertEquals(createProduction("foo", "AB", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(new Production("foox", null, "st:foo", strategy), words.get(1));
-		Assert.assertEquals(new Production("fooy", "A", "st:foo", strategy), words.get(2));
+		Assert.assertEquals(createProduction("foox", null, "st:foo"), words.get(1));
+		Assert.assertEquals(createProduction("fooy", "A", "st:foo"), words.get(2));
 		//twofold productions
-		Assert.assertEquals(new Production("fooyx", null, "st:foo", strategy), words.get(3));
+		Assert.assertEquals(createProduction("fooyx", null, "st:foo"), words.get(3));
 		//lastfold productions
 	}
 

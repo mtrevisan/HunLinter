@@ -16,21 +16,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
-@AllArgsConstructor
 @Slf4j
 public class WordGenerator{
 
@@ -50,9 +49,20 @@ public class WordGenerator{
 	}
 
 
-	@NonNull
 	private final AffixParser affParser;
+	private final DictionaryParser dicParser;
+	private final CorrectnessChecker checker;
 
+	private DictionaryInclusionTestWorker dicInclusionTestWorker;
+
+
+	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, CorrectnessChecker checker){
+		Objects.requireNonNull(affParser);
+
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.checker = checker;
+	}
 
 	public List<Production> applyRules(String line){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -472,6 +482,10 @@ return false;
 
 	// utility method to look up root words in hash table
 	private DictionaryEntry dictionaryLookup(String word){
+		if(dicInclusionTestWorker == null && dicParser != null && checker != null){
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, checker, affParser);
+			dicInclusionTestWorker.execute();
+		}
 //		DictionaryEntry dp;
 //		if(tableptr){
 //			dp = tableptr[hash(word)];
