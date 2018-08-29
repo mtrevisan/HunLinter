@@ -571,7 +571,7 @@ public class WordGeneratorCompoundFlagTest{
 			"szerviz"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 40, 3);
-words.forEach(stem -> System.out.println(stem));
+//words.forEach(stem -> System.out.println(stem));
 		//good: vízszer, szerkocsi
 		//bad: szervíz, szervízkocsi, kocsiszervíz
 		List<Production> expected = Arrays.asList(

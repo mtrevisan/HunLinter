@@ -55,6 +55,7 @@ public class WordGenerator{
 	private final DictionaryBaseData dictionaryBaseData;
 
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
+	private final Set<String> compoundAsReplacement = new HashSet<>();
 
 
 	public WordGenerator(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
@@ -305,6 +306,7 @@ public class WordGenerator{
 				log.error("Cannot read dictionary", e);
 			}
 		}
+		compoundAsReplacement.clear();
 
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
@@ -408,6 +410,8 @@ public class WordGenerator{
 			productions.set(i, new Production(word, production));
 		}
 
+		compoundAsReplacement.clear();
+
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
 
@@ -458,6 +462,11 @@ public class WordGenerator{
 	//is word a non compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(String word){
 		boolean exists = false;
+
+		for(String cr : compoundAsReplacement)
+			if(word.contains(cr))
+				return true;
+
 		List<Pair<String, String>> replacementTable = affParser.getReplacementTable();
 		if(word.length() >= 2 && replacementTable != null && !replacementTable.isEmpty())
 			for(Pair<String, String> entry : replacementTable){
@@ -473,8 +482,11 @@ public class WordGenerator{
 					sb.append(word);
 					sb.replace(idx, idx + patternLength, value);
 					String candidate = sb.toString();
-					if(dicInclusionTestWorker.isInDictionary(candidate))
+					if(dicInclusionTestWorker.isInDictionary(candidate)){
+						compoundAsReplacement.add(word);
+
 						return true;
+					}
 				}
 			}
 		return exists;
