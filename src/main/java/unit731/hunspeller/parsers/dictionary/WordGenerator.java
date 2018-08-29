@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.io.IOException;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -299,7 +302,14 @@ public class WordGenerator{
 			Objects.requireNonNull(dictionaryBaseData);
 
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, done, affParser);
-			dicInclusionTestWorker.execute();
+
+			ExecutorService pool = Executors.newFixedThreadPool(1);
+			try{
+				pool.execute(() -> dicInclusionTestWorker.execute());
+			}
+			catch(IOException e){
+				pool.shutdown();
+			}
 		}
 		else
 			done.run();
