@@ -46,14 +46,14 @@ public class Production extends DictionaryEntry{
 	}
 
 	public Production(String word, String continuationFlags, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
-		super(word, strategy.parseFlags(continuationFlags), AffixEntry.extractMorphologicalFields(compoundEntries), true);
+		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), AffixEntry.extractMorphologicalFields(compoundEntries), true);
 
 		this.compoundEntries = compoundEntries;
 	}
 
 	/** NOTE: used for testing purposes */
 	public Production(String word, String continuationFlags, String morphologicalFields, FlagParsingStrategy strategy){
-		super(word, strategy.parseFlags(continuationFlags), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
+		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		compoundEntries = null;
 	}
