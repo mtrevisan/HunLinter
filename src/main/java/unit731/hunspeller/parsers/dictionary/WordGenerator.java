@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -290,7 +289,21 @@ public class WordGenerator{
 		boolean forbidTriples = affParser.isForbidTriplesInCompound();
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		boolean allowTwofoldAffixesInCompound = affParser.allowTwofoldAffixesInCompound();
-	
+
+		Runnable done = () -> {
+			//TODO
+			completed = true;
+		};
+		if(checkCompoundReplacement && dicInclusionTestWorker == null){
+			Objects.requireNonNull(dicParser);
+			Objects.requireNonNull(dictionaryBaseData);
+
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, done, affParser);
+			dicInclusionTestWorker.execute();
+		}
+		else
+			done.run();
+
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
 
@@ -443,47 +456,27 @@ public class WordGenerator{
 
 	//is word a non compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(String word){
+		boolean exists = false;
 		List<Pair<String, String>> replacementTable = affParser.getReplacementTable();
-		if(word.length() < 2 || replacementTable == null || replacementTable.isEmpty())
-			return false;
+		if(word.length() >= 2 && replacementTable != null && !replacementTable.isEmpty())
+			for(Pair<String, String> entry : replacementTable){
+				String pattern = entry.getKey();
+				String value = entry.getValue();
 
-		for(Pair<String, String> entry : replacementTable){
-			String pattern = entry.getKey();
-			String value = entry.getValue();
-
-			int idx = -1;
-			int patternLength = pattern.length();
-			StringBuilder sb = new StringBuilder();
-			//search every occurence of the pattern in the word
-			while((idx = word.indexOf(pattern, idx + 1)) >= 0){
-				sb.setLength(0);
-				sb.append(word);
-				sb.replace(idx, idx + patternLength, value);
-				String candidate = sb.toString();
-				if(candidatePresentInDictionary(candidate))
-					return true;
-
-System.out.println(candidate);
+				int idx = -1;
+				int patternLength = pattern.length();
+				StringBuilder sb = new StringBuilder();
+				//search every occurence of the pattern in the word
+				while((idx = word.indexOf(pattern, idx + 1)) >= 0){
+					sb.setLength(0);
+					sb.append(word);
+					sb.replace(idx, idx + patternLength, value);
+					String candidate = sb.toString();
+					if(dicInclusionTestWorker.isInDictionary(candidate))
+						return true;
+				}
 			}
-		}
-
-		return false;
-	}
-
-	private boolean candidatePresentInDictionary(String word){
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(dictionaryBaseData);
-
-		if(dicInclusionTestWorker == null){
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
-			try{
-				dicInclusionTestWorker.waitForCompletion();
-			}
-			catch(InterruptedException | ExecutionException e){
-				log.error("Exception while extracting the dictionary", e);
-			}
-		}
-		return dicInclusionTestWorker.isInDictionary(word);
+		return exists;
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */

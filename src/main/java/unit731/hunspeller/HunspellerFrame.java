@@ -1782,14 +1782,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					compounds.add(production);
 			};
 			Runnable done = () -> {
-				if(!compoundRulesExtractorWorker.isCancelled()){
-					StringJoiner sj = new StringJoiner("\n");
-					compounds.forEach(compound -> sj.add(compound.toString(strategy)));
-					cmpInputTextArea.setText(sj.toString());
-					cmpInputTextArea.setCaretPosition(0);
-				}
+				StringJoiner sj = new StringJoiner("\n");
+				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
+				cmpInputTextArea.setText(sj.toString());
+				cmpInputTextArea.setCaretPosition(0);
 			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(affParser, backbone.getDicParser(), backbone.getWordGenerator(), productionReader, done);
+			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader, done, affParser);
 			compoundRulesExtractorWorker.addPropertyChangeListener(this);
 			compoundRulesExtractorWorker.execute();
 		}

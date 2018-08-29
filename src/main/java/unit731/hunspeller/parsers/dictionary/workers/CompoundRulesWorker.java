@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
+import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 @Slf4j
@@ -22,17 +22,23 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	private final Map<String, String> inputs = new HashMap<>();
 
 
-	public CompoundRulesWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader, Runnable done){
-		Objects.requireNonNull(affParser);
+	public CompoundRulesWorker(DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader, Runnable done,
+			ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(productionReader);
+		Objects.requireNonNull(lockable);
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyRules(line);
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
+		Runnable wrappedDone = () -> {
+			if(!isCancelled() && done != null)
+				done.run();
+		};
+		createWorker(WORKER_NAME, dicParser, lineReader, wrappedDone, lockable);
 	}
 
 	@Override

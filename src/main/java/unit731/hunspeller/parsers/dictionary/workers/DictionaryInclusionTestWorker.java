@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.Backbone;
@@ -25,7 +24,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public DictionaryInclusionTestWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData, ReadWriteLockable lockable){
+	public DictionaryInclusionTestWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData, Runnable done, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
@@ -39,7 +38,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> dictionary.add(production.getWord()));
 		};
-		Runnable done = () -> {
+		Runnable wrappedDone = () -> {
 			if(!isCancelled()){
 				int totalUniqueProductions = dictionary.getAddedElements();
 				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
@@ -47,9 +46,12 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 					DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 					falsePositiveCount);
+
+				if(done != null)
+					done.run();
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, done, lockable);
+		createWorker(WORKER_NAME, dicParser, lineReader, wrappedDone, lockable);
 	}
 
 	@Override
@@ -57,13 +59,6 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 		clear();
 
 		super.execute();
-	}
-
-	@Override
-	public void waitForCompletion() throws InterruptedException, ExecutionException{
-		clear();
-
-		super.waitForCompletion();
 	}
 
 	public void clear(){
