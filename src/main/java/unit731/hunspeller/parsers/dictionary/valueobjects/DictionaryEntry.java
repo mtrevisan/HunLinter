@@ -56,7 +56,7 @@ public class DictionaryEntry{
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
-		word = m.group(PARAM_WORD);
+		word = StringUtils.replace(m.group(PARAM_WORD), "\\/", "/");
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
