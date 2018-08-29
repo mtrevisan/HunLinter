@@ -373,7 +373,6 @@ public class WordGenerator{
 						Production p = new Production(sb.toString(), flags, compoundEntries, strategy);
 						List<Production> prods = applyRules(p, false);
 
-						//FIXME remove this piece of code, pass allowTwofoldAffixesInCompound inside applyRules
 						//remove twofold because they're not allowed in compounds
 						if(!allowTwofoldAffixesInCompound){
 							Iterator<Production> itr = prods.iterator();
