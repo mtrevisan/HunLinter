@@ -24,7 +24,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public DictionaryInclusionTestWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData, Runnable done, ReadWriteLockable lockable){
+	public DictionaryInclusionTestWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
@@ -38,7 +38,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 
 			productions.forEach(production -> dictionary.add(production.getWord()));
 		};
-		Runnable wrappedDone = () -> {
+		Runnable done = () -> {
 			if(!isCancelled()){
 				int totalUniqueProductions = dictionary.getAddedElements();
 				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
@@ -46,21 +46,12 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 					DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 					falsePositiveCount);
-
-				if(done != null)
-					done.run();
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, wrappedDone, lockable);
+		createWorker(WORKER_NAME, dicParser, lineReader, done, lockable);
 	}
 
 	@Override
-	public void execute(){
-		clear();
-
-		super.execute();
-	}
-
 	public void clear(){
 		dictionary.clear();
 	}

@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.io.IOException;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -16,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +25,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
+import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
@@ -293,26 +291,20 @@ public class WordGenerator{
 		boolean simplifyTriples = affParser.isSimplifyTriplesInCompound();
 		boolean allowTwofoldAffixesInCompound = affParser.allowTwofoldAffixesInCompound();
 
-		Runnable done = () -> {
-			//TODO
-			completed = true;
-		};
 		if(checkCompoundReplacement && dicInclusionTestWorker == null){
 			Objects.requireNonNull(dicParser);
 			Objects.requireNonNull(dictionaryBaseData);
 
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, done, affParser);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
 
-			ExecutorService pool = Executors.newFixedThreadPool(1);
 			try{
-				pool.execute(() -> dicInclusionTestWorker.execute());
+				dicInclusionTestWorker.executeInline();
 			}
-			catch(IOException e){
-				pool.shutdown();
+			catch(Exception e){
+				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				log.error("Cannot read dictionary", e);
 			}
 		}
-		else
-			done.run();
 
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);

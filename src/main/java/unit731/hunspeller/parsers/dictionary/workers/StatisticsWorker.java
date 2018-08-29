@@ -72,10 +72,8 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 	}
 
 	@Override
-	public void execute(){
+	public void clear(){
 		dicStatistics.clear();
-
-		super.execute();
 	}
 
 }

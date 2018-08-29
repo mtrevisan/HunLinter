@@ -55,11 +55,9 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	}
 
 	@Override
-	public void execute(){
+	public void clear(){
 		totalProductions = 0l;
 		dictionary.clear();
-
-		super.execute();
 	}
 
 }

@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -26,8 +27,18 @@ public class WorkerDictionaryReadBase{
 	}
 
 	public void execute(){
+		clear();
+
 		worker.execute();
 	}
+
+	public void executeInline() throws IOException{
+		clear();
+
+		worker.doInBackground();
+	}
+
+	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
 		return worker.getState();

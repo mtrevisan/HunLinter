@@ -42,10 +42,8 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	}
 
 	@Override
-	public void execute(){
+	public void clear(){
 		inputs.clear();
-
-		super.execute();
 	}
 
 }
