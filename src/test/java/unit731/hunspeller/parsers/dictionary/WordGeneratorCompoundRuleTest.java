@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.services.FileHelper;
 
@@ -25,9 +24,8 @@ public class WordGeneratorCompoundRuleTest{
 		backbone.loadFile(affixFilePath);
 	}
 
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, strategy);
+	private Production createProduction(String word){
+		return new Production(word, null, (List<DictionaryEntry>)null, null);
 	}
 
 	@Test
@@ -53,7 +51,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
 		List<String> expected = Arrays.asList("arbeitsscheu");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -74,7 +72,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 		List<String> expected = Arrays.asList("abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -97,7 +95,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
 				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
 				"abbb", "abbc", "abcb", "abcc", "acbb");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -118,7 +116,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -140,7 +138,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 	@Test
@@ -162,7 +160,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-		Assert.assertEquals(expected.stream().map(exp -> new Production(exp, null, (List<DictionaryEntry>)null, null)).collect(Collectors.toList()), words);
+		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
 	}
 
 }
