@@ -283,8 +283,6 @@ public class WordGenerator{
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
-//FIXME
-		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();
@@ -630,6 +628,7 @@ public class WordGenerator{
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 			String permitCompoundFlag = affParser.getPermitCompoundFlag();
+			String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
 			String word = dicEntry.getWord();
 
@@ -694,8 +693,8 @@ public class WordGenerator{
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
 					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable(), strategy);
-
-					productions.add(production);
+					if(!production.hasContinuationFlag(forbiddenWordFlag))
+						productions.add(production);
 				}
 			}
 		}

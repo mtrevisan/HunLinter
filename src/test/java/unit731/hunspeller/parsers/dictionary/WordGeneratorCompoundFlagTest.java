@@ -617,16 +617,16 @@ public class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"FORBIDDENWORD X",
 			"COMPOUNDFLAG Y",
-			"SFX A Y 1",
-			"SFX A 0 s .");
+			"SFX S Y 1",
+			"SFX S 0 s .");
 		loadData(affFile.getAbsolutePath());
 
 		String[] inputCompounds = new String[]{
-			"foo/S",
-			"foo/YX",
-			"foo/Y",
-			"foo/S",
-			"bar/YS",
+			"foo/S	[1]",
+			"foo/YX	[2]",
+			"foo/Y	[3]",
+			"foo/S	[4]",
+			"bar/YS	[5]",
 			"bars/X",
 			"foos/X"
 		};

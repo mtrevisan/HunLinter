@@ -470,6 +470,7 @@ public class AffixParser extends ReadWriteLockable{
 
 
 			terminalAffixes.add(getCompoundFlag());
+			terminalAffixes.add(getForbiddenWordFlag());
 			terminalAffixes.add(getOnlyInCompoundFlag());
 			terminalAffixes.add(getPermitCompoundFlag());
 			terminalAffixes.add(getForbidCompoundFlag());
