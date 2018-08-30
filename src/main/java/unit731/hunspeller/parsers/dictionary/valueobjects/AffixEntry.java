@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -191,17 +193,16 @@ public class AffixEntry{
 	}
 
 	public static String[] extractMorphologicalFields(List<DictionaryEntry> compoundEntries){
-		String[] mf = null;
+		List<String[]> mf = new ArrayList<>();
 		if(compoundEntries != null){
-			int i = 0;
-			mf = new String[compoundEntries.size() * 2];
 			for(DictionaryEntry compoundEntry : compoundEntries){
 				String compound = compoundEntry.getWord();
-				mf[i ++] = MorphologicalTag.TAG_PART + compound;
-				mf[i ++] = MorphologicalTag.TAG_STEM + compound;
+				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART + compound}, compoundEntry.morphologicalFields));
 			}
 		}
-		return mf;
+		return mf.stream()
+			.flatMap(Arrays::stream)
+			.toArray(String[]::new);
 	}
 
 	public final boolean isSuffix(){
