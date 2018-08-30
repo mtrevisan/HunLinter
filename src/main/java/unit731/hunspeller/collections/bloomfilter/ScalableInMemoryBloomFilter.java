@@ -22,17 +22,24 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
 
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability){
-		this(type, expectedNumberOfElements, falsePositiveProbability, 2., 0.85);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability){
+		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, BitArrayBuilder.Type.JAVA);
 	}
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
-		this(type, expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
+		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, type);
 	}
 
-	public ScalableInMemoryBloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability,
-			double growRatioWhenFull, double tighteningRatio){
-		super(type, expectedNumberOfElements, falsePositiveProbability);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
+		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, BitArrayBuilder.Type.JAVA);
+	}
+
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, BitArrayBuilder.Type type){
+		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, type);
+	}
+
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, double tighteningRatio, BitArrayBuilder.Type type){
+		super(expectedNumberOfElements, falsePositiveProbability, type);
 
 		if(growRatioWhenFull <= 1.)
 			throw new IllegalArgumentException("Grow ratio when full must be strictly greater than one");
@@ -51,8 +58,8 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
 		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
 			int size = filters.size();
-			currentFilter = new BloomFilter<>(type, (int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
-				falsePositiveProbability * Math.pow(tighteningRatio, size));
+			currentFilter = new BloomFilter<>((int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
+				falsePositiveProbability * Math.pow(tighteningRatio, size), type);
 			currentFilter.setCharset(currentCharset);
 			filters.add(0, currentFilter);
 		}

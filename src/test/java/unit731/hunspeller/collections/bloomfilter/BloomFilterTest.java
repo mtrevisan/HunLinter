@@ -18,7 +18,7 @@ public class BloomFilterTest{
 
 	@Test
 	public void defaultFilter(){
-		BloomFilterInterface<String> filter = new BloomFilter<>(BitArrayBuilder.Type.JAVA, 10 * MAX, FPP);
+		BloomFilterInterface<String> filter = new BloomFilter<>(10 * MAX, FPP, BitArrayBuilder.Type.JAVA);
 
 		//generate two one-million uuid arrays
 		List<String> contained = new ArrayList<>();

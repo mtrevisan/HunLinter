@@ -77,8 +77,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 */
-	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability){
-		this(type, expectedNumberOfElements, falsePositiveProbability, null, null);
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
+		this(expectedNumberOfElements, falsePositiveProbability, null, null, type);
 	}
 
 	/**
@@ -89,8 +89,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
 	 */
-	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer){
-		this(type, expectedNumberOfElements, falsePositiveProbability, decomposer, null);
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, BitArrayBuilder.Type type){
+		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null, type);
 	}
 
 	/**
@@ -102,8 +102,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
 	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
 	 */
-	public BloomFilter(BitArrayBuilder.Type type, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer,
-			HashFunction hasher){
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher, BitArrayBuilder.Type type){
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
