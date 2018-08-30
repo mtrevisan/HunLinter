@@ -106,12 +106,14 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	@Override
 	public void clear(){
-		filters.forEach(BloomFilterInterface::clear);
+		for(BloomFilterInterface<T> filter : filters)
+			filter.clear();
 	}
 
 	@Override
 	public void close(){
-		filters.forEach(BloomFilterInterface::close);
+		for(BloomFilterInterface<T> filter : filters)
+			filter.close();
 	}
 
 }

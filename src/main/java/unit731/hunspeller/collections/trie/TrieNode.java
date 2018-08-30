@@ -109,8 +109,8 @@ public class TrieNode<S, H, V>{
 
 	public void forEachChild(Consumer<TrieNode<S, H, V>> callback){
 		if(children != null)
-			children.values()
-				.forEach(callback::accept);
+			for(TrieNode<S, H, V> child : children.values())
+				callback.accept(child);
 	}
 
 	public boolean isEmpty(){

@@ -117,7 +117,8 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 
 	public void forEachChildren(Consumer<? super RadixTreeNode<S, V>> action){
 		if(children != null)
-			children.forEach(action);
+			for(RadixTreeNode<S, V> child : children)
+				action.accept(child);
 	}
 
 	/**

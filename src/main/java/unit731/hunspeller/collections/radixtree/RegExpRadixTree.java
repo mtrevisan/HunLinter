@@ -72,8 +72,8 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	public void putAllWithFlatKey(Map<? extends String, ? extends V> map){
 		Objects.requireNonNull(map);
 
-		map.entrySet()
-			.forEach(entry -> put(entry.getKey(), entry.getValue()));
+		for(Map.Entry<? extends String, ? extends V> entry : map.entrySet())
+			put(entry.getKey(), entry.getValue());
 	}
 
 	public V put(String key, V value){
