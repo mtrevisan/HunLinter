@@ -587,7 +587,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void finalSonorizationCheck(Production production) throws IllegalArgumentException{
 //		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
-//			boolean hasFinalSonorizationFlag = production.containsContinuationFlag(FINAL_SONORIZATION_RULE);
+//			boolean hasFinalSonorizationFlag = production.hasContinuationFlag(FINAL_SONORIZATION_RULE);
 //			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)

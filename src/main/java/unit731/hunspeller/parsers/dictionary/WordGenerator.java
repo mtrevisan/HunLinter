@@ -282,6 +282,7 @@ public class WordGenerator{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
+		String forceCompoundUppercaseFlag = affParser.getForceCompoundUppercaseFlag();
 		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();
@@ -409,16 +410,21 @@ public class WordGenerator{
 			}
 		}
 
+		compoundAsReplacement.clear();
 
 		//convert using output table
 		int size = productions.size();
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
-			String word = affParser.applyOutputConversionTable(production.getWord());
+			String word = production.getWord();
+			List<DictionaryEntry> compoundEntries = production.getCompoundEntries();
+			if(compoundEntries != null && !compoundEntries.isEmpty()
+					&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
+				word = StringUtils.capitalize(word);
+
+			word = affParser.applyOutputConversionTable(word);
 			productions.set(i, new Production(word, production));
 		}
-
-		compoundAsReplacement.clear();
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
@@ -576,15 +582,15 @@ public class WordGenerator{
 
 				List<AffixEntry> appliedRules = production.getAppliedRules();
 				boolean rulesContainsCircumfixFlag = appliedRules.stream()
-					.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
+					.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
 				if(rulesContainsCircumfixFlag){
 					//check if at least one SFX and one PFX have the circumfix flag
 					boolean suffixWithCircumfix = appliedRules.stream()
 						.filter(rule -> rule.isSuffix())
-						.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
+						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
 					boolean prefixWithCircumfix = appliedRules.stream()
 						.filter(rule -> !rule.isSuffix())
-						.anyMatch(rule -> rule.containsContinuationFlag(circumfixFlag));
+						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
 					if(suffixWithCircumfix ^ prefixWithCircumfix)
 						itr.remove();
 				}
@@ -612,11 +618,11 @@ public class WordGenerator{
 						AffixEntry appliedRule = appliedRules.get(i);
 						if(!lastSuffix && appliedRule.isSuffix()){
 							lastSuffix = true;
-							lastSuffixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+							lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 						}
 						else if(!lastPrefix && !appliedRule.isSuffix()){
 							lastPrefix = true;
-							lastPrefixNeedAffix = appliedRule.containsContinuationFlag(needAffixFlag);
+							lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 						}
 					}
 					hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
@@ -692,8 +698,8 @@ public class WordGenerator{
 				//	.collect(Collectors.toList());
 
 				for(AffixEntry entry : applicableAffixes){
-					boolean hasForbidFlag = (forbidCompoundFlag != null && entry.containsContinuationFlag(forbidCompoundFlag));
-					boolean hasPermitFlag = (permitCompoundFlag != null && entry.containsContinuationFlag(permitCompoundFlag));
+					boolean hasForbidFlag = (forbidCompoundFlag != null && entry.hasContinuationFlag(forbidCompoundFlag));
+					boolean hasPermitFlag = (permitCompoundFlag != null && entry.hasContinuationFlag(permitCompoundFlag));
 					if(isCompound && (hasForbidFlag || !hasPermitFlag))
 						continue;
 

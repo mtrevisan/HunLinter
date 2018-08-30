@@ -666,20 +666,43 @@ public class WordGeneratorCompoundFlagTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
 //words.forEach(stem -> System.out.println(stem));
-//good: foobar, Foobaz, foobazbar, Foobarbaz
-//bad: foobaz, foobarbaz
 		List<Production> expected = Arrays.asList(
-			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
-			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
-			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
-			createProduction("barbar", null, "pa:bar st:bar pa:bar st:bar"),
-			createProduction("Foobaz", null, "pa:foo st:foo pa:baz st:baz"),
-			createProduction("bazfoo", null, "pa:baz st:baz pa:foo st:foo"),
-			createProduction("Bazbaz", null, "pa:baz st:baz pa:baz st:baz"),
-			createProduction("barfoo", null, "pa:foo st:foo pa:foo st:foo"),
-			createProduction("Barbaz", null, "pa:foo st:foo pa:bar st:bar"),
-			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
-			createProduction("Barbaz", null, "pa:bar st:bar pa:bar st:bar")
+			createProduction("foofoo", "", "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foobar", "", "pa:foo st:foo pa:bar st:bar"),
+			createProduction("Foobaz", "A", "pa:foo st:foo pa:baz st:baz"),
+			createProduction("barfoo", "", "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barbar", "", "pa:bar st:bar pa:bar st:bar"),
+			createProduction("Barbaz", "A", "pa:bar st:bar pa:baz st:baz"),
+			createProduction("bazfoo", "A", "pa:baz st:baz pa:foo st:foo"),
+			createProduction("bazbar", "A", "pa:baz st:baz pa:bar st:bar"),
+			createProduction("Bazbaz", "A", "pa:baz st:baz pa:baz st:baz"),
+			createProduction("foofoofoo", "", "pa:foo st:foo pa:foo st:foo pa:foo st:foo"),
+			createProduction("foofoobar", "", "pa:foo st:foo pa:foo st:foo pa:bar st:bar"),
+			createProduction("Foofoobaz", "A", "pa:foo st:foo pa:foo st:foo pa:baz st:baz"),
+			createProduction("foobarfoo", "", "pa:foo st:foo pa:bar st:bar pa:foo st:foo"),
+			createProduction("foobarbar", "", "pa:foo st:foo pa:bar st:bar pa:bar st:bar"),
+			createProduction("Foobarbaz", "A", "pa:foo st:foo pa:bar st:bar pa:baz st:baz"),
+			createProduction("foobazfoo", "", "pa:foo st:foo pa:baz st:baz pa:foo st:foo"),
+			createProduction("foobazbar", "", "pa:foo st:foo pa:baz st:baz pa:bar st:bar"),
+			createProduction("Foobazbaz", "A", "pa:foo st:foo pa:baz st:baz pa:baz st:baz"),
+			createProduction("barfoofoo", "", "pa:bar st:bar pa:foo st:foo pa:foo st:foo"),
+			createProduction("barfoobar", "", "pa:bar st:bar pa:foo st:foo pa:bar st:bar"),
+			createProduction("Barfoobaz", "A", "pa:bar st:bar pa:foo st:foo pa:baz st:baz"),
+			createProduction("barbarfoo", "", "pa:bar st:bar pa:bar st:bar pa:foo st:foo"),
+			createProduction("barbarbar", "", "pa:bar st:bar pa:bar st:bar pa:bar st:bar"),
+			createProduction("Barbarbaz", "A", "pa:bar st:bar pa:bar st:bar pa:baz st:baz"),
+			createProduction("barbazfoo", "", "pa:bar st:bar pa:baz st:baz pa:foo st:foo"),
+			createProduction("barbazbar", "", "pa:bar st:bar pa:baz st:baz pa:bar st:bar"),
+			createProduction("Barbazbaz", "A", "pa:bar st:bar pa:baz st:baz pa:baz st:baz"),
+			createProduction("bazfoofoo", "A", "pa:baz st:baz pa:foo st:foo pa:foo st:foo"),
+			createProduction("bazfoobar", "A", "pa:baz st:baz pa:foo st:foo pa:bar st:bar"),
+			createProduction("Bazfoobaz", "A", "pa:baz st:baz pa:foo st:foo pa:baz st:baz"),
+			createProduction("bazbarfoo", "A", "pa:baz st:baz pa:bar st:bar pa:foo st:foo"),
+			createProduction("bazbarbar", "A", "pa:baz st:baz pa:bar st:bar pa:bar st:bar"),
+			createProduction("Bazbarbaz", "A", "pa:baz st:baz pa:bar st:bar pa:baz st:baz"),
+			createProduction("bazbazfoo", "A", "pa:baz st:baz pa:baz st:baz pa:foo st:foo"),
+			createProduction("bazbazbar", "A", "pa:baz st:baz pa:baz st:baz pa:bar st:bar"),
+			createProduction("Bazbazbaz", "A", "pa:baz st:baz pa:baz st:baz pa:baz st:baz")
 		);
 		Assert.assertEquals(expected, words);
 	}

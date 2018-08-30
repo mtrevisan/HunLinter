@@ -124,7 +124,7 @@ public class AffixEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	public boolean containsContinuationFlag(String flag){
+	public boolean hasContinuationFlag(String flag){
 		return (continuationFlags != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
