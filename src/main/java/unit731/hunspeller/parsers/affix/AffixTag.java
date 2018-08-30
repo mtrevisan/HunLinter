@@ -102,14 +102,18 @@ public enum AffixTag{
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -> Schiffahrt) */
 	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/**
-	 * Forbid compounding, if the first word in the compound ends with endchars, and next word begins with beginchars and (optionally) they have the requested flags. The optional replacement parameter allows simplified compound form.
-	 * The special "endchars" pattern 0 (zero) limits the rule to the unmodified stems (stems and stems with zero affixes)
+	 * Forbid compounding, if the first word in the compound ends with <endchars>, and next word begins with <beginchars> and (optionally)
+	 * they have the requested flags. The optional replacement parameter allows simplified compound form.
+	 * The special <endchars> pattern 0 (zero) limits the rule to the unmodified stems (stems and stems with zero affixes)
 	 * Note: COMPOUNDMIN doesn't work correctly with the compound word alternation, so it may need to set COMPOUNDMIN to lower value.
 	 */
 //	CHECK_COMPOUND_PATTERN("CHECKCOMPOUNDPATTERN"),
 	/** The last word of a compound with this flag forces capitalization of the whole compound word */
 	FORCE_UPPERCASE("FORCEUCASE"),
-	/** Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound, if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables) */
+	/**
+	 * Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound,
+	 * if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables)
+	 */
 //	COMPOUND_SYLLABLE("COMPOUNDSYLLABLE"),
 	/** Needed for special compounding rules in Hungarian */
 //	SYLLABLE_NUMBER("SYLLABLENUM"),
@@ -140,7 +144,10 @@ public enum AffixTag{
 //	SUB_STANDARD("SUBSTANDARD"),
 	/** Extends tokenizer of Hunspell command line interface with additional word character */
 //	WORD_CHARS("WORDCHARS"),
-	/** SS letter pair in uppercased (German) words may be uppercase sharp s (ß). Hunspell can handle this special casing with the CHECKSHARPS declaration (see also KEEPCASE flag and tests/germancompounding example) in both spelling and suggestion */
+	/**
+	 * SS letter pair in uppercased (German) words may be uppercase sharp s (ß). Hunspell can handle this special casing with the
+	 * CHECKSHARPS declaration (see also KEEPCASE flag and tests/germancompounding example) in both spelling and suggestion
+	 */
 //	CHECK_SHARPS("CHECKSHARPS");
 
 
