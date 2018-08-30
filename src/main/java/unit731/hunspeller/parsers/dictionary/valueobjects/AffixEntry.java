@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -194,12 +193,11 @@ public class AffixEntry{
 
 	public static String[] extractMorphologicalFields(List<DictionaryEntry> compoundEntries){
 		List<String[]> mf = new ArrayList<>();
-		if(compoundEntries != null){
+		if(compoundEntries != null)
 			for(DictionaryEntry compoundEntry : compoundEntries){
 				String compound = compoundEntry.getWord();
 				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART + compound}, compoundEntry.morphologicalFields));
 			}
-		}
 		return mf.stream()
 			.flatMap(Arrays::stream)
 			.toArray(String[]::new);

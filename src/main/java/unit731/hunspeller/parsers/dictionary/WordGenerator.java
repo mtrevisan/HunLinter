@@ -189,16 +189,10 @@ public class WordGenerator{
 		//generate all the words that matches the given regex
 		List<String> generatedWords = regexWordGenerator.generateAll(limit);
 		List<Production> productions = generatedWords.stream()
+			//convert using output table
+			.map(affParser::applyOutputConversionTable)
 			.map(word -> new Production(word, null, (List<DictionaryEntry>)null, strategy))
 			.collect(Collectors.toList());
-
-		//convert using output table
-		int size = productions.size();
-		for(int i = 0; i < size; i ++){
-			Production production = productions.get(i);
-			String word = affParser.applyOutputConversionTable(production.getWord());
-			productions.set(i, new Production(word, production));
-		}
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
@@ -283,6 +277,7 @@ public class WordGenerator{
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();
@@ -367,23 +362,26 @@ public class WordGenerator{
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
-					String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
-					if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-						productions.add(new Production(sb.toString(), flags, compoundEntries, strategy));
-					else{
-						//add boundary affixes
-						Production p = new Production(sb.toString(), flags, compoundEntries, strategy);
-						List<Production> prods = applyRules(p, false);
+					if(!continuationFlags.contains(forbiddenWordFlag)){
+						String word = sb.toString();
+						String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
+						if(hasForbidCompoundFlag || hasPermitCompoundFlag)
+							productions.add(new Production(word, flags, compoundEntries, strategy));
+						else{
+							//add boundary affixes
+							Production p = new Production(word, flags, compoundEntries, strategy);
+							List<Production> prods = applyRules(p, false);
 
-						//remove twofold because they're not allowed in compounds
-						if(!allowTwofoldAffixesInCompound){
-							Iterator<Production> itr = prods.iterator();
-							while(itr.hasNext())
-								if(itr.next().isTwofolded())
-									itr.remove();
+							//remove twofold because they're not allowed in compounds
+							if(!allowTwofoldAffixesInCompound){
+								Iterator<Production> itr = prods.iterator();
+								while(itr.hasNext())
+									if(itr.next().isTwofolded())
+										itr.remove();
+							}
+
+							productions.addAll(prods);
 						}
-
-						productions.addAll(prods);
 					}
 				}
 
