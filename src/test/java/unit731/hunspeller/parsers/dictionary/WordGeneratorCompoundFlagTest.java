@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
@@ -34,7 +33,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void simple() throws IOException, TimeoutException{
+	public void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -65,7 +64,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void compoundMinLength() throws IOException, TimeoutException{
+	public void compoundMinLength() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -89,7 +88,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void checkCompoundTriple() throws IOException, TimeoutException{
+	public void checkCompoundTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -121,7 +120,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void simplifiedTriple() throws IOException, TimeoutException{
+	public void simplifiedTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -145,7 +144,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void forbidWordDuplication() throws IOException, TimeoutException{
+	public void forbidWordDuplication() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -548,7 +547,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void compoundReplacement() throws IOException, TimeoutException{
+	public void compoundReplacement() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -611,7 +610,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 	@Test
-	public void forbiddenWord() throws IOException, TimeoutException{
+	public void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

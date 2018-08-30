@@ -763,4 +763,20 @@ public class WordGeneratorAffixTest{
 		//lastfold productions
 	}
 
+
+	@Test
+	public void forbiddenWord() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORBIDDENWORD !",
+			"SFX s N 1",
+			"SFX s 0 os .");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "forbidden/!s";
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		Assert.assertTrue(words.isEmpty());
+	}
+
 }

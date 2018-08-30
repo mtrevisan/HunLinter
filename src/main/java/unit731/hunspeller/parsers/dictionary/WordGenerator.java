@@ -98,6 +98,10 @@ public class WordGenerator{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	private List<Production> applyRules(DictionaryEntry dicEntry, boolean isCompound) throws IllegalArgumentException, NoApplicableRuleException{
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
+		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
+			return Collections.<Production>emptyList();
+
 		//extract base production
 		Production baseProduction = getBaseProduction(dicEntry);
 		if(log.isDebugEnabled()){
@@ -315,10 +319,12 @@ public class WordGenerator{
 				.mapToObj(inputCompoundsFlag::get)
 				.map(entry -> applyRules(entry, true))
 				.collect(Collectors.toList());
+			if(expandedPermutationEntries.size() < 2 || expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+				continue;
 
 			//compose compounds:
 			boolean completed = false;
-			int[] indexes = new int[permutation.length];
+			int[] indexes = new int[expandedPermutationEntries.size()];
 			while(!completed){
 				sb.setLength(0);
 				List<DictionaryEntry> compoundEntries = new ArrayList<>();

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRule_BjörnJacke() throws IOException, TimeoutException{
+	public void compoundRule_BjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -55,7 +54,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleSimple() throws IOException, TimeoutException{
+	public void compoundRuleSimple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -76,7 +75,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleInfinite() throws IOException, TimeoutException{
+	public void compoundRuleInfinite() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -99,7 +98,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleZeroOrOne() throws IOException, TimeoutException{
+	public void compoundRuleZeroOrOne() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -120,7 +119,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleLongFlag() throws IOException, TimeoutException{
+	public void compoundRuleLongFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -142,7 +141,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleNumericalFlag() throws IOException, TimeoutException{
+	public void compoundRuleNumericalFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
