@@ -629,7 +629,6 @@ public class WordGeneratorCompoundFlagTest{
 			"foos/X"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
-//words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
 			createProduction("foofoos", null, "pa:foo st:foo po:1 pa:foo st:foo po:1"),
@@ -646,6 +645,41 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("barfoo", null, "pa:bar st:bar po:4 pa:foo st:foo po:3"),
 			createProduction("barbar", "S", "pa:bar st:bar po:4 pa:bar st:bar po:4"),
 			createProduction("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+
+	@Test
+	public void forceUppercase() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORCEUCASE A",
+			"COMPOUNDFLAG C");
+		loadData(affFile.getAbsolutePath());
+
+		String[] inputCompounds = new String[]{
+			"foo/C",
+			"bar/C",
+			"baz/CA"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
+//words.forEach(stem -> System.out.println(stem));
+//good: foobar, Foobaz, foobazbar, Foobarbaz
+//bad: foobaz, foobarbaz
+		List<Production> expected = Arrays.asList(
+			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
+			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barbar", null, "pa:bar st:bar pa:bar st:bar"),
+			createProduction("Foobaz", null, "pa:foo st:foo pa:baz st:baz"),
+			createProduction("bazfoo", null, "pa:baz st:baz pa:foo st:foo"),
+			createProduction("Bazbaz", null, "pa:baz st:baz pa:baz st:baz"),
+			createProduction("barfoo", null, "pa:foo st:foo pa:foo st:foo"),
+			createProduction("Barbaz", null, "pa:foo st:foo pa:bar st:bar"),
+			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
+			createProduction("Barbaz", null, "pa:bar st:bar pa:bar st:bar")
 		);
 		Assert.assertEquals(expected, words);
 	}

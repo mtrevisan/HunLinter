@@ -107,11 +107,8 @@ public enum AffixTag{
 	 * Note: COMPOUNDMIN doesn't work correctly with the compound word alternation, so it may need to set COMPOUNDMIN to lower value.
 	 */
 //	CHECK_COMPOUND_PATTERN("CHECKCOMPOUNDPATTERN"),
-	/**
-	 * Last word part of a compound with flag FORCEUCASE forces capitalization of the whole compound word.
-	 * Eg. Dutch word "straat" (street) with FORCEUCASE flags will allowed only in capitalized compound forms, according to the Dutch spelling rules for proper names.
-	 */
-//	FORCE_UPPERCASE("FORCEUCASE"),
+	/** The last word of a compound with this flag forces capitalization of the whole compound word */
+	FORCE_UPPERCASE("FORCEUCASE"),
 	/** Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound, if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables) */
 //	COMPOUND_SYLLABLE("COMPOUNDSYLLABLE"),
 	/** Needed for special compounding rules in Hungarian */
