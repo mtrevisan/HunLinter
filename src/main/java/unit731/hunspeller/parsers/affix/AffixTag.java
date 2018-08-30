@@ -112,7 +112,7 @@ public enum AffixTag{
 	 * Eg. Dutch word "straat" (street) with FORCEUCASE flags will allowed only in capitalized compound forms, according to the Dutch spelling rules for proper names.
 	 */
 //	FORCE_UPPERCASE("FORCEUCASE"),
-	/** Needed for special compounding rules in Hungarian. First parameter is the maximum syllable number, that may be in a compound, if words in compounds are more than COMPOUNDWORDMAX. Second parameter is the list of vowels (for calculating syllables) */
+	/** Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound, if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables) */
 //	COMPOUND_SYLLABLE("COMPOUNDSYLLABLE"),
 	/** Needed for special compounding rules in Hungarian */
 //	SYLLABLE_NUMBER("SYLLABLENUM"),
@@ -143,7 +143,7 @@ public enum AffixTag{
 //	SUB_STANDARD("SUBSTANDARD"),
 	/** Extends tokenizer of Hunspell command line interface with additional word character */
 //	WORD_CHARS("WORDCHARS"),
-	/** SS letter pair in uppercased (German) words may be upper case sharp s (ß). Hunspell can handle this special casing with the CHECKSHARPS declaration (see also KEEPCASE flag and tests/germancompounding example) in both spelling and suggestion */
+	/** SS letter pair in uppercased (German) words may be uppercase sharp s (ß). Hunspell can handle this special casing with the CHECKSHARPS declaration (see also KEEPCASE flag and tests/germancompounding example) in both spelling and suggestion */
 //	CHECK_SHARPS("CHECKSHARPS");
 
 
