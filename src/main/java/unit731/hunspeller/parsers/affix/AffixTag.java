@@ -98,11 +98,8 @@ public enum AffixTag{
 	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
 	CIRCUMFIX("CIRCUMFIX"),
-	/**
-	 * Signs forbidden word form (because affixed forms are also forbidden, excepts with root homonyms, we can subtract a subset
-	 * from the set of accepted affixed and compound words)
-	 */
-//	FORBIDDEN_WORD("FORBIDDENWORD"),
+	/** Signs forbidden word form (affixed forms are also forbidden, excepts root homonyms) */
+	FORBIDDEN_WORD("FORBIDDENWORD"),
 
 	//Options for affix creation
 	PREFIX("PFX"),

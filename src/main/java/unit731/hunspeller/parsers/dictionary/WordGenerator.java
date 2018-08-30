@@ -283,6 +283,8 @@ public class WordGenerator{
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
+//FIXME
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 		boolean hasForbidCompoundFlag = (affParser.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affParser.getPermitCompoundFlag() != null);
 		boolean forbidDifferentCasesInCompound = affParser.isForbidDifferentCasesInCompound();

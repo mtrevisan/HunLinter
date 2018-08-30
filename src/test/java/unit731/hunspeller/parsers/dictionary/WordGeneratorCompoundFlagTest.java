@@ -571,9 +571,6 @@ public class WordGeneratorCompoundFlagTest{
 			"szerviz"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 40, 3);
-//words.forEach(stem -> System.out.println(stem));
-		//good: vízszer, szerkocsi
-		//bad: szervíz, szervízkocsi, kocsiszervíz
 		List<Production> expected = Arrays.asList(
 			createProduction("szerszer", null, "pa:szer st:szer pa:szer st:szer"),
 			createProduction("szerkocsi", null, "pa:szer st:szer pa:kocsi st:kocsi"),
@@ -608,6 +605,37 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("vízvízvíz", null, "pa:víz st:víz pa:víz st:víz pa:víz st:víz"),
 			createProduction("vízvízkocsi", null, "pa:víz st:víz pa:víz st:víz pa:kocsi st:kocsi"),
 			createProduction("vízvízszerviz", null, "pa:víz st:víz pa:víz st:víz pa:szerviz st:szerviz")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+
+	@Test
+	public void forbiddenWord() throws IOException, TimeoutException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORBIDDENWORD X",
+			"COMPOUNDFLAG Y",
+			"SFX A Y 1",
+			"SFX A 0 s .");
+		loadData(affFile.getAbsolutePath());
+
+		String[] inputCompounds = new String[]{
+			"foo/S",
+			"foo/YX",
+			"foo/Y",
+			"foo/S",
+			"bar/YS",
+			"bars/X",
+			"foos/X"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+words.forEach(stem -> System.out.println(stem));
+//bad: bars, foos, foobar, barfoo
+		List<Production> expected = Arrays.asList(
+			createProduction("foo", null, "pa:foo st:foo"),
+			createProduction("bar", null, "pa:bar st:bar")
 		);
 		Assert.assertEquals(expected, words);
 	}
