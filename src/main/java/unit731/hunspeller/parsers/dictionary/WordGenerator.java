@@ -325,6 +325,10 @@ public class WordGenerator{
 				StringHelper.Casing lastWordCasing = null;
 				for(int i = 0; i < indexes.length; i ++){
 					Production next = expandedPermutationEntries.get(i).get(indexes[i]);
+					if(next.hasContinuationFlag(forbiddenWordFlag)){
+						sb.setLength(0);
+						break;
+					}
 					compoundEntries.add(next);
 
 					String nextCompound = next.getWord();
@@ -621,12 +625,13 @@ public class WordGenerator{
 		String[] appliedAffixes = applyAffixes.get(0);
 		String[] postponedAffixes = applyAffixes.get(1);
 
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
+
 		List<Production> productions = new ArrayList<>();
-		if(appliedAffixes.length > 0){
+		if(appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag)){
 			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 			String permitCompoundFlag = affParser.getPermitCompoundFlag();
-			String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
 			String word = dicEntry.getWord();
 

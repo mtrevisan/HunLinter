@@ -630,16 +630,13 @@ public class WordGeneratorCompoundFlagTest{
 			"foos/X"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
-words.forEach(stem -> System.out.println(stem));
-//bad: bars, foos, foobar, barfoo
+//words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
 			createProduction("foofoos", null, "pa:foo st:foo po:1 pa:foo st:foo po:1"),
 			createProduction("foofoo", null, "pa:foo st:foo po:1 pa:foo st:foo po:3"),
 			createProduction("foobar", "S", "pa:foo st:foo po:1 pa:bar st:bar po:4"),
 			createProduction("foobars", null, "pa:foo st:foo po:1 pa:bar st:bar po:4"),
-			createProduction("foofoos", null, "pa:foo st:foo po:2 pa:foo st:foo po:1"),
-			createProduction("foobars", null, "pa:foo st:foo po:2 pa:bar st:bar po:4"),
 			createProduction("foofoo", "S", "pa:foo st:foo po:3 pa:foo st:foo po:1"),
 			createProduction("foofoos", null, "pa:foo st:foo po:3 pa:foo st:foo po:1"),
 			createProduction("foofoo", null, "pa:foo st:foo po:3 pa:foo st:foo po:3"),
@@ -649,11 +646,7 @@ words.forEach(stem -> System.out.println(stem));
 			createProduction("barfoos", null, "pa:bar st:bar po:4 pa:foo st:foo po:1"),
 			createProduction("barfoo", null, "pa:bar st:bar po:4 pa:foo st:foo po:3"),
 			createProduction("barbar", "S", "pa:bar st:bar po:4 pa:bar st:bar po:4"),
-			createProduction("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4"),
-			createProduction("barsfoos", null, "pa:bars st:bars pa:foo st:foo po:1"),
-			createProduction("barsbars", null, "pa:bars st:bars pa:bar st:bar po:4"),
-			createProduction("foosfoos", null, "pa:foos st:foos pa:foo st:foo po:1"),
-			createProduction("foosbars", null, "pa:foos st:foos pa:bar st:bar po:4")
+			createProduction("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4")
 		);
 		Assert.assertEquals(expected, words);
 	}
