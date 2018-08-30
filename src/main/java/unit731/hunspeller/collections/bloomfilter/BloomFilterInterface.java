@@ -1,7 +1,6 @@
 package unit731.hunspeller.collections.bloomfilter;
 
 import java.nio.charset.Charset;
-import java.util.List;
 import unit731.hunspeller.collections.bloomfilter.decompose.Decomposer;
 
 
@@ -48,15 +47,6 @@ public interface BloomFilterInterface<T>{
 	 * @return <code>true</code> if the value was added to the bloom filter, <code>false</code> otherwise
 	 */
 	boolean add(T value);
-
-	/**
-	 * Returns the indexes modified by inserting the given value object to the bloom filter by decomposing it using
-	 * the given/default {@link Decomposer}
-	 *
-	 * @param value	The object to be added to the bloom filter
-	 * @return <code>true</code> if the value was added to the bloom filter, <code>false</code> otherwise
-	 */
-	List<Integer> indexes(T value);
 
 	/**
 	 * Check if the value object is present in the bloom filter or not by decomposing it using the given/default decomposer

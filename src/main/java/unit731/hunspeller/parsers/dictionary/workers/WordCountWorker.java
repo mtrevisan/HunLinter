@@ -36,7 +36,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 			List<Production> productions = wordGenerator.applyRules(line);
 
 			totalProductions += productions.size();
-			productions.forEach(production -> dictionary.add(production.getWord()));
+			for(Production production : productions)
+				dictionary.add(production.getWord());
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){

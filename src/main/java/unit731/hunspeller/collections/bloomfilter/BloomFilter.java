@@ -2,11 +2,7 @@ package unit731.hunspeller.collections.bloomfilter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -152,16 +148,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
 	public boolean add(byte[] bytes){
-		boolean bitsChanged = calculateIndexes(bytes, index -> {});
+		boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;
 		return bitsChanged;
-	}
-
-	private List<Integer> indexes(byte[] bytes){
-		List<Integer> indexes = new ArrayList<>();
-		calculateIndexes(bytes, indexes::add);
-		return indexes;
 	}
 
 	/**
@@ -170,21 +160,20 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private boolean calculateIndexes(byte[] bytes, Consumer<Integer> callback){
+	private boolean calculateIndexes(byte[] bytes){
 		boolean bitsChanged = false;
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
 		int highHash = (int)(hash >>> 32);
+		int size = bitArray.size();
 		for(int i = 1; i <= hashFunctions; i ++){
 			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 
-			int index = nextHash % bitArray.size();
+			int index = nextHash % size;
 			bitsChanged |= bitArray.set(index);
-
-			callback.accept(index);
 		}
 		return bitsChanged;
 	}
@@ -199,13 +188,14 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
 		int highHash = (int)(hash >>> 32);
+		int size = bitArray.size();
 		for(int i = 1; i <= hashFunctions; i ++){
 			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 
-			int index = nextHash % bitArray.size();
+			int index = nextHash % size;
 			if(!bitArray.get(index))
 				return false;
 		}
@@ -248,11 +238,6 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public boolean add(T value){
 		return (value != null && add(decomposeValue(value)));
-	}
-
-	@Override
-	public List<Integer> indexes(T value){
-		return (value != null? indexes(decomposeValue(value)): Collections.<Integer>emptyList());
 	}
 
 	@Override
