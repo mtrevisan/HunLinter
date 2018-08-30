@@ -27,7 +27,8 @@ public class AffixEntry{
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
 	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
-	public static final String SLASH = "/";
+	private static final String SLASH = "/";
+	private static final String SLASH_ESCAPED = "\\/";
 	private static final Matcher MATCHER_ENTRY = PatternHelper.matcher("\t.*$");
 
 	public static final String DOT = ".";
@@ -80,13 +81,13 @@ public class AffixEntry{
 		String[] lineParts = StringUtils.split(line, null, 6);
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
-		String removal = StringUtils.replace(lineParts[2], "\\/", "/");
+		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		Matcher m = ENTRY_PATTERN.reset(lineParts[3]);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse affix line " + line);
-		String addition = StringUtils.replace(m.group(PARAM_CONDITION), "\\/", "/");
+		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
-		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], "\\/", "/"): DOT);
+		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
 		type = Type.toEnum(ruleType);

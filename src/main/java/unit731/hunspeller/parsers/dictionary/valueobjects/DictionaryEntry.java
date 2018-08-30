@@ -34,6 +34,9 @@ public class DictionaryEntry{
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
 	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
 
+	private static final String SLASH = "/";
+	private static final String SLASH_ESCAPED = "\\/";
+
 
 	@NonNull
 	@Getter
@@ -56,7 +59,7 @@ public class DictionaryEntry{
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
-		word = StringUtils.replace(m.group(PARAM_WORD), "\\/", "/");
+		word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		String dicFlags = m.group(PARAM_FLAGS);
 		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
@@ -183,7 +186,7 @@ public class DictionaryEntry{
 	public String toString(FlagParsingStrategy strategy){
 		StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
-			sb.append(AffixEntry.SLASH);
+			sb.append(SLASH);
 			if(strategy != null)
 				sb.append(strategy.joinFlags(continuationFlags));
 			else
