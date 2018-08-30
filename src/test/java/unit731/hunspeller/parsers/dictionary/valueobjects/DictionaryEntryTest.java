@@ -58,33 +58,33 @@ public class DictionaryEntryTest{
 		line = "abc\\/def";
 		entry = new DictionaryEntry(line, affParser.getFlagParsingStrategy());
 
-		Assert.assertEquals("abc\\/def", entry.getWord());
+		Assert.assertEquals("abc/def", entry.getWord());
 		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc\\/def"}, entry.morphologicalFields);
+		Assert.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def/ABC";
 		entry = new DictionaryEntry(line, affParser.getFlagParsingStrategy());
 
-		Assert.assertEquals("abc\\/def", entry.word);
+		Assert.assertEquals("abc/def", entry.word);
 		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc\\/def"}, entry.morphologicalFields);
+		Assert.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def	po:noun";
 		entry = new DictionaryEntry(line, affParser.getFlagParsingStrategy());
 
-		Assert.assertEquals("abc\\/def", entry.word);
+		Assert.assertEquals("abc/def", entry.word);
 		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc\\/def", "po:noun"}, entry.morphologicalFields);
+		Assert.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def/ABC	po:noun";
 		entry = new DictionaryEntry(line, affParser.getFlagParsingStrategy());
 
-		Assert.assertEquals("abc\\/def", entry.word);
+		Assert.assertEquals("abc/def", entry.word);
 		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc\\/def", "po:noun"}, entry.morphologicalFields);
+		Assert.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
 	}
 
 }

@@ -23,6 +23,10 @@ import unit731.hunspeller.services.PatternHelper;
 @EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
+	private static final int PARAM_CONDITION = 1;
+	private static final int PARAM_CONTINUATION_CLASSES = 2;
+	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
+
 	public static final String SLASH = "/";
 	private static final Matcher MATCHER_ENTRY = PatternHelper.matcher("\t.*$");
 
@@ -76,14 +80,17 @@ public class AffixEntry{
 		String[] lineParts = StringUtils.split(line, null, 6);
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
-		String removal = lineParts[2];
-		String[] additionParts = StringUtils.split(lineParts[3], SLASH);
-		String addition = additionParts[0];
-		String cond = (lineParts.length > 4? lineParts[4]: DOT);
+		String removal = StringUtils.replace(lineParts[2], "\\/", "/");
+		Matcher m = ENTRY_PATTERN.reset(lineParts[3]);
+		if(!m.find())
+			throw new IllegalArgumentException("Cannot parse affix line " + line);
+		String addition = StringUtils.replace(m.group(PARAM_CONDITION), "\\/", "/");
+		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
+		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], "\\/", "/"): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
 		type = Type.toEnum(ruleType);
-		String[] classes = strategy.parseFlags((additionParts.length > 1? expandAliases(additionParts[1], aliasesFlag): null));
+		String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);

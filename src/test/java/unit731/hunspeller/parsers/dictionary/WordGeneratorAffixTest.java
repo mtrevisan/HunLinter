@@ -739,4 +739,28 @@ public class WordGeneratorAffixTest{
 		//lastfold productions
 	}
 
+
+	@Test
+	public void escapeSlash() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"SFX A Y 1",
+			"SFX A 0 x .",
+			"SFX B Y 1",
+			"SFX B 0 y\\/z .");
+		loadData(affFile.getAbsolutePath());
+
+
+		String line = "foo\\/bar/AB";
+		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		Assert.assertEquals(3, words.size());
+		//base production
+		Assert.assertEquals(createProduction("foo/bar", "AB", "st:foo/bar"), words.get(0));
+		//onefold productions
+		Assert.assertEquals(createProduction("foo/barx", null, "st:foo/bar"), words.get(1));
+		Assert.assertEquals(createProduction("foo/bary/z", null, "st:foo/bar"), words.get(2));
+		//twofold productions
+		//lastfold productions
+	}
+
 }
