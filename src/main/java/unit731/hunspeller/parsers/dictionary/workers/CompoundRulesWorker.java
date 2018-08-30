@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.extern.slf4j.Slf4j;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
@@ -13,7 +12,6 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBa
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
 public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Compound rules extraction";
