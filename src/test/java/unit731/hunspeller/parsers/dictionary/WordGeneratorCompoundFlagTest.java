@@ -177,9 +177,9 @@ public class WordGeneratorCompoundFlagTest{
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
 			"PFX P Y 1",
-			"PFX P 0 pre .",
+			"PFX P 0 pre .	po:pre",
 			"SFX S Y 1",
-			"SFX S 0 suf .");
+			"SFX S 0 suf .	po:suf");
 		loadData(affFile.getAbsolutePath());
 
 
@@ -190,10 +190,10 @@ public class WordGeneratorCompoundFlagTest{
 		//base production
 		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "P", "st:foo"), words.get(1));
+		Assert.assertEquals(createProduction("foosuf", "P", "st:foo po:suf"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(2));
-		Assert.assertEquals(createProduction("prefoosuf", null, "st:foo"), words.get(3));
+		Assert.assertEquals(createProduction("prefoo", "S", "po:pre st:foo"), words.get(2));
+		Assert.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo po:suf"), words.get(3));
 		//lastfold productions
 
 
@@ -204,21 +204,21 @@ public class WordGeneratorCompoundFlagTest{
 		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 4, 2);
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
-			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo"),
-			createProduction("prefoofoo", "S", "pa:foo st:foo pa:foo st:foo"),
-			createProduction("prefoofoosuf", null, "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo po:suf"),
+			createProduction("prefoofoo", "S", "po:pre pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoosuf", null, "po:pre pa:foo st:foo pa:foo st:foo po:suf"),
 			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
-			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar"),
-			createProduction("prefoobar", "S", "pa:foo st:foo pa:bar st:bar"),
-			createProduction("prefoobarsuf", null, "pa:foo st:foo pa:bar st:bar"),
+			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar po:suf"),
+			createProduction("prefoobar", "S", "po:pre pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobarsuf", null, "po:pre pa:foo st:foo pa:bar st:bar po:suf"),
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
-			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo"),
-			createProduction("prebarfoo", "S", "pa:bar st:bar pa:foo st:foo"),
-			createProduction("prebarfoosuf", null, "pa:bar st:bar pa:foo st:foo"),
+			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo po:suf"),
+			createProduction("prebarfoo", "S", "po:pre pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoosuf", null, "po:pre pa:bar st:bar pa:foo st:foo po:suf"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbarsuf", null, "pa:bar st:bar pa:bar st:bar")
+			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar po:suf"),
+			createProduction("prebarbar", "S", "po:pre pa:bar st:bar pa:bar st:bar"),
+			createProduction("prebarbarsuf", null, "po:pre pa:bar st:bar pa:bar st:bar po:suf")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -622,11 +622,10 @@ public class WordGeneratorCompoundFlagTest{
 		loadData(affFile.getAbsolutePath());
 
 		String[] inputCompounds = new String[]{
-			"foo/S	[1]",
-			"foo/YX	[2]",
-			"foo/Y	[3]",
-			"foo/S	[4]",
-			"bar/YS	[5]",
+			"foo/S	po:1",
+			"foo/YX	po:2",
+			"foo/Y	po:3",
+			"bar/YS	po:4",
 			"bars/X",
 			"foos/X"
 		};
@@ -634,8 +633,8 @@ public class WordGeneratorCompoundFlagTest{
 words.forEach(stem -> System.out.println(stem));
 //bad: bars, foos, foobar, barfoo
 		List<Production> expected = Arrays.asList(
-			createProduction("foo", null, "pa:foo st:foo"),
-			createProduction("bar", null, "pa:bar st:bar")
+			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
+			createProduction("foofoos", null, "pa:foo st:foo pa:foo st:foo")
 		);
 		Assert.assertEquals(expected, words);
 	}
