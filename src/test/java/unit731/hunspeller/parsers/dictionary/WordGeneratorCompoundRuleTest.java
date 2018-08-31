@@ -28,7 +28,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRule_BjörnJacke() throws IOException{
+	public void testBjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -54,7 +54,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleSimple() throws IOException{
+	public void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -75,7 +75,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleInfinite() throws IOException{
+	public void infinite() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -98,7 +98,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleZeroOrOne() throws IOException{
+	public void zeroOrOne() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -119,7 +119,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleLongFlag() throws IOException{
+	public void longFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -141,7 +141,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void compoundRuleNumericalFlag() throws IOException{
+	public void numericalFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -160,6 +160,26 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
 		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
+	}
+
+
+	@Test
+	public void forbiddenWord() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORBIDDENWORD X",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "vw";
+		String[] inputCompounds = new String[]{
+			"arbeits/v",
+			"scheu/wX"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+		Assert.assertTrue(words.isEmpty());
 	}
 
 }

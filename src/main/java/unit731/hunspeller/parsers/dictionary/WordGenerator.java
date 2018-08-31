@@ -180,6 +180,8 @@ public class WordGenerator{
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
+		String forceCompoundUppercaseFlag = affParser.getForceCompoundUppercaseFlag();
 
 		//extract map flag -> regex of compounds
 		Map<String, String> inputs = extractCompoundRules(inputCompounds);
@@ -192,11 +194,28 @@ public class WordGenerator{
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
 		//generate all the words that matches the given regex
 		List<String> generatedWords = regexWordGenerator.generateAll(limit);
-		List<Production> productions = generatedWords.stream()
-			//convert using output table
-			.map(affParser::applyOutputConversionTable)
-			.map(word -> new Production(word, null, (List<DictionaryEntry>)null, strategy))
-			.collect(Collectors.toList());
+
+//		List<Production> productions = generatedWords.stream()
+//			//convert using output table
+//			.map(affParser::applyOutputConversionTable)
+//			.map(word -> new Production(word, null, (List<DictionaryEntry>)null, strategy))
+//			.collect(Collectors.toList());
+
+		List<Production> productions = new ArrayList<>();
+		//convert using output table
+		int size = generatedWords.size();
+		for(int i = 0; i < size; i ++){
+			Production production = generatedWords.get(i);
+
+			String word = production.getWord();
+			List<DictionaryEntry> compoundEntries = production.getCompoundEntries();
+			if(compoundEntries != null && !compoundEntries.isEmpty()
+					&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
+				word = StringUtils.capitalize(word);
+
+			word = affParser.applyOutputConversionTable(word);
+			productions.add(new Production(word, production));
+		}
 
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
@@ -416,6 +435,7 @@ public class WordGenerator{
 		int size = productions.size();
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
+
 			String word = production.getWord();
 			List<DictionaryEntry> compoundEntries = production.getCompoundEntries();
 			if(compoundEntries != null && !compoundEntries.isEmpty()

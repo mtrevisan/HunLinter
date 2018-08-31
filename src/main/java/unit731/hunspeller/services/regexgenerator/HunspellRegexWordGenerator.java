@@ -195,8 +195,7 @@ public class HunspellRegexWordGenerator{
 		return (max > min? random.nextInt(max - min): 0) + min;
 	}
 
-	private String generate(State initialState, Function<Integer, Integer> fnTransition,
-			BiFunction<Character, Character, Character> fnCharIntoTransition){
+	private String generate(State initialState, Function<Integer, Integer> fnTransition, BiFunction<Character, Character, Character> fnCharIntoTransition){
 		State state = initialState;
 		StringBuilder sb = new StringBuilder();
 		Map<State, Set<Integer>> automatonSelectedTransitions = new HashMap<>();
