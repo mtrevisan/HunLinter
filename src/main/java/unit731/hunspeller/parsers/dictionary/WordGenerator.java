@@ -203,13 +203,13 @@ public class WordGenerator{
 		List<List<List<Production>>> entries = new ArrayList<>();
 		for(String permutation : permutations){
 			//expand permutation
-			List<List<Production>> expandedPermutationEntries = permutation.chars()
-				.mapToObj(String::valueOf)
+			List<List<Production>> expandedPermutationEntries = strategy.extractCompoundRule(permutation).stream()
+				.map(flag -> flag.substring(1, flag.length() - 1))
 				.map(inputs::get)
 				.flatMap(Set::stream)
 				.map(entry -> WordGenerator.this.applyAffixRules(entry, true))
 				.collect(Collectors.toList());
-			if(expandedPermutationEntries.size() >= 2 && !expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
 		}
 
@@ -324,7 +324,7 @@ public class WordGenerator{
 				.mapToObj(inputs::get)
 				.map(entry -> WordGenerator.this.applyAffixRules(entry, true))
 				.collect(Collectors.toList());
-			if(expandedPermutationEntries.size() >= 2 && !expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
 		}
 
