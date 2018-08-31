@@ -97,7 +97,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasContinuationFlag(String ... continuationFlags){
-		if(this.continuationFlags != null)
+		if(this.continuationFlags != null && continuationFlags != null)
 			for(String flag : this.continuationFlags)
 				if(ArrayUtils.contains(continuationFlags, flag))
 					return true;
