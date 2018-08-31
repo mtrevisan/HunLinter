@@ -204,13 +204,21 @@ public class WordGenerator{
 		for(String permutation : permutations){
 			//expand permutation
 			String[] flags = StringUtils.split(permutation, "()");
-			List<List<Production>> expandedPermutationEntries = Arrays.stream(flags)
-				.map(inputs::get)
-				.flatMap(Set::stream)
-				.map(entry -> applyAffixRules(entry, true))
-				.collect(Collectors.toList());
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-				entries.add(expandedPermutationEntries);
+//			List<List<Production>> expandedPermutationEntries = Arrays.stream(flags)
+//				.map(inputs::get)
+//				.flatMap(Set::stream)
+//				.map(entry -> applyAffixRules(entry, true))
+//				.collect(Collectors.toList());
+//			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+//				entries.add(expandedPermutationEntries);
+			for(String flag : flags){
+				List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+				Set<DictionaryEntry> ins = inputs.get(flag);
+				for(DictionaryEntry entry : ins)
+					expandedPermutationEntries.add(applyAffixRules(entry, true));
+				if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+					entries.add(expandedPermutationEntries);
+			}
 		}
 
 		return applyCompound(entries);
