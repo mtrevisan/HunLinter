@@ -187,13 +187,14 @@ public class WordGenerator{
 		//extract map flag -> regex of compounds
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
-		checkCorrectness(inputs, compoundRule);
+		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		checkInputCorrectness(inputs, compoundRuleComponents);
 
 		filterCompoundRules(inputs);
 
 //TODO refactor -- begin
-		//escape reserved characters
-		compoundRule = Pattern.quote(compoundRule);
+		//TODO escape reserved characters like '(', ')', '*', and '?'
+//		compoundRule = Pattern.quote(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
 		//generate all the words that matches the given regex
 		List<String> permutations = regexWordGenerator.generateAll(limit);
@@ -262,13 +263,13 @@ public class WordGenerator{
 		return compoundRules;
 	}
 
-	private void checkCorrectness(Map<String, Set<DictionaryEntry>> inputs, String compoundRule){
+	private void checkInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, List<String> compoundRuleComponents){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 		for(String component : compoundRuleComponents){
 			String flag = strategy.cleanCompoundRuleComponent(component);
 			if(inputs.get(flag) == null)
-				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule " + compoundRule);
+				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule "
+					+ StringUtils.join(compoundAsReplacement, StringUtils.EMPTY));
 		}
 	}
 
