@@ -79,7 +79,7 @@ public class WordGenerator{
 		String word = affParser.applyInputConversionTable(dicEntry.getWord());
 		dicEntry = new DictionaryEntry(word, dicEntry);
 
-		List<Production> productions = WordGenerator.this.applyAffixRules(dicEntry, false);
+		List<Production> productions = applyAffixRules(dicEntry, false);
 
 		//convert using output table
 		int size = productions.size();
@@ -203,11 +203,11 @@ public class WordGenerator{
 		List<List<List<Production>>> entries = new ArrayList<>();
 		for(String permutation : permutations){
 			//expand permutation
-			List<List<Production>> expandedPermutationEntries = strategy.extractCompoundRule(permutation).stream()
-				.map(flag -> flag.substring(1, flag.length() - 1))
+			String[] flags = StringUtils.split(permutation, "()");
+			List<List<Production>> expandedPermutationEntries = Arrays.stream(flags)
 				.map(inputs::get)
 				.flatMap(Set::stream)
-				.map(entry -> WordGenerator.this.applyAffixRules(entry, true))
+				.map(entry -> applyAffixRules(entry, true))
 				.collect(Collectors.toList());
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
@@ -322,7 +322,7 @@ public class WordGenerator{
 			//expand permutation
 			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
 				.mapToObj(inputs::get)
-				.map(entry -> WordGenerator.this.applyAffixRules(entry, true))
+				.map(entry -> applyAffixRules(entry, true))
 				.collect(Collectors.toList());
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
@@ -428,7 +428,7 @@ public class WordGenerator{
 						else{
 							//add boundary affixes
 							Production p = new Production(word, flags, compoundEntries, strategy);
-							List<Production> prods = WordGenerator.this.applyAffixRules(p, false);
+							List<Production> prods = applyAffixRules(p, false);
 
 							//remove twofold because they're not allowed in compounds
 							if(!allowTwofoldAffixesInCompound){
@@ -555,7 +555,7 @@ public class WordGenerator{
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
 		List<String[]> applyAffixes = dicEntry.extractAffixes(affParser, reverse);
-		return WordGenerator.this.applyAffixRules(dicEntry, applyAffixes, isCompound);
+		return applyAffixRules(dicEntry, applyAffixes, isCompound);
 	}
 
 	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
