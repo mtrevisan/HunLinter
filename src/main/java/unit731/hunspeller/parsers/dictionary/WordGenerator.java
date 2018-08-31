@@ -29,15 +29,14 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWork
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.StringHelper;
-import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 @Slf4j
 public class WordGenerator{
 
-	private static final String PIPE = "|";
-	private static final String LEFT_PARENTHESIS = "(";
-	private static final String RIGHT_PARENTHESIS = ")";
+//	private static final String PIPE = "|";
+//	private static final String LEFT_PARENTHESIS = "(";
+//	private static final String RIGHT_PARENTHESIS = ")";
 
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
