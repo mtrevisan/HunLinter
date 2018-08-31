@@ -29,6 +29,7 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWork
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.StringHelper;
+import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
 @Slf4j
@@ -190,14 +191,17 @@ public class WordGenerator{
 		filterCompoundRules(inputs);
 
 //TODO refactor -- begin
-		//compose true compound rule
-//		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
-//		if(expandedCompoundRule == null)
-//			throw new NoApplicableRuleException("Cannot complete compound rule, some words are missing");
-//
-//		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(expandedCompoundRule, true);
-//		//generate all the words that matches the given regex
-//		List<String> generatedWords = regexWordGenerator.generateAll(limit);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
+		//generate all the words that matches the given regex
+		List<String> permutations = regexWordGenerator.generateAll(limit);
+
+		StringBuilder sb = new StringBuilder();
+		List<Production> productions = new ArrayList<>();
+		//generate compounds:
+		for(String permutation : permutations){
+			//compose compound:
+			//TODO
+		}
 
 //		List<Production> productions = generatedWords.stream()
 //			//convert using output table
@@ -206,7 +210,6 @@ public class WordGenerator{
 //			.collect(Collectors.toList());
 //TODO refactor -- end
 
-		List<Production> productions = new ArrayList<>();
 		//convert using output table
 //		int size = generatedWords.size();
 //		for(int i = 0; i < size; i ++){
@@ -237,10 +240,9 @@ public class WordGenerator{
 			//convert using input table
 			inputCompound = affParser.applyInputConversionTable(inputCompound);
 
-			//filter input set by minimum length and forbidden flag
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
-			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
 
+			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
 			//merge the distribution with the others
 			compoundRules = Stream.of(compoundRules, distribution)
 				.flatMap(m -> m.entrySet().stream())
@@ -343,11 +345,13 @@ public class WordGenerator{
 		compoundAsReplacement.clear();
 
 		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
+
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
+		List<int[]> permutations = perm.permutations(limit);
 
 		StringBuilder sb = new StringBuilder();
 		List<Production> productions = new ArrayList<>();
-		List<int[]> permutations = perm.permutations(limit);
+		//generate compounds:
 		for(int[] permutation : permutations){
 			//expand permutation
 			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
@@ -357,7 +361,7 @@ public class WordGenerator{
 			if(expandedPermutationEntries.size() < 2 || expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				continue;
 
-			//compose compounds:
+			//compose compound:
 			boolean completed = false;
 			int[] indexes = new int[expandedPermutationEntries.size()];
 			while(!completed){
