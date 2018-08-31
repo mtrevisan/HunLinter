@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +38,8 @@ public class WordGenerator{
 //	private static final String PIPE = "|";
 //	private static final String LEFT_PARENTHESIS = "(";
 //	private static final String RIGHT_PARENTHESIS = ")";
+	private static final String DOUBLE_LEFT_PARENTHESIS = "(\\(";
+	private static final String DOUBLE_RIGHT_PARENTHESIS = "\\))";
 
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
@@ -195,6 +196,7 @@ public class WordGenerator{
 //TODO refactor -- begin
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
+		compoundRule = formatCompoundRule(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
 		//generate all the words that matches the given regex
 		List<String> permutations = regexWordGenerator.generateAll(limit);
@@ -287,6 +289,22 @@ public class WordGenerator{
 					itr.remove();
 			}
 		}
+	}
+
+	private String formatCompoundRule(String compoundRule){
+		if(compoundRule.charAt(0) == '(')
+			compoundRule = StringUtils.replaceEach(compoundRule, new String[]{"(", ")"}, new String[]{DOUBLE_LEFT_PARENTHESIS, DOUBLE_RIGHT_PARENTHESIS});
+		else{
+			StringBuilder sb = new StringBuilder();
+			for(char chr : compoundRule.toCharArray()){
+				if(chr != '?' && chr != '*')
+					sb.append(DOUBLE_LEFT_PARENTHESIS).append(chr).append(DOUBLE_RIGHT_PARENTHESIS);
+				else
+					sb.append(chr);
+			}
+			compoundRule = sb.toString();
+		}
+		return compoundRule;
 	}
 
 //	private String composeTrueCompoundRule(Map<String, String> inputs, String compoundRule){
