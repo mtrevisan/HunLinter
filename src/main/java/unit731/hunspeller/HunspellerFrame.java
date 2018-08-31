@@ -1778,7 +1778,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
 				String word = production.getWord();
-				if(!production.collectFlagsFromCompoundRule(affParser).isEmpty() || production.hasContinuationFlag(compoundFlag))
+				if(!production.distributeByCompoundRule(affParser).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
 			Runnable done = () -> {

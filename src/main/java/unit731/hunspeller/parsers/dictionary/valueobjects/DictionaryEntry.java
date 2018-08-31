@@ -104,10 +104,10 @@ public class DictionaryEntry{
 		return false;
 	}
 
-	public Map<String, Set<String>> collectFlagsFromCompoundRule(AffixParser affParser){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixParser affParser){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affParser::isManagedByCompoundRule)
-			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> word, Collectors.toSet())));
+			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
 	public boolean hasPartOfSpeech(String partOfSpeech){
