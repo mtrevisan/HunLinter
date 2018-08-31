@@ -1040,7 +1040,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-				List<Production> productions = frame.backbone.getWordGenerator().applyRules(inputText);
+				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(inputText);
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);

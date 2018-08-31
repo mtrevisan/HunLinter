@@ -30,7 +30,7 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 
 
 		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
-			List<Production> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			try{
 				for(Production production : productions){

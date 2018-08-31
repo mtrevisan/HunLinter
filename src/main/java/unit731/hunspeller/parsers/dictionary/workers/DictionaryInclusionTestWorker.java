@@ -32,7 +32,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 		dictionary.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
-			List<Production> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			productions.forEach(production -> dictionary.add(production.getWord()));
 		};

@@ -183,7 +183,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -237,7 +237,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -294,7 +294,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -357,7 +357,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -458,7 +458,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production

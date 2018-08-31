@@ -33,7 +33,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		dictionary.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
-			List<Production> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			totalProductions += productions.size();
 			for(Production production : productions)

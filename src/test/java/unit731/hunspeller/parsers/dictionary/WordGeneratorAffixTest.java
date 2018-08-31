@@ -81,7 +81,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/AÜ";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
@@ -114,7 +114,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/999,54321";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
@@ -146,7 +146,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/A3";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
@@ -179,7 +179,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/zx09";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(8, words.size());
 		//base production
@@ -211,7 +211,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -237,7 +237,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(5, words.size());
 		//base production
@@ -265,7 +265,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -292,7 +292,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1P1";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -321,7 +321,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/P1S1";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -353,7 +353,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDE";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(14, words.size());
 		//base production
@@ -386,7 +386,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		backbone.getWordGenerator().applyRules(line);
+		backbone.getWordGenerator().applyAffixRules(line);
 	}
 
 	@Test
@@ -399,7 +399,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/A";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
@@ -427,7 +427,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "aa/S1";
-		backbone.getWordGenerator().applyRules(line);
+		backbone.getWordGenerator().applyAffixRules(line);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -453,7 +453,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDEFGH";
-		backbone.getWordGenerator().applyRules(line);
+		backbone.getWordGenerator().applyAffixRules(line);
 	}
 
 
@@ -475,7 +475,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDE";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(14, words.size());
 		//base production
@@ -510,7 +510,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "ouro/B";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(3, words.size());
 		//base production
@@ -534,7 +534,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "ⲟⲩⲣⲟ/B";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(3, words.size());
 		//base production
@@ -570,7 +570,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "a/ABCDEFGH";
-		backbone.getWordGenerator().applyRules(line);
+		backbone.getWordGenerator().applyAffixRules(line);
 	}
 
 
@@ -586,7 +586,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/A";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
@@ -613,7 +613,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "foo/AC";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(12, words.size());
 		//base production
@@ -651,7 +651,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "nagy/C";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -681,7 +681,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "drink/S	po:noun";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(2, words.size());
 		//base production
@@ -693,7 +693,7 @@ public class WordGeneratorAffixTest{
 
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
-		words = backbone.getWordGenerator().applyRules(line);
+		words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(6, words.size());
 		//base production
@@ -726,7 +726,7 @@ public class WordGeneratorAffixTest{
 
 
 		String line = "foo/1";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
 		Assert.assertEquals(4, words.size());
 		//base production
@@ -752,7 +752,7 @@ public class WordGeneratorAffixTest{
 
 
 		String line = "foo\\/bar/AB";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 		Assert.assertEquals(3, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo/bar", "AB", "st:foo/bar"), words.get(0));
@@ -775,7 +775,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		String line = "forbidden/!s";
-		List<Production> words = backbone.getWordGenerator().applyRules(line);
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 		Assert.assertTrue(words.isEmpty());
 	}
 

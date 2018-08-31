@@ -28,7 +28,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(lockable);
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
-			List<Production> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyAffixRules(line);
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};

@@ -21,7 +21,7 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(wordGenerator);
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
-			List<Production> productions = wordGenerator.applyRules(line);
+			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};

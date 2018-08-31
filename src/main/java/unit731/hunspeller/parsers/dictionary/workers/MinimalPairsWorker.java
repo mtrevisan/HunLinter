@@ -98,7 +98,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<Production> productions = wordGenerator.applyRules(line);
+							List<Production> productions = wordGenerator.applyAffixRules(line);
 
 							for(Production production : productions)
 								if(checker.shouldBeProcessedForMinimalPair(production)){

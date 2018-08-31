@@ -132,7 +132,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						List<Production> productions = wordGenerator.applyRules(line);
+						List<Production> productions = wordGenerator.applyAffixRules(line);
 
 						productions.stream()
 							.map(Production::toStringWithPartOfSpeechFields)
@@ -187,7 +187,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<Production> productions = wordGenerator.applyRules(line);
+							List<Production> productions = wordGenerator.applyAffixRules(line);
 							String word = productions.get(0).getWord();
 							for(Production production : productions){
 								String text = production.toStringWithPartOfSpeechFields();
