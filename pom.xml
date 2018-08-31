@@ -187,6 +187,9 @@
 		<!-- Murmur3 Hash -->
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
 
+		<!-- Generex -->
+		<com.github.mifmif.version>1.0.2</com.github.mifmif.version>
+
 		<!-- Lombok -->
 		<org.projectlombok.version>1.18.2</org.projectlombok.version>
 
@@ -240,6 +243,13 @@
 			<groupId>com.sangupta</groupId>
 			<artifactId>murmur</artifactId>
 			<version>${com.sangupta.murmur.version}</version>
+		</dependency>
+
+		<!-- Generex -->
+		<dependency>
+			<groupId>com.github.mifmif</groupId>
+			<artifactId>generex</artifactId>
+			<version>${com.github.mifmif.version}</version>
 		</dependency>
 
 		<!-- Lombok -->
