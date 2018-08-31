@@ -186,6 +186,7 @@ public class WordGenerator{
 		//extract map flag -> regex of compounds
 		Map<String, String> inputs = extractCompoundRules(inputCompounds);
 
+//TODO refactor -- begin
 		//compose true compound rule
 		String expandedCompoundRule = composeTrueCompoundRule(inputs, compoundRule);
 		if(expandedCompoundRule == null)
@@ -200,6 +201,7 @@ public class WordGenerator{
 //			.map(affParser::applyOutputConversionTable)
 //			.map(word -> new Production(word, null, (List<DictionaryEntry>)null, strategy))
 //			.collect(Collectors.toList());
+//TODO refactor -- end
 
 		List<Production> productions = new ArrayList<>();
 		//convert using output table
