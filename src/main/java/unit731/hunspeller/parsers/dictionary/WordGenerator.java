@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -191,6 +192,8 @@ public class WordGenerator{
 		filterCompoundRules(inputs);
 
 //TODO refactor -- begin
+		//escape reserved characters
+		compoundRule = Pattern.quote(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
 		//generate all the words that matches the given regex
 		List<String> permutations = regexWordGenerator.generateAll(limit);
@@ -199,6 +202,14 @@ public class WordGenerator{
 		List<Production> productions = new ArrayList<>();
 		//generate compounds:
 		for(String permutation : permutations){
+			//expand permutation
+//			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation.split(""))
+//				.mapToObj(inputs::get)
+//				.map(entry -> applyRules(entry, true))
+//				.collect(Collectors.toList());
+//			if(expandedPermutationEntries.size() < 2 || expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+//				continue;
+
 			//compose compound:
 			//TODO
 		}
@@ -344,9 +355,9 @@ public class WordGenerator{
 		}
 		compoundAsReplacement.clear();
 
-		List<DictionaryEntry> inputCompoundsFlag = extractCompoundFlags(inputCompounds);
+		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 
-		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputCompoundsFlag.size(), maxCompounds, forbidDuplications);
+		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
 		List<int[]> permutations = perm.permutations(limit);
 
 		StringBuilder sb = new StringBuilder();
@@ -355,7 +366,7 @@ public class WordGenerator{
 		for(int[] permutation : permutations){
 			//expand permutation
 			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
-				.mapToObj(inputCompoundsFlag::get)
+				.mapToObj(inputs::get)
 				.map(entry -> applyRules(entry, true))
 				.collect(Collectors.toList());
 			if(expandedPermutationEntries.size() < 2 || expandedPermutationEntries.stream().anyMatch(List::isEmpty))
