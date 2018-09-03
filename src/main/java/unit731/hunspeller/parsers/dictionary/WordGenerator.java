@@ -296,6 +296,8 @@ public class WordGenerator{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
+		if(maxCompounds <= 0)
+			throw new IllegalArgumentException("Max compounds cannot be non-positive");
 
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 
@@ -540,7 +542,7 @@ public class WordGenerator{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<Production> applyCompoundBeginMiddleEnd(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
+	public List<Production> applyCompoundBeginMiddleEnd(String[] inputCompounds, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
@@ -550,10 +552,12 @@ public class WordGenerator{
 		String compoundBeginFlag = affParser.getCompoundBeginFlag();
 		String compoundMiddleFlag = affParser.getCompoundMiddleFlag();
 		String compoundEndFlag = affParser.getCompoundEndFlag();
-		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
 
-		loadDictionaryForInclusionTest();
+		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
+		return applyCompoundRules(inputCompounds, compoundRule, limit);
 
+//		loadDictionaryForInclusionTest();
+//
 //		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 //
 //		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
@@ -572,7 +576,6 @@ public class WordGenerator{
 //		}
 //
 //		return applyCompound(entries, limit);
-return null;
 	}
 
 	private void loadDictionaryForInclusionTest(){
