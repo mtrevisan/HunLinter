@@ -49,6 +49,7 @@ public class WordGeneratorCompoundRuleTest{
 			"farbig/A"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 10);
+
 		List<Production> expected = Arrays.asList(
 			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
@@ -77,6 +78,7 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+
 		List<Production> expected = Arrays.asList(
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
@@ -101,6 +103,7 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 40);
+
 		List<Production> expected = Arrays.asList(
 			createProduction("a", null, "pa:a st:a"),
 			createProduction("b", null, "pa:b st:b"),
@@ -163,6 +166,7 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+
 		List<Production> expected = Arrays.asList(
 			createProduction("a", null, "pa:a st:a"),
 			createProduction("b", null, "pa:b st:b"),
@@ -177,53 +181,73 @@ public class WordGeneratorCompoundRuleTest{
 		Assert.assertEquals(expected, words);
 	}
 
-//	@Test
-//	public void longFlag() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"FLAG long",
-//			"COMPOUNDMIN 1",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE (aa)?(bb)?(cc)?");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "(aa)?(bb)?(cc)?";
-//		String[] inputCompounds = new String[]{
-//			"a/aa",
-//			"b/bb",
-//			"c/bbcc"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-//words.forEach(stem -> System.out.println(stem));
-//		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-//		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
-//	}
-//
-//	@Test
-//	public void numericalFlag() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"FLAG num",
-//			"COMPOUNDMIN 1",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE (1)?(2)?(3)?");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "(1)?(2)?(3)?";
-//		String[] inputCompounds = new String[]{
-//			"a/1",
-//			"b/2",
-//			"c/2,3"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-//words.forEach(stem -> System.out.println(stem));
-//		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-//		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
-//	}
-//
-//
+	@Test
+	public void longFlag() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FLAG long",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE (aa)?(bb)?(cc)?");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "(aa)?(bb)?(cc)?";
+		String[] inputCompounds = new String[]{
+			"a/aa",
+			"b/bb",
+			"c/bbcc"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+
+		List<Production> expected = Arrays.asList(
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("b", null, "pa:b st:b"),
+			createProduction("c", null, "pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
+			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void numericalFlag() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FLAG num",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE (1)?(2)?(3)?");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "(1)?(2)?(3)?";
+		String[] inputCompounds = new String[]{
+			"a/1",
+			"b/2",
+			"c/2,3"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+
+		List<Production> expected = Arrays.asList(
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("b", null, "pa:b st:b"),
+			createProduction("c", null, "pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
+			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+
 //	@Test(expected = IllegalArgumentException.class)
 //	public void forbiddenWordMissingRule() throws IOException{
 //		String language = "xxx";
