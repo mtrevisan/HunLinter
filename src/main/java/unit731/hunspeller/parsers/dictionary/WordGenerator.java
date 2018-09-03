@@ -423,11 +423,11 @@ public class WordGenerator{
 					if(!continuationFlags.contains(forbiddenWordFlag)){
 						String word = sb.toString();
 						String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
+						Production p = new Production(word, flags, compoundEntries, strategy);
 						if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-							productions.add(new Production(word, flags, compoundEntries, strategy));
+							productions.add(p);
 						else{
 							//add boundary affixes
-							Production p = new Production(word, flags, compoundEntries, strategy);
 							List<Production> prods = applyAffixRules(p, false);
 
 							//remove twofold because they're not allowed in compounds
