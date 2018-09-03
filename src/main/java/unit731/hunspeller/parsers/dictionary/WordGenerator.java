@@ -204,21 +204,11 @@ public class WordGenerator{
 		for(String permutation : permutations){
 			//expand permutation
 			String[] flags = StringUtils.split(permutation, "()");
-//			List<List<Production>> expandedPermutationEntries = Arrays.stream(flags)
-//				.map(inputs::get)
-//				.flatMap(Set::stream)
-//				.map(entry -> applyAffixRules(entry, true))
-//				.collect(Collectors.toList());
-//			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-//				entries.add(expandedPermutationEntries);
 			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(String flag : flags){
-				Set<DictionaryEntry> ins = inputs.get(flag);
-				List<Production> two = new ArrayList<>();
-				for(DictionaryEntry entry : ins)
-					two.addAll(applyAffixRules(entry, true));
-				expandedPermutationEntries.add(two);
-			}
+			for(String flag : flags)
+				expandedPermutationEntries.add(inputs.get(flag).stream()
+					.map(entry -> applyAffixRules(entry, true))
+					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
 		}
@@ -238,7 +228,7 @@ public class WordGenerator{
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
-			//merge the distribution with the others
+			//FIXME merge the distribution with the others
 			compoundRules = Stream.of(compoundRules, distribution)
 				.flatMap(m -> m.entrySet().stream())
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
