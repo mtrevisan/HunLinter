@@ -73,12 +73,12 @@ public class DictionaryEntry{
 	}
 
 	/* Clone constructor */
-	public DictionaryEntry(String word, DictionaryEntry dicEntry){
+	public DictionaryEntry(String word, DictionaryEntry dicEntry, String continuationFlagToRemove){
 		Objects.requireNonNull(word);
 		Objects.requireNonNull(dicEntry);
 
 		this.word = word;
-		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
+		continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(dicEntry.continuationFlags), continuationFlagToRemove);
 		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
 		combineable = dicEntry.combineable;
 	}

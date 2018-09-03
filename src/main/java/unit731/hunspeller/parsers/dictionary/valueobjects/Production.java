@@ -23,8 +23,8 @@ public class Production extends DictionaryEntry{
 
 
 	/* Clone constructor */
-	public Production(String word, DictionaryEntry dicEntry){
-		super(word, dicEntry);
+	public Production(String word, DictionaryEntry dicEntry, String continuationFlagToRemove){
+		super(word, dicEntry, continuationFlagToRemove);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}

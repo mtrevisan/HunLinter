@@ -77,7 +77,7 @@ public class WordGenerator{
 
 		//convert using input table
 		String word = affParser.applyInputConversionTable(dicEntry.getWord());
-		dicEntry = new DictionaryEntry(word, dicEntry);
+		dicEntry = new DictionaryEntry(word, dicEntry, null);
 
 		List<Production> productions = applyAffixRules(dicEntry, false);
 
@@ -86,7 +86,7 @@ public class WordGenerator{
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
 			word = affParser.applyOutputConversionTable(production.getWord());
-			productions.set(i, new Production(word, production));
+			productions.set(i, new Production(word, production, null));
 		}
 
 		return productions;
@@ -476,7 +476,7 @@ public class WordGenerator{
 				word = StringUtils.capitalize(word);
 
 			word = affParser.applyOutputConversionTable(word);
-			productions.set(i, new Production(word, production));
+			productions.set(i, new Production(word, production, forceCompoundUppercaseFlag));
 		}
 
 		if(log.isTraceEnabled())
@@ -555,7 +555,7 @@ public class WordGenerator{
 	}
 
 	private Production getBaseProduction(DictionaryEntry dicEntry){
-		return new Production(dicEntry.getWord(), dicEntry);
+		return new Production(dicEntry.getWord(), dicEntry, null);
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
