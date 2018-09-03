@@ -558,24 +558,28 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-//		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
-//		boolean checkCompoundReplacement = affParser.isCheckCompoundReplacement();
-//
-//		if(checkCompoundReplacement && dicInclusionTestWorker == null){
-//			Objects.requireNonNull(dicParser);
-//			Objects.requireNonNull(dictionaryBaseData);
-//
-//			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
-//
-//			try{
-//				dicInclusionTestWorker.executeInline();
-//			}
-//			catch(Exception e){
-//				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
-//				log.error("Cannot read dictionary", e);
-//			}
-//		}
-//
+//TODO
+		String compoundBeginFlag = affParser.getCompoundBeginFlag();
+		String compoundMiddleFlag = affParser.getCompoundMiddleFlag();
+		String compoundEndFlag = affParser.getCompoundEndFlag();
+		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
+		boolean checkCompoundReplacement = affParser.isCheckCompoundReplacement();
+
+		if(checkCompoundReplacement && dicInclusionTestWorker == null){
+			Objects.requireNonNull(dicParser);
+			Objects.requireNonNull(dictionaryBaseData);
+
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
+
+			try{
+				dicInclusionTestWorker.executeInline();
+			}
+			catch(Exception e){
+				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				log.error("Cannot read dictionary", e);
+			}
+		}
+
 //		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 //
 //		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);

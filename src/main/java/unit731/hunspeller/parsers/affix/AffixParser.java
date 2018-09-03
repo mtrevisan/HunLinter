@@ -355,10 +355,9 @@ public class AffixParser extends ReadWriteLockable{
 		RULE_FUNCTION.put(AffixTag.COMPOUND_RULE, FUN_COMPOUND_RULE);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_FLAG, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_BEGIN, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_LAST, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_BEGIN, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.ONLY_IN_COMPOUND, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
 		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
@@ -490,6 +489,9 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getNoSuggestFlag());
 			terminalAffixes.add(getCompoundFlag());
 			terminalAffixes.add(getForbiddenWordFlag());
+			terminalAffixes.add(getCompoundBeginFlag());
+			terminalAffixes.add(getCompoundMiddleFlag());
+			terminalAffixes.add(getCompoundEndFlag());
 			terminalAffixes.add(getOnlyInCompoundFlag());
 			terminalAffixes.add(getPermitCompoundFlag());
 			terminalAffixes.add(getForbidCompoundFlag());
@@ -786,6 +788,18 @@ public class AffixParser extends ReadWriteLockable{
 
 	public Set<String> getWordBreakCharacters(){
 		return getData(AffixTag.BREAK);
+	}
+
+	public String getCompoundBeginFlag(){
+		return getData(AffixTag.COMPOUND_BEGIN);
+	}
+
+	public String getCompoundMiddleFlag(){
+		return getData(AffixTag.COMPOUND_MIDDLE);
+	}
+
+	public String getCompoundEndFlag(){
+		return getData(AffixTag.COMPOUND_END);
 	}
 
 	public String getOnlyInCompoundFlag(){
