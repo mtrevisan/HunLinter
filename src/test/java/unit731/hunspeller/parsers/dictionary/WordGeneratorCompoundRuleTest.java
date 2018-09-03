@@ -248,62 +248,66 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 
-//	@Test(expected = IllegalArgumentException.class)
-//	public void forbiddenWordMissingRule() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE vw");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "vw";
-//		String[] inputCompounds = new String[]{
-//			"arbeits/v",
-//			"scheu/v"
-//		};
-//		backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
-//	}
-//
-//	@Test
-//	public void forbiddenWord() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"FORBIDDENWORD X",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE vw");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "vw";
-//		String[] inputCompounds = new String[]{
-//			"arbeits/v",
-//			"scheu/wX"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
-//		Assert.assertTrue(words.isEmpty());
-//	}
-//
-//
-//	@Test
-//	public void forceUppercase() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"FORCEUCASE U",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE vw");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "vw";
-//		String[] inputCompounds = new String[]{
-//			"arbeits/v",
-//			"scheu/wU"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
-//words.forEach(stem -> System.out.println(stem));
-//		List<String> expected = Arrays.asList("Arbeitsscheu");
-//		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
-//	}
+	@Test(expected = IllegalArgumentException.class)
+	public void forbiddenWordMissingRule() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "vw";
+		String[] inputCompounds = new String[]{
+			"arbeits/v",
+			"scheu/v"
+		};
+		backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+	}
+
+	@Test
+	public void forbiddenWord() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORBIDDENWORD X",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "vw";
+		String[] inputCompounds = new String[]{
+			"arbeits/v",
+			"scheu/wX"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+
+		Assert.assertTrue(words.isEmpty());
+	}
+
+
+	@Test
+	public void forceUppercase() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"FORCEUCASE U",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE vw");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "vw";
+		String[] inputCompounds = new String[]{
+			"arbeits/v",
+			"scheu/wU"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+words.forEach(stem -> System.out.println(stem));
+
+		List<Production> expected = Arrays.asList(
+			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+		);
+		Assert.assertEquals(expected, words);
+	}
 
 }
