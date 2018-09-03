@@ -214,8 +214,10 @@ public class WordGenerator{
 			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 			for(String flag : flags){
 				Set<DictionaryEntry> ins = inputs.get(flag);
+				List<Production> two = new ArrayList<>();
 				for(DictionaryEntry entry : ins)
-					expandedPermutationEntries.add(applyAffixRules(entry, true));
+					two.addAll(applyAffixRules(entry, true));
+				expandedPermutationEntries.add(two);
 			}
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);

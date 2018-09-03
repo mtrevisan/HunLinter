@@ -24,9 +24,9 @@ public class WordGeneratorCompoundRuleTest{
 		backbone.loadFile(affixFilePath);
 	}
 
-	private Production createProduction(String word, String continuationFlags, String morphologicalFields, List<DictionaryEntry> compoundEntries){
+	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
 		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, compoundEntries, strategy);
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 	@Test
@@ -52,12 +52,12 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
 		List<Production> expected = Arrays.asList(
-			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList())
+			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("arbeitsscheuer", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("arbeitsscheuen", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -79,38 +79,76 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
-			createProduction("abc", "A", "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList()),
-			createProduction("acc", null, "pa:arbeits st:arbeits pa:scheu st:scheu", Arrays.asList())
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
 		Assert.assertEquals(expected, words);
 	}
 
-//	@Test
-//	public void infinite() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"COMPOUNDMIN 1",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE A*B*C*");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "A*B*C*";
-//		String[] inputCompounds = new String[]{
-//			"a/A",
-//			"b/B",
-//			"c/BC"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-//words.forEach(stem -> System.out.println(stem));
-//		List<String> expected = Arrays.asList("a", "b", "c", "aa", "ab", "ac", "bb", "bc", "cb", "cc", "aaa", "aab", "aac", "abb",
-//				"abc", "acb", "acc", "bbb", "bbc", "bcb", "bcc", "cbb", "cbc", "ccb", "ccc", "aaaa", "aaab", "aaac", "aabb", "aabc", "aacb", "aacc",
-//				"abbb", "abbc", "abcb", "abcc", "acbb");
-//		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
-//	}
-//
+	@Test
+	public void infinite() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE A*B*C*");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "A*B*C*";
+		String[] inputCompounds = new String[]{
+			"a/A",
+			"b/B",
+			"c/BC"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 38);
+words.forEach(stem -> System.out.println(stem));
+		List<Production> expected = Arrays.asList(
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("b", null, "pa:b st:b"),
+			createProduction("c", null, "pa:c st:c"),
+			createProduction("aa", null, "pa:a st:a pa:a st:a"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("bb", null, "pa:b st:b pa:b st:b"),
+			createProduction("bc", null, "st:b pa:c st:c"),
+			createProduction("cb", null, "pa:c st:c pa:b st:b"),
+			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),
+			createProduction("aab", null, "pa:a st:a pa:a st:a pa:b st:b"),
+			createProduction("aac", null, "pa:a st:a pa:a st:a pa:c st:c"),
+			createProduction("abb", null, "pa:a st:a pa:b st:b pa:b st:b"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acb", null, "pa:a st:a pa:c st:c pa:b st:b"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
+			createProduction("bbb", null, "pa:b st:b pa:b st:b pa:b st:b"),
+			createProduction("bbc", null, "pa:b st:b pa:b st:b pa:c st:c"),
+			createProduction("bcb", null, "pa:b st:b pa:c st:c pa:b st:b"),
+			createProduction("bcc", null, "pa:b st:b pa:c st:c pa:c st:c"),
+			createProduction("cbb", null, "pa:c st:c pa:b st:b pa:b st:b"),
+			createProduction("cbc", null, "pa:c st:c pa:b st:b pa:c st:c"),
+			createProduction("ccb", null, "pa:c st:c pa:c st:c pa:b st:b"),
+			createProduction("ccc", null, "pa:c st:c pa:c st:c pa:c st:c"),
+			createProduction("aaaa", null, "pa:a st:a pa:a st:a pa:a st:a pa:a st:a"),
+			createProduction("aaab", null, "pa:a st:a pa:a st:a pa:a st:a pa:b st:b"),
+			createProduction("aaac", null, "pa:a st:a pa:a st:a pa:a st:a pa:c st:c"),
+			createProduction("aabb", null, "pa:a st:a pa:a st:a pa:b st:b pa:b st:b"),
+			createProduction("aabc", null, "pa:a st:a pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("aacb", null, "pa:a st:a pa:a st:a pa:c st:c pa:b st:b"),
+			createProduction("aacc", null, "pa:a st:a pa:a st:a pa:c st:c pa:c st:c"),
+			createProduction("abbb", null, "pa:a st:a pa:b st:b pa:b st:b pa:b st:b"),
+			createProduction("abbc", null, "pa:a st:a pa:b st:b pa:b st:b pa:c st:c"),
+			createProduction("abcb", null, "pa:a st:a pa:b st:b pa:c st:c pa:b st:b"),
+			createProduction("abcc", null, "pa:a st:a pa:b st:b pa:c st:c pa:c st:c"),
+			createProduction("acbb", null, "pa:a st:a pa:c st:c pa:b st:b pa:b st:b"),
+			createProduction("acbc", null, "pa:a st:a pa:c st:c pa:b st:b pa:c st:c"),
+			createProduction("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
+			createProduction("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
 //	@Test
 //	public void zeroOrOne() throws IOException{
 //		String language = "xxx";
