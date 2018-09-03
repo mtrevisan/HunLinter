@@ -543,6 +543,7 @@ public class AffixParser extends ReadWriteLockable{
 		acquireWriteLock();
 		try{
 			data.clear();
+			strategy = new ASCIIParsingStrategy();
 			terminalAffixes.clear();
 		}
 		finally{

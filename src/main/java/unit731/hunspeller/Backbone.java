@@ -243,7 +243,7 @@ public class Backbone implements FileChangeListener{
 
 	/* FIXME should be private!? */
 	public File getDictionaryFile(){
-		return getFile(affParser.getLanguage() + EXTENSION_DIC);
+		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
 	}
 
 	private File getAidFile(){
