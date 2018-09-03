@@ -184,6 +184,22 @@ public class WordGenerator{
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		boolean checkCompoundReplacement = affParser.isCheckCompoundReplacement();
+
+		if(checkCompoundReplacement && dicInclusionTestWorker == null){
+			Objects.requireNonNull(dicParser);
+			Objects.requireNonNull(dictionaryBaseData);
+
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
+
+			try{
+				dicInclusionTestWorker.executeInline();
+			}
+			catch(Exception e){
+				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				log.error("Cannot read dictionary", e);
+			}
+		}
 
 		//extract map flag -> regex of compounds
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
