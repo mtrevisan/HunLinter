@@ -69,6 +69,7 @@ public class Backbone implements FileChangeListener{
 	private DictionaryParser dicParser;
 	@Getter
 	private final ThesaurusParser theParser;
+	@Getter
 	private HyphenationParser hypParser;
 
 	@Getter
@@ -94,6 +95,8 @@ public class Backbone implements FileChangeListener{
 	}
 
 	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
+		clear();
+
 		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();
@@ -124,6 +127,13 @@ public class Backbone implements FileChangeListener{
 
 		File theFile = getThesaurusDataFile();
 		openThesaurusFile(theFile);
+	}
+
+	public void clear(){
+		hyphenator = null;
+		dictionaryBaseData = null;
+		checker = null;
+		wordGenerator = null;
 	}
 
 	public void registerFileListener() throws IOException{
