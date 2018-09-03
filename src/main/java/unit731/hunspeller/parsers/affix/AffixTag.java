@@ -71,8 +71,7 @@ public enum AffixTag{
 	/** Word signed with this flag (or with a signed affix) may be middle element in compound words */
 //	COMPOUND_MIDDLE("COMPOUNDMIDDLE"),
 	/** Word signed with this flag (or with a signed affix) may be last element in compound words */
-//	COMPOUND_END("COMPOUNDEND"),?
-//	COMPOUND_LAST("COMPOUNDLAST"),?
+//	COMPOUND_END("COMPOUNDEND")
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	ONLY_IN_COMPOUND("ONLYINCOMPOUND"),
 	/**
