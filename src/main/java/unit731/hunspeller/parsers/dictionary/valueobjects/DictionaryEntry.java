@@ -79,6 +79,8 @@ public class DictionaryEntry{
 
 		this.word = word;
 		continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(dicEntry.continuationFlags), continuationFlagToRemove);
+		if(continuationFlags != null && continuationFlags.length == 0)
+			continuationFlags = null;
 		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
 		combineable = dicEntry.combineable;
 	}
