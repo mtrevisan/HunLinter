@@ -335,7 +335,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	}
 
 	private void clearInternal(){
-		dictionary.clear();
+		dictionary.clear(false);
 	}
 
 	public boolean canUndo(){

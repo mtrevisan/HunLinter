@@ -74,16 +74,17 @@ public class ThesaurusDictionary{
 	}
 
 	public void restore(ThesaurusDictionary dictionary){
-		clear();
+		clear(true);
 
 		this.synonyms.addAll(dictionary.synonyms);
 	}
 
-	public void clear(){
+	public void clear(boolean setModifiedFlag){
 		if(!synonyms.isEmpty()){
 			synonyms.clear();
 
-			modified = true;
+			if(setModifiedFlag)
+				modified = true;
 		}
 	}
 
