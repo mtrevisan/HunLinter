@@ -34,7 +34,7 @@ public enum AffixTag{
 //	KEY("KEY"),
 //	TRY("TRY"),
 	/** Words signed with this flag are not suggested (but still accepted when typed correctly) */
-//	NO_SUGGEST("NOSUGGEST"),
+	NO_SUGGEST("NOSUGGEST"),
 //	MAX_COMPOUND_SUGGEST("MAXCPDSUGS"),
 //	MAX_NGRAM_SUGGEST("MAXNGRAMSUGS"),
 //	MAX_NGRAM_SIMILARITY_FACTOR("MAXDIFF"),

@@ -40,7 +40,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 /**
  * Managed options:
  *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
- *		REP
+ *		NOSUGGEST (only read), REP
  *		BREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX,
  *			CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
  *		PFX, SFX
@@ -336,7 +336,7 @@ public class AffixParser extends ReadWriteLockable{
 		//Options for suggestions
 //		RULE_FUNCTION.put(AffixTag.KEY, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.TRY, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.NO_SUGGEST, FUN_COPY_OVER);
+		RULE_FUNCTION.put(AffixTag.NO_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.MAX_COMPOUND_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.MAX_NGRAM_SUGGEST, FUN_COPY_OVER);
 //		RULE_FUNCTION.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, FUN_COPY_OVER);
@@ -487,6 +487,7 @@ public class AffixParser extends ReadWriteLockable{
 //				addData(AffixTag.WORD_CHARS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 
 
+			terminalAffixes.add(getNoSuggestFlag());
 			terminalAffixes.add(getCompoundFlag());
 			terminalAffixes.add(getForbiddenWordFlag());
 			terminalAffixes.add(getOnlyInCompoundFlag());
@@ -667,6 +668,10 @@ public class AffixParser extends ReadWriteLockable{
 			if(entry.match(word))
 				applicableAffixes.add(entry);
 		return applicableAffixes;
+	}
+
+	public String getNoSuggestFlag(){
+		return getData(AffixTag.NO_SUGGEST);
 	}
 
 	//FIXME to remove?
