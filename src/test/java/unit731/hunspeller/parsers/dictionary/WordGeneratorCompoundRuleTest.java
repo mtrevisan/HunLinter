@@ -50,7 +50,7 @@ public class WordGeneratorCompoundRuleTest{
 			"scheu/Aw",
 			"farbig/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 10);
 		List<Production> expected = Arrays.asList(
 			createProduction("arbeitsscheu", "A", "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheue", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
@@ -102,7 +102,7 @@ public class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 38);
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 40);
 words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			createProduction("a", null, "pa:a st:a"),
@@ -112,7 +112,7 @@ words.forEach(stem -> System.out.println(stem));
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("bb", null, "pa:b st:b pa:b st:b"),
-			createProduction("bc", null, "st:b pa:c st:c"),
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cb", null, "pa:c st:c pa:b st:b"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
 			createProduction("aaa", null, "pa:a st:a pa:a st:a pa:a st:a"),

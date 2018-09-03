@@ -213,7 +213,7 @@ public class WordGenerator{
 				entries.add(expandedPermutationEntries);
 		}
 
-		return applyCompound(entries);
+		return applyCompound(entries, limit);
 	}
 
 	/** Extract a map of flag > dictionary entry from input compounds */
@@ -328,7 +328,7 @@ public class WordGenerator{
 				entries.add(expandedPermutationEntries);
 		}
 
-		return applyCompound(entries);
+		return applyCompound(entries, limit);
 	}
 
 	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
@@ -351,7 +351,7 @@ public class WordGenerator{
 		return result;
 	}
 
-	private List<Production> applyCompound(List<List<List<Production>>> entries) throws IllegalArgumentException, NoApplicableRuleException{
+	private List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException, NoApplicableRuleException{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
@@ -456,6 +456,11 @@ public class WordGenerator{
 				}
 			}
 		}
+
+		productions = productions.stream()
+			.distinct()
+			.limit(limit)
+			.collect(Collectors.toList());
 
 		compoundAsReplacement.clear();
 
