@@ -66,16 +66,16 @@ public enum AffixTag{
 	 * Affixes with COMPOUNDFLAG also permits compounding of affixed words.
 	 */
 	COMPOUND_FLAG("COMPOUNDFLAG"),
-	/** Word signed with this flag (or with a signed affix) may be first element in compound words */
+	/** Word signed with this flag (or with a signed affix) may be the first element in compound words */
 //	COMPOUND_BEGIN("COMPOUNDBEGIN"),
-	/** Word signed with this flag (or with a signed affix) may be middle element in compound words */
+	/** Word signed with this flag (or with a signed affix) may be the middle element in compound words */
 //	COMPOUND_MIDDLE("COMPOUNDMIDDLE"),
-	/** Word signed with this flag (or with a signed affix) may be last element in compound words */
+	/** Word signed with this flag (or with a signed affix) may be the last element in compound words */
 //	COMPOUND_END("COMPOUNDEND")
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
 	ONLY_IN_COMPOUND("ONLYINCOMPOUND"),
 	/**
-	 * Affixes with this flag may be inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
+	 * Affixes with this flag may be present inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
 	 * at the end of compounds only).
 	 */
 	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
