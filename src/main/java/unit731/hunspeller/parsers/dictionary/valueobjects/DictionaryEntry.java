@@ -2,6 +2,8 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,6 +70,16 @@ public class DictionaryEntry{
 		combineable = true;
 	}
 
+	public static String extractWord(String line){
+		Objects.requireNonNull(line);
+
+		Matcher m = ENTRY_PATTERN.reset(line);
+		if(!m.find())
+			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
+
+		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+	}
+
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
@@ -110,6 +122,20 @@ public class DictionaryEntry{
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affParser::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
+	}
+
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
+		Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
+		distribution.put(compoundBeginFlag, new HashSet<>());
+		distribution.put(compoundMiddleFlag, new HashSet<>());
+		distribution.put(compoundEndFlag, new HashSet<>());
+		if(continuationFlags != null)
+			for(String flag : continuationFlags){
+				Set<DictionaryEntry> value = distribution.get(flag);
+				if(value != null)
+					value.add(this);
+			}
+		return distribution;
 	}
 
 	public boolean hasPartOfSpeech(String partOfSpeech){

@@ -73,10 +73,10 @@ public class WordGenerator{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
 		//convert using input table
-		String word = affParser.applyInputConversionTable(dicEntry.getWord());
+		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
+		String word = affParser.applyInputConversionTable(DictionaryEntry.extractWord(line));
 		dicEntry = new DictionaryEntry(word, dicEntry, null);
 
 		List<Production> productions = applyAffixRules(dicEntry, false);
@@ -187,7 +187,7 @@ public class WordGenerator{
 
 		loadDictionaryForInclusionTest();
 
-		//extract map flag -> regex of compounds
+		//extract map flag -> dictionary entries
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
 		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
@@ -221,14 +221,15 @@ public class WordGenerator{
 
 	/** Extract a map of flag > dictionary entry from input compounds */
 	private Map<String, Set<DictionaryEntry>> extractCompoundRules(String[] inputCompounds){
-		//extract map flag -> compounds
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
+		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
 			//convert using input table
-			inputCompound = affParser.applyInputConversionTable(inputCompound);
-
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
+			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
 			//FIXME merge the distribution with the others
@@ -303,6 +304,7 @@ public class WordGenerator{
 
 		loadDictionaryForInclusionTest();
 
+		//extract list of dictionary entries
 		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
@@ -330,15 +332,15 @@ public class WordGenerator{
 		List<DictionaryEntry> result = new ArrayList<>();
 		for(String inputCompound : inputCompounds){
 			//convert using input table
-			inputCompound = affParser.applyInputConversionTable(inputCompound);
-
-			DictionaryEntry production = new DictionaryEntry(inputCompound, strategy);
+			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
+			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
 
 			//filter input set by minimum length
-			if(production.getWord().length() < compoundMinimumLength)
+			if(dicEntry.getWord().length() < compoundMinimumLength)
 				continue;
 
-			result.add(production);
+			result.add(dicEntry);
 		}
 		return result;
 	}
@@ -552,6 +554,11 @@ public class WordGenerator{
 		String compoundMiddleFlag = affParser.getCompoundMiddleFlag();
 		String compoundEndFlag = affParser.getCompoundEndFlag();
 
+		loadDictionaryForInclusionTest();
+
+		//extract map flag -> dictionary entries
+		Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
+
 //TODO
 		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
 		return applyCompoundRules(inputCompounds, compoundRule, limit);
@@ -576,6 +583,29 @@ public class WordGenerator{
 //		}
 //
 //		return applyCompound(entries, limit);
+	}
+
+	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+
+		//extract map flag -> compounds
+		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
+		for(String inputCompound : inputCompounds){
+			//convert using input table
+			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
+			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
+
+			List<Production> productions = applyAffixRules(dicEntry, false);
+			for(Production production : productions){
+				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(affParser, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
+				//FIXME merge the distribution with the others
+				compoundRules = Stream.of(compoundRules, distribution)
+					.flatMap(m -> m.entrySet().stream())
+					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
+			}
+		}
+		return compoundRules;
 	}
 
 	private void loadDictionaryForInclusionTest(){
