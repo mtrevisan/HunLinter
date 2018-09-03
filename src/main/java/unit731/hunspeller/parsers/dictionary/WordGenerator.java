@@ -211,14 +211,14 @@ public class WordGenerator{
 //				.collect(Collectors.toList());
 //			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 //				entries.add(expandedPermutationEntries);
+			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 			for(String flag : flags){
-				List<List<Production>> expandedPermutationEntries = new ArrayList<>();
 				Set<DictionaryEntry> ins = inputs.get(flag);
 				for(DictionaryEntry entry : ins)
 					expandedPermutationEntries.add(applyAffixRules(entry, true));
-				if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-					entries.add(expandedPermutationEntries);
 			}
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+				entries.add(expandedPermutationEntries);
 		}
 
 		return applyCompound(entries);

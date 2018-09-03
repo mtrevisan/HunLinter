@@ -29,7 +29,7 @@ public class WordGeneratorCompoundFlagTest{
 
 	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
 		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
-		return new Production(word, continuationFlags, morphologicalFields, strategy);
+		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
 	@Test
