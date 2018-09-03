@@ -548,11 +548,11 @@ public class WordGenerator{
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-//TODO
 		String compoundBeginFlag = affParser.getCompoundBeginFlag();
 		String compoundMiddleFlag = affParser.getCompoundMiddleFlag();
 		String compoundEndFlag = affParser.getCompoundEndFlag();
 
+//TODO
 		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
 		return applyCompoundRules(inputCompounds, compoundRule, limit);
 
