@@ -69,7 +69,6 @@ public class Backbone implements FileChangeListener{
 	private DictionaryParser dicParser;
 	@Getter
 	private final ThesaurusParser theParser;
-	@Getter
 	private HyphenationParser hypParser;
 
 	@Getter
@@ -102,6 +101,8 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
+		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
+
 		File dicFile = getDictionaryFile();
 		prepareDictionaryFile(dicFile);
 
@@ -118,6 +119,8 @@ public class Backbone implements FileChangeListener{
 
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
+
+		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
 
 		File dicFile = new File(dictionaryFilePath);
 		prepareDictionaryFile(dicFile);
@@ -177,7 +180,6 @@ public class Backbone implements FileChangeListener{
 			hypParser.parse(hypFile);
 
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
-			checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
 
 			if(hunspellable != null)
 				hunspellable.clearHyphenationParser();

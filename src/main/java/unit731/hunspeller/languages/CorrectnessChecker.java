@@ -14,7 +14,6 @@ public class CorrectnessChecker{
 
 	@NonNull
 	protected AffixParser affParser;
-	@NonNull
 	protected final AbstractHyphenator hyphenator;
 
 

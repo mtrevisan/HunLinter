@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -363,6 +364,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator){
 		super(affParser, hyphenator);
+
+		Objects.requireNonNull(hyphenator);
 	}
 
 	@Override
