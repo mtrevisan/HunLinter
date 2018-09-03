@@ -5,12 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -103,7 +101,6 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 40);
-words.forEach(stem -> System.out.println(stem));
 		List<Production> expected = Arrays.asList(
 			createProduction("a", null, "pa:a st:a"),
 			createProduction("b", null, "pa:b st:b"),
@@ -149,28 +146,37 @@ words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(expected, words);
 	}
 
-//	@Test
-//	public void zeroOrOne() throws IOException{
-//		String language = "xxx";
-//		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-//			"SET UTF-8",
-//			"COMPOUNDMIN 1",
-//			"COMPOUNDRULE 1",
-//			"COMPOUNDRULE A?B?C?");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "A?B?C?";
-//		String[] inputCompounds = new String[]{
-//			"a/A",
-//			"b/B",
-//			"c/BC"
-//		};
-//		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-//words.forEach(stem -> System.out.println(stem));
-//		List<String> expected = Arrays.asList("a", "b", "c", "ab", "ac", "bc", "cc", "abc", "acc");
-//		Assert.assertEquals(expected.stream().map(exp -> createProduction(exp)).collect(Collectors.toList()), words);
-//	}
-//
+	@Test
+	public void zeroOrOne() throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDMIN 1",
+			"COMPOUNDRULE 1",
+			"COMPOUNDRULE A?B?C?");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "A?B?C?";
+		String[] inputCompounds = new String[]{
+			"a/A",
+			"b/B",
+			"c/BC"
+		};
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+		List<Production> expected = Arrays.asList(
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("b", null, "pa:b st:b"),
+			createProduction("c", null, "pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
+			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+		);
+		Assert.assertEquals(expected, words);
+	}
+
 //	@Test
 //	public void longFlag() throws IOException{
 //		String language = "xxx";
