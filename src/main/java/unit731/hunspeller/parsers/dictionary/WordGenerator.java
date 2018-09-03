@@ -166,6 +166,7 @@ public class WordGenerator{
 		return productions;
 	}
 
+
 	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
 	 * 
@@ -278,13 +279,14 @@ public class WordGenerator{
 		return compoundRule;
 	}
 
+
 	/**
 	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_FLAG
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param limit	Limit result count
 	 * @param maxCompounds	Maximum compound count
-	 * @return	The list of productions for the given rule
+	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	public List<Production> applyCompoundFlag(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
@@ -538,6 +540,63 @@ public class WordGenerator{
 			}
 		return exists;
 	}
+
+
+	/**
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixTag.COMPOUND_BEGIN, AffixTag.COMPOUND_MIDDLE,
+	 * and AffixTag.COMPOUND_END
+	 * 
+	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
+	 * @param limit	Limit result count
+	 * @param maxCompounds	Maximum compound count
+	 * @return	The list of productions
+	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
+	 */
+	public List<Production> applyCompoundBeginMiddleEnd(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
+			NoApplicableRuleException{
+		Objects.requireNonNull(inputCompounds);
+		if(limit <= 0)
+			throw new IllegalArgumentException("Limit cannot be non-positive");
+
+//		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
+//		boolean checkCompoundReplacement = affParser.isCheckCompoundReplacement();
+//
+//		if(checkCompoundReplacement && dicInclusionTestWorker == null){
+//			Objects.requireNonNull(dicParser);
+//			Objects.requireNonNull(dictionaryBaseData);
+//
+//			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, this, dictionaryBaseData, affParser);
+//
+//			try{
+//				dicInclusionTestWorker.executeInline();
+//			}
+//			catch(Exception e){
+//				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+//				log.error("Cannot read dictionary", e);
+//			}
+//		}
+//
+//		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
+//
+//		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
+//		List<int[]> permutations = perm.permutations(limit);
+//
+//		//generate compounds:
+//		List<List<List<Production>>> entries = new ArrayList<>();
+//		for(int[] permutation : permutations){
+//			//expand permutation
+//			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
+//				.mapToObj(inputs::get)
+//				.map(entry -> applyAffixRules(entry, true))
+//				.collect(Collectors.toList());
+//			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+//				entries.add(expandedPermutationEntries);
+//		}
+//
+//		return applyCompound(entries, limit);
+return null;
+	}
+
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
 	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){

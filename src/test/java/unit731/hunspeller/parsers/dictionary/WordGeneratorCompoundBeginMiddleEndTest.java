@@ -29,7 +29,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 
 	@Test
 	public void germanCompounding() throws IOException{
-		String language = "de";
+		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
 			"CHECKSHARPS",
