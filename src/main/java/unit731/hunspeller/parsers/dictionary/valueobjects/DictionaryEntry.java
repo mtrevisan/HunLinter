@@ -156,7 +156,7 @@ public class DictionaryEntry{
 					String parentFlag = null;
 					if(this instanceof Production){
 						List<AffixEntry> appliedRules = ((Production)this).getAppliedRules();
-						if(!appliedRules.isEmpty())
+						if(appliedRules != null && !appliedRules.isEmpty())
 							parentFlag = appliedRules.get(0).getFlag();
 					}
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
