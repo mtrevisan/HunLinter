@@ -183,10 +183,15 @@ public class DictionaryEntry{
 	 */
 	private Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
 		List<String> terminalAffixes = new ArrayList<>();
+		List<String> compoundAffixes = new ArrayList<>();
 		List<String> prefixes = new ArrayList<>();
 		List<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null)
 			for(String affix : continuationFlags){
+				if(affParser.isCompoundAffix(affix)){
+					compoundAffixes.add(affix);
+					continue;
+				}
 				if(affParser.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
 					continue;
@@ -217,7 +222,7 @@ public class DictionaryEntry{
 					terminalAffixes.add(affix);
 			}
 
-		return new Affixes(terminalAffixes, prefixes, suffixes);
+		return new Affixes(prefixes, suffixes, terminalAffixes, compoundAffixes);
 	}
 
 	public boolean isCompound(){

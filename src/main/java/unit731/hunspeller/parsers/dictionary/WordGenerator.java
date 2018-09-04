@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
@@ -188,7 +189,7 @@ public class WordGenerator{
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
 		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
-		checkInputCorrectness(inputs, compoundRuleComponents);
+		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
 		filterCompoundRules(inputs);
 
@@ -235,7 +236,7 @@ public class WordGenerator{
 		return compoundRules;
 	}
 
-	private void checkInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, List<String> compoundRuleComponents){
+	private void checkCompoundRuleInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, List<String> compoundRuleComponents){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		for(String component : compoundRuleComponents){
 			String flag = strategy.cleanCompoundRuleComponent(component);
@@ -547,30 +548,31 @@ public class WordGenerator{
 		//extract map flag -> dictionary entries
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
 
-//TODO
-		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
-		return applyCompoundRules(inputCompounds, compoundRule, limit);
+		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-//		loadDictionaryForInclusionTest();
-//
-//		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
-//
-//		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
-//		List<int[]> permutations = perm.permutations(limit);
-//
-//		//generate compounds:
-//		List<List<List<Production>>> entries = new ArrayList<>();
-//		for(int[] permutation : permutations){
-//			//expand permutation
-//			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
-//				.mapToObj(inputs::get)
-//				.map(entry -> applyAffixRules(entry, true))
-//				.collect(Collectors.toList());
-//			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-//				entries.add(expandedPermutationEntries);
-//		}
-//
-//		return applyCompound(entries, limit);
+		//TODO escape reserved characters like '(', ')', '*', and '?'
+//		compoundRule = Pattern.quote(compoundRule);
+		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
+//TODO
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
+		//generate all the words that matches the given regex
+		List<String> permutations = regexWordGenerator.generateAll(limit);
+
+		//generate compounds:
+		List<List<List<Production>>> entries = new ArrayList<>();
+		for(String permutation : permutations){
+			//expand permutation
+			String[] flags = StringUtils.split(permutation, "()");
+			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+			for(String flag : flags)
+				expandedPermutationEntries.add(inputs.get(flag).stream()
+					.map(entry -> applyAffixRules(entry, true))
+					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+				entries.add(expandedPermutationEntries);
+		}
+
+		return applyCompound(entries, limit);
 	}
 
 	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
@@ -592,6 +594,12 @@ public class WordGenerator{
 			}
 		}
 		return compoundRules;
+	}
+
+	private void checkCompoundBeginMiddleEndInputCorrectness(Map<String, Set<DictionaryEntry>> inputs){
+		for(Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
+			if(entry.getValue().isEmpty())
+				throw new IllegalArgumentException("Missing word(s) for rule " + entry.getKey() + " in compound begin-middle-end");
 	}
 
 	private void loadDictionaryForInclusionTest(){
@@ -742,7 +750,7 @@ public class WordGenerator{
 
 	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound) throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
-		String[] postponedAffixes = applyAffixes.get(1);
+		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
 
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
