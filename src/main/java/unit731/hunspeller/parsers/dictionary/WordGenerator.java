@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -75,10 +74,8 @@ public class WordGenerator{
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
-		//convert using input table
 		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
-		String word = affParser.applyInputConversionTable(DictionaryEntry.extractWord(line));
-		dicEntry = new DictionaryEntry(word, dicEntry, null);
+		dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 		List<Production> productions = applyAffixRules(dicEntry, false);
 
@@ -86,8 +83,7 @@ public class WordGenerator{
 		int size = productions.size();
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
-			word = affParser.applyOutputConversionTable(production.getWord());
-			productions.set(i, new Production(word, production, null));
+			production.applyConversionTable(affParser::applyInputConversionTable);
 		}
 
 		return productions;
@@ -227,10 +223,8 @@ public class WordGenerator{
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
-			//convert using input table
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
-			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
-			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
+			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
 			//merge the distribution with the others
@@ -332,10 +326,8 @@ public class WordGenerator{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<DictionaryEntry> result = new ArrayList<>();
 		for(String inputCompound : inputCompounds){
-			//convert using input table
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
-			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
-			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
+			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			//filter input set by minimum length
 			if(dicEntry.getWord().length() < compoundMinimumLength)
@@ -464,14 +456,9 @@ public class WordGenerator{
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
 
-			String word = production.getWord();
-			List<DictionaryEntry> compoundEntries = production.getCompoundEntries();
-			if(compoundEntries != null && !compoundEntries.isEmpty()
-					&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
-				word = StringUtils.capitalize(word);
-
-			word = affParser.applyOutputConversionTable(word);
-			productions.set(i, new Production(word, production, forceCompoundUppercaseFlag));
+			production.applyConversionTable(affParser::applyOutputConversionTable);
+			production.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
+			production.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
 
 		if(log.isTraceEnabled())
@@ -592,10 +579,8 @@ public class WordGenerator{
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
-			//convert using input table
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
-			inputCompound = affParser.applyInputConversionTable(DictionaryEntry.extractWord(inputCompound));
-			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
+			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			List<Production> productions = applyAffixRules(dicEntry, false);
 			for(Production production : productions){
@@ -644,7 +629,7 @@ public class WordGenerator{
 	}
 
 	private Production getBaseProduction(DictionaryEntry dicEntry){
-		return new Production(dicEntry.getWord(), dicEntry, null);
+		return new Production(dicEntry);
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{

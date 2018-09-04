@@ -23,8 +23,8 @@ public class Production extends DictionaryEntry{
 
 
 	/* Clone constructor */
-	public Production(String word, DictionaryEntry dicEntry, String continuationFlagToRemove){
-		super(word, dicEntry, continuationFlagToRemove);
+	public Production(DictionaryEntry dicEntry){
+		super(dicEntry);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
@@ -56,6 +56,12 @@ public class Production extends DictionaryEntry{
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		this.compoundEntries = compoundEntries;
+	}
+
+	public void capitalizeIfContainsFlag(String forceCompoundUppercaseFlag){
+		if(compoundEntries != null && !compoundEntries.isEmpty()
+				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
+			word = StringUtils.capitalize(word);
 	}
 
 	public boolean hasMorphologicalFields(){

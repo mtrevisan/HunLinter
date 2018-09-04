@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
@@ -84,15 +85,32 @@ public class DictionaryEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
+	public void applyConversionTable(Function<String, String> inputConversion){
+		if(inputConversion != null)
+			//convert using input table
+			word = inputConversion.apply(word);
+	}
+
+	public boolean removeContinuationFlag(String continuationFlagToRemove){
+		boolean removed = false;
+		if(continuationFlagToRemove != null && continuationFlags != null){
+			int previousSize = continuationFlags.length;
+			continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(continuationFlags), continuationFlagToRemove);
+
+			removed = (continuationFlags.length != previousSize);
+
+			if(continuationFlags.length == 0)
+				continuationFlags = null;
+		}
+		return removed;
+	}
+
 	/* Clone constructor */
-	public DictionaryEntry(String word, DictionaryEntry dicEntry, String continuationFlagToRemove){
-		Objects.requireNonNull(word);
+	public DictionaryEntry(DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry);
 
-		this.word = word;
-		continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(dicEntry.continuationFlags), continuationFlagToRemove);
-		if(continuationFlags != null && continuationFlags.length == 0)
-			continuationFlags = null;
+		word = dicEntry.word;
+		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
 		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
 		combineable = dicEntry.combineable;
 	}
