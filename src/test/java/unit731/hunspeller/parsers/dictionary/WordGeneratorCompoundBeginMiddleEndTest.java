@@ -91,7 +91,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 10);
+		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 40);
 words.forEach(stem -> System.out.println(stem));
 
 //good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern, Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit, Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
@@ -107,6 +107,36 @@ words.forEach(stem -> System.out.println(stem));
 			createProduction("-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
 			createProduction("-Arbeits-Computer", "P", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
 			createProduction("-Arbeits-Arbeits", "P", "pa:-Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+			createProduction("-ComputerComputern", "P", "pa:-Computer st:Computer pa:Computern st:Computer"),
+			createProduction("-Computer-Computern", "P", "pa:-Computer st:Computer pa:-Computern st:Computer"),
+			createProduction("-Computer-", "P", "pa:-Computer st:Computer pa:- st:-"),
+			createProduction("-Computer-Arbeit", "P", "pa:-Computer st:Computer pa:-Arbeit st:Arbeit"),
+			createProduction("-ArbeitsComputern", "P", "pa:-Arbeits st:Arbeit pa:Computern st:Computer"),
+			createProduction("-Arbeits-Computern", "P", "pa:-Arbeits st:Arbeit pa:-Computern st:Computer"),
+			createProduction("-Arbeits-", "P", "pa:-Arbeits st:Arbeit pa:- st:-"),
+			createProduction("-Arbeits-Arbeit", "P", "pa:-Arbeits st:Arbeit pa:-Arbeit st:Arbeit"),
+			createProduction("Computern-Computern", "D-P", "pa:Computern st:Computer pa:-Computern st:Computer"),
+			createProduction("Computern-", "D-", "pa:Computern st:Computer pa:- st:-"),
+			createProduction("Computern-Arbeit", "D-P", "pa:Computern st:Computer pa:-Arbeit st:Arbeit"),
+			createProduction("Computern-Computer", "D-P", "pa:Computern st:Computer pa:-Computer st:Computer"),
+			createProduction("-ComputernComputern", "P", "pa:-Computern st:Computer pa:Computern st:Computer"),
+			createProduction("-Computern-Computern", "P", "pa:-Computern st:Computer pa:-Computern st:Computer"),
+			createProduction("-Computern-", "P", "pa:-Computern st:Computer pa:- st:-"),
+			createProduction("-Computern-Arbeit", "P", "pa:-Computern st:Computer pa:-Arbeit st:Arbeit"),
+			createProduction("-Computern-Computer", "P", "pa:-Computern st:Computer pa:-Computer st:Computer"),
+			createProduction("-Computern", null, "pa:- st:- pa:Computern st:Computer"),
+			createProduction("--Computern", "P", "pa:- st:- pa:-Computern st:Computer"),
+			createProduction("--", null, "pa:- st:- pa:- st:-"),
+			createProduction("--Arbeit", "P", "pa:- st:- pa:-Arbeit st:Arbeit"),
+			createProduction("--Computer", "P", "pa:- st:- pa:-Computer st:Computer"),
+			createProduction("-ArbeitComputern", "P", "pa:-Arbeit st:Arbeit pa:Computern st:Computer"),
+			createProduction("-Arbeit-Computern", "P", "pa:-Arbeit st:Arbeit pa:-Computern st:Computer"),
+			createProduction("-Arbeit-", "P", "pa:-Arbeit st:Arbeit pa:- st:-"),
+			createProduction("-Arbeit-Arbeit", "P", "pa:-Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
+			createProduction("-Arbeit-Computer", "P", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
+			createProduction("-Computer-Computer-Computer", "P", "pa:-Computer st:Computer pa:-Computer st:Computer pa:-Computer st:Computer"),
+			createProduction("-Computer-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
+			createProduction("-Computer-Arbeits-Computer", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
 
 			createProduction("Arbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("Arbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
