@@ -552,7 +552,9 @@ public class WordGenerator{
 
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
-		String compoundRule = "(" + compoundBeginFlag + ")*(" + compoundMiddleFlag + ")*(" + compoundEndFlag + ")*";
+		String compoundRule = DOUBLE_LEFT_PARENTHESIS + compoundBeginFlag + DOUBLE_RIGHT_PARENTHESIS + "*"
+			+ DOUBLE_LEFT_PARENTHESIS + compoundMiddleFlag + DOUBLE_RIGHT_PARENTHESIS + "*"
+			+ DOUBLE_LEFT_PARENTHESIS + compoundEndFlag + DOUBLE_RIGHT_PARENTHESIS + "*";
 //TODO
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
 		//generate all the words that matches the given regex
