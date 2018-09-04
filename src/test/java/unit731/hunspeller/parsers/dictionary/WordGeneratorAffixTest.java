@@ -4,7 +4,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
@@ -780,13 +779,6 @@ public class WordGeneratorAffixTest{
 		Assert.assertTrue(words.isEmpty());
 	}
 
-//TODO check that these flags remains
-//	"COMPOUNDBEGIN U",
-//	"COMPOUNDMIDDLE V",
-//	"COMPOUNDEND W",
-//	"COMPOUNDPERMITFLAG P",
-//	"ONLYINCOMPOUND X",
-
 	@Test
 	public void germanCompounding1() throws IOException{
 		String language = "ger";
@@ -807,42 +799,14 @@ public class WordGeneratorAffixTest{
 			"SFX C 0 n/WD .",
 			"PFX - Y 1",
 			"PFX - 0 -/P .",
-			"PFX D Y 29",
+			"PFX D Y 2",
 			"PFX D A a/P A",
-			"PFX D Ä ä/P Ä",
-			"PFX D B b/P B",
-			"PFX D C c/P C",
-			"PFX D D d/P D",
-			"PFX D E e/P E",
-			"PFX D F f/P F",
-			"PFX D G g/P G",
-			"PFX D H h/P H",
-			"PFX D I i/P I",
-			"PFX D J j/P J",
-			"PFX D K k/P K",
-			"PFX D L l/P L",
-			"PFX D M m/P M",
-			"PFX D N n/P N",
-			"PFX D O o/P O",
-			"PFX D Ö ö/P Ö",
-			"PFX D P p/P P",
-			"PFX D Q q/P Q",
-			"PFX D R r/P R",
-			"PFX D S s/P S",
-			"PFX D T t/P T",
-			"PFX D U u/P U",
-			"PFX D Ü ü/P Ü",
-			"PFX D V v/P V",
-			"PFX D W w/P W",
-			"PFX D X x/P X",
-			"PFX D Y y/P Y",
-			"PFX D Z z/P Z");
+			"PFX D C c/P C");
 		loadData(affFile.getAbsolutePath());
 
 
 		String line = "Arbeit/A-";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
-words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(10, words.size());
 		//base production
 		Assert.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
@@ -859,11 +823,34 @@ words.forEach(stem -> System.out.println(stem));
 		Assert.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(8));
 		Assert.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(9));
 
-		String[] inputCompounds = new String[]{
-			"Computer/BC-",
-			"-/W",
-			"Arbeitsnehmer/Z"
-		};
+
+		line = "Computer/BC-";
+		words = backbone.getWordGenerator().applyAffixRules(line);
+		Assert.assertEquals(10, words.size());
+		//base production
+		Assert.assertEquals(createProduction("Computer", "BC-", "st:Computer"), words.get(0));
+		//suffix productions
+		Assert.assertEquals(createProduction("Computer", "PU-", "st:Computer"), words.get(1));
+		Assert.assertEquals(createProduction("Computer", "PDVW-", "st:Computer"), words.get(2));
+		Assert.assertEquals(createProduction("Computern", "DW-", "st:Computer"), words.get(3));
+		//prefix productions
+		//twofold productions
+		Assert.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(4));
+		Assert.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(5));
+		Assert.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(6));
+		Assert.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(7));
+		Assert.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(8));
+		Assert.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(9));
+
+
+		line = "-/W";
+		words = backbone.getWordGenerator().applyAffixRules(line);
+		Assert.assertEquals(1, words.size());
+		//base production
+		Assert.assertEquals(createProduction("-", "W", "st:-"), words.get(0));
+		//suffix productions
+		//prefix productions
+		//twofold productions
 	}
 
 	@Test
@@ -887,43 +874,15 @@ words.forEach(stem -> System.out.println(stem));
 			"SFX C 0 n/WD .",
 			"PFX - Y 1",
 			"PFX - 0 -/P .",
-			"PFX D Y 29",
-			"PFX D A a/PX A",
-			"PFX D Ä ä/PX Ä",
-			"PFX D B b/PX B",
-			"PFX D C c/PX C",
-			"PFX D D d/PX D",
-			"PFX D E e/PX E",
-			"PFX D F f/PX F",
-			"PFX D G g/PX G",
-			"PFX D H h/PX H",
-			"PFX D I i/PX I",
-			"PFX D J j/PX J",
-			"PFX D K k/PX K",
-			"PFX D L l/PX L",
-			"PFX D M m/PX M",
-			"PFX D N n/PX N",
-			"PFX D O o/PX O",
-			"PFX D Ö ö/PX Ö",
-			"PFX D P p/PX P",
-			"PFX D Q q/PX Q",
-			"PFX D R r/PX R",
-			"PFX D S s/PX S",
-			"PFX D T t/PX T",
-			"PFX D U u/PX U",
-			"PFX D Ü ü/PX Ü",
-			"PFX D V v/PX V",
-			"PFX D W w/PX W",
-			"PFX D X x/PX X",
-			"PFX D Y y/PX Y",
-			"PFX D Z z/PX Z");
+			"PFX D Y 2",
+			"PFX D A a/P A",
+			"PFX D C c/P C");
 		loadData(affFile.getAbsolutePath());
 
 
 		String line = "Arbeit/A-";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
-words.forEach(stem -> System.out.println(stem));
-		Assert.assertEquals(5, words.size());
+		Assert.assertEquals(7, words.size());
 		//base production
 		Assert.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
 		//suffix productions
@@ -931,14 +890,37 @@ words.forEach(stem -> System.out.println(stem));
 		//twofold productions
 		Assert.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(1));
 		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(2));
-		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(3));
-		Assert.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(4));
+		Assert.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(3));
+		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(4));
+		Assert.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(5));
+		Assert.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(6));
 
-		String[] inputCompounds = new String[]{
-			"Computer/BC-",
-			"-/W",
-			"Arbeitsnehmer/Z"
-		};
+
+		line = "Computer/BC-";
+		words = backbone.getWordGenerator().applyAffixRules(line);
+		Assert.assertEquals(8, words.size());
+		//base production
+		Assert.assertEquals(createProduction("Computer", "BC-", "st:Computer"), words.get(0));
+		//suffix productions
+		Assert.assertEquals(createProduction("Computern", "DW-", "st:Computer"), words.get(1));
+		//prefix productions
+		//twofold productions
+		Assert.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(2));
+		Assert.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(3));
+		Assert.assertEquals(createProduction("computer", "P", "st:Computer"), words.get(4));
+		Assert.assertEquals(createProduction("-Computer", "P", "st:Computer"), words.get(5));
+		Assert.assertEquals(createProduction("computern", "P", "st:Computer"), words.get(6));
+		Assert.assertEquals(createProduction("-Computern", "P", "st:Computer"), words.get(7));
+
+
+		line = "-/W";
+		words = backbone.getWordGenerator().applyAffixRules(line);
+		Assert.assertEquals(1, words.size());
+		//base production
+		Assert.assertEquals(createProduction("-", "W", "st:-"), words.get(0));
+		//suffix productions
+		//prefix productions
+		//twofold productions
 	}
 
 }
