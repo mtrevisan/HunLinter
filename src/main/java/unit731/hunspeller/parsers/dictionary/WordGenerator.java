@@ -680,7 +680,6 @@ public class WordGenerator{
 		while(itr.hasNext()){
 			Production production = itr.next();
 
-//			if(!isCompound ^ production.hasContinuationFlag(onlyInCompoundFlag))
 			if(production.hasContinuationFlag(onlyInCompoundFlag))
 				itr.remove();
 		}

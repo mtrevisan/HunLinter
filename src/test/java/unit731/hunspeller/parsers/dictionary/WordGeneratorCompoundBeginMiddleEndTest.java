@@ -27,7 +27,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
-	@Test
+//	@Test
 	public void germanCompounding() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
