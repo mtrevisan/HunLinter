@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -232,7 +233,7 @@ public class WordGenerator{
 			dicEntry = new DictionaryEntry(inputCompound, dicEntry, null);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
-			//FIXME merge the distribution with the others
+			//merge the distribution with the others
 			compoundRules = Stream.of(compoundRules, distribution)
 				.flatMap(m -> m.entrySet().stream())
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
@@ -599,7 +600,7 @@ public class WordGenerator{
 			List<Production> productions = applyAffixRules(dicEntry, false);
 			for(Production production : productions){
 				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(affParser, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
-				//FIXME merge the distribution with the others
+				//merge the distribution with the others
 				compoundRules = Stream.of(compoundRules, distribution)
 					.flatMap(m -> m.entrySet().stream())
 					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
