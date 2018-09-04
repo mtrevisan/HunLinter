@@ -4,6 +4,7 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
@@ -86,12 +87,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(8, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "AÜ", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foos", "ÖÜü", "st:foo"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foosbar", "Ü", "st:foo"), words.get(2));
 		Assert.assertEquals(createProduction("foosbaz", "Ü", "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("unfoo", "A", "st:foo"), words.get(4));
 		Assert.assertEquals(createProduction("unfoos", "Öü", "st:foo"), words.get(5));
 		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
@@ -119,12 +120,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(8, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "999,54321", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foos", "54321,214,216", "st:foo"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foosbar", "54321", "st:foo"), words.get(2));
 		Assert.assertEquals(createProduction("foosbaz", "54321", "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("unfoo", "999", "st:foo"), words.get(4));
 		Assert.assertEquals(createProduction("unfoos", "214,216", "st:foo"), words.get(5));
 		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
@@ -151,12 +152,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(8, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "A3", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foos", "123", "st:foo"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foosbar", "3", "st:foo"), words.get(2));
 		Assert.assertEquals(createProduction("foosbaz", "3", "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("unfoo", "A", "st:foo"), words.get(4));
 		Assert.assertEquals(createProduction("unfoos", "12", "st:foo"), words.get(5));
 		Assert.assertEquals(createProduction("unfoosbar", null, "st:foo"), words.get(6));
@@ -184,12 +185,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(8, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "zx09", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foos", "1Gg?09", "st:foo"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foosbaz", "09", "st:foo"), words.get(2));
 		Assert.assertEquals(createProduction("foosbar", "09", "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("unfoo", "zx", "st:foo"), words.get(4));
 		Assert.assertEquals(createProduction("unfoos", "1Gg?", "st:foo"), words.get(5));
 		Assert.assertEquals(createProduction("unfoosbaz", null, "st:foo"), words.get(6));
@@ -216,7 +217,7 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(4, words.size());
 		//base production
 		Assert.assertEquals(createProduction("a", "A", "st:a"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aa", null, "st:a"), words.get(1));
 		Assert.assertEquals(createProduction("ac", null, "st:a"), words.get(2));
 		Assert.assertEquals(createProduction("ae", null, "st:a"), words.get(3));
@@ -242,11 +243,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(5, words.size());
 		//base production
 		Assert.assertEquals(createProduction("aa", "S1", "st:aa"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(3));
 		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(4));
 	}
@@ -270,10 +271,10 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(4, words.size());
 		//base production
 		Assert.assertEquals(createProduction("aa", "S1", "st:aa"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aas1", "S2", "st:aa"), words.get(1));
+		//prefix productions
 		//twofold productions
-		//lastfold productions
 		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
 		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(3));
 	}
@@ -297,11 +298,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(6, words.size());
 		//base production
 		Assert.assertEquals(createProduction("aa", "S1P1", "st:aa"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("p1aa", "S1", "st:aa"), words.get(3));
 		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(4));
 		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(5));
@@ -326,11 +327,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(6, words.size());
 		//base production
 		Assert.assertEquals(createProduction("aa", "P1S1", "st:aa"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aas1", "P1S2", "st:aa"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("aas1s2", "P1", "st:aa"), words.get(2));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("p1aa", "S1", "st:aa"), words.get(3));
 		Assert.assertEquals(createProduction("p1aas1", "S2", "st:aa"), words.get(4));
 		Assert.assertEquals(createProduction("p1aas1s2", null, "st:aa"), words.get(5));
@@ -358,15 +359,15 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(14, words.size());
 		//base production
 		Assert.assertEquals(createProduction("a", "ABCDE", "st:a"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aa", "E", "st:a"), words.get(1));
 		Assert.assertEquals(createProduction("ab", "AE", "st:a"), words.get(2));
 		Assert.assertEquals(createProduction("ac", "E", "st:a"), words.get(3));
 		Assert.assertEquals(createProduction("ad", "AE", "st:a"), words.get(4));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("aba", "E", "st:a"), words.get(5));
 		Assert.assertEquals(createProduction("ada", "E", "st:a"), words.get(6));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("ea", "ABCD", "st:a"), words.get(7));
 		Assert.assertEquals(createProduction("eaa", null, "st:a"), words.get(8));
 		Assert.assertEquals(createProduction("eab", "A", "st:a"), words.get(9));
@@ -404,7 +405,7 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(2, words.size());
 		//base production
 		Assert.assertEquals(createProduction("a", "A", "st:a"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("b", null, "st:a"), words.get(1));
 	}
 
@@ -480,15 +481,15 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(14, words.size());
 		//base production
 		Assert.assertEquals(createProduction("a", "ABCDE", "st:a"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("aa", "E", "st:a"), words.get(1));
 		Assert.assertEquals(createProduction("ba", "AE", "st:a"), words.get(2));
 		Assert.assertEquals(createProduction("ca", "E", "st:a"), words.get(3));
 		Assert.assertEquals(createProduction("da", "AE", "st:a"), words.get(4));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("aba", "E", "st:a"), words.get(5));
 		Assert.assertEquals(createProduction("ada", "E", "st:a"), words.get(6));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("ae", "ABCD", "st:a"), words.get(7));
 		Assert.assertEquals(createProduction("aae", null, "st:a"), words.get(8));
 		Assert.assertEquals(createProduction("bae", "A", "st:a"), words.get(9));
@@ -515,11 +516,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(3, words.size());
 		//base production
 		Assert.assertEquals(createProduction("ouro", "B", "st:ouro"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("metouro", "A", "st:ouro"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("tekmetouro", null, "st:ouro"), words.get(2));
-		//lastfold productions
+		//twofold productions
 	}
 
 	@Test
@@ -539,11 +540,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(3, words.size());
 		//base production
 		Assert.assertEquals(createProduction("ⲟⲩⲣⲟ", "B", "st:ⲟⲩⲣⲟ"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("ⲙⲉⲧⲟⲩⲣⲟ", "A", "st:ⲟⲩⲣⲟ"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("ⲧⲉⲕⲙⲉⲧⲟⲩⲣⲟ", null, "st:ⲟⲩⲣⲟ"), words.get(2));
-		//lastfold productions
+		//twofold productions
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -591,10 +592,10 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(2, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "A", "st:foo"), words.get(0));
-		//onefold productions
-		//twofold productions
+		//suffix productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foosbaz", null, "st:foo"), words.get(1));
-		//lastfold productions
+		//twofold productions
 	}
 
 	@Test
@@ -618,12 +619,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(12, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "AC", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foo-suf", "BC", "st:foo"), words.get(1));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("foo-suf-bar", "C", "st:foo"), words.get(2));
 		Assert.assertEquals(createProduction("foo-pseudosuf-bar", "C", "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("pre-foo", "A", "st:foo"), words.get(4));
 		Assert.assertEquals(createProduction("pre-foo-suf", "B", "st:foo"), words.get(5));
 		Assert.assertEquals(createProduction("pseudopre-foo-suf", "BX", "st:foo"), words.get(6));
@@ -656,12 +657,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(6, words.size());
 		//base production
 		Assert.assertEquals(createProduction("nagy", "C", "st:nagy"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("nagyobb", null, "st:nagy"), words.get(1));
 		Assert.assertEquals(createProduction("nagyobb", "AX", "st:nagy"), words.get(2));
 		Assert.assertEquals(createProduction("nagyobb", "BX", "st:nagy"), words.get(3));
+		//prefix productions
 		//twofold productions
-		//lastfold productions
 		Assert.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(4));
 		Assert.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(5));
 	}
@@ -686,10 +687,10 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(2, words.size());
 		//base production
 		Assert.assertEquals(createProduction("drink", "S", "st:drink po:noun"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("drinks", null, "st:drink po:noun is:plur"), words.get(1));
+		//prefix productions
 		//twofold productions
-		//lastfold productions
 
 
 		line = "drink/RQ	po:verb	al:drank	al:drunk	ts:present";
@@ -698,13 +699,13 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(6, words.size());
 		//base production
 		Assert.assertEquals(createProduction("drink", "RQ", "st:drink po:verb al:drank al:drunk ts:present"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("drinkable", "PS", "st:drink po:verb al:drank al:drunk ts:present ds:der_able"), words.get(1));
 		Assert.assertEquals(createProduction("drinks", null, "st:drink po:verb al:drank al:drunk ts:present is:sg_3"), words.get(2));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("drinkables", "P", "st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"),
 			words.get(3));
-		//lastfold productions
+		//twofold productions
 		Assert.assertEquals(createProduction("undrinkable", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able"),
 			words.get(4));
 		Assert.assertEquals(createProduction("undrinkables", null, "dp:pfx_un sp:un st:drink po:verb al:drank al:drunk ts:present ds:der_able is:plur"), words.get(5));
@@ -731,12 +732,12 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(4, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo", "AB", "st:foo"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foox", null, "st:foo"), words.get(1));
 		Assert.assertEquals(createProduction("fooy", "A", "st:foo"), words.get(2));
-		//twofold productions
+		//prefix productions
 		Assert.assertEquals(createProduction("fooyx", null, "st:foo"), words.get(3));
-		//lastfold productions
+		//twofold productions
 	}
 
 
@@ -756,11 +757,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertEquals(3, words.size());
 		//base production
 		Assert.assertEquals(createProduction("foo/bar", "AB", "st:foo/bar"), words.get(0));
-		//onefold productions
+		//suffix productions
 		Assert.assertEquals(createProduction("foo/barx", null, "st:foo/bar"), words.get(1));
 		Assert.assertEquals(createProduction("foo/bary/z", null, "st:foo/bar"), words.get(2));
+		//prefix productions
 		//twofold productions
-		//lastfold productions
 	}
 
 
@@ -785,5 +786,159 @@ public class WordGeneratorAffixTest{
 //	"COMPOUNDEND W",
 //	"COMPOUNDPERMITFLAG P",
 //	"ONLYINCOMPOUND X",
+
+	@Test
+	public void germanCompounding1() throws IOException{
+		String language = "ger";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDBEGIN U",
+			"COMPOUNDMIDDLE V",
+			"COMPOUNDEND W",
+			"COMPOUNDPERMITFLAG P",
+			"SFX A Y 3",
+			"SFX A 0 s/UP .",
+			"SFX A 0 s/VPD .",
+			"SFX A 0 0/WD .",
+			"SFX B Y 2",
+			"SFX B 0 0/UP .",
+			"SFX B 0 0/VWDP .",
+			"SFX C Y 1",
+			"SFX C 0 n/WD .",
+			"PFX - Y 1",
+			"PFX - 0 -/P .",
+			"PFX D Y 29",
+			"PFX D A a/P A",
+			"PFX D Ä ä/P Ä",
+			"PFX D B b/P B",
+			"PFX D C c/P C",
+			"PFX D D d/P D",
+			"PFX D E e/P E",
+			"PFX D F f/P F",
+			"PFX D G g/P G",
+			"PFX D H h/P H",
+			"PFX D I i/P I",
+			"PFX D J j/P J",
+			"PFX D K k/P K",
+			"PFX D L l/P L",
+			"PFX D M m/P M",
+			"PFX D N n/P N",
+			"PFX D O o/P O",
+			"PFX D Ö ö/P Ö",
+			"PFX D P p/P P",
+			"PFX D Q q/P Q",
+			"PFX D R r/P R",
+			"PFX D S s/P S",
+			"PFX D T t/P T",
+			"PFX D U u/P U",
+			"PFX D Ü ü/P Ü",
+			"PFX D V v/P V",
+			"PFX D W w/P W",
+			"PFX D X x/P X",
+			"PFX D Y y/P Y",
+			"PFX D Z z/P Z");
+		loadData(affFile.getAbsolutePath());
+
+
+		String line = "Arbeit/A-";
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+words.forEach(stem -> System.out.println(stem));
+		Assert.assertEquals(10, words.size());
+		//base production
+		Assert.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
+		//suffix productions
+		Assert.assertEquals(createProduction("Arbeits", "PU-", "st:Arbeit"), words.get(1));
+		Assert.assertEquals(createProduction("Arbeits", "PDV-", "st:Arbeit"), words.get(2));
+		Assert.assertEquals(createProduction("Arbeit", "DW-", "st:Arbeit"), words.get(3));
+		//prefix productions
+		//twofold productions
+		Assert.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(4));
+		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(5));
+		Assert.assertEquals(createProduction("arbeits", "P", "st:Arbeit"), words.get(6));
+		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(7));
+		Assert.assertEquals(createProduction("arbeit", "P", "st:Arbeit"), words.get(8));
+		Assert.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(9));
+
+		String[] inputCompounds = new String[]{
+			"Computer/BC-",
+			"-/W",
+			"Arbeitsnehmer/Z"
+		};
+	}
+
+	@Test
+	public void germanCompounding2() throws IOException{
+		String language = "ger";
+		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+			"SET UTF-8",
+			"COMPOUNDBEGIN U",
+			"COMPOUNDMIDDLE V",
+			"COMPOUNDEND W",
+			"COMPOUNDPERMITFLAG P",
+			"ONLYINCOMPOUND X",
+			"SFX A Y 3",
+			"SFX A 0 s/UPX .",
+			"SFX A 0 s/VPDX .",
+			"SFX A 0 0/WXD .",
+			"SFX B Y 2",
+			"SFX B 0 0/UPX .",
+			"SFX B 0 0/VWXDP .",
+			"SFX C Y 1",
+			"SFX C 0 n/WD .",
+			"PFX - Y 1",
+			"PFX - 0 -/P .",
+			"PFX D Y 29",
+			"PFX D A a/PX A",
+			"PFX D Ä ä/PX Ä",
+			"PFX D B b/PX B",
+			"PFX D C c/PX C",
+			"PFX D D d/PX D",
+			"PFX D E e/PX E",
+			"PFX D F f/PX F",
+			"PFX D G g/PX G",
+			"PFX D H h/PX H",
+			"PFX D I i/PX I",
+			"PFX D J j/PX J",
+			"PFX D K k/PX K",
+			"PFX D L l/PX L",
+			"PFX D M m/PX M",
+			"PFX D N n/PX N",
+			"PFX D O o/PX O",
+			"PFX D Ö ö/PX Ö",
+			"PFX D P p/PX P",
+			"PFX D Q q/PX Q",
+			"PFX D R r/PX R",
+			"PFX D S s/PX S",
+			"PFX D T t/PX T",
+			"PFX D U u/PX U",
+			"PFX D Ü ü/PX Ü",
+			"PFX D V v/PX V",
+			"PFX D W w/PX W",
+			"PFX D X x/PX X",
+			"PFX D Y y/PX Y",
+			"PFX D Z z/PX Z");
+		loadData(affFile.getAbsolutePath());
+
+
+		String line = "Arbeit/A-";
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+words.forEach(stem -> System.out.println(stem));
+		Assert.assertEquals(5, words.size());
+		//base production
+		Assert.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
+		//suffix productions
+		//prefix productions
+		//twofold productions
+		Assert.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(1));
+		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(2));
+		Assert.assertEquals(createProduction("-Arbeits", "P", "st:Arbeit"), words.get(3));
+		Assert.assertEquals(createProduction("-Arbeit", "P", "st:Arbeit"), words.get(4));
+
+		String[] inputCompounds = new String[]{
+			"Computer/BC-",
+			"-/W",
+			"Arbeitsnehmer/Z"
+		};
+	}
 
 }
