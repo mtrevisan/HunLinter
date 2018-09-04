@@ -779,4 +779,11 @@ public class WordGeneratorAffixTest{
 		Assert.assertTrue(words.isEmpty());
 	}
 
+//TODO check that these flags remains
+//	"COMPOUNDBEGIN U",
+//	"COMPOUNDMIDDLE V",
+//	"COMPOUNDEND W",
+//	"COMPOUNDPERMITFLAG P",
+//	"ONLYINCOMPOUND X",
+
 }
