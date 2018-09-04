@@ -290,7 +290,7 @@ public class WordGenerator{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
-		if(maxCompounds <= 0)
+		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
 			throw new IllegalArgumentException("Max compounds cannot be non-positive");
 
 		boolean forbidDuplications = affParser.isForbidDuplicationsInCompound();
@@ -680,7 +680,8 @@ public class WordGenerator{
 		while(itr.hasNext()){
 			Production production = itr.next();
 
-			if(isCompound ^ production.hasContinuationFlag(onlyInCompoundFlag))
+//			if(!isCompound ^ production.hasContinuationFlag(onlyInCompoundFlag))
+			if(production.hasContinuationFlag(onlyInCompoundFlag))
 				itr.remove();
 		}
 		return productions;

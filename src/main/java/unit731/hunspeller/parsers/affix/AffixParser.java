@@ -501,7 +501,6 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getKeepCaseFlag());
 			terminalAffixes.add(getNeedAffixFlag());
 
-			compoundAffixes.add(getCompoundFlag());
 			compoundAffixes.add(getCompoundBeginFlag());
 			compoundAffixes.add(getCompoundMiddleFlag());
 			compoundAffixes.add(getCompoundEndFlag());
