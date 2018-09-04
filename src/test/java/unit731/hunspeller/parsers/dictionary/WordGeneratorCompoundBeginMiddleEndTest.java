@@ -91,7 +91,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 40);
+		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 33);
 words.forEach(stem -> System.out.println(stem));
 
 //good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern, Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit, Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
@@ -130,13 +130,6 @@ words.forEach(stem -> System.out.println(stem));
 			createProduction("--Arbeit", "P", "pa:- st:- pa:-Arbeit st:Arbeit"),
 			createProduction("--Computer", "P", "pa:- st:- pa:-Computer st:Computer"),
 			createProduction("-ArbeitComputern", "P", "pa:-Arbeit st:Arbeit pa:Computern st:Computer"),
-			createProduction("-Arbeit-Computern", "P", "pa:-Arbeit st:Arbeit pa:-Computern st:Computer"),
-			createProduction("-Arbeit-", "P", "pa:-Arbeit st:Arbeit pa:- st:-"),
-			createProduction("-Arbeit-Arbeit", "P", "pa:-Arbeit st:Arbeit pa:-Arbeit st:Arbeit"),
-			createProduction("-Arbeit-Computer", "P", "pa:-Arbeit st:Arbeit pa:-Computer st:Computer"),
-			createProduction("-Computer-Computer-Computer", "P", "pa:-Computer st:Computer pa:-Computer st:Computer pa:-Computer st:Computer"),
-			createProduction("-Computer-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
-			createProduction("-Computer-Arbeits-Computer", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
 
 			createProduction("Arbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("Arbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
