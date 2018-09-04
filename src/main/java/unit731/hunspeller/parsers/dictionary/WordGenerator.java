@@ -106,16 +106,15 @@ public class WordGenerator{
 		//extract base production
 		Production baseProduction = getBaseProduction(dicEntry);
 		if(log.isDebugEnabled()){
-			log.debug("Base productions:");
+			log.debug("Base production:");
 			log.debug("   {}", baseProduction);
 		}
 
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
 		if(log.isDebugEnabled()){
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			log.debug("Onefold productions:");
-			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
+			log.debug("Suffix productions:");
+			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
 
 		List<Production> twofoldProductions = Collections.<Production>emptyList();
@@ -123,9 +122,8 @@ public class WordGenerator{
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
 			if(log.isDebugEnabled()){
-				FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-				log.debug("Twofold productions:");
-				twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
+				log.debug("Prefix productions:");
+				twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 			}
 		}
 
@@ -136,9 +134,8 @@ public class WordGenerator{
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
 		if(log.isDebugEnabled()){
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			log.debug("Lastfold productions:");
-			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(strategy), production.getRulesSequence()));
+			log.debug("Twofold productions:");
+			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
 
 		checkTwofoldCorrectness(lastfoldProductions);

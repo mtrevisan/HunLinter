@@ -149,7 +149,7 @@ public class Production extends DictionaryEntry{
 		StringJoiner sj = new StringJoiner("\t");
 		sj.add(super.toString(strategy));
 		if(hasProductionRules()){
-			sj.add(" from ");
+			sj.add("from");
 			sj.add(appliedRules.stream()
 				.map(AffixEntry::getFlag)
 				.collect(Collectors.joining(" > ")));
