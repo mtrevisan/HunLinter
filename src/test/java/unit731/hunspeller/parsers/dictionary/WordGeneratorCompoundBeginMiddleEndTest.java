@@ -97,8 +97,17 @@ words.forEach(stem -> System.out.println(stem));
 //good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern, Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit, Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
 //bad: computer, computern, arbeit, Arbeits, arbeits, ComputerArbeit, ComputernArbeit, Computernarbeit, ComputerArbeits, Arbeitcomputer, Arbeitcomputern, ArbeitsComputer, ArbeitsComputern, Computerarbeitcomputer, ComputerArbeitcomputer, ComputerArbeitscomputer, Computerarbeitcomputern, ComputerArbeitcomputern, ComputerArbeitscomputern, Arbeitscomputerarbeits, Arbeitscomputernarbeits, Computerarbeits-computer, Arbeitsnehmer, computers, computern, computernarbeit, computernArbeit, computerArbeit, computerArbeits, arbeitcomputer, arbeitsComputer, computerarbeitcomputer, computerArbeitcomputer, computerArbeitscomputer, arbeitscomputerarbeits, computerarbeits-computer, arbeitsnehmer, computernarbeit, computernArbeit, arbeits-, computerarbeit, computerarbeits-, arbeitscomputer, arbeitscomputern, computerarbeitscomputer, computerarbeitscomputern, computerarbeitscomputers, arbeitscomputerarbeit, computerarbeits-Computer, computerarbeits-Computern
 		List<Production> expected = Arrays.asList(
-			createProduction("Computer", "BC-", "st:Computer"),
-			createProduction("Computern", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
+			createProduction("Computer", "P", "pa:-Computer st:Computer"),
+			createProduction("-Arbeits", "P", "pa:-Arbeits st:Arbeit"),
+			createProduction("Computern", "D-", "pa:Computern st:Computer"),
+			createProduction("-Computern", "P", "pa:-Computern st:Computer"),
+			createProduction("-", null, "pa:- st:-"),
+			createProduction("-Arbeit", "P", "pa:-Arbeit st:Arbeit"),
+			createProduction("-Computer-Computer", "P", "pa:-Computer st:Computer pa:-Computer st:Computer"),
+			createProduction("-Computer-Arbeits", "P", "pa:-Computer st:Computer pa:-Arbeits st:Arbeit"),
+			createProduction("-Arbeits-Computer", "P", "pa:-Arbeits st:Arbeit pa:-Computer st:Computer"),
+			createProduction("-Arbeits-Arbeits", "P", "pa:-Arbeits st:Arbeit pa:-Arbeits st:Arbeit"),
+
 			createProduction("Arbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("Arbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("Computerarbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
