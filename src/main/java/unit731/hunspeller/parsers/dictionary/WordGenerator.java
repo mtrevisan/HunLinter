@@ -748,9 +748,8 @@ public class WordGenerator{
 
 	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound) throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
-		//FIXME
-//		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
-		String[] postponedAffixes = applyAffixes.get(1);
+		//add COMPOUNDBEGIN, COMPOUNDMIDDLE, and COMPOUNDEND flags
+		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
 
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
