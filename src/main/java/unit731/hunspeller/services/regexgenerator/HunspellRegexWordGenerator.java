@@ -1,6 +1,7 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import dk.brics.automaton.Automaton;
+import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -48,7 +48,8 @@ public class HunspellRegexWordGenerator{
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
-		automaton = PatternHelper.automaton(regex);
+		RegExp re = new RegExp(regex);
+		automaton = re.toAutomaton();
 	}
 
 
