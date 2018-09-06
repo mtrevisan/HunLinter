@@ -1,15 +1,13 @@
 package unit731.hunspeller.services.regexgenerator;
 
-import dk.brics.automaton.Automaton;
-import dk.brics.automaton.RegExp;
-import dk.brics.automaton.State;
-import dk.brics.automaton.Transition;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -22,8 +20,29 @@ import org.apache.commons.lang3.StringUtils;
  * @see <a href="https://github.com/mifmif/Generex">Generex</a>
  * @see <a href="https://github.com/bluezio/xeger">Xeger</a>
  * @see <a href="http://www.brics.dk/automaton/index.html">dk.brics.automaton</a>
+ * 
+ * TODO https://github.com/zhztheplayer/DFA-Regex
  */
 public class HunspellRegexWordGenerator{
+
+	@AllArgsConstructor(access = AccessLevel.PRIVATE)
+	private static class State{
+
+		private final String word;
+		private Modifier modifier;
+		private State nextState;
+
+		public boolean isAccept(){
+			return (nextState == null);
+		}
+
+	}
+
+	private static final State EMPTY_STATE = new State(StringUtils.EMPTY, Modifier.ONE, null);
+
+	private static enum Modifier{
+		ONE, ZERO_OR_ONE, ANY;
+	};
 
 	@AllArgsConstructor
 	private static class GeneratedElement{
@@ -32,17 +51,30 @@ public class HunspellRegexWordGenerator{
 	}
 
 
-	private final Automaton automaton;
+	private final List<State> automaton;
 
 
 	/**
-	 * @param regex	Regex used to generate the set
+	 * @param regex	Regex used to generate the set (each word should be enclosed by parentheses, eg. (abc)*(ed)?(fff))
 	 */
 	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
-		RegExp re = new RegExp(regex);
-		automaton = re.toAutomaton();
+		String[] parts = StringUtils.split(regex, "()");
+		int size = 0;
+		automaton = new ArrayList<>(parts.length);
+		for(String part : parts){
+			char last = part.charAt(0);
+			if(part.length() == 1 && (last == '?' || last == '*'))
+				automaton.get(size - 1).modifier = (last == '?'? Modifier.ZERO_OR_ONE: Modifier.ANY);
+			else{
+				State newState = new State(part, Modifier.ONE, EMPTY_STATE);
+				if(size > 0)
+					automaton.get(size - 1).nextState = newState;
+				automaton.add(newState);
+				size ++;
+			}
+		}
 	}
 
 	/**
@@ -58,30 +90,46 @@ public class HunspellRegexWordGenerator{
 		int matchedWordCounter = 0;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
-		queue.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
+		queue.add(new GeneratedElement(automaton.get(0).word, automaton.get(0)));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
 			State state = elem.state;
-			List<Transition> transitions = state.getSortedTransitions(false);
-			boolean emptyTransitions = transitions.isEmpty();
-			if(!subword.isEmpty() && (emptyTransitions || state.isAccept())){
+			State[] transitions = getTransitions(state);
+			if(!subword.isEmpty() && state.isAccept()){
 				matchedWords.add(subword);
 
 				matchedWordCounter ++;
 				if(matchedWordCounter == limit)
 					break;
-
-				if(emptyTransitions)
-					continue;
 			}
 
-			for(Transition transition : transitions)
-				for(char chr = transition.getMin(); chr <= transition.getMax(); chr ++)
-					queue.add(new GeneratedElement(subword + chr, transition.getDest()));
+			for(State transition : transitions)
+				if(transition.nextState != null)
+					queue.add(new GeneratedElement(subword + transition.word, transition.nextState));
 		}
 
 		return matchedWords;
+	}
+
+	private State[] getTransitions(State currentState){
+		State[] result;
+		switch(currentState.modifier){
+			case ONE:
+				result = new State[]{};
+				break;
+
+			case ZERO_OR_ONE:
+				result = new State[]{new State(StringUtils.EMPTY, Modifier.ONE, currentState.nextState)};
+				break;
+
+			case ANY:
+			default:
+				result = new State[]{new State(StringUtils.EMPTY, Modifier.ONE, currentState.nextState), currentState};
+		}
+		if(currentState.nextState != null)
+			result = ArrayUtils.addAll(result, currentState.nextState);
+		return result;
 	}
 
 }
