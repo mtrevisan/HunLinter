@@ -5,17 +5,10 @@ import dk.brics.automaton.RegExp;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -52,7 +45,6 @@ public class HunspellRegexWordGenerator{
 		automaton = re.toAutomaton();
 	}
 
-
 	/**
 	 * Tells whether or not the given pattern (or {@code Automaton}) is infinite, that is, generates an infinite number of words.
 	 *
@@ -60,63 +52,6 @@ public class HunspellRegexWordGenerator{
 	 */
 	public boolean isInfinite(){
 		return !automaton.isFinite();
-	}
-
-
-	/**
-	 * Generate a random word that matches the given pattern, and the string has a <code>minLength <= length <= maxLength</code>
-	 *
-	 * @param random	A random generator
-	 * @return	A random word
-	 */
-	public String generate(Random random){
-		Function<Integer, Integer> fnTransition = max -> getRandomInt(random, 0, max);
-		BiFunction<Character, Character, Character> fnCharIntoTransition = (min, max) -> (char)getRandomInt(random, min, max);
-		return generate(automaton.getInitialState(), fnTransition, fnCharIntoTransition);
-	}
-
-	/**
-	 * Generates a random number within the given bounds.
-	 *
-	 * @param min	The minimum number (inclusive).
-	 * @param max	The maximum number (inclusive).
-	 * @param random	The object used as the randomizer.
-	 * @return	A random number in the given range.
-	 */
-	private int getRandomInt(Random random, int min, int max){
-		//use random.nextInt as it guarantees a uniform distribution
-		return (max > min? random.nextInt(max - min): 0) + min;
-	}
-
-	private String generate(State initialState, Function<Integer, Integer> fnTransition, BiFunction<Character, Character, Character> fnCharIntoTransition){
-		State state = initialState;
-		StringBuilder sb = new StringBuilder();
-		Map<State, Set<Integer>> automatonSelectedTransitions = new HashMap<>();
-		while(true){
-			List<Transition> transitions = state.getSortedTransitions(false);
-			if(transitions.isEmpty()){
-				assert state.isAccept();
-
-				break;
-			}
-
-			//choose a transition
-			int option;
-			automatonSelectedTransitions.putIfAbsent(state, new HashSet<>());
-			Set<Integer> selectedTransitions = automatonSelectedTransitions.get(state);
-			do{
-				option = fnTransition.apply(transitions.size());
-			}while(selectedTransitions.size() < transitions.size() && selectedTransitions.contains(option));
-			selectedTransitions.add(option);
-			Transition transition = transitions.get(option);
-
-			//moving on to next transition
-			char chr = fnCharIntoTransition.apply(transition.getMin(), transition.getMax());
-			sb.append(chr);
-
-			state = transition.getDest();
-		}
-		return sb.toString();
 	}
 
 	/**
