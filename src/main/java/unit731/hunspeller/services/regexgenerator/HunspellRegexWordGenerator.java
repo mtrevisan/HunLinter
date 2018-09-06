@@ -46,15 +46,6 @@ public class HunspellRegexWordGenerator{
 	}
 
 	/**
-	 * Tells whether or not the given pattern (or {@code Automaton}) is infinite, that is, generates an infinite number of words.
-	 *
-	 * @return	Whether the pattern (or {@code Automaton}) generates an infinite number of words
-	 */
-	public boolean isInfinite(){
-		return !automaton.isFinite();
-	}
-
-	/**
 	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
 	 * <p>
 	 * The Strings are ordered in lexicographical order.
@@ -63,15 +54,12 @@ public class HunspellRegexWordGenerator{
 	 * @return	The list of words that matcher the given regex
 	 */
 	public List<String> generateAll(int limit){
-		List<String> matchedWords = new ArrayList<>(0);
+		List<String> matchedWords = new ArrayList<>(limit);
 		int matchedWordCounter = 0;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(StringUtils.EMPTY, automaton.getInitialState()));
 		while(!queue.isEmpty()){
-			if(matchedWordCounter == limit)
-				break;
-
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
 			State state = elem.state;
@@ -79,7 +67,10 @@ public class HunspellRegexWordGenerator{
 			boolean emptyTransitions = transitions.isEmpty();
 			if(!subword.isEmpty() && (emptyTransitions || state.isAccept())){
 				matchedWords.add(subword);
+
 				matchedWordCounter ++;
+				if(matchedWordCounter == limit)
+					break;
 
 				if(emptyTransitions)
 					continue;
