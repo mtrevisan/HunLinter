@@ -34,7 +34,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		if(n < 1)
 			throw new IllegalArgumentException("At least one element needed");
 		if(k != MAX_COMPOUNDS_INFINITY && k < 2)
-			throw new IllegalArgumentException("Maximum number of maximum compounds must be greater than one or -1 (infinity)");
+			throw new IllegalArgumentException("Number of maximum compounds must be greater than one or -1 (infinity)");
 
 		this.n = n;
 		this.k = k;
