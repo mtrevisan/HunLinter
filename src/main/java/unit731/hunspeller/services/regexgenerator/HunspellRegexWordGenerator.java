@@ -4,7 +4,6 @@ import dk.brics.automaton.Automaton;
 import dk.brics.automaton.State;
 import dk.brics.automaton.Transition;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,7 +15,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
@@ -47,22 +45,6 @@ public class HunspellRegexWordGenerator{
 	}
 
 
-	private static final Map<String, String> PREDEFINED_CHARACTER_CLASSES;
-	static{
-		Map<String, String> characterClasses = new HashMap<>();
-		characterClasses.put("\\\\d", "[0-9]");
-		characterClasses.put("\\\\D", "[^0-9]");
-		characterClasses.put("\\\\s", "[ \t\n\f\r]");
-		characterClasses.put("\\\\S", "[^ \t\n\f\r]");
-		characterClasses.put("\\\\w", "[a-zA-Z_0-9]");
-		characterClasses.put("\\\\W", "[^a-zA-Z_0-9]");
-		PREDEFINED_CHARACTER_CLASSES = Collections.unmodifiableMap(characterClasses);
-	}
-
-	private static final Matcher MATCHER_REQUOTE_SPECIAL_CHARS = PatternHelper.matcher("[.^$*+?(){|\\[\\\\@]");
-	private static final Matcher MATCHER_REQUOTE = PatternHelper.matcher("\\\\Q(.*?)\\\\E");
-
-
 	private final Automaton automaton;
 	private final boolean ignoreEmptyWord;
 
@@ -76,27 +58,8 @@ public class HunspellRegexWordGenerator{
 	public HunspellRegexWordGenerator(String regex, boolean ignoreEmptyWord){
 		Objects.requireNonNull(regex);
 
-		regex = StringUtils.replaceEach(requote(regex),
-			PREDEFINED_CHARACTER_CLASSES.keySet().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]),
-			PREDEFINED_CHARACTER_CLASSES.values().toArray(new String[PREDEFINED_CHARACTER_CLASSES.size()]));
 		automaton = PatternHelper.automaton(regex);
 		this.ignoreEmptyWord = ignoreEmptyWord;
-	}
-
-	/**
-	 * Requote a regular expression by escaping some parts of it from generation without need to escape each special
-	 * character one by one. <br> this is done by setting the part to be interpreted as normal characters (thus, quote
-	 * all meta-characters) between \Q and \E , ex : <br> <code> minion_\d{3}\Q@gru.evil\E </code> <br> will be
-	 * transformed to : <br> <code> minion_\d{3}\@gru\.evil </code>
-	 */
-	private String requote(String regex){
-		//http://stackoverflow.com/questions/399078/what-special-characters-must-be-escaped-in-regular-expressions
-		//adding "@" prevents StackOverflowError inside generex: https://github.com/mifmif/Generex/issues/21
-		StringBuilder sb = new StringBuilder(regex);
-		Matcher matcher = MATCHER_REQUOTE.reset(regex);
-		while(matcher.find())
-			sb.replace(matcher.start(), matcher.end(), MATCHER_REQUOTE_SPECIAL_CHARS.reset(matcher.group(1)).replaceAll("\\\\$0"));
-		return sb.toString();
 	}
 
 
