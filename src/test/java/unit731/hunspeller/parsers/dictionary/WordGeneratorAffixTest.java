@@ -882,35 +882,40 @@ public class WordGeneratorAffixTest{
 
 		String line = "Arbeit/A-";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
-		Assert.assertEquals(7, words.size());
+		Assert.assertEquals(10, words.size());
 		//base production
 		Assert.assertEquals(createProduction("Arbeit", "A-", "st:Arbeit"), words.get(0));
 		//suffix productions
+		Assert.assertEquals(createProduction("Arbeits", "PUX-", "st:Arbeit"), words.get(1));
+		Assert.assertEquals(createProduction("Arbeits", "PDVX-", "st:Arbeit"), words.get(2));
+		Assert.assertEquals(createProduction("Arbeit", "DWX-", "st:Arbeit"), words.get(3));
 		//prefix productions
 		//twofold productions
-		Assert.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(1));
-		Assert.assertEquals(createProduction("-Arbeits", "PU", "st:Arbeit"), words.get(2));
-		Assert.assertEquals(createProduction("arbeits", "PV", "st:Arbeit"), words.get(3));
-		Assert.assertEquals(createProduction("-Arbeits", "PV", "st:Arbeit"), words.get(4));
-		Assert.assertEquals(createProduction("arbeit", "PW", "st:Arbeit"), words.get(5));
-		Assert.assertEquals(createProduction("-Arbeit", "PW", "st:Arbeit"), words.get(6));
+		Assert.assertEquals(createProduction("-Arbeit", "PA", "st:Arbeit"), words.get(4));
+		Assert.assertEquals(createProduction("-Arbeits", "PU", "st:Arbeit"), words.get(5));
+		Assert.assertEquals(createProduction("arbeits", "PV", "st:Arbeit"), words.get(6));
+		Assert.assertEquals(createProduction("-Arbeits", "PV", "st:Arbeit"), words.get(7));
+		Assert.assertEquals(createProduction("arbeit", "PW", "st:Arbeit"), words.get(8));
+		Assert.assertEquals(createProduction("-Arbeit", "PW", "st:Arbeit"), words.get(9));
 
 
 		line = "Computer/BC-";
 		words = backbone.getWordGenerator().applyAffixRules(line);
-		Assert.assertEquals(8, words.size());
+		Assert.assertEquals(10, words.size());
 		//base production
 		Assert.assertEquals(createProduction("Computer", "BC-", "st:Computer"), words.get(0));
 		//suffix productions
-		Assert.assertEquals(createProduction("Computern", "DW-", "st:Computer"), words.get(1));
+		Assert.assertEquals(createProduction("Computer", "PUX-", "st:Computer"), words.get(1));
+		Assert.assertEquals(createProduction("Computer", "PDVWX-", "st:Computer"), words.get(2));
+		Assert.assertEquals(createProduction("Computern", "DW-", "st:Computer"), words.get(3));
 		//prefix productions
 		//twofold productions
-		Assert.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(2));
-		Assert.assertEquals(createProduction("-Computer", "PU", "st:Computer"), words.get(3));
-		Assert.assertEquals(createProduction("computer", "PVW", "st:Computer"), words.get(4));
-		Assert.assertEquals(createProduction("-Computer", "PVW", "st:Computer"), words.get(5));
-		Assert.assertEquals(createProduction("computern", "PW", "st:Computer"), words.get(6));
-		Assert.assertEquals(createProduction("-Computern", "PW", "st:Computer"), words.get(7));
+		Assert.assertEquals(createProduction("-Computer", "PBC", "st:Computer"), words.get(4));
+		Assert.assertEquals(createProduction("-Computer", "PU", "st:Computer"), words.get(5));
+		Assert.assertEquals(createProduction("computer", "PVW", "st:Computer"), words.get(6));
+		Assert.assertEquals(createProduction("-Computer", "PVW", "st:Computer"), words.get(7));
+		Assert.assertEquals(createProduction("computern", "PW", "st:Computer"), words.get(8));
+		Assert.assertEquals(createProduction("-Computern", "PW", "st:Computer"), words.get(9));
 
 
 		line = "-/W";
