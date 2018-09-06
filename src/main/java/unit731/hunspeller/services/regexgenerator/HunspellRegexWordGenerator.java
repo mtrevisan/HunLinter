@@ -32,13 +32,37 @@ public class HunspellRegexWordGenerator{
 		private Modifier modifier;
 		private State nextState;
 
+		private State(State nextState){
+			word = StringUtils.EMPTY;
+			modifier = Modifier.ONE;
+			this.nextState = nextState;
+		}
+
 		public boolean isAccept(){
 			return (nextState == null);
 		}
 
-	}
+		public State[] getTransitions(){
+			State[] result;
+			switch(modifier){
+				case ONE:
+					result = new State[]{};
+					break;
 
-	private static final State EMPTY_STATE = new State(StringUtils.EMPTY, Modifier.ONE, null);
+				case ZERO_OR_ONE:
+					result = new State[]{new State(nextState)};
+					break;
+
+				case ANY:
+				default:
+					result = new State[]{new State(nextState), this};
+			}
+			if(nextState != null)
+				result = ArrayUtils.addAll(result, nextState);
+			return result;
+		}
+
+	}
 
 	private static enum Modifier{
 		ONE, ZERO_OR_ONE, ANY;
@@ -68,7 +92,7 @@ public class HunspellRegexWordGenerator{
 			if(part.length() == 1 && (last == '?' || last == '*'))
 				automaton.get(size - 1).modifier = (last == '?'? Modifier.ZERO_OR_ONE: Modifier.ANY);
 			else{
-				State newState = new State(part, Modifier.ONE, EMPTY_STATE);
+				State newState = new State(part, Modifier.ONE, null);
 				if(size > 0)
 					automaton.get(size - 1).nextState = newState;
 				automaton.add(newState);
@@ -95,7 +119,7 @@ public class HunspellRegexWordGenerator{
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
 			State state = elem.state;
-			State[] transitions = getTransitions(state);
+			State[] transitions = state.getTransitions();
 			if(!subword.isEmpty() && state.isAccept()){
 				matchedWords.add(subword);
 
@@ -110,26 +134,6 @@ public class HunspellRegexWordGenerator{
 		}
 
 		return matchedWords;
-	}
-
-	private State[] getTransitions(State currentState){
-		State[] result;
-		switch(currentState.modifier){
-			case ONE:
-				result = new State[]{};
-				break;
-
-			case ZERO_OR_ONE:
-				result = new State[]{new State(StringUtils.EMPTY, Modifier.ONE, currentState.nextState)};
-				break;
-
-			case ANY:
-			default:
-				result = new State[]{new State(StringUtils.EMPTY, Modifier.ONE, currentState.nextState), currentState};
-		}
-		if(currentState.nextState != null)
-			result = ArrayUtils.addAll(result, currentState.nextState);
-		return result;
 	}
 
 }
