@@ -23,7 +23,7 @@ import unit731.hunspeller.services.PatternHelper;
 /**
  * A class that help generating words that match a given regular expression.
  * <p>
- * It generates all values that are matched by the Regex, or a random value.
+ * It does not support all valid Java regular expressions, but only '(', ')', '*' and '?'.
  * </p>
  *
  * @see <a href="https://github.com/mifmif/Generex">Generex</a>
@@ -38,28 +38,17 @@ public class HunspellRegexWordGenerator{
 		private final State state;
 	}
 
-	@AllArgsConstructor
-	private static class StateNodeElement{
-		private final State state;
-		private final HunspellAutomataNode node;
-	}
-
 
 	private final Automaton automaton;
-	private final boolean ignoreEmptyWord;
-
-	private HunspellAutomataNode rootNode;
 
 
 	/**
 	 * @param regex	Regex used to generate the set
-	 * @param ignoreEmptyWord	Does not consider ε as a valid response if set
 	 */
-	public HunspellRegexWordGenerator(String regex, boolean ignoreEmptyWord){
+	public HunspellRegexWordGenerator(String regex){
 		Objects.requireNonNull(regex);
 
 		automaton = PatternHelper.automaton(regex);
-		this.ignoreEmptyWord = ignoreEmptyWord;
 	}
 
 
@@ -70,66 +59,6 @@ public class HunspellRegexWordGenerator{
 	 */
 	public boolean isInfinite(){
 		return !automaton.isFinite();
-	}
-
-	/**
-	 * @see <a href="https://cs.stackexchange.com/questions/71371/why-isnt-it-simple-to-count-the-number-of-words-in-a-regular-language">Why isn't it simple to count the number of words in a regular language?</a>
-	 * @see <a href="https://cs.stackexchange.com/questions/1045/number-of-words-of-a-given-length-in-a-regular-language">Number of words of a given length in a regular language</a>
-	 * @see <a href="https://cstheory.stackexchange.com/questions/8200/counting-words-accepted-by-a-regular-grammar">Counting words accepted by a regular grammar</a>
-	 * 
-	 * @return	The number of words that are matched by the given pattern, or {@value #INFINITY} if infinite.
-	 */
-	public long wordCount(){
-		long count = 0l;
-		try{
-			if(!isInfinite()){
-				buildRootNode();
-
-				count = rootNode.getMatchedWordCount();
-
-				if(ignoreEmptyWord && automaton.getInitialState().isAccept())
-					count --;
-			}
-		}
-		catch(StackOverflowError e){}
-		return count;
-	}
-
-	/**
-	 * Build list of nodes that represent all the possible transactions from the given <code>state</code>.
-	 */
-	private void buildRootNode(){
-		if(rootNode == null){
-			Queue<StateNodeElement> queue = new LinkedList<>();
-			rootNode = new HunspellAutomataNode();
-			rootNode.setTransitionCount(1);
-			queue.add(new StateNodeElement(automaton.getInitialState(), rootNode));
-			while(!queue.isEmpty()){
-				StateNodeElement elem = queue.remove();
-				State state = elem.state;
-				HunspellAutomataNode node = elem.node;
-
-				List<HunspellAutomataNode> transactionNodes = new ArrayList<>();
-				node.setNextNodes(transactionNodes);
-
-				if(state.isAccept()){
-					HunspellAutomataNode acceptedNode = new HunspellAutomataNode();
-					acceptedNode.setTransitionCount(1);
-					transactionNodes.add(acceptedNode);
-				}
-				List<Transition> transitions = state.getSortedTransitions(true);
-				for(Transition transition : transitions){
-					HunspellAutomataNode tn = new HunspellAutomataNode();
-					int transitionsCount = transition.getMax() - transition.getMin() + 1;
-					tn.setTransitionCount(transitionsCount);
-					transactionNodes.add(tn);
-
-					queue.add(new StateNodeElement(transition.getDest(), tn));
-				}
-			}
-
-			rootNode.updateMatchedWordCount();
-		}
 	}
 
 
@@ -212,7 +141,7 @@ public class HunspellRegexWordGenerator{
 			State state = elem.state;
 			List<Transition> transitions = state.getSortedTransitions(false);
 			boolean emptyTransitions = transitions.isEmpty();
-			if((!ignoreEmptyWord || !subword.isEmpty()) && (emptyTransitions || state.isAccept())){
+			if(!subword.isEmpty() && (emptyTransitions || state.isAccept())){
 				matchedWords.add(subword);
 				matchedWordCounter ++;
 

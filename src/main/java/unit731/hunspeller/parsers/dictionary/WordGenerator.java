@@ -195,7 +195,7 @@ public class WordGenerator{
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
 		compoundRule = formatCompoundRule(compoundRule);
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		List<String> permutations = regexWordGenerator.generateAll(limit);
 
@@ -552,7 +552,7 @@ public class WordGenerator{
 			+ DOUBLE_LEFT_PARENTHESIS + compoundMiddleFlag + DOUBLE_RIGHT_PARENTHESIS + "*"
 			+ DOUBLE_LEFT_PARENTHESIS + compoundEndFlag + DOUBLE_RIGHT_PARENTHESIS + "*";
 //TODO
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule, true);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		List<String> permutations = regexWordGenerator.generateAll(limit);
 

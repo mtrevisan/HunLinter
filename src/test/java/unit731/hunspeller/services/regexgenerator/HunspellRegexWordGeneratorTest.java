@@ -18,7 +18,7 @@ public class HunspellRegexWordGeneratorTest{
 		Matcher m = Pattern.compile(regex).matcher(StringUtils.EMPTY);
 
 		Random random = new Random();
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		boolean infinite = generator.isInfinite();
 		Assert.assertFalse(infinite);
 		for(int i = 0; i < 100; i ++){
@@ -32,13 +32,11 @@ public class HunspellRegexWordGeneratorTest{
 	public void shouldGenerateAllWords(){
 		String regex = "[abc]c[de]?";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		boolean infinite = generator.isInfinite();
-		long wordCount = generator.wordCount();
 		List<String> words = generator.generateAll(10);
 
 		Assert.assertFalse(infinite);
-		Assert.assertEquals(9l, wordCount);
 		Assert.assertEquals(9l, words.size());
 	}
 
@@ -46,7 +44,7 @@ public class HunspellRegexWordGeneratorTest{
 	public void shouldGenerateInfiniteWords(){
 		String regex = "[abc]c[de]*";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		boolean infinite = generator.isInfinite();
 
 		Assert.assertTrue(infinite);
@@ -56,24 +54,20 @@ public class HunspellRegexWordGeneratorTest{
 	public void shouldGenerateEmptyWord(){
 		String regex = "a?b?c?";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, false);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		boolean infinite = generator.isInfinite();
-		long wordCount = generator.wordCount();
 
 		Assert.assertFalse(infinite);
-		Assert.assertEquals(8l, wordCount);
 	}
 
 	@Test
 	public void shouldNotGenerateEmptyWord(){
 		String regex = "a?b?c?";
 
-		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex, true);
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		boolean infinite = generator.isInfinite();
-		long wordCount = generator.wordCount();
 
 		Assert.assertFalse(infinite);
-		Assert.assertEquals(7l, wordCount);
 	}
 
 }
