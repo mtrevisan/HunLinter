@@ -11,6 +11,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -353,7 +354,7 @@ public class WordGenerator{
 		compoundAsReplacement.clear();
 
 		StringBuilder sb = new StringBuilder();
-		List<Production> productions = new ArrayList<>();
+		Set<Production> productions = new LinkedHashSet<>();
 		//generate compounds:
 		for(List<List<Production>> entry : entries){
 			//compose compound:
@@ -426,12 +427,15 @@ public class WordGenerator{
 
 							productions.addAll(prods);
 						}
+
+						if(productions.size() >= limit)
+							completed = true;
 					}
 				}
 
 
 				//obtain next tuple
-				for(int i = indexes.length - 1; i >= 0; i --){
+				for(int i = indexes.length - 1; !completed && i >= 0; i --){
 					indexes[i] ++;
 					if(indexes[i] < entry.get(i).size())
 						break;
@@ -443,18 +447,10 @@ public class WordGenerator{
 			}
 		}
 
-		productions = productions.stream()
-			.distinct()
-			.limit(limit)
-			.collect(Collectors.toList());
-
 		compoundAsReplacement.clear();
 
 		//convert using output table
-		int size = productions.size();
-		for(int i = 0; i < size; i ++){
-			Production production = productions.get(i);
-
+		for(Production production : productions){
 			production.applyConversionTable(affParser::applyOutputConversionTable);
 			production.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			production.removeContinuationFlag(forceCompoundUppercaseFlag);
@@ -463,7 +459,10 @@ public class WordGenerator{
 		if(log.isTraceEnabled())
 			productions.forEach(production -> log.trace("Produced word: {}", production));
 
-		return productions;
+		List<Production> response = new ArrayList<>(productions);
+		if(response.size() > limit)
+			response = response.subList(0, limit);
+		return response;
 	}
 
 	private boolean containsTriple(StringBuilder sb, String compound){
