@@ -104,6 +104,20 @@ public class HunspellRegexWordGenerator{
 	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
 	 * <p>
 	 * The Strings are ordered in lexicographical order.
+	 * 
+	 * https://cs.stackexchange.com/questions/40819/how-to-create-dfa-from-regular-expression-without-using-nfa
+	 * https://cstheory.stackexchange.com/questions/14939/what-algorithms-exist-for-construction-a-dfa-that-recognizes-the-language-descri/14946#14946
+	 * https://medium.com/@DmitrySoshnikov/building-a-regexp-machine-part-2-finite-automata-nfa-fragments-5a7c5c005ef0
+	 * https://swtch.com/~rsc/regexp/regexp1.html
+	 * https://www.tutorialspoint.com/automata_theory/constructing_fa_from_re.htm
+	 * https://core.ac.uk/download/pdf/82527579.pdf
+	 * https://www.cse.cuhk.edu.hk/~siuon/csci3130-f16/slides/lec03.pdf
+	 * https://lambda.uta.edu/cse5317/spring01/notes/node9.html
+	 * https://github.com/alirezakay/RegexToDFA
+	 * https://github.com/felipemoura/RegularExpression-to-NFA-to-DFA
+	 * http://matt.might.net/articles/implementation-of-nfas-and-regular-expressions-in-java/
+	 * http://www-igm.univ-mlv.fr/~berstel/Lothaire/AppliedCW/ProgrammesJava/BibliJava/NFA.java
+	 * http://www.vesalainen.org/javalpg
 	 *
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
