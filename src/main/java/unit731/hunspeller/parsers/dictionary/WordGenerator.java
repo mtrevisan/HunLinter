@@ -31,7 +31,7 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWork
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 import unit731.hunspeller.services.StringHelper;
-import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
+import unit731.hunspeller.services.HunspellRegexWordGenerator;
 
 
 @Slf4j

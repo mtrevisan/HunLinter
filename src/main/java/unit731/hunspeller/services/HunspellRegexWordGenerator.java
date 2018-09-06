@@ -1,4 +1,4 @@
-package unit731.hunspeller.services.regexgenerator;
+package unit731.hunspeller.services;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -119,6 +119,7 @@ public class HunspellRegexWordGenerator{
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
 			State state = elem.state;
+
 			State[] transitions = state.getTransitions();
 			if(!subword.isEmpty() && state.isAccept()){
 				matchedWords.add(subword);

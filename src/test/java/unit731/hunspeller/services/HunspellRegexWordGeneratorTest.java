@@ -1,4 +1,4 @@
-package unit731.hunspeller.services.regexgenerator;
+package unit731.hunspeller.services;
 
 import java.util.Arrays;
 import java.util.List;
