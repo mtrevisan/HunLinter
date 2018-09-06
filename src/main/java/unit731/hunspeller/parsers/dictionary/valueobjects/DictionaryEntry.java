@@ -170,9 +170,14 @@ public class DictionaryEntry{
 				fun.accept(morphologicalField);
 	}
 
-	public List<String[]> extractAffixes(AffixParser affParser, boolean reverse){
+	public void removeAffixes(AffixParser affParser){
 		Affixes affixes = separateAffixes(affParser);
-		return affixes.extractAffixes(reverse);
+		continuationFlags = affixes.extractTerminals();
+	}
+
+	public List<String[]> extractAllAffixes(AffixParser affParser, boolean reverse){
+		Affixes affixes = separateAffixes(affParser);
+		return affixes.extractAllAffixes(reverse);
 	}
 
 	/**
