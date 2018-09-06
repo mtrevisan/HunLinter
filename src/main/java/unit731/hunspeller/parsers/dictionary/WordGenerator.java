@@ -121,7 +121,7 @@ public class WordGenerator{
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
-			if(log.isDebugEnabled()){
+			if(log.isDebugEnabled() && !twofoldProductions.isEmpty()){
 				log.debug("Prefix productions:");
 				twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 			}
@@ -133,7 +133,7 @@ public class WordGenerator{
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
-		if(log.isDebugEnabled()){
+		if(log.isDebugEnabled() && !lastfoldProductions.isEmpty()){
 			log.debug("Twofold productions:");
 			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
