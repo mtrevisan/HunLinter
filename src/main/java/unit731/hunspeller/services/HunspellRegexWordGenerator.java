@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Queue;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -25,44 +24,47 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class HunspellRegexWordGenerator{
 
+	private static final int EPSILON_TRANSITION = -1;
+
+
 	@AllArgsConstructor(access = AccessLevel.PRIVATE)
 	private static class State{
 
 		private final String word;
 		private Modifier modifier;
-		private State nextState;
+		private final int index;
 
-		private State(State nextState){
+		private State(){
 			word = StringUtils.EMPTY;
 			modifier = Modifier.ONE;
-			this.nextState = nextState;
+			index = EPSILON_TRANSITION;
 		}
 
 		public boolean isAccept(){
-			return (nextState == null);
+			return (index == EPSILON_TRANSITION);
 		}
 
-		public State[] getTransitions(){
-			State[] result;
+		public int[] getTransitions(){
+			int[] result;
 			switch(modifier){
 				case ONE:
-					result = new State[]{};
+					result = new int[]{index + 1};
 					break;
 
 				case ZERO_OR_ONE:
-					result = new State[]{new State(nextState)};
+					result = new int[]{EPSILON_TRANSITION, index};
 					break;
 
 				case ANY:
 				default:
-					result = new State[]{new State(nextState), this};
+					result = new int[]{EPSILON_TRANSITION, index, index + 1};
 			}
-			if(nextState != null)
-				result = ArrayUtils.addAll(result, nextState);
 			return result;
 		}
 
 	}
+
+	private static final State EMPTY_STATE = new State(StringUtils.EMPTY, Modifier.ONE, EPSILON_TRANSITION);
 
 	private static enum Modifier{
 		ONE, ZERO_OR_ONE, ANY;
@@ -71,7 +73,7 @@ public class HunspellRegexWordGenerator{
 	@AllArgsConstructor
 	private static class GeneratedElement{
 		private final String word;
-		private final State state;
+		private final int stateIndex;
 	}
 
 
@@ -92,10 +94,7 @@ public class HunspellRegexWordGenerator{
 			if(part.length() == 1 && (last == '?' || last == '*'))
 				automaton.get(size - 1).modifier = (last == '?'? Modifier.ZERO_OR_ONE: Modifier.ANY);
 			else{
-				State newState = new State(part, Modifier.ONE, null);
-				if(size > 0)
-					automaton.get(size - 1).nextState = newState;
-				automaton.add(newState);
+				automaton.add(new State(part, Modifier.ONE, EPSILON_TRANSITION));
 				size ++;
 			}
 		}
@@ -114,13 +113,13 @@ public class HunspellRegexWordGenerator{
 		int matchedWordCounter = 0;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
-		queue.add(new GeneratedElement(automaton.get(0).word, automaton.get(0)));
+		queue.add(new GeneratedElement(automaton.get(0).word, 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
-			State state = elem.state;
+			State state = automaton.get(elem.stateIndex);
 
-			State[] transitions = state.getTransitions();
+			int[] transitions = state.getTransitions();
 			if(!subword.isEmpty() && state.isAccept()){
 				matchedWords.add(subword);
 
@@ -129,9 +128,9 @@ public class HunspellRegexWordGenerator{
 					break;
 			}
 
-			for(State transition : transitions)
-				if(transition.nextState != null)
-					queue.add(new GeneratedElement(subword + transition.word, transition.nextState));
+			for(int transition : transitions)
+				if(0 <= transition && transition < automaton.size())
+					queue.add(new GeneratedElement(subword + automaton.get(transition).word, transition));
 		}
 
 		return matchedWords;
