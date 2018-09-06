@@ -622,8 +622,8 @@ public class WordGenerator{
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
 	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
-		List<String[]> prefixes = compoundEntries.get(0).extractAffixes(affParser, false);
-		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAffixes(affParser, false);
+		List<String[]> prefixes = compoundEntries.get(0).extractAllAffixes(affParser, false);
+		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAllAffixes(affParser, false);
 
 		Set<String> terminals = new HashSet<>(Arrays.asList(prefixes.get(2)));
 		terminals.addAll(Arrays.asList(suffixes.get(2)));
@@ -640,7 +640,7 @@ public class WordGenerator{
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
-		List<String[]> applyAffixes = dicEntry.extractAffixes(affParser, reverse);
+		List<String[]> applyAffixes = dicEntry.extractAllAffixes(affParser, reverse);
 		return applyAffixRules(dicEntry, applyAffixes, isCompound);
 	}
 
@@ -663,7 +663,7 @@ public class WordGenerator{
 	private void checkTwofoldCorrectness(List<Production> twofoldProductions) throws IllegalArgumentException{
 		boolean complexPrefixes = affParser.isComplexPrefixes();
 		for(Production prod : twofoldProductions){
-			List<String[]> affixes = prod.extractAffixes(affParser, false);
+			List<String[]> affixes = prod.extractAllAffixes(affParser, false);
 			String[] aff = affixes.get(complexPrefixes? 1: 0);
 			if(aff.length > 0){
 				String overabundantAffixes = affParser.getFlagParsingStrategy().joinFlags(aff);
@@ -818,6 +818,8 @@ public class WordGenerator{
 					boolean hasPermitFlag = (permitCompoundFlag != null && entry.hasContinuationFlag(permitCompoundFlag));
 					if(isCompound && (hasForbidFlag || !hasPermitFlag))
 						continue;
+//					if(isCompound && hasForbidFlag)
+//						continue;
 
 
 					//produce the new word
@@ -826,6 +828,12 @@ public class WordGenerator{
 					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable(), strategy);
 					if(!production.hasContinuationFlag(forbiddenWordFlag))
 						productions.add(production);
+//					if(!production.hasContinuationFlag(forbiddenWordFlag)){
+//						if(isCompound && !hasPermitFlag)
+//							production.removeAffixes(affParser);
+//
+//						productions.add(production);
+//					}
 				}
 			}
 		}
