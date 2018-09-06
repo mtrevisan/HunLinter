@@ -583,7 +583,7 @@ public class WordGenerator{
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
-			List<Production> productions = applyAffixRules(dicEntry, true);
+			List<Production> productions = applyAffixRules(dicEntry, false);
 			for(Production production : productions){
 				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(affParser, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
 				//merge the distribution with the others
@@ -814,8 +814,10 @@ public class WordGenerator{
 				//	.collect(Collectors.toList());
 
 				for(AffixEntry entry : applicableAffixes){
-					boolean hasForbidFlag = (forbidCompoundFlag != null && entry.hasContinuationFlag(forbidCompoundFlag));
-					boolean hasPermitFlag = (permitCompoundFlag != null && entry.hasContinuationFlag(permitCompoundFlag));
+					boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
+					boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
+//if("SFX A 0 0/WXD .".equals(entry.toString()))
+//	System.out.println("");
 					if(isCompound && (hasForbidFlag || !hasPermitFlag))
 						continue;
 //					if(isCompound && hasForbidFlag)

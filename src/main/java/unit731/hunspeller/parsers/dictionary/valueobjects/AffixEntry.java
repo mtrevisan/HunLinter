@@ -125,7 +125,7 @@ public class AffixEntry{
 	}
 
 	public boolean hasContinuationFlag(String flag){
-		return (continuationFlags != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
+		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
 	public boolean containsUniqueContinuationFlags(){
