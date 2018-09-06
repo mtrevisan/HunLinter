@@ -150,7 +150,8 @@ public class WordGenerator{
 		productions.addAll(lastfoldProductions);
 
 		//remove rules that invalidate the onlyInCompound rule
-		enforceOnlyInCompound(productions, isCompound);
+		if(isCompound)
+			enforceOnlyInCompound(productions);
 
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
@@ -526,7 +527,6 @@ public class WordGenerator{
 	 * 
 	 * @param inputCompounds	List of compounds used to generate the production through the compound rule
 	 * @param limit	Limit result count
-	 * @param maxCompounds	Maximum compound count
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
@@ -673,15 +673,17 @@ public class WordGenerator{
 		}
 	}
 
-	private List<Production> enforceOnlyInCompound(List<Production> productions, boolean isCompound){
+	private List<Production> enforceOnlyInCompound(List<Production> productions){
 		String onlyInCompoundFlag = affParser.getOnlyInCompoundFlag();
 
-		Iterator<Production> itr = productions.iterator();
-		while(itr.hasNext()){
-			Production production = itr.next();
+		if(StringUtils.isNotBlank(onlyInCompoundFlag)){
+			Iterator<Production> itr = productions.iterator();
+			while(itr.hasNext()){
+				Production production = itr.next();
 
-			if(production.hasContinuationFlag(onlyInCompoundFlag))
-				itr.remove();
+				if(!production.hasContinuationFlag(onlyInCompoundFlag))
+					itr.remove();
+			}
 		}
 		return productions;
 	}
