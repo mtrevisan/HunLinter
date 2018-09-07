@@ -69,14 +69,14 @@ public class HunspellRegexWordGenerator{
 		graph = new Digraph();
 		graph.addEdge(0, 1);
 		for(int i = 1; i < m; ){
-			char nextChar = (i < m - 1 && automaton[i].length() == 1? automaton[i].charAt(0): 0);
+			char nextChar = (i < m - 1 && automaton[i - 1].length() == 1? automaton[i - 1].charAt(0): 0);
 			switch(nextChar){
 				//zero or more
 				case '*':
 					graph.addEpsilonTransition(i - 1, i + 1);
 					graph.addEdge(i, i);
 
-					automaton = ArrayUtils.remove(automaton, i);
+					automaton = ArrayUtils.remove(automaton, i - 1);
 					m --;
 					break;
 
@@ -84,7 +84,7 @@ public class HunspellRegexWordGenerator{
 				case '?':
 					graph.addEpsilonTransition(i - 1, i + 1);
 
-					automaton = ArrayUtils.remove(automaton, i);
+					automaton = ArrayUtils.remove(automaton, i - 1);
 					m --;
 					break;
 
