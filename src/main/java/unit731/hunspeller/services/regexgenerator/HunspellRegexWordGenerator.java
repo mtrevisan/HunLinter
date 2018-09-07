@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  * 
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
+ * @see <a href="https://www.dennis-grinch.co.uk/tutorial/enfa">ε-NFA in Java</a>
  */
 public class HunspellRegexWordGenerator{
 
@@ -51,7 +52,7 @@ public class HunspellRegexWordGenerator{
 		automaton = StringUtils.split(regexp, "()");
 
 		int m = automaton.length + 1;
-		graph = new Digraph(m + 2);
+		graph = new Digraph();
 		graph.addEdge(0, 1);
 		for(int i = 1; i < m; ){
 			char nextChar = (i < m - 1 && automaton[i].length() == 1? automaton[i].charAt(0): 0);
@@ -61,7 +62,6 @@ public class HunspellRegexWordGenerator{
 					graph.addEdge(i - 1, i + 1);
 					graph.addEdge(i, i);
 
-					graph.setVertices(m);
 					automaton = ArrayUtils.remove(automaton, i);
 					m --;
 					break;
@@ -70,7 +70,6 @@ public class HunspellRegexWordGenerator{
 				case '?':
 					graph.addEdge(i - 1, i + 1);
 
-					graph.setVertices(m);
 					automaton = ArrayUtils.remove(automaton, i);
 					m --;
 					break;

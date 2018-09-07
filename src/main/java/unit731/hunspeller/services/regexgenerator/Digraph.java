@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
+import lombok.NoArgsConstructor;
 
 
 /**
@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
  * For additional documentation, see <a href="https://algs4.cs.princeton.edu/42digraph">Section 4.2</a> of
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  */
+@NoArgsConstructor
 public class Digraph{
 
 	private static final String NEWLINE = System.getProperty("line.separator");
@@ -28,24 +29,8 @@ public class Digraph{
 	@Getter
 	private int vertices;
 	//adjacency list for given vertex
-	private List<Integer>[] adjacency;
+	private List<List<Integer>> adjacency = new ArrayList<>(0);
 
-
-	/**
-	 * Initializes an empty digraph with <em>V</em> vertices.
-	 *
-	 * @param vertices	The number of vertices
-	 * @throws IllegalArgumentException if {@code vertices < 0}
-	 */
-	public Digraph(int vertices){
-		if(vertices < 0)
-			throw new IllegalArgumentException("Number of vertices in a Digraph must be nonnegative");
-
-		this.vertices = vertices;
-		adjacency = new ArrayList[vertices];
-		for(int v = 0; v < vertices; v ++)
-			adjacency[v] = new ArrayList<>();
-	}
 
 	/**
 	 * Initializes a new digraph that is a deep copy of the specified digraph.
@@ -53,21 +38,16 @@ public class Digraph{
 	 * @param graph	The digraph to copy
 	 */
 	public Digraph(Digraph graph){
-		this(graph.vertices);
-
+		vertices = graph.vertices;
+		adjacency = new ArrayList<>(vertices);
 		for(int v = 0; v < graph.vertices; v ++){
 			//reverse so that adjacency list is in same order as original
 			Stack<Integer> reverse = new Stack<>();
-			for(int w : graph.adjacency[v])
+			for(int w : graph.adjacency.get(v))
 				reverse.push(w);
 			for(int w : reverse)
-				adjacency[v].add(w);
+				addEdge(v, w);
 		}
-	}
-
-	public void setVertices(int vertices){
-		this.vertices = vertices;
-		adjacency = ArrayUtils.remove(adjacency, vertices);
 	}
 
 	/**
@@ -78,10 +58,11 @@ public class Digraph{
 	 * @throws IllegalArgumentException	unless both {@code 0 <= v < vertices} and {@code 0 <= w < vertices}
 	 */
 	public void addEdge(int v, int w){
-		validateVertex(v);
-		validateVertex(w);
-
-		adjacency[v].add(0, w);
+		while(v >= adjacency.size()){
+			adjacency.add(new ArrayList<>(0));
+			vertices ++;
+		}
+		adjacency.get(v).add(0, w);
 	}
 
 	/**
@@ -92,15 +73,7 @@ public class Digraph{
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Integer> adjacentVertices(int vertex){
-		validateVertex(vertex);
-
-		return adjacency[vertex];
-	}
-
-	//throw an IllegalArgumentException unless {@code 0 <= vertex < vertices}
-	private void validateVertex(int vertex){
-		if(vertex < 0 || vertex >= vertices)
-			throw new IllegalArgumentException("vertex " + vertex + " is not between 0 and " + (vertices - 1));
+		return adjacency.get(vertex);
 	}
 
 	/**
@@ -109,7 +82,7 @@ public class Digraph{
 	 * @return	the reverse of the digraph
 	 */
 	public Digraph reverse(){
-		Digraph reverse = new Digraph(vertices);
+		Digraph reverse = new Digraph();
 		for(int v = 0; v < vertices; v ++)
 			for(int w : adjacentVertices(v))
 				reverse.addEdge(w, v);
@@ -127,7 +100,7 @@ public class Digraph{
 		s.append(vertices).append(" vertices, ").append(NEWLINE);
 		for(int v = 0; v < vertices; v ++){
 			s.append(String.format("%d: ", v));
-			for(int w : adjacency[v])
+			for(int w : adjacency.get(v))
 				s.append(String.format("%d ", w));
 			s.append(NEWLINE);
 		}
