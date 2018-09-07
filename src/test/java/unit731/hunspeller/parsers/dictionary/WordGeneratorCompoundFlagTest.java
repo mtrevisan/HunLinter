@@ -678,7 +678,7 @@ public class WordGeneratorCompoundFlagTest{
 			"baz/CA"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
-//words.forEach(stem -> System.out.println(stem));
+//words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),

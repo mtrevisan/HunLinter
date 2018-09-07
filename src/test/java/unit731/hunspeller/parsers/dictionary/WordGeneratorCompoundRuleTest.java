@@ -302,7 +302,7 @@ public class WordGeneratorCompoundRuleTest{
 			"scheu/wU"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
-//words.forEach(stem -> System.out.println(stem));
+//words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")

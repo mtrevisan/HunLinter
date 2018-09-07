@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 
 /**
@@ -25,7 +26,7 @@ public class Digraph{
 
 	//number of vertices in this digraph
 	@Getter
-	private final int vertices;
+	private int vertices;
 	//number of edges in this digraph
 	@Getter
 	private int edges;
@@ -72,6 +73,12 @@ public class Digraph{
 			for(int w : reverse)
 				adjacency[v].add(w);
 		}
+	}
+
+	public void setVertices(int vertices){
+		this.vertices = vertices;
+		adjacency = ArrayUtils.remove(adjacency, vertices);
+		inDegree = ArrayUtils.remove(inDegree, vertices);;
 	}
 
 	/**
