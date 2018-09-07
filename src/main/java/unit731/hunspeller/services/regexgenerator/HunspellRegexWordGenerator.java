@@ -103,16 +103,18 @@ public class HunspellRegexWordGenerator{
 			int stateIndex = elem.stateIndex;
 
 			//if this is the accepting state (skip empty generated word)
-			if(!subword.isEmpty() && stateIndex == acceptingStateIndex){
-				matchedWords.add(subword);
+			if(stateIndex == acceptingStateIndex){
+				if(!subword.isEmpty()){
+					matchedWords.add(subword);
 
-				if(matchedWords.size() == limit)
-					break;
+					if(matchedWords.size() == limit)
+						break;
+				}
+
+				Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
+				for(int transition : transitions)
+					queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition - 1]: subword), transition));
 			}
-
-			Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
-			for(int transition : transitions)
-				queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition - 1]: subword), transition));
 		}
 
 		return matchedWords;

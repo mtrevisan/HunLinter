@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  */
 @NoArgsConstructor
-public class Digraph{
+public final class Digraph{
 
 	private static final String NEWLINE = System.getProperty("line.separator");
 
@@ -83,9 +83,11 @@ public class Digraph{
 	 */
 	public Digraph reverse(){
 		Digraph reverse = new Digraph();
-		for(int v = 0; v < vertices; v ++)
-			for(int w : adjacentVertices(v))
+		for(int v = 0; v < vertices; v ++){
+			Iterable<Integer> transitions = adjacentVertices(v);
+			for(int w : transitions)
 				reverse.addEdge(w, v);
+		}
 		return reverse;
 	}
 
