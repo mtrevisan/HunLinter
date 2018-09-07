@@ -1,5 +1,10 @@
 package unit731.hunspeller.services.regexgenerator;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,8 +30,14 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class NFA{
 
-	//digraph of transitions
+	@AllArgsConstructor
+	private static class GeneratedElement{
+		private final String word;
+		private final int stateIndex;
+	}
+
 	private final Digraph graph;
+	private String[] automaton;
 
 
 	/**
@@ -35,20 +46,19 @@ public class NFA{
 	 * @param regexp	The regular expression
 	 */
 	public NFA(String regexp){
-		String[] parts = StringUtils.split(regexp, "()");
+		automaton = StringUtils.split(regexp, "()");
 
-		int m = parts.length;
+		int m = automaton.length;
 		graph = new Digraph(m + 1);
 		for(int i = 0; i < m; ){
-			//closure operator (uses 1-character lookahead)
-			char nextChar = (i < m - 1 && parts[i + 1].length() == 1? parts[i + 1].charAt(0): 0);
+			char nextChar = (i < m - 1 && automaton[i + 1].length() == 1? automaton[i + 1].charAt(0): 0);
 			switch(nextChar){
 				case '*':
 					graph.addEdge(i - 1, i + 1);
 					graph.addEdge(i, i);
 
 					graph.setVertices(m);
-					parts = ArrayUtils.remove(parts, i + 1);
+					automaton = ArrayUtils.remove(automaton, i + 1);
 					m --;
 					break;
 
@@ -56,11 +66,12 @@ public class NFA{
 					graph.addEdge(i - 1, i + 1);
 
 					graph.setVertices(m);
-					parts = ArrayUtils.remove(parts, i + 1);
+					automaton = ArrayUtils.remove(automaton, i + 1);
 					m --;
 					break;
 
 				default:
+					graph.addEdge(i, i + 1);
 					i ++;
 			}
 		}
@@ -74,38 +85,41 @@ public class NFA{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-//	public List<String> generateAll(int limit){
-//		List<String> matchedWords = new ArrayList<>(limit);
-//
-//		Queue<GeneratedElement> queue = new LinkedList<>();
-//		queue.add(new GeneratedElement(automaton.get(0).word, 0));
-//		while(!queue.isEmpty()){
-//			GeneratedElement elem = queue.remove();
-//			String subword = elem.word;
-//			State state = automaton.get(elem.stateIndex);
-//
-//			int[] transitions = state.getTransitions();
-//			if(!subword.isEmpty() && state.isAccept()){
-//				matchedWords.add(subword);
-//
-//				if(matchedWords.size() == limit)
-//					break;
-//			}
-//
-//			for(int transition : transitions)
-//				if(0 <= transition && transition < automaton.size())
-//					queue.add(new GeneratedElement(subword + automaton.get(transition).word, transition));
-//		}
-//
-//		return matchedWords;
-//	}
+	public List<String> generateAll(int limit){
+		List<String> matchedWords = new ArrayList<>(limit);
+
+		int acceptingStateIndex = graph.getVertices() - 1;
+
+		Queue<GeneratedElement> queue = new LinkedList<>();
+		queue.add(new GeneratedElement(automaton[0], 0));
+		while(!queue.isEmpty()){
+			GeneratedElement elem = queue.remove();
+			String subword = elem.word;
+			int stateIndex = elem.stateIndex;
+
+			//if this is the accepting state (skip empty generated word)
+			if(!subword.isEmpty() && stateIndex == acceptingStateIndex){
+				matchedWords.add(subword);
+
+				if(matchedWords.size() == limit)
+					break;
+			}
+
+			Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
+			for(int transition : transitions)
+				if(0 <= transition && transition < automaton.length)
+					queue.add(new GeneratedElement(subword + automaton[transition], transition));
+		}
+
+		return matchedWords;
+	}
 
 	public static void main(String[] args){
 		NFA nfa = new NFA("(as)(ert)?(b)*");
 		System.out.println(nfa.graph);
 
-//		List<String> words = nfa.generateAll(10);
-//		words.forEach(System.out::println);
+		List<String> words = nfa.generateAll(10);
+		words.forEach(System.out::println);
 	}
 
 }
