@@ -1,8 +1,8 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
@@ -97,7 +97,7 @@ public class HunspellRegexWordGenerator{
 
 		int finalStateIndex = automaton.length + 1;
 
-		Queue<GeneratedElement> queue = new LinkedList<>();
+		Queue<GeneratedElement> queue = new PriorityQueue<>((elem1, elem2) -> elem1.word.length() - elem2.word.length());
 		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
@@ -123,14 +123,6 @@ public class HunspellRegexWordGenerator{
 		}
 
 		return matchedWords;
-	}
-
-	public static void main(String[] args){
-		HunspellRegexWordGenerator nfa = new HunspellRegexWordGenerator("(as)(ert)?(b)*");
-		System.out.println(nfa.graph);
-
-		List<String> words = nfa.generateAll(10);
-		words.forEach(System.out::println);
 	}
 
 }
