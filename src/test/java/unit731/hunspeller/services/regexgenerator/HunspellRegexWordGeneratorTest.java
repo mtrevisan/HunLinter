@@ -13,6 +13,7 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "(abc)(de)?(a)*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+System.out.println(generator);
 		List<String> words = generator.generateAll(6);
 words.forEach(System.out::println);
 

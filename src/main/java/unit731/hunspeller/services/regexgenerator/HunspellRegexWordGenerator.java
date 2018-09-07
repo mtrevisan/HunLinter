@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
  * @see <a href="https://www.dennis-grinch.co.uk/tutorial/enfa">ε-NFA in Java</a>
  */
+@ToString
 public class HunspellRegexWordGenerator{
 
 	@AllArgsConstructor
@@ -93,7 +95,7 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int acceptingStateIndex = automaton.length + 1;
+		int finalStateIndex = automaton.length + 1;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
@@ -102,18 +104,18 @@ public class HunspellRegexWordGenerator{
 			String subword = elem.word;
 			int stateIndex = elem.stateIndex;
 
-			//if this is the accepting state (skip empty generated word)
-			if(stateIndex == acceptingStateIndex){
-				if(!subword.isEmpty()){
-					matchedWords.add(subword);
-
-					if(matchedWords.size() == limit)
-						break;
-				}
-
+			//final state not reached, add transitions
+			if(stateIndex < finalStateIndex){
 				Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
 				for(int transition : transitions)
-					queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition - 1]: subword), transition));
+					queue.add(new GeneratedElement((transition < finalStateIndex? subword + automaton[transition - 1]: subword), transition));
+			}
+			//if this is the accepting state add the generated word (skip empty generated word)
+			else if(!subword.isEmpty()){
+				matchedWords.add(subword);
+
+				if(matchedWords.size() == limit)
+					break;
 			}
 		}
 

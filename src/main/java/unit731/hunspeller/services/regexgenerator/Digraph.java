@@ -99,7 +99,7 @@ public final class Digraph{
 	@Override
 	public String toString(){
 		StringBuilder s = new StringBuilder();
-		s.append(vertices).append(" vertices, ").append(NEWLINE);
+		s.append(NEWLINE);
 		for(int v = 0; v < vertices; v ++){
 			s.append(String.format("%d: ", v));
 			for(int w : adjacency.get(v))
