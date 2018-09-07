@@ -3,12 +3,11 @@ package unit731.hunspeller.services.regexgenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 /**
- * The {@code Digraph} class represents a directed graph of vertices named 0 through <em>V</em> - 1.
+ * The {@code Digraph} class represents a directed graph of vertices.
  * <p>
  * It supports the following two primary operations: add an edge to the digraph, iterate over all of the vertices adjacent from a given vertex.
  * Parallel edges and self-loops are permitted.
@@ -25,11 +24,10 @@ public final class Digraph{
 
 	private static final String NEWLINE = System.getProperty("line.separator");
 
-	//number of vertices in this digraph
-	@Getter
-	private int vertices;
 	//adjacency list for given vertex
 	private List<List<Integer>> adjacency = new ArrayList<>(0);
+	//ε-transition list for given vertex
+	private List<List<Integer>> epsilons = new ArrayList<>(0);
 
 
 	/**
@@ -38,15 +36,25 @@ public final class Digraph{
 	 * @param graph	The digraph to copy
 	 */
 	public Digraph(Digraph graph){
-		vertices = graph.vertices;
+		int vertices = graph.adjacency.size();
 		adjacency = new ArrayList<>(vertices);
-		for(int v = 0; v < graph.vertices; v ++){
+		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
 			Stack<Integer> reverse = new Stack<>();
 			for(int w : graph.adjacency.get(v))
 				reverse.push(w);
 			for(int w : reverse)
 				addEdge(v, w);
+		}
+		vertices = graph.epsilons.size();
+		epsilons = new ArrayList<>(vertices);
+		for(int v = 0; v < vertices; v ++){
+			//reverse so that ε-transition list is in same order as original
+			Stack<Integer> reverse = new Stack<>();
+			for(int w : graph.epsilons.get(v))
+				reverse.push(w);
+			for(int w : reverse)
+				addEpsilonTransition(v, w);
 		}
 	}
 
@@ -55,25 +63,45 @@ public final class Digraph{
 	 *
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
-	 * @throws IllegalArgumentException	unless both {@code 0 <= v < vertices} and {@code 0 <= w < vertices}
 	 */
 	public void addEdge(int v, int w){
-		while(v >= adjacency.size()){
+		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
-			vertices ++;
-		}
 		adjacency.get(v).add(0, w);
+	}
+
+	/**
+	 * Adds the directed edge v→w to this digraph through an ε-transition.
+	 *
+	 * @param v	The tail vertex
+	 * @param w	The head vertex
+	 */
+	public void addEpsilonTransition(int v, int w){
+		while(v >= epsilons.size())
+			epsilons.add(new ArrayList<>(0));
+		epsilons.get(v).add(0, w);
 	}
 
 	/**
 	 * Returns the vertices adjacent from vertex {@code vertex} in this digraph.
 	 *
 	 * @param vertex the vertex
-	 * @return the vertices adjacent from vertex {@code vertex} in this digraph, as an iterable
+	 * @return the vertices adjacent from vertex {@code vertex}
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Integer> adjacentVertices(int vertex){
 		return adjacency.get(vertex);
+	}
+
+	/**
+	 * Returns the vertices that are in a ε-transition from vertex {@code vertex} in this digraph.
+	 *
+	 * @param vertex the vertex
+	 * @return the vertices that are in a ε-transition from vertex {@code vertex}
+	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
+	 */
+	public Iterable<Integer> epsilonTransitionVertices(int vertex){
+		return epsilons.get(vertex);
 	}
 
 	/**
@@ -83,10 +111,17 @@ public final class Digraph{
 	 */
 	public Digraph reverse(){
 		Digraph reverse = new Digraph();
+		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			Iterable<Integer> transitions = adjacentVertices(v);
 			for(int w : transitions)
 				reverse.addEdge(w, v);
+		}
+		vertices = epsilons.size();
+		for(int v = 0; v < vertices; v ++){
+			Iterable<Integer> transitions = epsilonTransitionVertices(v);
+			for(int w : transitions)
+				reverse.addEpsilonTransition(w, v);
 		}
 		return reverse;
 	}
@@ -100,9 +135,17 @@ public final class Digraph{
 	public String toString(){
 		StringBuilder s = new StringBuilder();
 		s.append(NEWLINE);
+		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			s.append(String.format("%d: ", v));
 			for(int w : adjacency.get(v))
+				s.append(String.format("%d ", w));
+			s.append(NEWLINE);
+		}
+		vertices = epsilons.size();
+		for(int v = 0; v < vertices; v ++){
+			s.append(String.format("%d (ε): ", v));
+			for(int w : epsilons.get(v))
 				s.append(String.format("%d ", w));
 			s.append(NEWLINE);
 		}

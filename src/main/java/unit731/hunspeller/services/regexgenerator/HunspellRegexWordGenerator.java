@@ -61,8 +61,8 @@ public class HunspellRegexWordGenerator{
 			switch(nextChar){
 				//zero or more
 				case '*':
-					graph.addEdge(i - 1, i + 1);
-					graph.addEdge(i, i);
+					graph.addEpsilonTransition(i - 1, i + 1);
+					graph.addEpsilonTransition(i, i);
 
 					automaton = ArrayUtils.remove(automaton, i);
 					m --;
@@ -70,7 +70,7 @@ public class HunspellRegexWordGenerator{
 
 				//zero or one
 				case '?':
-					graph.addEdge(i - 1, i + 1);
+					graph.addEpsilonTransition(i - 1, i + 1);
 
 					automaton = ArrayUtils.remove(automaton, i);
 					m --;
@@ -106,7 +106,10 @@ public class HunspellRegexWordGenerator{
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
+				Iterable<Integer> transitions = graph.epsilonTransitionVertices(stateIndex);
+				for(int transition : transitions)
+					queue.add(new GeneratedElement(subword, transition));
+				transitions = graph.adjacentVertices(stateIndex);
 				for(int transition : transitions)
 					queue.add(new GeneratedElement((transition < finalStateIndex? subword + automaton[transition - 1]: subword), transition));
 			}
