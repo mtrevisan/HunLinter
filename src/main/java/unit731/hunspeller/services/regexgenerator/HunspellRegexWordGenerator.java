@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
  */
-public class NFA{
+public class HunspellRegexWordGenerator{
 
 	@AllArgsConstructor
 	private static class GeneratedElement{
@@ -42,10 +42,12 @@ public class NFA{
 
 	/**
 	 * Initializes the NFA from the specified regular expression.
+	 * <p>
+	 * NOTE: each element should be enclosed in parentheses (eg. <code>(as)(ert)?(b)*</code>), the managed operations are <code>*</code> and <code>?</code>
 	 *
 	 * @param regexp	The regular expression
 	 */
-	public NFA(String regexp){
+	public HunspellRegexWordGenerator(String regexp){
 		automaton = StringUtils.split(regexp, "()");
 
 		int m = automaton.length;
@@ -53,6 +55,7 @@ public class NFA{
 		for(int i = 0; i < m; ){
 			char nextChar = (i < m - 1 && automaton[i + 1].length() == 1? automaton[i + 1].charAt(0): 0);
 			switch(nextChar){
+				//zero or more
 				case '*':
 					graph.addEdge(i - 1, i + 1);
 					graph.addEdge(i, i);
@@ -62,6 +65,7 @@ public class NFA{
 					m --;
 					break;
 
+				//zero or one
 				case '?':
 					graph.addEdge(i - 1, i + 1);
 
@@ -70,6 +74,7 @@ public class NFA{
 					m --;
 					break;
 
+				//one
 				default:
 					graph.addEdge(i, i + 1);
 					i ++;
@@ -88,7 +93,7 @@ public class NFA{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int acceptingStateIndex = graph.getVertices() - 1;
+		int acceptingStateIndex = automaton.length;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(automaton[0], 0));
@@ -107,19 +112,10 @@ public class NFA{
 
 			Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
 			for(int transition : transitions)
-				if(0 <= transition && transition < automaton.length)
-					queue.add(new GeneratedElement(subword + automaton[transition], transition));
+				queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition]: subword), transition));
 		}
 
 		return matchedWords;
-	}
-
-	public static void main(String[] args){
-		NFA nfa = new NFA("(as)(ert)?(b)*");
-		System.out.println(nfa.graph);
-
-		List<String> words = nfa.generateAll(10);
-		words.forEach(System.out::println);
 	}
 
 }

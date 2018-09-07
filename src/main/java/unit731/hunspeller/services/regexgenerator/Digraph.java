@@ -1,7 +1,7 @@
 package unit731.hunspeller.services.regexgenerator;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -27,13 +27,8 @@ public class Digraph{
 	//number of vertices in this digraph
 	@Getter
 	private int vertices;
-	//number of edges in this digraph
-	@Getter
-	private int edges;
 	//adjacency list for given vertex
-	private Set<Integer>[] adjacency;
-	//indegree of given vertex
-	private int[] inDegree;
+	private List<Integer>[] adjacency;
 
 
 	/**
@@ -47,11 +42,9 @@ public class Digraph{
 			throw new IllegalArgumentException("Number of vertices in a Digraph must be nonnegative");
 
 		this.vertices = vertices;
-		edges = 0;
-		adjacency = new HashSet[vertices];
+		adjacency = new ArrayList[vertices];
 		for(int v = 0; v < vertices; v ++)
-			adjacency[v] = new HashSet<>();
-		inDegree = new int[vertices];
+			adjacency[v] = new ArrayList<>();
 	}
 
 	/**
@@ -62,9 +55,6 @@ public class Digraph{
 	public Digraph(Digraph graph){
 		this(graph.vertices);
 
-		edges = graph.edges;
-		for(int v = 0; v < vertices; v ++)
-			inDegree[v] = graph.inDegree(v);
 		for(int v = 0; v < graph.vertices; v ++){
 			//reverse so that adjacency list is in same order as original
 			Stack<Integer> reverse = new Stack<>();
@@ -78,7 +68,6 @@ public class Digraph{
 	public void setVertices(int vertices){
 		this.vertices = vertices;
 		adjacency = ArrayUtils.remove(adjacency, vertices);
-		inDegree = ArrayUtils.remove(inDegree, vertices);;
 	}
 
 	/**
@@ -93,8 +82,6 @@ public class Digraph{
 		validateVertex(w);
 
 		adjacency[v].add(w);
-		inDegree[w] ++;
-		edges ++;
 	}
 
 	/**
@@ -108,36 +95,6 @@ public class Digraph{
 		validateVertex(vertex);
 
 		return adjacency[vertex];
-	}
-
-	/**
-	 * Returns the number of directed edges incident from vertex {@code vertex}.
-	 * <p>
-	 * This is known as the <em>out degree</em> of vertex {@code vertex}.
-	 *
-	 * @param vertex	The vertex
-	 * @return	the outdegree of vertex {@code v}
-	 * @throws IllegalArgumentException	unless {@code 0 <= vertex < vertics}
-	 */
-	public int outDegree(int vertex){
-		validateVertex(vertex);
-
-		return adjacency[vertex].size();
-	}
-
-	/**
-	 * Returns the number of directed edges incident to vertex {@code vertex}.
-	 * <p>
-	 * This is known as the <em>in degree</em> of vertex {@code vertex}.
-	 *
-	 * @param vertex	The vertex
-	 * @return	the indegree of vertex {@code vertex}
-	 * @throws IllegalArgumentException	unless {@code 0 <= vertex < vertices}
-	 */
-	public int inDegree(int vertex){
-		validateVertex(vertex);
-
-		return inDegree[vertex];
 	}
 
 	//throw an IllegalArgumentException unless {@code 0 <= vertex < vertices}
@@ -167,7 +124,7 @@ public class Digraph{
 	@Override
 	public String toString(){
 		StringBuilder s = new StringBuilder();
-		s.append(vertices).append(" vertices, ").append(edges).append(" edges ").append(NEWLINE);
+		s.append(vertices).append(" vertices, ").append(NEWLINE);
 		for(int v = 0; v < vertices; v ++){
 			s.append(String.format("%d: ", v));
 			for(int w : adjacency[v])
