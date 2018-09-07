@@ -81,7 +81,7 @@ public class Digraph{
 		validateVertex(v);
 		validateVertex(w);
 
-		adjacency[v].add(w);
+		adjacency[v].add(0, w);
 	}
 
 	/**
