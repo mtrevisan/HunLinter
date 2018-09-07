@@ -50,10 +50,11 @@ public class HunspellRegexWordGenerator{
 	public HunspellRegexWordGenerator(String regexp){
 		automaton = StringUtils.split(regexp, "()");
 
-		int m = automaton.length;
-		graph = new Digraph(m + 1);
-		for(int i = 0; i < m; ){
-			char nextChar = (i < m - 1 && automaton[i + 1].length() == 1? automaton[i + 1].charAt(0): 0);
+		int m = automaton.length + 1;
+		graph = new Digraph(m + 2);
+		graph.addEdge(0, 1);
+		for(int i = 1; i < m; ){
+			char nextChar = (i < m - 1 && automaton[i].length() == 1? automaton[i].charAt(0): 0);
 			switch(nextChar){
 				//zero or more
 				case '*':
@@ -61,7 +62,7 @@ public class HunspellRegexWordGenerator{
 					graph.addEdge(i, i);
 
 					graph.setVertices(m);
-					automaton = ArrayUtils.remove(automaton, i + 1);
+					automaton = ArrayUtils.remove(automaton, i);
 					m --;
 					break;
 
@@ -70,7 +71,7 @@ public class HunspellRegexWordGenerator{
 					graph.addEdge(i - 1, i + 1);
 
 					graph.setVertices(m);
-					automaton = ArrayUtils.remove(automaton, i + 1);
+					automaton = ArrayUtils.remove(automaton, i);
 					m --;
 					break;
 
@@ -93,10 +94,10 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int acceptingStateIndex = automaton.length;
+		int acceptingStateIndex = automaton.length + 1;
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
-		queue.add(new GeneratedElement(automaton[0], 0));
+		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
 			String subword = elem.word;
@@ -112,10 +113,18 @@ public class HunspellRegexWordGenerator{
 
 			Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
 			for(int transition : transitions)
-				queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition]: subword), transition));
+				queue.add(new GeneratedElement((transition < acceptingStateIndex? subword + automaton[transition - 1]: subword), transition));
 		}
 
 		return matchedWords;
+	}
+
+	public static void main(String[] args){
+		HunspellRegexWordGenerator nfa = new HunspellRegexWordGenerator("(as)(ert)?(b)*");
+		System.out.println(nfa.graph);
+
+		List<String> words = nfa.generateAll(10);
+		words.forEach(System.out::println);
 	}
 
 }
