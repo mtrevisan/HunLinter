@@ -1,6 +1,7 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import lombok.NoArgsConstructor;
@@ -90,7 +91,7 @@ public final class Digraph{
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Integer> adjacentVertices(int vertex){
-		return adjacency.get(vertex);
+		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Integer>emptyList());
 	}
 
 	/**
@@ -101,7 +102,7 @@ public final class Digraph{
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Integer> epsilonTransitionVertices(int vertex){
-		return epsilons.get(vertex);
+		return (vertex < epsilons.size()? epsilons.get(vertex): Collections.<Integer>emptyList());
 	}
 
 	/**

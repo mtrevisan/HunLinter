@@ -62,7 +62,7 @@ public class HunspellRegexWordGenerator{
 				//zero or more
 				case '*':
 					graph.addEpsilonTransition(i - 1, i + 1);
-					graph.addEpsilonTransition(i, i);
+					graph.addEdge(i, i);
 
 					automaton = ArrayUtils.remove(automaton, i);
 					m --;
