@@ -9,11 +9,31 @@ import org.junit.Test;
 public class HunspellRegexWordGeneratorTest{
 
 	@Test
-	public void shouldGenerateAllWords(){
+	public void oneForEach(){
 		String regex = "(abc)(de)?(a)*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<String> words = generator.generateAll(6);
+words.forEach(System.out::println);
+
+		List<String> expected = Arrays.asList(
+			"(abc)",
+			"(abc)(de)",
+			"(abc)(a)",
+			"(abc)(de)(a)",
+			"(abc)(a)(a)",
+			"(abc)(de)(a)(a)"
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void allOptionals(){
+		String regex = "(abc)?(de)?(a)?";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		List<String> words = generator.generateAll(6);
+words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(abc)",

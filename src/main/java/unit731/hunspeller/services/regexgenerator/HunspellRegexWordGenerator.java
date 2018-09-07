@@ -2,6 +2,7 @@ package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -108,9 +109,10 @@ public class HunspellRegexWordGenerator{
 
 		int finalStateIndex = automaton.length + 1;
 
-		Comparator<GeneratedElement> compareLength = (elem1, elem2) -> elem1.word.length() - elem2.word.length();
-		Comparator<GeneratedElement> compareAlphabet = (elem1, elem2) -> elem1.word.compareTo(elem2.word);
-		Queue<GeneratedElement> queue = new PriorityQueue<>(compareLength.thenComparing(compareAlphabet));
+//		Comparator<GeneratedElement> compareLength = (elem1, elem2) -> elem1.word.length() - elem2.word.length();
+//		Comparator<GeneratedElement> compareAlphabet = (elem1, elem2) -> elem1.word.compareTo(elem2.word);
+//		Queue<GeneratedElement> queue = new PriorityQueue<>(compareLength.thenComparing(compareAlphabet));
+		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();

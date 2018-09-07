@@ -199,6 +199,7 @@ public class WordGeneratorCompoundRuleTest{
 			"c/bbcc"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("a", null, "pa:a st:a"),
