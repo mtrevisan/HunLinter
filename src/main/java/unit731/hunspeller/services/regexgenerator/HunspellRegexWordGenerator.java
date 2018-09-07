@@ -1,6 +1,7 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -60,6 +61,8 @@ public class HunspellRegexWordGenerator{
 	 */
 	public HunspellRegexWordGenerator(String regexp){
 		automaton = PatternHelper.split(regexp, SPLITTER);
+		if(automaton[0].isEmpty())
+			automaton = ArrayUtils.remove(automaton, 0);
 
 		int m = automaton.length + 1;
 		graph = new Digraph();
@@ -105,7 +108,9 @@ public class HunspellRegexWordGenerator{
 
 		int finalStateIndex = automaton.length + 1;
 
-		Queue<GeneratedElement> queue = new PriorityQueue<>((elem1, elem2) -> elem1.word.length() - elem2.word.length());
+		Comparator<GeneratedElement> compareLength = (elem1, elem2) -> elem1.word.length() - elem2.word.length();
+		Comparator<GeneratedElement> compareAlphabet = (elem1, elem2) -> elem1.word.compareTo(elem2.word);
+		Queue<GeneratedElement> queue = new PriorityQueue<>(compareLength.thenComparing(compareAlphabet));
 		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
