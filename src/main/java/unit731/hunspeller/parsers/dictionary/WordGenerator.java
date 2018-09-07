@@ -38,10 +38,8 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 public class WordGenerator{
 
 //	private static final String PIPE = "|";
-//	private static final String LEFT_PARENTHESIS = "(";
-//	private static final String RIGHT_PARENTHESIS = ")";
-	private static final String DOUBLE_LEFT_PARENTHESIS = "(\\(";
-	private static final String DOUBLE_RIGHT_PARENTHESIS = "\\))";
+	private static final String LEFT_PARENTHESIS = "(";
+	private static final String RIGHT_PARENTHESIS = ")";
 
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
@@ -262,13 +260,11 @@ public class WordGenerator{
 	}
 
 	private String formatCompoundRule(String compoundRule){
-		if(compoundRule.charAt(0) == '(')
-			compoundRule = StringUtils.replaceEach(compoundRule, new String[]{"(", ")"}, new String[]{DOUBLE_LEFT_PARENTHESIS, DOUBLE_RIGHT_PARENTHESIS});
-		else{
+		if(compoundRule.charAt(0) != '('){
 			StringBuilder sb = new StringBuilder();
 			for(char chr : compoundRule.toCharArray()){
 				if(chr != '?' && chr != '*')
-					sb.append(DOUBLE_LEFT_PARENTHESIS).append(chr).append(DOUBLE_RIGHT_PARENTHESIS);
+					sb.append(LEFT_PARENTHESIS).append(chr).append(RIGHT_PARENTHESIS);
 				else
 					sb.append(chr);
 			}
@@ -548,9 +544,9 @@ public class WordGenerator{
 
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
-		String compoundRule = DOUBLE_LEFT_PARENTHESIS + compoundBeginFlag + DOUBLE_RIGHT_PARENTHESIS + "*"
-			+ DOUBLE_LEFT_PARENTHESIS + compoundMiddleFlag + DOUBLE_RIGHT_PARENTHESIS + "*"
-			+ DOUBLE_LEFT_PARENTHESIS + compoundEndFlag + DOUBLE_RIGHT_PARENTHESIS + "*";
+		String compoundRule = LEFT_PARENTHESIS + compoundBeginFlag + RIGHT_PARENTHESIS + "*"
+			+ LEFT_PARENTHESIS + compoundMiddleFlag + RIGHT_PARENTHESIS + "*"
+			+ LEFT_PARENTHESIS + compoundEndFlag + RIGHT_PARENTHESIS + "*";
 //TODO
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex

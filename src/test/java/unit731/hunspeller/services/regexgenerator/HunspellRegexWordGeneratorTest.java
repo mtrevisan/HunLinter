@@ -16,12 +16,12 @@ public class HunspellRegexWordGeneratorTest{
 		List<String> words = generator.generateAll(6);
 
 		List<String> expected = Arrays.asList(
-			"abc",
-			"abca",
-			"abcaa",
-			"abcde",
-			"abcdea",
-			"abcaaa"
+			"(abc)",
+			"(abc)(a)",
+			"(abc)(de)",
+			"(abc)(a)(a)",
+			"(abc)(de)(a)",
+			"(abc)(a)(a)(a)"
 		);
 		Assert.assertEquals(expected, words);
 	}

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -33,6 +35,12 @@ import org.apache.commons.lang3.StringUtils;
 @ToString
 public class HunspellRegexWordGenerator{
 
+	private static final Pattern SPLITTER = PatternHelper.pattern("(?<!\\\\)[()]");
+
+	private static final String LEFT_PARENTHESIS = "(";
+	private static final String RIGHT_PARENTHESIS = ")";
+
+
 	@AllArgsConstructor
 	private static class GeneratedElement{
 		private final String word;
@@ -51,7 +59,7 @@ public class HunspellRegexWordGenerator{
 	 * @param regexp	The regular expression
 	 */
 	public HunspellRegexWordGenerator(String regexp){
-		automaton = StringUtils.split(regexp, "()");
+		automaton = PatternHelper.split(regexp, SPLITTER);
 
 		int m = automaton.length + 1;
 		graph = new Digraph();
@@ -110,8 +118,17 @@ public class HunspellRegexWordGenerator{
 				for(int transition : transitions)
 					queue.add(new GeneratedElement(subword, transition));
 				transitions = graph.adjacentVertices(stateIndex);
-				for(int transition : transitions)
-					queue.add(new GeneratedElement((transition < finalStateIndex? subword + automaton[transition - 1]: subword), transition));
+				StringBuilder sb = new StringBuilder();
+				for(int transition : transitions){
+					if(transition < finalStateIndex){
+						String nextword = (!automaton[transition - 1].isEmpty()?
+							sb.append(subword).append(LEFT_PARENTHESIS).append(automaton[transition - 1]).append(RIGHT_PARENTHESIS).toString():
+							subword);
+						queue.add(new GeneratedElement(nextword, transition));
+					}
+					else
+						queue.add(new GeneratedElement(subword, transition));
+				}
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)
 			else if(!subword.isEmpty()){

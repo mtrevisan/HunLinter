@@ -27,6 +27,7 @@ public class PatternHelper{
 		return pattern(pattern).matcher(text);
 	}
 
+	/** Returns the delimiters along with the splitted elements */
 	public static Pattern splitterWithDelimiters(String delimitersRegex){
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
 	}
