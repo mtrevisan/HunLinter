@@ -27,8 +27,6 @@ public final class Digraph{
 
 	//adjacency list for given vertex
 	private List<List<Integer>> adjacency = new ArrayList<>(0);
-	//ε-transition list for given vertex
-	private List<List<Integer>> epsilons = new ArrayList<>(0);
 
 
 	/**
@@ -46,16 +44,6 @@ public final class Digraph{
 				reverse.push(w);
 			for(int w : reverse)
 				addEdge(v, w);
-		}
-		vertices = graph.epsilons.size();
-		epsilons = new ArrayList<>(vertices);
-		for(int v = 0; v < vertices; v ++){
-			//reverse so that ε-transition list is in same order as original
-			Stack<Integer> reverse = new Stack<>();
-			for(int w : graph.epsilons.get(v))
-				reverse.push(w);
-			for(int w : reverse)
-				addEpsilonTransition(v, w);
 		}
 	}
 
@@ -83,29 +71,6 @@ public final class Digraph{
 	}
 
 	/**
-	 * Adds the directed edge v→w to this digraph through an ε-transition.
-	 *
-	 * @param v	The tail vertex
-	 * @param w	The head vertex
-	 */
-	public void addEpsilonTransition(int v, int w){
-		while(v >= epsilons.size())
-			epsilons.add(new ArrayList<>(0));
-		epsilons.get(v).add(0, w);
-	}
-
-	/**
-	 * Adds the directed edge v→w to this digraph through an ε-transition.
-	 *
-	 * @param v	The tail vertex
-	 * @param w	The head vertex
-	 * @return <code>true</code> if this list contained the specified element
-	 */
-	public boolean removeEpsilonTransition(int v, int w){
-		return epsilons.get(v).remove(Integer.valueOf(w));
-	}
-
-	/**
 	 * Returns the vertices adjacent from vertex {@code vertex} in this digraph.
 	 *
 	 * @param vertex the vertex
@@ -114,17 +79,6 @@ public final class Digraph{
 	 */
 	public Iterable<Integer> adjacentVertices(int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Integer>emptyList());
-	}
-
-	/**
-	 * Returns the vertices that are in a ε-transition from vertex {@code vertex} in this digraph.
-	 *
-	 * @param vertex the vertex
-	 * @return the vertices that are in a ε-transition from vertex {@code vertex}
-	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
-	 */
-	public Iterable<Integer> epsilonTransitionVertices(int vertex){
-		return (vertex < epsilons.size()? epsilons.get(vertex): Collections.<Integer>emptyList());
 	}
 
 	/**
@@ -139,12 +93,6 @@ public final class Digraph{
 			Iterable<Integer> transitions = adjacentVertices(v);
 			for(int w : transitions)
 				reverse.addEdge(w, v);
-		}
-		vertices = epsilons.size();
-		for(int v = 0; v < vertices; v ++){
-			Iterable<Integer> transitions = epsilonTransitionVertices(v);
-			for(int w : transitions)
-				reverse.addEpsilonTransition(w, v);
 		}
 		return reverse;
 	}
@@ -162,13 +110,6 @@ public final class Digraph{
 		for(int v = 0; v < vertices; v ++){
 			s.append(String.format("%d: ", v));
 			for(int w : adjacency.get(v))
-				s.append(String.format("%d ", w));
-			s.append(NEWLINE);
-		}
-		vertices = epsilons.size();
-		for(int v = 0; v < vertices; v ++){
-			s.append(String.format("%d (ε): ", v));
-			for(int w : epsilons.get(v))
 				s.append(String.format("%d ", w));
 			s.append(NEWLINE);
 		}

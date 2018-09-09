@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -29,6 +30,7 @@ import unit731.hunspeller.services.PatternHelper;
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  * 
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
+ * @see <a href="https://algs4.cs.princeton.edu/lectures/54RegularExpressions.pdf">Algorithms - Robert Sedgewick, Kevin Wayne</a>
  * @see <a href="https://www.dennis-grinch.co.uk/tutorial/enfa">ε-NFA in Java</a>
  */
 @ToString
@@ -46,6 +48,7 @@ public class HunspellRegexWordGenerator{
 		private final int stateIndex;
 	}
 
+	//graph of ε-transitions
 	private final Digraph graph;
 	private String[] automaton;
 
@@ -58,31 +61,24 @@ public class HunspellRegexWordGenerator{
 	 * @param regexp	The regular expression
 	 */
 	public HunspellRegexWordGenerator(String regexp){
-		String[] parts = PatternHelper.split(regexp, SPLITTER);
+		automaton = PatternHelper.split(regexp, SPLITTER);
+		automaton = ArrayUtils.remove(automaton, 0);
 
-		int m = parts.length >> 1;
-		automaton = new String[m];
+		int m = automaton.length;
 		graph = new Digraph();
-		for(int i = 0; i < m; i ++){
-			graph.addEdge(i, i + 1);
-			automaton[i] = parts[(i << 1) + 1];
-
-			String next = parts[(i + 1) << 1];
-			if(!next.isEmpty())
-				switch(next.charAt(0)){
+		for(int i = 1; i < m; i += 2)
+			if(!automaton[i].isEmpty())
+				switch(automaton[i].charAt(0)){
 					//zero or more
 					case '*':
-						if(i + 1 < m)
-							graph.addEpsilonTransition(i, i + 1);
-						graph.addEdge(i, i);
+						graph.addEdge(i - 1, i);
+						graph.addEdge(i, i - 1);
 						break;
 
 					//zero or one
 					case '?':
-						if(i + 1 < m)
-							graph.addEpsilonTransition(i, i + 1);
+						graph.addEdge(i - 1, i);
 				}
-		}
 	}
 
 	/**
@@ -108,19 +104,24 @@ public class HunspellRegexWordGenerator{
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				Iterable<Integer> transitions = graph.epsilonTransitionVertices(stateIndex);
+				Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
 				for(int transition : transitions)
 					queue.add(new GeneratedElement(subword, transition));
 
-				sb.setLength(0);
-				subword = sb.append(subword)
-					.append(LEFT_PARENTHESIS)
-					.append(automaton[stateIndex])
-					.append(RIGHT_PARENTHESIS)
-					.toString();
-				transitions = graph.adjacentVertices(stateIndex);
-				for(int transition : transitions)
-					queue.add(new GeneratedElement(subword, transition));
+				String part = automaton[stateIndex];
+				int size = part.length();
+				if(size > 0){
+					char op = (size == 1? part.charAt(0): 0);
+					if(op != '*' && op != '?'){
+						sb.setLength(0);
+						subword = sb.append(subword)
+							.append(LEFT_PARENTHESIS)
+							.append(part)
+							.append(RIGHT_PARENTHESIS)
+							.toString();
+					}
+				}
+				queue.add(new GeneratedElement(subword, stateIndex + 1));
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)
 			else if(!subword.isEmpty()){

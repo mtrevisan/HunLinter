@@ -18,8 +18,8 @@ words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(abc)",
-			"(abc)(de)",
 			"(abc)(a)",
+			"(abc)(de)",
 			"(abc)(de)(a)",
 			"(abc)(a)(a)",
 			"(abc)(de)(a)(a)"
@@ -38,10 +38,10 @@ words.forEach(System.out::println);
 		List<String> expected = Arrays.asList(
 			"(a)",
 			"(de)",
-			"(abc)",
-			"(abc)(de)",
 			"(de)(a)",
+			"(abc)",
 			"(abc)(a)",
+			"(abc)(de)",
 			"(abc)(de)(a)"
 		);
 		Assert.assertEquals(expected, words);
