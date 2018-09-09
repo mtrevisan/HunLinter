@@ -32,16 +32,17 @@ words.forEach(System.out::println);
 		String regex = "(abc)?(de)?(a)?";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		List<String> words = generator.generateAll(6);
+		List<String> words = generator.generateAll(7);
 words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
+			"(a)",
+			"(de)",
 			"(abc)",
-			"(abc)(a)",
 			"(abc)(de)",
-			"(abc)(a)(a)",
-			"(abc)(de)(a)",
-			"(abc)(a)(a)(a)"
+			"(de)(a)",
+			"(abc)(a)",
+			"(abc)(de)(a)"
 		);
 		Assert.assertEquals(expected, words);
 	}

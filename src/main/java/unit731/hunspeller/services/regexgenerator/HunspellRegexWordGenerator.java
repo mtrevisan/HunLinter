@@ -1,15 +1,12 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -61,38 +58,30 @@ public class HunspellRegexWordGenerator{
 	 * @param regexp	The regular expression
 	 */
 	public HunspellRegexWordGenerator(String regexp){
-		automaton = PatternHelper.split(regexp, SPLITTER);
-		if(automaton[0].isEmpty())
-			automaton = ArrayUtils.remove(automaton, 0);
+		String[] parts = PatternHelper.split(regexp, SPLITTER);
 
-		int m = automaton.length + 1;
+		int m = parts.length >> 1;
+		automaton = new String[m];
 		graph = new Digraph();
-		graph.addEdge(0, 1);
-		for(int i = 1; i < m; ){
-			char nextChar = (i < m - 1 && automaton[i - 1].length() == 1? automaton[i - 1].charAt(0): 0);
-			switch(nextChar){
-				//zero or more
-				case '*':
-					graph.addEpsilonTransition(i - 1, i + 1);
-					graph.addEdge(i, i);
+		for(int i = 0; i < m; i ++){
+			graph.addEdge(i, i + 1);
+			automaton[i] = parts[(i << 1) + 1];
 
-					automaton = ArrayUtils.remove(automaton, i - 1);
-					m --;
-					break;
+			String next = parts[(i + 1) << 1];
+			if(!next.isEmpty())
+				switch(next.charAt(0)){
+					//zero or more
+					case '*':
+						if(i + 1 < m)
+							graph.addEpsilonTransition(i, i + 1);
+						graph.addEdge(i, i);
+						break;
 
-				//zero or one
-				case '?':
-					graph.addEpsilonTransition(i - 1, i + 1);
-
-					automaton = ArrayUtils.remove(automaton, i - 1);
-					m --;
-					break;
-
-				//one
-				default:
-					graph.addEdge(i, i + 1);
-					i ++;
-			}
+					//zero or one
+					case '?':
+						if(i + 1 < m)
+							graph.addEpsilonTransition(i, i + 1);
+				}
 		}
 	}
 
@@ -107,11 +96,9 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int finalStateIndex = automaton.length + 1;
+		int finalStateIndex = automaton.length;
+		StringBuilder sb = new StringBuilder();
 
-//		Comparator<GeneratedElement> compareLength = (elem1, elem2) -> elem1.word.length() - elem2.word.length();
-//		Comparator<GeneratedElement> compareAlphabet = (elem1, elem2) -> elem1.word.compareTo(elem2.word);
-//		Queue<GeneratedElement> queue = new PriorityQueue<>(compareLength.thenComparing(compareAlphabet));
 		Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
 		while(!queue.isEmpty()){
@@ -124,18 +111,16 @@ public class HunspellRegexWordGenerator{
 				Iterable<Integer> transitions = graph.epsilonTransitionVertices(stateIndex);
 				for(int transition : transitions)
 					queue.add(new GeneratedElement(subword, transition));
+
+				sb.setLength(0);
+				subword = sb.append(subword)
+					.append(LEFT_PARENTHESIS)
+					.append(automaton[stateIndex])
+					.append(RIGHT_PARENTHESIS)
+					.toString();
 				transitions = graph.adjacentVertices(stateIndex);
-				StringBuilder sb = new StringBuilder();
-				for(int transition : transitions){
-					if(transition < finalStateIndex){
-						String nextword = (!automaton[transition - 1].isEmpty()?
-							sb.append(subword).append(LEFT_PARENTHESIS).append(automaton[transition - 1]).append(RIGHT_PARENTHESIS).toString():
-							subword);
-						queue.add(new GeneratedElement(nextword, transition));
-					}
-					else
-						queue.add(new GeneratedElement(subword, transition));
-				}
+				for(int transition : transitions)
+					queue.add(new GeneratedElement(subword, transition));
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)
 			else if(!subword.isEmpty()){

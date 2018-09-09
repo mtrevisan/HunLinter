@@ -72,6 +72,17 @@ public final class Digraph{
 	}
 
 	/**
+	 * Adds the directed edge v→w to this digraph.
+	 *
+	 * @param v	The tail vertex
+	 * @param w	The head vertex
+	 * @return <code>true</code> if this list contained the specified element
+	 */
+	public boolean removeEdge(int v, int w){
+		return adjacency.get(v).remove(Integer.valueOf(w));
+	}
+
+	/**
 	 * Adds the directed edge v→w to this digraph through an ε-transition.
 	 *
 	 * @param v	The tail vertex
@@ -81,6 +92,17 @@ public final class Digraph{
 		while(v >= epsilons.size())
 			epsilons.add(new ArrayList<>(0));
 		epsilons.get(v).add(0, w);
+	}
+
+	/**
+	 * Adds the directed edge v→w to this digraph through an ε-transition.
+	 *
+	 * @param v	The tail vertex
+	 * @param w	The head vertex
+	 * @return <code>true</code> if this list contained the specified element
+	 */
+	public boolean removeEpsilonTransition(int v, int w){
+		return epsilons.get(v).remove(Integer.valueOf(w));
 	}
 
 	/**
