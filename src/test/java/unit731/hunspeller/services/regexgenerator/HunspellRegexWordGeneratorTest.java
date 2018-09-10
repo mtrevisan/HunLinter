@@ -18,8 +18,8 @@ words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(abc)",
-			"(abc)(a)",
 			"(abc)(de)",
+			"(abc)(a)",
 			"(abc)(de)(a)",
 			"(abc)(a)(a)",
 			"(abc)(de)(a)(a)"

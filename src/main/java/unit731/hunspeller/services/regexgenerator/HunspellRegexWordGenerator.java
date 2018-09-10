@@ -1,16 +1,14 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -54,7 +52,7 @@ public class HunspellRegexWordGenerator{
 
 	//graph of ε-transitions
 	private final Digraph<String> graph = new Digraph<>();
-	private Map<Integer, String> automaton;
+	private final int finalStateIndex;
 
 
 	/**
@@ -66,47 +64,28 @@ public class HunspellRegexWordGenerator{
 	 */
 	public HunspellRegexWordGenerator(String regexp){
 		String[] parts = PatternHelper.split(regexp, SPLITTER);
-
-		int m = parts.length >> 1;
-		automaton = new HashMap<>(m);
-		for(int i = 0; i < m; i ++){
+		finalStateIndex = parts.length >> 1;
+		for(int i = 0; i < finalStateIndex; i ++){
 			int j = (i << 1) + 1;
-			automaton.put(i, parts[j]);
-
 			String next = parts[j + 1];
-			if(!next.isEmpty())
+			if(next.isEmpty())
+				//one
+				graph.addEdge(i, i + 1, parts[j]);
+			else
 				switch(next.charAt(0)){
 					//zero or more
 					case '*':
 						graph.addEdge(i, i + 1);
-						graph.addEdge(i, i);
+						graph.addEdge(i, i, parts[j]);
 						break;
 
 					//zero or one
 					case '?':
+						graph.addEdge(i, i + 1, parts[j]);
 						graph.addEdge(i, i + 1);
+						break;
 				}
 		}
-	}
-
-	/**
-	 * @param initialState	Starting state
-	 * @return	Final state
-	 */
-	private int kleeneStar(String value, int initialState){
-		graph.addEdge(initialState, initialState, value);
-		graph.addEdge(initialState, initialState + 1);
-		return initialState + 1;
-	}
-
-	/**
-	 * @param initialState	Starting state
-	 * @return	Final state
-	 */
-	private int zeroOrOne(String value, int initialState){
-		graph.addEdge(initialState, initialState + 1, value);
-		graph.addEdge(initialState, initialState + 1);
-		return initialState + 1;
 	}
 
 	/**
@@ -120,7 +99,6 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int finalStateIndex = automaton.size();
 		StringBuilder sb = new StringBuilder();
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
@@ -132,24 +110,21 @@ public class HunspellRegexWordGenerator{
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				Iterable<Integer> transitions = graph.adjacentVertices(stateIndex);
-				for(int transition : transitions)
-					queue.add(new GeneratedElement(subword, transition));
-
-				String part = automaton.get(stateIndex);
-				int size = part.length();
-				if(size > 0){
-					char op = (size == 1? part.charAt(0): 0);
-					if(op != '*' && op != '?'){
+				Iterable<Pair<Integer, String>> transitions = graph.adjacentVertices(stateIndex);
+				for(Pair<Integer, String> transition : transitions){
+					String value = transition.getValue();
+					String nextword = subword;
+					if(StringUtils.isNotBlank(value)){
 						sb.setLength(0);
-						subword = sb.append(subword)
+						nextword = sb.append(subword)
 							.append(LEFT_PARENTHESIS)
-							.append(part)
+							.append(value)
 							.append(RIGHT_PARENTHESIS)
 							.toString();
 					}
+
+					queue.add(new GeneratedElement(nextword, transition.getKey()));
 				}
-				queue.add(new GeneratedElement(subword, stateIndex + 1));
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)
 			else if(!subword.isEmpty()){

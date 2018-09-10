@@ -2,10 +2,9 @@ package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -31,8 +30,7 @@ public final class Digraph<T>{
 	private static final String NEWLINE = System.getProperty("line.separator");
 
 	//adjacency list for given vertex
-	private final List<List<Integer>> adjacency = new ArrayList<>(0);
-	private final Map<Pair<Integer, Integer>, T> values = new HashMap<>();
+	private final List<List<Pair<Integer, T>>> adjacency = new ArrayList<>(0);
 
 
 	/**
@@ -44,11 +42,11 @@ public final class Digraph<T>{
 		int vertices = graph.adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
-			Stack<Integer> reverse = new Stack<>();
-			for(int w : graph.adjacency.get(v))
+			Stack<Pair<Integer, T>> reverse = new Stack<>();
+			for(Pair<Integer, T> w : graph.adjacency.get(v))
 				reverse.push(w);
-			for(int w : reverse)
-				addEdge(v, w);
+			for(Pair<Integer, T> w : reverse)
+				addEdge(v, w.getKey(), w.getValue());
 		}
 	}
 
@@ -72,21 +70,7 @@ public final class Digraph<T>{
 	public void addEdge(int v, int w, T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
-		adjacency.get(v).add(0, w);
-
-		if(value != null)
-			values.put(Pair.of(v, w), value);
-	}
-
-	/**
-	 * Adds the directed edge v→w to this digraph.
-	 *
-	 * @param v	The tail vertex
-	 * @param w	The head vertex
-	 * @return <code>true</code> if this list contained the specified element
-	 */
-	public boolean removeEdge(int v, int w){
-		return adjacency.get(v).remove(Integer.valueOf(w));
+		adjacency.get(v).add(0, Pair.of(w, value));
 	}
 
 	/**
@@ -96,17 +80,8 @@ public final class Digraph<T>{
 	 * @return the vertices adjacent from vertex {@code vertex}
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
-	public Iterable<Integer> adjacentVertices(int vertex){
-		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Integer>emptyList());
-	}
-
-	/**
-	 * @param v	The tail vertex
-	 * @param w	The head vertex
-	 * @return	The value associated with this transition
-	 */
-	public T valueOf(int v, int w){
-		return values.get(Pair.of(v, w));
+	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
+		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Pair<Integer, T>>emptyList());
 	}
 
 	/**
@@ -118,9 +93,9 @@ public final class Digraph<T>{
 		Digraph reverse = new Digraph();
 		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			Iterable<Integer> transitions = adjacentVertices(v);
-			for(int w : transitions)
-				reverse.addEdge(w, v);
+			Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
+			for(Pair<Integer, T> w : transitions)
+				reverse.addEdge(w.getKey(), v, w.getValue());
 		}
 		return reverse;
 	}
@@ -136,10 +111,12 @@ public final class Digraph<T>{
 		s.append(NEWLINE);
 		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			s.append(String.format("%d: ", v));
-			for(int w : adjacency.get(v))
-				s.append(String.format("%d ", w));
-			s.append(NEWLINE);
+			String transitions = adjacency.get(v).stream()
+				.map(w -> String.format("%d (%s)", w.getKey(), (w.getValue() != null? w.getValue(): "ε")))
+				.collect(Collectors.joining(", "));
+			s.append(String.format("%d: ", v))
+				.append(transitions)
+				.append(NEWLINE);
 		}
 		return s.toString();
 	}
