@@ -78,6 +78,7 @@ public class WordGeneratorCompoundRuleTest{
 			"c/BC"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
+words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
@@ -199,16 +200,15 @@ public class WordGeneratorCompoundRuleTest{
 			"c/bbcc"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
-words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
 			createProduction("c", null, "pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("b", null, "pa:b st:b"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
@@ -235,13 +235,13 @@ words.forEach(System.out::println);
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
 			createProduction("c", null, "pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("b", null, "pa:b st:b"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("a", null, "pa:a st:a"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);

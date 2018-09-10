@@ -9,6 +9,19 @@ import org.junit.Test;
 public class HunspellRegexWordGeneratorTest{
 
 	@Test
+	public void allOne(){
+		String regex = "(abc)(de)(a)";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		List<String> words = generator.generateAll(6);
+
+		List<String> expected = Arrays.asList(
+			"(abc)(de)(a)"
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
 	public void oneForEach(){
 		String regex = "(abc)(de)?(a)*";
 

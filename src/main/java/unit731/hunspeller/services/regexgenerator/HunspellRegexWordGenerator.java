@@ -67,7 +67,7 @@ public class HunspellRegexWordGenerator{
 		finalStateIndex = parts.length >> 1;
 		for(int i = 0; i < finalStateIndex; i ++){
 			int j = (i << 1) + 1;
-			String next = parts[j + 1];
+			String next = (j + 1 < parts.length? parts[j + 1]: StringUtils.EMPTY);
 			if(next.isEmpty())
 				//one
 				graph.addEdge(i, i + 1, parts[j]);
