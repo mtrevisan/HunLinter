@@ -27,7 +27,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
-//	@Test
+	@Test
 	public void germanCompounding() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
@@ -64,11 +64,20 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 18);
+		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 40);
 words.forEach(System.out::println);
 
-//good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern, Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit, Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
-//bad: computer, computern, arbeit, Arbeits, arbeits, ComputerArbeit, ComputernArbeit, Computernarbeit, ComputerArbeits, Arbeitcomputer, Arbeitcomputern, ArbeitsComputer, ArbeitsComputern, Computerarbeitcomputer, ComputerArbeitcomputer, ComputerArbeitscomputer, Computerarbeitcomputern, ComputerArbeitcomputern, ComputerArbeitscomputern, Arbeitscomputerarbeits, Arbeitscomputernarbeits, Computerarbeits-computer, Arbeitsnehmer, computers, computern, computernarbeit, computernArbeit, computerArbeit, computerArbeits, arbeitcomputer, arbeitsComputer, computerarbeitcomputer, computerArbeitcomputer, computerArbeitscomputer, arbeitscomputerarbeits, computerarbeits-computer, arbeitsnehmer, computernarbeit, computernArbeit, arbeits-, computerarbeit, computerarbeits-, arbeitscomputer, arbeitscomputern, computerarbeitscomputer, computerarbeitscomputern, computerarbeitscomputers, arbeitscomputerarbeit, computerarbeits-Computer, computerarbeits-Computern
+//good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern,
+//			Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit,
+//			Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
+//bad: computer, computern, arbeit, Arbeits, arbeits, ComputerArbeit, ComputernArbeit, Computernarbeit, ComputerArbeits, Arbeitcomputer,
+//			Arbeitcomputern, ArbeitsComputer, ArbeitsComputern, Computerarbeitcomputer, ComputerArbeitcomputer, ComputerArbeitscomputer,
+//			Computerarbeitcomputern, ComputerArbeitcomputern, ComputerArbeitscomputern, Arbeitscomputerarbeits, Arbeitscomputernarbeits,
+//			Computerarbeits-computer, Arbeitsnehmer, computers, computern, computernarbeit, computernArbeit, computerArbeit, computerArbeits,
+//			arbeitcomputer, arbeitsComputer, computerarbeitcomputer, computerArbeitcomputer, computerArbeitscomputer, arbeitscomputerarbeits,
+//			computerarbeits-computer, arbeitsnehmer, computernarbeit, computernArbeit, arbeits-, computerarbeit, computerarbeits-, arbeitscomputer,
+//			arbeitscomputern, computerarbeitscomputer, computerarbeitscomputern, computerarbeitscomputers, arbeitscomputerarbeit,
+//			computerarbeits-Computer, computerarbeits-Computern
 		List<Production> expected = Arrays.asList(
 			createProduction("Arbeits", "-PX", "pa:Arbeits st:Arbeit"),
 			createProduction("Computer", "-PX", "pa:Computer st:Computer"),
@@ -76,10 +85,17 @@ words.forEach(System.out::println);
 			createProduction("arbeits", "PX", "pa:arbeits st:Arbeit"),
 			createProduction("Computer", "D-PX", "pa:Computer st:Computer"),
 			createProduction("computer", "PX", "pa:computer st:Computer"),
+			createProduction("arbeit", "PX", "pa:arbeit st:Arbeit"),
+			createProduction("computern", "PX", "pa:computern st:Computer"),
+			createProduction("Arbeit", "D-X", "pa:Arbeit st:Arbeit"),
 			createProduction("Arbeitsarbeits", "-PX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
 			createProduction("Arbeitscomputer", "-PX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
 			createProduction("Computerarbeits", "-PX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
 			createProduction("Computercomputer", "-PX", "pa:Computer st:Computer pa:computer st:Computer"),
+			createProduction("Arbeitsarbeit", "-PX", "pa:Arbeits st:Arbeit pa:arbeit st:Arbeit"),
+			createProduction("Arbeitscomputern", "-PX", "pa:Arbeits st:Arbeit pa:computern st:Computer"),
+			createProduction("Computerarbeit", "-PX", "pa:Computer st:Computer pa:arbeit st:Arbeit"),
+			createProduction("Computercomputern", "-PX", "pa:Computer st:Computer pa:computern st:Computer"),
 			createProduction("Arbeitsarbeits", "D-PX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
 			createProduction("Arbeitscomputer", "D-PX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
 			createProduction("arbeitsarbeits", "PX", "pa:arbeits st:Arbeit pa:arbeits st:Arbeit"),
@@ -88,11 +104,21 @@ words.forEach(System.out::println);
 			createProduction("Computercomputer", "D-PX", "pa:Computer st:Computer pa:computer st:Computer"),
 			createProduction("computerarbeits", "PX", "pa:computer st:Computer pa:arbeits st:Arbeit"),
 			createProduction("computercomputer", "PX", "pa:computer st:Computer pa:computer st:Computer"),
-
-			createProduction("Arbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Arbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Computerarbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Computerarbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+			createProduction("Arbeitsarbeit", "D-PX", "pa:Arbeits st:Arbeit pa:arbeit st:Arbeit"),
+			createProduction("Arbeitscomputern", "D-PX", "pa:Arbeits st:Arbeit pa:computern st:Computer"),
+			createProduction("arbeitsarbeit", "PX", "pa:arbeits st:Arbeit pa:arbeit st:Arbeit"),
+			createProduction("arbeitscomputern", "PX", "pa:arbeits st:Arbeit pa:computern st:Computer"),
+			createProduction("Computerarbeit", "D-PX", "pa:Computer st:Computer pa:arbeit st:Arbeit"),
+			createProduction("Computercomputern", "D-PX", "pa:Computer st:Computer pa:computern st:Computer"),
+			createProduction("computerarbeit", "PX", "pa:computer st:Computer pa:arbeit st:Arbeit"),
+			createProduction("computercomputern", "PX", "pa:computer st:Computer pa:computern st:Computer"),
+			createProduction("arbeitarbeit", "PX", "pa:arbeit st:Arbeit pa:arbeit st:Arbeit"),
+			createProduction("arbeitcomputern", "PX", "pa:arbeit st:Arbeit pa:computern st:Computer"),
+			createProduction("arbeitcomputer", "PX", "pa:arbeit st:Arbeit pa:computer st:Computer"),
+			createProduction("computernarbeit", "PX", "pa:computern st:Computer pa:arbeit st:Arbeit"),
+			createProduction("computerncomputern", "PX", "pa:computern st:Computer pa:computern st:Computer"),
+			createProduction("computerncomputer", "PX", "pa:computern st:Computer pa:computer st:Computer"),
+			createProduction("Arbeitarbeit", "D-PX", "pa:Arbeit st:Arbeit pa:arbeit st:Arbeit")
 		);
 		Assert.assertEquals(expected, words);
 	}
