@@ -112,7 +112,9 @@ public class HunspellRegexWordGenerator{
 			if(stateIndex < finalStateIndex){
 				Iterable<Pair<Integer, String>> transitions = graph.adjacentVertices(stateIndex);
 				for(Pair<Integer, String> transition : transitions){
+					int key = transition.getKey();
 					String value = transition.getValue();
+
 					String nextword = subword;
 					if(StringUtils.isNotBlank(value)){
 						sb.setLength(0);
@@ -123,7 +125,7 @@ public class HunspellRegexWordGenerator{
 							.toString();
 					}
 
-					queue.add(new GeneratedElement(nextword, transition.getKey()));
+					queue.add(new GeneratedElement(nextword, key));
 				}
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)

@@ -28,7 +28,7 @@ words.forEach(System.out::println);
 	}
 
 	@Test
-	public void allOptionals(){
+	public void allZeroOrOne(){
 		String regex = "(abc)?(de)?(a)?";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -43,6 +43,26 @@ words.forEach(System.out::println);
 			"(abc)(a)",
 			"(abc)(de)",
 			"(abc)(de)(a)"
+		);
+		Assert.assertEquals(expected, words);
+	}
+
+	@Test
+	public void allZeroOrMore(){
+		String regex = "(abc)*(de)*(a)*";
+
+		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
+		List<String> words = generator.generateAll(7);
+words.forEach(System.out::println);
+
+		List<String> expected = Arrays.asList(
+			"(abc)",
+			"(de)",
+			"(a)",
+			"(abc)(abc)",
+			"(abc)(de)",
+			"(abc)(a)",
+			"(de)(de)"
 		);
 		Assert.assertEquals(expected, words);
 	}
