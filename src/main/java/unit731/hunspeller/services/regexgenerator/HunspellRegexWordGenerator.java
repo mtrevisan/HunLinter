@@ -90,10 +90,11 @@ public class HunspellRegexWordGenerator{
 	 * <p>
 	 * The Strings are ordered in lexicographical order.
 	 *
+	 * @param minimumSubwords	The minimum number of compounds that forms the generated word
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<List<String>> generateAll(int limit){
+	public List<List<String>> generateAll(int minimumSubwords, int limit){
 		List<List<String>> matchedWords = new ArrayList<>(limit);
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
@@ -120,7 +121,7 @@ public class HunspellRegexWordGenerator{
 				}
 			}
 			//if this is the accepting state add the generated word (skip empty generated word)
-			else if(!subword.isEmpty()){
+			else if(subword.size() >= minimumSubwords){
 				matchedWords.add(subword);
 
 				if(matchedWords.size() == limit)

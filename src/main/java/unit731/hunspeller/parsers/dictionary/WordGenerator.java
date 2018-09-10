@@ -195,7 +195,7 @@ public class WordGenerator{
 		compoundRule = formatCompoundRule(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		List<List<String>> permutations = regexWordGenerator.generateAll(limit);
+		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
 		//generate compounds:
 		List<List<List<Production>>> entries = new ArrayList<>();
@@ -549,7 +549,7 @@ public class WordGenerator{
 //TODO
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		List<List<String>> permutations = regexWordGenerator.generateAll(limit);
+		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
 		//generate compounds:
 		List<List<List<Production>>> entries = new ArrayList<>();

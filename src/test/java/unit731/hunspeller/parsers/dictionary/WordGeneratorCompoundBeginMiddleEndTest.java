@@ -64,7 +64,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 40);
+		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 33);
 words.forEach(System.out::println);
 
 //good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern,
@@ -79,15 +79,6 @@ words.forEach(System.out::println);
 //			arbeitscomputern, computerarbeitscomputer, computerarbeitscomputern, computerarbeitscomputers, arbeitscomputerarbeit,
 //			computerarbeits-Computer, computerarbeits-Computern
 		List<Production> expected = Arrays.asList(
-			createProduction("Arbeits", "-PX", "pa:Arbeits st:Arbeit"),
-			createProduction("Computer", "-PX", "pa:Computer st:Computer"),
-			createProduction("Arbeits", "D-PX", "pa:Arbeits st:Arbeit"),
-			createProduction("arbeits", "PX", "pa:arbeits st:Arbeit"),
-			createProduction("Computer", "D-PX", "pa:Computer st:Computer"),
-			createProduction("computer", "PX", "pa:computer st:Computer"),
-			createProduction("arbeit", "PX", "pa:arbeit st:Arbeit"),
-			createProduction("computern", "PX", "pa:computern st:Computer"),
-			createProduction("Arbeit", "D-X", "pa:Arbeit st:Arbeit"),
 			createProduction("Arbeitsarbeits", "-PX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
 			createProduction("Arbeitscomputer", "-PX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
 			createProduction("Computerarbeits", "-PX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
@@ -118,7 +109,9 @@ words.forEach(System.out::println);
 			createProduction("computernarbeit", "PX", "pa:computern st:Computer pa:arbeit st:Arbeit"),
 			createProduction("computerncomputern", "PX", "pa:computern st:Computer pa:computern st:Computer"),
 			createProduction("computerncomputer", "PX", "pa:computern st:Computer pa:computer st:Computer"),
-			createProduction("Arbeitarbeit", "D-PX", "pa:Arbeit st:Arbeit pa:arbeit st:Arbeit")
+			createProduction("Arbeitarbeit", "D-PX", "pa:Arbeit st:Arbeit pa:arbeit st:Arbeit"),
+			createProduction("Arbeitcomputern", "D-PX", "pa:Arbeit st:Arbeit pa:computern st:Computer"),
+			createProduction("Arbeitcomputer", "D-PX", "pa:Arbeit st:Arbeit pa:computer st:Computer")
 		);
 		Assert.assertEquals(expected, words);
 	}
