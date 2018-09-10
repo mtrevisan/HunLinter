@@ -102,7 +102,6 @@ public class AffixParser extends ReadWriteLockable{
 	private FlagParsingStrategy strategy = new ASCIIParsingStrategy();
 
 	private final Set<String> terminalAffixes = new HashSet<>();
-	private final Set<String> compoundAffixes = new HashSet<>();
 
 
 	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
@@ -500,10 +499,6 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getKeepCaseFlag());
 			terminalAffixes.add(getNeedAffixFlag());
-
-			compoundAffixes.add(getCompoundBeginFlag());
-			compoundAffixes.add(getCompoundMiddleFlag());
-			compoundAffixes.add(getCompoundEndFlag());
 		}
 		finally{
 			releaseWriteLock();
@@ -553,7 +548,6 @@ public class AffixParser extends ReadWriteLockable{
 			data.clear();
 			strategy = new ASCIIParsingStrategy();
 			terminalAffixes.clear();
-			compoundAffixes.clear();
 		}
 		finally{
 			releaseWriteLock();
@@ -574,10 +568,6 @@ public class AffixParser extends ReadWriteLockable{
 
 	public boolean isTerminalAffix(String flag){
 		return terminalAffixes.contains(flag);
-	}
-
-	public boolean isCompoundAffix(String flag){
-		return compoundAffixes.contains(flag);
 	}
 
 	public Set<String> getCompoundRules(){
