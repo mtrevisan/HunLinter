@@ -61,24 +61,29 @@ public class HunspellRegexWordGenerator{
 	 * @param regexp	The regular expression
 	 */
 	public HunspellRegexWordGenerator(String regexp){
-		automaton = PatternHelper.split(regexp, SPLITTER);
-		automaton = ArrayUtils.remove(automaton, 0);
+		String[] parts = PatternHelper.split(regexp, SPLITTER);
 
-		int m = automaton.length;
+		int m = parts.length >> 1;
+		automaton = new String[m];
 		graph = new Digraph();
-		for(int i = 1; i < m; i += 2)
-			if(!automaton[i].isEmpty())
-				switch(automaton[i].charAt(0)){
+		for(int i = 0; i < m; i ++){
+			int j = (i << 1) + 1;
+			automaton[i] = parts[j];
+
+			String next = parts[j + 1];
+			if(!next.isEmpty())
+				switch(next.charAt(0)){
 					//zero or more
 					case '*':
-						graph.addEdge(i - 1, i);
-						graph.addEdge(i, i - 1);
+						graph.addEdge(i, i + 1);
+						graph.addEdge(i, i);
 						break;
 
 					//zero or one
 					case '?':
-						graph.addEdge(i - 1, i);
+						graph.addEdge(i, i + 1);
 				}
+		}
 	}
 
 	/**
