@@ -195,15 +195,14 @@ public class WordGenerator{
 		compoundRule = formatCompoundRule(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		List<String> permutations = regexWordGenerator.generateAll(limit);
+		List<List<String>> permutations = regexWordGenerator.generateAll(limit);
 
 		//generate compounds:
 		List<List<List<Production>>> entries = new ArrayList<>();
-		for(String permutation : permutations){
+		for(List<String> permutation : permutations){
 			//expand permutation
-			String[] flags = StringUtils.split(permutation, "()");
 			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(String flag : flags)
+			for(String flag : permutation)
 				expandedPermutationEntries.add(inputs.get(flag).stream()
 					.map(entry -> applyAffixRules(entry, true))
 					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
@@ -550,15 +549,14 @@ public class WordGenerator{
 //TODO
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		List<String> permutations = regexWordGenerator.generateAll(limit);
+		List<List<String>> permutations = regexWordGenerator.generateAll(limit);
 
 		//generate compounds:
 		List<List<List<Production>>> entries = new ArrayList<>();
-		for(String permutation : permutations){
+		for(List<String> permutation : permutations){
 			//expand permutation
-			String[] flags = StringUtils.split(permutation, "()");
 			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(String flag : flags)
+			for(String flag : permutation)
 				expandedPermutationEntries.add(inputs.get(flag).stream()
 					.map(entry -> applyAffixRules(entry, true))
 					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));

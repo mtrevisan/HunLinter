@@ -13,10 +13,10 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "(abc)(de)(a)";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		List<String> words = generator.generateAll(6);
+		List<List<String>> words = generator.generateAll(6);
 
-		List<String> expected = Arrays.asList(
-			"(abc)(de)(a)"
+		List<List<String>> expected = Arrays.asList(
+			Arrays.asList("abc", "de", "a")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -26,15 +26,15 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "(abc)(de)?(a)*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		List<String> words = generator.generateAll(6);
+		List<List<String>> words = generator.generateAll(6);
 
-		List<String> expected = Arrays.asList(
-			"(abc)",
-			"(abc)(de)",
-			"(abc)(a)",
-			"(abc)(de)(a)",
-			"(abc)(a)(a)",
-			"(abc)(de)(a)(a)"
+		List<List<String>> expected = Arrays.asList(
+			Arrays.asList("abc"),
+			Arrays.asList("abc", "de"),
+			Arrays.asList("abc", "a"),
+			Arrays.asList("abc", "de", "a"),
+			Arrays.asList("abc", "a", "a"),
+			Arrays.asList("abc", "de", "a", "a")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -44,16 +44,16 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "(abc)?(de)?(a)?";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		List<String> words = generator.generateAll(7);
+		List<List<String>> words = generator.generateAll(7);
 
-		List<String> expected = Arrays.asList(
-			"(a)",
-			"(de)",
-			"(de)(a)",
-			"(abc)",
-			"(abc)(a)",
-			"(abc)(de)",
-			"(abc)(de)(a)"
+		List<List<String>> expected = Arrays.asList(
+			Arrays.asList("a"),
+			Arrays.asList("de"),
+			Arrays.asList("de", "a"),
+			Arrays.asList("abc"),
+			Arrays.asList("abc", "a"),
+			Arrays.asList("abc", "de"),
+			Arrays.asList("abc", "de", "a")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -63,16 +63,16 @@ public class HunspellRegexWordGeneratorTest{
 		String regex = "(abc)*(de)*(a)*";
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
-		List<String> words = generator.generateAll(7);
+		List<List<String>> words = generator.generateAll(7);
 
-		List<String> expected = Arrays.asList(
-			"(abc)",
-			"(de)",
-			"(a)",
-			"(abc)(abc)",
-			"(abc)(de)",
-			"(abc)(a)",
-			"(de)(de)"
+		List<List<String>> expected = Arrays.asList(
+			Arrays.asList("abc"),
+			Arrays.asList("de"),
+			Arrays.asList("a"),
+			Arrays.asList("abc", "abc"),
+			Arrays.asList("abc", "de"),
+			Arrays.asList("abc", "a"),
+			Arrays.asList("de", "de")
 		);
 		Assert.assertEquals(expected, words);
 	}

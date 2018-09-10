@@ -1,6 +1,7 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -40,17 +41,14 @@ public class HunspellRegexWordGenerator{
 
 	private static final Pattern SPLITTER = PatternHelper.pattern("(?<!\\\\)[()]");
 
-	private static final String LEFT_PARENTHESIS = "(";
-	private static final String RIGHT_PARENTHESIS = ")";
-
 
 	@AllArgsConstructor
 	private static class GeneratedElement{
-		private final String word;
+		private final List<String> word;
 		private final int stateIndex;
 	}
 
-	//graph of ε-transitions
+
 	private final Digraph<String> graph = new Digraph<>();
 	private final int finalStateIndex;
 
@@ -96,16 +94,14 @@ public class HunspellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<String> generateAll(int limit){
-		List<String> matchedWords = new ArrayList<>(limit);
-
-		StringBuilder sb = new StringBuilder();
+	public List<List<String>> generateAll(int limit){
+		List<List<String>> matchedWords = new ArrayList<>(limit);
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
-		queue.add(new GeneratedElement(StringUtils.EMPTY, 0));
+		queue.add(new GeneratedElement(new ArrayList<>(0), 0));
 		while(!queue.isEmpty()){
 			GeneratedElement elem = queue.remove();
-			String subword = elem.word;
+			List<String> subword = elem.word;
 			int stateIndex = elem.stateIndex;
 
 			//final state not reached, add transitions
@@ -115,14 +111,10 @@ public class HunspellRegexWordGenerator{
 					int key = transition.getKey();
 					String value = transition.getValue();
 
-					String nextword = subword;
+					List<String> nextword = subword;
 					if(StringUtils.isNotBlank(value)){
-						sb.setLength(0);
-						nextword = sb.append(subword)
-							.append(LEFT_PARENTHESIS)
-							.append(value)
-							.append(RIGHT_PARENTHESIS)
-							.toString();
+						nextword = new ArrayList<>(subword);
+						nextword.add(value);
 					}
 
 					queue.add(new GeneratedElement(nextword, key));
