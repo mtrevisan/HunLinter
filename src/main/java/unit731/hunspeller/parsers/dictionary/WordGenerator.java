@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.Backbone;
@@ -558,6 +557,8 @@ public class WordGenerator{
 			for(String flag : permutation)
 				expandedPermutationEntries.add(inputs.get(flag).stream()
 					.map(entry -> applyAffixRules(entry, true))
+//FIXME
+					.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
 					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
