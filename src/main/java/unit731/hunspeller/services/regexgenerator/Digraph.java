@@ -2,9 +2,12 @@ package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 
 
 /**
@@ -19,14 +22,17 @@ import lombok.NoArgsConstructor;
  * <p>
  * For additional documentation, see <a href="https://algs4.cs.princeton.edu/42digraph">Section 4.2</a> of
  * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
+ * 
+ * @param <T>	Type of values stored in transitions
  */
 @NoArgsConstructor
-public final class Digraph{
+public final class Digraph<T>{
 
 	private static final String NEWLINE = System.getProperty("line.separator");
 
 	//adjacency list for given vertex
-	private List<List<Integer>> adjacency = new ArrayList<>(0);
+	private final List<List<Integer>> adjacency = new ArrayList<>(0);
+	private final Map<Pair<Integer, Integer>, T> values = new HashMap<>();
 
 
 	/**
@@ -34,9 +40,8 @@ public final class Digraph{
 	 *
 	 * @param graph	The digraph to copy
 	 */
-	public Digraph(Digraph graph){
+	public Digraph(Digraph<T> graph){
 		int vertices = graph.adjacency.size();
-		adjacency = new ArrayList<>(vertices);
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
 			Stack<Integer> reverse = new Stack<>();
@@ -54,9 +59,23 @@ public final class Digraph{
 	 * @param w	The head vertex
 	 */
 	public void addEdge(int v, int w){
+		addEdge(v, w, null);
+	}
+
+	/**
+	 * Adds the directed edge v→w to this digraph.
+	 *
+	 * @param v	The tail vertex
+	 * @param w	The head vertex
+	 * @param value	The value associated with this transition
+	 */
+	public void addEdge(int v, int w, T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
 		adjacency.get(v).add(0, w);
+
+		if(value != null)
+			values.put(Pair.of(v, w), value);
 	}
 
 	/**
@@ -79,6 +98,15 @@ public final class Digraph{
 	 */
 	public Iterable<Integer> adjacentVertices(int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Integer>emptyList());
+	}
+
+	/**
+	 * @param v	The tail vertex
+	 * @param w	The head vertex
+	 * @return	The value associated with this transition
+	 */
+	public T valueOf(int v, int w){
+		return values.get(Pair.of(v, w));
 	}
 
 	/**

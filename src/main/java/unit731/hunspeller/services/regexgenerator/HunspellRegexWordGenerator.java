@@ -1,8 +1,10 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
@@ -32,6 +34,8 @@ import unit731.hunspeller.services.PatternHelper;
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
  * @see <a href="https://algs4.cs.princeton.edu/lectures/54RegularExpressions.pdf">Algorithms - Robert Sedgewick, Kevin Wayne</a>
  * @see <a href="https://www.dennis-grinch.co.uk/tutorial/enfa">ε-NFA in Java</a>
+ * @see <a href="https://pdfs.semanticscholar.org/presentation/e14c/b69f0feb2856734a5e5e85b6ae1a210ab936.pdf">Automata & Languages</a>
+ * @see <a href="http://www.dfki.de/compling/pdfs/SS06-fsa-presentation.pdf">Finite-State Automata and Algorithms</a>
  */
 @ToString
 public class HunspellRegexWordGenerator{
@@ -49,8 +53,8 @@ public class HunspellRegexWordGenerator{
 	}
 
 	//graph of ε-transitions
-	private final Digraph graph;
-	private String[] automaton;
+	private final Digraph<String> graph = new Digraph<>();
+	private Map<Integer, String> automaton;
 
 
 	/**
@@ -64,11 +68,10 @@ public class HunspellRegexWordGenerator{
 		String[] parts = PatternHelper.split(regexp, SPLITTER);
 
 		int m = parts.length >> 1;
-		automaton = new String[m];
-		graph = new Digraph();
+		automaton = new HashMap<>(m);
 		for(int i = 0; i < m; i ++){
 			int j = (i << 1) + 1;
-			automaton[i] = parts[j];
+			automaton.put(i, parts[j]);
 
 			String next = parts[j + 1];
 			if(!next.isEmpty())
@@ -87,6 +90,26 @@ public class HunspellRegexWordGenerator{
 	}
 
 	/**
+	 * @param initialState	Starting state
+	 * @return	Final state
+	 */
+	private int kleeneStar(String value, int initialState){
+		graph.addEdge(initialState, initialState, value);
+		graph.addEdge(initialState, initialState + 1);
+		return initialState + 1;
+	}
+
+	/**
+	 * @param initialState	Starting state
+	 * @return	Final state
+	 */
+	private int zeroOrOne(String value, int initialState){
+		graph.addEdge(initialState, initialState + 1, value);
+		graph.addEdge(initialState, initialState + 1);
+		return initialState + 1;
+	}
+
+	/**
 	 * Generate a subList with a maximum size of <code>limit</code> of words that matches the given regex.
 	 * <p>
 	 * The Strings are ordered in lexicographical order.
@@ -97,7 +120,7 @@ public class HunspellRegexWordGenerator{
 	public List<String> generateAll(int limit){
 		List<String> matchedWords = new ArrayList<>(limit);
 
-		int finalStateIndex = automaton.length;
+		int finalStateIndex = automaton.size();
 		StringBuilder sb = new StringBuilder();
 
 		Queue<GeneratedElement> queue = new LinkedList<>();
@@ -113,7 +136,7 @@ public class HunspellRegexWordGenerator{
 				for(int transition : transitions)
 					queue.add(new GeneratedElement(subword, transition));
 
-				String part = automaton[stateIndex];
+				String part = automaton.get(stateIndex);
 				int size = part.length();
 				if(size > 0){
 					char op = (size == 1? part.charAt(0): 0);
