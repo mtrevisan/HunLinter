@@ -546,7 +546,6 @@ public class WordGenerator{
 		String compoundRule = LEFT_PARENTHESIS + compoundBeginFlag + RIGHT_PARENTHESIS + "*"
 			+ LEFT_PARENTHESIS + compoundMiddleFlag + RIGHT_PARENTHESIS + "*"
 			+ LEFT_PARENTHESIS + compoundEndFlag + RIGHT_PARENTHESIS + "*";
-//TODO
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
@@ -744,7 +743,9 @@ public class WordGenerator{
 	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound) throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
 		//add COMPOUNDBEGIN, COMPOUNDMIDDLE, and COMPOUNDEND flags
-		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
+		//FIXME
+//		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
+		String[] postponedAffixes = applyAffixes.get(1);
 
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
