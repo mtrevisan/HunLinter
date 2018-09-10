@@ -14,7 +14,6 @@ public class HunspellRegexWordGeneratorTest{
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<String> words = generator.generateAll(6);
-words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(abc)",
@@ -33,7 +32,6 @@ words.forEach(System.out::println);
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<String> words = generator.generateAll(7);
-words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(a)",
@@ -53,7 +51,6 @@ words.forEach(System.out::println);
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<String> words = generator.generateAll(7);
-words.forEach(System.out::println);
 
 		List<String> expected = Arrays.asList(
 			"(abc)",
