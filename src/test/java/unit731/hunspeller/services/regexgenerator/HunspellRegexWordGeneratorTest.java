@@ -10,7 +10,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void allOne(){
-		String regex = "(abc)(de)(a)";
+		String[] regex = new String[]{"abc", "de", "a"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
@@ -23,7 +23,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void oneForEach(){
-		String regex = "(abc)(de)?(a)*";
+		String[] regex = new String[]{"abc", "de", "?", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
@@ -41,7 +41,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void allZeroOrOne(){
-		String regex = "(abc)?(de)?(a)?";
+		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
@@ -60,7 +60,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void allZeroOrOneWithZeroMinimum(){
-		String regex = "(abc)?(de)?(a)?";
+		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(0, 7);
@@ -79,7 +79,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void allZeroOrOneWithTwoMinimum(){
-		String regex = "(abc)?(de)?(a)?";
+		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(2, 7);
@@ -95,7 +95,7 @@ public class HunspellRegexWordGeneratorTest{
 
 	@Test
 	public void allZeroOrMore(){
-		String regex = "(abc)*(de)*(a)*";
+		String[] regex = new String[]{"abc", "*", "de", "*", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);

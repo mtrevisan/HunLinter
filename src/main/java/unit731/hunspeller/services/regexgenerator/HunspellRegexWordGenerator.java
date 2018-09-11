@@ -57,28 +57,27 @@ public class HunspellRegexWordGenerator{
 	 * <p>
 	 * NOTE: each element should be enclosed in parentheses (eg. <code>(as)(ert)?(b)*</code>), the managed operations are <code>*</code> and <code>?</code>
 	 *
-	 * @param regexp	The regular expression
+	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
 	 */
-	public HunspellRegexWordGenerator(String regexp){
-		String[] parts = PatternHelper.split(regexp, SPLITTER);
-		finalStateIndex = parts.length >> 1;
+	public HunspellRegexWordGenerator(String[] regexpParts){
+		finalStateIndex = regexpParts.length >> 1;
 		for(int i = 0; i < finalStateIndex; i ++){
-			int j = (i << 1) + 1;
-			String next = (j + 1 < parts.length? parts[j + 1]: StringUtils.EMPTY);
+			int j = (i << 1);
+			String next = (j + 1 < regexpParts.length? regexpParts[j + 1]: StringUtils.EMPTY);
 			if(next.isEmpty())
 				//one
-				graph.addEdge(i, i + 1, parts[j]);
+				graph.addEdge(i, i + 1, regexpParts[j]);
 			else
 				switch(next.charAt(0)){
 					//zero or more
 					case '*':
 						graph.addEdge(i, i + 1);
-						graph.addEdge(i, i, parts[j]);
+						graph.addEdge(i, i, regexpParts[j]);
 						break;
 
 					//zero or one
 					case '?':
-						graph.addEdge(i, i + 1, parts[j]);
+						graph.addEdge(i, i + 1, regexpParts[j]);
 						graph.addEdge(i, i + 1);
 						break;
 				}

@@ -184,13 +184,13 @@ public class WordGenerator{
 		//extract map flag -> dictionary entries
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
-		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+		String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
-		compoundRule = formatCompoundRule(compoundRule);
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
+		String[] compRule = strategy.extractCompoundRule(compoundRule);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compRule);
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
@@ -238,28 +238,13 @@ public class WordGenerator{
 		return compoundRules;
 	}
 
-	private void checkCompoundRuleInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, List<String> compoundRuleComponents){
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+	private void checkCompoundRuleInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, String[] compoundRuleComponents){
 		for(String component : compoundRuleComponents){
-			String flag = strategy.cleanCompoundRuleComponent(component);
-			if(inputs.get(flag) == null)
-				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule "
+			char chr = (component.length() == 1? component.charAt(0): 0);
+			if(chr != '*' && chr != '?' && inputs.get(component) == null)
+				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
 					+ StringUtils.join(compoundAsReplacement, StringUtils.EMPTY));
 		}
-	}
-
-	private String formatCompoundRule(String compoundRule){
-		if(compoundRule.charAt(0) != '('){
-			StringBuilder sb = new StringBuilder();
-			for(char chr : compoundRule.toCharArray()){
-				if(chr != '?' && chr != '*')
-					sb.append(LEFT_PARENTHESIS).append(chr).append(RIGHT_PARENTHESIS);
-				else
-					sb.append(chr);
-			}
-			compoundRule = sb.toString();
-		}
-		return compoundRule;
 	}
 
 
@@ -532,9 +517,9 @@ public class WordGenerator{
 
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
-		String compoundRule = LEFT_PARENTHESIS + compoundBeginFlag + RIGHT_PARENTHESIS + "*"
-			+ LEFT_PARENTHESIS + compoundMiddleFlag + RIGHT_PARENTHESIS + "*"
-			+ LEFT_PARENTHESIS + compoundEndFlag + RIGHT_PARENTHESIS + "*";
+		String[] compoundRule = new String[]{compoundBeginFlag, "*",
+			compoundMiddleFlag, "*",
+			compoundEndFlag, "*"};
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);

@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -59,26 +57,6 @@ public interface FlagParsingStrategy{
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags
 	 */
-	List<String> extractCompoundRule(String compoundRule);
-
-	default List<String> cleanCompoundRuleComponents(List<String> components){
-		return components.stream()
-			.map(this::cleanCompoundRuleComponent)
-			.collect(Collectors.toList());
-	}
-
-	/** Leave only the flag, removes any parenthesys, star, or question mark */
-	default String cleanCompoundRuleComponent(String component){
-		int firstCharIndex = 0;
-		int lastCharIndex = component.length() - 1;
-		char chr = component.charAt(lastCharIndex);
-		if(chr == '*' || chr == '?')
-			lastCharIndex --;
-		if(component.charAt(firstCharIndex) == '(' && component.charAt(lastCharIndex) == ')'){
-			firstCharIndex ++;
-			lastCharIndex --;
-		}
-		return component.substring(firstCharIndex, lastCharIndex + 1);
-	}
+	String[] extractCompoundRule(String compoundRule);
 
 }

@@ -40,12 +40,18 @@ public class PatternHelper{
 		return pattern.split(text, limit);
 	}
 
-	public static List<String> extract(String text, Matcher matcher){
+	public static String[] extract(String text, Matcher matcher){
 		List<String> result = new ArrayList<>();
 		matcher.reset(text);
-		while(matcher.find())
-			result.add(matcher.group());
-		return result;
+		while(matcher.find()){
+			String component = null;
+			int i = 1;
+			int size = matcher.groupCount();
+			while(component == null && i < size)
+				component = matcher.group(i ++);
+			result.add(component != null? component: matcher.group());
+		}
+		return result.toArray(new String[result.size()]);
 	}
 
 	public static boolean find(String text, Matcher matcher){

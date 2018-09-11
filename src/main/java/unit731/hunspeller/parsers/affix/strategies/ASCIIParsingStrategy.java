@@ -4,20 +4,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.services.PatternHelper;
 
 
 /**
  * Simple implementation of {@link FlagParsingStrategy} that treats the chars in each String as a individual flags.
  */
 public class ASCIIParsingStrategy implements FlagParsingStrategy{
-
-	private static final Matcher COMPOUND_RULE = PatternHelper.matcher(".[*?]?");
-
 
 	@Override
 	@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "Deliberate")
@@ -55,8 +49,8 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 	@Override
-	public List<String> extractCompoundRule(String compoundRule){
-		return PatternHelper.extract(compoundRule, COMPOUND_RULE);
+	public String[] extractCompoundRule(String compoundRule){
+		return compoundRule.split(StringUtils.EMPTY);
 	}
 
 }

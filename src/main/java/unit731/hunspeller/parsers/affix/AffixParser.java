@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -137,8 +138,8 @@ public class AffixParser extends ReadWriteLockable{
 				String rule = lineParts[1];
 				if(StringUtils.isBlank(rule))
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule type cannot be empty");
-				List<String> compounds = strategy.extractCompoundRule(rule);
-				if(compounds.isEmpty())
+				String[] compounds = strategy.extractCompoundRule(rule);
+				if(compounds.length == 0)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule is bad formatted");
 
 				boolean inserted = compoundRules.add(rule);
@@ -455,10 +456,10 @@ public class AffixParser extends ReadWriteLockable{
 			if(!containsData(AffixTag.LANGUAGE)){
 				//try to infer language from filename
 				String filename = FilenameUtils.removeExtension(affFile.getName());
-				List<String> languages = PatternHelper.extract(filename, MATCHER_ISO639_2);
-				if(languages.isEmpty())
+				String[] languages = PatternHelper.extract(filename, MATCHER_ISO639_2);
+				if(languages.length == 0)
 					languages = PatternHelper.extract(filename, MATCHER_ISO639_1);
-				String language = (!languages.isEmpty()? languages.get(0): NO_LANGUAGE);
+				String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 				addData(AffixTag.LANGUAGE, language);
 			}
 			if(!containsData(AffixTag.BREAK)){
@@ -587,9 +588,8 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	public boolean isManagedByCompoundRule(String compoundRule, String flag){
-		List<String> flags = strategy.extractCompoundRule(compoundRule);
-		flags = strategy.cleanCompoundRuleComponents(flags);
-		return flags.contains(flag);
+		String[] flags = strategy.extractCompoundRule(compoundRule);
+		return ArrayUtils.contains(flags, flag);
 	}
 
 	public Charset getCharset(){
