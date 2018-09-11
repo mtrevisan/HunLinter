@@ -187,8 +187,6 @@ public class WordGenerator{
 		String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
-		//TODO escape reserved characters like '(', ')', '*', and '?'
-//		compoundRule = Pattern.quote(compoundRule);
 		String[] compRule = strategy.extractCompoundRule(compoundRule);
 		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compRule);
 		//generate all the words that matches the given regex
@@ -515,8 +513,6 @@ public class WordGenerator{
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-		//TODO escape reserved characters like '(', ')', '*', and '?'
-//		compoundRule = Pattern.quote(compoundRule);
 		String[] compoundRule = new String[]{compoundBeginFlag, "*",
 			compoundMiddleFlag, "*",
 			compoundEndFlag, "*"};
