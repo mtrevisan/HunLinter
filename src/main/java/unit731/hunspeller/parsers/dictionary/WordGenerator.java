@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
+import java.util.AbstractMap;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
@@ -186,8 +187,6 @@ public class WordGenerator{
 		List<String> compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
-		filterCompoundRules(inputs);
-
 		//TODO escape reserved characters like '(', ')', '*', and '?'
 //		compoundRule = Pattern.quote(compoundRule);
 		compoundRule = formatCompoundRule(compoundRule);
@@ -214,6 +213,8 @@ public class WordGenerator{
 	/** Extract a map of flag > dictionary entry from input compounds */
 	private Map<String, Set<DictionaryEntry>> extractCompoundRules(String[] inputCompounds){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
@@ -225,6 +226,13 @@ public class WordGenerator{
 			//merge the distribution with the others
 			compoundRules = Stream.of(compoundRules, distribution)
 				.flatMap(m -> m.entrySet().stream())
+				.map(m -> {
+					String key = m.getKey();
+					Set<DictionaryEntry> value = m.getValue().stream()
+						.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+						.collect(Collectors.toSet());
+					return new AbstractMap.SimpleEntry<>(key, value);
+				})
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
 		}
 		return compoundRules;
@@ -237,22 +245,6 @@ public class WordGenerator{
 			if(inputs.get(flag) == null)
 				throw new IllegalArgumentException("Missing word(s) for rule " + flag + " in compound rule "
 					+ StringUtils.join(compoundAsReplacement, StringUtils.EMPTY));
-		}
-	}
-
-	private void filterCompoundRules(Map<String, Set<DictionaryEntry>> inputs){
-		int compoundMinimumLength = affParser.getCompoundMinimumLength();
-		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
-
-		for(Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet()){
-			Iterator<DictionaryEntry> itr = entry.getValue().iterator();
-			while(itr.hasNext()){
-				DictionaryEntry dicEntry = itr.next();
-
-				//filter input set by minimum length and forbidden flag
-				if(dicEntry.getWord().length() < compoundMinimumLength || dicEntry.hasContinuationFlag(forbiddenWordFlag))
-					itr.remove();
-			}
 		}
 	}
 
@@ -315,6 +307,7 @@ public class WordGenerator{
 
 	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<DictionaryEntry> result = new ArrayList<>();
@@ -322,11 +315,9 @@ public class WordGenerator{
 			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
-			//filter input set by minimum length
-			if(dicEntry.getWord().length() < compoundMinimumLength)
-				continue;
-
-			result.add(dicEntry);
+			//filter input set by minimum length and forbidden flag
+			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
+				result.add(dicEntry);
 		}
 		return result;
 	}
@@ -568,6 +559,8 @@ public class WordGenerator{
 
 	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		int compoundMinimumLength = affParser.getCompoundMinimumLength();
+		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
@@ -581,6 +574,13 @@ public class WordGenerator{
 				//merge the distribution with the others
 				compoundRules = Stream.of(compoundRules, distribution)
 					.flatMap(m -> m.entrySet().stream())
+					.map(m -> {
+						String key = m.getKey();
+						Set<DictionaryEntry> value = m.getValue().stream()
+							.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+							.collect(Collectors.toSet());
+						return new AbstractMap.SimpleEntry<>(key, value);
+					})
 					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
 			}
 		}
