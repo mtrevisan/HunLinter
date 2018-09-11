@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.services.PatternHelper;
 
 
 /**
@@ -38,9 +36,6 @@ import unit731.hunspeller.services.PatternHelper;
 @ToString
 public class HunspellRegexWordGenerator{
 
-	private static final Pattern SPLITTER = PatternHelper.pattern("(?<!\\\\)[()]");
-
-
 	@AllArgsConstructor
 	private static class GeneratedElement{
 		private final List<String> word;
@@ -60,28 +55,36 @@ public class HunspellRegexWordGenerator{
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
 	 */
 	public HunspellRegexWordGenerator(String[] regexpParts){
-		finalStateIndex = regexpParts.length >> 1;
-		for(int i = 0; i < finalStateIndex; i ++){
-			int j = (i << 1);
-			String next = (j + 1 < regexpParts.length? regexpParts[j + 1]: StringUtils.EMPTY);
-			if(next.isEmpty())
-				//one
-				graph.addEdge(i, i + 1, regexpParts[j]);
-			else
-				switch(next.charAt(0)){
-					//zero or more
-					case '*':
-						graph.addEdge(i, i + 1);
-						graph.addEdge(i, i, regexpParts[j]);
-						break;
+		int offset = 0;
+		for(int i = 0; i + offset < regexpParts.length; i ++){
+			int operatorIndex = i + offset + 1;
+			char next = (operatorIndex < regexpParts.length && regexpParts[operatorIndex].length() == 1? regexpParts[operatorIndex].charAt(0): 0);
+			switch(next){
+				//zero or more
+				case '*':
+					graph.addEdge(i, i + 1);
+					graph.addEdge(i, i, regexpParts[operatorIndex - 1]);
 
-					//zero or one
-					case '?':
-						graph.addEdge(i, i + 1, regexpParts[j]);
-						graph.addEdge(i, i + 1);
-						break;
-				}
+					//skip operator
+					offset ++;
+					break;
+
+				//zero or one
+				case '?':
+					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
+					graph.addEdge(i, i + 1);
+
+					//skip operator
+					offset ++;
+					break;
+
+				default:
+					//one
+					graph.addEdge(i, i + 1, regexpParts[operatorIndex - 1]);
+			}
 		}
+
+		finalStateIndex = regexpParts.length - offset;
 	}
 
 	/**
