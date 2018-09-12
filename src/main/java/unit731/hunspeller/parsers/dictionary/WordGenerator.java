@@ -200,7 +200,8 @@ public class WordGenerator{
 			for(String flag : permutation)
 				expandedPermutationEntries.add(inputs.get(flag).stream()
 					.map(entry -> applyAffixRules(entry, true))
-					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
+					.flatMap(List::stream)
+					.collect(Collectors.toList()));
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
 		}
@@ -530,7 +531,8 @@ public class WordGenerator{
 					.map(entry -> applyAffixRules(entry, true))
 //FIXME
 					.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
-					.reduce(new ArrayList<>(), (res, elem) -> { res.addAll(elem); return res; }));
+					.flatMap(List::stream)
+					.collect(Collectors.toList()));
 			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
 				entries.add(expandedPermutationEntries);
 		}
