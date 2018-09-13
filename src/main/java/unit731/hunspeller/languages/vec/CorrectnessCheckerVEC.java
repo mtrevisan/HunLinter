@@ -97,7 +97,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternHelper.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
 
 	private static final Matcher L_BETWEEN_VOWELS = PatternHelper.matcher("l i l$");
-	private static final Matcher CIJJHNHIV = PatternHelper.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aàeèéiíoòóuú]");
+	private static final Matcher CIJJHNHIV = PatternHelper.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
 
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 //	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
