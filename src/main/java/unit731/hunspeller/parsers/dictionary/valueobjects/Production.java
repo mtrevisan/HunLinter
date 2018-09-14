@@ -29,8 +29,7 @@ public class Production extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	public Production(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags,
-			boolean combineable, FlagParsingStrategy strategy){
+	public Production(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags, boolean combineable){
 		super(word, appliedEntry.combineContinuationFlags(remainingContinuationFlags), appliedEntry.combineMorphologicalFields(dicEntry),
 			combineable);
 

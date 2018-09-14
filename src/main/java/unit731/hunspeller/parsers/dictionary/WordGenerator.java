@@ -37,9 +37,6 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 @Slf4j
 public class WordGenerator{
 
-	private static final String LEFT_PARENTHESIS = "(";
-	private static final String RIGHT_PARENTHESIS = ")";
-
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
 		Set<StringHelper.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
@@ -734,7 +731,6 @@ public class WordGenerator{
 
 		List<Production> productions = new ArrayList<>();
 		if(appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag)){
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 			String permitCompoundFlag = affParser.getPermitCompoundFlag();
 
@@ -804,7 +800,7 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable(), strategy);
+					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
 					if(!production.hasContinuationFlag(forbiddenWordFlag))
 						productions.add(production);
 //					if(!production.hasContinuationFlag(forbiddenWordFlag)){
