@@ -9,15 +9,17 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
 public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerWrite.class);
 
 	private final List<T> entries;
 	private final File outputFile;
@@ -42,7 +44,7 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening output file{}", (workerName != null? " - " + workerName: StringUtils.EMPTY));
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening output file{}", (workerName != null? " - " + workerName: StringUtils.EMPTY));
 
 		watch.reset();
 
@@ -64,17 +66,17 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 
 				setProgress(100);
 
-				log.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes {})", watch.toStringMinuteSeconds());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Output file written successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Throwable t){
-			log.info(Backbone.MARKER_APPLICATION, "Stopped writing output file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped writing output file");
 
 			if(t instanceof ClosedChannelException)
-				log.warn("Thread interrupted");
+				LOGGER.warn("Thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		finally{

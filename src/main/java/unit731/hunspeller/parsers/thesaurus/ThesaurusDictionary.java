@@ -12,12 +12,10 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@Getter
 public class ThesaurusDictionary{
 
 	private static final Matcher PART_OF_SPEECH = PatternHelper.matcher("\\([^)]+\\)");
@@ -29,6 +27,14 @@ public class ThesaurusDictionary{
 	@JsonIgnore
 	private boolean modified;
 
+
+	public List<ThesaurusEntry> getSynonyms(){
+		return synonyms;
+	}
+
+	public boolean isModified(){
+		return modified;
+	}
 
 	public boolean add(String partOfSpeech, List<String> meanings){
 		boolean result = false;

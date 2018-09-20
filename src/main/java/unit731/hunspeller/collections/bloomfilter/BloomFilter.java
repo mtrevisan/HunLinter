@@ -3,9 +3,9 @@ package unit731.hunspeller.collections.bloomfilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
@@ -29,8 +29,9 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
  *
  * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
  */
-@Slf4j
 public class BloomFilter<T> implements BloomFilterInterface<T>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BloomFilter.class);
 
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
@@ -56,13 +57,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
 	protected int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	@Getter
 	protected double falsePositiveProbability;
 	/** Number of bits required for the bloom filter */
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter */
-	@Getter
 	protected int addedElements;
 
 
@@ -116,6 +115,16 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		this.hasher = ObjectUtils.defaultIfNull(hasher, DEFAULT_HASHER);
 
 		addedElements = 0;
+	}
+
+	@Override
+	public double getFalsePositiveProbability(){
+		return falsePositiveProbability;
+	}
+
+	@Override
+	public int getAddedElements(){
+		return addedElements;
 	}
 
 	//Default bloom filter functions follow
@@ -286,7 +295,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 			bitArray.close();
 		}
 		catch(IOException e){
-			log.error("Error closing the Bloom filter", e);
+			LOGGER.error("Error closing the Bloom filter", e);
 		}
 	}
 

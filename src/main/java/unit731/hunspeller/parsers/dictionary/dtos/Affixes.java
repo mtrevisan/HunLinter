@@ -3,14 +3,12 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.Getter;
 
 
 public class Affixes{
 
 	private final String[] prefixes;
 	private final String[] suffixes;
-	@Getter
 	private final String[] terminalAffixes;
 
 
@@ -18,6 +16,10 @@ public class Affixes{
 		this.prefixes = prefixes.toArray(new String[prefixes.size()]);
 		this.suffixes = suffixes.toArray(new String[suffixes.size()]);
 		this.terminalAffixes = terminalAffixes.toArray(new String[terminalAffixes.size()]);
+	}
+
+	public String[] getTerminalAffixes(){
+		return terminalAffixes;
 	}
 
 	public List<String[]> extractAllAffixes(boolean reverseAffixes){

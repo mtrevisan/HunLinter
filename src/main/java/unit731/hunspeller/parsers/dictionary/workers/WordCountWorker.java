@@ -4,7 +4,8 @@ import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBa
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -15,8 +16,9 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
 public class WordCountWorker extends WorkerDictionaryReadBase{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
 
 	public static final String WORKER_NAME = "Word count";
 
@@ -44,8 +46,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				int totalUniqueProductions = dictionary.getAddedElements();
 				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
 				int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-				log.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-				log.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 					DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 					falsePositiveCount);
 			}

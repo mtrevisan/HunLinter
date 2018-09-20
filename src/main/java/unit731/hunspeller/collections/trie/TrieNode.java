@@ -6,11 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 
 
@@ -19,21 +16,17 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
  * @param <H>	The hash type (used to find a particular child).
  * @param <V>	The value type.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = {"sequence", "startIndex", "endIndex"})
 public class TrieNode<S, H, V>{
 
-	@Getter @Setter
 	private S sequence;
-	@Getter
 	private int startIndex;
-	@Getter
 	private int endIndex;
 
-	@Getter
 	private V value;
 	private Map<H, TrieNode<S, H, V>> children;
 
+
+	private TrieNode(){}
 
 	public TrieNode(S sequence, int startIndex, int endIndex, V value){
 		this.sequence = sequence;
@@ -45,6 +38,26 @@ public class TrieNode<S, H, V>{
 
 	public static <S, H, V> TrieNode<S, H, V> makeRoot(){
 		return new TrieNode<>();
+	}
+
+	public S getSequence(){
+		return sequence;
+	}
+
+	public void setSequence(S sequence){
+		this.sequence = sequence;
+	}
+
+	public int getStartIndex(){
+		return startIndex;
+	}
+
+	public int getEndIndex(){
+		return endIndex;
+	}
+
+	public V getValue(){
+		return value;
 	}
 
 	public void clear(){
@@ -147,6 +160,32 @@ public class TrieNode<S, H, V>{
 		addChild(stem, lowerNode);
 
 		return lowerNode;
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if(obj.getClass() != getClass())
+			return false;
+
+		TrieNode rhs = (TrieNode)obj;
+		return new EqualsBuilder()
+			.append(sequence, rhs.sequence)
+			.append(startIndex, rhs.startIndex)
+			.append(endIndex, rhs.endIndex)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(sequence)
+			.append(startIndex)
+			.append(endIndex)
+			.toHashCode();
 	}
 
 }

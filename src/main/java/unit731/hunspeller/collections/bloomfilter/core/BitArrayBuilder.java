@@ -3,17 +3,19 @@ package unit731.hunspeller.collections.bloomfilter.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
 public class BitArrayBuilder{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BitArrayBuilder.class);
+
 
 	public static enum Type{JAVA, MEMORY_MAPPED_FILE}
 
+
+	private BitArrayBuilder(){}
 
 	@SuppressWarnings("fallthrough")
 	public static BitArray getBitArray(Type type, int bits){
@@ -34,7 +36,7 @@ public class BitArrayBuilder{
 				catch(IOException e){
 					ba = new JavaBitArray(bits);
 
-					log.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);
+					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);
 				}
 		}
 		return ba;

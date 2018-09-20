@@ -19,19 +19,19 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionListener;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
-@Slf4j
 public class DictionarySortDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionarySortDialog.class);
 
 	private static final long serialVersionUID = -4815599935456195094L;
 
 
-	@NonNull
 	private final DictionaryParser dicParser;
 
 	private final JList<String> list = new JList<>();
@@ -195,7 +195,7 @@ public class DictionarySortDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex){
-			log.error(null, ex);
+			LOGGER.error(null, ex);
 		}
 		//</editor-fold>
 

@@ -12,15 +12,14 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
 public class FileHelper{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
 	//FEFF because this is the Unicode char represented by the UTF-8 byte order mark (EF BB BF)
 	private static final String BOM_MARKER = "\uFEFF";
@@ -42,6 +41,8 @@ public class FileHelper{
 			.collect(Collectors.toList());
 	}
 
+
+	private FileHelper(){}
 
 	public static Charset determineCharset(Path path){
 		for(Charset cs : HUNSPELL_CHARSETS){
@@ -94,7 +95,7 @@ public class FileHelper{
 			process.waitFor();
 		}
 		else
-			log.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
+			LOGGER.warn("Cannot open file {}, OS not recognized ({})", file.getName(), SystemUtils.OS_NAME);
 	}
 
 }

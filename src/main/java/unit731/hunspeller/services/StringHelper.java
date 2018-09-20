@@ -1,11 +1,8 @@
 package unit731.hunspeller.services;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringHelper{
 
 	public static enum Casing{
@@ -21,6 +18,8 @@ public class StringHelper{
 		PASCAL_CASE
 	}
 
+
+	private StringHelper(){}
 
 	public static Casing classifyCasing(String text){
 		if(StringUtils.isBlank(text))

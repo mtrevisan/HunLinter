@@ -15,9 +15,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
@@ -33,8 +34,9 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
-@Slf4j
 public class MinimalPairsWorker extends WorkerBase<Void, Void>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MinimalPairsWorker.class);
 
 	private static final String SLASH = "/";
 
@@ -64,7 +66,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	@Override
 	protected Void doInBackground() throws Exception{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
 		watch = TimeWatch.start();
 
@@ -108,14 +110,14 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
+							LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
 						}
 					}
 
 					setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
 				}
 			}
-			log.info(Backbone.MARKER_APPLICATION, "Support file written");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file written");
 
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -128,10 +130,10 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "Support file sorted");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file sorted");
 
 
-			log.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (pass 2/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting minimal pairs (pass 2/3)");
 			setProgress(0);
 
 			int totalPairs = 0;
@@ -180,10 +182,10 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			}
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 
 
-			log.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (pass 3/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Reordering minimal pairs (pass 3/3)");
 			setProgress(0);
 
 			//write result
@@ -203,7 +205,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs file written");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs file written");
 
 			//sort file alphabetically:
 			options = ExternalSorterOptions.builder()
@@ -218,31 +220,31 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
-			log.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes {})", watch.toStringMinuteSeconds());
 
 			try{
 				FileHelper.openFileWithChoosenEditor(outputFile);
 			}
 			catch(IOException | InterruptedException e){
-				log.warn("Exception while opening the resulting file", e);
+				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		}
 		catch(Throwable t){
 			stopped = true;
 
 			if(t instanceof ClosedChannelException)
-				log.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
-				log.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		finally{
 			lockable.releaseReadLock();
 		}
 		if(stopped)
-			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}

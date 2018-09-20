@@ -8,9 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
@@ -21,14 +20,19 @@ import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@AllArgsConstructor
 public abstract class AbstractHyphenator implements HyphenatorInterface{
 
-	@NonNull
 	protected final HyphenationParser hypParser;
-	@NonNull
 	private final String breakCharacter;
 
+
+	protected AbstractHyphenator(HyphenationParser hypParser, String breakCharacter){
+		Objects.requireNonNull(hypParser);
+		Objects.requireNonNull(breakCharacter);
+
+		this.hypParser = hypParser;
+		this.breakCharacter = breakCharacter;
+	}
 
 	/**
 	 * Performs hyphenation

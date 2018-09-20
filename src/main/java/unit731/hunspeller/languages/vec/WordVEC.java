@@ -9,17 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
 public class WordVEC{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
 	private static final String VOWELS_PLAIN = "aAeEiIoOuU" + GraphemeVEC.I_UMLAUT_PHONEME;
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
@@ -46,7 +45,7 @@ public class WordVEC{
 		}
 		catch(ParseException e){
 			//cannot happen
-			log.error(e.getMessage());
+			LOGGER.error(e.getMessage());
 		}
 	}
 
@@ -84,6 +83,9 @@ public class WordVEC{
 		ACUTE_STRESSES.put("o", "ó");
 		ACUTE_STRESSES.put("u", "ú");
 	}
+
+
+	private WordVEC(){}
 
 	public static int countGraphemes(String word){
 		int count = 0;

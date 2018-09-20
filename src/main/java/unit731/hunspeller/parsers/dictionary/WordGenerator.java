@@ -19,9 +19,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -34,8 +35,9 @@ import unit731.hunspeller.services.StringHelper;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
-@Slf4j
 public class WordGenerator{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordGenerator.class);
 
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
 	static{
@@ -100,25 +102,25 @@ public class WordGenerator{
 
 		//extract base production
 		Production baseProduction = getBaseProduction(dicEntry);
-		if(log.isDebugEnabled()){
-			log.debug("Base production:");
-			log.debug("   {}", baseProduction);
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("Base production:");
+			LOGGER.debug("   {}", baseProduction);
 		}
 
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
-		if(log.isDebugEnabled()){
-			log.debug("Suffix productions:");
-			onefoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+		if(LOGGER.isDebugEnabled()){
+			LOGGER.debug("Suffix productions:");
+			onefoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
 
 		List<Production> twofoldProductions = Collections.<Production>emptyList();
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
-			if(log.isDebugEnabled() && !twofoldProductions.isEmpty()){
-				log.debug("Prefix productions:");
-				twofoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+			if(LOGGER.isDebugEnabled() && !twofoldProductions.isEmpty()){
+				LOGGER.debug("Prefix productions:");
+				twofoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 			}
 		}
 
@@ -128,9 +130,9 @@ public class WordGenerator{
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
-		if(log.isDebugEnabled() && !lastfoldProductions.isEmpty()){
-			log.debug("Twofold productions:");
-			lastfoldProductions.forEach(production -> log.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+		if(LOGGER.isDebugEnabled() && !lastfoldProductions.isEmpty()){
+			LOGGER.debug("Twofold productions:");
+			lastfoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
 
 		checkTwofoldCorrectness(lastfoldProductions);
@@ -151,8 +153,8 @@ public class WordGenerator{
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
 
-		if(log.isTraceEnabled())
-			productions.forEach(production -> log.trace("Produced word: {}", production));
+		if(LOGGER.isTraceEnabled())
+			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}
@@ -421,8 +423,8 @@ public class WordGenerator{
 			production.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
 
-		if(log.isTraceEnabled())
-			productions.forEach(production -> log.trace("Produced word: {}", production));
+		if(LOGGER.isTraceEnabled())
+			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		List<Production> response = new ArrayList<>(productions);
 		if(response.size() > limit)
@@ -585,8 +587,8 @@ public class WordGenerator{
 				dicInclusionTestWorker.executeInline();
 			}
 			catch(Exception e){
-				log.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
-				log.error("Cannot read dictionary", e);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot read dictionary: {}", ExceptionHelper.getMessage(e));
+				LOGGER.error("Cannot read dictionary", e);
 			}
 		}
 	}

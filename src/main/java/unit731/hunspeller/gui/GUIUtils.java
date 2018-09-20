@@ -17,16 +17,15 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GUIUtils{
 
 	private static final Matcher MATCHER_HTML_CODE = PatternHelper.matcher("</?[^>]+>");
 
+
+	private GUIUtils(){}
 
 	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
 		JPopupMenu popupMenu = new JPopupMenu();

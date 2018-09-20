@@ -5,7 +5,6 @@ import java.awt.Frame;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.Getter;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -21,7 +20,6 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Statistics";
 
-	@Getter
 	private final boolean performHyphenationStatistics;
 
 	private final DictionaryStatistics dicStatistics;
@@ -69,6 +67,10 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			}
 		};
 		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
+	}
+
+	public boolean isPerformHyphenationStatistics(){
+		return performHyphenationStatistics;
 	}
 
 	@Override

@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PatternHelper{
 
 	private static final String SPLITTER_PATTERN_WITH_DELIMITER = "(?=(?!^)%1$s)(?<!%1$s)|(?!%1$s)(?<=%1$s)";
 
+
+	private PatternHelper(){}
 
 	public static Pattern pattern(String pattern){
 		return Pattern.compile(pattern);

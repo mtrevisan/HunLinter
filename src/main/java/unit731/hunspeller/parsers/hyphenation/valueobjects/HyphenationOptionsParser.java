@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
-@Getter
 public class HyphenationOptionsParser{
 
 	/** minimal hyphenation distance from the left word end */
@@ -30,6 +28,18 @@ public class HyphenationOptionsParser{
 	private final HyphenationOptions compoundOptions = new HyphenationOptions(0);
 	private final Set<String> noHyphen = new HashSet<>();
 
+
+	public HyphenationOptions getNonCompoundOptions(){
+		return nonCompoundOptions;
+	}
+
+	public HyphenationOptions getCompoundOptions(){
+		return compoundOptions;
+	}
+
+	public Set<String> getNoHyphen(){
+		return noHyphen;
+	}
 
 	public void clear(){
 		nonCompoundOptions.clear();

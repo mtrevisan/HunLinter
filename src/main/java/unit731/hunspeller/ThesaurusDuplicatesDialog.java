@@ -12,12 +12,14 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-@Slf4j
 public class ThesaurusDuplicatesDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusDuplicatesDialog.class);
 
 	private static final long serialVersionUID = 5718588727397261977L;
 
@@ -92,7 +94,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -110,7 +112,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}

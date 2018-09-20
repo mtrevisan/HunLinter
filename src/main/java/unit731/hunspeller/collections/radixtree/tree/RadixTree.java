@@ -15,10 +15,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
@@ -41,8 +37,6 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	private static final String GRAPHVIZ_STYLE_BEGIN = " [";
@@ -60,11 +54,15 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
 
 
-	@AllArgsConstructor
 	private class TraverseElement{
 
 		protected final RadixTreeNode<S, V> node;
 		protected final S prefix;
+
+		TraverseElement(RadixTreeNode<S, V> node, S prefix){
+			this.node = node;
+			this.prefix = prefix;
+		}
 
 	}
 
@@ -115,6 +113,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		tree.noDuplicatesAllowed = true;
 		return tree;
 	}
+
+	protected RadixTree(){}
 
 	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){

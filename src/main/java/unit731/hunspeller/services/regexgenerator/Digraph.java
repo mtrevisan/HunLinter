@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -24,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
  * 
  * @param <T>	Type of values stored in transitions
  */
-@NoArgsConstructor
 public final class Digraph<T>{
 
 	private static final String NEWLINE = System.getProperty("line.separator");
@@ -32,6 +30,8 @@ public final class Digraph<T>{
 	//adjacency list for given vertex
 	private final List<List<Pair<Integer, T>>> adjacency = new ArrayList<>(0);
 
+
+	public Digraph(){}
 
 	/**
 	 * Initializes a new digraph that is a deep copy of the specified digraph.
@@ -89,8 +89,8 @@ public final class Digraph<T>{
 	 *
 	 * @return	the reverse of the digraph
 	 */
-	public Digraph reverse(){
-		Digraph reverse = new Digraph();
+	public Digraph<T> reverse(){
+		Digraph<T> reverse = new Digraph<>();
 		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);

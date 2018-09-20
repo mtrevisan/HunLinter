@@ -1,21 +1,31 @@
 package unit731.hunspeller.languages;
 
+import java.util.Objects;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 
 
-@AllArgsConstructor
-@Getter
 public class CorrectnessChecker{
 
-	@NonNull
 	protected AffixParser affParser;
 	protected final AbstractHyphenator hyphenator;
 
+
+	public CorrectnessChecker(AffixParser affParser, AbstractHyphenator hyphenator){
+		Objects.requireNonNull(affParser);
+
+		this.affParser = affParser;
+		this.hyphenator = hyphenator;
+	}
+
+	public AffixParser getAffParser(){
+		return affParser;
+	}
+
+	public AbstractHyphenator getHyphenator(){
+		return hyphenator;
+	}
 
 	//correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{

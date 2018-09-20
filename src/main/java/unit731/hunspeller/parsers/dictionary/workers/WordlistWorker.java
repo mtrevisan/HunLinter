@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -16,8 +17,9 @@ import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
 public class WordlistWorker extends WorkerDictionaryReadWriteBase{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
 
 	public static final String WORKER_NAME = "Wordlist";
 
@@ -44,13 +46,13 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 		};
 		Runnable done = () -> {
 			if(!isCancelled()){
-				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
 				try{
 					FileHelper.openFileWithChoosenEditor(outputFile);
 				}
 				catch(IOException | InterruptedException e){
-					log.warn("Exception while opening the resulting file", e);
+					LOGGER.warn("Exception while opening the resulting file", e);
 				}
 			}
 		};

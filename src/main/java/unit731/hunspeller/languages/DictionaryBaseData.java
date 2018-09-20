@@ -1,10 +1,6 @@
 package unit731.hunspeller.languages;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
-
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DictionaryBaseData{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
@@ -16,6 +12,8 @@ public class DictionaryBaseData{
 		private static final DictionaryBaseData INSTANCE = new DictionaryBaseData();
 	}
 
+
+	protected DictionaryBaseData(){}
 
 	public static synchronized DictionaryBaseData getInstance(){
 		return SingletonHelper.INSTANCE;

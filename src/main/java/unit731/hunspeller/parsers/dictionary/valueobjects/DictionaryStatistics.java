@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -20,7 +19,6 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 /**
  * @see <a href="https://home.ubalt.edu/ntsbarsh/Business-stat/otherapplets/PoissonTest.htm">Goodness-of-Fit for Poisson</a>
  */
-@Getter
 public class DictionaryStatistics{
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
@@ -39,7 +37,6 @@ public class DictionaryStatistics{
 	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
 
 	private final BloomFilterInterface<String> bloomFilter;
-	@Getter
 	private final Orthography orthography;
 
 
@@ -47,6 +44,60 @@ public class DictionaryStatistics{
 		bloomFilter = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
 		bloomFilter.setCharset(charset);
 		orthography = OrthographyBuilder.getOrthography(language);
+	}
+
+	public int getTotalProductions(){
+		return totalProductions;
+	}
+
+	public int getLongestWordCountByCharacters(){
+		return longestWordCountByCharacters;
+	}
+
+	public int getLongestWordCountBySyllabes(){
+		return longestWordCountBySyllabes;
+	}
+
+	/** @return	The count of unique words */
+	public int getUniqueWords(){
+		return bloomFilter.getAddedElements();
+	}
+
+	/** @return	The count of compound words */
+	public int getCompoundWords(){
+		return compoundWords;
+	}
+
+	public int getContractedWords(){
+		return contractedWords;
+	}
+
+	public Frequency<Integer> getLengthsFrequencies(){
+		return lengthsFrequencies;
+	}
+
+	public Frequency<String> getSyllabesFrequencies(){
+		return syllabesFrequencies;
+	}
+
+	public Frequency<Integer> getSyllabeLengthsFrequencies(){
+		return syllabeLengthsFrequencies;
+	}
+
+	public Frequency<Integer> getStressFromLastFrequencies(){
+		return stressFromLastFrequencies;
+	}
+
+	public List<String> getLongestWordsByCharacters(){
+		return longestWordsByCharacters;
+	}
+
+	public List<Hyphenation> getLongestWordsBySyllabes(){
+		return longestWordsBySyllabes;
+	}
+
+	public Orthography getOrthography(){
+		return orthography;
 	}
 
 	public void addData(String word){
@@ -113,24 +164,10 @@ public class DictionaryStatistics{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
-	public long getTotalProductions(){
-		return totalProductions;
-	}
-
 	public List<String> getMostCommonSyllabes(int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
 			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
-	}
-
-	/** @return	The count of unique words */
-	public int getUniqueWords(){
-		return bloomFilter.getAddedElements();
-	}
-
-	/** @return	The count of compound words */
-	public int getCompoundWords(){
-		return compoundWords;
 	}
 
 	public void clear(){

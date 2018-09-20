@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
@@ -123,18 +122,12 @@ public class HyphenationParser extends ReadWriteLockable{
 	}
 
 	private final Comparator<String> comparator;
-	@Getter
 	private final Orthography orthography;
 
-	@Getter
 	private boolean secondLevelPresent;
-	@Getter
 	public Pattern patternNoHyphen;
-	@Getter
 	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
-	@Getter
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
-	@Getter
 	private final HyphenationOptionsParser optParser;
 
 
@@ -175,6 +168,30 @@ public class HyphenationParser extends ReadWriteLockable{
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
+	}
+
+	public Orthography getOrthography(){
+		return orthography;
+	}
+
+	public boolean isSecondLevelPresent(){
+		return secondLevelPresent;
+	}
+
+	public Pattern getPatternNoHyphen(){
+		return patternNoHyphen;
+	}
+
+	public Map<Level, RadixTree<String, String>> getPatterns(){
+		return patterns;
+	}
+
+	public Map<Level, Map<String, String>> getCustomHyphenations(){
+		return customHyphenations;
+	}
+
+	public HyphenationOptionsParser getOptParser(){
+		return optParser;
 	}
 
 	/**

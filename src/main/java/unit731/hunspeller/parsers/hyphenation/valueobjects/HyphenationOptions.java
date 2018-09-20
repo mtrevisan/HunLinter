@@ -1,9 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.valueobjects;
 
-import lombok.Getter;
 
-
-@Getter
 public class HyphenationOptions{
 
 	private int leftMin;
@@ -16,6 +13,18 @@ public class HyphenationOptions{
 		this.minDefault = Math.max(minDefault, 0);
 
 		clear();
+	}
+
+	public int getLeftMin(){
+		return leftMin;
+	}
+
+	public int getRightMin(){
+		return rightMin;
+	}
+
+	public int getMinDefault(){
+		return minDefault;
 	}
 
 	public final void clear(){

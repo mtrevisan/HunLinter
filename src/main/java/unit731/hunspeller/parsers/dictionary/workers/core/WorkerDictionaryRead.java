@@ -8,10 +8,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -20,12 +20,12 @@ import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
 public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionaryRead.class);
 
 	private final File dicFile;
 
-	@Getter
 	protected boolean preventExceptionRelaunch;
 
 
@@ -44,9 +44,13 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		this.lockable = lockable;
 	}
 
+	public boolean isPreventExceptionRelaunch(){
+		return preventExceptionRelaunch;
+	}
+
 	@Override
 	protected Void doInBackground() throws IOException{
-		log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file"
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file"
 			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
 
 		watch.reset();
@@ -76,7 +80,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 						lineReader.accept(line, br.getLineNumber());
 					}
 					catch(Exception e){
-						log.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
+						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
 
 						if(!preventExceptionRelaunch)
 							throw e;
@@ -91,18 +95,18 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 				setProgress(100);
 
-				log.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes {})", watch.toStringMinuteSeconds());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){
 			if(e instanceof ClosedChannelException)
-				log.warn("Thread interrupted");
+				LOGGER.warn("Thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(e);
-				log.error("{}: {}", e.getClass().getSimpleName(), message);
+				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 			}
 
-			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 		}
 		finally{
 			lockable.releaseReadLock();

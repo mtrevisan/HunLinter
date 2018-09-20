@@ -12,13 +12,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -28,8 +25,6 @@ import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class DictionaryEntry{
 
 	private static final int PARAM_WORD = 1;
@@ -41,14 +36,20 @@ public class DictionaryEntry{
 	private static final String SLASH_ESCAPED = "\\/";
 
 
-	@NonNull
-	@Getter
 	protected String word;
 	protected String[] continuationFlags;
 	protected final String[] morphologicalFields;
-	@Getter
 	private final boolean combineable;
 
+
+	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
+		Objects.requireNonNull(word);
+
+		this.word = word;
+		this.continuationFlags = continuationFlags;
+		this.morphologicalFields = morphologicalFields;
+		this.combineable = combineable;
+	}
 
 	public DictionaryEntry(String line, FlagParsingStrategy strategy){
 		this(line, strategy, null, null);
@@ -69,6 +70,14 @@ public class DictionaryEntry{
 		morphologicalFields = ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word},
 			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
 		combineable = true;
+	}
+
+	public String getWord(){
+		return word;
+	}
+
+	public boolean isCombineable(){
+		return combineable;
 	}
 
 	public static String extractWord(String line){
@@ -246,6 +255,32 @@ public class DictionaryEntry{
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if(obj.getClass() != getClass())
+			return false;
+
+		DictionaryEntry rhs = (DictionaryEntry)obj;
+		return new EqualsBuilder()
+			.append(word, rhs.word)
+			.append(continuationFlags, rhs.continuationFlags)
+			.append(morphologicalFields, rhs.morphologicalFields)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(word)
+			.append(continuationFlags)
+			.append(morphologicalFields)
+			.toHashCode();
 	}
 
 }

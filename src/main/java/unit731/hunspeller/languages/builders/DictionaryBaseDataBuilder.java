@@ -1,14 +1,13 @@
 package unit731.hunspeller.languages.builders;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.vec.CorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.DictionaryBaseDataVEC;
 
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DictionaryBaseDataBuilder{
+
+	private DictionaryBaseDataBuilder(){}
 
 	public static DictionaryBaseData getDictionaryBaseData(String language){
 		DictionaryBaseData checker;

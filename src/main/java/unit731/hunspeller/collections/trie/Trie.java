@@ -8,8 +8,6 @@ import java.util.Stack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
 
 
@@ -22,7 +20,6 @@ import unit731.hunspeller.collections.trie.sequencers.TrieSequencerInterface;
  * @param <H>	The hash type (used to find a particular child).
  * @param <V>	The value type.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Trie<S, H, V>{
 
 	/** The matching logic used for retrieving values from a Trie or for determining the existence of values given an input/key sequence */
@@ -44,6 +41,8 @@ public class Trie<S, H, V>{
 
 	private TrieSequencerInterface<S, H> sequencer;
 
+
+	private Trie(){}
 
 	public Trie(TrieSequencerInterface<S, H> sequencer){
 		this.sequencer = sequencer;

@@ -5,16 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 
 
-@Getter
-@EqualsAndHashCode(of = {}, callSuper = true)
 public class Production extends DictionaryEntry{
 
 	private List<AffixEntry> appliedRules;
@@ -55,6 +51,14 @@ public class Production extends DictionaryEntry{
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		this.compoundEntries = compoundEntries;
+	}
+
+	public List<AffixEntry> getAppliedRules(){
+		return appliedRules;
+	}
+
+	public List<DictionaryEntry> getCompoundEntries(){
+		return compoundEntries;
 	}
 
 	public void capitalizeIfContainsFlag(String forceCompoundUppercaseFlag){

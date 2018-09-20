@@ -1,10 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.dtos;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MorphologicalTag{
 
 	//default morphological fields:
@@ -23,5 +18,8 @@ public class MorphologicalTag{
 	private static final String TAG_HYPHENATION = "hy:";
 	public static final String TAG_PART = "pa:";
 	private static final String TAG_FLAG = "fl:";
-	
+
+
+	private MorphologicalTag(){}
+
 }

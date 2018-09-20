@@ -11,7 +11,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -20,8 +21,9 @@ import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
-@Slf4j
 public class SorterWorker extends WorkerBase<Void, Void>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(SorterWorker.class);
 
 	public static final String WORKER_NAME = "Sorting";
 
@@ -48,7 +50,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			log.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
 			setProgress(0);
 
 			//extract boundaries from the file (from comment to comment, or blank line)
@@ -77,14 +79,14 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 				//remove temporary files
 				chunks.forEach(File::delete);
 
-				log.info(Backbone.MARKER_APPLICATION, "File sorted");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "File sorted");
 
 				dicParser.clear();
 
 				backbone.startFileListener();
 			}
 			else
-				log.info(Backbone.MARKER_APPLICATION, "File NOT sorted");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "File NOT sorted");
 
 			setProgress(100);
 		}
@@ -92,14 +94,14 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			stopped = true;
 
 			if(e instanceof ClosedChannelException)
-				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(e);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			}
 		}
 		if(stopped)
-			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}

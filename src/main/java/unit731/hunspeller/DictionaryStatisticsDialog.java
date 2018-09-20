@@ -33,7 +33,6 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
@@ -41,6 +40,8 @@ import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
@@ -49,8 +50,9 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
-@Slf4j
 public class DictionaryStatisticsDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
 
 	private static final long serialVersionUID = 5762751368059394067l;
 
@@ -328,7 +330,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				exportToFile(outputFile);
 			}
 			catch(Exception e){
-				log.error("Cannot export statistics", e);
+				LOGGER.error("Cannot export statistics", e);
 			}
 
 			exportButton.setEnabled(true);
@@ -523,7 +525,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -554,7 +556,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}

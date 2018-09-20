@@ -21,8 +21,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,14 +58,16 @@ public class AffixParser extends ReadWriteLockable{
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
 
-	@AllArgsConstructor
 	private static enum AliasesType{
 		FLAG(AffixTag.ALIASES_FLAG),
 		MORPHOLOGICAL_FIELD(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
 
-		@Getter
 		private final AffixTag flag;
+
+		AliasesType(AffixTag flag){
+			this.flag = flag;
+		}
 
 		public static AliasesType toEnum(String flag){
 			AliasesType[] types = AliasesType.values();
@@ -76,17 +76,24 @@ public class AffixParser extends ReadWriteLockable{
 					return type;
 			return null;
 		}
+
+		public AffixTag getFlag(){
+			return flag;
+		}
+
 	}
 
-	@AllArgsConstructor
 	private static enum ConversionTableType{
 		REPLACEMENT(AffixTag.REPLACEMENT_TABLE),
 		INPUT(AffixTag.INPUT_CONVERSION_TABLE),
 		OUTPUT(AffixTag.OUTPUT_CONVERSION_TABLE);
 
 
-		@Getter
 		private final AffixTag flag;
+
+		ConversionTableType(AffixTag flag){
+			this.flag = flag;
+		}
 
 		public static ConversionTableType toEnum(String flag){
 			ConversionTableType[] types = ConversionTableType.values();
@@ -95,6 +102,11 @@ public class AffixParser extends ReadWriteLockable{
 					return type;
 			return null;
 		}
+
+		public AffixTag getFlag(){
+			return flag;
+		}
+
 	}
 
 

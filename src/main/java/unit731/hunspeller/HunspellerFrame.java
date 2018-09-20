@@ -53,8 +53,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.CompoundTableModel;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
@@ -102,8 +103,9 @@ import unit731.hunspeller.services.RecentItems;
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  */
-@Slf4j
 public class HunspellerFrame extends JFrame implements ActionListener, PropertyChangeListener, Hunspellable, Undoable{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HunspellerFrame.class);
 
 	private static final long serialVersionUID = 6772959670167531135L;
 
@@ -523,7 +525,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                         backbone.storeThesaurusFiles();
                      }
                      catch(IllegalArgumentException | IOException ex){
-                        log.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(ex));
+                        LOGGER.info(Backbone.MARKER_APPLICATION, unit731.hunspeller.services.ExceptionHelper.getMessage(ex));
                      }
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
@@ -1048,7 +1050,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				frame.totalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
 			catch(IllegalArgumentException e){
-				log.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else{
@@ -1089,7 +1091,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicDialog.setVisible(true);
 		}
 		catch(IOException e){
-			log.error("Something very bad happend while sorting the dictionary", e);
+			LOGGER.error("Something very bad happend while sorting the dictionary", e);
 		}
 
 		dicSortDictionaryMenuItem.setEnabled(true);
@@ -1174,7 +1176,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(Throwable t){
 			String message = ExceptionHelper.getMessage(t);
-			log.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
 		}
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
@@ -1226,7 +1228,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(Exception e){
 			String message = ExceptionHelper.getMessage(e);
-			log.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Deletion error: {}", message);
 		}
 	}
 
@@ -1239,7 +1241,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		}
 		catch(IOException e){
-			log.error("Something very bad happend while undoing changes to the thesaurus file", e);
+			LOGGER.error("Something very bad happend while undoing changes to the thesaurus file", e);
 		}
    }//GEN-LAST:event_theUndoButtonActionPerformed
 
@@ -1252,7 +1254,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 		}
 		catch(IOException e){
-			log.error("Something very bad happend while redoing changes to the thesaurus file", e);
+			LOGGER.error("Something very bad happend while redoing changes to the thesaurus file", e);
 		}
    }//GEN-LAST:event_theRedoButtonActionPerformed
 
@@ -1285,13 +1287,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				hypAddRuleSyllabesCountOutputLabel.setText(null);
 			}
 			catch(IOException e){
-				log.error("Something very bad happend while adding a rule to the hyphenation file", e);
+				LOGGER.error("Something very bad happend while adding a rule to the hyphenation file", e);
 			}
 		}
 		else{
 			hypAddRuleTextField.requestFocusInWindow();
 
-			log.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
@@ -1308,7 +1310,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			extractWordCount();
 		}
 		catch(Exception e){
-			log.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
+			LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
 
@@ -1336,7 +1338,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 			catch(IllegalArgumentException e){
-				log.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
 			}
 		}
 		else
@@ -1362,7 +1364,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
 
 					dicCorrectnessWorker = null;
 				}
@@ -1378,7 +1380,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					dicExtractDuplicatesMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
 
 					dicDuplicatesWorker = null;
 				}
@@ -1394,7 +1396,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					dicWordCountMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
 
 					dicWordCountWorker = null;
 				}
@@ -1413,7 +1415,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					else
 						disStatisticsNoHyphenationMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
 
 					dicStatisticsWorker = null;
 				}
@@ -1429,7 +1431,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					dicExtractWordlistMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
 
 					dicWordlistWorker = null;
 				}
@@ -1444,7 +1446,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					compoundRulesExtractorWorker.cancel();
 
 					dicSortDictionaryMenuItem.setEnabled(true);
-					log.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -1466,9 +1468,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			backbone.startFileListener();
 		}
 		catch(IOException e){
-			log.error(Backbone.MARKER_APPLICATION, "Cannot start file listener");
+			LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot start file listener");
 
-			log.error("Cannot start file listener", e);
+			LOGGER.error("Cannot start file listener", e);
 		}
 	}
 
@@ -1550,15 +1552,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 		}
 		catch(FileNotFoundException e){
-			log.info(Backbone.MARKER_APPLICATION, "The file does not exists");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "The file does not exists");
 		}
 		catch(IllegalArgumentException e){
-			log.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
+			LOGGER.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
 		catch(Exception e){
-			log.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));
+			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));
 
-			log.error("A bad error occurred", e);
+			LOGGER.error("A bad error occurred", e);
 		}
 	}
 
@@ -1929,7 +1931,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 
 		//create and display the form

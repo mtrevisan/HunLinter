@@ -22,15 +22,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @see <a href="https://gist.github.com/hindol-viz/394ebc553673e2cd0699">Hindol viz</a>
  * @see <a href="https://github.com/Hindol/commons">Hindol commons</a>
  */
-@Slf4j
 public class FileListenerManager implements FileListener, Runnable{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FileListenerManager.class);
 
 	private static final String ASTERISK = "*";
 
@@ -80,7 +82,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			File fil = dir.toFile();
 			//create directory if it doesn't exists
 			if(!fil.exists() && !fil.mkdirs()){
-				log.error("Exception while creating directory {}", dir);
+				LOGGER.error("Exception while creating directory {}", dir);
 
 				continue;
 			}
@@ -92,7 +94,7 @@ public class FileListenerManager implements FileListener, Runnable{
 					watchKeyToDirPath.put(key, dir);
 				}
 				catch(IOException e){
-					log.error("Exception while watching {}", dir, e);
+					LOGGER.error("Exception while watching {}", dir, e);
 				}
 			}
 			dirPathToListeners.computeIfAbsent(dir, key -> newConcurrentSet())
@@ -133,7 +135,7 @@ public class FileListenerManager implements FileListener, Runnable{
 
 				Path dir = getDirPath(key);
 				if(dir == null){
-					log.warn("Watch key not recognized");
+					LOGGER.warn("Watch key not recognized");
 
 					continue;
 				}
@@ -145,7 +147,7 @@ public class FileListenerManager implements FileListener, Runnable{
 				if(!valid){
 					watchKeyToDirPath.remove(key);
 
-					log.warn("'{}' is inaccessible, stopping watch", dir);
+					LOGGER.warn("'{}' is inaccessible, stopping watch", dir);
 
 					if(watchKeyToDirPath.isEmpty())
 						break;
@@ -156,7 +158,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			}
 		}
 
-		log.info("Stopping file watcher service");
+		LOGGER.info("Stopping file watcher service");
 	}
 
 	private WatchService createWatcher() throws RuntimeException{

@@ -195,12 +195,12 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
 		);
 		Assert.assertEquals(expected, words);
 	}

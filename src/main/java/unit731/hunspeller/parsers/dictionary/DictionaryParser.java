@@ -17,17 +17,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
 
-@Slf4j
-@Getter
 public class DictionaryParser{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryParser.class);
 
 	private static final Matcher REGEX_COMMENT = PatternHelper.matcher("(^\\s*|\\s+)[#\\/].*$");
 
@@ -64,6 +64,25 @@ public class DictionaryParser{
 		this.charset = charset;
 	}
 
+	public File getDicFile(){
+		return dicFile;
+	}
+
+	public String getLanguage(){
+		return language;
+	}
+
+	public Charset getCharset(){
+		return charset;
+	}
+
+	public ExternalSorter getSorter(){
+		return sorter;
+	}
+
+	public NavigableMap<Integer, Integer> getBoundaries(){
+		return boundaries;
+	}
 
 	//sorter worker
 	public final Map.Entry<Integer, Integer> getBoundary(int lineIndex){
@@ -138,7 +157,7 @@ public class DictionaryParser{
 					boundaries.put(startSection, lineIndex - 1);
 			}
 			catch(IOException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		}
 	}

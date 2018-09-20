@@ -18,7 +18,8 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -26,8 +27,9 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
  * @see <a href="https://pixabay.com/en/tree-kahl-winter-aesthetic-530324/">Tree logo</a>
  * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version informations into your apps with maven</a>
  */
-@Slf4j
 public class HelpDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HelpDialog.class);
 
 	private static final long serialVersionUID = -9151942201399886892L;
 
@@ -206,7 +208,7 @@ public class HelpDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -224,7 +226,7 @@ public class HelpDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}

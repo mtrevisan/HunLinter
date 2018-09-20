@@ -4,28 +4,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import lombok.AllArgsConstructor;
-import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 
 /**
  * The {@code NFA} class provides a data type for creating a <em>Nondeterministic Finite state Automaton</em> (NFA) from a regular
  * expression and testing whether a given string is matched by that regular expression.
- * <p>
- * It supports the following operations: <em>concatenation</em> <em>closure</em>, <em>binary or</em>, and <em>parentheses</em>.
- * It does not support <em>mutiway or</em>, <em>character classes</em>, <em>metacharacters</em> (either in the text or pattern),
- * <em>capturing capabilities</em>, <em>greedy</em> or <em>relucantant</em> modifiers, and other features in industrial-strength implementations
- * such as {@link java.util.regex.Pattern} and {@link java.util.regex.Matcher}.
- * <p>
- * This implementation builds the NFA using a digraph and a stack and simulates the NFA using digraph search (see the textbook for details).
- * The constructor takes time proportional to <em>m</em>, where <em>m</em> is the number of characters in the regular expression.
- * <p>
- * The <em>recognizes</em> method takes time proportional to <em>m n</em>, where <em>n</em> is the number of characters in the text.
- * <p>
- * For additional documentation, see <a href="https://algs4.cs.princeton.edu/54regexp">Section 5.4</a> of
- * <i>Algorithms, 4th Edition</i> by Robert Sedgewick and Kevin Wayne.
  * 
  * @see <a href="https://algs4.cs.princeton.edu/54regexp/NFA.java.html">NFA.java</a>
  * @see <a href="https://algs4.cs.princeton.edu/lectures/54RegularExpressions.pdf">Algorithms - Robert Sedgewick, Kevin Wayne</a>
@@ -33,13 +19,17 @@ import org.apache.commons.lang3.tuple.Pair;
  * @see <a href="https://pdfs.semanticscholar.org/presentation/e14c/b69f0feb2856734a5e5e85b6ae1a210ab936.pdf">Automata & Languages</a>
  * @see <a href="http://www.dfki.de/compling/pdfs/SS06-fsa-presentation.pdf">Finite-State Automata and Algorithms</a>
  */
-@ToString
 public class HunspellRegexWordGenerator{
 
-	@AllArgsConstructor
 	private static class GeneratedElement{
 		private final List<String> word;
 		private final int stateIndex;
+
+		GeneratedElement(List<String> word, int stateIndex){
+			this.word = word;
+			this.stateIndex = stateIndex;
+		}
+
 	}
 
 
@@ -132,6 +122,14 @@ public class HunspellRegexWordGenerator{
 		}
 
 		return matchedWords;
+	}
+
+	@Override
+	public String toString(){
+		return new ToStringBuilder(this)
+			.append("graph", graph)
+			.append("finalStateIndex", finalStateIndex)
+			.toString();
 	}
 
 }

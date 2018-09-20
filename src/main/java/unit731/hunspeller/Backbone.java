@@ -14,10 +14,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.Deflater;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
@@ -38,8 +38,9 @@ import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
 
-@Slf4j
 public class Backbone implements FileChangeListener{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Backbone.class);
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 
@@ -61,23 +62,15 @@ public class Backbone implements FileChangeListener{
 
 	private File affFile;
 
-	@Getter
 	private final AffixParser affParser;
-	@Getter
 	private final AidParser aidParser;
-	@Getter
 	private DictionaryParser dicParser;
-	@Getter
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
-	@Getter
 	private AbstractHyphenator hyphenator;
-	@Getter
 	private DictionaryBaseData dictionaryBaseData;
-	@Getter
 	private CorrectnessChecker checker;
-	@Getter
 	private WordGenerator wordGenerator;
 
 	private final Hunspellable hunspellable;
@@ -91,6 +84,38 @@ public class Backbone implements FileChangeListener{
 
 		this.hunspellable = hunspellable;
 		flm = new FileListenerManager();
+	}
+
+	public AffixParser getAffParser(){
+		return affParser;
+	}
+
+	public AidParser getAidParser(){
+		return aidParser;
+	}
+
+	public DictionaryParser getDicParser(){
+		return dicParser;
+	}
+
+	public ThesaurusParser getTheParser(){
+		return theParser;
+	}
+
+	public AbstractHyphenator getHyphenator(){
+		return hyphenator;
+	}
+
+	public DictionaryBaseData getDictionaryBaseData(){
+		return dictionaryBaseData;
+	}
+
+	public CorrectnessChecker getChecker(){
+		return checker;
+	}
+
+	public WordGenerator getWordGenerator(){
+		return wordGenerator;
 	}
 
 	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
@@ -165,16 +190,16 @@ public class Backbone implements FileChangeListener{
 			throw new FileNotFoundException("The file does not exists");
 		}
 
-		log.info(MARKER_APPLICATION, "Opening Affix file for parsing: {}", affFile.getName());
+		LOGGER.info(MARKER_APPLICATION, "Opening Affix file for parsing: {}", affFile.getName());
 
 		affParser.parse(affFile);
 
-		log.info(MARKER_APPLICATION, "Finished reading Affix file");
+		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
 	private void openHyphenationFile(File hypFile) throws IOException{
 		if(hypFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
 
 			hypParser = new HyphenationParser(affParser.getLanguage());
 			hypParser.parse(hypFile);
@@ -184,7 +209,7 @@ public class Backbone implements FileChangeListener{
 			if(hunspellable != null)
 				hunspellable.clearHyphenationParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
 		}
 		else if(hypParser != null)
 			hypParser.clear();
@@ -208,14 +233,14 @@ public class Backbone implements FileChangeListener{
 
 	private void openAidFile(File aidFile) throws IOException{
 		if(aidFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Aid file for parsing: {}", aidFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Aid file for parsing: {}", aidFile.getName());
 
 			aidParser.parse(aidFile);
 
 			if(hunspellable != null)
 				hunspellable.clearAidParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Aid file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Aid file");
 		}
 		else
 			aidParser.clear();
@@ -223,14 +248,14 @@ public class Backbone implements FileChangeListener{
 
 	private void openThesaurusFile(File theFile) throws IOException{
 		if(theFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Thesaurus file for parsing: {}", theFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file for parsing: {}", theFile.getName());
 
 			theParser.parse(theFile);
 
 			if(hunspellable != null)
 				hunspellable.clearThesaurusParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
 		}
 		else
 			theParser.clear();
@@ -284,7 +309,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(Path path){
-		log.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
+		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
 		String absolutePath = affFile.getParent() + File.separator + path.toString();
 		if(hasAFFExtension(absolutePath)){
@@ -303,7 +328,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
+		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
 			hunspellable.loadFileInternal(affFile.getAbsolutePath());
@@ -334,22 +359,22 @@ public class Backbone implements FileChangeListener{
 
 		//package entire folder with ZIP
 		if(basePath != null){
-			log.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
 
 			try{
 				String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
 				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
-				log.info(Backbone.MARKER_APPLICATION, "Package created");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
 				//open directory
 				if(Desktop.isDesktopSupported())
 					Desktop.getDesktop().open(new File(basePath.toString()));
 			}
 			catch(IOException e){
-				log.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
-				log.error("Something very bad happend while creating package", e);
+				LOGGER.error("Something very bad happend while creating package", e);
 			}
 		}
 	}

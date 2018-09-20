@@ -9,11 +9,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -21,7 +20,6 @@ import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
 	private static final int PARAM_CONDITION = 1;
@@ -36,14 +34,16 @@ public class AffixEntry{
 	private static final String ZERO = "0";
 
 
-	@AllArgsConstructor
 	public static enum Type{
 		SUFFIX(AffixTag.SUFFIX),
 		PREFIX(AffixTag.PREFIX);
 
 
-		@Getter
 		private final AffixTag flag;
+
+		Type(AffixTag flag){
+			this.flag = flag;
+		}
 
 		public static Type toEnum(String flag){
 			Type[] types = Type.values();
@@ -52,17 +52,19 @@ public class AffixEntry{
 					return type;
 			return null;
 		}
+
+		public AffixTag getFlag(){
+			return flag;
+		}
+
 	}
 
 
-	@Getter
 	private final Type type;
 	/** ID used to represent the affix */
-	@Getter
 	private final String flag;
 	private final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
-	@Getter
 	private final AffixCondition condition;
 	/** string to strip */
 	private final String removing;
@@ -118,6 +120,18 @@ public class AffixEntry{
 		}
 
 		entry = PatternHelper.clear(line, MATCHER_ENTRY);
+	}
+
+	public Type getType(){
+		return type;
+	}
+
+	public String getFlag(){
+		return flag;
+	}
+
+	public AffixCondition getCondition(){
+		return condition;
 	}
 
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
@@ -225,6 +239,28 @@ public class AffixEntry{
 	@Override
 	public String toString(){
 		return entry;
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if(obj.getClass() != getClass())
+			return false;
+
+		AffixEntry rhs = (AffixEntry)obj;
+		return new EqualsBuilder()
+			.append(entry, rhs.entry)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(entry)
+			.toHashCode();
 	}
 
 }

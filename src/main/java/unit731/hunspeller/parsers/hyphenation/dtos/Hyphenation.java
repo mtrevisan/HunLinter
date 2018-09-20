@@ -1,34 +1,52 @@
 package unit731.hunspeller.parsers.hyphenation.dtos;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 
 
-@AllArgsConstructor
-@EqualsAndHashCode(of = {"syllabes", "breakCharacter"})
 public class Hyphenation{
 
-	@NonNull
-	@Getter
 	private final List<String> syllabes;
-	@NonNull
-	@Getter
 	private final List<String> compounds;
-	@NonNull
-	@Getter
 	private final List<String> rules;
-	@NonNull
 	private final boolean[] errors;
-	@NonNull
-	@Getter
 	private final String breakCharacter;
 
+
+	public Hyphenation(List<String> syllabes, List<String> compounds, List<String> rules, boolean[] errors, String breakCharacter){
+		Objects.requireNonNull(syllabes);
+		Objects.requireNonNull(compounds);
+		Objects.requireNonNull(rules);
+		Objects.requireNonNull(errors);
+		Objects.requireNonNull(breakCharacter);
+
+		this.syllabes = syllabes;
+		this.compounds = compounds;
+		this.rules = rules;
+		this.errors = errors;
+		this.breakCharacter = breakCharacter;
+	}
+
+	public List<String> getSyllabes(){
+		return syllabes;
+	}
+
+	public List<String> getCompounds(){
+		return compounds;
+	}
+
+	public List<String> getRules(){
+		return rules;
+	}
+
+	public String getBreakCharacter(){
+		return breakCharacter;
+	}
 
 	/**
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
@@ -103,6 +121,30 @@ public class Hyphenation{
 	public String toString(){
 		return formatHyphenation(new StringJoiner(HyphenationParser.SOFT_HYPHEN), Function.identity())
 			.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null)
+			return false;
+		if(obj == this)
+			return true;
+		if(obj.getClass() != getClass())
+			return false;
+
+		Hyphenation rhs = (Hyphenation)obj;
+		return new EqualsBuilder()
+			.append(syllabes, rhs.syllabes)
+			.append(breakCharacter, rhs.breakCharacter)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(syllabes)
+			.append(breakCharacter)
+			.toHashCode();
 	}
 
 }

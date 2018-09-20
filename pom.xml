@@ -30,42 +30,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.0</version>
 			</plugin>-->
-			<!-- Maven JavaDoc Plugin -->
-			<!-- FIXME -->
-<!--			<plugin>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok-maven-plugin</artifactId>
-				<version>1.18.0.0</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>delombok</goal>
-						</goals>
-						<configuration>
-							<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-							<outputDirectory>${delombok.output}</outputDirectory>
-							<addOutputDirectory>false</addOutputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<sourcepath>${delombok.output}</sourcepath>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
 			<!-- Maven Deploy Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -138,7 +102,6 @@
 								<exclude>changelog.txt</exclude>
 								<exclude>latestchanges.html</exclude>
 								<exclude>release-timestamp.txt</exclude>
-								<exclude>module-info.SCL.lombok</exclude>
 								<exclude>.netbeans_automatic_build</exclude>
 								<exclude>META-INF/LICENSE</exclude>
 								<exclude>META-INF/LICENSE.txt</exclude>
@@ -169,8 +132,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>10</maven.compiler.source>
+		<maven.compiler.target>10</maven.compiler.target>
 
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -186,9 +149,6 @@
 
 		<!-- Murmur3 Hash -->
 		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
-
-		<!-- Lombok -->
-		<org.projectlombok.version>1.18.2</org.projectlombok.version>
 
 		<!-- Jackson -->
 		<com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
@@ -240,13 +200,6 @@
 			<groupId>com.sangupta</groupId>
 			<artifactId>murmur</artifactId>
 			<version>${com.sangupta.murmur.version}</version>
-		</dependency>
-
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${org.projectlombok.version}</version>
 		</dependency>
 
 		<!-- Jackson -->

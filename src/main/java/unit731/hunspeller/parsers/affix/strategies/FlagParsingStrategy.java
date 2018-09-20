@@ -1,15 +1,11 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
 
-	@AllArgsConstructor
-	@Getter
 	static enum Type{
 		ASCII(null, new ASCIIParsingStrategy()),
 		UTF_8("UTF-8", new UTF8ParsingStrategy()),
@@ -18,6 +14,11 @@ public interface FlagParsingStrategy{
 
 		private final String code;
 		private final FlagParsingStrategy stategy;
+
+		Type(String code, FlagParsingStrategy stategy){
+			this.code = code;
+			this.stategy = stategy;
+		}
 
 		public static Type toEnum(String flag){
 			Type type = ASCII;
@@ -31,6 +32,15 @@ public interface FlagParsingStrategy{
 			}
 			return type;
 		}
+
+		public String getCode(){
+			return code;
+		}
+
+		public FlagParsingStrategy getStategy(){
+			return stategy;
+		}
+
 	};
 
 

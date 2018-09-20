@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
@@ -31,8 +32,9 @@ import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.TimeWatch;
 
 
-@Slf4j
 public class DuplicatesWorker extends WorkerBase<Void, Void>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
 	public static final String WORKER_NAME = "Duplications extraction";
 
@@ -68,7 +70,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	protected Void doInBackground() throws Exception{
 		boolean stopped = false;
 		try{
-			log.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
 
 			watch = TimeWatch.start();
 
@@ -80,14 +82,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			watch.stop();
 
-			log.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes {})", watch.toStringMinuteSeconds());
 
 			if(!duplicates.isEmpty()){
 				try{
 					FileHelper.openFileWithChoosenEditor(outputFile);
 				}
 				catch(IOException | InterruptedException e){
-					log.warn("Exception while opening the resulting file", e);
+					LOGGER.warn("Exception while opening the resulting file", e);
 				}
 			}
 		}
@@ -95,14 +97,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			stopped = true;
 
 			if(t instanceof ClosedChannelException)
-				log.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
-				log.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 		}
 		if(stopped)
-			log.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}
@@ -140,7 +142,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							.forEach(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						log.error(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
+						LOGGER.error(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
 
@@ -152,8 +154,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		int totalProductions = bloomFilter.getAddedElements();
 		double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 		int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
-		log.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-		log.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+		LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		bloomFilter.close();
@@ -166,7 +168,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			log.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
 			File dicFile = dicParser.getDicFile();
@@ -196,7 +198,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							}
 						}
 						catch(IllegalArgumentException e){
-							log.warn(Backbone.MARKER_APPLICATION, e.getMessage());
+							LOGGER.warn(Backbone.MARKER_APPLICATION, e.getMessage());
 						}
 					}
 
@@ -207,8 +209,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-			log.info(Backbone.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			log.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
+			LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
 			duplicatesBloomFilter.close();
@@ -217,7 +219,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
-			log.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining passes");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining passes");
 
 		return result;
 	}
@@ -225,7 +227,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
 		int totalSize = duplicates.size();
 		if(totalSize > 0){
-			log.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
 			setProgress(0);
 
 			int writtenSoFar = 0;
@@ -249,7 +251,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 			setProgress(100);
 
-			log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		}
 	}
 

@@ -3,15 +3,12 @@ package unit731.hunspeller.languages.vec;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrthographyVEC extends Orthography{
 
 	private static final String[] STRESS_CODES = new String[]{"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "o/", "u/", "u\\", "ù"};
@@ -44,6 +41,8 @@ public class OrthographyVEC extends Orthography{
 		private static final Orthography INSTANCE = new OrthographyVEC();
 	}
 
+
+	private OrthographyVEC(){}
 
 	public static synchronized Orthography getInstance(){
 		return SingletonHelper.INSTANCE;
