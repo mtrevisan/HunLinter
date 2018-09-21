@@ -191,19 +191,7 @@ public class WordGenerator{
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		//generate compounds:
-		List<List<List<Production>>> entries = new ArrayList<>();
-		for(List<String> permutation : permutations){
-			//expand permutation
-			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(String flag : permutation)
-				expandedPermutationEntries.add(inputs.get(flag).stream()
-					.map(entry -> applyAffixRules(entry, true))
-					.flatMap(List::stream)
-					.collect(Collectors.toList()));
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-				entries.add(expandedPermutationEntries);
-		}
+		List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -273,17 +261,7 @@ public class WordGenerator{
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
 		List<int[]> permutations = perm.permutations(limit);
 
-		//generate compounds:
-		List<List<List<Production>>> entries = new ArrayList<>();
-		for(int[] permutation : permutations){
-			//expand permutation
-			List<List<Production>> expandedPermutationEntries = Arrays.stream(permutation)
-				.mapToObj(inputs::get)
-				.map(entry -> applyAffixRules(entry, true))
-				.collect(Collectors.toList());
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-				entries.add(expandedPermutationEntries);
-		}
+		List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
@@ -303,6 +281,48 @@ public class WordGenerator{
 				result.add(dicEntry);
 		}
 		return result;
+	}
+
+	private List<List<List<Production>>> generateCompounds(List<List<String>> permutations, Map<String, Set<DictionaryEntry>> inputs){
+		List<List<List<Production>>> entries = new ArrayList<>();
+		Map<String, List<Production>> dicEntries = new HashMap<>();
+		for(List<String> permutation : permutations){
+			//expand permutation
+			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+			for(String flag : permutation){
+				if(!dicEntries.containsKey(flag)){
+					Set<DictionaryEntry> input = inputs.get(flag);
+					dicEntries.put(flag, input.stream()
+						.map(entry -> applyAffixRules(entry, true))
+						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
+						.flatMap(List::stream)
+						.collect(Collectors.toList()));
+				}
+				expandedPermutationEntries.add(dicEntries.get(flag));
+			}
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+				entries.add(expandedPermutationEntries);
+		}
+		return entries;
+	}
+
+	private List<List<List<Production>>> generateCompounds(List<int[]> permutations, List<DictionaryEntry> inputs){
+		List<List<List<Production>>> entries = new ArrayList<>();
+		Map<Integer, List<Production>> dicEntries = new HashMap<>();
+		for(int[] permutation : permutations){
+			//expand permutation
+			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+			for(int index : permutation){
+				if(!dicEntries.containsKey(index)){
+					DictionaryEntry input = inputs.get(index);
+					dicEntries.put(index, applyAffixRules(input, true));
+				}
+				expandedPermutationEntries.add(dicEntries.get(index));
+			}
+			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+				entries.add(expandedPermutationEntries);
+		}
+		return entries;
 	}
 
 	private List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException, NoApplicableRuleException{
@@ -520,21 +540,7 @@ public class WordGenerator{
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		//generate compounds:
-		List<List<List<Production>>> entries = new ArrayList<>();
-		for(List<String> permutation : permutations){
-			//expand permutation
-			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(String flag : permutation)
-				expandedPermutationEntries.add(inputs.get(flag).stream()
-					.map(entry -> applyAffixRules(entry, true))
-//FIXME
-					.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
-					.flatMap(List::stream)
-					.collect(Collectors.toList()));
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
-				entries.add(expandedPermutationEntries);
-		}
+		List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
