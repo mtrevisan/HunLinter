@@ -384,10 +384,10 @@ public class WordGenerator{
 							char nextChar = nextCompound.charAt(0);
 							if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
 								Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
-								if(collisions != null && collisions.contains(nextWord)){
-									sb.setLength(0);
-									break;
-								}
+								//convert nextChar to lowercase/uppercase and go on
+								if(collisions != null && collisions.contains(nextWord))
+									nextCompound = (Character.isUpperCase(lastChar)? StringUtils.capitalize(nextCompound):
+										StringUtils.uncapitalize(nextCompound));
 							}
 
 							lastWordCasing = nextWord;
