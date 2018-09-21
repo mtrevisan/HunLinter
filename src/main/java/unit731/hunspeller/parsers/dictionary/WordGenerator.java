@@ -109,7 +109,7 @@ public class WordGenerator{
 
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
-		if(LOGGER.isDebugEnabled()){
+		if(LOGGER.isDebugEnabled() && !onefoldProductions.isEmpty()){
 			LOGGER.debug("Suffix productions:");
 			onefoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
 		}
@@ -298,9 +298,11 @@ public class WordGenerator{
 						.flatMap(List::stream)
 						.collect(Collectors.toList()));
 				}
-				expandedPermutationEntries.add(dicEntries.get(flag));
+				List<Production> de = dicEntries.get(flag);
+				if(!de.isEmpty())
+					expandedPermutationEntries.add(de);
 			}
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+			if(!expandedPermutationEntries.isEmpty())
 				entries.add(expandedPermutationEntries);
 		}
 		return entries;
@@ -317,9 +319,11 @@ public class WordGenerator{
 					DictionaryEntry input = inputs.get(index);
 					dicEntries.put(index, applyAffixRules(input, true));
 				}
-				expandedPermutationEntries.add(dicEntries.get(index));
+				List<Production> de = dicEntries.get(index);
+				if(!de.isEmpty())
+					expandedPermutationEntries.add(de);
 			}
-			if(!expandedPermutationEntries.stream().anyMatch(List::isEmpty))
+			if(!expandedPermutationEntries.isEmpty())
 				entries.add(expandedPermutationEntries);
 		}
 		return entries;
