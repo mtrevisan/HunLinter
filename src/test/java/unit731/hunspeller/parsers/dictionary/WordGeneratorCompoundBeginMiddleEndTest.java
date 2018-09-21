@@ -67,7 +67,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 33);
 words.forEach(System.out::println);
 
-//good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern,
+//good: Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern,
 //			Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit,
 //			Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
 //bad: computer, computern, arbeit, Arbeits, arbeits, ComputerArbeit, ComputernArbeit, Computernarbeit, ComputerArbeits, Arbeitcomputer,
