@@ -184,10 +184,10 @@ public class WordGenerator{
 		Map<String, Set<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
 		String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
+
 		checkCompoundRuleInputCorrectness(inputs, compoundRuleComponents);
 
-		String[] compRule = strategy.extractCompoundRule(compoundRule);
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compRule);
+		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRuleComponents);
 		//generate all the words that matches the given regex
 		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
@@ -258,6 +258,10 @@ public class WordGenerator{
 		//extract list of dictionary entries
 		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 
+		//check if it's possible to compound some words
+		if(inputs.isEmpty())
+			return Collections.<Production>emptyList();
+
 		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
 		List<int[]> permutations = perm.permutations(limit);
 
@@ -286,6 +290,7 @@ public class WordGenerator{
 	private List<List<List<Production>>> generateCompounds(List<List<String>> permutations, Map<String, Set<DictionaryEntry>> inputs){
 		List<List<List<Production>>> entries = new ArrayList<>();
 		Map<String, List<Production>> dicEntries = new HashMap<>();
+		outer:
 		for(List<String> permutation : permutations){
 			//expand permutation
 			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
@@ -301,6 +306,11 @@ public class WordGenerator{
 				List<Production> de = dicEntries.get(flag);
 				if(!de.isEmpty())
 					expandedPermutationEntries.add(de);
+				else{
+					//it is not possible to compound some words, return empty list
+					entries.clear();
+					break outer;
+				}
 			}
 			if(!expandedPermutationEntries.isEmpty())
 				entries.add(expandedPermutationEntries);
