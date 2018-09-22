@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.awt.Frame;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -59,6 +60,11 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			}
 		};
 		Runnable done = () -> {
+			try{
+				dicStatistics.close();
+			}
+			catch(IOException e){}
+
 			if(!isCancelled()){
 				//show statistics window
 				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);

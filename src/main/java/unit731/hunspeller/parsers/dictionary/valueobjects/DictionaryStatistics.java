@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +21,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 /**
  * @see <a href="https://home.ubalt.edu/ntsbarsh/Business-stat/otherapplets/PoissonTest.htm">Goodness-of-Fit for Poisson</a>
  */
-public class DictionaryStatistics{
+public class DictionaryStatistics implements Closeable{
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
@@ -168,6 +170,11 @@ public class DictionaryStatistics{
 		return syllabesFrequencies.getMostCommonValues(size).stream()
 			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void close() throws IOException{
+		bloomFilter.close();
 	}
 
 	public void clear(){

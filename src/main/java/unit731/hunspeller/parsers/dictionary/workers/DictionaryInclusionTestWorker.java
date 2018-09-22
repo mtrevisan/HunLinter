@@ -39,6 +39,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 			productions.forEach(production -> dictionary.add(production.getWord()));
 		};
 		Runnable done = () -> {
+			dictionary.close();
+
 			if(!isCancelled()){
 				int totalUniqueProductions = dictionary.getAddedElements();
 				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();

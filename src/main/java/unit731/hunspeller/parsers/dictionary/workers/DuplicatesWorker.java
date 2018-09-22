@@ -148,6 +148,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 				setProgress((int)((readSoFar * 100.) / totalSize));
 			}
+
+			bloomFilter.close();
+			duplicatesBloomFilter.close();
 		}
 		setProgress(100);
 
@@ -158,7 +161,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
-		bloomFilter.close();
 		bloomFilter.clear();
 
 		return duplicatesBloomFilter;
@@ -213,7 +215,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
-			duplicatesBloomFilter.close();
 			duplicatesBloomFilter.clear();
 
 			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));

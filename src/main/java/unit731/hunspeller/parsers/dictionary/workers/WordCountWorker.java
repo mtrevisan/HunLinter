@@ -42,6 +42,8 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 				dictionary.add(production.getWord());
 		};
 		Runnable done = () -> {
+			dictionary.close();
+
 			if(!isCancelled()){
 				int totalUniqueProductions = dictionary.getAddedElements();
 				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
