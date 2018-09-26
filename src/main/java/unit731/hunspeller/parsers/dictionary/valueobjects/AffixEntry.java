@@ -82,6 +82,10 @@ public class AffixEntry{
 		Objects.requireNonNull(strategy);
 
 		String[] lineParts = StringUtils.split(line, null, 6);
+		if(lineParts.length < 4 || lineParts.length > 6)
+			throw new IllegalArgumentException("Expected an affix entry, found something else"
+				+ (lineParts.length > 0? ": " + line: StringUtils.EMPTY));
+
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
