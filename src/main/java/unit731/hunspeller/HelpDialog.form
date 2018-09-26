@@ -56,7 +56,7 @@
                   </Group>
                   <Component id="lblCopyrightOut" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblManagedOptionsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblSupportedOptionsLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -86,7 +86,7 @@
                   <Component id="lblLogo" min="-2" pref="134" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblManagedOptionsLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="lblSupportedOptionsLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="140" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -139,9 +139,9 @@
         <Property name="horizontalAlignment" type="int" value="0"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblManagedOptionsLabel">
+    <Component class="javax.swing.JLabel" name="lblSupportedOptionsLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Managed options:"/>
+        <Property name="text" type="java.lang.String" value="Supported options:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">

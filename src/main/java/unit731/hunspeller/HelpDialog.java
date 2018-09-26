@@ -92,7 +92,7 @@ public class HelpDialog extends JDialog{
       lblCopyrightOut = new javax.swing.JLabel();
       lblProductNameOut = new javax.swing.JLabel();
       lblLogo = new javax.swing.JLabel();
-      lblManagedOptionsLabel = new javax.swing.JLabel();
+      lblSupportedOptionsLabel = new javax.swing.JLabel();
       jScrollPane1 = new javax.swing.JScrollPane();
       lblManagedOptionsTextArea = new javax.swing.JTextArea();
 
@@ -115,7 +115,7 @@ public class HelpDialog extends JDialog{
 
       lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-      lblManagedOptionsLabel.setText("Managed options:");
+      lblSupportedOptionsLabel.setText("Supported options:");
 
       jScrollPane1.setEnabled(false);
 
@@ -153,7 +153,7 @@ public class HelpDialog extends JDialog{
                   .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                .addComponent(lblCopyrightOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                  .addComponent(lblManagedOptionsLabel)
+                  .addComponent(lblSupportedOptionsLabel)
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -175,7 +175,7 @@ public class HelpDialog extends JDialog{
                   .addGap(75, 75, 75))
                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(lblManagedOptionsLabel)
+            .addComponent(lblSupportedOptionsLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
@@ -235,12 +235,12 @@ public class HelpDialog extends JDialog{
    private javax.swing.JScrollPane jScrollPane1;
    private javax.swing.JLabel lblCopyrightOut;
    private javax.swing.JLabel lblLogo;
-   private javax.swing.JLabel lblManagedOptionsLabel;
    private javax.swing.JTextArea lblManagedOptionsTextArea;
    private javax.swing.JLabel lblProductNameOut;
    private javax.swing.JLabel lblProductVersion;
    private javax.swing.JLabel lblProductVersionOut;
    private javax.swing.JLabel lblReleaseDate;
    private javax.swing.JLabel lblReleaseDateOut;
+   private javax.swing.JLabel lblSupportedOptionsLabel;
    // End of variables declaration//GEN-END:variables
 }
