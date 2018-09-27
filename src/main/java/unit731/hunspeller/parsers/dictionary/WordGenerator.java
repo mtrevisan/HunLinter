@@ -411,7 +411,7 @@ public class WordGenerator{
 					if(!continuationFlags.contains(forbiddenWordFlag)){
 						String word = sb.toString();
 						String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
-						Production p = new Production(word, flags, compoundEntries, strategy);
+						Production p = Production.createFromCompound(word, flags, compoundEntries, strategy);
 						if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 							productions.add(p);
 						else{
@@ -630,7 +630,7 @@ public class WordGenerator{
 	}
 
 	private Production getBaseProduction(DictionaryEntry dicEntry){
-		return new Production(dicEntry);
+		return Production.clone(dicEntry);
 	}
 
 	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
@@ -822,7 +822,7 @@ public class WordGenerator{
 					//produce the new word
 					String newWord = entry.applyRule(word, affParser.isFullstrip());
 
-					Production production = new Production(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
+					Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
 					if(!production.hasContinuationFlag(forbiddenWordFlag))
 						productions.add(production);
 //					if(!production.hasContinuationFlag(forbiddenWordFlag)){

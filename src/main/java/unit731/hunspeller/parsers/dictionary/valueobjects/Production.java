@@ -18,39 +18,57 @@ public class Production extends DictionaryEntry{
 	private final List<DictionaryEntry> compoundEntries;
 
 
-	/* Clone constructor */
-	public Production(DictionaryEntry dicEntry){
+	private Production(DictionaryEntry dicEntry){
 		super(dicEntry);
 
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	public Production(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry, String[] remainingContinuationFlags, boolean combineable){
-		super(word, appliedEntry.combineContinuationFlags(remainingContinuationFlags), appliedEntry.combineMorphologicalFields(dicEntry),
-			combineable);
+	private Production(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable,
+			List<AffixEntry> appliedRules, List<DictionaryEntry> compoundEntries){
+		super(word, continuationFlags, morphologicalFields, combineable);
 
-		appliedRules = new ArrayList<>(3);
-		appliedRules.add(appliedEntry);
-
-		compoundEntries = extractCompoundEntries(dicEntry);
-	}
-
-	private List<DictionaryEntry> extractCompoundEntries(DictionaryEntry dicEntry){
-		List<DictionaryEntry> entries = (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
-		return (entries != null? new ArrayList<>(entries): null);
-	}
-
-	public Production(String word, String continuationFlags, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
-		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), AffixEntry.extractMorphologicalFields(compoundEntries), true);
-
+		this.appliedRules = appliedRules;
 		this.compoundEntries = compoundEntries;
 	}
 
 	/* NOTE: used for testing purposes */
-	public Production(String word, String continuationFlags, String morphologicalFields, List<DictionaryEntry> compoundEntries, FlagParsingStrategy strategy){
-		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null), (morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
+	public Production(String word, String continuationFlags, String morphologicalFields, List<DictionaryEntry> compoundEntries,
+			FlagParsingStrategy strategy){
+		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
+			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
 
 		this.compoundEntries = compoundEntries;
+	}
+
+	public static Production clone(DictionaryEntry dicEntry){
+		return new Production(dicEntry);
+	}
+
+	public static Production createFromCompound(String word, String continuationFlags, List<DictionaryEntry> compoundEntries,
+			FlagParsingStrategy strategy){
+		String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
+		String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
+		boolean combineable = true;
+		List<AffixEntry> appliedRules = null;
+		return new Production(word, cfs, morphologicalFields, combineable,
+			appliedRules, compoundEntries);
+	}
+
+	public static Production createFromProduction(String word, AffixEntry appliedEntry, DictionaryEntry dicEntry,
+			String[] remainingContinuationFlags, boolean combineable){
+		String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+		String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
+		List<AffixEntry> appliedRules = new ArrayList<>(3);
+		appliedRules.add(appliedEntry);
+		List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
+		return new Production(word, continuationFlags, morphologicalFields, combineable,
+			appliedRules, compoundEntries);
+	}
+
+	private static List<DictionaryEntry> extractCompoundEntries(DictionaryEntry dicEntry){
+		List<DictionaryEntry> entries = (dicEntry instanceof Production? ((Production)dicEntry).compoundEntries: null);
+		return (entries != null? new ArrayList<>(entries): null);
 	}
 
 	public List<AffixEntry> getAppliedRules(){
