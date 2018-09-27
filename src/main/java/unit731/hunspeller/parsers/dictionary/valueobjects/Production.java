@@ -33,7 +33,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	/* NOTE: used for testing purposes */
-	public Production(String word, String continuationFlags, String morphologicalFields, List<DictionaryEntry> compoundEntries,
+	Production(String word, String continuationFlags, String morphologicalFields, List<DictionaryEntry> compoundEntries,
 			FlagParsingStrategy strategy){
 		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
 			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);

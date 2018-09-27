@@ -255,10 +255,7 @@ public class DictionaryEntry{
 		StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			if(strategy != null)
-				sb.append(strategy.joinFlags(continuationFlags));
-			else
-				sb.append(StringUtils.join(continuationFlags, ","));
+			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, ","));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));

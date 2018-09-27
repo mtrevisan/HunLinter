@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.valueobjects;
 
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
