@@ -51,25 +51,47 @@ public class DictionaryEntry{
 		this.combineable = combineable;
 	}
 
-	public DictionaryEntry(String line, FlagParsingStrategy strategy){
-		this(line, strategy, null, null);
+	public static DictionaryEntry createFromDictionaryLine(String line, FlagParsingStrategy strategy){
+		return createFromDictionaryLineWithAliases(line, strategy, null, null);
 	}
 
-	public DictionaryEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
-		Objects.requireNonNull(line);
+	public static DictionaryEntry createFromDictionaryLineWithAliases(String line, FlagParsingStrategy strategy, List<String> aliasesFlag,
+			List<String> aliasesMorphologicaField){
 		Objects.requireNonNull(strategy);
 
-		Matcher m = ENTRY_PATTERN.reset(line);
-		if(!m.find())
+		String word = extractWord(line);
+		String dicFlags = ENTRY_PATTERN.group(PARAM_FLAGS);
+		String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
+		String dicMorphologicalFields = ENTRY_PATTERN.group(PARAM_MORPHOLOGICAL_FIELDS);
+		String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
+		String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
+		boolean combineable = true;
+		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combineable);
+	}
+
+	private static String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
+	}
+
+	private static boolean containsStem(String[] mfs){
+		boolean containsStem = false;
+		if(mfs != null)
+			for(String mf : mfs)
+				if(mf.startsWith(MorphologicalTag.TAG_STEM)){
+					containsStem = true;
+					break;
+				}
+		return containsStem;
+	}
+
+	public static String extractWord(String line){
+		Objects.requireNonNull(line);
+
+		ENTRY_PATTERN.reset(line);
+		if(!ENTRY_PATTERN.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
-		word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-		String dicFlags = m.group(PARAM_FLAGS);
-		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
-		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word},
-			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
-		combineable = true;
+		return StringUtils.replace(ENTRY_PATTERN.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 	}
 
 	public String getWord(){
@@ -78,20 +100,6 @@ public class DictionaryEntry{
 
 	public boolean isCombineable(){
 		return combineable;
-	}
-
-	public static String extractWord(String line){
-		Objects.requireNonNull(line);
-
-		Matcher m = ENTRY_PATTERN.reset(line);
-		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
-
-		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-	}
-
-	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
 	public void applyConversionTable(Function<String, String> inputConversion){

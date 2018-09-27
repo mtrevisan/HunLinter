@@ -89,11 +89,11 @@ public class AffixEntry{
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
-		Matcher m = ENTRY_PATTERN.reset(lineParts[3]);
-		if(!m.find())
+		ENTRY_PATTERN.reset(lineParts[3]);
+		if(!ENTRY_PATTERN.find())
 			throw new IllegalArgumentException("Cannot parse affix line " + line);
-		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
-		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
+		String addition = StringUtils.replace(ENTRY_PATTERN.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
+		String continuationClasses = ENTRY_PATTERN.group(PARAM_CONTINUATION_CLASSES);
 		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 

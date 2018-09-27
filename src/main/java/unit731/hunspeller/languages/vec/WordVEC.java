@@ -128,13 +128,13 @@ public class WordVEC{
 	}
 
 	public static int getFirstVowelIndex(String word, int index){
-		Matcher m = FIRST_STRESSED_VOWEL.reset(word.substring(index));
-		return (m.find() ? m.start() + index : -1);
+		FIRST_STRESSED_VOWEL.reset(word.substring(index));
+		return (FIRST_STRESSED_VOWEL.find() ? FIRST_STRESSED_VOWEL.start() + index : -1);
 	}
 
 	public static int getLastVowelIndex(String word){
-		Matcher m = LAST_VOWEL.reset(word);
-		return (m.find() ? m.start() : -1);
+		LAST_VOWEL.reset(word);
+		return (LAST_VOWEL.find() ? LAST_VOWEL.start() : -1);
 	}
 
 	//[aeiou][^aeiou]*$

@@ -72,7 +72,7 @@ public class WordGenerator{
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
-		DictionaryEntry dicEntry = new DictionaryEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
+		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 		List<Production> productions = applyAffixRules(dicEntry, false);
@@ -205,7 +205,7 @@ public class WordGenerator{
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
-			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affParser);
@@ -277,7 +277,7 @@ public class WordGenerator{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<DictionaryEntry> result = new ArrayList<>();
 		for(String inputCompound : inputCompounds){
-			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			//filter input set by minimum length and forbidden flag
@@ -567,7 +567,7 @@ public class WordGenerator{
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
-			DictionaryEntry dicEntry = new DictionaryEntry(inputCompound, strategy);
+			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
 
 			List<Production> productions = applyAffixRules(dicEntry, false);
