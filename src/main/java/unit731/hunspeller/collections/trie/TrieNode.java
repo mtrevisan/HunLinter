@@ -164,14 +164,12 @@ public class TrieNode<S, H, V>{
 
 	@Override
 	public boolean equals(Object obj){
-		if(obj == null)
-			return false;
 		if(obj == this)
 			return true;
-		if(obj.getClass() != getClass())
+		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		TrieNode rhs = (TrieNode)obj;
+		TrieNode<?, ?, ?> rhs = (TrieNode<?, ?, ?>)obj;
 		return new EqualsBuilder()
 			.append(sequence, rhs.sequence)
 			.append(startIndex, rhs.startIndex)

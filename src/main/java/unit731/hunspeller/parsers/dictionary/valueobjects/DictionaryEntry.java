@@ -42,6 +42,16 @@ public class DictionaryEntry{
 	private final boolean combineable;
 
 
+	/* Clone constructor */
+	protected DictionaryEntry(DictionaryEntry dicEntry){
+		Objects.requireNonNull(dicEntry);
+
+		word = dicEntry.word;
+		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
+		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
+		combineable = dicEntry.combineable;
+	}
+
 	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
 		Objects.requireNonNull(word);
 
@@ -122,27 +132,16 @@ public class DictionaryEntry{
 		return removed;
 	}
 
-	/* Clone constructor */
-	public DictionaryEntry(DictionaryEntry dicEntry){
-		Objects.requireNonNull(dicEntry);
-
-		word = dicEntry.word;
-		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
-		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
-		combineable = dicEntry.combineable;
-	}
-
 	/**
 	 * @param affParser	The Affix Parser used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasContinuationFlags(AffixParser affParser){
-		int continuationFlagsCount = 0;
+	public boolean hasNonTerminalContinuationFlags(AffixParser affParser){
 		if(continuationFlags != null)
 			for(String flag : continuationFlags)
 				if(!affParser.isTerminalAffix(flag))
-					continuationFlagsCount ++;
-		return (continuationFlagsCount > 0);
+					return true;
+		return false;
 	}
 
 	public boolean hasContinuationFlag(String ... continuationFlags){
@@ -159,7 +158,8 @@ public class DictionaryEntry{
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag,
+			String compoundMiddleFlag, String compoundEndFlag){
 		Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
@@ -264,11 +264,9 @@ public class DictionaryEntry{
 
 	@Override
 	public boolean equals(Object obj){
-		if(obj == null)
-			return false;
 		if(obj == this)
 			return true;
-		if(obj.getClass() != getClass())
+		if(obj == null || obj.getClass() != getClass())
 			return false;
 
 		DictionaryEntry rhs = (DictionaryEntry)obj;

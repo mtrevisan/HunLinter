@@ -389,7 +389,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 //FIXME move this in super?
 			String derivedWordWithoutMorphologicalFields = production.toString();
-			if(production.hasContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
+			if(production.hasNonTerminalContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
 				northernPluralCheck(production);
