@@ -39,7 +39,8 @@ public class WordGenerator{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGenerator.class);
 
-	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS = new EnumMap<>(StringHelper.Casing.class);
+	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS
+		= new EnumMap<>(StringHelper.Casing.class);
 	static{
 		Set<StringHelper.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
 			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE));
@@ -95,7 +96,8 @@ public class WordGenerator{
 	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	private List<Production> applyAffixRules(DictionaryEntry dicEntry, boolean isCompound) throws IllegalArgumentException, NoApplicableRuleException{
+	private List<Production> applyAffixRules(DictionaryEntry dicEntry, boolean isCompound) throws IllegalArgumentException,
+			NoApplicableRuleException{
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.<Production>emptyList();
@@ -111,7 +113,8 @@ public class WordGenerator{
 		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
 		if(LOGGER.isDebugEnabled() && !onefoldProductions.isEmpty()){
 			LOGGER.debug("Suffix productions:");
-			onefoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+			onefoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
+				production.getRulesSequence()));
 		}
 
 		List<Production> twofoldProductions = Collections.<Production>emptyList();
@@ -120,7 +123,8 @@ public class WordGenerator{
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
 			if(LOGGER.isDebugEnabled() && !twofoldProductions.isEmpty()){
 				LOGGER.debug("Prefix productions:");
-				twofoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+				twofoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
+					production.getRulesSequence()));
 			}
 		}
 
@@ -132,7 +136,8 @@ public class WordGenerator{
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
 		if(LOGGER.isDebugEnabled() && !lastfoldProductions.isEmpty()){
 			LOGGER.debug("Twofold productions:");
-			lastfoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()), production.getRulesSequence()));
+			lastfoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
+				production.getRulesSequence()));
 		}
 
 		checkTwofoldCorrectness(lastfoldProductions);
@@ -219,7 +224,8 @@ public class WordGenerator{
 						.collect(Collectors.toSet());
 					return new AbstractMap.SimpleEntry<>(key, value);
 				})
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+					(entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
 		}
 		return compoundRules;
 	}
@@ -339,7 +345,8 @@ public class WordGenerator{
 		return entries;
 	}
 
-	private List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException, NoApplicableRuleException{
+	private List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException,
+			NoApplicableRuleException{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		String compoundFlag = affParser.getCompoundFlag();
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
@@ -543,7 +550,8 @@ public class WordGenerator{
 		loadDictionaryForInclusionTest();
 
 		//extract map flag -> dictionary entries
-		Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
+		Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag,
+			compoundEndFlag);
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
@@ -559,7 +567,8 @@ public class WordGenerator{
 		return applyCompound(entries, limit);
 	}
 
-	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
+	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag,
+			String compoundMiddleFlag, String compoundEndFlag){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		int compoundMinimumLength = affParser.getCompoundMinimumLength();
 		String forbiddenWordFlag = affParser.getForbiddenWordFlag();
@@ -572,7 +581,8 @@ public class WordGenerator{
 
 			List<Production> productions = applyAffixRules(dicEntry, false);
 			for(Production production : productions){
-				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(affParser, compoundBeginFlag, compoundMiddleFlag, compoundEndFlag);
+				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(affParser, compoundBeginFlag,
+					compoundMiddleFlag, compoundEndFlag);
 				//merge the distribution with the others
 				compoundRules = Stream.of(compoundRules, distribution)
 					.flatMap(m -> m.entrySet().stream())
@@ -633,12 +643,14 @@ public class WordGenerator{
 		return Production.clone(dicEntry);
 	}
 
-	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
+	private List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse)
+			throws NoApplicableRuleException{
 		List<String[]> applyAffixes = dicEntry.extractAllAffixes(affParser, reverse);
 		return applyAffixRules(dicEntry, applyAffixes, isCompound);
 	}
 
-	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound, boolean reverse) throws NoApplicableRuleException{
+	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound, boolean reverse)
+			throws NoApplicableRuleException{
 		List<Production> twofoldProductions = new ArrayList<>();
 		for(Production production : onefoldProductions)
 			if(production.isCombineable()){
@@ -742,7 +754,8 @@ public class WordGenerator{
 		}
 	}
 
-	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound) throws NoApplicableRuleException{
+	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound)
+			throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
 		//add COMPOUNDBEGIN, COMPOUNDMIDDLE, and COMPOUNDEND flags
 		//FIXME
