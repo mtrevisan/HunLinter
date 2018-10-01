@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
@@ -121,10 +125,11 @@ public class MemoryMappedFileBitArray implements BitArray{
 		if(buffer != null && buffer.isDirect()){
 			//we could use this type cast and call functions without reflection code,
 			//but static import from sun.* package is risky for non–SUN virtual machine
-			//try{
-			//	((sun.nio.ch.DirectBuffer)buffer).cleaner().clean();
-			//}
-			//catch(Exception e){ }
+//			try{
+//				((sun.nio.ch.DirectBuffer)buffer).cleaner().clean();
+//			}
+//			catch(Exception e){ }
+
 //			try{
 //				Method cleaner = buffer.getClass().getMethod("cleaner");
 //				cleaner.setAccessible(true);
@@ -133,16 +138,18 @@ public class MemoryMappedFileBitArray implements BitArray{
 //				clean.invoke(cleaner.invoke(buffer));
 //			}
 //			catch(ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e){ }
+
 			try{
-				sun.misc.Unsafe a;
 				Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-				Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
-				unsafeField.setAccessible(true);
-				Object unsafe = unsafeField.get(null);
-				Method invokeCleaner = unsafeClass.getMethod("invokeCleaner", ByteBuffer.class);
-				invokeCleaner.invoke(unsafe, buffer);
+				//do not need to check for a specific class, we can call the Unsafe method with any buffer class
+				MethodHandle unmapper = MethodHandles.lookup().findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
+				//fetch the unsafe instance and bind it to the virtual MethodHandle
+				final Field f = unsafeClass.getDeclaredField("theUnsafe");
+				f.setAccessible(true);
+				final Object theUnsafe = f.get(null);
+				unmapper.bindTo(theUnsafe).invokeExact(buffer);
 			}
-			catch(ClassNotFoundException | NoSuchFieldException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e){ }
+			catch(Throwable e){ }
 
 			buffer = null;
 		}
