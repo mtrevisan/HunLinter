@@ -187,7 +187,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		return bitsChanged;
 	}
 
-	/**
+	/*
 	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
 	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
 	 *		asymptotic false positive probability'.
