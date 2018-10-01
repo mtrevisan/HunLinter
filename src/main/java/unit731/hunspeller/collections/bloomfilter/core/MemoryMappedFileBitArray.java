@@ -11,8 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
