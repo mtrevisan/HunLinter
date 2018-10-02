@@ -1477,6 +1477,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void loadFileInternal(String filePath){
 		try{
+			mainProgressBar.setValue(0);
 			backbone.loadFile(filePath);
 
 
