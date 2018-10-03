@@ -789,7 +789,7 @@ public class WordGenerator{
 
 				List<AffixEntry> applicableAffixes = AffixParser.extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + dicEntry.toString());
+					throw new NoApplicableRuleException("Word has no applicable rules for " + affix + " from " + dicEntry.getWord());
 
 //List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
 //List<AffixEntry> en1 = new ArrayList<>();
