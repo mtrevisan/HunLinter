@@ -190,7 +190,7 @@ public class Backbone implements FileChangeListener{
 			throw new FileNotFoundException("The file does not exists");
 		}
 
-		LOGGER.info(MARKER_APPLICATION, "Opening Affix file for parsing: {}", affFile.getName());
+		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());
 
 		affParser.parse(affFile);
 
@@ -199,7 +199,7 @@ public class Backbone implements FileChangeListener{
 
 	private void openHyphenationFile(File hypFile) throws IOException{
 		if(hypFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
 			hypParser = new HyphenationParser(affParser.getLanguage());
 			hypParser.parse(hypFile);
@@ -233,7 +233,7 @@ public class Backbone implements FileChangeListener{
 
 	private void openAidFile(File aidFile) throws IOException{
 		if(aidFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening Aid file for parsing: {}", aidFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Aid file: {}", aidFile.getName());
 
 			aidParser.parse(aidFile);
 
@@ -248,7 +248,7 @@ public class Backbone implements FileChangeListener{
 
 	private void openThesaurusFile(File theFile) throws IOException{
 		if(theFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file for parsing: {}", theFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theFile.getName());
 
 			theParser.parse(theFile);
 
