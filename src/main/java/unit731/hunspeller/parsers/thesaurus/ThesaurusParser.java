@@ -149,7 +149,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 			if(!partOfSpeech.startsWith("("))
 				sb.append('(');
 			sb.append(partOfSpeech);
-			if(!partOfSpeech.endsWith("("))
+			if(!partOfSpeech.endsWith(")"))
 				sb.append(')');
 			partOfSpeech = sb.toString();
 
