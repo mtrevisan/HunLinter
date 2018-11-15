@@ -1,5 +1,6 @@
 package unit731.hunspeller.languages;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
@@ -34,8 +35,12 @@ public class Orthography{
 		return new boolean[syllabes.size()];
 	}
 
+	/**
+	 * @param syllabes	The list of syllabes
+	 * @return The 0-based index of the syllabe starting from the end
+	 */
 	public List<Integer> getStressIndexFromLast(List<String> syllabes){
-		return null;
+		return Collections.<Integer>emptyList();
 	}
 
 	public int countGraphemes(String word){

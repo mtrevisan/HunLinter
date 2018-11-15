@@ -1,5 +1,6 @@
 package unit731.hunspeller.languages.vec;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -117,11 +118,12 @@ public class OrthographyVEC extends Orthography{
 
 	@Override
 	public List<Integer> getStressIndexFromLast(List<String> syllabes){
+		List<Integer> indexes = new ArrayList<>();
 		int size = syllabes.size() - 1;
 		for(int i = 0; i <= size; i ++)
 			if(hasStressedGrapheme(syllabes.get(size - i)))
-				return Arrays.asList(i);
-		return null;
+				indexes.add(i);
+		return indexes;
 	}
 
 	@Override
