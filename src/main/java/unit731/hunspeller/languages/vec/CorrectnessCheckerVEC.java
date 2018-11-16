@@ -79,8 +79,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL = "s1";
 	private static final String ADVERB_MENTE_RULE_NON_VANISHING_EL = "W0";
 	private static final String ADVERB_MENTE_RULE_VANISHING_EL = "W1";
-	private static final String COLLECTIVE_SUBSTANTIVES_RULE_NON_VANISHING_EL = "Y0";
-	private static final String COLLECTIVE_SUBSTANTIVES_RULE_VANISHING_EL = "Y1";
 	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
 	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
 	private static final String DIMINUTIVE_EL_RULE_NON_VANISHING_EL = "&2";
@@ -117,6 +115,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private static final Set<String> CANNOT_CONTAINS_ACCENT = new HashSet<>();
 	static{
+		CANNOT_CONTAINS_ACCENT.add(PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL);
+		CANNOT_CONTAINS_ACCENT.add(PLANTS_AND_CRAFTS_RULE_VANISHING_EL);
 		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_ISTA_RULE);
 		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL);
 		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL);
