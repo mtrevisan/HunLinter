@@ -68,7 +68,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	@Override
 	protected Void doInBackground() throws Exception{
-		boolean stopped = false;
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
 
@@ -94,17 +93,17 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(Throwable t){
-			stopped = true;
-
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
 				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
-		}
-		if(stopped)
+
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+
+			cancel(true);
+		}
 
 		return null;
 	}

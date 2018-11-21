@@ -107,6 +107,8 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			}
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+
+			cancel(true);
 		}
 		finally{
 			lockable.releaseReadLock();

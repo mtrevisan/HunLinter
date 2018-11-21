@@ -78,6 +78,8 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 				String message = ExceptionHelper.getMessage(t);
 				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
+
+			cancel(true);
 		}
 		finally{
 			lockable.releaseReadLock();

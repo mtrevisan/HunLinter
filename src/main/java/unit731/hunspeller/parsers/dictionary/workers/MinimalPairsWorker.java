@@ -73,7 +73,6 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		lockable.acquireReadLock();
 
 		setProgress(0);
-		boolean stopped = false;
 		try{
 			File dicFile = dicParser.getDicFile();
 			try(
@@ -231,20 +230,20 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(Throwable t){
-			stopped = true;
-
 			if(t instanceof ClosedChannelException)
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+
+			cancel(true);
 		}
 		finally{
 			lockable.releaseReadLock();
 		}
-		if(stopped)
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 		return null;
 	}
