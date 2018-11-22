@@ -159,7 +159,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 				.map(String::trim)
 				.distinct()
 				.collect(Collectors.toList());
-			if(meanings.size() < 1)
+			if(meanings.size() < 2)
 				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
 
 			DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
