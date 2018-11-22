@@ -148,12 +148,12 @@ public class DictionaryStatisticsDialog extends JDialog{
       contractedWordsOutputLabel.setText("...");
 
       lengthsModeLabel.setLabelFor(lengthsModeOutputLabel);
-      lengthsModeLabel.setText("Mode of words' length:");
+      lengthsModeLabel.setText("Mode of wordsʼ length:");
 
       lengthsModeOutputLabel.setText("...");
 
       syllabeLengthsModeLabel.setLabelFor(syllabeLengthsModeOutputLabel);
-      syllabeLengthsModeLabel.setText("Mode of words' syllabe:");
+      syllabeLengthsModeLabel.setText("Mode of wordsʼ syllabe:");
 
       syllabeLengthsModeOutputLabel.setText("...");
 
@@ -213,8 +213,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       exportButton.setText("Export");
       exportButton.addActionListener(new java.awt.event.ActionListener() {
-         @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             exportButtonActionPerformed(evt);
          }
       });
@@ -264,12 +263,12 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addGroup(layout.createSequentialGroup()
                   .addComponent(contractedWordsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                  .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                  .addGap(0, 0, Short.MAX_VALUE)
+                  .addComponent(exportButton)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(exportButton)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

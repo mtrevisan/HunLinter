@@ -59,7 +59,7 @@ public class HyphenationParser extends ReadWriteLockable{
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "\u2013";
 	public static final String EM_DASH = "\u2014";
-	public static final String APOSTROPHE = "'";
+	public static final String APOSTROPHE = "ʼ";
 	public static final String RIGHT_SINGLE_QUOTATION_MARK = "\u2019";
 	/**
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
