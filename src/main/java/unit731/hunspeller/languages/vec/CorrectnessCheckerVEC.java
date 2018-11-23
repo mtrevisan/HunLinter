@@ -451,7 +451,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			for(String subword : splittedWords){
 				accentCheck(subword, production);
 
-				ciuiCheck(subword, production);
+//				ciuiCheck(subword, production);
 			}
 
 			syllabationCheck(production);
