@@ -59,10 +59,27 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 		setProgress(0);
 		long totalSize = dicFile.length();
+//		if(totalSize == 0l)
+//			throw new IllegalArgumentException("Dictionary file empty");
+//		boolean firstLine = true;
+//		Files.readAllLines(dicFile.toPath(), charset)
+//			.parallelStream()
+//			.map(line -> {
+//				if(firstLine){
+//					line = FileHelper.clearBOMMarker(line);
+//					if(!NumberUtils.isCreatable(line))
+//						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
+//
+//					firstLine = false;
+//				}
+//				return line;
+//			});
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
 			if(line == null)
 				throw new IllegalArgumentException("Dictionary file empty");
+
+			long readSoFar = line.length();
 
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -70,7 +87,6 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-			long readSoFar = line.length();
 			while((line = br.readLine()) != null){
 				readSoFar += line.length();
 

@@ -65,13 +65,14 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			if(line == null)
 				throw new IllegalArgumentException("Dictionary file empty");
 
+			long readSoFar = line.length();
+
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
 				line = FileHelper.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-			long readSoFar = line.length();
 			while((line = br.readLine()) != null){
 				readSoFar += line.length();
 

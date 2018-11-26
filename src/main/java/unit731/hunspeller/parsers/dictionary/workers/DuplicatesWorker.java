@@ -118,6 +118,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		File dicFile = dicParser.getDicFile();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
+
+			long readSoFar = line.length();
+
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
 				line = FileHelper.clearBOMMarker(line);
@@ -125,7 +128,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 			int lineIndex = 1;
-			long readSoFar = line.length();
 			long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
@@ -175,6 +177,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			File dicFile = dicParser.getDicFile();
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
+
+				long readSoFar = line.length();
+
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
 					line = FileHelper.clearBOMMarker(line);
@@ -182,7 +187,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 				int lineIndex = 1;
-				long readSoFar = line.length();
 				long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
