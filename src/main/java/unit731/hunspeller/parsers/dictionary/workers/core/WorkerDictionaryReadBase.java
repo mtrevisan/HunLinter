@@ -22,8 +22,8 @@ public class WorkerDictionaryReadBase{
 			completed, cancelled, lockable);
 	}
 
-	public final void createWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+	public final void createWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser,
+			BiConsumer<String, Integer> lineReader, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
 		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,

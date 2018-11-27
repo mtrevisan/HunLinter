@@ -29,8 +29,8 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 	private final File outputFile;
 
 
-	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineReader,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset,
+			BiConsumer<BufferedWriter, String> lineReader, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);

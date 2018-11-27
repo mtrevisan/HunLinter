@@ -15,8 +15,8 @@ public class WorkerWriteBase<T>{
 	private WorkerWrite<T> worker;
 
 
-	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineWriter,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset,
+			BiConsumer<BufferedWriter, T> lineWriter, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, lineWriter, completed, cancelled, lockable);
 	}
 

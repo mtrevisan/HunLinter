@@ -15,8 +15,8 @@ public class WorkerDictionaryReadWriteBase{
 	private WorkerDictionaryReadWrite worker;
 
 
-	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> lineReader,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile,
+			BiConsumer<BufferedWriter, String> lineReader, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.nonNull(dicParser);
 
 		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader,
