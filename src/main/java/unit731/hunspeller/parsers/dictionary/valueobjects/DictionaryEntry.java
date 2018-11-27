@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,7 @@ public class DictionaryEntry{
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
+	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
 
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
@@ -67,12 +68,17 @@ public class DictionaryEntry{
 
 	public static DictionaryEntry createFromDictionaryLineWithAliases(String line, FlagParsingStrategy strategy, List<String> aliasesFlag,
 			List<String> aliasesMorphologicaField){
+		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		String word = extractWord(line);
-		String dicFlags = ENTRY_PATTERN.group(PARAM_FLAGS);
+		Matcher m = PATTERN_ENTRY.matcher(line);
+		if(!m.find())
+			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
+
+		String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+		String dicFlags = m.group(PARAM_FLAGS);
 		String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
-		String dicMorphologicalFields = ENTRY_PATTERN.group(PARAM_MORPHOLOGICAL_FIELDS);
+		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
 		String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
 		boolean combineable = true;
@@ -97,11 +103,11 @@ public class DictionaryEntry{
 	public static String extractWord(String line){
 		Objects.requireNonNull(line);
 
-		ENTRY_PATTERN.reset(line);
-		if(!ENTRY_PATTERN.find())
+		Matcher m = PATTERN_ENTRY.matcher(line);
+		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
-		return StringUtils.replace(ENTRY_PATTERN.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 	}
 
 	public String getWord(){

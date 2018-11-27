@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,10 +51,10 @@ public class WordVEC{
 	}
 
 //	private static final String VOWELS_LOWERCASE = "aeiouàèéíòóú";
-	private static final Matcher FIRST_STRESSED_VOWEL = PatternHelper.matcher("[aeiouàèéíòóú].*$");
-	private static final Matcher LAST_VOWEL = PatternHelper.matcher("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
+	private static final Pattern FIRST_STRESSED_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú].*$");
+	private static final Pattern LAST_VOWEL = PatternHelper.pattern("[aeiouàèéíòóú][^aeiouàèéíòóú]*$");
 
-	private static final Matcher DEFAULT_STRESS_GROUP = PatternHelper.matcher("(fr|[ln]|st)au$");
+	private static final Pattern DEFAULT_STRESS_GROUP = PatternHelper.pattern("(fr|[ln]|st)au$");
 
 	private static final String NO_STRESS_AVER = "^(r[ei])?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[ei])?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
@@ -62,7 +63,7 @@ public class WordVEC{
 	private static final String NO_STRESS_ANDAR = "^(re)?v[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_WORDS = "^(síngui|spiràkui|títui|triàngui|vínkui)$";
-	private static final Matcher PREVENT_UNMARK_STRESS;
+	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		StringJoiner sj = (new StringJoiner("|"))
 			.add(NO_STRESS_AVER)
@@ -72,7 +73,7 @@ public class WordVEC{
 			.add(NO_STRESS_ANDAR)
 			.add(NO_STRESS_TRAER)
 			.add(NO_STRESS_WORDS);
-		PREVENT_UNMARK_STRESS = PatternHelper.matcher(sj.toString());
+		PREVENT_UNMARK_STRESS = PatternHelper.pattern(sj.toString());
 	}
 
 	private static final Map<String, String> ACUTE_STRESSES = new HashMap<>();
@@ -128,13 +129,13 @@ public class WordVEC{
 	}
 
 	public static int getFirstVowelIndex(String word, int index){
-		FIRST_STRESSED_VOWEL.reset(word.substring(index));
-		return (FIRST_STRESSED_VOWEL.find() ? FIRST_STRESSED_VOWEL.start() + index : -1);
+		Matcher m = FIRST_STRESSED_VOWEL.matcher(word.substring(index));
+		return (m.find()? m.start() + index: -1);
 	}
 
 	public static int getLastVowelIndex(String word){
-		LAST_VOWEL.reset(word);
-		return (LAST_VOWEL.find() ? LAST_VOWEL.start() : -1);
+		Matcher m = LAST_VOWEL.matcher(word);
+		return (m.find()? m.start(): -1);
 	}
 
 	//[aeiou][^aeiou]*$

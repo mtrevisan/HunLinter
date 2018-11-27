@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -14,8 +15,12 @@ public class WorkerDictionaryReadWriteBase{
 	private WorkerDictionaryReadWrite worker;
 
 
-	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> lineReader, Runnable done, ReadWriteLockable lockable){
-		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader, done, lockable);
+	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile, BiConsumer<BufferedWriter, String> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+		Objects.nonNull(dicParser);
+
+		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader,
+			completed, cancelled, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

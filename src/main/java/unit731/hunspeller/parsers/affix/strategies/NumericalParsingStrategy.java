@@ -4,7 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.services.PatternHelper;
@@ -20,7 +20,7 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final String COMMA = ",";
 
-	private static final Matcher COMPOUND_RULE_SPLITTER = PatternHelper.matcher("\\((\\d+)\\)|([?*])");
+	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((\\d+)\\)|([?*])");
 
 
 	@Override

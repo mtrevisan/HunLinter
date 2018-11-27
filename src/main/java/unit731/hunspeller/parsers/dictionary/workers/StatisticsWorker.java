@@ -59,20 +59,24 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 					dicStatistics.addData(word);
 			}
 		};
-		Runnable done = () -> {
+		Runnable completed = () -> {
 			try{
 				dicStatistics.close();
 			}
 			catch(IOException e){}
 
-			if(!isCancelled()){
-				//show statistics window
-				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-				dialog.setLocationRelativeTo(parent);
-				dialog.setVisible(true);
-			}
+			//show statistics window
+			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			dialog.setLocationRelativeTo(parent);
+			dialog.setVisible(true);
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
+		Runnable cancelled = () -> {
+			try{
+				dicStatistics.close();
+			}
+			catch(IOException e){}
+		};
+		createWorker(WORKER_NAME, dicParser, lineReader, completed, cancelled, affParser);
 	}
 
 	public boolean isPerformHyphenationStatistics(){

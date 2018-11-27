@@ -29,7 +29,8 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 	private final File outputFile;
 
 
-	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineReader, Runnable done, ReadWriteLockable lockable){
+	public WorkerDictionaryReadWrite(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<BufferedWriter, String> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(outputFile);
@@ -42,7 +43,8 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 		this.outputFile = outputFile;
 		this.charset = charset;
 		this.lineReader = lineReader;
-		this.done = done;
+		this.completed = completed;
+		this.cancelled = cancelled;
 		this.lockable = lockable;
 	}
 
@@ -65,7 +67,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 			if(line == null)
 				throw new IllegalArgumentException("Dictionary file empty");
 
-			long readSoFar = line.length();
+			long readSoFar = line.getBytes(charset).length + 2;
 
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -74,7 +76,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 			while((line = br.readLine()) != null){
-				readSoFar += line.length();
+				readSoFar += line.getBytes(charset).length + 2;
 
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){

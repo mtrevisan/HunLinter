@@ -44,19 +44,17 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 				throw new IllegalArgumentException(e);
 			}
 		};
-		Runnable done = () -> {
-			if(!isCancelled()){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+		Runnable completed = () -> {
+			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-				try{
-					FileHelper.openFileWithChoosenEditor(outputFile);
-				}
-				catch(IOException | InterruptedException e){
-					LOGGER.warn("Exception while opening the resulting file", e);
-				}
+			try{
+				FileHelper.openFileWithChoosenEditor(outputFile);
+			}
+			catch(IOException | InterruptedException e){
+				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, outputFile, body, done, lockable);
+		createWorker(WORKER_NAME, dicParser, outputFile, body, completed, null, lockable);
 	}
 
 }

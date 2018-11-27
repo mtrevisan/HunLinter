@@ -24,12 +24,13 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionaryRead.class);
 
-	private final File dicFile;
 
 	protected boolean preventExceptionRelaunch;
 
+	private final File dicFile;
 
-	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
+	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
@@ -40,7 +41,8 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		this.dicFile = dicFile;
 		this.charset = charset;
 		this.lineReader = lineReader;
-		this.done = done;
+		this.completed = completed;
+		this.cancelled = cancelled;
 		this.lockable = lockable;
 	}
 
@@ -59,27 +61,12 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 		setProgress(0);
 		long totalSize = dicFile.length();
-//		if(totalSize == 0l)
-//			throw new IllegalArgumentException("Dictionary file empty");
-//		boolean firstLine = true;
-//		Files.readAllLines(dicFile.toPath(), charset)
-//			.parallelStream()
-//			.map(line -> {
-//				if(firstLine){
-//					line = FileHelper.clearBOMMarker(line);
-//					if(!NumberUtils.isCreatable(line))
-//						throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
-//
-//					firstLine = false;
-//				}
-//				return line;
-//			});
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
 			if(line == null)
 				throw new IllegalArgumentException("Dictionary file empty");
 
-			long readSoFar = line.length();
+			long readSoFar = line.getBytes(charset).length + 2;
 
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -88,7 +75,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 			while((line = br.readLine()) != null){
-				readSoFar += line.length();
+				readSoFar += line.getBytes(charset).length + 2;
 
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
@@ -111,7 +98,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 				setProgress(100);
 
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary file read successfully (it takes {})", watch.toStringMinuteSeconds());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){
@@ -122,7 +109,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 			}
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
 
 			cancel(true);
 		}
@@ -135,8 +122,10 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 	@Override
 	protected void done(){
-		if(done != null)
-			done.run();
+		if(!isCancelled() && completed != null)
+			completed.run();
+		else if(isCancelled() && cancelled != null)
+			cancelled.run();
 	}
 
 }

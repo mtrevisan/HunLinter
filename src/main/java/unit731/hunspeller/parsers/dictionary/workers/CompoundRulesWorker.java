@@ -17,10 +17,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 	public static final String WORKER_NAME = "Compound rules extraction";
 
 
-	private final Map<String, String> inputs = new HashMap<>();
-
-
-	public CompoundRulesWorker(DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader, Runnable done,
+	public CompoundRulesWorker(DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader, Runnable completed,
 			ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
@@ -32,16 +29,7 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};
-		Runnable wrappedDone = () -> {
-			if(!isCancelled() && done != null)
-				done.run();
-		};
-		createWorker(WORKER_NAME, dicParser, lineReader, wrappedDone, lockable);
-	}
-
-	@Override
-	public void clear(){
-		inputs.clear();
+		createWorker(WORKER_NAME, dicParser, lineReader, completed, null, lockable);
 	}
 
 }

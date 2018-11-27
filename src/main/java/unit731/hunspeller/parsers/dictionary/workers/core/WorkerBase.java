@@ -14,7 +14,8 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 	protected Charset charset;
 
 	protected BiConsumer<S, T> lineReader;
-	protected Runnable done;
+	protected Runnable completed;
+	protected Runnable cancelled;
 	protected ReadWriteLockable lockable;
 
 	protected TimeWatch watch = TimeWatch.start();

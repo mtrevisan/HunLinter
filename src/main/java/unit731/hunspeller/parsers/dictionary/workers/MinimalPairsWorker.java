@@ -83,7 +83,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				if(line == null)
 					throw new IllegalArgumentException("Dictionary file empty");
 
-				long readSoFar = line.length();
+				long readSoFar = line.getBytes(charset).length + 2;
 
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -95,7 +95,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
-					readSoFar += line.length();
+					readSoFar += line.getBytes(charset).length + 2;
 
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
@@ -143,7 +143,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				long readSoFarSource = 0;
 				long totalSizeSource = outputFile.length();
 				while((sourceLine = sourceBR.readLine()) != null){
-					readSoFarSource += sourceLine.length();
+					readSoFarSource += sourceLine.getBytes(charset).length + 2;
 
 					sourceBR.mark((int)(totalSizeSource - readSoFarSource));
 

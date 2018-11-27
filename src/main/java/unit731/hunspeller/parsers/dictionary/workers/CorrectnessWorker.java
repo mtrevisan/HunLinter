@@ -17,15 +17,15 @@ public class CorrectnessWorker extends WorkerDictionaryReadBase{
 
 
 	public CorrectnessWorker(DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, ReadWriteLockable lockable){
-		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(checker);
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};
-		createWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineReader, null, lockable);
+		createWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineReader, null, null, lockable);
 	}
 
 }

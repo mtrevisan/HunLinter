@@ -35,7 +35,7 @@ public class Hyphenator extends AbstractHyphenator{
 			for(String rule : prefixes){
 				int j = -1;
 				//remove non–standard part
-				String reducedData = PatternHelper.clear(rule, HyphenationParser.MATCHER_REDUCE);
+				String reducedData = PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 				int ruleSize = reducedData.length();
 				//cycle the pattern's characters searching for numbers
 				for(int k = 0; k < ruleSize; k ++){

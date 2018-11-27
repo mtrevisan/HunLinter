@@ -42,7 +42,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 			int delta = HyphenationParser.getKeyFromData(rule).length() - r.getNode().getKey().length();
 
 			//remove non–standard part
-			String reducedData = PatternHelper.clear(rule, HyphenationParser.MATCHER_REDUCE);
+			String reducedData = PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 			int ruleSize = reducedData.length();
 			//cycle the pattern's characters searching for numbers
 			int j = -1;
@@ -67,7 +67,7 @@ public class AhoCorasickHyphenator extends AbstractHyphenator{
 			if(rls != null)
 				for(String rl : rls){
 					//remove non–standard part
-					reducedData = PatternHelper.clear(rl, HyphenationParser.MATCHER_REDUCE);
+					reducedData = PatternHelper.clear(rl, HyphenationParser.PATTERN_REDUCE);
 					ruleSize = reducedData.length();
 					//cycle the pattern's characters searching for numbers
 					j = -1;

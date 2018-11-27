@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -13,12 +14,20 @@ public class WorkerDictionaryReadBase{
 	private WorkerDictionaryRead worker;
 
 
-	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader, done, lockable);
+	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+		Objects.requireNonNull(dicParser);
+
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
+			completed, cancelled, lockable);
 	}
 
-	public final void createWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader, Runnable done, ReadWriteLockable lockable){
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader, done, lockable);
+	public final void createWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+		Objects.requireNonNull(dicParser);
+
+		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
+			completed, cancelled, lockable);
 		worker.preventExceptionRelaunch = true;
 	}
 

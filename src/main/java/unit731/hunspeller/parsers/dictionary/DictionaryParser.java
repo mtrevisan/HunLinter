@@ -16,7 +16,7 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class DictionaryParser{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryParser.class);
 
-	private static final Matcher REGEX_COMMENT = PatternHelper.matcher("(^\\s*|\\s+)[#\\/].*$");
+	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("(^\\s*|\\s+)[#\\/].*$");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
@@ -164,7 +164,7 @@ public class DictionaryParser{
 
 
 	private boolean isComment(String line){
-		return PatternHelper.find(line, REGEX_COMMENT);
+		return PatternHelper.find(line, PATTERN_COMMENT);
 	}
 
 	public final void clear(){
@@ -180,7 +180,7 @@ public class DictionaryParser{
 	 */
 	public static String cleanLine(String line){
 		//remove comments
-		line = PatternHelper.clear(line, REGEX_COMMENT);
+		line = PatternHelper.clear(line, PATTERN_COMMENT);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;

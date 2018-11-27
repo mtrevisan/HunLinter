@@ -25,7 +25,8 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 	private final File outputFile;
 
 
-	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineReader, Runnable done, ReadWriteLockable lockable){
+	public WorkerWrite(String workerName, List<T> entries, File outputFile, Charset charset, BiConsumer<BufferedWriter, T> lineReader,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(entries);
 		Objects.requireNonNull(outputFile);
@@ -38,7 +39,8 @@ public class WorkerWrite<T> extends WorkerBase<BufferedWriter, T>{
 		this.outputFile = outputFile;
 		this.charset = charset;
 		this.lineReader = lineReader;
-		this.done = done;
+		this.completed = completed;
+		this.cancelled = cancelled;
 		this.lockable = lockable;
 	}
 

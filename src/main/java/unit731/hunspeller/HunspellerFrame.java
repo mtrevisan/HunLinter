@@ -35,7 +35,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -110,7 +110,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final long serialVersionUID = 6772959670167531135L;
 
 	private static final int DEBOUNCER_INTERVAL = 600;
-	private static final Matcher MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.matcher("[.\\d=-]");
+	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -1357,8 +1357,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		else{
 			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicCorrectnessWorker.cancel();
 
@@ -1373,8 +1373,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicDuplicatesWorker.cancel(true);
 
@@ -1389,8 +1389,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			if(dicWordCountWorker != null && dicWordCountWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicWordCountWorker.cancel();
 
@@ -1405,8 +1405,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			if(dicStatisticsWorker != null && dicStatisticsWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicStatisticsWorker.cancel();
 
@@ -1424,8 +1424,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			if(dicWordlistWorker != null && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicWordlistWorker.cancel();
 
@@ -1440,8 +1440,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			}
 			if(compoundRulesExtractorWorker != null && compoundRulesExtractorWorker.getState() == SwingWorker.StateValue.STARTED){
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the compound extraction task?", "Warning!", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the compound extraction task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					compoundRulesExtractorWorker.cancel();
 
@@ -1629,7 +1629,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			boolean hyphenationChanged = false;
 			boolean correctHyphenation = false;
 			if(!alreadyHasRule){
-				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule, MATCHER_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
+				ruleMatchesText = addedRuleText.contains(PatternHelper.clear(addedRule, PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS));
 
 				if(ruleMatchesText){
 					Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(addedRuleText);
@@ -1784,13 +1784,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				if(!production.distributeByCompoundRule(affParser).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
-			Runnable done = () -> {
+			Runnable completed = () -> {
 				StringJoiner sj = new StringJoiner("\n");
 				compounds.forEach(compound -> sj.add(compound.toString(strategy)));
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
 			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader, done, affParser);
+			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader, completed, affParser);
 			compoundRulesExtractorWorker.addPropertyChangeListener(this);
 			compoundRulesExtractorWorker.execute();
 		}

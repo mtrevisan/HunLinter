@@ -119,7 +119,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
 
-			long readSoFar = line.length();
+			long readSoFar = line.getBytes(charset).length + 2;
 
 			//ignore any BOM marker on first line
 			if(br.getLineNumber() == 1)
@@ -131,7 +131,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
-				readSoFar += line.length();
+				readSoFar += line.getBytes(charset).length + 2;
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
@@ -178,7 +178,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 
-				long readSoFar = line.length();
+				long readSoFar = line.getBytes(charset).length + 2;
 
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -190,7 +190,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
-					readSoFar += line.length();
+					readSoFar += line.getBytes(charset).length + 2;
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{

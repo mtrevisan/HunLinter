@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
@@ -100,11 +100,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String FINAL_SONORIZATION_RULE = "FS";
 	private static final String GUA_TO_VA_RULE = "gv";
 
-	private static final Matcher NON_VANISHING_EL = PatternHelper.matcher("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
-	private static final Matcher VANISHING_EL_NEAR_CONSONANT = PatternHelper.matcher("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
+	private static final Pattern NON_VANISHING_EL = PatternHelper.pattern("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
+	private static final Pattern VANISHING_EL_NEAR_CONSONANT = PatternHelper.pattern("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
 
-	private static final Matcher L_BETWEEN_VOWELS = PatternHelper.matcher("l i l$");
-	private static final Matcher CIJJHNHIV = PatternHelper.matcher("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
+	private static final Pattern L_BETWEEN_VOWELS = PatternHelper.pattern("l i l$");
+	private static final Pattern CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
 
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 //	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
@@ -315,7 +315,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			MatcherEntry.CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD, PEJORATIVE_ASO_RULE_VANISHING_EL, PEJORATIVE_ASO_RULE_NON_VANISHING_EL));
 	}
 
-	private static final Matcher MATCHER_NORTHERN_PLURAL = PatternHelper.matcher("[èò][ln]$");
+	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[èò][ln]$");
 	private static final String MAN = "man";
 
 	private static final Set<MatcherEntry> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
@@ -535,7 +535,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		if(!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
 			List<String> subwords = hyphenator.splitIntoCompounds(word);
-			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, MATCHER_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
@@ -583,7 +583,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 							break;
 						}
 				if(!elBetweenVowelsRemoval)
-					throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent here");
+					throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent there");
 			}
 		}
 	}

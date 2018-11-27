@@ -79,17 +79,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	}
 
-	private final RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
-		@Override
-		public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-			V value = node.getValue();
-			Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
-			result.add(entry);
-
-			return false;
-		}
-	};
-
 
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
@@ -320,12 +309,21 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
 
-		synchronized(visitorEntries){
-			visitorEntries.getResult().clear();
-			visitPrefixedBy(visitorEntries, prefix);
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+				result.add(entry);
 
-			return visitorEntries.getResult();
-		}
+				return false;
+			}
+		};
+
+		visitorEntries.getResult().clear();
+		visitPrefixedBy(visitorEntries, prefix);
+
+		return visitorEntries.getResult();
 	}
 
 	/**
@@ -383,12 +381,21 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public List<Map.Entry<S, V>> getEntries(S prefix){
 		Objects.requireNonNull(prefix);
 
-		synchronized(visitorEntries){
-			visitorEntries.getResult().clear();
-			visit(visitorEntries, prefix);
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+				result.add(entry);
 
-			return visitorEntries.getResult();
-		}
+				return false;
+			}
+		};
+
+		visitorEntries.getResult().clear();
+		visit(visitorEntries, prefix);
+
+		return visitorEntries.getResult();
 	}
 
 	/**

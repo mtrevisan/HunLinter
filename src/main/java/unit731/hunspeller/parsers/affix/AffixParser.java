@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -52,8 +52,8 @@ public class AffixParser extends ReadWriteLockable{
 	private static final String START = "^";
 	private static final String END = "$";
 
-	private static final Matcher MATCHER_ISO639_1 = PatternHelper.matcher("([a-z]{2})");
-	private static final Matcher MATCHER_ISO639_2 = PatternHelper.matcher("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
+	private static final Pattern PATTERN_ISO639_1 = PatternHelper.pattern("([a-z]{2})");
+	private static final Pattern PATTERN_ISO639_2 = PatternHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
@@ -468,9 +468,9 @@ public class AffixParser extends ReadWriteLockable{
 			if(!containsData(AffixTag.LANGUAGE)){
 				//try to infer language from filename
 				String filename = FilenameUtils.removeExtension(affFile.getName());
-				String[] languages = PatternHelper.extract(filename, MATCHER_ISO639_2);
+				String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
 				if(languages.length == 0)
-					languages = PatternHelper.extract(filename, MATCHER_ISO639_1);
+					languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
 				String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 				addData(AffixTag.LANGUAGE, language);
 			}

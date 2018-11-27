@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
@@ -18,7 +17,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	private static final Pattern PATTERN = PatternHelper.pattern("(?<=\\G.{2})");
 
-	private static final Matcher COMPOUND_RULE_SPLITTER = PatternHelper.matcher("\\((..)\\)|([?*])");
+	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((..)\\)|([?*])");
 
 
 	@Override

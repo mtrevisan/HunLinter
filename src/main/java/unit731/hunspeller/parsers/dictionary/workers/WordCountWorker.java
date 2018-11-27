@@ -26,12 +26,14 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData, ReadWriteLockable lockable){
+	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
+			ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
 
-		dictionary = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
+		dictionary = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(),
+			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
 		dictionary.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
@@ -41,20 +43,22 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 			for(Production production : productions)
 				dictionary.add(production.getWord());
 		};
-		Runnable done = () -> {
+		Runnable completed = () -> {
 			dictionary.close();
 
-			if(!isCancelled()){
-				int totalUniqueProductions = dictionary.getAddedElements();
-				double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-				int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
-					DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions), DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
-					falsePositiveCount);
-			}
+			int totalUniqueProductions = dictionary.getAddedElements();
+			double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
+			int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
+				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
+				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
+				falsePositiveCount);
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, done, lockable);
+		Runnable cancelled = () -> {
+			dictionary.close();
+		};
+		createWorker(WORKER_NAME, dicParser, lineReader, completed, cancelled, lockable);
 	}
 
 	@Override
