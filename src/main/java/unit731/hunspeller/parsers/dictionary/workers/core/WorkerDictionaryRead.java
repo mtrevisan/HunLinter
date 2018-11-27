@@ -100,48 +100,47 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			lockable.releaseReadLock();
 		}
 
-		if(!isCancelled()){
-			try{
-				LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
-				setProgress(0);
 
-				int totalLines = lines.size();
-				int processingIndex = 0;
-				for(String line : lines){
-					try{
-						processingIndex ++;
+		try{
+			LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
+			setProgress(0);
 
-						lineReader.accept(line, processingIndex);
+			int totalLines = lines.size();
+			int processingIndex = 0;
+			for(String line : lines){
+				try{
+					processingIndex ++;
 
-						setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
-					}
-					catch(Exception e){
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex, line);
+					lineReader.accept(line, processingIndex);
 
-						if(!preventExceptionRelaunch)
-							throw e;
-					}
+					setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
 				}
+				catch(Exception e){
+					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex, line);
 
-
-				watch.stop();
-
-				setProgress(100);
-
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
-			}
-			catch(Exception e){
-				if(e instanceof ClosedChannelException)
-					LOGGER.warn("Thread interrupted");
-				else{
-					String message = ExceptionHelper.getMessage(e);
-					LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
+					if(!preventExceptionRelaunch)
+						throw e;
 				}
-
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
-
-				cancel(true);
 			}
+
+
+			watch.stop();
+
+			setProgress(100);
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
+		}
+		catch(Exception e){
+			if(e instanceof ClosedChannelException)
+				LOGGER.warn("Thread interrupted");
+			else{
+				String message = ExceptionHelper.getMessage(e);
+				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
+			}
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
+
+			cancel(true);
 		}
 
 		return null;
