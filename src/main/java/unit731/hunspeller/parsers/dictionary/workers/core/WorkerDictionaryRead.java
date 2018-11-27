@@ -6,15 +6,15 @@ import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
@@ -52,8 +52,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 	@Override
 	protected Void doInBackground() throws IOException{
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file"
-			+ (workerName != null? StringUtils.SPACE + HyphenationParser.EM_DASH + StringUtils.SPACE + workerName: StringUtils.EMPTY));
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file (pass 1/2)");
 
 		watch.reset();
 
@@ -74,26 +73,40 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
+			List<String> lines = new ArrayList<>();
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + 2;
 
 				line = DictionaryParser.cleanLine(line);
-				if(!line.isEmpty()){
+				if(!line.isEmpty())
+					lines.add(line);
+
+				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+			}
+
+			if(!isCancelled()){
+				LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
+				setProgress(0);
+
+				int totalLines = lines.size();
+				int processingIndex = 0;
+				for(String l : lines){
 					try{
-						lineReader.accept(line, br.getLineNumber());
+						processingIndex ++;
+
+						lineReader.accept(l, processingIndex);
+
+						setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
 					}
 					catch(Exception e){
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), line);
+						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), l);
 
 						if(!preventExceptionRelaunch)
 							throw e;
 					}
 				}
 
-				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
-			}
 
-			if(!isCancelled()){
 				watch.stop();
 
 				setProgress(100);
