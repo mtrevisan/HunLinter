@@ -108,6 +108,9 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			int totalLines = lines.size();
 			int processingIndex = 0;
 			for(String line : lines){
+				if(isCancelled())
+					throw new InterruptedException();
+
 				try{
 					processingIndex ++;
 
