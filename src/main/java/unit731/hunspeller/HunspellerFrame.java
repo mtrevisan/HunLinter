@@ -1790,7 +1790,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
 			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader, completed, affParser);
+			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader,
+				completed, affParser);
 			compoundRulesExtractorWorker.addPropertyChangeListener(this);
 			compoundRulesExtractorWorker.execute();
 		}
