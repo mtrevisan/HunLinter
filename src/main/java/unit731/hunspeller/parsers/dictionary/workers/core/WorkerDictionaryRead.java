@@ -60,6 +60,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 		setProgress(0);
 		long totalSize = dicFile.length();
+		List<String> lines = new ArrayList<>();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
 			if(line == null)
@@ -73,7 +74,6 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
-			List<String> lines = new ArrayList<>();
 			while((line = br.readLine()) != null){
 				readSoFar += line.getBytes(charset).length + 2;
 
@@ -82,36 +82,6 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 					lines.add(line);
 
 				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
-			}
-
-			if(!isCancelled()){
-				LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
-				setProgress(0);
-
-				int totalLines = lines.size();
-				int processingIndex = 0;
-				for(String l : lines){
-					try{
-						processingIndex ++;
-
-						lineReader.accept(l, processingIndex);
-
-						setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
-					}
-					catch(Exception e){
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), br.getLineNumber(), l);
-
-						if(!preventExceptionRelaunch)
-							throw e;
-					}
-				}
-
-
-				watch.stop();
-
-				setProgress(100);
-
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
 			}
 		}
 		catch(Exception e){
@@ -128,6 +98,50 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		}
 		finally{
 			lockable.releaseReadLock();
+		}
+
+		if(!isCancelled()){
+			try{
+				LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
+				setProgress(0);
+
+				int totalLines = lines.size();
+				int processingIndex = 0;
+				for(String line : lines){
+					try{
+						processingIndex ++;
+
+						lineReader.accept(line, processingIndex);
+
+						setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
+					}
+					catch(Exception e){
+						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex, line);
+
+						if(!preventExceptionRelaunch)
+							throw e;
+					}
+				}
+
+
+				watch.stop();
+
+				setProgress(100);
+
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
+			}
+			catch(Exception e){
+				if(e instanceof ClosedChannelException)
+					LOGGER.warn("Thread interrupted");
+				else{
+					String message = ExceptionHelper.getMessage(e);
+					LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
+				}
+
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
+
+				cancel(true);
+			}
 		}
 
 		return null;
