@@ -111,25 +111,44 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 			int totalLines = lines.size();
 			processingIndex.set(0);
-			lines.parallelStream()
-				.forEach(line -> {
-					if(isCancelled())
-						throw new RuntimeInterruptedException();
+			for(String line : lines){
+				if(isCancelled())
+					throw new InterruptedException();
 
-					try{
-						processingIndex.incrementAndGet();
+				try{
+					processingIndex.incrementAndGet();
 
-						lineReader.accept(line, processingIndex.get());
+					lineReader.accept(line, processingIndex.get());
 
-						setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
-					}
-					catch(Exception e){
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
+					setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
+				}
+				catch(Exception e){
+					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
 
-						if(!preventExceptionRelaunch)
-							throw e;
-					}
-				});
+					if(!preventExceptionRelaunch)
+						throw e;
+				}
+			}
+//			processingIndex.set(0);
+//			lines.parallelStream()
+//				.forEach(line -> {
+//					if(isCancelled())
+//						throw new RuntimeInterruptedException();
+//
+//					try{
+//						processingIndex.incrementAndGet();
+//
+//						lineReader.accept(line, processingIndex.get());
+//
+//						setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
+//					}
+//					catch(Exception e){
+//						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
+//
+//						if(!preventExceptionRelaunch)
+//							throw e;
+//					}
+//				});
 
 
 			watch.stop();
