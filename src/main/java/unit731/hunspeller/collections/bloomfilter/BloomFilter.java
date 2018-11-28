@@ -164,7 +164,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter
 	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
-	public boolean add(byte[] bytes){
+	public synchronized boolean add(byte[] bytes){
 		boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;

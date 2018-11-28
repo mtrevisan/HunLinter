@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	public static final String WORKER_NAME = "Word count";
 
-	private long totalProductions;
+	private final AtomicInteger totalProductions = new AtomicInteger(0);
 	private final BloomFilterInterface<String> dictionary;
 
 
@@ -38,7 +39,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			totalProductions += productions.size();
+			totalProductions.addAndGet(productions.size());
 			for(Production production : productions)
 				dictionary.add(production.getWord());
 		};
@@ -62,7 +63,7 @@ public class WordCountWorker extends WorkerDictionaryReadBase{
 
 	@Override
 	public void clear(){
-		totalProductions = 0l;
+		totalProductions.set(0);
 		dictionary.clear();
 	}
 
