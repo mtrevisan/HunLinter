@@ -45,7 +45,6 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/** The default {@link Charset} is the platform encoding charset */
 	protected Charset currentCharset = Charset.defaultCharset();
 
-	protected final BitArrayBuilder.Type type;
 	/** The {@link BitArray} instance that holds the entire data */
 	private final BitArray bitArray;
 	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
@@ -68,48 +67,48 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
+	 * @param bitArrayType					The type of the bit array
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, null, null, type);
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
+		this(expectedNumberOfElements, falsePositiveProbability, null, null, bitArrayType);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param bitArrayType					The type of the bit array
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null, type);
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, BitArrayBuilder.Type bitArrayType){
+		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null, bitArrayType);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param bitArrayType					The type of the bit array
 	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher, BitArrayBuilder.Type type){
+	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher,
+			BitArrayBuilder.Type bitArrayType){
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
 			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
 
-		this.type = type;
 		expectedElements = expectedNumberOfElements;
 		this.falsePositiveProbability = falsePositiveProbability;
 
 		bitsRequired = optimalBitSize(expectedNumberOfElements, falsePositiveProbability);
 		hashFunctions = optimalNumberOfHashFunctions(falsePositiveProbability);
-		bitArray = BitArrayBuilder.getBitArray(type, bitsRequired);
+		bitArray = BitArrayBuilder.getBitArray(bitArrayType, bitsRequired);
 
 		this.decomposer = decomposer;
 		this.hasher = ObjectUtils.defaultIfNull(hasher, HASHER_DEFAULT);

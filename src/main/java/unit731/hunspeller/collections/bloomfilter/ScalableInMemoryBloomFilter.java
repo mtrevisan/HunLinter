@@ -18,28 +18,39 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
+	private BitArrayBuilder.Type bitArrayType;
 
 	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
 
 
 	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability){
 		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, BitArrayBuilder.Type.JAVA);
+
+		bitArrayType = BitArrayBuilder.Type.JAVA;
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, type);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
+		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, bitArrayType);
+
+		this.bitArrayType = bitArrayType;
 	}
 
 	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
 		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, BitArrayBuilder.Type.JAVA);
+
+		bitArrayType = BitArrayBuilder.Type.JAVA;
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, type);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull,
+			BitArrayBuilder.Type bitArrayType){
+		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, bitArrayType);
+
+		this.bitArrayType = bitArrayType;
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, double tighteningRatio, BitArrayBuilder.Type type){
-		super(expectedNumberOfElements, falsePositiveProbability, type);
+	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, double tighteningRatio,
+			BitArrayBuilder.Type bitArrayType){
+		super(expectedNumberOfElements, falsePositiveProbability, bitArrayType);
 
 		if(growRatioWhenFull <= 1.)
 			throw new IllegalArgumentException("Grow ratio when full must be strictly greater than one");
@@ -48,6 +59,7 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 
 		this.growRatioWhenFull = growRatioWhenFull;
 		this.tighteningRatio = tighteningRatio;
+		this.bitArrayType = bitArrayType;
 	}
 
 	@Override
@@ -59,7 +71,7 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
 			int size = filters.size();
 			currentFilter = new BloomFilter<>((int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
-				falsePositiveProbability * Math.pow(tighteningRatio, size), type);
+				falsePositiveProbability * Math.pow(tighteningRatio, size), bitArrayType);
 			currentFilter.setCharset(currentCharset);
 			filters.add(0, currentFilter);
 		}
