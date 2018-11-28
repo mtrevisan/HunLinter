@@ -53,12 +53,12 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 	@Override
 	protected Void doInBackground() throws IOException{
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file (pass 1/2)");
+		setProgress(0);
 
 		watch.reset();
 
 		lockable.acquireReadLock();
 
-		setProgress(0);
 		long totalSize = dicFile.length();
 		List<String> lines = new ArrayList<>();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
