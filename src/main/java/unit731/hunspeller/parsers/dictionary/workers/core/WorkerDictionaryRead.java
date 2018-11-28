@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -25,9 +26,12 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionaryRead.class);
 
 
+	private final AtomicInteger processingIndex = new AtomicInteger(0);
+
 	protected boolean preventExceptionRelaunch;
 
 	private final File dicFile;
+
 
 	public WorkerDictionaryRead(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> lineReader,
 			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
@@ -106,20 +110,20 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			setProgress(0);
 
 			int totalLines = lines.size();
-			int processingIndex = 0;
+			processingIndex.set(0);
 			for(String line : lines){
 				if(isCancelled())
 					throw new InterruptedException();
 
 				try{
-					processingIndex ++;
+					processingIndex.incrementAndGet();
 
-					lineReader.accept(line, processingIndex);
+					lineReader.accept(line, processingIndex.get());
 
-					setProgress(Math.min((int)Math.ceil((processingIndex * 100.) / totalLines), 100));
+					setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
 				}
 				catch(Exception e){
-					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex, line);
+					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
 
 					if(!preventExceptionRelaunch)
 						throw e;
