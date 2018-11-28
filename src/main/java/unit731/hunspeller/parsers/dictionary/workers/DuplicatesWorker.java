@@ -109,10 +109,10 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
-		bloomFilter.setCharset(dicParser.getCharset());
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dictionaryBaseData.getGrowRatioWhenFull());
-		duplicatesBloomFilter.setCharset(dicParser.getCharset());
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
+			dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
+		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
+			EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dictionaryBaseData.getGrowRatioWhenFull());
 
 		setProgress(0);
 		File dicFile = dicParser.getDicFile();

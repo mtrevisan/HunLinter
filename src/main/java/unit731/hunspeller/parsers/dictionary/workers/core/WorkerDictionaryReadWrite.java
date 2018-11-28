@@ -90,7 +90,7 @@ public class WorkerDictionaryReadWrite extends WorkerBase<BufferedWriter, String
 					}
 				}
 
-				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+				setProgress(Math.min((int)Math.ceil((readSoFar * 100.) / totalSize), 100));
 			}
 
 			if(!isCancelled()){

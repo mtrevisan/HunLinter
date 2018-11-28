@@ -30,9 +30,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
-		dictionary = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(),
+		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData.getExpectedNumberOfElements(),
 			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
-		dictionary.setCharset(dicParser.getCharset());
 
 		BiConsumer<String, Integer> lineReader = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);

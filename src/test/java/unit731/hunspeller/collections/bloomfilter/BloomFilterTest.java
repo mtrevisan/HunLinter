@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.bloomfilter;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +19,7 @@ public class BloomFilterTest{
 
 	@Test
 	public void defaultFilter(){
-		BloomFilterInterface<String> filter = new BloomFilter<>(10 * MAX, FPP, BitArrayBuilder.Type.JAVA);
+		BloomFilterInterface<String> filter = new BloomFilter<>(StandardCharsets.UTF_8, 10 * MAX, FPP, BitArrayBuilder.Type.JAVA);
 
 		//generate two one-million uuid arrays
 		List<String> contained = new ArrayList<>();

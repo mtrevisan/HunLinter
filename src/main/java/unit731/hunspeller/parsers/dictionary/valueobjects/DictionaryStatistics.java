@@ -43,8 +43,8 @@ public class DictionaryStatistics implements Closeable{
 
 
 	public DictionaryStatistics(String language, Charset charset, DictionaryBaseData dictionaryBaseData){
-		bloomFilter = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
-		bloomFilter.setCharset(charset);
+		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData.getExpectedNumberOfElements(),
+			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
 		orthography = OrthographyBuilder.getOrthography(language);
 	}
 

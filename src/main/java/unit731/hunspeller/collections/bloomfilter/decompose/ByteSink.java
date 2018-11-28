@@ -11,9 +11,9 @@ import java.io.IOException;
 public class ByteSink{
 
 	/** The actual storage stream */
-	protected ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 	/** Wrapper over the byte stream */
-	protected DataOutputStream dataStream = new DataOutputStream(stream);
+	private final DataOutputStream dataStream = new DataOutputStream(stream);
 
 
 	/**

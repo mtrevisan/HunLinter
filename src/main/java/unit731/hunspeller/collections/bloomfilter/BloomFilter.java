@@ -43,8 +43,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 
 	/** The default {@link Charset} is the platform encoding charset */
-	protected Charset currentCharset = Charset.defaultCharset();
+	private Charset charset;
 
+	private BitArrayBuilder.Type bitArrayType;
 	/** The {@link BitArray} instance that holds the entire data */
 	private final BitArray bitArray;
 	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
@@ -54,60 +55,68 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/** The hashing method to be used for hashing */
 	private final HashFunction hasher;
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
-	protected int expectedElements;
+	private int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	protected double falsePositiveProbability;
+	private double falsePositiveProbability;
 	/** Number of bits required for the bloom filter */
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter */
-	protected int addedElements;
+	private int addedElements;
 
 
 	/**
 	 * Create a new bloom filter.
 	 *
+	 * @param charset							The {@link Charset} to be used
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param bitArrayType					The type of the bit array
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
-		this(expectedNumberOfElements, falsePositiveProbability, null, null, bitArrayType);
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, null, null, bitArrayType);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
+	 * @param charset							The {@link Charset} to be used
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 * @param bitArrayType					The type of the bit array
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, BitArrayBuilder.Type bitArrayType){
-		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null, bitArrayType);
-	}
-
-	/**
-	 * Create a new bloom filter.
-	 *
-	 * @param expectedNumberOfElements	The number of max expected insertions
-	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param bitArrayType					The type of the bit array
-	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
-	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher,
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer,
 			BitArrayBuilder.Type bitArrayType){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, decomposer, null, bitArrayType);
+	}
+
+	/**
+	 * Create a new bloom filter.
+	 *
+	 * @param charset							The {@link Charset} to be used
+	 * @param expectedNumberOfElements	The number of max expected insertions
+	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
+	 * @param bitArrayType					The type of the bit array
+	 */
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher,
+			BitArrayBuilder.Type bitArrayType){
+		Objects.nonNull(charset);
+		Objects.nonNull(bitArrayType);
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
 			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
 
+		this.charset = charset;
 		expectedElements = expectedNumberOfElements;
 		this.falsePositiveProbability = falsePositiveProbability;
 
 		bitsRequired = optimalBitSize(expectedNumberOfElements, falsePositiveProbability);
 		hashFunctions = optimalNumberOfHashFunctions(falsePositiveProbability);
+		this.bitArrayType = bitArrayType;
 		bitArray = BitArrayBuilder.getBitArray(bitArrayType, bitsRequired);
 
 		this.decomposer = decomposer;
@@ -236,9 +245,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private byte[] decomposeValue(T value){
 		ByteSink sink = new ByteSink();
 		if(decomposer != null)
-			decomposer.decompose(value, sink, currentCharset);
+			decomposer.decompose(value, sink, charset);
 		else
-			DECOMPOSER_DEFAULT.decompose(value, sink, currentCharset);
+			DECOMPOSER_DEFAULT.decompose(value, sink, charset);
 		return sink.getByteArray();
 	}
 
@@ -250,14 +259,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public boolean contains(T value){
-		return (value != null && contains(value.toString().getBytes(currentCharset)));
-	}
-
-	@Override
-	public void setCharset(Charset charset){
-		Objects.requireNonNull(charset, "Charset to be changed to cannot be null");
-
-		currentCharset = charset;
+		return (value != null && contains(value.toString().getBytes(charset)));
 	}
 
 	@Override
@@ -283,13 +285,13 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	/** Sets all bits to false in the Bloom filter. */
 	@Override
-	public void clear(){
+	public synchronized void clear(){
 		bitArray.clearAll();
 		addedElements = 0;
 	}
 
 	@Override
-	public void close(){
+	public synchronized void close(){
 		try{
 			bitArray.close();
 		}

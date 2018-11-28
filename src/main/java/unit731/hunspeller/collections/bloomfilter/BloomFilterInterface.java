@@ -1,6 +1,5 @@
 package unit731.hunspeller.collections.bloomfilter;
 
-import java.nio.charset.Charset;
 import unit731.hunspeller.collections.bloomfilter.decompose.Decomposer;
 
 
@@ -57,16 +56,6 @@ public interface BloomFilterInterface<T>{
 	boolean contains(T value);
 
 	/**
-	 * Override the default charset that will be used when decomposing the
-	 * {@link String} values into byte arrays. The default {@link Charset} used
-	 * in the platform's default {@link Charset}.
-	 *
-	 * @param charset	The {@link Charset} to be used
-	 * @throws NullPointerException	if the charset is null
-	 */
-	void setCharset(Charset charset);
-
-	/**
 	 * Get the number of added elements.
 	 *
 	 * @return the number of added elements
@@ -103,10 +92,10 @@ public interface BloomFilterInterface<T>{
 	/**
 	 * Estimate the current false positive rate (approximated) when given number of elements have been inserted in to the filter.
 	 *
-	 * @param numInsertedElements	The number of elements inserted into the filter
+	 * @param insertedElements	The number of elements inserted into the filter
 	 * @return the approximated false positive rate
 	 */
-	double getTrueFalsePositiveProbability(int numInsertedElements);
+	double getTrueFalsePositiveProbability(int insertedElements);
 
 	/** Clear the Bloom filter. */
 	void clear();

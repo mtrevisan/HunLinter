@@ -81,7 +81,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 				if(!line.isEmpty())
 					lines.add(line);
 
-				setProgress((int)Math.ceil((readSoFar * 100.) / totalSize));
+				setProgress(Math.min((int)Math.ceil((readSoFar * 100.) / totalSize), 100));
 			}
 		}
 		catch(Exception e){
@@ -116,7 +116,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 					lineReader.accept(line, processingIndex);
 
-					setProgress((int)Math.ceil((processingIndex * 100.) / totalLines));
+					setProgress(Math.min((int)Math.ceil((processingIndex * 100.) / totalLines), 100));
 				}
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex, line);

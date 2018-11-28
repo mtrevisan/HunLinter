@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
