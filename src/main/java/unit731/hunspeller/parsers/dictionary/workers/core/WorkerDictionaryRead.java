@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -64,7 +65,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 		lockable.acquireReadLock();
 
 		long totalSize = dicFile.length();
-		List<String> lines = new ArrayList<>();
+		List<Pair<Integer, String>> lines = new ArrayList<>();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
 			if(line == null)
@@ -83,7 +84,7 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty())
-					lines.add(line);
+					lines.add(Pair.of(br.getLineNumber(), line));
 
 				setProgress(Math.min((int)Math.ceil((readSoFar * 100.) / totalSize), 100));
 			}
@@ -131,19 +132,19 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 //			}
 			processingIndex.set(0);
 			lines.parallelStream()
-				.forEach(line -> {
+				.forEach(rowLine -> {
 					if(isCancelled())
 						throw new RuntimeInterruptedException();
 
 					try{
 						processingIndex.incrementAndGet();
 
-						lineReader.accept(line, processingIndex.get());
+						lineReader.accept(rowLine.getValue(), rowLine.getKey());
 
 						setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
 					}
 					catch(Exception e){
-						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
+						LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 						if(!preventExceptionRelaunch)
 							throw e;
