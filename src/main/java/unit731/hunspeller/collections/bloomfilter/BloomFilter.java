@@ -59,7 +59,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter */
-	private int addedElements;
+	private volatile int addedElements;
 
 
 	/**
