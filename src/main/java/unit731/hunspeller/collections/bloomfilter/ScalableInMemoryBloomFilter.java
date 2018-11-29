@@ -19,14 +19,14 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	/** The default {@link Charset} is the platform encoding charset */
-	private Charset charset;
+	private final Charset charset;
+	private final BitArrayBuilder.Type bitArrayType;
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
-	private int expectedElements;
+	private final int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	private double falsePositiveProbability;
+	private final double falsePositiveProbability;
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
-	private BitArrayBuilder.Type bitArrayType;
 
 	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean add(T value){
+	public synchronized boolean add(T value){
 		if(value == null)
 			return false;
 
@@ -91,7 +91,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean contains(T value){
+	public synchronized boolean contains(T value){
 		boolean result = false;
 		if(value != null)
 			for(BloomFilterInterface<T> filter : filters)
@@ -103,14 +103,14 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public int getAddedElements(){
+	public synchronized int getAddedElements(){
 		return filters.stream()
 			.map(BloomFilterInterface::getAddedElements)
 			.reduce(0, Integer::sum);
 	}
 
 	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
 		int addedElements = (!filters.isEmpty()? filters.get(0).getAddedElements(): 0);
 		return (addedElements >= expectedElements / 2);
 	}
@@ -132,7 +132,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	//P = 1 - Prod(i = 0 to n - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		int size = filters.size();
 		double p0 = filters.get(size - 1).getFalsePositiveProbability();
 		double probability = 1.;
@@ -144,13 +144,13 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public void clear(){
+	public synchronized void clear(){
 		for(BloomFilterInterface<T> filter : filters)
 			filter.clear();
 	}
 
 	@Override
-	public void close(){
+	public synchronized void close(){
 		for(BloomFilterInterface<T> filter : filters)
 			filter.close();
 	}

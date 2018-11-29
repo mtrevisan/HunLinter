@@ -127,7 +127,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public int getAddedElements(){
+	public synchronized int getAddedElements(){
 		return addedElements;
 	}
 
@@ -173,7 +173,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private boolean calculateIndexes(byte[] bytes){
+	private synchronized boolean calculateIndexes(byte[] bytes){
 		boolean bitsChanged = false;
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
@@ -197,7 +197,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public boolean contains(byte[] bytes){
+	public synchronized boolean contains(byte[] bytes){
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
 		int highHash = (int)(hash >>> 32);
@@ -259,7 +259,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
 		return (addedElements >= expectedElements);
 	}
 
@@ -269,7 +269,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		return getTrueFalsePositiveProbability(addedElements);
 	}
 
