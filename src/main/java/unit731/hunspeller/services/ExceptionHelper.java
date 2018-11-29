@@ -23,7 +23,8 @@ public class ExceptionHelper{
 					break;
 				}
 			message = stackTrace0.getFileName();
-			message = String.join(StringUtils.EMPTY, message.substring(0, message.indexOf('.')), DOT, stackTrace0.getMethodName(), ":", Integer.toString(stackTrace0.getLineNumber()));
+			message = String.join(StringUtils.EMPTY, message.substring(0, message.indexOf('.')), DOT, stackTrace0.getMethodName(), ":",
+				Integer.toString(stackTrace0.getLineNumber()));
 		}
 		return message;
 	}
