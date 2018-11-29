@@ -51,11 +51,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private final Decomposer<T> decomposer;
 	/** The hashing method to be used for hashing */
 	private final HashFunction hasher;
-
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
-	private int expectedElements;
+	private final int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	private double falsePositiveProbability;
+	private final double falsePositiveProbability;
 	/** Number of bits required for the bloom filter */
 	private final int bitsRequired;
 
