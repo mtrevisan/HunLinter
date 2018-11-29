@@ -1,9 +1,8 @@
 package unit731.hunspeller.collections.bloomfilter;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+import java.util.Stack;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
@@ -28,7 +27,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
 
-	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
+	private final Stack<BloomFilterInterface<T>> filters = new Stack<>();
 
 
 	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability){
@@ -75,11 +74,11 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 		if(value == null)
 			return false;
 
-		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
+		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
 		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
 			currentFilter = fork(filters.size());
 
-			filters.add(0, currentFilter);
+			filters.push(currentFilter);
 		}
 
 		return currentFilter.add(value);
@@ -111,7 +110,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized boolean isFull(){
-		int addedElements = (!filters.isEmpty()? filters.get(0).getAddedElements(): 0);
+		int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
 		return (addedElements >= expectedElements / 2);
 	}
 
@@ -134,7 +133,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public synchronized double getTrueFalsePositiveProbability(){
 		int size = filters.size();
-		double p0 = filters.get(size - 1).getFalsePositiveProbability();
+		double p0 = filters.lastElement().getFalsePositiveProbability();
 		double probability = 1.;
 		for(int i = 0; i < size; i ++)
 			probability *= 1 - p0 * Math.pow(tighteningRatio, i);
