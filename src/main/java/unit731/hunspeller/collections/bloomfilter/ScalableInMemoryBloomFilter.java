@@ -91,14 +91,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized boolean contains(T value){
-		boolean result = false;
-		if(value != null)
-			for(BloomFilterInterface<T> filter : filters)
-				if(filter.contains(value)){
-					result = true;
-					break;
-				}
-		return result;
+		return (value != null && filters.stream().anyMatch(filter -> filter.contains(value)));
 	}
 
 	@Override
@@ -144,14 +137,12 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized void clear(){
-		for(BloomFilterInterface<T> filter : filters)
-			filter.clear();
+		filters.forEach(BloomFilterInterface::clear);
 	}
 
 	@Override
 	public synchronized void close(){
-		for(BloomFilterInterface<T> filter : filters)
-			filter.close();
+		filters.forEach(BloomFilterInterface::close);
 	}
 
 }
