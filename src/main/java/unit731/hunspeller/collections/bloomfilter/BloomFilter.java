@@ -43,16 +43,15 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 
 	/** The default {@link Charset} is the platform encoding charset */
-	private Charset charset;
-
+	private final Charset charset;
 	/** The {@link BitArray} instance that holds the entire data */
 	private final BitArray bitArray;
 	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
 	private final int hashFunctions;
-
 	private final Decomposer<T> decomposer;
 	/** The hashing method to be used for hashing */
 	private final HashFunction hasher;
+
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
 	private int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
