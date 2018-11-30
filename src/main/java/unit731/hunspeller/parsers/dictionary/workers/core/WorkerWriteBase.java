@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -25,8 +26,18 @@ public class WorkerWriteBase<T>{
 	}
 
 	public void execute(){
+		clear();
+
 		worker.execute();
 	}
+
+	public void executeInline() throws IOException{
+		clear();
+
+		worker.doInBackground();
+	}
+
+	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
 		return worker.getState();
