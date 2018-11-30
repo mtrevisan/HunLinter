@@ -42,8 +42,6 @@ public class Trie<S, H, V>{
 	private TrieSequencerInterface<S, H> sequencer;
 
 
-	private Trie(){}
-
 	public Trie(TrieSequencerInterface<S, H> sequencer){
 		this.sequencer = sequencer;
 	}

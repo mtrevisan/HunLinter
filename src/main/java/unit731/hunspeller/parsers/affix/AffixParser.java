@@ -533,7 +533,6 @@ public class AffixParser extends ReadWriteLockable{
 		return data.containsKey(key);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> T getData(AffixTag key){
 		return getData(key.getCode());
 	}

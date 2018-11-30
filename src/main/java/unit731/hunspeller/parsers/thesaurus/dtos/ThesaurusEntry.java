@@ -27,8 +27,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	private List<MeaningEntry> meanings;
 
 
-	private ThesaurusEntry(){}
-
 	public ThesaurusEntry(String synonym, List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(meanings);

@@ -46,8 +46,6 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 		private ThesaurusDictionary dictionary;
 
 
-		private Memento(){}
-
 		Memento(ThesaurusDictionary dictionary){
 			this.dictionary = dictionary;
 		}
