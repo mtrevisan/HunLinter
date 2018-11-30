@@ -13,49 +13,49 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 public class WorkerDictionaryReadWriteBase{
 
-	private WorkerDictionaryReadWrite worker;
+	private WorkerDictionaryReadWrite readerWriter;
 
 
 	public final void createWorker(String workerName, DictionaryParser dicParser, File outputFile,
 			BiConsumer<BufferedWriter, String> lineReader, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		worker = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader,
+		readerWriter = new WorkerDictionaryReadWrite(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineReader,
 			completed, cancelled, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
-		worker.addPropertyChangeListener(listener);
+		readerWriter.addPropertyChangeListener(listener);
 	}
 
 	public void execute(){
 		clear();
 
-		worker.execute();
+		readerWriter.execute();
 	}
 
 	public void executeInline() throws IOException{
 		clear();
 
-		worker.doInBackground();
+		readerWriter.doInBackground();
 	}
 
 	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
-		return worker.getState();
+		return readerWriter.getState();
 	}
 
 	public void cancel(){
-		worker.cancel(true);
+		readerWriter.cancel(true);
 	}
 
 	public boolean isCancelled(){
-		return worker.isCancelled();
+		return readerWriter.isCancelled();
 	}
 
 	public boolean isDone(){
-		return worker.isDone();
+		return readerWriter.isDone();
 	}
 
 }

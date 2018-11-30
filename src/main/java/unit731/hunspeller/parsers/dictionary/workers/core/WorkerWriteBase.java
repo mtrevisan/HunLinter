@@ -13,46 +13,46 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 public class WorkerWriteBase<T>{
 
-	private WorkerWrite<T> worker;
+	private WorkerWrite<T> writer;
 
 
 	public final void createWorker(String workerName, List<T> entries, File outputFile, Charset charset,
 			BiConsumer<BufferedWriter, T> lineWriter, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
-		worker = new WorkerWrite<>(workerName, entries, outputFile, charset, lineWriter, completed, cancelled, lockable);
+		writer = new WorkerWrite<>(workerName, entries, outputFile, charset, lineWriter, completed, cancelled, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
-		worker.addPropertyChangeListener(listener);
+		writer.addPropertyChangeListener(listener);
 	}
 
 	public void execute(){
 		clear();
 
-		worker.execute();
+		writer.execute();
 	}
 
 	public void executeInline() throws IOException{
 		clear();
 
-		worker.doInBackground();
+		writer.doInBackground();
 	}
 
 	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
-		return worker.getState();
+		return writer.getState();
 	}
 
 	public void cancel(){
-		worker.cancel(true);
+		writer.cancel(true);
 	}
 
 	public boolean isCancelled(){
-		return worker.isCancelled();
+		return writer.isCancelled();
 	}
 
 	public boolean isDone(){
-		return worker.isDone();
+		return writer.isDone();
 	}
 
 }

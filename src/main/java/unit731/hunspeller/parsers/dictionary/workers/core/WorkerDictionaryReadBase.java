@@ -11,14 +11,14 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 public class WorkerDictionaryReadBase{
 
-	private WorkerDictionaryRead worker;
+	private WorkerDictionaryRead reader;
 
 
 	public final void createWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineReader,
 			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
+		reader = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
 			completed, cancelled, lockable);
 	}
 
@@ -26,43 +26,43 @@ public class WorkerDictionaryReadBase{
 			BiConsumer<String, Integer> lineReader, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		worker = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
+		reader = new WorkerDictionaryRead(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineReader,
 			completed, cancelled, lockable);
-		worker.preventExceptionRelaunch = true;
+		reader.preventExceptionRelaunch = true;
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
-		worker.addPropertyChangeListener(listener);
+		reader.addPropertyChangeListener(listener);
 	}
 
 	public void execute(){
 		clear();
 
-		worker.execute();
+		reader.execute();
 	}
 
 	public void executeInline() throws IOException{
 		clear();
 
-		worker.doInBackground();
+		reader.doInBackground();
 	}
 
 	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
-		return worker.getState();
+		return reader.getState();
 	}
 
 	public void cancel(){
-		worker.cancel(true);
+		reader.cancel(true);
 	}
 
 	public boolean isCancelled(){
-		return worker.isCancelled();
+		return reader.isCancelled();
 	}
 
 	public boolean isDone(){
-		return worker.isDone();
+		return reader.isDone();
 	}
 
 }
