@@ -43,7 +43,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	protected static class Memento{
 
 		@JsonProperty
-		private ThesaurusDictionary dictionary;
+		private final ThesaurusDictionary dictionary;
 
 
 		Memento(ThesaurusDictionary dictionary){

@@ -22,7 +22,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 
 	@JsonProperty
-	private String synonym;
+	private final String synonym;
 	@JsonProperty
 	private List<MeaningEntry> meanings;
 
