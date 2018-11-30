@@ -22,13 +22,12 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 	public static final String WORKER_NAME = "Statistics";
 
 	private final boolean performHyphenationStatistics;
-
 	private final DictionaryStatistics dicStatistics;
 
 
 	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
 			DictionaryBaseData dictionaryBaseData, boolean performHyphenationStatistics, Frame parent){
-		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(dictionaryBaseData);

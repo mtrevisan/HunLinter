@@ -111,25 +111,6 @@ public class WorkerDictionaryRead extends WorkerBase<String, Integer>{
 			setProgress(0);
 
 			int totalLines = lines.size();
-//			processingIndex.set(0);
-//			for(String line : lines){
-//				if(isCancelled())
-//					throw new InterruptedException();
-//
-//				try{
-//					processingIndex.incrementAndGet();
-//
-//					lineReader.accept(line, processingIndex.get());
-//
-//					setProgress(Math.min((int)Math.ceil((processingIndex.get() * 100.) / totalLines), 100));
-//				}
-//				catch(Exception e){
-//					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), processingIndex.get(), line);
-//
-//					if(!preventExceptionRelaunch)
-//						throw e;
-//				}
-//			}
 			processingIndex.set(0);
 			lines.parallelStream()
 				.forEach(rowLine -> {
