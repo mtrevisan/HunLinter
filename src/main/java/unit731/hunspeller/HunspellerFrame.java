@@ -622,7 +622,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypWordLabel.setLabelFor(hypWordTextField);
       hypWordLabel.setText("Word:");
 
-      hypWordTextField.setNextFocusableComponent(hypAddRuleTextField);
       hypWordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
          public void keyReleased(java.awt.event.KeyEvent evt) {
             hypWordTextFieldKeyReleased(evt);

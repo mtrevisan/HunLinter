@@ -1,6 +1,7 @@
 package unit731.hunspeller;
 
 import java.awt.FlowLayout;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -79,7 +80,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
       btnOk.setText("Ok");
       btnOk.setMaximumSize(new java.awt.Dimension(65, 23));
       btnOk.setMinimumSize(new java.awt.Dimension(65, 23));
-      btnOk.setNextFocusableComponent(btnCancel);
       btnOk.setPreferredSize(new java.awt.Dimension(65, 23));
       btnOk.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -88,7 +88,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
       });
 
       btnCancel.setText("Cancel");
-      btnCancel.setNextFocusableComponent(btnOk);
       btnCancel.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnCancelActionPerformed(evt);
