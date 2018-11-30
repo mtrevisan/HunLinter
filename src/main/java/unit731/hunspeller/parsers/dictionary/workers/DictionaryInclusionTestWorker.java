@@ -27,7 +27,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryReadBase{
 
 	public DictionaryInclusionTestWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
 			ReadWriteLockable lockable){
-		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(dictionaryBaseData);
 		Objects.requireNonNull(wordGenerator);
 
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData.getExpectedNumberOfElements(),

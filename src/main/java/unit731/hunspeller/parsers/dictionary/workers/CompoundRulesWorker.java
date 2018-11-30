@@ -17,7 +17,6 @@ public class CompoundRulesWorker extends WorkerDictionaryReadBase{
 
 	public CompoundRulesWorker(DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader,
 			Runnable completed, ReadWriteLockable lockable){
-		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(productionReader);
 		Objects.requireNonNull(lockable);
