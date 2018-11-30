@@ -4,7 +4,7 @@
 
 	<groupId>unit731</groupId>
 	<artifactId>Hunspeller</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -238,13 +238,6 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- ConcurrentUnit -->
-<!--		<dependency>
-			<groupId>net.jodah</groupId>
-			<artifactId>concurrentunit</artifactId>
-			<version>${concurrent.unit.version}</version>
-			<scope>test</scope>
-		</dependency>-->
 		<!-- FindBugs -->
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
