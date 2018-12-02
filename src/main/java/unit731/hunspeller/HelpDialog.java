@@ -97,6 +97,7 @@ public class HelpDialog extends JDialog{
       lblManagedOptionsTextArea = new javax.swing.JTextArea();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+      setResizable(false);
 
       lblProductVersion.setLabelFor(lblProductVersionOut);
       lblProductVersion.setText("Product Version:");

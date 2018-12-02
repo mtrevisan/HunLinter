@@ -280,6 +280,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
       setTitle("Hunspeller");
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
+      setMinimumSize(new java.awt.Dimension(964, 534));
+      setPreferredSize(new java.awt.Dimension(964, 534));
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
