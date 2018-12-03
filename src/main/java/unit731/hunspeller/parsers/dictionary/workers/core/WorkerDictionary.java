@@ -40,7 +40,8 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	private final File outputFile;
 
 
-	public WorkerDictionary(String workerName, File dicFile, Charset charset, BiConsumer<String, Integer> readLineProcessor,
+	public WorkerDictionary(String workerName, File dicFile, Charset charset,
+			BiConsumer<String, Integer> readLineProcessor,
 			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		this(workerName, dicFile, null, charset, readLineProcessor, null, completed, cancelled, lockable);
 
@@ -48,15 +49,18 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	public WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		this(workerName, dicFile, outputFile, charset, null, writeLineProcessor, completed, cancelled, lockable);
 
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(writeLineProcessor);
 	}
 
-	private WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset, BiConsumer<String, Integer> readLineProcessor,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+	private WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
+			BiConsumer<String, Integer> readLineProcessor,
+			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);

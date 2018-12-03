@@ -14,85 +14,90 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 public class WorkerDictionaryBase{
 
-	private WorkerDictionary reader;
+	private WorkerDictionary worker;
 
 
-	public final void createReadWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineProcessor,
+	public final void createReadWorker(String workerName, DictionaryParser dicParser,
+			BiConsumer<String, Integer> lineProcessor,
 			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		reader = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
+		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
 			completed, cancelled, lockable);
 	}
 
 	public final void createReadWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
-		Objects.requireNonNull(dicParser);
-
-		reader = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
-			completed, cancelled, lockable);
-		reader.preventExceptionRelaunch = true;
-	}
-
-	public final void createReadParallelWorker(String workerName, DictionaryParser dicParser, BiConsumer<String, Integer> lineProcessor,
+			BiConsumer<String, Integer> lineProcessor,
 			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		reader = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
+		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
 			completed, cancelled, lockable);
-		reader.parallelProcessing = true;
+		worker.preventExceptionRelaunch = true;
+	}
+
+	public final void createReadParallelWorker(String workerName, DictionaryParser dicParser,
+			BiConsumer<String, Integer> lineProcessor,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+		Objects.requireNonNull(dicParser);
+
+		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
+			completed, cancelled, lockable);
+		worker.parallelProcessing = true;
 	}
 
 	public final void createReadParallelWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+			BiConsumer<String, Integer> lineProcessor,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		reader = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
+		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
 			completed, cancelled, lockable);
-		reader.parallelProcessing = true;
-		reader.preventExceptionRelaunch = true;
+		worker.parallelProcessing = true;
+		worker.preventExceptionRelaunch = true;
 	}
 
 	public final void createReadWriteWorker(String workerName, DictionaryParser dicParser, File outputFile,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor, Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+			BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor,
+			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 
-		reader = new WorkerDictionary(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineProcessor,
+		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineProcessor,
 			completed, cancelled, lockable);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){
-		reader.addPropertyChangeListener(listener);
+		worker.addPropertyChangeListener(listener);
 	}
 
 	public void execute(){
 		clear();
 
-		reader.execute();
+		worker.execute();
 	}
 
 	public void executeInline() throws IOException{
 		clear();
 
-		reader.doInBackground();
+		worker.doInBackground();
 	}
 
 	public void clear(){}
 
 	public SwingWorker.StateValue getState(){
-		return reader.getState();
+		return worker.getState();
 	}
 
 	public void cancel(){
-		reader.cancel(true);
+		worker.cancel(true);
 	}
 
 	public boolean isCancelled(){
-		return reader.isCancelled();
+		return worker.isCancelled();
 	}
 
 	public boolean isDone(){
-		return reader.isDone();
+		return worker.isDone();
 	}
 
 }

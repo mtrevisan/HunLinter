@@ -47,7 +47,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, File outputFile, ReadWriteLockable lockable){
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator,
+			File outputFile, ReadWriteLockable lockable){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);
