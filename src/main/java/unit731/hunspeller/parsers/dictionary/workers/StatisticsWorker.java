@@ -1,6 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
 import java.io.IOException;
 import java.util.List;
@@ -17,7 +17,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 
 
-public class StatisticsWorker extends WorkerDictionaryReadBase{
+public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Statistics";
 
@@ -38,7 +38,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), affParser.getCharset(), dictionaryBaseData);
 
 
-		BiConsumer<String, Integer> lineReader = (line, row) -> {
+		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			for(Production production : productions){
@@ -75,7 +75,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 			}
 			catch(IOException e){}
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, completed, cancelled, affParser);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled, affParser);
 	}
 
 	public boolean isPerformHyphenationStatistics(){
