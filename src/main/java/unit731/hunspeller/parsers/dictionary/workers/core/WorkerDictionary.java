@@ -91,9 +91,9 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		List<Pair<Integer, String>> lines = readLines();
 
 		if(outputFile == null)
-			readProcessLines(lines);
+			readProcess(lines);
 		else
-			writeProcessLines(lines);
+			writeProcess(lines);
 
 		return null;
 	}
@@ -144,7 +144,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		return lines;
 	}
 
-	private void readProcessLines(List<Pair<Integer, String>> lines){
+	private void readProcess(List<Pair<Integer, String>> lines){
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
 			setProgress(0);
@@ -197,7 +197,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		}
 	}
 
-	private void writeProcessLines(List<Pair<Integer, String>> lines){
+	private void writeProcess(List<Pair<Integer, String>> lines){
 		LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
 
 		setProgress(0);
