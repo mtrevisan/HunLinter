@@ -115,7 +115,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 						}
 					}
 
-					setProgress(Math.min((int)Math.floor((readSoFar * 100.) / totalSize), 100));
+					setProgress(getProgress(readSoFar, totalSize));
 				}
 			}
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Support file written");
@@ -178,7 +178,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 					sourceBR.reset();
 
-					setProgress((int)((readSoFarSource * 100.) / totalSizeSource));
+					setProgress(getProgress(readSoFarSource, totalSizeSource));
 				}
 			}
 			setProgress(100);
@@ -248,6 +248,10 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		}
 
 		return null;
+	}
+
+	private int getProgress(double index, double total){
+		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 }

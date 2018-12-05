@@ -147,7 +147,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					}
 				}
 
-				setProgress((int)((readSoFar * 100.) / totalSize));
+				setProgress(getProgress(readSoFar, totalSize));
 			}
 
 			bloomFilter.close();
@@ -207,7 +207,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						}
 					}
 
-					setProgress((int)((readSoFar * 100.) / totalSize));
+					setProgress(getProgress(readSoFar, totalSize));
 				}
 			}
 			setProgress(100);
@@ -236,7 +236,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			int writtenSoFar = 0;
 			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			setProgress((int)(100. / (totalSize + 1)));
+			setProgress(getProgress(1., totalSize + 1));
 			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().getWord());
@@ -250,13 +250,17 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					writer.newLine();
 
 					writtenSoFar ++;
-					setProgress((int)((writtenSoFar * 100.) / (totalSize + 1)));
+					setProgress(getProgress(writtenSoFar, totalSize + 1));
 				}
 			}
 			setProgress(100);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 		}
+	}
+
+	private int getProgress(double index, double total){
+		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 	private List<List<Duplicate>> mergeDuplicates(List<Duplicate> duplicates){

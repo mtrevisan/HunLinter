@@ -127,7 +127,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 				if(!line.isEmpty())
 					lines.add(Pair.of(br.getLineNumber(), line));
 				
-				setProgress(Math.min((int)Math.floor((readSoFar * 100.) / totalSize), 100));
+				setProgress(getProgress(readSoFar, totalSize));
 			}
 		}
 		catch(Exception e){
@@ -164,7 +164,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 
 					readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
-					setProgress(Math.min((int)Math.floor((processingIndex.get() * 100.) / totalLines), 100));
+					setProgress(getProgress(processingIndex.get(), totalLines));
 				}
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
@@ -218,7 +218,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 
 					writeLineProcessor.accept(writer, rowLine);
 
-					setProgress((int)Math.floor((writtenSoFar * 100.) / totalLines));
+					setProgress(getProgress(writtenSoFar, totalLines));
 				}
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
@@ -247,6 +247,10 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			cancel(true);
 		}
+	}
+
+	private int getProgress(double index, double total){
+		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
 	@Override
