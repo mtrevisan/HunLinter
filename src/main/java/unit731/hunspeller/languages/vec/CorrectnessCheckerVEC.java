@@ -517,14 +517,14 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
 				ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis not needed for " + line + " (missing plural flag), handle " + METAPHONESIS_RULE);
+				throw new IllegalArgumentException("Metaphonesis not needed for " + production.getWord() + " (missing plural flag), handle " + METAPHONESIS_RULE);
 			else{
 				boolean canHaveMetaphonesis = affParser.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 					if(canHaveMetaphonesis && hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis missing for " + line + ", add " + METAPHONESIS_RULE);
+						throw new IllegalArgumentException("Metaphonesis missing for " + production.getWord() + ", add " + METAPHONESIS_RULE);
 					else if(!canHaveMetaphonesis && !hasPluralFlag)
-						throw new IllegalArgumentException("Metaphonesis not needed for " + line + ", remove " + METAPHONESIS_RULE);
+						throw new IllegalArgumentException("Metaphonesis not needed for " + production.getWord() + ", remove " + METAPHONESIS_RULE);
 				}
 			}
 		}
