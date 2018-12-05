@@ -69,13 +69,13 @@ public class HelpDialog extends JDialog{
 		lblReleaseDateOut.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
 		lblManagedOptionsTextArea.setText(
 			"General:\n"
-				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n"
+				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n\n"
 			+ "Suggestions:\n"
-				+ "\tREP\n"
+				+ "\tREP\n\n"
 			+ "Compounding:\n"
-				+ "\tCOMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n"
+				+ "\tCOMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n\n"
 			+ "Affix creation:\n"
-				+ "\tPFX, SFX\n"
+				+ "\tPFX, SFX\n\n"
 			+ "Others:\n"
 				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
 		lblManagedOptionsTextArea.setCaretPosition(0);
@@ -123,8 +123,10 @@ public class HelpDialog extends JDialog{
       lblManagedOptionsTextArea.setEditable(false);
       lblManagedOptionsTextArea.setColumns(20);
       lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      lblManagedOptionsTextArea.setLineWrap(true);
       lblManagedOptionsTextArea.setRows(5);
       lblManagedOptionsTextArea.setTabSize(3);
+      lblManagedOptionsTextArea.setWrapStyleWord(true);
       jScrollPane1.setViewportView(lblManagedOptionsTextArea);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
