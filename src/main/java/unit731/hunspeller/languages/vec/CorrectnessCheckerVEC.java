@@ -603,7 +603,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				word = word.toLowerCase(Locale.ROOT);
 				String correctedDerivedWord = orthography.correctOrthography(word);
 				if(!correctedDerivedWord.equals(word))
-					throw new IllegalArgumentException("Word " + word + " is mispelled (should be " + correctedDerivedWord + ")");
+					throw new IllegalArgumentException("Word " + word + " is mispelled, should be " + correctedDerivedWord);
 
 				if(word.length() > 1){
 					Hyphenation hyphenation = hyphenator.hyphenate(word);
