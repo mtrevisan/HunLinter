@@ -61,6 +61,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String PLURAL_NOUN_MASCULINE_IO_RULE = "M1";
 	private static final String VARIANT_TRANSFORMATIONS_BEGIN_RULE = "TB";
 	private static final String VARIANT_TRANSFORMATIONS_END_RULE = "TE";
+	private static final String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = "Te";
 	private static final String VARIANT_TRANSFORMATIONS_FEMININE_RULE = "TF";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
@@ -320,6 +321,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private static final Set<MatcherEntry> ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS = new HashSet<>();
 	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1}";
+	private static final String WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = "Word with rule {0} cannot have toehr rules than {1}";
 	static{
 		ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL),
 			WORD_WITH_RULE_CANNOT_HAVE, ADJECTIVE_FIRST_CLASS_RULE));
@@ -500,6 +502,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 		continuationFlagIncompatibilityCheck(production, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_FIRST_CLASS_MISMATCH_CHECKS);
 		continuationFlagIncompatibilityCheck(production, VARIANT_TRANSFORMATIONS_END_RULE, VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS);
+		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
+				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
+			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 		continuationFlagIncompatibilityCheck(production, VARIANT_TRANSFORMATIONS_FEMININE_RULE, VARIANT_TRANSFORMATION_FEMININE_MISMATCH_CHECKS);
 		continuationFlagIncompatibilityCheck(production, GUA_TO_VA_RULE, GUA_TO_VA_CHECKS);
 	}

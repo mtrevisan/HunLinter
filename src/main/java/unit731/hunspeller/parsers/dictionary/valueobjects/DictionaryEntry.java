@@ -150,6 +150,10 @@ public class DictionaryEntry{
 		return false;
 	}
 
+	public int getContinuationFlagCount(){
+		return continuationFlags.length;
+	}
+
 	public boolean hasContinuationFlag(String ... continuationFlags){
 		if(this.continuationFlags != null && continuationFlags != null)
 			for(String flag : this.continuationFlags)
