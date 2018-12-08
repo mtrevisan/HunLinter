@@ -345,8 +345,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_END_RULE));
 		VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(PLURAL_NOUN_MASCULINE_IO_RULE),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_END_RULE));
-		VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL, DIMINUTIVE_ETO_RULE_VANISHING_EL),
-			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_END_RULE));
 		VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_RULE_VANISHING_EL),
 			WORD_WITH_RULE_CANNOT_HAVE, VARIANT_TRANSFORMATIONS_END_RULE));
 		VARIANT_TRANSFORMATION_END_MISMATCH_CHECKS.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_A_RULE_NON_VANISHING_EL, AUGMENTATIVE_ON_A_RULE_VANISHING_EL),
@@ -540,7 +538,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		if(!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
 				&& hyphenator.hyphenate(word).countSyllabes() > 1){
 			List<String> subwords = hyphenator.splitIntoCompounds(word);
-			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)? NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
+				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			boolean canHaveNorthernPlural = (production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
@@ -548,7 +547,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				if(canHaveNorthernPlural)
 					throw new IllegalArgumentException("Northern plural missing for " + word + ", add " + rule);
 				else if(!canHaveNorthernPlural)
-					throw new IllegalArgumentException("Northern plural not needed for " + word + ", remove " + NORTHERN_PLURAL_RULE + " or " + NORTHERN_PLURAL_STRESSED_RULE);
+					throw new IllegalArgumentException("Northern plural not needed for " + word + ", remove " + NORTHERN_PLURAL_RULE
+						+ " or " + NORTHERN_PLURAL_STRESSED_RULE);
 			}
 		}
 	}
