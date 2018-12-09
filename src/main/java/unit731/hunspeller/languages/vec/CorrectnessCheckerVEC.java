@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,16 +13,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
+import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.affix.strategies.DoubleASCIIParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
-import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.services.PatternHelper;
@@ -176,56 +170,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	private static final MessageFormat WORD_WITH_RULE_CANNOT_HAVE = new MessageFormat("Word with rule {0} cannot have rule {1} for {2}");
-	private static final MessageFormat WORD_WITH_LETTER_CANNOT_HAVE = new MessageFormat("Word with letter ''{0}'' cannot have rule {1} for {3}");
-	private static final MessageFormat WORD_WITH_LETTER_CANNOT_HAVE_USE = new MessageFormat("Word with letter ''{0}'' cannot have rule {1}, use {2} for {3}");
-
-	private static final class RuleMatcherEntry{
-
-		private final MessageFormat messagePattern;
-		private final String masterFlag;
-		private final String[] wrongFlags;
-
-
-		RuleMatcherEntry(MessageFormat messagePattern, String masterFlag, String[] wrongFlags){
-			this.messagePattern = messagePattern;
-			this.masterFlag = masterFlag;
-			this.wrongFlags = wrongFlags;
-		}
-
-		public void match(Production production) throws IllegalArgumentException{
-			for(String flag : wrongFlags)
-				if(production.hasContinuationFlag(flag)){
-					String message = messagePattern.format(new Object[]{masterFlag, flag, production.getWord()});
-					throw new IllegalArgumentException(message);
-				}
-		}
-	}
-
-	private static final class LetterMatcherEntry{
-
-		private final MessageFormat messagePattern;
-		private final String masterLetter;
-		private final String[] wrongFlags;
-		private final String correctRule;
-
-
-		LetterMatcherEntry(MessageFormat messagePattern, String masterLetter, String[] wrongFlags, String correctRule){
-			this.messagePattern = messagePattern;
-			this.masterLetter = masterLetter;
-			this.wrongFlags = wrongFlags;
-			this.correctRule = correctRule;
-		}
-
-		public void match(Production production) throws IllegalArgumentException{
-			for(String flag : wrongFlags)
-				if(production.hasContinuationFlag(flag)){
-					String message = messagePattern.format(new Object[]{masterLetter, flag, correctRule, production.getWord()});
-					throw new IllegalArgumentException(message);
-				}
-		}
-	}
-
 	private static final Set<MatcherEntry> MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH = new HashSet<>();
 	static{
 		if(false){
@@ -309,16 +253,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 
-	private final Properties rulesProperties = new Properties();
-	private final FlagParsingStrategy strategy = new DoubleASCIIParsingStrategy();
 	private final Orthography orthography = OrthographyVEC.getInstance();
-
-	private boolean enableVerbCheck;
-	private final Map<String, Set<String>> dataFields = new HashMap<>();
-	private Set<String> unsyllabableWords;
-	private Set<String> multipleAccentedWords;
-	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
-	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 
 
 	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator) throws IOException{
@@ -327,63 +262,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		Objects.requireNonNull(hyphenator);
 
 
-		loadRules();
-	}
-
-	private void loadRules() throws IOException{
+		Properties rulesProperties = new Properties();
 		rulesProperties.load(CorrectnessCheckerVEC.class.getResourceAsStream("rules.properties"));
-
-		enableVerbCheck = Boolean.getBoolean((String)rulesProperties.get("verbCheck"));
-
-		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
-		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_STEM, null);
-		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
-
-		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
-		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');
-
-		Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
-		while(rules.hasNext()){
-			String masterFlag = rules.next();
-			String[] wrongFlags = strategy.parseFlags(rules.next());
-			ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
-				.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
-		}
-
-		String letter = null;
-		Iterator<String> letterAndRules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
-		while(letterAndRules.hasNext()){
-			String elem = letterAndRules.next();
-			if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
-				letter = String.valueOf(elem.charAt(1));
-			else{
-				String[] flags = strategy.parseFlags(elem);
-				String correctRule = flags[flags.length - 1];
-				String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-				letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
-					.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
-						letter, wrongFlags, correctRule));
-			}
-		}
-	}
-
-	private Set<String> readPropertyAsSet(String key, char separator){
-		String line = rulesProperties.getProperty(key, StringUtils.EMPTY);
-		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
-	}
-
-	private Iterator<String> readPropertyAsIterator(String key, char separator){
-		List<String> values = new ArrayList<>();
-		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
-		for(String k : keys)
-			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
-				String line = rulesProperties.getProperty(k, StringUtils.EMPTY);
-				if(StringUtils.isNotEmpty(line))
-					values.addAll(Arrays.asList(StringUtils.split(line, separator)));
-			}
-		return values.iterator();
+		loadRules(rulesProperties);
 	}
 
 	@Override
@@ -473,27 +354,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 	}
 
-	private void letterToFlagIncompatibilityCheck(Production production, Map<String, Set<LetterMatcherEntry>> checks)
-			throws IllegalArgumentException{
-		for(Map.Entry<String, Set<LetterMatcherEntry>> check : checks.entrySet())
-			if(StringUtils.containsAny(production.getWord(), check.getKey()))
-				for(LetterMatcherEntry entry : check.getValue())
-					entry.match(production);
-	}
-
 	private void variantIncompatibilityCheck(Production production, Set<MatcherEntry> checks, String... contains)
 			throws IllegalArgumentException{
 		if(StringUtils.containsAny(production.getWord(), contains))
 			for(MatcherEntry entry : checks)
 				entry.match(production);
-	}
-
-	private void flagToFlagIncompatibilityCheck(Production production, Map<String, Set<RuleMatcherEntry>> checks)
-			throws IllegalArgumentException{
-		for(Map.Entry<String, Set<RuleMatcherEntry>> check : checks.entrySet())
-			if(production.hasContinuationFlag(check.getKey()))
-				for(RuleMatcherEntry entry : check.getValue())
-					entry.match(production);
 	}
 
 	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
