@@ -413,8 +413,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				northernPluralCheck(production);
 			}
 
-			mismatchCheck(production);
-
 			finalSonorizationCheck(production);
 
 			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
@@ -466,6 +464,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
 		letterToFlagIncompatibilityCheck(production, letterAndRulesNotCombinable);
+		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
 
 		flagToFlagIncompatibilityCheck(production, ruleAndRulesNotCombinable);
 
@@ -474,19 +473,26 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 	}
 
-	private void flagToFlagIncompatibilityCheck(Production production, Map<String, Set<RuleMatcherEntry>> checks)
-			throws IllegalArgumentException{
-		for(Map.Entry<String, Set<RuleMatcherEntry>> check : checks.entrySet())
-			if(production.hasContinuationFlag(check.getKey()))
-				for(RuleMatcherEntry entry : check.getValue())
-					entry.match(production);
-	}
-
 	private void letterToFlagIncompatibilityCheck(Production production, Map<String, Set<LetterMatcherEntry>> checks)
 			throws IllegalArgumentException{
 		for(Map.Entry<String, Set<LetterMatcherEntry>> check : checks.entrySet())
 			if(StringUtils.containsAny(production.getWord(), check.getKey()))
 				for(LetterMatcherEntry entry : check.getValue())
+					entry.match(production);
+	}
+
+	private void variantIncompatibilityCheck(Production production, Set<MatcherEntry> checks, String... contains)
+			throws IllegalArgumentException{
+		if(StringUtils.containsAny(production.getWord(), contains))
+			for(MatcherEntry entry : checks)
+				entry.match(production);
+	}
+
+	private void flagToFlagIncompatibilityCheck(Production production, Map<String, Set<RuleMatcherEntry>> checks)
+			throws IllegalArgumentException{
+		for(Map.Entry<String, Set<RuleMatcherEntry>> check : checks.entrySet())
+			if(production.hasContinuationFlag(check.getKey()))
+				for(RuleMatcherEntry entry : check.getValue())
 					entry.match(production);
 	}
 
@@ -527,17 +533,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 						+ " or " + NORTHERN_PLURAL_STRESSED_RULE);
 			}
 		}
-	}
-
-	private void mismatchCheck(Production production) throws IllegalArgumentException{
-		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
-	}
-
-	private void variantIncompatibilityCheck(Production production, Set<MatcherEntry> checks, String... contains)
-			throws IllegalArgumentException{
-		if(StringUtils.containsAny(production.getWord(), contains))
-			for(MatcherEntry entry : checks)
-				entry.match(production);
 	}
 
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
