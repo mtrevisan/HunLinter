@@ -422,11 +422,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", COMMA);
 		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", COMMA);
 
-		Iterator<String> mustNotAdmits = readPropertyAsList("mustNotAdmit", SLASH_CHAR)
+		Iterator<String> notCombinableRules = readPropertyAsList("notCombinableRules", SLASH_CHAR)
 			.iterator();
-		while(mustNotAdmits.hasNext()){
-			String masterRule = mustNotAdmits.next();
-			String[] otherRules = strategy.parseFlags(mustNotAdmits.next());
+		while(notCombinableRules.hasNext()){
+			String masterRule = notCombinableRules.next();
+			String[] otherRules = strategy.parseFlags(notCombinableRules.next());
 			mustNotAdmit.computeIfAbsent(masterRule, k -> new HashSet<>())
 				.add(new MatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterRule, otherRules));
 		}
