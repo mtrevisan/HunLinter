@@ -548,11 +548,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void continuationFlagIncompatibilityCheck(Production production, Map<String, Set<MatcherEntry>> checks)
 			throws IllegalArgumentException{
-		for(Map.Entry<String, Set<MatcherEntry>> check : checks.entrySet()){
+		for(Map.Entry<String, Set<MatcherEntry>> check : checks.entrySet())
 			if(production.hasContinuationFlag(check.getKey()))
 				for(MatcherEntry entry : check.getValue())
 					entry.match(production);
-		}
 	}
 
 	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
