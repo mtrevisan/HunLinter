@@ -431,8 +431,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		dataFields.put(MorphologicalTag.TAG_STEM, null);
 		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
 
-		unsyllabableWords = readPropertyAsSet("unsyllabableInterjections", COMMA);
-		multipleAccentedWords = readPropertyAsSet("multipleAccentedInterjections", COMMA);
+		unsyllabableWords = readPropertyAsSet("unsyllabableWords", COMMA);
+		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", COMMA);
 
 //		Iterator<String> mustNotAdmits = readPropertyAsList("mustNotAdmit", SLASH_CHAR)
 //			.iterator();
