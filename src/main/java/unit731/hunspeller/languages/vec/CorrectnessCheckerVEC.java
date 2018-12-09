@@ -67,11 +67,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String ADJECTIVE_SECOND_CLASS_RULE = "A2";
 	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
-	private static final String PLURAL_NOUN_MASCULINE_IO_RULE = "M1";
-	private static final String VARIANT_TRANSFORMATIONS_BEGIN_RULE = "TB";
-	private static final String VARIANT_TRANSFORMATIONS_END_RULE = "TE";
 	private static final String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = "Te";
-	private static final String VARIANT_TRANSFORMATIONS_FEMININE_RULE = "TF";
 	private static final String METAPHONESIS_RULE = "mf";
 	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
 	private static final String PLANTS_AND_CRAFTS_RULE_VANISHING_EL = "V1";
@@ -110,9 +106,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String PEJORATIVE_ASO_RULE_VANISHING_EL = "<2";
 	private static final String NORTHERN_PLURAL_RULE = "U0";
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
-	private static final String COLLECTIVE_NOUNS_RULE = "Y0";
-	private static final String FINAL_SONORIZATION_RULE = "FS";
-	private static final String GUA_TO_VA_RULE = "gv";
 
 	private static final Pattern NON_VANISHING_EL = PatternHelper.pattern("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
 	private static final Pattern VANISHING_EL_NEAR_CONSONANT = PatternHelper.pattern("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
@@ -162,10 +155,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private static final class MatcherEntry{
 
-		private static final String CANNOT_USE_RULE_WITH_LH = "Cannot use {0} rule with ƚ";
-		private static final String CANNOT_USE_RULE_WITH_LH_USE_INSTEAD = "Cannot use {0} rule with ƚ, use {1}";
 		private static final String CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD = "Cannot use {0} rule with non–ƚ, use {1}";
-		private static final String CANNOT_USE_RULE_WITH_TH_OR_DH_USE_INSTEAD = "Cannot use {0} rule with đ or ŧ, use {1}";
 
 		private final List<String> continuationFlags;
 		private final String error;
@@ -315,7 +305,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String POS_ADVERB = "adverb";
 	private static final String POS_CONJUNCTION = "conjunction";
 	private static final String POS_NUMERAL_LATIN = "numeral_latin";
-	private static final String POS_INTERJECTION = "interjection";
 	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
