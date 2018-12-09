@@ -1,6 +1,5 @@
 package unit731.hunspeller;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Desktop;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
@@ -338,12 +337,10 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean hasDICExtension(String path){
 		return path.endsWith(EXTENSION_DIC);
 	}
 
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
 		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));

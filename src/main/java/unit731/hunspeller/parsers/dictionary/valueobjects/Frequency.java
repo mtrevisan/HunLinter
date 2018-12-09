@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -140,7 +139,6 @@ public class Frequency<T>{
 		return FN_SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
 	}
 
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Called via reflection through the Memoizer")
 	private long sumOfFrequencies(int hashCode){
 		long result = 0l;
 		Iterator<Long> iterator = frequencies.values().iterator();
