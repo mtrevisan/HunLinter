@@ -374,7 +374,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 
-	private final Properties rules = new Properties();
+	private final Properties rulesProperties = new Properties();
 	private final FlagParsingStrategy strategy = new DoubleASCIIParsingStrategy();
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
@@ -382,7 +382,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private final Map<String, Set<String>> dataFields = new HashMap<>();
 	private Set<String> unsyllabableWords;
 	private Set<String> multipleAccentedWords;
-	private final Map<String, Set<RuleMatcherEntry>> notCombinableRules = new HashMap<>();
+	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 
 
@@ -396,9 +396,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void loadRules() throws IOException{
-		rules.load(CorrectnessCheckerVEC.class.getResourceAsStream("rules.properties"));
+		rulesProperties.load(CorrectnessCheckerVEC.class.getResourceAsStream("rules.properties"));
 
-		enableVerbCheck = Boolean.getBoolean((String)rules.get("verbCheck"));
+		enableVerbCheck = Boolean.getBoolean((String)rulesProperties.get("verbCheck"));
 
 		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", COMMA));
 		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", COMMA));
@@ -413,7 +413,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		while(rules.hasNext()){
 			String masterFlag = rules.next();
 			String[] wrongFlags = strategy.parseFlags(rules.next());
-			notCombinableRules.computeIfAbsent(masterFlag, k -> new HashSet<>())
+			ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
 				.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 		}
 
@@ -429,12 +429,12 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private Set<String> readPropertyAsSet(String key, char separator){
-		String line = rules.getProperty(key, StringUtils.EMPTY);
+		String line = rulesProperties.getProperty(key, StringUtils.EMPTY);
 		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
 	}
 
 	private Iterator<String> readPropertyAsIterator(String key, char separator){
-		String line = rules.getProperty(key, StringUtils.EMPTY);
+		String line = rulesProperties.getProperty(key, StringUtils.EMPTY);
 		return (StringUtils.isNotEmpty(line)? Arrays.asList(StringUtils.split(line, separator)): Collections.<String>emptyList())
 			.iterator();
 	}
@@ -520,16 +520,16 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
 		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH, GraphemeVEC.D_STROKE_GRAPHEME, GraphemeVEC.T_STROKE_GRAPHEME);
 
-		letterAndFlagIncompatibilityCheck(production, letterAndRulesNotCombinable);
+		letterToFlagIncompatibilityCheck(production, letterAndRulesNotCombinable);
 
-		continuationFlagIncompatibilityCheck(production, notCombinableRules);
+		flagToFlagIncompatibilityCheck(production, ruleAndRulesNotCombinable);
 
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
 			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 	}
 
-	private void continuationFlagIncompatibilityCheck(Production production, Map<String, Set<RuleMatcherEntry>> checks)
+	private void flagToFlagIncompatibilityCheck(Production production, Map<String, Set<RuleMatcherEntry>> checks)
 			throws IllegalArgumentException{
 		for(Map.Entry<String, Set<RuleMatcherEntry>> check : checks.entrySet())
 			if(production.hasContinuationFlag(check.getKey()))
@@ -537,7 +537,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 					entry.match(production);
 	}
 
-	private void letterAndFlagIncompatibilityCheck(Production production, Map<String, Set<LetterMatcherEntry>> checks)
+	private void letterToFlagIncompatibilityCheck(Production production, Map<String, Set<LetterMatcherEntry>> checks)
 			throws IllegalArgumentException{
 		for(Map.Entry<String, Set<LetterMatcherEntry>> check : checks.entrySet())
 			if(StringUtils.containsAny(production.getWord(), check.getKey()))
