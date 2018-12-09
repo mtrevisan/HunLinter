@@ -189,23 +189,23 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private static final class MatcherEntry{
 
-		private static final String OR = " or ";
-		private static final String FOR = " for ";
-
-
+		private final String messagePattern;
+		private final String masterRule;
 		private final String[] continuationFlags;
-		private final String error;
 
 
 		MatcherEntry(String messagePattern, String masterRule, String... continuationFlags){
+			this.messagePattern = messagePattern;
+			this.masterRule = masterRule;
 			this.continuationFlags = continuationFlags;
-			error = MessageFormat.format(messagePattern, masterRule, String.join(OR, continuationFlags));
 		}
 
 		public void match(Production production) throws IllegalArgumentException{
 			for(String flag : continuationFlags)
-				if(production.hasContinuationFlag(flag))
-					throw new IllegalArgumentException(error + FOR + production.getWord());
+				if(production.hasContinuationFlag(flag)){
+					String message = MessageFormat.format(messagePattern, masterRule, flag, production.getWord());
+					throw new IllegalArgumentException(message);
+				}
 		}
 	}
 
@@ -363,7 +363,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[èò][ln]$");
 	private static final String MAN = "man";
 
-	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1}";
+	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {0} cannot have rule {1} for {2}";
 	private static final String WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = "Word with rule {0} cannot have toehr rules than {1}";
 
 
