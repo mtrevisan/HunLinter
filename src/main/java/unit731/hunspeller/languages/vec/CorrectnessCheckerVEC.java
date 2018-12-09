@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
@@ -354,14 +355,20 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 		}
 
+		String letter = null;
 		Iterator<String> letterAndRules = readPropertyAsIterator("letterAndRulesNotCombinable", SLASH_CHAR);
 		while(letterAndRules.hasNext()){
-			String letter = letterAndRules.next();
-			String[] wrongFlags = strategy.parseFlags(letterAndRules.next());
-			String correctRule = letterAndRules.next();
-			letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
-				.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
-					letter, wrongFlags, correctRule));
+			String elem = letterAndRules.next();
+			if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
+				letter = String.valueOf(elem.charAt(1));
+			else{
+				String[] flags = strategy.parseFlags(elem);
+				String correctRule = flags[flags.length - 1];
+				String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+				letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
+					.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
+						letter, wrongFlags, correctRule));
+			}
 		}
 	}
 
