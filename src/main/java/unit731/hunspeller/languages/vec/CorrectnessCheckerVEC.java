@@ -1,14 +1,17 @@
 package unit731.hunspeller.languages.vec;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -25,6 +28,8 @@ import unit731.hunspeller.services.PatternHelper;
 
 
 public class CorrectnessCheckerVEC extends CorrectnessChecker{
+
+	private static final char COMMA = ',';
 
 	public static final String LANGUAGE = "vec";
 
@@ -177,12 +182,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 					throw new IllegalArgumentException(error + " for " + production.getWord());
 		}
 	}
-	private static final boolean ENABLE_VERB_CHECK = false;
 	private static final Set<MatcherEntry> MISMATCH_CHECKS_MUST_CONTAINS_LH = new HashSet<>();
 	private static final Set<MatcherEntry> MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH = new HashSet<>();
 	private static final Set<MatcherEntry> MISMATCH_CHECKS_MUST_CONTAINS_DH_OR_TH = new HashSet<>();
 	static{
-		if(ENABLE_VERB_CHECK){
+		if(false){
 			MISMATCH_CHECKS_MUST_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_1ST_RULE_NON_VANISHING_EL),
 				MatcherEntry.CANNOT_USE_RULE_WITH_LH_USE_INSTEAD, VERB_1ST_RULE_NON_VANISHING_EL, VERB_1ST_RULE_VANISHING_EL));
 			MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(VERB_1ST_RULE_VANISHING_EL),
@@ -377,56 +381,92 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 
-	public static final String POS_PROPER_NOUN = "proper_noun";
-	public static final String POS_NOUN = "noun";
-	public static final String POS_ADJECTIVE = "adjective";
-	public static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
-	public static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
-	public static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
-	public static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
-	public static final String POS_QUANTIFIER = "quantifier";
-	public static final String POS_VERB = "verb";
-	public static final String POS_ARTICLE = "article";
-	public static final String POS_PRONOUN = "pronoun";
-	public static final String POS_PREPOSITION = "preposition";
-	public static final String POS_ADVERB = "adverb";
-	public static final String POS_CONJUNCTION = "conjunction";
-	public static final String POS_NUMERAL_LATIN = "numeral_latin";
-	public static final String POS_INTERJECTION = "interjection";
-	public static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
-
-	private static final Set<String> PART_OF_SPEECH = new HashSet<>(Arrays.asList(POS_NOUN, POS_PROPER_NOUN, POS_VERB, POS_ADJECTIVE,
-		POS_ADJECTIVE_POSSESSIVE, POS_ADJECTIVE_DEMONSTRATIVE, POS_ADJECTIVE_IDENTIFICATIVE, POS_ADJECTIVE_INTERROGATIVE, POS_QUANTIFIER,
-		POS_NUMERAL_LATIN, "numeral_cardenal", "numeral_ordenal", "numeral_collective", "numeral_fractional", "numeral_multiplicative",
-		POS_ARTICLE, POS_PRONOUN, POS_PREPOSITION, POS_ADVERB, POS_CONJUNCTION, "prefix", POS_INTERJECTION, POS_UNIT_OF_MEASURE));
-	private static final Set<String> INFLECTIONAL_SUFFIX = new HashSet<>(Arrays.asList("singular_masculine", "singular_femenine", "plural",
-		"plural_masculine", "plural_femenine", "procomplementar", "interrogative", "second_singular", "second_plural"));
-	private static final Set<String> TERMINAL_SUFFIX = new HashSet<>(Arrays.asList("indicative_present", "indicative_imperfect",
-		"indicative_future", "subjunctive_present", "subjunctive_imperfect", "conditional_present", "imperative_present", "infinitive_simple",
-		"gerund_simple", "participle_active", "participle_passive", "participle_perfect", "participle_perfect_strong", "participle_imperfect"));
-
-	private static final Map<String, Set<String>> DATA_FIELDS = new HashMap<>();
-	static{
-		DATA_FIELDS.put(MorphologicalTag.TAG_PART_OF_SPEECH, PART_OF_SPEECH);
-		DATA_FIELDS.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, INFLECTIONAL_SUFFIX);
-		DATA_FIELDS.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, TERMINAL_SUFFIX);
-		DATA_FIELDS.put(MorphologicalTag.TAG_STEM, null);
-		DATA_FIELDS.put(MorphologicalTag.TAG_ALLOMORPH, null);
-	}
-
-	private static final List<String> UNSYLLABABLE_INTERJECTIONS = Arrays.asList("brr", "ii", "iii", "mm", "mmm", "ss", "sss", "iu");
-	private static final List<String> MULTIPLE_ACCENTED_INTERJECTIONS = Arrays.asList("àà", "ààà", "èè", "èèè", "íí", "ííí", "òò", "òòò");
+	private static final String POS_PROPER_NOUN = "proper_noun";
+	private static final String POS_NOUN = "noun";
+	private static final String POS_ADJECTIVE = "adjective";
+	private static final String POS_ADJECTIVE_POSSESSIVE = "adjective_possessive";
+	private static final String POS_ADJECTIVE_DEMONSTRATIVE = "adjective_demonstrative";
+	private static final String POS_ADJECTIVE_IDENTIFICATIVE = "adjective_identificative";
+	private static final String POS_ADJECTIVE_INTERROGATIVE = "adjective_interrogative";
+	private static final String POS_QUANTIFIER = "quantifier";
+	private static final String POS_VERB = "verb";
+	private static final String POS_ARTICLE = "article";
+	private static final String POS_PRONOUN = "pronoun";
+	private static final String POS_PREPOSITION = "preposition";
+	private static final String POS_ADVERB = "adverb";
+	private static final String POS_CONJUNCTION = "conjunction";
+	private static final String POS_NUMERAL_LATIN = "numeral_latin";
+	private static final String POS_INTERJECTION = "interjection";
+	private static final String POS_UNIT_OF_MEASURE = "unit_of_measure";
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
 
+	private final Properties rules = new Properties();
+	private boolean enableVerbCheck;
+	private Set<String> unsyllabableWords;
+	private Set<String> multipleAccentedWords;
+	private final Map<String, Set<String>> dataFields = new HashMap<>();
+
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
 
-	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator){
+	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator) throws IOException{
 		super(affParser, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
+
+
+		loadRules();
+	}
+
+	private void loadRules() throws IOException{
+		rules.load(CorrectnessCheckerVEC.class.getResourceAsStream("rules.properties"));
+
+		enableVerbCheck = Boolean.getBoolean((String)rules.get("verbCheck"));
+
+		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", COMMA));
+		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", COMMA));
+		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", COMMA));
+		dataFields.put(MorphologicalTag.TAG_STEM, null);
+		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
+
+		unsyllabableWords = readPropertyAsSet("unsyllabableInterjections", COMMA);
+		multipleAccentedWords = readPropertyAsSet("multipleAccentedInterjections", COMMA);
+
+//		Iterator<String> mustNotAdmits = readPropertyAsList("mustNotAdmit", SLASH_CHAR)
+//			.iterator();
+//		while(mustNotAdmits.hasNext()){
+//			String masterRule = mustNotAdmits.next();
+//			String[] otherRules = strategy.parseFlags(mustNotAdmits.next());
+//			mustNotAdmit.computeIfAbsent(masterRule, k -> new HashSet<>())
+//				.add(new MatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterRule, otherRules));
+//		}
+//
+//		Iterator<String> mustAdmits = readPropertyAsList("mustAdmit", SLASH_CHAR)
+//			.iterator();
+//		while(mustAdmits.hasNext()){
+//			String masterRule = mustAdmits.next();
+//			boolean converse = (masterRule.charAt(0) == '^');
+//			if(converse)
+//				masterRule = masterRule.substring(1);
+//			String[] wrongRightRules = strategy.parseFlags(mustAdmits.next());
+//			mustAdmit.computeIfAbsent(masterRule, k -> new HashSet<>())
+//				.add(new MismatcherEntry(CANNOT_USE_RULE_WITH_USE_INSTEAD, masterRule, wrongRightRules[0], wrongRightRules[1]));
+//			if(converse)
+//				converseMustAdmit.computeIfAbsent(masterRule, k -> new HashSet<>())
+//					.add(new MismatcherEntry(CANNOT_USE_RULE_WITH_NON_USE_INSTEAD, masterRule, wrongRightRules[1], wrongRightRules[0]));
+//		}
+	}
+
+	private Set<String> readPropertyAsSet(String key, char separator){
+		List<String> properties = readPropertyAsList(key, separator);
+		return (!properties.isEmpty()? new HashSet<>(properties): Collections.<String>emptySet());
+	}
+
+	private List<String> readPropertyAsList(String key, char separator){
+		String line = rules.getProperty(key, StringUtils.EMPTY);
+		return (StringUtils.isNotEmpty(line)? Arrays.asList(StringUtils.split(line, separator)): Collections.<String>emptyList());
 	}
 
 	@Override
@@ -484,10 +524,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
 
 			String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
-			if(!DATA_FIELDS.containsKey(morphologicalFieldPrefix))
+			if(!dataFields.containsKey(morphologicalFieldPrefix))
 				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
 
-			Set<String> morphologicalFieldTypes = DATA_FIELDS.get(morphologicalFieldPrefix);
+			Set<String> morphologicalFieldTypes = dataFields.get(morphologicalFieldPrefix);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
 				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
 		});
@@ -579,7 +619,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
 		int accents = WordVEC.countAccents(subword);
-		if(!MULTIPLE_ACCENTED_INTERJECTIONS.contains(subword)){
+		if(!multipleAccentedWords.contains(subword)){
 			if(accents > 1)
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
 
@@ -615,9 +655,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((ENABLE_VERB_CHECK || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if((enableVerbCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
-			if(!UNSYLLABABLE_INTERJECTIONS.contains(word) && !MULTIPLE_ACCENTED_INTERJECTIONS.contains(word)){
+			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
 				word = word.toLowerCase(Locale.ROOT);
 				String correctedDerivedWord = orthography.correctOrthography(word);
 				if(!correctedDerivedWord.equals(word))

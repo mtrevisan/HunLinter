@@ -1,5 +1,6 @@
 package unit731.hunspeller.languages.builders;
 
+import java.io.IOException;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.vec.CorrectnessCheckerVEC;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -10,7 +11,7 @@ public class CorrectnessCheckerBuilder{
 
 	private CorrectnessCheckerBuilder(){}
 
-	public static CorrectnessChecker getParser(AffixParser affParser, AbstractHyphenator hyphenator){
+	public static CorrectnessChecker getParser(AffixParser affParser, AbstractHyphenator hyphenator) throws IOException{
 		CorrectnessChecker checker;
 		switch(affParser.getLanguage()){
 			case CorrectnessCheckerVEC.LANGUAGE:

@@ -134,6 +134,13 @@
 					<include>*.*</include>
 				</includes>
 			</resource>
+			<!-- include non-java src files in the same place in the output jar -->
+			<resource>
+				<directory>${project.build.sourceDirectory}</directory>
+				<includes>
+					<include>**/rules.properties</include>
+				</includes>
+			</resource>
 		</resources>
 	</build>
 
