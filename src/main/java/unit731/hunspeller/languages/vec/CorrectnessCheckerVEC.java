@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -370,9 +371,15 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private Iterator<String> readPropertyAsIterator(String key, char separator){
-		String line = rulesProperties.getProperty(key, StringUtils.EMPTY);
-		return (StringUtils.isNotEmpty(line)? Arrays.asList(StringUtils.split(line, separator)): Collections.<String>emptyList())
-			.iterator();
+		List<String> values = new ArrayList<>();
+		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
+		for(String k : keys)
+			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
+				String line = rulesProperties.getProperty(k, StringUtils.EMPTY);
+				if(StringUtils.isNotEmpty(line))
+					values.addAll(Arrays.asList(StringUtils.split(line, separator)));
+			}
+		return values.iterator();
 	}
 
 	@Override
