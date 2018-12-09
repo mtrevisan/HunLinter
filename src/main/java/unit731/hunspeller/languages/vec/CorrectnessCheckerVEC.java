@@ -34,9 +34,6 @@ import unit731.hunspeller.services.PatternHelper;
 
 public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
-	private static final char COMMA = ',';
-	private static final char SLASH_CHAR = '/';
-
 	public static final String LANGUAGE = "vec";
 
 	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
@@ -338,16 +335,16 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 		enableVerbCheck = Boolean.getBoolean((String)rulesProperties.get("verbCheck"));
 
-		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", COMMA));
-		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", COMMA));
-		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", COMMA));
+		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
+		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
+		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
 		dataFields.put(MorphologicalTag.TAG_STEM, null);
 		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
 
-		unsyllabableWords = readPropertyAsSet("unsyllabableWords", COMMA);
-		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", COMMA);
+		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
+		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');
 
-		Iterator<String> rules = readPropertyAsIterator("notCombinableRules", SLASH_CHAR);
+		Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
 		while(rules.hasNext()){
 			String masterFlag = rules.next();
 			String[] wrongFlags = strategy.parseFlags(rules.next());
@@ -356,7 +353,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 
 		String letter = null;
-		Iterator<String> letterAndRules = readPropertyAsIterator("letterAndRulesNotCombinable", SLASH_CHAR);
+		Iterator<String> letterAndRules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
 		while(letterAndRules.hasNext()){
 			String elem = letterAndRules.next();
 			if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
