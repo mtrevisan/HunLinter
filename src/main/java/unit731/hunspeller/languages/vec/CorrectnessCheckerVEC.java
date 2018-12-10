@@ -2,9 +2,6 @@ package unit731.hunspeller.languages.vec;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -27,73 +24,12 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
 
-	private static final String VERB_1ST_RULE_NON_VANISHING_EL = "a1";
-	private static final String VERB_1ST_RULE_VANISHING_EL = "a2";
-	private static final String VERB_DAR_RULE_NON_VANISHING_EL = "a4";
-	private static final String VERB_DAR_RULE_VANISHING_EL = "a5";
-	private static final String VERB_2ND_RULE_NON_VANISHING_EL = "b1";
-	private static final String VERB_2ND_RULE_VANISHING_EL = "b2";
-	private static final String VERB_DIXER_RULE_NON_VANISHING_EL = "b6";
-	private static final String VERB_DIXER_RULE_VANISHING_EL = "b7";
-	private static final String VERB_TOLER_RULE_NON_VANISHING_EL = "c3";
-	private static final String VERB_TOLER_RULE_VANISHING_EL = "c4";
-	private static final String VERB_3RD_IS_RULE_NON_VANISHING_EL = "d1";
-	private static final String VERB_3RD_IS_RULE_VANISHING_EL = "d2";
-	private static final String VERB_3RD_NO_IS_RULE_NON_VANISHING_EL = "e1";
-	private static final String VERB_3RD_NO_IS_RULE_VANISHING_EL = "e2";
-	private static final String VERB_3RD_BOTH_IS_RULE_NON_VANISHING_EL = "f1";
-	private static final String VERB_3RD_BOTH_IS_RULE_VANISHING_EL = "f2";
-	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_NON_VANISHING_EL = "P1";
-	private static final String PROCOMPLEMENTAR_VERB_DEFINITE_RULE_VANISHING_EL = "P2";
-	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_NON_VANISHING_EL = "P4";
-	private static final String PROCOMPLEMENTAR_VERB_IMPERATIVE_RULE_VANISHING_EL = "P5";
-	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_NON_VANISHING_EL = "P7";
-	private static final String PROCOMPLEMENTAR_VERB_INDEFINITE_RULE_VANISHING_EL = "P8";
-	private static final String INTERROGATIVES_3RD_PERSON_RULE_NON_VANISHING_EL = "I6";
-	private static final String INTERROGATIVES_3RD_PERSON_RULE_VANISHING_EL = "I7";
-	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_NON_VANISHING_EL = "I8";
-	private static final String INTERROGATIVES_3RD_PERSON_CONDITIONAL_RULE_VANISHING_EL = "I9";
 	private static final String ADJECTIVE_FIRST_CLASS_RULE = "A1";
 	private static final String ADJECTIVE_SECOND_CLASS_RULE = "A2";
 	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
 	private static final String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = "Te";
 	private static final String METAPHONESIS_RULE = "mf";
-	private static final String PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL = "V0";
-	private static final String PLANTS_AND_CRAFTS_RULE_VANISHING_EL = "V1";
-	private static final String DEVERBAL_NOMINALS_ISTA_RULE = "v1";
-	private static final String ETHA_RULE_NON_VANISHING_EL = "q0";
-	private static final String ESA_RULE_VANISHING_EL = "q1";
-	private static final String ITHIA_RULE_NON_VANISHING_EL = "q2";
-	private static final String ISIA_RULE_VANISHING_EL = "q3";
-	private static final String DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL = "r0";
-	private static final String DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL = "r1";
-	private static final String DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL = "r2";
-	private static final String DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL = "r3";
-	private static final String DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL = "r4";
-	private static final String DEVERBAL_NOMINALS_DURA_RULE_NON_VANISHING_EL = "r5";
-	private static final String DEVERBAL_NOMINALS_DURA_RULE_VANISHING_EL = "r6";
-	private static final String DEVERBAL_NOMINALS_DOR_RULE_NON_VANISHING_EL = "r7";
-	private static final String DEVERBAL_NOMINALS_DOR_RULE_VANISHING_EL = "r8";
-	private static final String DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL = "s0";
-	private static final String DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL = "s1";
-	private static final String ADVERB_MENTE_RULE_NON_VANISHING_EL = "W0";
-	private static final String ADVERB_MENTE_RULE_VANISHING_EL = "W1";
-	private static final String DIMINUTIVE_ETO_RULE_NON_VANISHING_EL = "&0";
-	private static final String DIMINUTIVE_ETO_RULE_VANISHING_EL = "&1";
-	private static final String DIMINUTIVE_EL_RULE_NON_VANISHING_EL = "&2";
-	private static final String DIMINUTIVE_EL_RULE_VANISHING_EL = "&3";
-	private static final String AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL = "(0";
-	private static final String AUGMENTATIVE_OTO_RULE_VANISHING_EL = "(1";
-	private static final String AUGMENTATIVE_ON_RULE_NON_VANISHING_EL = "(2";
-	private static final String AUGMENTATIVE_ON_RULE_VANISHING_EL = "(3";
-	private static final String AUGMENTATIVE_ON_A_RULE_NON_VANISHING_EL = "(4";
-	private static final String AUGMENTATIVE_ON_A_RULE_VANISHING_EL = "(5";
-	private static final String PEJORATIVE_ATO_RULE_NON_VANISHING_EL = "§0";
-	private static final String PEJORATIVE_ATO_RULE_VANISHING_EL = "§1";
-	private static final String PEJORATIVE_ATHO_RULE_NON_VANISHING_EL = "<0";
-	private static final String PEJORATIVE_ASO_RULE_NON_VANISHING_EL = "<1";
-	private static final String PEJORATIVE_ASO_RULE_VANISHING_EL = "<2";
 	private static final String NORTHERN_PLURAL_RULE = "U0";
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 
@@ -110,67 +46,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String ASTERISK = "*";
 
 
-	private static final Set<String> CANNOT_CONTAINS_ACCENT = new HashSet<>();
-	static{
-//		CANNOT_CONTAINS_ACCENT.add(PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL);
-//		CANNOT_CONTAINS_ACCENT.add(PLANTS_AND_CRAFTS_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_ISTA_RULE);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_DURA_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_DURA_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_DOR_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_DOR_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(ADVERB_MENTE_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(ADVERB_MENTE_RULE_VANISHING_EL);
-//		CANNOT_CONTAINS_ACCENT.add(COLLECTIVE_SUBSTANTIVES_RULE_NON_VANISHING_EL);
-//		CANNOT_CONTAINS_ACCENT.add(COLLECTIVE_SUBSTANTIVES_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DIMINUTIVE_ETO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(DIMINUTIVE_ETO_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(AUGMENTATIVE_ON_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(AUGMENTATIVE_ON_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(AUGMENTATIVE_ON_A_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(AUGMENTATIVE_ON_A_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(PEJORATIVE_ATO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(PEJORATIVE_ATO_RULE_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(PEJORATIVE_ATHO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(PEJORATIVE_ASO_RULE_NON_VANISHING_EL);
-		CANNOT_CONTAINS_ACCENT.add(PEJORATIVE_ASO_RULE_VANISHING_EL);
-	}
-
-	private static final class MatcherEntry{
-
-		private static final String CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD = "Cannot use {0} rule with non–ƚ, use {1}";
-
-		private final List<String> continuationFlags;
-		private final String error;
-
-
-		MatcherEntry(List<String> continuationFlags, String messagePattern, Object ... arguments){
-			this.continuationFlags = continuationFlags;
-			//take last argument as the concatenation of the continuationFlags
-			List<Object> args = new ArrayList<>(arguments.length + 1);
-			args.addAll(Arrays.asList(arguments));
-			args.add(String.join(" or ", continuationFlags));
-			error = MessageFormat.format(messagePattern, args.toArray(new Object[args.size()]));
-		}
-
-		public void match(Production production) throws IllegalArgumentException{
-			for(String flag : continuationFlags)
-				if(production.hasContinuationFlag(flag))
-					throw new IllegalArgumentException(error + " for " + production.getWord());
-		}
-	}
-
 	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[èò][ln]$");
 	private static final String MAN = "man";
 
-	private static final String WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = "Word with rule {0} cannot have toehr rules than {1}";
+	private static final String WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = "Word with rule {0} cannot have otehr rules than {1}";
 
 
 	private static final String POS_PROPER_NOUN = "proper_noun";
@@ -335,15 +214,18 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
 		int accents = WordVEC.countAccents(subword);
 		if(!multipleAccentedWords.contains(subword)){
-			if(accents > 1)
-				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have multiple accents");
+			if(!wordCanHaveMultipleAccents && accents > 1)
+				throw new IllegalArgumentException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null && WordVEC.countAccents(subword) > 0){
+			if(appliedRules != null){
+				//retrieve last applied rule
 				String appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
 					.getFlag();
-				if(CANNOT_CONTAINS_ACCENT.contains(appliedRuleFlag))
-					throw new IllegalArgumentException("Word " + production.getWord() + " cannot be generated by the rule " + appliedRuleFlag + " because of the accent");
+				if(accents == 0 && hasToContainAccent.contains(appliedRuleFlag))
+					throw new IllegalArgumentException(WORD_HAS_NOT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
+				else if(accents > 0 && cannotContainAccent.contains(appliedRuleFlag))
+					throw new IllegalArgumentException(WORD_HAS_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 			}
 
 			//if word contains accent and appliedRule is one of those commented
