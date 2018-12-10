@@ -118,6 +118,7 @@ public class CorrectnessChecker{
 
 	private Iterator<String> readPropertyAsIterator(Properties rulesProperties, String key, char separator){
 		List<String> values = new ArrayList<>();
+		@SuppressWarnings("unchecked")
 		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
 		for(String k : keys)
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
@@ -182,15 +183,16 @@ public class CorrectnessChecker{
 
 		production.forEachMorphologicalField(morphologicalField -> {
 			if(morphologicalField.length() < 4)
-				throw new IllegalArgumentException(WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(), morphologicalField}));
+				throw new IllegalArgumentException(WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+					morphologicalField}));
 
-			String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
-			if(!dataFields.containsKey(morphologicalFieldPrefix))
-				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(), morphologicalField}));
-
-			Set<String> morphologicalFieldTypes = dataFields.get(morphologicalFieldPrefix);
-			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
-				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(), morphologicalField}));
+			Set<String> morphologicalFieldTypes = dataFields.get(morphologicalField.substring(0, 3));
+			if(morphologicalFieldTypes == null)
+				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
+					morphologicalField}));
+			if(!morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
+					morphologicalField}));
 		});
 	}
 
