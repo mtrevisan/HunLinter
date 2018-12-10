@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -89,17 +88,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	public void checkProduction(Production production) throws IllegalArgumentException{
 //		if(!ENABLE_VERB_CHECK && production.isPartOfSpeech(POS_VERB))
 //			return;
+		super.checkProduction(production);
 
 		try{
-			if(!production.hasMorphologicalFields())
-				throw new IllegalArgumentException("Line does not contains any morphological fields");
-
-			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
-			if(!production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-				throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
-
-			morphologicalFieldCheck(production);
-
 			vanishingElCheck(production);
 
 			incompatibilityCheck(production);
@@ -114,37 +105,14 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 			finalSonorizationCheck(production);
 
-			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-			for(String subword : splittedWords){
-				accentCheck(subword, production);
-
-//				ciuiCheck(subword, production);
-			}
-
 			syllabationCheck(production);
 		}
 		catch(IllegalArgumentException e){
 			String message = e.getMessage();
-			String rulesSequence = production.getRulesSequence();
-			if(rulesSequence.length() > 0)
-				message += " (via " + rulesSequence + ")";
+			if(production.hasProductionRules())
+				message += " (via " + production.getRulesSequence() + ")";
 			throw new IllegalArgumentException(message);
 		}
-	}
-
-	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{
-		production.forEachMorphologicalField(morphologicalField -> {
-			if(morphologicalField.length() < 4)
-				throw new IllegalArgumentException("Word " + production.getWord() + " has an invalid morphological field prefix: " + morphologicalField);
-
-			String morphologicalFieldPrefix = morphologicalField.substring(0, 3);
-			if(!dataFields.containsKey(morphologicalFieldPrefix))
-				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field prefix: " + morphologicalField);
-
-			Set<String> morphologicalFieldTypes = dataFields.get(morphologicalFieldPrefix);
-			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
-				throw new IllegalArgumentException("Word " + production.getWord() + " has an unknown morphological field value: " + morphologicalField);
-		});
 	}
 
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
@@ -162,10 +130,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
-		letterToFlagIncompatibilityCheck(production, letterAndRulesNotCombinable);
-
-		flagToFlagIncompatibilityCheck(production, ruleAndRulesNotCombinable);
-
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
 			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
@@ -210,6 +174,32 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
+	private void syllabationCheck(Production production) throws IllegalArgumentException{
+		if((enableVerbSyllabationCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+			String word = production.getWord();
+			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
+				word = word.toLowerCase(Locale.ROOT);
+				String correctedDerivedWord = orthography.correctOrthography(word);
+				if(!correctedDerivedWord.equals(word))
+					throw new IllegalArgumentException("Word " + word + " is mispelled, should be " + correctedDerivedWord);
+
+				if(word.length() > 1){
+					Hyphenation hyphenation = hyphenator.hyphenate(word);
+					if(hyphenation.hasErrors())
+						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
+							+ ") is not syllabable");
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void checkCompoundProduction(String subword, Production production) throws IllegalArgumentException{
+		accentCheck(subword, production);
+
+//		ciuiCheck(subword, production);
+	}
+
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
 		int accents = WordVEC.countAccents(subword);
 		if(!multipleAccentedWords.contains(subword)){
@@ -234,25 +224,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternHelper.find(phonemizedSubword, CIJJHNHIV))
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
-		}
-	}
-
-	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((enableVerbSyllabationCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
-			String word = production.getWord();
-			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
-				word = word.toLowerCase(Locale.ROOT);
-				String correctedDerivedWord = orthography.correctOrthography(word);
-				if(!correctedDerivedWord.equals(word))
-					throw new IllegalArgumentException("Word " + word + " is mispelled, should be " + correctedDerivedWord);
-
-				if(word.length() > 1){
-					Hyphenation hyphenation = hyphenator.hyphenate(word);
-					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
-							+ ") is not syllabable");
-				}
-			}
 		}
 	}
 
