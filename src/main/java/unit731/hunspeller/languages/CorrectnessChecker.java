@@ -76,8 +76,13 @@ public class CorrectnessChecker{
 		rules = readPropertyAsIterator(rulesProperties, "letterAndRulesNotCombinable", '/');
 		while(rules.hasNext()){
 			String elem = rules.next();
+			boolean converse = false;
 			if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
 				letter = String.valueOf(elem.charAt(1));
+			else if(elem.length() == 3 && elem.charAt(0) == '^' && elem.charAt(2) == '^'){
+				letter = String.valueOf(elem.charAt(1));
+				converse = true;
+			}
 			else{
 				String[] flags = strategy.parseFlags(elem);
 				String correctRule = flags[flags.length - 1];
@@ -85,6 +90,10 @@ public class CorrectnessChecker{
 				letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
 					.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
 						letter, wrongFlags, correctRule));
+				if(converse)
+					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
+						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
+							letter, new String[]{correctRule}, wrongFlags[0]));
 			}
 		}
 	}
