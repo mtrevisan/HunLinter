@@ -110,7 +110,7 @@ public class OrthographyVEC extends Orthography{
 		for(int i = 0; i < size; i ++){
 			String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE) && !syllabe.contains(HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)
-				&& !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
+				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
 		return errors;
 	}
