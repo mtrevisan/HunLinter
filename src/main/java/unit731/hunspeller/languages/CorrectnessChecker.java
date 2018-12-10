@@ -153,7 +153,7 @@ public class CorrectnessChecker{
 		return hyphenator;
 	}
 
-	//correctness worker:
+	//used by the correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
 		try{
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
@@ -202,14 +202,15 @@ public class CorrectnessChecker{
 		flagToFlagIncompatibilityCheck(production, ruleAndRulesNotCombinable);
 	}
 
+	//used by the correctness worker:
 	protected void checkCompoundProduction(String subword, Production production) throws IllegalArgumentException{}
 
-	//minimal pairs worker:
+	//used by the minimal pairs worker:
 	public boolean isConsonant(char chr){
 		return true;
 	}
 
-	//minimal pairs worker:
+	//used by the minimal pairs worker:
 	public boolean shouldBeProcessedForMinimalPair(Production production){
 		return true;
 	}
