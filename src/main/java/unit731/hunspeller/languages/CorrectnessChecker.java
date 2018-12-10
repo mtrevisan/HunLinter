@@ -35,7 +35,7 @@ public class CorrectnessChecker{
 	protected AffixParser affParser;
 	protected final AbstractHyphenator hyphenator;
 
-	protected boolean enableVerbCheck;
+	protected boolean enableVerbSyllabationCheck;
 	protected final Map<String, Set<String>> dataFields = new HashMap<>();
 	protected Set<String> unsyllabableWords;
 	protected Set<String> multipleAccentedWords;
@@ -53,7 +53,7 @@ public class CorrectnessChecker{
 	protected final void loadRules(Properties rulesProperties) throws IOException{
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
-		enableVerbCheck = Boolean.getBoolean((String)rulesProperties.get("verbCheck"));
+		enableVerbSyllabationCheck = Boolean.getBoolean((String)rulesProperties.get("verbSyllabationCheck"));
 
 		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet(rulesProperties, "partOfSpeeches", ','));
 		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet(rulesProperties, "inflectionalSuffixes", ','));
