@@ -167,33 +167,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		}
 	}
 
-	static{
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_MENTO_RULE_VANISHING_EL, DEVERBAL_NOMINALS_MENTO_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(PLANTS_AND_CRAFTS_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, PLANTS_AND_CRAFTS_RULE_VANISHING_EL, PLANTS_AND_CRAFTS_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_THION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_NON_VANISHING_EL, DEVERBAL_NOMINALS_SION_RULE_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DEVERBAL_NOMINALS_IXMO_RULE_VANISHING_EL, DEVERBAL_NOMINALS_IXMO_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(ADVERB_MENTE_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, ADVERB_MENTE_RULE_VANISHING_EL, ADVERB_MENTE_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_ETO_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DIMINUTIVE_ETO_RULE_VANISHING_EL, DIMINUTIVE_ETO_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(DIMINUTIVE_EL_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, DIMINUTIVE_EL_RULE_VANISHING_EL, DIMINUTIVE_EL_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_OTO_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, AUGMENTATIVE_OTO_RULE_VANISHING_EL, AUGMENTATIVE_OTO_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, AUGMENTATIVE_ON_RULE_VANISHING_EL, AUGMENTATIVE_ON_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(AUGMENTATIVE_ON_A_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, AUGMENTATIVE_ON_A_RULE_VANISHING_EL, AUGMENTATIVE_ON_A_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(ESA_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, ESA_RULE_VANISHING_EL, ETHA_RULE_NON_VANISHING_EL));
-//		MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH.add(new MatcherEntry(Arrays.asList(ISIA_RULE_VANISHING_EL),
-//			MatcherEntry.CANNOT_USE_RULE_WITH_NON_LH_USE_INSTEAD, ISIA_RULE_VANISHING_EL, ITHIA_RULE_NON_VANISHING_EL));
-	}
-
 	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[èò][ln]$");
 	private static final String MAN = "man";
 
@@ -312,20 +285,12 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
 		letterToFlagIncompatibilityCheck(production, letterAndRulesNotCombinable);
-//		variantIncompatibilityCheck(production, MISMATCH_CHECKS_MUST_NOT_CONTAINS_LH);
 
 		flagToFlagIncompatibilityCheck(production, ruleAndRulesNotCombinable);
 
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
 			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
-	}
-
-	private void variantIncompatibilityCheck(Production production, Set<MatcherEntry> checks, String... contains)
-			throws IllegalArgumentException{
-		if(StringUtils.containsAny(production.getWord(), contains))
-			for(MatcherEntry entry : checks)
-				entry.match(production);
 	}
 
 	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
