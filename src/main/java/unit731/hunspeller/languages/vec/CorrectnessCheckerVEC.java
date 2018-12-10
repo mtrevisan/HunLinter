@@ -93,10 +93,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			incompatibilityCheck(production);
 
 //FIXME move this in super?
-			String derivedWordWithoutMorphologicalFields = production.toString();
 			if(production.hasNonTerminalContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB)
 					&& !production.hasPartOfSpeech(POS_ADVERB)){
-				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
+				metaphonesisCheck(production);
 
 				northernPluralCheck(production);
 			}
@@ -135,7 +134,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 	}
 
-	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
+	private void metaphonesisCheck(Production production) throws IllegalArgumentException{
 		if(!production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_ARTICLE)){
 			boolean hasMetaphonesisFlag = production.hasContinuationFlag(METAPHONESIS_RULE);
 			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE,
