@@ -36,7 +36,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final Pattern NON_VANISHING_EL = PatternHelper.pattern("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
 	private static final Pattern VANISHING_EL_NEAR_CONSONANT = PatternHelper.pattern("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
 
-	private static final Pattern L_BETWEEN_VOWELS = PatternHelper.pattern("l i l$");
 	private static final Pattern CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
 
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
@@ -223,22 +222,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				String appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
 					.getFlag();
 				if(accents == 0 && hasToContainAccent.contains(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_NOT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
+					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 				else if(accents > 0 && cannotContainAccent.contains(appliedRuleFlag))
-					throw new IllegalArgumentException(WORD_HAS_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
-			}
-
-			//if word contains accent and appliedRule is one of those commented
-			if(accents == 1 && !subword.equals(WordVEC.unmarkDefaultStress(subword))){
-				boolean elBetweenVowelsRemoval = false;
-				if(appliedRules != null)
-					for(AffixEntry appliedRule : appliedRules)
-						if(PatternHelper.find(appliedRule.toString(), L_BETWEEN_VOWELS)){
-							elBetweenVowelsRemoval = true;
-							break;
-						}
-				if(!elBetweenVowelsRemoval)
-					throw new IllegalArgumentException("Word " + production.getWord() + " cannot have an accent there");
+					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 			}
 		}
 	}
