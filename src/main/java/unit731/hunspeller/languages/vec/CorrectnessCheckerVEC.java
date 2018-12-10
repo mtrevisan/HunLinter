@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -16,8 +15,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
-import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
@@ -263,7 +260,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 
 		Properties rulesProperties = new Properties();
-		rulesProperties.load(CorrectnessCheckerVEC.class.getResourceAsStream("rules.properties"));
+		rulesProperties.load(getClass().getResourceAsStream("rules.properties"));
 		loadRules(rulesProperties);
 	}
 
