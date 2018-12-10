@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -86,8 +85,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	@Override
 	public void checkProduction(Production production) throws IllegalArgumentException{
-//		if(!ENABLE_VERB_CHECK && production.isPartOfSpeech(POS_VERB))
-//			return;
 		super.checkProduction(production);
 
 		try{
@@ -97,7 +94,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 //FIXME move this in super?
 			String derivedWordWithoutMorphologicalFields = production.toString();
-			if(production.hasNonTerminalContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
+			if(production.hasNonTerminalContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB)
+					&& !production.hasPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production, derivedWordWithoutMorphologicalFields);
 
 				northernPluralCheck(production);
@@ -117,31 +115,34 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && PatternHelper.find(derivedWord, NON_VANISHING_EL))
-			throw new IllegalArgumentException("Word with ƚ cannot contain non–ƚ, " + derivedWord);
-		if(StringUtils.contains(production.getWord(), GraphemeVEC.L_STROKE_GRAPHEME)
-				&& (StringUtils.contains(production.getWord(), GraphemeVEC.D_STROKE_GRAPHEME) || StringUtils.contains(production.getWord(), GraphemeVEC.T_STROKE_GRAPHEME)))
-			throw new IllegalArgumentException("Word with ƚ cannot contain đ or ŧ, " + derivedWord);
+		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME)){
+			if(PatternHelper.find(derivedWord, NON_VANISHING_EL))
+				throw new IllegalArgumentException("Word with ƚ cannot contain non–ƚ, " + derivedWord);
+			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
+				throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
+					+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
+			if(derivedWord.contains(GraphemeVEC.D_STROKE_GRAPHEME) || derivedWord.contains(GraphemeVEC.T_STROKE_GRAPHEME))
+				throw new IllegalArgumentException("Word with ƚ cannot contain đ or ŧ, " + derivedWord);
+		}
 		if(PatternHelper.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
 			throw new IllegalArgumentException("Word with ƚ near a consonant, " + derivedWord);
-		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME) && production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-			throw new IllegalArgumentException("Word with ƚ cannot contain rule " + NORTHERN_PLURAL_RULE + " or "
-				+ NORTHERN_PLURAL_STRESSED_RULE + ", " + derivedWord);
 	}
 
 	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
-			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN, VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
+			throw new IllegalArgumentException(MessageFormat.format(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN,
+				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE) + " for " + production.getWord());
 	}
 
 	private void metaphonesisCheck(Production production, String line) throws IllegalArgumentException{
 		if(!production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_ARTICLE)){
 			boolean hasMetaphonesisFlag = production.hasContinuationFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE,
-				ADJECTIVE_THIRD_CLASS_RULE);
+			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE,
+				ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException("Metaphonesis not needed for " + production.getWord() + " (missing plural flag), handle " + METAPHONESIS_RULE);
+				throw new IllegalArgumentException("Metaphonesis not needed for " + production.getWord() + " (missing plural flag), handle "
+					+ METAPHONESIS_RULE);
 			else{
 				boolean canHaveMetaphonesis = affParser.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
@@ -162,7 +163,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
-			boolean canHaveNorthernPlural = (production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE, ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
+			boolean canHaveNorthernPlural = (production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE,
+				ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE)
 				&& !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN) && affParser.isAffixProductive(word, rule));
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
 				if(canHaveNorthernPlural)
@@ -175,7 +177,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((enableVerbSyllabationCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if((enableVerbSyllabationCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
+				&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
 			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
 				word = word.toLowerCase(Locale.ROOT);
@@ -186,8 +189,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				if(word.length() > 1){
 					Hyphenation hyphenation = hyphenator.hyphenate(word);
 					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK)
-							+ ") is not syllabable");
+						throw new IllegalArgumentException("Word " + word + " (" + hyphenation.formatHyphenation(new StringJoiner(SLASH),
+							syllabe -> ASTERISK + syllabe + ASTERISK) + ") is not syllabable");
 				}
 			}
 		}
