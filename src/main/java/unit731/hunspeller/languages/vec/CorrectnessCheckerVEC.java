@@ -370,7 +370,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if((enableVerbCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
 			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
 				word = word.toLowerCase(Locale.ROOT);
