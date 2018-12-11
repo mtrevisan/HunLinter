@@ -19,10 +19,8 @@ public class RuleMatcherEntry{
 
 	public void match(Production production) throws IllegalArgumentException{
 		for(String flag : wrongFlags)
-			if(production.hasContinuationFlag(flag)){
-				String message = messagePattern.format(new Object[]{masterFlag, flag, production.getWord()});
-				throw new IllegalArgumentException(message);
-			}
+			if(production.hasContinuationFlag(flag))
+				throw new IllegalArgumentException(messagePattern.format(new Object[]{masterFlag, flag}));
 	}
 	
 }
