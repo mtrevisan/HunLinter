@@ -20,6 +20,7 @@ import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
 import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
@@ -155,7 +156,7 @@ public class CorrectnessChecker{
 		try{
 			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
 			if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-				throw new IllegalArgumentException("Non-affix entry contains COMPOUNDFORBIDFLAG");
+				throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.COMPOUND_FORBID_FLAG.getCode());
 
 			if(morphologicalFieldsCheck)
 				morphologicalFieldCheck(production);
