@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import unit731.hunspeller.languages.CorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -22,9 +23,6 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
 
-	private static final String ADJECTIVE_FIRST_CLASS_RULE = "A1";
-	private static final String ADJECTIVE_SECOND_CLASS_RULE = "A2";
-	private static final String ADJECTIVE_THIRD_CLASS_RULE = "F0";
 	private static final String PLURAL_NOUN_MASCULINE_RULE = "M0";
 	private static final String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = "Te";
 	private static final String METAPHONESIS_RULE = "mf";
@@ -86,6 +84,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
+	private final String[] pluralFlags;
+
 
 	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator) throws IOException{
 		super(affParser, hyphenator);
@@ -96,6 +96,14 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		Properties rulesProperties = new Properties();
 		rulesProperties.load(getClass().getResourceAsStream("rules.properties"));
 		loadRules(rulesProperties);
+
+		String pluralFlagsValue = readProperty(rulesProperties, "pluralFlags");
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
+	}
+
+	private boolean hasPluralFlag(Production production){
+		return (pluralFlags != null && production.hasContinuationFlag(pluralFlags));
 	}
 
 	@Override
@@ -152,8 +160,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void metaphonesisCheck(Production production) throws IllegalArgumentException{
 		if(!production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_ARTICLE)){
 			boolean hasMetaphonesisFlag = production.hasContinuationFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE,
-				ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
+			boolean hasPluralFlag = hasPluralFlag(production);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED_HANDLE.format(new Object[]{production.getWord(), METAPHONESIS_RULE}));
 			else{
@@ -176,8 +183,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
-			boolean hasPluralFlag = production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE, ADJECTIVE_FIRST_CLASS_RULE,
-				ADJECTIVE_SECOND_CLASS_RULE, ADJECTIVE_THIRD_CLASS_RULE);
+			boolean hasPluralFlag = hasPluralFlag(production);
 			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.L_STROKE_GRAPHEME) && !word.endsWith(MAN)
 				&& affParser.isAffixProductive(word, rule));
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){

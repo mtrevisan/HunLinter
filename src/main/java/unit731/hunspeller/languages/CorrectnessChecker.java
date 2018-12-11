@@ -104,16 +104,16 @@ public class CorrectnessChecker{
 		}
 	}
 
-	private String readProperty(Properties rulesProperties, String key){
+	protected final String readProperty(Properties rulesProperties, String key){
 		return rulesProperties.getProperty(key, StringUtils.EMPTY);
 	}
 
-	private Set<String> readPropertyAsSet(Properties rulesProperties, String key, char separator){
+	protected final Set<String> readPropertyAsSet(Properties rulesProperties, String key, char separator){
 		String line = readProperty(rulesProperties, key);
 		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
 	}
 
-	private Iterator<String> readPropertyAsIterator(Properties rulesProperties, String key, char separator){
+	protected final Iterator<String> readPropertyAsIterator(Properties rulesProperties, String key, char separator){
 		List<String> values = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
