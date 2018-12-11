@@ -42,7 +42,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String OR = " or ";
 
 
-	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[èò][ln]$");
+	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[àéèóòú][ln]$");
 	private static final String MAN = "man";
 
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
