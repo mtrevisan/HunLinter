@@ -23,17 +23,17 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = PatternHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
 
-	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.JJH_PHONEME + "(?=[^aeiouàèéí" + GraphemeVEC.I_UMLAUT_PHONEME + "òóúh])");
+	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéí" + GraphemeVEC.PHONEME_I_UMLAUT + "òóúh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = PatternHelper.pattern("^i(?=[aeiouàèéíòóú])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = PatternHelper.pattern("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.pattern("b[ae]roi[aeèi]r"));
 	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = PatternHelper.pattern("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = PatternHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Pattern PATTERN_LH_INSIDE_INTO_L = PatternHelper.pattern("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
-	private static final Pattern PATTERN_X_INTO_S = PatternHelper.pattern(GraphemeVEC.X_GRAPHEME + "(?=[cfkpt])");
-	private static final Pattern PATTERN_S_INTO_X = PatternHelper.pattern(GraphemeVEC.S_GRAPHEME + "(?=([mnñbdg" + GraphemeVEC.JJH_PHONEME + "ɉsvrlŧ]))");
+	private static final Pattern PATTERN_X_INTO_S = PatternHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
+	private static final Pattern PATTERN_S_INTO_X = PatternHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH + "ɉsvrlŧ]))");
 
-	private static final Pattern PATTERN_MORPHOLOGICAL = PatternHelper.pattern("([c" + GraphemeVEC.JJH_PHONEME + "ñ])i([aeiou])");
+	private static final Pattern PATTERN_MORPHOLOGICAL = PatternHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
 	private static final Pattern PATTERN_CONSONANT_GEMINATES = PatternHelper.pattern("([^aeiou]){1}\\1+");
 
@@ -57,7 +57,7 @@ public class OrthographyVEC extends Orthography{
 		word = StringUtils.replaceEach(word, EXTENDED_CHARS, TRUE_CHARS);
 
 		//remove other occurrences of h not into fhV
-		if(!GraphemeVEC.H_GRAPHEME.equals(word))
+		if(!GraphemeVEC.GRAPHEME_H.equals(word))
 			word = PatternHelper.replaceAll(word, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
@@ -68,12 +68,12 @@ public class OrthographyVEC extends Orthography{
 		word = correctIJOccurrences(word);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		word = PatternHelper.replaceAll(word, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.L_GRAPHEME);
+		word = PatternHelper.replaceAll(word, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
 		word = PatternHelper.replaceAll(word, PATTERN_LH_INSIDE_INTO_L, "$1l");
 		//correct x occurrences into s prior to c, f, k, p, t
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
-		word = PatternHelper.replaceAll(word, PATTERN_X_INTO_S, GraphemeVEC.S_GRAPHEME);
-		word = PatternHelper.replaceAll(word, PATTERN_S_INTO_X, GraphemeVEC.X_GRAPHEME);
+		word = PatternHelper.replaceAll(word, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
+		word = PatternHelper.replaceAll(word, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//correct morphological errors
 		word = PatternHelper.replaceAll(word, PATTERN_MORPHOLOGICAL, "$1$2");
@@ -90,8 +90,8 @@ public class OrthographyVEC extends Orthography{
 
 	private String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels, correcting also the converse
-		word = PatternHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.I_GRAPHEME);
-		word = PatternHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.JJH_PHONEME);
+		word = PatternHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
+		word = PatternHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.PHONEME_JJH);
 		boolean iInsideIntoJFalsePositive = false;
 		for(Pattern p : PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES)
 			if(PatternHelper.find(word, p)){
@@ -99,7 +99,7 @@ public class OrthographyVEC extends Orthography{
 				break;
 			}
 		if(!iInsideIntoJFalsePositive && !PatternHelper.find(word, PATTERN_I_INSIDE_INTO_J_EXCLUSIONS))
-			word = PatternHelper.replaceAll(word, PATTERN_I_INSIDE_INTO_J, "$1" + GraphemeVEC.JJH_PHONEME);
+			word = PatternHelper.replaceAll(word, PATTERN_I_INSIDE_INTO_J, "$1" + GraphemeVEC.PHONEME_JJH);
 		return word;
 	}
 
