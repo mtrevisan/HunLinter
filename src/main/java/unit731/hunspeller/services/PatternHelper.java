@@ -18,6 +18,10 @@ public class PatternHelper{
 		return Pattern.compile(pattern);
 	}
 
+	public static Pattern pattern(String pattern, int flags){
+		return Pattern.compile(pattern, flags);
+	}
+
 	/** Returns the delimiters along with the splitted elements */
 	public static Pattern splitterWithDelimiters(String delimitersRegex){
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));

@@ -29,10 +29,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String NORTHERN_PLURAL_RULE = "U0";
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 
-	private static final Pattern NON_VANISHING_EL = PatternHelper.pattern("(^|[aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-])l([aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]|$)");
-	private static final Pattern VANISHING_EL_NEAR_CONSONANT = PatternHelper.pattern("[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ'–-]ƚ|ƚ[^aàeèéiíoòóuúAÀEÈÉIÍOÒÓUÚʼ']");
+	private static Pattern PATTERN_NON_VANISHING_EL;
+	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
 
-	private static final Pattern CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
+	private static final Pattern PATTERN_CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
 
 //	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
 //	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
@@ -42,7 +42,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String OR = " or ";
 
 
-	private static final Pattern PATTERN_NORTHERN_PLURAL = PatternHelper.pattern("[àéèóòú][ln]$");
+	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static final String MAN = "man";
 
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
@@ -100,6 +100,11 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		String pluralFlagsValue = readProperty(rulesProperties, "pluralFlags");
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
+
+		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(readProperty(rulesProperties, "patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
+		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(readProperty(rulesProperties, "patternVanishingElNextToConsonant"),
+			Pattern.CASE_INSENSITIVE);
+		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(readProperty(rulesProperties, "patternNorthernPlural"), Pattern.CASE_INSENSITIVE);
 	}
 
 	private boolean hasPluralFlag(Production production){
@@ -139,14 +144,14 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.L_STROKE_GRAPHEME)){
-			if(PatternHelper.find(derivedWord, NON_VANISHING_EL))
+			if(PatternHelper.find(derivedWord, PATTERN_NON_VANISHING_EL))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{derivedWord}));
 			if(derivedWord.contains(GraphemeVEC.D_STROKE_GRAPHEME) || derivedWord.contains(GraphemeVEC.T_STROKE_GRAPHEME))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH.format(new Object[]{derivedWord}));
 		}
-		if(PatternHelper.find(derivedWord, VANISHING_EL_NEAR_CONSONANT))
+		if(PatternHelper.find(derivedWord, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
 			throw new IllegalArgumentException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 	}
 
@@ -244,7 +249,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
 		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
-			if(PatternHelper.find(phonemizedSubword, CIJJHNHIV))
+			if(PatternHelper.find(phonemizedSubword, PATTERN_CIJJHNHIV))
 				throw new IllegalArgumentException("Word " + production.getWord() + " cannot have [cijɉñ]iV");
 		}
 	}
