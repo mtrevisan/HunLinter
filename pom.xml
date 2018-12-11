@@ -161,9 +161,6 @@
 		<!-- XChart -->
 		<org.knowm.xchart.version>3.5.2</org.knowm.xchart.version>
 
-		<!-- Murmur3 Hash -->
-		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
-
 		<!-- Jackson -->
 		<com.fasterxml.jackson.version>2.9.7</com.fasterxml.jackson.version>
 
@@ -207,13 +204,6 @@
 			<groupId>org.knowm.xchart</groupId>
 			<artifactId>xchart</artifactId>
 			<version>${org.knowm.xchart.version}</version>
-		</dependency>
-
-		<!-- Bloom filter: For computing Murmur hashes -->
-		<dependency>
-			<groupId>com.sangupta</groupId>
-			<artifactId>murmur</artifactId>
-			<version>${com.sangupta.murmur.version}</version>
 		</dependency>
 
 		<!-- Jackson -->
