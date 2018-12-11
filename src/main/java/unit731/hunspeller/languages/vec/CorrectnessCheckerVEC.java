@@ -29,19 +29,13 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private static final String NORTHERN_PLURAL_RULE = "U0";
 	private static final String NORTHERN_PLURAL_STRESSED_RULE = "U1";
 
-	private static Pattern PATTERN_NON_VANISHING_EL;
-	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
-
-	private static final Pattern PATTERN_CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
-
-//	private static final String START_TAGS = "(?<!\\\\)\\/.*?";
-//	private static final String NON_VANISHING_L = "(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú][^ƚ]+?" + START_TAGS;
-
 	private static final String SLASH = "/";
 	private static final String ASTERISK = "*";
 	private static final String OR = " or ";
 
-
+	private static Pattern PATTERN_NON_VANISHING_EL;
+	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
+	private static final Pattern PATTERN_CIJJHNHIV = PatternHelper.pattern("[ci" + GraphemeVEC.JJH_PHONEME + "ɉñ]j[aeiou]");
 	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static final String MAN = "man";
 
