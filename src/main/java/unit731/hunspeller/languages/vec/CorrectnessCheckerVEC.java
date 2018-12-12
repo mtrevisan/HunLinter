@@ -88,9 +88,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 		Objects.requireNonNull(hyphenator);
 
 
-		Properties rulesProperties = new Properties();
-		rulesProperties.load(getClass().getResourceAsStream("rules.properties"));
-		loadRules(rulesProperties);
+		Properties rulesProperties = loadRules(getClass());
 
 		String pluralFlagsValue = readProperty(rulesProperties, "pluralFlags");
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();

@@ -59,7 +59,10 @@ public class CorrectnessChecker{
 		this.hyphenator = hyphenator;
 	}
 
-	protected final void loadRules(Properties rulesProperties) throws IOException{
+	protected final Properties loadRules(Class<? extends CorrectnessChecker> klazz) throws IOException{
+		Properties rulesProperties = new Properties();
+		rulesProperties.load(klazz.getResourceAsStream("rules.properties"));
+
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 
 		morphologicalFieldsCheck = Boolean.getBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
@@ -103,6 +106,8 @@ public class CorrectnessChecker{
 						letter, wrongFlags, correctRule));
 			}
 		}
+
+		return rulesProperties;
 	}
 
 	protected final String readProperty(Properties rulesProperties, String key){
