@@ -41,8 +41,9 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		this.backbone = backbone;
 		dicParser = backbone.getDicParser();
 		this.lineIndex = lineIndex;
-		workerName = WORKER_NAME;
 
+		workerName = WORKER_NAME;
+		charset = dicParser.getCharset();
 		comparator  = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
 	}
 
