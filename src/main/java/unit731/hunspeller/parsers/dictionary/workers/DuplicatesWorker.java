@@ -61,8 +61,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		this.wordGenerator = wordGenerator;
 		this.dictionaryBaseData = dictionaryBaseData;
 		this.outputFile = outputFile;
-		workerName = WORKER_NAME;
 
+		workerName = WORKER_NAME;
+		charset = dicParser.getCharset();
 		comparator = ComparatorBuilder.getComparator(language);
 	}
 

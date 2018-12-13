@@ -38,6 +38,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MinimalPairsWorker.class);
 
+	public static final String WORKER_NAME = "Minimal pairs extraction";
+
 	private static final String SLASH = "/";
 
 	private final CorrectnessChecker checker;
@@ -62,6 +64,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		this.outputFile = outputFile;
 		this.lockable = lockable;
 
+		workerName = WORKER_NAME;
+		charset = dicParser.getCharset();
 		comparator = ComparatorBuilder.getComparator(language);
 	}
 
