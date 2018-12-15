@@ -7,26 +7,26 @@
         <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="addWindowListener(new WindowAdapter(){&#xa;&#x9;@Override&#xa;&#x9;public void windowClosing(WindowEvent e){&#xa;&#x9;&#x9;exit();&#xa;&#x9;}&#xa;});&#xa;"/>
       </AuxValues>
       <SubComponents>
-        <Menu class="javax.swing.JMenu" name="fileMenu">
+        <Menu class="javax.swing.JMenu" name="filMenu">
           <Properties>
             <Property name="mnemonic" type="int" value="70"/>
             <Property name="text" type="java.lang.String" value="File"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;rfm = new RecentFileMenu(recentItems, this::loadFile);&#xa;rfm.setText(&quot;Recent files&quot;);&#xa;rfm.setMnemonic(&apos;R&apos;);&#xa;fileMenu.add(rfm, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;rfm = new RecentFileMenu(recentItems, this::loadFile);&#xa;rfm.setText(&quot;Recent files&quot;);&#xa;rfm.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(rfm, 3);"/>
           </AuxValues>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="fileOpenAFFMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="filOpenAFFMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="97"/>
                 <Property name="text" type="java.lang.String" value="Open AFF file..."/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fileOpenAFFMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filOpenAFFMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="fileCreatePackageMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="filCreatePackageMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/file_package.png"/>
@@ -36,14 +36,24 @@
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fileCreatePackageMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filCreatePackageMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="recentFilesFileSeparator">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="filRecentFilesSeparator">
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="fileSeparator">
+            <MenuItem class="javax.swing.JMenuItem" name="filEmptyRecentFilesMenuItem">
+              <Properties>
+                <Property name="mnemonic" type="int" value="101"/>
+                <Property name="text" type="java.lang.String" value="Empty Recent Files list"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filEmptyRecentFilesMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="fileExitMenuItem">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="filSeparator">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="filExitMenuItem">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/file_exit.png"/>
@@ -52,7 +62,7 @@
                 <Property name="text" type="java.lang.String" value="Exit"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fileExitMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filExitMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -117,13 +127,13 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicStatisticsMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="disStatisticsNoHyphenationMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="dicStatisticsNoHyphenationMenuItem">
               <Properties>
                 <Property name="mnemonic" type="int" value="104"/>
                 <Property name="text" type="java.lang.String" value="Statistics without hyphenation"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="disStatisticsNoHyphenationMenuItemActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicStatisticsNoHyphenationMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicStatisticsSeparator">

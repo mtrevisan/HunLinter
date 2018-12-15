@@ -146,6 +146,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		initComponents();
 
+		filEmptyRecentFilesMenuItem.setEnabled(rfm.hasEntries());
+
 		try{
 			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
@@ -180,7 +182,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				dicStatisticsMenuItem.setEnabled(true);
 			else
-				disStatisticsNoHyphenationMenuItem.setEnabled(true);
+				dicStatisticsNoHyphenationMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
@@ -253,19 +255,20 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
       mainMenuBar = new javax.swing.JMenuBar();
-      fileMenu = new javax.swing.JMenu();
-      fileOpenAFFMenuItem = new javax.swing.JMenuItem();
-      fileCreatePackageMenuItem = new javax.swing.JMenuItem();
-      recentFilesFileSeparator = new javax.swing.JPopupMenu.Separator();
-      fileSeparator = new javax.swing.JPopupMenu.Separator();
-      fileExitMenuItem = new javax.swing.JMenuItem();
+      filMenu = new javax.swing.JMenu();
+      filOpenAFFMenuItem = new javax.swing.JMenuItem();
+      filCreatePackageMenuItem = new javax.swing.JMenuItem();
+      filRecentFilesSeparator = new javax.swing.JPopupMenu.Separator();
+      filEmptyRecentFilesMenuItem = new javax.swing.JMenuItem();
+      filSeparator = new javax.swing.JPopupMenu.Separator();
+      filExitMenuItem = new javax.swing.JMenuItem();
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
-      disStatisticsNoHyphenationMenuItem = new javax.swing.JMenuItem();
+      dicStatisticsNoHyphenationMenuItem = new javax.swing.JMenuItem();
       dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
@@ -781,49 +784,59 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      fileMenu.setMnemonic('F');
-      fileMenu.setText("File");
-      fileMenu.setToolTipText("");
+      filMenu.setMnemonic('F');
+      filMenu.setText("File");
+      filMenu.setToolTipText("");
 
-      fileOpenAFFMenuItem.setMnemonic('a');
-      fileOpenAFFMenuItem.setText("Open AFF file...");
-      fileOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      filOpenAFFMenuItem.setMnemonic('a');
+      filOpenAFFMenuItem.setText("Open AFF file...");
+      filOpenAFFMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            fileOpenAFFMenuItemActionPerformed(evt);
+            filOpenAFFMenuItemActionPerformed(evt);
          }
       });
-      fileMenu.add(fileOpenAFFMenuItem);
+      filMenu.add(filOpenAFFMenuItem);
 
-      fileCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
-      fileCreatePackageMenuItem.setMnemonic('p');
-      fileCreatePackageMenuItem.setText("Create package");
-      fileCreatePackageMenuItem.setEnabled(false);
-      fileCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      filCreatePackageMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_package.png"))); // NOI18N
+      filCreatePackageMenuItem.setMnemonic('p');
+      filCreatePackageMenuItem.setText("Create package");
+      filCreatePackageMenuItem.setEnabled(false);
+      filCreatePackageMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            fileCreatePackageMenuItemActionPerformed(evt);
+            filCreatePackageMenuItemActionPerformed(evt);
          }
       });
-      fileMenu.add(fileCreatePackageMenuItem);
-      fileMenu.add(recentFilesFileSeparator);
-      fileMenu.add(fileSeparator);
+      filMenu.add(filCreatePackageMenuItem);
+      filMenu.add(filRecentFilesSeparator);
 
-      fileExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
-      fileExitMenuItem.setMnemonic('x');
-      fileExitMenuItem.setText("Exit");
-      fileExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      filEmptyRecentFilesMenuItem.setMnemonic('e');
+      filEmptyRecentFilesMenuItem.setText("Empty Recent Files list");
+      filEmptyRecentFilesMenuItem.setEnabled(false);
+      filEmptyRecentFilesMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            fileExitMenuItemActionPerformed(evt);
+            filEmptyRecentFilesMenuItemActionPerformed(evt);
          }
       });
-      fileMenu.add(fileExitMenuItem);
+      filMenu.add(filEmptyRecentFilesMenuItem);
+      filMenu.add(filSeparator);
 
-      mainMenuBar.add(fileMenu);
+      filExitMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_exit.png"))); // NOI18N
+      filExitMenuItem.setMnemonic('x');
+      filExitMenuItem.setText("Exit");
+      filExitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            filExitMenuItemActionPerformed(evt);
+         }
+      });
+      filMenu.add(filExitMenuItem);
+
+      mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
       rfm = new RecentFileMenu(recentItems, this::loadFile);
       rfm.setText("Recent files");
       rfm.setMnemonic('R');
-      fileMenu.add(rfm, 3);
+      filMenu.add(rfm, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
@@ -873,14 +886,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicStatisticsMenuItem);
 
-      disStatisticsNoHyphenationMenuItem.setMnemonic('h');
-      disStatisticsNoHyphenationMenuItem.setText("Statistics without hyphenation");
-      disStatisticsNoHyphenationMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      dicStatisticsNoHyphenationMenuItem.setMnemonic('h');
+      dicStatisticsNoHyphenationMenuItem.setText("Statistics without hyphenation");
+      dicStatisticsNoHyphenationMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            disStatisticsNoHyphenationMenuItemActionPerformed(evt);
+            dicStatisticsNoHyphenationMenuItemActionPerformed(evt);
          }
       });
-      dicMenu.add(disStatisticsNoHyphenationMenuItem);
+      dicMenu.add(dicStatisticsNoHyphenationMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
       dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
@@ -1001,29 +1014,30 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
-   private void fileOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileOpenAFFMenuItemActionPerformed
+   private void filOpenAFFMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenAFFMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
 			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
+			filEmptyRecentFilesMenuItem.setEnabled(true);
 
 			File affFile = openAffixFileFileChooser.getSelectedFile();
 			loadFile(affFile.getAbsolutePath());
 		}
-   }//GEN-LAST:event_fileOpenAFFMenuItemActionPerformed
+   }//GEN-LAST:event_filOpenAFFMenuItemActionPerformed
 
-   private void fileCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileCreatePackageMenuItemActionPerformed
+   private void filCreatePackageMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filCreatePackageMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		backbone.createPackage();
-   }//GEN-LAST:event_fileCreatePackageMenuItemActionPerformed
+   }//GEN-LAST:event_filCreatePackageMenuItemActionPerformed
 
-   private void fileExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileExitMenuItemActionPerformed
+   private void filExitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filExitMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		exit();
-   }//GEN-LAST:event_fileExitMenuItemActionPerformed
+   }//GEN-LAST:event_filExitMenuItemActionPerformed
 
 	private void exit(){
 		if(backbone.getTheParser().isDictionaryModified()){
@@ -1312,11 +1326,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
-   private void disStatisticsNoHyphenationMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disStatisticsNoHyphenationMenuItemActionPerformed
+   private void dicStatisticsNoHyphenationMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsNoHyphenationMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(false);
-   }//GEN-LAST:event_disStatisticsNoHyphenationMenuItemActionPerformed
+   }//GEN-LAST:event_dicStatisticsNoHyphenationMenuItemActionPerformed
 
    private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1365,6 +1379,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		checkHyphenationCorrectness();
    }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
+
+   private void filEmptyRecentFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentFilesMenuItemActionPerformed
+		rfm.clear();
+
+		filEmptyRecentFilesMenuItem.setEnabled(false);
+   }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
 
 	@Override
@@ -1427,7 +1447,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					if(dicStatisticsWorker.isPerformHyphenationStatistics())
 						dicStatisticsMenuItem.setEnabled(true);
 					else
-						disStatisticsNoHyphenationMenuItem.setEnabled(true);
+						dicStatisticsNoHyphenationMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
 
 					dicStatisticsWorker = null;
@@ -1552,7 +1572,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 			});
 
-			fileCreatePackageMenuItem.setEnabled(true);
+			filCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, (compoundRules != null && !compoundRules.isEmpty()));
@@ -1742,7 +1762,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(performHyphenationStatistics)
 				dicStatisticsMenuItem.setEnabled(false);
 			else
-				disStatisticsNoHyphenationMenuItem.setEnabled(false);
+				dicStatisticsNoHyphenationMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
@@ -1882,7 +1902,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		//disable menu
 		dicMenu.setEnabled(false);
-		fileCreatePackageMenuItem.setEnabled(false);
+		filCreatePackageMenuItem.setEnabled(false);
 		dicInputTextField.requestFocusInWindow();
 	}
 
@@ -2007,15 +2027,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
+   private javax.swing.JMenuItem dicStatisticsNoHyphenationMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
    private javax.swing.JTable dicTable;
    private javax.swing.JMenuItem dicWordCountMenuItem;
-   private javax.swing.JMenuItem disStatisticsNoHyphenationMenuItem;
-   private javax.swing.JMenuItem fileCreatePackageMenuItem;
-   private javax.swing.JMenuItem fileExitMenuItem;
-   private javax.swing.JMenu fileMenu;
-   private javax.swing.JMenuItem fileOpenAFFMenuItem;
-   private javax.swing.JPopupMenu.Separator fileSeparator;
+   private javax.swing.JMenuItem filCreatePackageMenuItem;
+   private javax.swing.JMenuItem filEmptyRecentFilesMenuItem;
+   private javax.swing.JMenuItem filExitMenuItem;
+   private javax.swing.JMenu filMenu;
+   private javax.swing.JMenuItem filOpenAFFMenuItem;
+   private javax.swing.JPopupMenu.Separator filRecentFilesSeparator;
+   private javax.swing.JPopupMenu.Separator filSeparator;
    private javax.swing.JMenuItem hlpAboutMenuItem;
    private javax.swing.JMenu hlpMenu;
    private javax.swing.JButton hypAddRuleButton;
@@ -2044,7 +2066,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
-   private javax.swing.JPopupMenu.Separator recentFilesFileSeparator;
    private javax.swing.JButton theAddButton;
    private javax.swing.JMenuItem theFindDuplicatesMenuItem;
    private javax.swing.JLayeredPane theLayeredPane;
