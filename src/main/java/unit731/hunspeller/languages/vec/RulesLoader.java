@@ -16,8 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
-import unit731.hunspeller.languages.builders.BaseClassBuilder;
+import unit731.hunspeller.languages.builders.RulesPropertiesBuilder;
 import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
 import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -32,7 +31,7 @@ public class RulesLoader{
 	private static final MessageFormat WORD_WITH_LETTER_CANNOT_HAVE_USE = new MessageFormat("Word with letter ''{0}'' cannot have rule {1}, use {2}");
 
 
-	private final Properties rulesProperties = new Properties();
+	private final Properties rulesProperties;
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;
 	private final boolean wordCanHaveMultipleAccents;
@@ -46,10 +45,9 @@ public class RulesLoader{
 
 
 	public RulesLoader(String language, FlagParsingStrategy strategy) throws IOException{
-		Class<? extends DictionaryCorrectnessChecker> klazz = BaseClassBuilder.getBaseClass(language);
-		Objects.requireNonNull(klazz);
+		Objects.requireNonNull(language);
 
-		rulesProperties.load(klazz.getResourceAsStream("rules.properties"));
+		rulesProperties = RulesPropertiesBuilder.getProperties(language);
 
 		morphologicalFieldsCheck = Boolean.getBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
 		enableVerbSyllabationCheck = Boolean.getBoolean((String)rulesProperties.get("verbSyllabationCheck"));

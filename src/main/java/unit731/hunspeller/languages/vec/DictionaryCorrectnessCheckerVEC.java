@@ -82,7 +82,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String[] pluralFlags;
 
 
-	public DictionaryCorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator) throws IOException{
+	public DictionaryCorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator){
 		super(affParser, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
