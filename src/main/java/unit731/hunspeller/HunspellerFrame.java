@@ -166,33 +166,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
-			hypCheckCorrectnessMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
 			dicExtractDuplicatesMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
 			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				dicStatisticsMenuItem.setEnabled(true);
 			else
 				disStatisticsNoHyphenationMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
-			dicSortDictionaryMenuItem.setEnabled(true);
 			cmpInputComboBox.setEnabled(true);
 			limitComboBox.setEnabled(true);
 			cmpInputTextArea.setEnabled(true);
@@ -200,8 +193,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				cmpLoadInputButton.setEnabled(true);
 		});
 		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> {
-			dicCheckCorrectnessMenuItem.setEnabled(true);
-			dicSortDictionaryMenuItem.setEnabled(true);
 			hypCheckCorrectnessMenuItem.setEnabled(true);
 		});
 	}
@@ -1346,8 +1337,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		inputText = StringUtils.strip(inputText);
 		if(StringUtils.isNotBlank(inputText)){
 			try{
-				dicSortDictionaryMenuItem.setEnabled(false);
-
 				List<Production> words;
 				if(backbone.getAffParser().getCompoundFlag().equals(inputText)){
 					Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
@@ -1358,8 +1347,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
 				dm.setProductions(words);
-
-				dicSortDictionaryMenuItem.setEnabled(true);
 			}
 			catch(IllegalArgumentException e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
@@ -1393,8 +1380,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicCorrectnessWorker.cancel();
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
-					hypCheckCorrectnessMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
 
 					dicCorrectnessWorker = null;
@@ -1410,7 +1395,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicDuplicatesWorker.cancel(true);
 
 					dicExtractDuplicatesMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary duplicate extraction aborted");
 
 					dicDuplicatesWorker = null;
@@ -1426,7 +1410,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicWordCountWorker.cancel();
 
 					dicWordCountMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
 
 					dicWordCountWorker = null;
@@ -1445,7 +1428,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 						dicStatisticsMenuItem.setEnabled(true);
 					else
 						disStatisticsNoHyphenationMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
 
 					dicStatisticsWorker = null;
@@ -1461,7 +1443,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicWordlistWorker.cancel();
 
 					dicExtractWordlistMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
 
 					dicWordlistWorker = null;
@@ -1476,7 +1457,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				if(answer == JOptionPane.YES_OPTION){
 					compoundRulesExtractorWorker.cancel();
 
-					dicSortDictionaryMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
@@ -1489,8 +1469,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				if(answer == JOptionPane.YES_OPTION){
 					hypCorrectnessWorker.cancel();
 
-					dicCheckCorrectnessMenuItem.setEnabled(true);
-					dicSortDictionaryMenuItem.setEnabled(true);
 					hypCheckCorrectnessMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Hyphenation correctness check aborted");
 
@@ -1721,8 +1699,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void checkDictionaryCorrectness(){
 		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
-			hypCheckCorrectnessMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
@@ -1737,7 +1713,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
-				dicSortDictionaryMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);
 
@@ -1753,7 +1728,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void extractWordCount(){
 		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
 			dicWordCountMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
@@ -1769,7 +1743,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				dicStatisticsMenuItem.setEnabled(false);
 			else
 				disStatisticsNoHyphenationMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
@@ -1785,7 +1758,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
-				dicSortDictionaryMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);
 
@@ -1802,7 +1774,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
-				dicSortDictionaryMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);
 
@@ -1817,7 +1788,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractCompoundRulesInputs(){
 		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
-			dicSortDictionaryMenuItem.setEnabled(false);
 			cmpInputComboBox.setEnabled(false);
 			cmpInputTextArea.setEnabled(false);
 			cmpLoadInputButton.setEnabled(false);
@@ -1856,8 +1826,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				hypCorrectnessWorker.addPropertyChangeListener(this);
 				hypCorrectnessWorker.execute();
 
-				dicCheckCorrectnessMenuItem.setEnabled(false);
-				dicSortDictionaryMenuItem.setEnabled(false);
 				hypCheckCorrectnessMenuItem.setEnabled(false);
 				
 				mainProgressBar.setValue(0);
