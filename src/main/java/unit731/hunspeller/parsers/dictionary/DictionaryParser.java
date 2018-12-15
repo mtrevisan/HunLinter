@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
@@ -129,7 +129,7 @@ public class DictionaryParser{
 				String line;
 				int startSection = -1;
 				boolean needSorting = false;
-				Comparator<String> comparator = ComparatorBuilder.getComparator(language);
+				Comparator<String> comparator = BaseBuilder.getComparator(language);
 				while((line = br.readLine()) != null){
 					if(isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){

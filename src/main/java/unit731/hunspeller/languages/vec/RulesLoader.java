@@ -16,7 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.languages.builders.RulesPropertiesBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
 import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -47,7 +47,7 @@ public class RulesLoader{
 	public RulesLoader(String language, FlagParsingStrategy strategy) throws IOException{
 		Objects.requireNonNull(language);
 
-		rulesProperties = RulesPropertiesBuilder.getProperties(language);
+		rulesProperties = BaseBuilder.getRulesProperties(language);
 
 		morphologicalFieldsCheck = Boolean.getBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
 		enableVerbSyllabationCheck = Boolean.getBoolean((String)rulesProperties.get("verbSyllabationCheck"));

@@ -12,7 +12,7 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -45,7 +45,7 @@ public class DictionaryStatistics implements Closeable{
 	public DictionaryStatistics(String language, Charset charset, DictionaryBaseData dictionaryBaseData){
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData.getExpectedNumberOfElements(),
 			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
-		orthography = OrthographyBuilder.getOrthography(language);
+		orthography = BaseBuilder.getOrthography(language);
 	}
 
 	public int getTotalProductions(){

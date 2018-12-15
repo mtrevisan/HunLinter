@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
@@ -66,7 +66,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
-		comparator = ComparatorBuilder.getComparator(language);
+		comparator = BaseBuilder.getComparator(language);
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			//sort file by length first and by alphabet after:
 			ExternalSorterOptions options = ExternalSorterOptions.builder()
 				.charset(dicParser.getCharset())
-				.comparator(ComparatorBuilder.COMPARATOR_LENGTH.thenComparing(comparator))
+				.comparator(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator))
 				.useZip(true)
 				.removeDuplicates(true)
 				.build();

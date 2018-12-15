@@ -33,7 +33,6 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,7 +64,7 @@ import unit731.hunspeller.gui.RecentFileMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -1629,7 +1628,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void hyphenate(HunspellerFrame frame){
 		String language = frame.backbone.getAffParser().getLanguage();
-		Orthography orthography = OrthographyBuilder.getOrthography(language);
+		Orthography orthography = BaseBuilder.getOrthography(language);
 		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
 			return;
@@ -1668,7 +1667,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void hyphenateAddRule(HunspellerFrame frame){
 		String language = frame.backbone.getAffParser().getLanguage();
-		Orthography orthography = OrthographyBuilder.getOrthography(language);
+		Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
 		String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
 		HyphenationParser.Level level = HyphenationParser.Level.values()[frame.hypAddRuleLevelComboBox.getSelectedIndex()];

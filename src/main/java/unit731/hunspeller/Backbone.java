@@ -22,8 +22,7 @@ import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.DictionaryBaseData;
-import unit731.hunspeller.languages.builders.DictionaryCorrectnessCheckerBuilder;
-import unit731.hunspeller.languages.builders.DictionaryBaseDataBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -125,7 +124,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = DictionaryCorrectnessCheckerBuilder.getCorrectnessChecker(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = getDictionaryFile();
 		prepareDictionaryFile(dicFile);
@@ -144,7 +143,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = DictionaryCorrectnessCheckerBuilder.getCorrectnessChecker(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = new File(dictionaryFilePath);
 		prepareDictionaryFile(dicFile);
@@ -226,7 +225,7 @@ public class Backbone implements FileChangeListener{
 		else if(dicParser != null)
 			dicParser.clear();
 
-		dictionaryBaseData = DictionaryBaseDataBuilder.getDictionaryBaseData(affParser.getLanguage());
+		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affParser.getLanguage());
 		wordGenerator = new WordGenerator(affParser, dicParser, dictionaryBaseData);
 	}
 

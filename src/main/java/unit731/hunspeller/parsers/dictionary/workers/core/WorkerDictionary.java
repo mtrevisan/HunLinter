@@ -188,7 +188,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
 		}
 		catch(Exception e){
-			if(e instanceof ClosedChannelException)
+			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
 				LOGGER.warn("Thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(e);

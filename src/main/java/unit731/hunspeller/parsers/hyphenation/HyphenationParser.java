@@ -29,8 +29,7 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
-import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
@@ -134,8 +133,8 @@ public class HyphenationParser extends ReadWriteLockable{
 	public HyphenationParser(String language){
 		Objects.requireNonNull(language);
 
-		comparator = ComparatorBuilder.getComparator(language);
-		orthography = OrthographyBuilder.getOrthography(language);
+		comparator = BaseBuilder.getComparator(language);
+		orthography = BaseBuilder.getOrthography(language);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);
@@ -151,8 +150,8 @@ public class HyphenationParser extends ReadWriteLockable{
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
-		comparator = ComparatorBuilder.getComparator(language);
-		orthography = OrthographyBuilder.getOrthography(language);
+		comparator = BaseBuilder.getComparator(language);
+		orthography = BaseBuilder.getOrthography(language);
 
 		Objects.requireNonNull(comparator);
 		Objects.requireNonNull(orthography);

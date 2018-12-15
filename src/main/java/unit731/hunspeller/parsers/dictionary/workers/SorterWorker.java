@@ -14,7 +14,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionHelper;
@@ -44,7 +44,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
-		comparator  = ComparatorBuilder.getComparator(backbone.getAffParser().getLanguage());
+		comparator  = BaseBuilder.getComparator(backbone.getAffParser().getLanguage());
 	}
 
 	@Override

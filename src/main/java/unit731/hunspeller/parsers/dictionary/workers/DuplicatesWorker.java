@@ -21,7 +21,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
@@ -64,7 +64,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
-		comparator = ComparatorBuilder.getComparator(language);
+		comparator = BaseBuilder.getComparator(language);
 	}
 
 	@Override
