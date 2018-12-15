@@ -29,8 +29,8 @@ import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
@@ -67,7 +67,7 @@ public class Backbone implements FileChangeListener{
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
-	private AbstractHyphenator hyphenator;
+	private HyphenatorInterface hyphenator;
 	private DictionaryBaseData dictionaryBaseData;
 	private CorrectnessChecker checker;
 	private WordGenerator wordGenerator;
@@ -101,7 +101,7 @@ public class Backbone implements FileChangeListener{
 		return theParser;
 	}
 
-	public AbstractHyphenator getHyphenator(){
+	public HyphenatorInterface getHyphenator(){
 		return hyphenator;
 	}
 

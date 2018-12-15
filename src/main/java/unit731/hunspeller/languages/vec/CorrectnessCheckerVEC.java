@@ -15,7 +15,7 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -79,26 +79,29 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private final Orthography orthography = OrthographyVEC.getInstance();
 
-	private final String[] pluralFlags;
+	private String[] pluralFlags;
 
 
-	public CorrectnessCheckerVEC(AffixParser affParser, AbstractHyphenator hyphenator) throws IOException{
+	public CorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator) throws IOException{
 		super(affParser, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
+	}
 
+	@Override
+	public void loadRules() throws IOException{
+		rulesLoader = new RulesLoader(getClass(), affParser.getFlagParsingStrategy());
 
-		Properties rulesProperties = loadRules(getClass());
-
-		String pluralFlagsValue = readProperty(rulesProperties, "pluralFlags");
+		Properties rulesProperties = rulesLoader.getRulesPorperties();
+		String pluralFlagsValue = rulesLoader.readProperty(rulesProperties, "pluralFlags");
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
 
-		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(readProperty(rulesProperties, "patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
-		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(readProperty(rulesProperties, "patternVanishingElNextToConsonant"),
+		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty(rulesProperties, "patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
+		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = PatternHelper.pattern(rulesLoader.readProperty(rulesProperties, "patternVanishingElNextToConsonant"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(readProperty(rulesProperties, "patternPhonemeCIJJHNHIV"), Pattern.CASE_INSENSITIVE);
-		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(readProperty(rulesProperties, "patternNorthernPlural"), Pattern.CASE_INSENSITIVE);
+		PATTERN_PHONEME_CIJJHNHIV = PatternHelper.pattern(rulesLoader.readProperty(rulesProperties, "patternPhonemeCIJJHNHIV"), Pattern.CASE_INSENSITIVE);
+		PATTERN_NORTHERN_PLURAL = PatternHelper.pattern(rulesLoader.readProperty(rulesProperties, "patternNorthernPlural"), Pattern.CASE_INSENSITIVE);
 	}
 
 	private boolean hasPluralFlag(Production production){
@@ -195,10 +198,10 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((enableVerbSyllabationCheck || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
+		if((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
 				&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 			String word = production.getWord();
-			if(!unsyllabableWords.contains(word) && !multipleAccentedWords.contains(word)){
+			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
 				word = word.toLowerCase(Locale.ROOT);
 				String correctedDerivedWord = orthography.correctOrthography(word);
 				if(!correctedDerivedWord.equals(word))
@@ -223,8 +226,8 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
 		int accents = WordVEC.countAccents(subword);
-		if(!multipleAccentedWords.contains(subword)){
-			if(!wordCanHaveMultipleAccents && accents > 1)
+		if(!rulesLoader.containsMultipleAccentedWords(subword)){
+			if(!rulesLoader.isWordCanHaveMultipleAccents() && accents > 1)
 				throw new IllegalArgumentException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
 			List<AffixEntry> appliedRules = production.getAppliedRules();
@@ -232,9 +235,9 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 				//retrieve last applied rule
 				String appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
 					.getFlag();
-				if(accents == 0 && hasToContainAccent.contains(appliedRuleFlag))
+				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
-				else if(accents > 0 && cannotContainAccent.contains(appliedRuleFlag))
+				else if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 			}
 		}

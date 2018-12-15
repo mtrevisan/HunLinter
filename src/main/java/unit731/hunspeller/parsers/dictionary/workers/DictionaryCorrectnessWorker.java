@@ -11,12 +11,12 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-public class CorrectnessWorker extends WorkerDictionaryBase{
+public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 
-	public static final String WORKER_NAME = "Correctness checking";
+	public static final String WORKER_NAME = "Dictionary correctness checking";
 
 
-	public CorrectnessWorker(DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, ReadWriteLockable lockable){
+	public DictionaryCorrectnessWorker(DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);
 

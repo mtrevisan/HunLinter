@@ -14,7 +14,7 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 
 public class StatisticsWorker extends WorkerDictionaryBase{
@@ -25,7 +25,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
+	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
 			DictionaryBaseData dictionaryBaseData, boolean performHyphenationStatistics, Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);

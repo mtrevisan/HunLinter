@@ -70,8 +70,9 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
-import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
+import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
+import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
@@ -128,7 +129,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 
-	private CorrectnessWorker dicCorrectnessWorker;
+	private DictionaryCorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
 	private WordCountWorker dicWordCountWorker;
@@ -136,6 +137,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private WordlistWorker dicWordlistWorker;
 	private MinimalPairsWorker dicMinimalPairsWorker;
 	private CompoundRulesWorker compoundRulesExtractorWorker;
+	private HyphenationCorrectnessWorker hypCorrectnessWorker;
 	private final Map<String, Runnable> enableComponentFromWorker = new HashMap<>();
 
 
@@ -162,9 +164,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> {
+		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> {
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
+			hypCheckCorrectnessMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
 			dicExtractDuplicatesMenuItem.setEnabled(true);
@@ -195,6 +198,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			cmpInputTextArea.setEnabled(true);
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
+		});
+		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> {
+			dicCheckCorrectnessMenuItem.setEnabled(true);
+			dicSortDictionaryMenuItem.setEnabled(true);
+			hypCheckCorrectnessMenuItem.setEnabled(true);
 		});
 	}
 
@@ -273,6 +281,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
+      hypMenu = new javax.swing.JMenu();
+      hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -931,6 +941,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainMenuBar.add(theMenu);
 
+      hypMenu.setMnemonic('H');
+      hypMenu.setText("Hyphenation tools");
+      hypMenu.setToolTipText("");
+      hypMenu.setEnabled(false);
+
+      hypCheckCorrectnessMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_correctness.png"))); // NOI18N
+      hypCheckCorrectnessMenuItem.setMnemonic('d');
+      hypCheckCorrectnessMenuItem.setText("Check correctness");
+      hypCheckCorrectnessMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hypCheckCorrectnessMenuItemActionPerformed(evt);
+         }
+      });
+      hypMenu.add(hypCheckCorrectnessMenuItem);
+
+      mainMenuBar.add(hypMenu);
+
       hlpMenu.setMnemonic('H');
       hlpMenu.setText("Help");
 
@@ -1346,6 +1373,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		extractCompoundRulesInputs();
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
+   private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		checkHyphenationCorrectness();
+   }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -1361,6 +1394,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 					dicCheckCorrectnessMenuItem.setEnabled(true);
 					dicSortDictionaryMenuItem.setEnabled(true);
+					hypCheckCorrectnessMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
 
 					dicCorrectnessWorker = null;
@@ -1448,6 +1482,23 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
+			if(hypCorrectnessWorker != null && hypCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
+				Object[] options = {"Abort", "Cancel"};
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the hyphenation correctness task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				if(answer == JOptionPane.YES_OPTION){
+					hypCorrectnessWorker.cancel();
+
+					dicCheckCorrectnessMenuItem.setEnabled(true);
+					dicSortDictionaryMenuItem.setEnabled(true);
+					hypCheckCorrectnessMenuItem.setEnabled(true);
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Hyphenation correctness check aborted");
+
+					hypCorrectnessWorker = null;
+				}
+				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
+					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+			}
 		}
 	}
 
@@ -1480,6 +1531,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
+			hypCheckCorrectnessMenuItem.setEnabled(true);
 
 
 			//affix file:
@@ -1497,6 +1549,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//hyphenation file:
+			hypMenu.setEnabled(true);
 			dicStatisticsMenuItem.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 
@@ -1669,10 +1722,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 			dicSortDictionaryMenuItem.setEnabled(false);
+			hypCheckCorrectnessMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(), backbone.getAffParser());
+			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(), backbone.getAffParser());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1794,6 +1848,22 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 
+	private void checkHyphenationCorrectness(){
+		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
+			dicCheckCorrectnessMenuItem.setEnabled(false);
+			dicSortDictionaryMenuItem.setEnabled(false);
+			hypCheckCorrectnessMenuItem.setEnabled(false);
+
+			mainProgressBar.setValue(0);
+
+			hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(),
+				backbone.getAffParser());
+			hypCorrectnessWorker.addPropertyChangeListener(this);
+			hypCorrectnessWorker.execute();
+		}
+	}
+
+
 	private void updateSynonyms(){
 		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.fireTableDataChanged();
@@ -1810,6 +1880,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public void clearHyphenationParser(){
 		clearHyphenationFields();
 
+		hypMenu.setEnabled(false);
 		dicStatisticsMenuItem.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 	}
@@ -1982,7 +2053,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel hypAddRuleSyllabesCountLabel;
    private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
    private javax.swing.JTextField hypAddRuleTextField;
+   private javax.swing.JMenuItem hypCheckCorrectnessMenuItem;
    private javax.swing.JLayeredPane hypLayeredPane;
+   private javax.swing.JMenu hypMenu;
    private javax.swing.JLabel hypRulesLabel;
    private javax.swing.JLabel hypRulesOutputLabel;
    private javax.swing.JLabel hypSyllabationLabel;
