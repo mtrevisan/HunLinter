@@ -33,6 +33,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1850,16 +1851,21 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void checkHyphenationCorrectness(){
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
-			dicCheckCorrectnessMenuItem.setEnabled(false);
-			dicSortDictionaryMenuItem.setEnabled(false);
-			hypCheckCorrectnessMenuItem.setEnabled(false);
+			try{
+				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(),
+					backbone.getAffParser());
+				hypCorrectnessWorker.addPropertyChangeListener(this);
+				hypCorrectnessWorker.execute();
 
-			mainProgressBar.setValue(0);
-
-			hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(),
-				backbone.getAffParser());
-			hypCorrectnessWorker.addPropertyChangeListener(this);
-			hypCorrectnessWorker.execute();
+				dicCheckCorrectnessMenuItem.setEnabled(false);
+				dicSortDictionaryMenuItem.setEnabled(false);
+				hypCheckCorrectnessMenuItem.setEnabled(false);
+				
+				mainProgressBar.setValue(0);
+			}
+			catch(IOException e){
+				LOGGER.warn("Cannot instantiate Hyphenation correctness worker", e);
+			}
 		}
 	}
 

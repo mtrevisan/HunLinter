@@ -1,7 +1,7 @@
 package unit731.hunspeller.languages.builders;
 
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.vec.CorrectnessCheckerVEC;
+import unit731.hunspeller.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.OrthographyVEC;
 
 
@@ -12,7 +12,7 @@ public class OrthographyBuilder{
 	public static Orthography getOrthography(String language){
 		Orthography ortho;
 		switch(language){
-			case CorrectnessCheckerVEC.LANGUAGE:
+			case DictionaryCorrectnessCheckerVEC.LANGUAGE:
 				ortho = OrthographyVEC.getInstance();
 				break;
 

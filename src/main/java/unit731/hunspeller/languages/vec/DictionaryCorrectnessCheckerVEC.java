@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -19,7 +19,7 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.services.PatternHelper;
 
 
-public class CorrectnessCheckerVEC extends CorrectnessChecker{
+public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{
 
 	public static final String LANGUAGE = "vec";
 
@@ -82,7 +82,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 	private String[] pluralFlags;
 
 
-	public CorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator) throws IOException{
+	public DictionaryCorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator) throws IOException{
 		super(affParser, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
@@ -90,7 +90,7 @@ public class CorrectnessCheckerVEC extends CorrectnessChecker{
 
 	@Override
 	public void loadRules() throws IOException{
-		rulesLoader = new RulesLoader(getClass(), affParser.getFlagParsingStrategy());
+		rulesLoader = new RulesLoader(affParser.getLanguage(), affParser.getFlagParsingStrategy());
 
 		Properties rulesProperties = rulesLoader.getRulesPorperties();
 		String pluralFlagsValue = rulesLoader.readProperty(rulesProperties, "pluralFlags");

@@ -1,7 +1,7 @@
 package unit731.hunspeller.languages.builders;
 
 import java.util.Comparator;
-import unit731.hunspeller.languages.vec.CorrectnessCheckerVEC;
+import unit731.hunspeller.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.WordVEC;
 
 
@@ -16,7 +16,7 @@ public class ComparatorBuilder{
 	public static Comparator<String> getComparator(String language){
 		Comparator<String> cmp;
 		switch(language){
-			case CorrectnessCheckerVEC.LANGUAGE:
+			case DictionaryCorrectnessCheckerVEC.LANGUAGE:
 				cmp = WordVEC.sorterComparator();
 				break;
 

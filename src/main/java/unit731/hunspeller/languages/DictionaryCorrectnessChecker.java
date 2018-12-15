@@ -12,7 +12,7 @@ import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 
-public class CorrectnessChecker{
+public class DictionaryCorrectnessChecker{
 
 	private static final MessageFormat WORD_HAS_NOT_MORPHOLOGICAL_FIELD = new MessageFormat("Word {0} does not have any morphological fields");
 	private static final MessageFormat WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("Word {0} has an invalid morphological field prefix: {1}");
@@ -26,7 +26,7 @@ public class CorrectnessChecker{
 	protected RulesLoader rulesLoader;
 
 
-	public CorrectnessChecker(AffixParser affParser, HyphenatorInterface hyphenator){
+	public DictionaryCorrectnessChecker(AffixParser affParser, HyphenatorInterface hyphenator){
 		Objects.requireNonNull(affParser);
 
 		this.affParser = affParser;
@@ -34,7 +34,7 @@ public class CorrectnessChecker{
 	}
 
 	public void loadRules() throws IOException{
-		rulesLoader = new RulesLoader(getClass(), affParser.getFlagParsingStrategy());
+		rulesLoader = new RulesLoader(affParser.getLanguage(), affParser.getFlagParsingStrategy());
 	}
 
 	public AffixParser getAffParser(){

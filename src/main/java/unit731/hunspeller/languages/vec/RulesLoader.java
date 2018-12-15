@@ -11,11 +11,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
+import unit731.hunspeller.languages.builders.BaseClassBuilder;
 import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
 import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -37,13 +39,16 @@ public class RulesLoader{
 	private final Map<String, Set<String>> dataFields = new HashMap<>();
 	private final Set<String> unsyllabableWords;
 	private final Set<String> multipleAccentedWords;
-	private final Set<String> hasToContainAccent;
-	private final Set<String> cannotContainAccent;
+	private final Set<String> hasToContainAccent = new HashSet<>();
+	private final Set<String> cannotContainAccent = new HashSet<>();
 	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>();
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
 
-	public RulesLoader(Class<? extends CorrectnessChecker> klazz, FlagParsingStrategy strategy) throws IOException{
+	public RulesLoader(String language, FlagParsingStrategy strategy) throws IOException{
+		Class<? extends DictionaryCorrectnessChecker> klazz = BaseClassBuilder.getBaseClass(language);
+		Objects.requireNonNull(klazz);
+
 		rulesProperties.load(klazz.getResourceAsStream("rules.properties"));
 
 		morphologicalFieldsCheck = Boolean.getBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
@@ -59,32 +64,36 @@ public class RulesLoader{
 		unsyllabableWords = readPropertyAsSet(rulesProperties, "unsyllabableWords", ',');
 		multipleAccentedWords = readPropertyAsSet(rulesProperties, "multipleAccentedWords", ',');
 
-		String[] flags = strategy.parseFlags(readProperty(rulesProperties, "hasToContainAccent"));
-		hasToContainAccent = (flags != null? new HashSet<>(Arrays.asList(flags)): Collections.<String>emptySet());
-		flags = strategy.parseFlags(readProperty(rulesProperties, "cannotContainAccent"));
-		cannotContainAccent = (flags != null? new HashSet<>(Arrays.asList(flags)): Collections.<String>emptySet());
+		if(strategy != null){
+			String[] flags = strategy.parseFlags(readProperty(rulesProperties, "hasToContainAccent"));
+			if(flags != null)
+				hasToContainAccent.addAll(Arrays.asList(flags));
+			flags = strategy.parseFlags(readProperty(rulesProperties, "cannotContainAccent"));
+			if(flags != null)
+				cannotContainAccent.addAll(Arrays.asList(flags));
 
-		Iterator<String> rules = readPropertyAsIterator(rulesProperties, "notCombinableRules", '/');
-		while(rules.hasNext()){
-			String masterFlag = rules.next();
-			String[] wrongFlags = strategy.parseFlags(rules.next());
-			ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
-				.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
-		}
+			Iterator<String> rules = readPropertyAsIterator(rulesProperties, "notCombinableRules", '/');
+			while(rules.hasNext()){
+				String masterFlag = rules.next();
+				String[] wrongFlags = strategy.parseFlags(rules.next());
+				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
+					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
+			}
 
-		String letter = null;
-		rules = readPropertyAsIterator(rulesProperties, "letterAndRulesNotCombinable", '/');
-		while(rules.hasNext()){
-			String elem = rules.next();
-			if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
-				letter = String.valueOf(elem.charAt(1));
-			else{
-				flags = strategy.parseFlags(elem);
-				String correctRule = flags[flags.length - 1];
-				String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-				letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
-					.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
-						letter, wrongFlags, correctRule));
+			String letter = null;
+			rules = readPropertyAsIterator(rulesProperties, "letterAndRulesNotCombinable", '/');
+			while(rules.hasNext()){
+				String elem = rules.next();
+				if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
+					letter = String.valueOf(elem.charAt(1));
+				else{
+					flags = strategy.parseFlags(elem);
+					String correctRule = flags[flags.length - 1];
+					String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
+						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
+							letter, wrongFlags, correctRule));
+				}
 			}
 		}
 	}

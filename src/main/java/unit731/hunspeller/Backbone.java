@@ -20,9 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.DictionaryBaseData;
-import unit731.hunspeller.languages.builders.CorrectnessCheckerBuilder;
+import unit731.hunspeller.languages.builders.DictionaryCorrectnessCheckerBuilder;
 import unit731.hunspeller.languages.builders.DictionaryBaseDataBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
@@ -69,7 +69,7 @@ public class Backbone implements FileChangeListener{
 
 	private HyphenatorInterface hyphenator;
 	private DictionaryBaseData dictionaryBaseData;
-	private CorrectnessChecker checker;
+	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
 
 	private final Hunspellable hunspellable;
@@ -109,7 +109,7 @@ public class Backbone implements FileChangeListener{
 		return dictionaryBaseData;
 	}
 
-	public CorrectnessChecker getChecker(){
+	public DictionaryCorrectnessChecker getChecker(){
 		return checker;
 	}
 
@@ -125,7 +125,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
+		checker = DictionaryCorrectnessCheckerBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = getDictionaryFile();
 		prepareDictionaryFile(dicFile);
@@ -144,7 +144,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
+		checker = DictionaryCorrectnessCheckerBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = new File(dictionaryFilePath);
 		prepareDictionaryFile(dicFile);

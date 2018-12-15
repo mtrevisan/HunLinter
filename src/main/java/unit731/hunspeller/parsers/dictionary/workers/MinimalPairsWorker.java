@@ -20,7 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.builders.ComparatorBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
@@ -42,14 +42,14 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	private static final String SLASH = "/";
 
-	private final CorrectnessChecker checker;
+	private final DictionaryCorrectnessChecker checker;
 	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(String language, DictionaryParser dicParser, CorrectnessChecker checker, WordGenerator wordGenerator,
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator,
 			File outputFile, ReadWriteLockable lockable){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);

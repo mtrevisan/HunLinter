@@ -1,11 +1,13 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
+import unit731.hunspeller.languages.vec.RulesLoader;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
@@ -28,16 +30,19 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 
 
 	public HyphenationCorrectnessWorker(DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
-			ReadWriteLockable lockable){
+			ReadWriteLockable lockable) throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
+
+		RulesLoader rulesLoader = new RulesLoader(dicParser.getLanguage(), null);
 
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			productions.forEach(production -> {
 				String word = production.getWord();
-				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
+						&& !rulesLoader.containsUnsyllabableWords(word)){
 					Hyphenation hyphenation = hyphenator.hyphenate(word);
 					if(hyphenation.hasErrors()){
 						String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
