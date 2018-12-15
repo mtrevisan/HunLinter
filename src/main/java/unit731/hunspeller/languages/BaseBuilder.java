@@ -78,7 +78,8 @@ public class BaseBuilder{
 		InputStream is = cl.getResourceAsStream("rules.properties");
 
 		Properties rulesProperties = new Properties();
-		rulesProperties.load(is);
+		if(is != null)
+			rulesProperties.load(is);
 		return rulesProperties;
 	}
 

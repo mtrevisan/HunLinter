@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.valueobjects;
+package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 

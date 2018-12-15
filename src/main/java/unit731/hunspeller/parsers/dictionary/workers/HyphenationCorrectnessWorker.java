@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import unit731.hunspeller.languages.vec.RulesLoader;
+import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;

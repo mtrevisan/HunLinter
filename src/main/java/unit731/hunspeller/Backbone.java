@@ -136,7 +136,7 @@ public class Backbone implements FileChangeListener{
 		openThesaurusFile(theFile);
 	}
 
-	/** NOTE: used in test */
+	/* NOTE: used for testing purposes */
 	public void loadFile(String affixFilePath, String dictionaryFilePath) throws FileNotFoundException, IOException{
 		openAffixFile(affixFilePath);
 

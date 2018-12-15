@@ -10,6 +10,7 @@ import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
+import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;

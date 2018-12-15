@@ -1,4 +1,4 @@
-package unit731.hunspeller.languages.vec;
+package unit731.hunspeller.languages;
 
 import java.io.IOException;
 import java.text.MessageFormat;
