@@ -1,23 +1,26 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadWriteBase;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-@Slf4j
-public class WordlistWorker extends WorkerDictionaryReadWriteBase{
+public class WordlistWorker extends WorkerDictionaryBase{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountWorker.class);
 
 	public static final String WORKER_NAME = "Wordlist";
 
@@ -29,8 +32,8 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 		Objects.requireNonNull(lockable);
 
 
-		BiConsumer<BufferedWriter, String> body = (writer, line) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
+			List<Production> productions = wordGenerator.applyAffixRules(line.getValue());
 
 			try{
 				for(Production production : productions){
@@ -42,19 +45,17 @@ public class WordlistWorker extends WorkerDictionaryReadWriteBase{
 				throw new IllegalArgumentException(e);
 			}
 		};
-		Runnable done = () -> {
-			if(!isCancelled()){
-				log.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
+		Runnable completed = () -> {
+			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-				try{
-					FileHelper.openFileWithChoosenEditor(outputFile);
-				}
-				catch(IOException | InterruptedException e){
-					log.warn("Exception while opening the resulting file", e);
-				}
+			try{
+				FileHelper.openFileWithChoosenEditor(outputFile);
+			}
+			catch(IOException | InterruptedException e){
+				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		createWorker(WORKER_NAME, dicParser, outputFile, body, done, lockable);
+		createReadWriteWorker(WORKER_NAME, dicParser, outputFile, lineProcessor, completed, null, lockable);
 	}
 
 }

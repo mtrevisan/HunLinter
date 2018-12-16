@@ -1,6 +1,7 @@
 package unit731.hunspeller;
 
 import java.awt.FlowLayout;
+import java.awt.FocusTraversalPolicy;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -19,14 +20,16 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
 
-@Slf4j
 public class ThesaurusMeaningsDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusMeaningsDialog.class);
 
 	private static final long serialVersionUID = 667526009330291911L;
 
@@ -77,7 +80,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
       btnOk.setText("Ok");
       btnOk.setMaximumSize(new java.awt.Dimension(65, 23));
       btnOk.setMinimumSize(new java.awt.Dimension(65, 23));
-      btnOk.setNextFocusableComponent(btnCancel);
       btnOk.setPreferredSize(new java.awt.Dimension(65, 23));
       btnOk.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -86,7 +88,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
       });
 
       btnCancel.setText("Cancel");
-      btnCancel.setNextFocusableComponent(btnOk);
       btnCancel.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             btnCancelActionPerformed(evt);
@@ -144,7 +145,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			okButtonAction.accept(meanings, text);
 		}
 		catch(IllegalArgumentException e){
-			log.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());
 		}
 
 		dispose();
@@ -184,7 +185,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -207,7 +208,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}

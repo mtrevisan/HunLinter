@@ -1,10 +1,6 @@
 package unit731.hunspeller.services.externalsorter;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringSizeEstimator{
 
 	private static final int OBJ_OVERHEAD;
@@ -30,6 +26,8 @@ public class StringSizeEstimator{
 		OBJ_OVERHEAD = objectHeader + integerFields + objectReference + arrayHeader;
 	}
 
+
+	private StringSizeEstimator(){}
 
 	/**
 	 * Estimates the size of a {@link String} object in bytes.

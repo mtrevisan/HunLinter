@@ -3,29 +3,35 @@ package unit731.hunspeller.parsers.hyphenation.dtos;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 
-@AllArgsConstructor
 public class HyphenationBreak{
 
 	public static final Pair<Integer, String> EMPTY_PAIR = Pair.of(0, null);
 
 
-	@NonNull
 	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
-	@Getter
 	private final int size;
 
 
 	public static HyphenationBreak getEmptyInstance(){
 		return new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), 0);
+	}
+
+	public HyphenationBreak(Map<Integer, Pair<Integer, String>> indexesAndRules, int size){
+		Objects.requireNonNull(indexesAndRules);
+
+		this.indexesAndRules = indexesAndRules;
+		this.size = size;
+	}
+
+	public int getSize(){
+		return size;
 	}
 
 	public boolean isBreakpoint(int index){

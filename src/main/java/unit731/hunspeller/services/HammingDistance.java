@@ -1,8 +1,6 @@
 package unit731.hunspeller.services;
 
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -11,8 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Hamming_distance">Hamming distance</a>
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HammingDistance{
+
+	private HammingDistance(){}
 
 	/**
 	 * Find the Hamming Distance between two strings with the same length.

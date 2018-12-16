@@ -11,14 +11,12 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -28,61 +26,96 @@ import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = {"word", "continuationFlags", "morphologicalFields"})
 public class DictionaryEntry{
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
 	private static final int PARAM_MORPHOLOGICAL_FIELDS = 3;
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
+	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("^(?<word>[^\\s]+?)(?:(?<!\\\\)\\/(?<flags>[^\\s]+))?(?:[\\s]+(?<morphologicalFields>.+))?$");
 
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
 
 
-	@NonNull
-	@Getter
 	protected String word;
 	protected String[] continuationFlags;
 	protected final String[] morphologicalFields;
-	@Getter
 	private final boolean combineable;
 
 
-	public DictionaryEntry(String line, FlagParsingStrategy strategy){
-		this(line, strategy, null, null);
+	/* Clone constructor */
+	protected DictionaryEntry(DictionaryEntry dicEntry){
+		Objects.requireNonNull(dicEntry);
+
+		word = dicEntry.word;
+		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
+		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
+		combineable = dicEntry.combineable;
 	}
 
-	public DictionaryEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
+	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
+		Objects.requireNonNull(word);
+
+		this.word = word;
+		this.continuationFlags = continuationFlags;
+		this.morphologicalFields = morphologicalFields;
+		this.combineable = combineable;
+	}
+
+	public static DictionaryEntry createFromDictionaryLine(String line, FlagParsingStrategy strategy){
+		return createFromDictionaryLineWithAliases(line, strategy, null, null);
+	}
+
+	public static DictionaryEntry createFromDictionaryLineWithAliases(String line, FlagParsingStrategy strategy, List<String> aliasesFlag,
+			List<String> aliasesMorphologicaField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		Matcher m = ENTRY_PATTERN.reset(line);
+		Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
-		word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+		String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		String dicFlags = m.group(PARAM_FLAGS);
-		continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
+		String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		morphologicalFields = ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word},
-			(dicMorphologicalFields != null? StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField)): null));
-		combineable = true;
+		String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
+		String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
+		boolean combineable = true;
+		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combineable);
+	}
+
+	private static String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
+	}
+
+	private static boolean containsStem(String[] mfs){
+		boolean containsStem = false;
+		if(mfs != null)
+			for(String mf : mfs)
+				if(mf.startsWith(MorphologicalTag.TAG_STEM)){
+					containsStem = true;
+					break;
+				}
+		return containsStem;
 	}
 
 	public static String extractWord(String line){
 		Objects.requireNonNull(line);
 
-		Matcher m = ENTRY_PATTERN.reset(line);
+		Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
 
 		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 	}
 
-	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
-		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
+	public String getWord(){
+		return word;
+	}
+
+	public boolean isCombineable(){
+		return combineable;
 	}
 
 	public void applyConversionTable(Function<String, String> inputConversion){
@@ -105,27 +138,20 @@ public class DictionaryEntry{
 		return removed;
 	}
 
-	/* Clone constructor */
-	public DictionaryEntry(DictionaryEntry dicEntry){
-		Objects.requireNonNull(dicEntry);
-
-		word = dicEntry.word;
-		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
-		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
-		combineable = dicEntry.combineable;
-	}
-
 	/**
 	 * @param affParser	The Affix Parser used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasContinuationFlags(AffixParser affParser){
-		int continuationFlagsCount = 0;
+	public boolean hasNonTerminalContinuationFlags(AffixParser affParser){
 		if(continuationFlags != null)
 			for(String flag : continuationFlags)
 				if(!affParser.isTerminalAffix(flag))
-					continuationFlagsCount ++;
-		return (continuationFlagsCount > 0);
+					return true;
+		return false;
+	}
+
+	public int getContinuationFlagCount(){
+		return continuationFlags.length;
 	}
 
 	public boolean hasContinuationFlag(String ... continuationFlags){
@@ -142,7 +168,8 @@ public class DictionaryEntry{
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag, String compoundMiddleFlag, String compoundEndFlag){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag,
+			String compoundMiddleFlag, String compoundEndFlag){
 		Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
@@ -172,7 +199,7 @@ public class DictionaryEntry{
 
 	public void removeAffixes(AffixParser affParser){
 		Affixes affixes = separateAffixes(affParser);
-		continuationFlags = affixes.extractTerminals();
+		continuationFlags = affixes.getTerminalAffixes();
 	}
 
 	public List<String[]> extractAllAffixes(AffixParser affParser, boolean reverse){
@@ -188,15 +215,10 @@ public class DictionaryEntry{
 	 */
 	private Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
 		List<String> terminalAffixes = new ArrayList<>();
-		List<String> compoundAffixes = new ArrayList<>();
 		List<String> prefixes = new ArrayList<>();
 		List<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null)
 			for(String affix : continuationFlags){
-				if(affParser.isCompoundAffix(affix)){
-					compoundAffixes.add(affix);
-					continue;
-				}
 				if(affParser.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
 					continue;
@@ -227,7 +249,7 @@ public class DictionaryEntry{
 					terminalAffixes.add(affix);
 			}
 
-		return new Affixes(prefixes, suffixes, terminalAffixes, compoundAffixes);
+		return new Affixes(prefixes, suffixes, terminalAffixes);
 	}
 
 	public boolean isCompound(){
@@ -243,14 +265,35 @@ public class DictionaryEntry{
 		StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			if(strategy != null)
-				sb.append(strategy.joinFlags(continuationFlags));
-			else
-				sb.append(StringUtils.join(continuationFlags, ","));
+			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, ","));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));
 		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		DictionaryEntry rhs = (DictionaryEntry)obj;
+		return new EqualsBuilder()
+			.append(word, rhs.word)
+			.append(continuationFlags, rhs.continuationFlags)
+			.append(morphologicalFields, rhs.morphologicalFields)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(word)
+			.append(continuationFlags)
+			.append(morphologicalFields)
+			.toHashCode();
 	}
 
 }

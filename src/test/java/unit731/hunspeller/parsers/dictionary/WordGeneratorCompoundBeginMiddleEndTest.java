@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -27,7 +28,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
-//	@Test
+	@Test
 	public void germanCompounding() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
@@ -64,35 +65,75 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 18);
-words.forEach(stem -> System.out.println(stem));
+		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 62);
+words.forEach(System.out::println);
 
-//good: Computer, Computern, Arbeit, Arbeits-, Computerarbeit, Computerarbeits-, Arbeitscomputer, Computercomputer, Computercomputern, Arbeitscomputern, Computerarbeitscomputer, Computerarbeitscomputern, Arbeitscomputercomputer, Computercomputerarbeit, Arbeitscomputerarbeit, Arbeitsarbeitsarbeit, Computerarbeitsarbeit, Computerarbeits-Computer, Computerarbeits-Computern, Computer-Arbeit
-//bad: computer, computern, arbeit, Arbeits, arbeits, ComputerArbeit, ComputernArbeit, Computernarbeit, ComputerArbeits, Arbeitcomputer, Arbeitcomputern, ArbeitsComputer, ArbeitsComputern, Computerarbeitcomputer, ComputerArbeitcomputer, ComputerArbeitscomputer, Computerarbeitcomputern, ComputerArbeitcomputern, ComputerArbeitscomputern, Arbeitscomputerarbeits, Arbeitscomputernarbeits, Computerarbeits-computer, Arbeitsnehmer, computers, computern, computernarbeit, computernArbeit, computerArbeit, computerArbeits, arbeitcomputer, arbeitsComputer, computerarbeitcomputer, computerArbeitcomputer, computerArbeitscomputer, arbeitscomputerarbeits, computerarbeits-computer, arbeitsnehmer, computernarbeit, computernArbeit, arbeits-, computerarbeit, computerarbeits-, arbeitscomputer, arbeitscomputern, computerarbeitscomputer, computerarbeitscomputern, computerarbeitscomputers, arbeitscomputerarbeit, computerarbeits-Computer, computerarbeits-Computern
+//good: Computerarbeits-, Computercomputern, Arbeitscomputern, Computerarbeitscomputerns, Computerarbeits-Computer,
+//			Computerarbeits-Computern, Computer-Arbeit
+//bad: Arbeitcomputer, Computerarbeitcomputer, Arbeitscomputerarbeits
 		List<Production> expected = Arrays.asList(
-			createProduction("Arbeits", "-PX", "pa:Arbeits st:Arbeit"),
-			createProduction("Computer", "-PX", "pa:Computer st:Computer"),
-			createProduction("Arbeits", "D-PX", "pa:Arbeits st:Arbeit"),
-			createProduction("arbeits", "PX", "pa:arbeits st:Arbeit"),
-			createProduction("Computer", "D-PX", "pa:Computer st:Computer"),
-			createProduction("computer", "PX", "pa:computer st:Computer"),
-			createProduction("Arbeitsarbeits", "-PX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
-			createProduction("Arbeitscomputer", "-PX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
-			createProduction("Computerarbeits", "-PX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
-			createProduction("Computercomputer", "-PX", "pa:Computer st:Computer pa:computer st:Computer"),
-			createProduction("Arbeitsarbeits", "D-PX", "pa:Arbeits st:Arbeit pa:arbeits st:Arbeit"),
-			createProduction("Arbeitscomputer", "D-PX", "pa:Arbeits st:Arbeit pa:computer st:Computer"),
-			createProduction("arbeitsarbeits", "PX", "pa:arbeits st:Arbeit pa:arbeits st:Arbeit"),
-			createProduction("arbeitscomputer", "PX", "pa:arbeits st:Arbeit pa:computer st:Computer"),
-			createProduction("Computerarbeits", "D-PX", "pa:Computer st:Computer pa:arbeits st:Arbeit"),
-			createProduction("Computercomputer", "D-PX", "pa:Computer st:Computer pa:computer st:Computer"),
-			createProduction("computerarbeits", "PX", "pa:computer st:Computer pa:arbeits st:Arbeit"),
-			createProduction("computercomputer", "PX", "pa:computer st:Computer pa:computer st:Computer"),
-
-			createProduction("Arbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Arbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Computerarbeit", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
-			createProduction("Computerarbeits-", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
+			createProduction("Computercomputer", "-PUX", "pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Computerarbeits", "-PUX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Computerarbeits", "-PUVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Computercomputer", "-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeits", "-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computerarbeit", "-PUWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeit", "-PUWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computerarbeits", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Computercomputer", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeit", "D-PVWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Computerarbeit", "D-PVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitcomputer", "D-PVWX", "pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitarbeit", "D-WX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Computercomputercomputer", "-PUX", "pa:Computer st:Computer pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Computercomputerarbeits", "-PUX", "pa:Computer st:Computer pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Computerarbeitscomputer", "-PUX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computerarbeitsarbeits", "-PUX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputercomputer", "-PUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitscomputerarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitsarbeitscomputer", "-PUX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeitsarbeits", "-PUX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Computercomputerarbeits", "-PUVX", "pa:Computer st:Computer pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Computercomputercomputer", "-PUVWX", "pa:Computer st:Computer pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Computerarbeitsarbeits", "-PUVX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Computerarbeitscomputer", "-PUVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitscomputerarbeits", "-PUVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputercomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeitsarbeits", "-PUVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitsarbeitscomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computercomputerarbeit", "-PUWX", "pa:Computer st:Computer pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Computerarbeitsarbeit", "-PUWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitscomputerarbeit", "-PUWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeitsarbeit", "-PUWX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Computerarbeitcomputer", "-PUVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computerarbeitarbeit", "-PUWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeitcomputer", "-PUVWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeitarbeit", "-PUWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeitsarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitsarbeitscomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitscomputerarbeits", "D-PVX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Arbeitscomputercomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Computerarbeitsarbeits", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit"),
+			createProduction("Computerarbeitscomputer", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computercomputerarbeits", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer pa:Arbeits st:Arbeit"),
+			createProduction("Computercomputercomputer", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeitsarbeit", "D-PVWX", "pa:Arbeits st:Arbeit pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitscomputerarbeit", "D-PVWX", "pa:Arbeits st:Arbeit pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Computerarbeitsarbeit", "D-PVWX", "pa:Computer st:Computer pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Computercomputerarbeit", "D-PVWX", "pa:Computer st:Computer pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitsarbeitcomputer", "D-PVWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitsarbeitarbeit", "D-PVWX", "pa:Arbeits st:Arbeit pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Computerarbeitcomputer", "D-PVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Computerarbeitarbeit", "D-PVWX", "pa:Computer st:Computer pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitcomputercomputer", "D-PVWX", "pa:Arbeit st:Arbeit pa:Computer st:Computer pa:Computer st:Computer"),
+			createProduction("Arbeitcomputerarbeit", "D-WX", "pa:Arbeit st:Arbeit pa:Computer st:Computer pa:Arbeit st:Arbeit"),
+			createProduction("Arbeitarbeitcomputer", "D-PVWX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit pa:Computer st:Computer"),
+			createProduction("Arbeitarbeitarbeit", "D-WX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit")
 		);
 		Assert.assertEquals(expected, words);
 	}

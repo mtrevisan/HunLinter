@@ -1,11 +1,9 @@
 package unit731.hunspeller.parsers.dictionary.dtos;
 
 import java.awt.Color;
-import lombok.Getter;
 
 
 /** @see <a href="http://www.easyrgb.com/en/create.php">Watercolors</a> */
-@Getter
 public enum Watercolors{
 	//http://www.color-hex.com/
 	//http://fabrizio.zellini.org/tabella-nomi-e-codici-html-rgb-dei-colori
@@ -24,8 +22,13 @@ public enum Watercolors{
 
 	private final Color color;
 
+
 	Watercolors(String hexColor){
 		color = Color.decode(hexColor);
+	}
+
+	public Color getColor(){
+		return color;
 	}
 
 }

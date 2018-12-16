@@ -7,7 +7,7 @@ public interface HunspellerTableModel<T>{
 
 	void setProductions(List<T> list);
 
-	default public void clear(){
+	default void clear(){
 		setProductions(null);
 	}
 

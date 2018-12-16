@@ -4,7 +4,7 @@
 
 	<groupId>unit731</groupId>
 	<artifactId>Hunspeller</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -24,48 +24,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Maven Surefire Plugin -->
-<!--			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.0</version>
-			</plugin>-->
-			<!-- Maven JavaDoc Plugin -->
-			<!-- FIXME -->
-<!--			<plugin>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok-maven-plugin</artifactId>
-				<version>1.18.0.0</version>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>delombok</goal>
-						</goals>
-						<configuration>
-							<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-							<outputDirectory>${delombok.output}</outputDirectory>
-							<addOutputDirectory>false</addOutputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<sourcepath>${delombok.output}</sourcepath>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
 			<!-- Maven Deploy Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -90,7 +48,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<!-- Run shade goal on package phase -->
 					<execution>
@@ -108,7 +66,7 @@
 						<filter>
 							<artifact>commons-io:commons-io</artifact>
 							<includes>
-								<include>org.apache.commons.io.IOUtils</include>
+								<include>**</include>
 							</includes>
 						</filter>
 						<!-- FIXME: strenghten the inclusions -->
@@ -119,17 +77,23 @@
 							</includes>
 						</filter>
 						<filter>
-							<artifact>commons-logging:commons-logging</artifact>
+							<artifact>ch.qos.logback:logback-classic</artifact>
 							<includes>
 								<include>**</include>
 							</includes>
 						</filter>
 						<filter>
+							<artifact>commons-logging:commons-logging</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+<!--						<filter>
 							<artifact>com.google.code.findbugs:annotations</artifact>
 							<excludes>
 								<exclude>**</exclude>
 							</excludes>
-						</filter>
+						</filter>-->
 						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
@@ -138,7 +102,6 @@
 								<exclude>changelog.txt</exclude>
 								<exclude>latestchanges.html</exclude>
 								<exclude>release-timestamp.txt</exclude>
-								<exclude>module-info.SCL.lombok</exclude>
 								<exclude>.netbeans_automatic_build</exclude>
 								<exclude>META-INF/LICENSE</exclude>
 								<exclude>META-INF/LICENSE.txt</exclude>
@@ -154,6 +117,14 @@
 					</transformers>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<showDeprecation>true</showDeprecation>
+				</configuration>
+			</plugin>
 		</plugins>
 
 		<resources>
@@ -162,42 +133,39 @@
 				<includes>
 					<include>*.*</include>
 				</includes>
-				<filtering>true</filtering>
+			</resource>
+			<!-- include non-java src files in the same place in the output jar -->
+			<resource>
+				<directory>${project.build.sourceDirectory}</directory>
+				<includes>
+					<include>**/rules.properties</include>
+				</includes>
 			</resource>
 		</resources>
 	</build>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>10</maven.compiler.source>
+		<maven.compiler.target>10</maven.compiler.target>
 
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 
 		<!-- Apache -->
-		<org.apache.commons.lang3.version>3.8</org.apache.commons.lang3.version>
-		<org.apache.commons.text.version>1.4</org.apache.commons.text.version>
+		<org.apache.commons.lang3.version>3.8.1</org.apache.commons.lang3.version>
+		<org.apache.commons.text.version>1.6</org.apache.commons.text.version>
 		<org.apache.commons.math3.version>3.6.1</org.apache.commons.math3.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
 
 		<!-- XChart -->
 		<org.knowm.xchart.version>3.5.2</org.knowm.xchart.version>
 
-		<!-- Murmur3 Hash -->
-		<com.sangupta.murmur.version>1.0.0</com.sangupta.murmur.version>
-
-		<!-- Generex -->
-		<com.github.mifmif.version>1.0.2</com.github.mifmif.version>
-
-		<!-- Lombok -->
-		<org.projectlombok.version>1.18.2</org.projectlombok.version>
-
 		<!-- Jackson -->
-		<com.fasterxml.jackson.version>2.9.6</com.fasterxml.jackson.version>
+		<com.fasterxml.jackson.version>2.9.7</com.fasterxml.jackson.version>
 
 		<!-- CarrotSearch sizeof -->
-		<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>
+		<!--<com.carrotsearch.sizeof.version>0.0.5</com.carrotsearch.sizeof.version>-->
 
 		<!-- Logging -->
 		<ch.qos.logback.version>1.2.3</ch.qos.logback.version>
@@ -205,7 +173,7 @@
 		<!-- JUnit -->
 		<junit.version>4.12</junit.version>
 		<!-- FindBugs -->
-		<com.google.code.findbugs.version>3.0.1</com.google.code.findbugs.version>
+		<!--<com.google.code.findbugs.version>3.0.1</com.google.code.findbugs.version>-->
 	</properties>
 
 	<dependencies>
@@ -238,27 +206,6 @@
 			<version>${org.knowm.xchart.version}</version>
 		</dependency>
 
-		<!-- Bloom filter: For computing Murmur hashes -->
-		<dependency>
-			<groupId>com.sangupta</groupId>
-			<artifactId>murmur</artifactId>
-			<version>${com.sangupta.murmur.version}</version>
-		</dependency>
-
-		<!-- Generex -->
-		<dependency>
-			<groupId>com.github.mifmif</groupId>
-			<artifactId>generex</artifactId>
-			<version>${com.github.mifmif.version}</version>
-		</dependency>
-
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>${org.projectlombok.version}</version>
-		</dependency>
-
 		<!-- Jackson -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -287,18 +234,11 @@
 			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- ConcurrentUnit -->
-<!--		<dependency>
-			<groupId>net.jodah</groupId>
-			<artifactId>concurrentunit</artifactId>
-			<version>${concurrent.unit.version}</version>
-			<scope>test</scope>
-		</dependency>-->
 		<!-- FindBugs -->
-		<dependency>
+<!--		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>annotations</artifactId>
 			<version>${com.google.code.findbugs.version}</version>
-		</dependency>
+		</dependency>-->
 	</dependencies>
 </project>

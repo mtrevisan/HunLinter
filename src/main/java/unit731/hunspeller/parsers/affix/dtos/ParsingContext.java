@@ -4,7 +4,6 @@ import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -12,7 +11,6 @@ public class ParsingContext{
 
 	private final String line;
 	private final String[] definitionParts;
-	@Getter
 	private final BufferedReader reader;
 
 
@@ -23,6 +21,10 @@ public class ParsingContext{
 		this.line = line;
 		definitionParts = StringUtils.split(line);
 		reader = br;
+	}
+
+	public BufferedReader getReader(){
+		return reader;
 	}
 
 	public String getRuleType(){

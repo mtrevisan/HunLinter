@@ -9,7 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -17,16 +17,15 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GUIUtils{
 
-	private static final Matcher MATCHER_HTML_CODE = PatternHelper.matcher("</?[^>]+>");
+	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
+
+	private GUIUtils(){}
 
 	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
 		JPopupMenu popupMenu = new JPopupMenu();
@@ -56,7 +55,7 @@ public class GUIUtils{
 	}
 
 	private static String removeHTMLCode(String text){
-		return PatternHelper.clear(text, MATCHER_HTML_CODE);
+		return PatternHelper.clear(text, PATTERN_HTML_CODE);
 	}
 
 	/**

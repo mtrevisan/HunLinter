@@ -1,7 +1,8 @@
 package unit731.hunspeller.collections.bloomfilter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.Stack;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
@@ -14,88 +15,118 @@ import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
  *
  * @param <T> the type of object to be stored in the filter
  */
-public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
+public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
+	/** The default {@link Charset} is the platform encoding charset */
+	private final Charset charset;
+	private final BitArrayBuilder.Type bitArrayType;
+	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
+	private final int expectedElements;
+	/** The maximum false positive probability rate that the bloom filter can give */
+	private final double falsePositiveProbability;
 	private final double growRatioWhenFull;
 	private final double tighteningRatio;
 
-	private final List<BloomFilterInterface<T>> filters = new ArrayList<>();
+	private final Stack<BloomFilterInterface<T>> filters = new Stack<>();
 
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability){
-		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, BitArrayBuilder.Type.JAVA);
+	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, 2., 0.85, BitArrayBuilder.Type.JAVA);
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, 2., 0.85, type);
+	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability,
+			BitArrayBuilder.Type bitArrayType){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, 2., 0.85, bitArrayType);
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
-		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, BitArrayBuilder.Type.JAVA);
+	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, BitArrayBuilder.Type.JAVA);
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, type);
+	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull,
+			BitArrayBuilder.Type bitArrayType){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, growRatioWhenFull, 0.85, bitArrayType);
 	}
 
-	public ScalableInMemoryBloomFilter(int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull, double tighteningRatio, BitArrayBuilder.Type type){
-		super(expectedNumberOfElements, falsePositiveProbability, type);
-
+	public ScalableInMemoryBloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, double growRatioWhenFull,
+			double tighteningRatio, BitArrayBuilder.Type bitArrayType){
+		Objects.nonNull(charset);
+		Objects.nonNull(bitArrayType);
+		if(expectedNumberOfElements <= 0)
+			throw new IllegalArgumentException("Number of elements must be strict positive");
+		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
+			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
 		if(growRatioWhenFull <= 1.)
 			throw new IllegalArgumentException("Grow ratio when full must be strictly greater than one");
 		if(tighteningRatio <= 0. && tighteningRatio >= 1.)
 			throw new IllegalArgumentException("Tightening ratio must be in the interval ]0, 1[");
 
+		this.charset = charset;
+		expectedElements = expectedNumberOfElements;
+		this.falsePositiveProbability = falsePositiveProbability;
 		this.growRatioWhenFull = growRatioWhenFull;
 		this.tighteningRatio = tighteningRatio;
+		this.bitArrayType = bitArrayType;
 	}
 
 	@Override
-	public boolean add(T value){
+	public synchronized boolean add(T value){
 		if(value == null)
 			return false;
 
-		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.get(0): null);
-		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
-			int size = filters.size();
-			currentFilter = new BloomFilter<>((int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, size)),
-				falsePositiveProbability * Math.pow(tighteningRatio, size), type);
-			currentFilter.setCharset(currentCharset);
-			filters.add(0, currentFilter);
+		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
+		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
+			currentFilter = fork(filters.size());
+
+			filters.push(currentFilter);
 		}
 
 		return currentFilter.add(value);
 	}
 
-	@Override
-	public boolean contains(T value){
-		boolean result = false;
-		if(value != null)
-			for(BloomFilterInterface<T> filter : filters)
-				if(filter.contains(value)){
-					result = true;
-					break;
-				}
-		return result;
+	private BloomFilterInterface<T> fork(int count){
+		return new BloomFilter<>(charset, (int)Math.ceil(expectedElements * Math.pow(growRatioWhenFull, count)),
+			falsePositiveProbability * Math.pow(tighteningRatio, count), bitArrayType);
 	}
 
 	@Override
-	public int getAddedElements(){
+	public synchronized boolean contains(T value){
+		return (value != null && filters.stream().anyMatch(filter -> filter.contains(value)));
+	}
+
+	@Override
+	public synchronized int getAddedElements(){
 		return filters.stream()
 			.map(BloomFilterInterface::getAddedElements)
 			.reduce(0, Integer::sum);
 	}
 
 	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
+		int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
 		return (addedElements >= expectedElements / 2);
+	}
+
+	@Override
+	public double getFalsePositiveProbability(){
+		return falsePositiveProbability;
+	}
+
+	@Override
+	public double getExpectedFalsePositiveProbability(){
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public double getTrueFalsePositiveProbability(int insertedElements){
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	//P = 1 - Prod(i = 0 to n - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		int size = filters.size();
-		double p0 = filters.get(size - 1).getFalsePositiveProbability();
+		double p0 = filters.lastElement().getFalsePositiveProbability();
 		double probability = 1.;
 		for(int i = 0; i < size; i ++)
 			probability *= 1 - p0 * Math.pow(tighteningRatio, i);
@@ -105,15 +136,13 @@ public class ScalableInMemoryBloomFilter<T> extends BloomFilter<T>{
 	}
 
 	@Override
-	public void clear(){
-		for(BloomFilterInterface<T> filter : filters)
-			filter.clear();
+	public synchronized void clear(){
+		filters.forEach(BloomFilterInterface::clear);
 	}
 
 	@Override
-	public void close(){
-		for(BloomFilterInterface<T> filter : filters)
-			filter.close();
+	public synchronized void close(){
+		filters.forEach(BloomFilterInterface::close);
 	}
 
 }

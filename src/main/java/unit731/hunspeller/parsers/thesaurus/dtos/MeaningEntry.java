@@ -6,26 +6,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode(of = "partOfSpeech")
 public class MeaningEntry implements Comparable<MeaningEntry>{
 
-	@NonNull
 	@JsonProperty
 	private final String partOfSpeech;
-	@NonNull
 	@JsonProperty
 	private final List<String> meanings;
 
+
+	public MeaningEntry(String partOfSpeech, List<String> meanings){
+		Objects.requireNonNull(partOfSpeech);
+		Objects.requireNonNull(meanings);
+
+		this.partOfSpeech = partOfSpeech;
+		this.meanings = meanings;
+	}
 
 	public MeaningEntry(String synonymAndMeanings){
 		Objects.requireNonNull(synonymAndMeanings);
@@ -50,6 +51,14 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		}
 	}
 
+	public String getPartOfSpeech(){
+		return partOfSpeech;
+	}
+
+	public List<String> getMeanings(){
+		return meanings;
+	}
+
 	@Override
 	public String toString(){
 		return (new StringJoiner(ThesaurusEntry.PIPE))
@@ -63,6 +72,26 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		return new CompareToBuilder()
 			.append(partOfSpeech, other.partOfSpeech)
 			.toComparison();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		MeaningEntry rhs = (MeaningEntry)obj;
+		return new EqualsBuilder()
+			.append(partOfSpeech, rhs.partOfSpeech)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(partOfSpeech)
+			.toHashCode();
 	}
 
 }

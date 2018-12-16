@@ -1,11 +1,5 @@
 package unit731.hunspeller.parsers.affix;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-
-@AllArgsConstructor
-@Getter
 public enum AffixTag{
 
 	//General options
@@ -155,11 +149,19 @@ public enum AffixTag{
 	private final String code;
 
 
+	AffixTag(String code){
+		this.code = code;
+	}
+
 	public static AffixTag toEnum(String code){
 		for(AffixTag tag : values())
 			if(tag.getCode().equals(code))
 				return tag;
 		return null;
+	}
+
+	public String getCode(){
+		return code;
 	}
 
 }

@@ -1,11 +1,8 @@
 package unit731.hunspeller.languages.vec;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.languages.DictionaryBaseData;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DictionaryBaseDataVEC extends DictionaryBaseData{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 50_000_000;
@@ -17,6 +14,8 @@ public class DictionaryBaseDataVEC extends DictionaryBaseData{
 		private static final DictionaryBaseData INSTANCE = new DictionaryBaseDataVEC();
 	}
 
+
+	private DictionaryBaseDataVEC(){}
 
 	public static synchronized DictionaryBaseData getInstance(){
 		return SingletonHelper.INSTANCE;

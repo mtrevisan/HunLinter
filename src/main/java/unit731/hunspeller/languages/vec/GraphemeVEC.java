@@ -2,45 +2,45 @@ package unit731.hunspeller.languages.vec;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class GraphemeVEC{
 
-	public static final String JJH_PHONEME = "ʝ";
-	public static final String FH_PHONEME = "\uA799";
-	public static final String I_UMLAUT_PHONEME = "ï";
-	public static final String D_STROKE_GRAPHEME = "đ";
-	private static final String F_GRAPHEME = "f";
-	public static final String H_GRAPHEME = "h";
-	private static final String FH_GRAPHEME = F_GRAPHEME + H_GRAPHEME;
-	private static final String J_GRAPHEME = "j";
-	public static final String I_GRAPHEME = "i";
-	public static final String L_GRAPHEME = "l";
-	public static final String L_STROKE_GRAPHEME = "ƚ";
-	private static final String W_GRAPHEME = "w";
-	private static final String U_GRAPHEME = "u";
-	public static final String S_GRAPHEME = "s";
-	public static final String T_STROKE_GRAPHEME = "ŧ";
-	public static final String X_GRAPHEME = "x";
+	public static final String PHONEME_JJH = "ʝ";
+	public static final String PHONEME_FH = "\uA799";
+	public static final String PHONEME_I_UMLAUT = "ï";
+	public static final String GRAPHEME_D_STROKE = "đ";
+	private static final String GRAPHEME_F = "f";
+	public static final String GRAPHEME_H = "h";
+	private static final String GRAPHEME_FH = GRAPHEME_F + GRAPHEME_H;
+	private static final String GRAPHEME_J = "j";
+	public static final String GRAPHEME_I = "i";
+	public static final String GRAPHEME_L = "l";
+	public static final String GRAPHEME_L_STROKE = "ƚ";
+	private static final String GRAPHEME_W = "w";
+	private static final String GRAPHEME_U = "u";
+	public static final String GRAPHEME_S = "s";
+	public static final String GRAPHEME_T_STROKE = "ŧ";
+	public static final String GRAPHEME_X = "x";
 
-	private static final Matcher DIPHTONG = PatternHelper.matcher("[iu][íú]|[àèéòó][iu]");
-	private static final Matcher HYATUS = PatternHelper.matcher("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
-//	private static final Matcher HYATUS = PatternService.matcher("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
+	private static final Pattern DIPHTONG = PatternHelper.pattern("[iu][íú]|[àèéòó][iu]");
+	private static final Pattern HYATUS = PatternHelper.pattern("[aeoàèéòó][aeo]|[íú][aeiou]|[aeiou][àèéíòóú]");
+//	private static final Pattern HYATUS = PatternService.pattern("[íú][aeiou]|[iu][aeoàèéòó]|[aeo][aeoàèéíòóú]|[àèéòó][aeo]");
 
-	private static final Matcher ETEROPHONIC_SEQUENCE = PatternHelper.matcher("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
-	private static final Matcher ETEROPHONIC_SEQUENCE_W = PatternHelper.matcher("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
-	private static final Matcher ETEROPHONIC_SEQUENCE_J = PatternHelper.matcher("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
-	private static final List<Matcher> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.matcher("^(c)i(uí)$"),
-		PatternHelper.matcher("^(teñ|ko[" + JJH_PHONEME + "ɉñ])i([ou]r)"),
-		PatternHelper.matcher("^([d" + JJH_PHONEME + "ɉ])i(aspr)")
+	private static final Pattern ETEROPHONIC_SEQUENCE = PatternHelper.pattern("(?:^|[^aeiouàèéíòóú])[iju][àèéíòóú]");
+	private static final Pattern ETEROPHONIC_SEQUENCE_W = PatternHelper.pattern("((?:^|[^s])t|(?:^|[^t])[kgrs]|i)u([aeiouàèéíòóú])");
+	private static final Pattern ETEROPHONIC_SEQUENCE_J = PatternHelper.pattern("([^aeiouàèéíòóúw])i([aeiouàèéíòóú])");
+	private static final List<Pattern> ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.pattern("^(c)i(uí)$"),
+		PatternHelper.pattern("^(teñ|ko[" + PHONEME_JJH + "ɉñ])i([ou]r)"),
+		PatternHelper.pattern("^([d" + PHONEME_JJH + "ɉ])i(aspr)"),
+		PatternHelper.pattern("^((re)?bo[" + PHONEME_JJH + "ɉ])i(ur[ae])")
 	);
 
+
+	private GraphemeVEC(){}
 
 	public static boolean isDiphtong(String group){
 		return PatternHelper.find(group, DIPHTONG);
@@ -65,22 +65,22 @@ class GraphemeVEC{
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
 		//correct fh occurrences
-		if(word.contains(FH_GRAPHEME))
-			word = StringUtils.replace(word, FH_GRAPHEME, F_GRAPHEME);
+		if(word.contains(GRAPHEME_FH))
+			word = StringUtils.replace(word, GRAPHEME_FH, GRAPHEME_F);
 
 		//this step is mandatory before eterophonic sequence VjV
 //FIXME is there a way to optimize this PatternService.replaceAll?
-		if(word.contains(J_GRAPHEME))
-			word = StringUtils.replace(word, J_GRAPHEME, JJH_PHONEME);
-		if(word.contains(I_GRAPHEME))
-			for(Matcher m : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
-				word = PatternHelper.replaceAll(word, m, "$1" + I_UMLAUT_PHONEME + "$2");
+		if(word.contains(GRAPHEME_J))
+			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
+		if(word.contains(GRAPHEME_I))
+			for(Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
+				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
 
 
 		//phonize etherophonic sequences
-		if(word.contains(U_GRAPHEME))
+		if(word.contains(GRAPHEME_U))
 			word = PatternHelper.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
-		if(word.contains(I_GRAPHEME))
+		if(word.contains(GRAPHEME_I))
 			word = PatternHelper.replaceAll(word, ETEROPHONIC_SEQUENCE_J, "$1j$2");
 		return word;
 	}
@@ -92,12 +92,12 @@ class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String rollbackJHJWIUmlautPhonemes(String word){
-		word = StringUtils.replace(word, FH_PHONEME, FH_GRAPHEME);
+		word = StringUtils.replace(word, PHONEME_FH, GRAPHEME_FH);
 		//this step is mandatory before eterophonic sequence VjV
-		word = StringUtils.replace(word, J_GRAPHEME, I_GRAPHEME);
-		word = StringUtils.replace(word, I_UMLAUT_PHONEME, I_GRAPHEME);
-		word = StringUtils.replace(word, W_GRAPHEME, U_GRAPHEME);
-		word = StringUtils.replace(word, JJH_PHONEME, J_GRAPHEME);
+		word = StringUtils.replace(word, GRAPHEME_J, GRAPHEME_I);
+		word = StringUtils.replace(word, PHONEME_I_UMLAUT, GRAPHEME_I);
+		word = StringUtils.replace(word, GRAPHEME_W, GRAPHEME_U);
+		word = StringUtils.replace(word, PHONEME_JJH, GRAPHEME_J);
 		return word;
 	}
 

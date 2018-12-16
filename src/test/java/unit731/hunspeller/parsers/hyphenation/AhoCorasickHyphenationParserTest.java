@@ -6,7 +6,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import unit731.hunspeller.services.PatternHelper;
 
 public class AhoCorasickHyphenationParserTest{
 
-	private static final Matcher REGEX_CLEANER = PatternHelper.matcher("\\d|/.+$");
+	private static final Pattern PATTERN_CLEANER = PatternHelper.pattern("\\d|/.+$");
 
 
 	@Test
@@ -554,7 +554,7 @@ public class AhoCorasickHyphenationParserTest{
 	}
 
 	private String getKeyFromData(String rule){
-		return PatternHelper.replaceAll(rule, REGEX_CLEANER, StringUtils.EMPTY);
+		return PatternHelper.replaceAll(rule, PATTERN_CLEANER, StringUtils.EMPTY);
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){

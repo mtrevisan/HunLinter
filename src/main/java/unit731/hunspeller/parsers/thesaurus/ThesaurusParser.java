@@ -16,15 +16,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -33,22 +30,25 @@ import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
-@Slf4j
-@Getter
 public class ThesaurusParser extends ReadWriteLockable implements OriginatorInterface<ThesaurusParser.Memento>{
 
-	private static final Matcher REGEX_PARENTHESIS = PatternHelper.matcher("\\([^)]+\\)");
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
-	private static final Matcher REGEX_FILTER_EMPTY = PatternHelper.matcher("^\\(.+?\\)\\|?|^\\||\\|$");
-	private static final Matcher REGEX_FILTER_OR = PatternHelper.matcher("\\|{2,}");
+	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
+
+	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("\\|{2,}");
 
 	//NOTE: All members are private and accessible only by Originator
-	@AllArgsConstructor
-	@NoArgsConstructor(access = AccessLevel.PRIVATE)
 	protected static class Memento{
 
 		@JsonProperty
-		private ThesaurusDictionary dictionary;
+		private final ThesaurusDictionary dictionary;
+
+
+		Memento(ThesaurusDictionary dictionary){
+			this.dictionary = dictionary;
+		}
 
 	}
 
@@ -61,6 +61,22 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 
 	public ThesaurusParser(Undoable undoable){
 		this.undoable = undoable;
+	}
+
+	public ThesaurusDictionary getDictionary(){
+		return dictionary;
+	}
+
+	public Undoable getUndoable(){
+		return undoable;
+	}
+
+	public CaretakerInterface<Memento> getUndoCaretaker(){
+		return undoCaretaker;
+	}
+
+	public CaretakerInterface<Memento> getRedoCaretaker(){
+		return redoCaretaker;
 	}
 
 	/**
@@ -131,7 +147,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 			if(!partOfSpeech.startsWith("("))
 				sb.append('(');
 			sb.append(partOfSpeech);
-			if(!partOfSpeech.endsWith("("))
+			if(!partOfSpeech.endsWith(")"))
 				sb.append(')');
 			partOfSpeech = sb.toString();
 
@@ -141,7 +157,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 				.map(String::trim)
 				.distinct()
 				.collect(Collectors.toList());
-			if(meanings.size() < 1)
+			if(meanings.size() < 2)
 				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
 
 			DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
@@ -154,7 +170,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 						undoable.onUndoChange(true);
 				}
 				catch(IOException e){
-					log.warn("Error while storing a memento", e);
+					LOGGER.warn("Error while storing a memento", e);
 				}
 
 				dictionary.add(partOfSpeech, meanings);
@@ -212,20 +228,20 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 				undoCaretaker.popMemento();
 			}
 			catch(IOException ioe){
-				log.warn("Error while removing a memento", ioe);
+				LOGGER.warn("Error while removing a memento", ioe);
 			}
 
-			log.warn("Error while storing a memento", e);
+			LOGGER.warn("Error while storing a memento", e);
 		}
 		catch(Exception e){
 			try{
 				undoCaretaker.popMemento();
 			}
 			catch(IOException ioe){
-				log.warn("Error while removing a memento", ioe);
+				LOGGER.warn("Error while removing a memento", ioe);
 			}
 
-			log.warn("Error while modifying the meanings", e);
+			LOGGER.warn("Error while modifying the meanings", e);
 		}
 		finally{
 			releaseWriteLock();
@@ -244,7 +260,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 						undoable.onUndoChange(true);
 				}
 				catch(IOException e){
-					log.warn("Error while storing a memento", e);
+					LOGGER.warn("Error while storing a memento", e);
 				}
 
 				for(int i = 0; i < count; i ++)
@@ -262,9 +278,9 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 
 	public static String prepareTextForThesaurusFilter(String text){
 		text = StringUtils.strip(text);
-		text = PatternHelper.clear(text, REGEX_FILTER_EMPTY);
-		text = PatternHelper.replaceAll(text, REGEX_FILTER_OR, "|");
-		text = PatternHelper.replaceAll(text, REGEX_PARENTHESIS, StringUtils.EMPTY);
+		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
+		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
+		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 		return "(?iu)(" + text + ")";
 	}
 

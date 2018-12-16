@@ -16,20 +16,20 @@ import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.languages.builders.ComparatorBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorter;
 
 
-@Slf4j
-@Getter
 public class DictionaryParser{
 
-	private static final Matcher REGEX_COMMENT = PatternHelper.matcher("(^\\s*|\\s+)[#\\/].*$");
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryParser.class);
+
+	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("(^\\s*|\\s+)[#\\/].*$");
 
 	//thin space
 	public static final char COUNTER_GROUPING_SEPARATOR = '\u2009';
@@ -64,6 +64,25 @@ public class DictionaryParser{
 		this.charset = charset;
 	}
 
+	public File getDicFile(){
+		return dicFile;
+	}
+
+	public String getLanguage(){
+		return language;
+	}
+
+	public Charset getCharset(){
+		return charset;
+	}
+
+	public ExternalSorter getSorter(){
+		return sorter;
+	}
+
+	public NavigableMap<Integer, Integer> getBoundaries(){
+		return boundaries;
+	}
 
 	//sorter worker
 	public final Map.Entry<Integer, Integer> getBoundary(int lineIndex){
@@ -110,7 +129,7 @@ public class DictionaryParser{
 				String line;
 				int startSection = -1;
 				boolean needSorting = false;
-				Comparator<String> comparator = ComparatorBuilder.getComparator(language);
+				Comparator<String> comparator = BaseBuilder.getComparator(language);
 				while((line = br.readLine()) != null){
 					if(isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){
@@ -138,14 +157,14 @@ public class DictionaryParser{
 					boundaries.put(startSection, lineIndex - 1);
 			}
 			catch(IOException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		}
 	}
 
 
 	private boolean isComment(String line){
-		return PatternHelper.find(line, REGEX_COMMENT);
+		return PatternHelper.find(line, PATTERN_COMMENT);
 	}
 
 	public final void clear(){
@@ -161,7 +180,7 @@ public class DictionaryParser{
 	 */
 	public static String cleanLine(String line){
 		//remove comments
-		line = PatternHelper.clear(line, REGEX_COMMENT);
+		line = PatternHelper.clear(line, PATTERN_COMMENT);
 		//trim the entire string
 		line = StringUtils.strip(line);
 		return line;

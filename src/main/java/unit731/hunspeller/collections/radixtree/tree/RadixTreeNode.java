@@ -8,10 +8,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
@@ -21,26 +20,21 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-@Getter
-@EqualsAndHashCode(of = {"key", "value", "additionalValues"})
 public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixTreeNode<S, V>>, Serializable{
 
 	private static final long serialVersionUID = -627223674493970063L;
 
 
 	/** The key at this node */
-	@Setter
 	private S key;
 
 	/** The value stored at this node, <code>null</code> if an internal node */
-	@Setter
 	private V value;
 	private List<V> additionalValues;
 
 	/** The children for this node. */
 	private Collection<RadixTreeNode<S, V>> children;
 
-	@Setter
 	private RadixTreeNode<S, V> failNode;
 
 
@@ -57,6 +51,34 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	public RadixTreeNode(S key, V value){
 		this.key = key;
 		this.value = value;
+	}
+
+	public S getKey(){
+		return key;
+	}
+
+	public V getValue(){
+		return value;
+	}
+
+	public void setValue(V value){
+		this.value = value;
+	}
+
+	public List<V> getAdditionalValues(){
+		return additionalValues;
+	}
+
+	public Collection<RadixTreeNode<S, V>> getChildren(){
+		return children;
+	}
+
+	public RadixTreeNode<S, V> getFailNode(){
+		return failNode;
+	}
+
+	public void setFailNode(RadixTreeNode<S, V> failNode){
+		this.failNode = failNode;
 	}
 
 	public boolean isEmpty(){
@@ -154,8 +176,8 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	 * @param sequencer	The sequencer
 	 */
 	public void mergeWithAncestor(RadixTreeNode<S, V> parent, SequencerInterface<S> sequencer){
-		parent.setKey(sequencer.concat(parent.getKey(), key));
-		parent.setValue(value);
+		parent.key = sequencer.concat(parent.getKey(), key);
+		parent.value = value;
 		parent.clearChildren();
 	}
 
@@ -183,6 +205,30 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 	@Override
 	public Iterator<RadixTreeNode<S, V>> iterator(){
 		return (children != null? children.iterator(): Collections.<RadixTreeNode<S, V>>emptyIterator());
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		RadixTreeNode<?, ?> rhs = (RadixTreeNode<?, ?>)obj;
+		return new EqualsBuilder()
+			.append(key, rhs.key)
+			.append(value, rhs.value)
+			.append(additionalValues, rhs.additionalValues)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(key)
+			.append(value)
+			.append(additionalValues)
+			.toHashCode();
 	}
 
 }

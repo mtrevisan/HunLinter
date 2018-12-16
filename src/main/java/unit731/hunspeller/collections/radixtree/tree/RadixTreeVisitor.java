@@ -1,7 +1,6 @@
 package unit731.hunspeller.collections.radixtree.tree;
 
 import java.io.Serializable;
-import lombok.Getter;
 
 
 /**
@@ -15,12 +14,15 @@ import lombok.Getter;
 public abstract class RadixTreeVisitor<S, V extends Serializable, R>{
 
 	/** An overall result from the traversal of the radix tree. */
-	@Getter
 	protected R result;
 
 
 	public RadixTreeVisitor(R initialValue){
 		result = initialValue;
+	}
+
+	public R getResult(){
+		return result;
 	}
 
 	/**

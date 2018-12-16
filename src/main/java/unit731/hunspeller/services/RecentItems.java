@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -22,7 +21,6 @@ public class RecentItems{
 	private final int maxItems;
 	private final Preferences preferenceNode;
 
-	@Getter
 	private final List<String> items;
 	private final List<RecentItemsObserver> observers = new ArrayList<>();
 
@@ -35,6 +33,10 @@ public class RecentItems{
 		items = new ArrayList<>(maxItems);
 
 		loadFromPreferences();
+	}
+
+	public List<String> getItems(){
+		return items;
 	}
 
 	public void push(String item){
@@ -51,6 +53,12 @@ public class RecentItems{
 		items.remove(item);
 
 		update();
+	}
+
+	public void clear(){
+		items.clear();
+
+		observers.forEach(observer -> observer.onRecentItemChange(this));
 	}
 
 	public String get(int index){

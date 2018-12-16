@@ -3,9 +3,9 @@ package unit731.hunspeller.collections.bloomfilter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.collections.bloomfilter.core.BitArray;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 import unit731.hunspeller.collections.bloomfilter.decompose.ByteSink;
@@ -29,93 +29,106 @@ import unit731.hunspeller.collections.bloomfilter.hash.Murmur3HashFunction;
  *
  * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
  */
-@Slf4j
 public class BloomFilter<T> implements BloomFilterInterface<T>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BloomFilter.class);
 
 	private static final double LN2 = Math.log(2);
 	private static final double LN2_SQUARE = LN2 * LN2;
 
 	/** The decomposer to use when there is none specified at construction */
-	private static final Decomposer<Object> DEFAULT_DECOMPOSER = new DefaultDecomposer();
+	private static final Decomposer<Object> DECOMPOSER_DEFAULT = new DefaultDecomposer();
 	/** The default hasher to use if one is not specified */
-	private static final HashFunction DEFAULT_HASHER = new Murmur3HashFunction();
+	private static final HashFunction HASHER_DEFAULT = new Murmur3HashFunction();
+
 
 	/** The default {@link Charset} is the platform encoding charset */
-	protected Charset currentCharset = Charset.defaultCharset();
-
-
-	protected final BitArrayBuilder.Type type;
+	private final Charset charset;
 	/** The {@link BitArray} instance that holds the entire data */
 	private final BitArray bitArray;
 	/** Optimal number of hash functions based on the size of the Bloom filter and the expected number of inserted elements */
 	private final int hashFunctions;
-
 	private final Decomposer<T> decomposer;
 	/** The hashing method to be used for hashing */
 	private final HashFunction hasher;
 	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
-	protected int expectedElements;
+	private final int expectedElements;
 	/** The maximum false positive probability rate that the bloom filter can give */
-	@Getter
-	protected double falsePositiveProbability;
+	private final double falsePositiveProbability;
 	/** Number of bits required for the bloom filter */
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter */
-	@Getter
-	protected int addedElements;
+	private volatile int addedElements;
 
 
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
+	 * @param charset							The {@link Charset} to be used
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
+	 * @param bitArrayType					The type of the bit array
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, null, null, type);
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, bitArrayType, null, null);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
+	 * @param charset							The {@link Charset} to be used
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
+	 * @param bitArrayType					The type of the bit array
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, BitArrayBuilder.Type type){
-		this(expectedNumberOfElements, falsePositiveProbability, decomposer, null, type);
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
+			Decomposer<T> decomposer){
+		this(charset, expectedNumberOfElements, falsePositiveProbability, bitArrayType, decomposer, null);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param type								The type of the bit array
+	 * @param charset							The {@link Charset} to be used
 	 * @param expectedNumberOfElements	The number of max expected insertions
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param decomposer	A {@link Decomposer} that helps decompose the given object
-	 * @param hasher	The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
+	 * @param bitArrayType					The type of the bit array
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
 	 */
-	public BloomFilter(int expectedNumberOfElements, double falsePositiveProbability, Decomposer<T> decomposer, HashFunction hasher, BitArrayBuilder.Type type){
+	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
+			Decomposer<T> decomposer, HashFunction hasher){
+		Objects.nonNull(charset);
+		Objects.nonNull(bitArrayType);
 		if(expectedNumberOfElements <= 0)
 			throw new IllegalArgumentException("Number of elements must be strict positive");
 		if(falsePositiveProbability <= 0. || falsePositiveProbability >= 1.)
 			throw new IllegalArgumentException("False positive probability must be in ]0, 1[ interval");
 
-		this.type = type;
+		this.charset = charset;
 		expectedElements = expectedNumberOfElements;
 		this.falsePositiveProbability = falsePositiveProbability;
 
 		bitsRequired = optimalBitSize(expectedNumberOfElements, falsePositiveProbability);
 		hashFunctions = optimalNumberOfHashFunctions(falsePositiveProbability);
-		bitArray = BitArrayBuilder.getBitArray(type, bitsRequired);
+		bitArray = BitArrayBuilder.getBitArray(bitArrayType, bitsRequired);
 
 		this.decomposer = decomposer;
-		this.hasher = ObjectUtils.defaultIfNull(hasher, DEFAULT_HASHER);
+		this.hasher = ObjectUtils.defaultIfNull(hasher, HASHER_DEFAULT);
 
 		addedElements = 0;
+	}
+
+	@Override
+	public double getFalsePositiveProbability(){
+		return falsePositiveProbability;
+	}
+
+	@Override
+	public synchronized int getAddedElements(){
+		return addedElements;
 	}
 
 	//Default bloom filter functions follow
@@ -147,7 +160,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter
 	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
-	public boolean add(byte[] bytes){
+	public synchronized boolean add(byte[] bytes){
 		boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;
@@ -160,7 +173,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private boolean calculateIndexes(byte[] bytes){
+	private synchronized boolean calculateIndexes(byte[] bytes){
 		boolean bitsChanged = false;
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
@@ -178,13 +191,13 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		return bitsChanged;
 	}
 
-	/**
+	/*
 	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
 	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public boolean contains(byte[] bytes){
+	public synchronized boolean contains(byte[] bytes){
 		long hash = getLongHash64(bytes);
 		int lowHash = (int)hash;
 		int highHash = (int)(hash >>> 32);
@@ -228,9 +241,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private byte[] decomposeValue(T value){
 		ByteSink sink = new ByteSink();
 		if(decomposer != null)
-			decomposer.decompose(value, sink, currentCharset);
+			decomposer.decompose(value, sink, charset);
 		else
-			DEFAULT_DECOMPOSER.decompose(value, sink, currentCharset);
+			DECOMPOSER_DEFAULT.decompose(value, sink, charset);
 		return sink.getByteArray();
 	}
 
@@ -242,18 +255,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public boolean contains(T value){
-		return (value != null && contains(value.toString().getBytes(currentCharset)));
+		return (value != null && contains(value.toString().getBytes(charset)));
 	}
 
 	@Override
-	public void setCharset(Charset charset){
-		Objects.requireNonNull(charset, "Charset to be changed to cannot be null");
-
-		currentCharset = charset;
-	}
-
-	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
 		return (addedElements >= expectedElements);
 	}
 
@@ -263,7 +269,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		return getTrueFalsePositiveProbability(addedElements);
 	}
 
@@ -275,18 +281,18 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	/** Sets all bits to false in the Bloom filter. */
 	@Override
-	public void clear(){
+	public synchronized void clear(){
 		bitArray.clearAll();
 		addedElements = 0;
 	}
 
 	@Override
-	public void close(){
+	public synchronized void close(){
 		try{
 			bitArray.close();
 		}
 		catch(IOException e){
-			log.error("Error closing the Bloom filter", e);
+			LOGGER.error("Error closing the Bloom filter", e);
 		}
 	}
 

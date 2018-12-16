@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,11 +8,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -21,29 +20,30 @@ import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@EqualsAndHashCode(of = "entry")
 public class AffixEntry{
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
-	private static final Matcher ENTRY_PATTERN = PatternHelper.matcher("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
+	private static final Pattern PATTERN_LINE = PatternHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
-	private static final Matcher MATCHER_ENTRY = PatternHelper.matcher("\t.*$");
+	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("\t.*$");
 
 	public static final String DOT = ".";
 	private static final String ZERO = "0";
 
 
-	@AllArgsConstructor
 	public static enum Type{
 		SUFFIX(AffixTag.SUFFIX),
 		PREFIX(AffixTag.PREFIX);
 
 
-		@Getter
 		private final AffixTag flag;
+
+		Type(AffixTag flag){
+			this.flag = flag;
+		}
 
 		public static Type toEnum(String flag){
 			Type[] types = Type.values();
@@ -52,17 +52,19 @@ public class AffixEntry{
 					return type;
 			return null;
 		}
+
+		public AffixTag getFlag(){
+			return flag;
+		}
+
 	}
 
 
-	@Getter
 	private final Type type;
 	/** ID used to represent the affix */
-	@Getter
 	private final String flag;
 	private final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
-	@Getter
 	private final AffixCondition condition;
 	/** string to strip */
 	private final String removing;
@@ -80,10 +82,14 @@ public class AffixEntry{
 		Objects.requireNonNull(strategy);
 
 		String[] lineParts = StringUtils.split(line, null, 6);
+		if(lineParts.length < 4 || lineParts.length > 6)
+			throw new IllegalArgumentException("Expected an affix entry, found something else"
+				+ (lineParts.length > 0? ": " + line: StringUtils.EMPTY));
+
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
-		Matcher m = ENTRY_PATTERN.reset(lineParts[3]);
+		Matcher m = PATTERN_LINE.matcher(lineParts[3]);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse affix line " + line);
 		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
@@ -117,7 +123,19 @@ public class AffixEntry{
 			}
 		}
 
-		entry = PatternHelper.clear(line, MATCHER_ENTRY);
+		entry = PatternHelper.clear(line, PATTERN_ENTRY);
+	}
+
+	public Type getType(){
+		return type;
+	}
+
+	public String getFlag(){
+		return flag;
+	}
+
+	public AffixCondition getCondition(){
+		return condition;
 	}
 
 	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
@@ -137,7 +155,6 @@ public class AffixEntry{
 			.allMatch(set::add);
 	}
 
-	@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "Deliberate")
 	public String[] combineContinuationFlags(String[] otherContinuationFlags){
 		Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)
@@ -225,6 +242,26 @@ public class AffixEntry{
 	@Override
 	public String toString(){
 		return entry;
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		AffixEntry rhs = (AffixEntry)obj;
+		return new EqualsBuilder()
+			.append(entry, rhs.entry)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(entry)
+			.toHashCode();
 	}
 
 }

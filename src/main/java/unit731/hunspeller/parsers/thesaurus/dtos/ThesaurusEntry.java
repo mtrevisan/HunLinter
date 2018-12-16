@@ -7,22 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.services.FileHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@Getter
-@EqualsAndHashCode(of = "synonym")
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
@@ -30,14 +21,31 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public static final String MEANS = PIPE + ",";
 
 
-	@NonNull
 	@JsonProperty
-	private String synonym;
-	@NonNull
+	private final String synonym;
 	@JsonProperty
-	@Setter
 	private List<MeaningEntry> meanings;
 
+
+	public ThesaurusEntry(String synonym, List<MeaningEntry> meanings){
+		Objects.requireNonNull(synonym);
+		Objects.requireNonNull(meanings);
+
+		this.synonym = synonym;
+		this.meanings = meanings;
+	}
+
+	public String getSynonym(){
+		return synonym;
+	}
+
+	public List<MeaningEntry> getMeanings(){
+		return meanings;
+	}
+
+	public void setMeanings(List<MeaningEntry> meanings){
+		this.meanings = meanings;
+	}
 
 	public ThesaurusEntry(String line, LineNumberReader br) throws IOException{
 		Objects.requireNonNull(line);
@@ -74,6 +82,26 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return new CompareToBuilder()
 			.append(synonym, other.getSynonym())
 			.toComparison();
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		ThesaurusEntry rhs = (ThesaurusEntry)obj;
+		return new EqualsBuilder()
+			.append(synonym, rhs.synonym)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(synonym)
+			.toHashCode();
 	}
 
 }

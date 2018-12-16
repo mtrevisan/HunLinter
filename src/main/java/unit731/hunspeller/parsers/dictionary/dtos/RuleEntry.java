@@ -3,16 +3,14 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.List;
 import java.util.Objects;
-import lombok.Getter;
 
 
-@Getter
 public class RuleEntry{
 
 	private static final char YES = 'Y';
 
 
-	private final boolean isSuffix;
+	private final boolean suffix;
 	//cross product flag
 	private final boolean combineable;
 	private final List<AffixEntry> entries;
@@ -20,11 +18,11 @@ public class RuleEntry{
 //private final List<AffixEntry> suffixEntries;
 
 
-	public RuleEntry(boolean isSuffix, char combineable, List<AffixEntry> entries){
+	public RuleEntry(boolean suffix, char combineable, List<AffixEntry> entries){
 		Objects.requireNonNull(combineable);
 		Objects.requireNonNull(entries);
 
-		this.isSuffix = isSuffix;
+		this.suffix = suffix;
 		this.combineable = (combineable == YES);
 		this.entries = entries;
 	}
@@ -40,5 +38,17 @@ public class RuleEntry{
 //	this.prefixEntries = prefixEntries;
 //	this.suffixEntries = suffixEntries;
 //}
+
+	public boolean isSuffix(){
+		return suffix;
+	}
+
+	public boolean isCombineable(){
+		return combineable;
+	}
+
+	public List<AffixEntry> getEntries(){
+		return entries;
+	}
 
 }

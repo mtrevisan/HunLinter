@@ -6,15 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Memoizer<T, U>{
 
 	private static final Object DEFAULT_OBJECT = new Object();
 
+
+	private Memoizer(){}
 
 	public static <T> Supplier<T> memoize(Supplier<T> supplier){
 		Map<Object, T> cache = new ConcurrentHashMap<>();

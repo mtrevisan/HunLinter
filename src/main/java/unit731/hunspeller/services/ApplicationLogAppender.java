@@ -4,12 +4,10 @@ import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
 import java.nio.charset.StandardCharsets;
 import javax.swing.JTextArea;
-import lombok.Setter;
 
 
 public class ApplicationLogAppender<T> extends AppenderBase<T>{
 
-	@Setter
 	private Encoder<T> encoder;
 
 	private static JTextArea textArea;
@@ -17,6 +15,10 @@ public class ApplicationLogAppender<T> extends AppenderBase<T>{
 
 	public static void setTextArea(JTextArea textArea){
 		ApplicationLogAppender.textArea = textArea;
+	}
+
+	public void setEncoder(Encoder<T> encoder){
+		this.encoder = encoder;
 	}
 
 	@Override

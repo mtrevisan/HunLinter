@@ -1,22 +1,22 @@
 package unit731.hunspeller.languages;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import java.util.regex.Pattern;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orthography{
 
-	private static final Matcher MATCHER_APOSTROPHE = PatternHelper.matcher("['‘ʼ]");
+	private static final Pattern PATTERN_APOSTROPHE = PatternHelper.pattern("['‘ʼ]");
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new Orthography();
 	}
 
+
+	protected Orthography(){}
 
 	public static Orthography getInstance(){
 		return SingletonHelper.INSTANCE;
@@ -28,15 +28,19 @@ public class Orthography{
 	}
 
 	protected String correctApostrophes(String word){
-		return PatternHelper.replaceAll(word, MATCHER_APOSTROPHE, HyphenationParser.APOSTROPHE);
+		return PatternHelper.replaceAll(word, PATTERN_APOSTROPHE, HyphenationParser.APOSTROPHE);
 	}
 
 	public boolean[] getSyllabationErrors(List<String> syllabes){
 		return new boolean[syllabes.size()];
 	}
 
+	/**
+	 * @param syllabes	The list of syllabes
+	 * @return The 0-based index of the syllabe starting from the end
+	 */
 	public List<Integer> getStressIndexFromLast(List<String> syllabes){
-		return null;
+		return Collections.<Integer>emptyList();
 	}
 
 	public int countGraphemes(String word){

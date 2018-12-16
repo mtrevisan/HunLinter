@@ -1,11 +1,11 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryReadBase;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import lombok.Getter;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -14,22 +14,20 @@ import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 
-public class StatisticsWorker extends WorkerDictionaryReadBase{
+public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Statistics";
 
-	@Getter
 	private final boolean performHyphenationStatistics;
-
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, AbstractHyphenator hyphenator, WordGenerator wordGenerator,
+	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
 			DictionaryBaseData dictionaryBaseData, boolean performHyphenationStatistics, Frame parent){
-		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(dictionaryBaseData);
@@ -40,7 +38,7 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 		dicStatistics = new DictionaryStatistics(affParser.getLanguage(), affParser.getCharset(), dictionaryBaseData);
 
 
-		BiConsumer<String, Integer> lineReader = (line, row) -> {
+		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			for(Production production : productions){
@@ -60,15 +58,28 @@ public class StatisticsWorker extends WorkerDictionaryReadBase{
 					dicStatistics.addData(word);
 			}
 		};
-		Runnable done = () -> {
-			if(!isCancelled()){
-				//show statistics window
-				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
-				dialog.setLocationRelativeTo(parent);
-				dialog.setVisible(true);
+		Runnable completed = () -> {
+			try{
+				dicStatistics.close();
 			}
+			catch(IOException e){}
+
+			//show statistics window
+			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			dialog.setLocationRelativeTo(parent);
+			dialog.setVisible(true);
 		};
-		createWorker(WORKER_NAME, dicParser, lineReader, done, affParser);
+		Runnable cancelled = () -> {
+			try{
+				dicStatistics.close();
+			}
+			catch(IOException e){}
+		};
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled, affParser);
+	}
+
+	public boolean isPerformHyphenationStatistics(){
+		return performHyphenationStatistics;
 	}
 
 	@Override

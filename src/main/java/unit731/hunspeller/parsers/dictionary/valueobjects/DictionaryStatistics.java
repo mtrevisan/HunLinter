@@ -1,17 +1,18 @@
 package unit731.hunspeller.parsers.dictionary.valueobjects;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.Orthography;
-import unit731.hunspeller.languages.builders.OrthographyBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
@@ -20,8 +21,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 /**
  * @see <a href="https://home.ubalt.edu/ntsbarsh/Business-stat/otherapplets/PoissonTest.htm">Goodness-of-Fit for Poisson</a>
  */
-@Getter
-public class DictionaryStatistics{
+public class DictionaryStatistics implements Closeable{
 
 	private static final LevenshteinDistance LEVENSHTEIN_DISTANCE = LevenshteinDistance.getDefaultInstance();
 
@@ -39,26 +39,79 @@ public class DictionaryStatistics{
 	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
 
 	private final BloomFilterInterface<String> bloomFilter;
-	@Getter
 	private final Orthography orthography;
 
 
 	public DictionaryStatistics(String language, Charset charset, DictionaryBaseData dictionaryBaseData){
-		bloomFilter = new ScalableInMemoryBloomFilter<>(dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
-		bloomFilter.setCharset(charset);
-		orthography = OrthographyBuilder.getOrthography(language);
+		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData.getExpectedNumberOfElements(),
+			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
+		orthography = BaseBuilder.getOrthography(language);
+	}
+
+	public int getTotalProductions(){
+		return totalProductions;
+	}
+
+	public int getLongestWordCountByCharacters(){
+		return longestWordCountByCharacters;
+	}
+
+	public int getLongestWordCountBySyllabes(){
+		return longestWordCountBySyllabes;
+	}
+
+	/** @return	The count of unique words */
+	public int getUniqueWords(){
+		return bloomFilter.getAddedElements();
+	}
+
+	/** @return	The count of compound words */
+	public int getCompoundWords(){
+		return compoundWords;
+	}
+
+	public int getContractedWords(){
+		return contractedWords;
+	}
+
+	public synchronized Frequency<Integer> getLengthsFrequencies(){
+		return lengthsFrequencies;
+	}
+
+	public synchronized Frequency<String> getSyllabesFrequencies(){
+		return syllabesFrequencies;
+	}
+
+	public synchronized Frequency<Integer> getSyllabeLengthsFrequencies(){
+		return syllabeLengthsFrequencies;
+	}
+
+	public synchronized Frequency<Integer> getStressFromLastFrequencies(){
+		return stressFromLastFrequencies;
+	}
+
+	public synchronized List<String> getLongestWordsByCharacters(){
+		return longestWordsByCharacters;
+	}
+
+	public synchronized List<Hyphenation> getLongestWordsBySyllabes(){
+		return longestWordsBySyllabes;
+	}
+
+	public Orthography getOrthography(){
+		return orthography;
 	}
 
 	public void addData(String word){
 		addData(word, null);
 	}
 
-	public void addData(String word, Hyphenation hyphenation){
+	public synchronized void addData(String word, Hyphenation hyphenation){
 		if(hyphenation != null && !hyphenation.hasErrors()){
 			List<String> syllabes = hyphenation.getSyllabes();
 
 			List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
-			if(stressIndexes != null)
+			if(!stressIndexes.isEmpty())
 				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
 			syllabeLengthsFrequencies.addValue(syllabes.size());
 			StringBuilder sb = new StringBuilder();
@@ -88,7 +141,7 @@ public class DictionaryStatistics{
 		}
 	}
 
-	private void storeLongestWord(String word){
+	private synchronized void storeLongestWord(String word){
 		int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -101,7 +154,7 @@ public class DictionaryStatistics{
 		bloomFilter.add(word);
 	}
 
-	private void storeHyphenation(Hyphenation hyphenation){
+	private synchronized void storeHyphenation(Hyphenation hyphenation){
 		List<String> syllabes = hyphenation.getSyllabes();
 		int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
@@ -113,33 +166,24 @@ public class DictionaryStatistics{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
-	public long getTotalProductions(){
-		return totalProductions;
-	}
-
-	public List<String> getMostCommonSyllabes(int size){
+	public synchronized List<String> getMostCommonSyllabes(int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
 			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
 	}
 
-	/** @return	The count of unique words */
-	public int getUniqueWords(){
-		return bloomFilter.getAddedElements();
+	@Override
+	public void close() throws IOException{
+		bloomFilter.close();
 	}
 
-	/** @return	The count of compound words */
-	public int getCompoundWords(){
-		return compoundWords;
-	}
-
-	public void clear(){
+	public synchronized void clear(){
 		totalProductions = 0;
 		longestWordCountByCharacters = 0;
 		longestWordCountBySyllabes = 0;
 		lengthsFrequencies.clear();
-		syllabeLengthsFrequencies.clear();
 		syllabesFrequencies.clear();
+		syllabeLengthsFrequencies.clear();
 		stressFromLastFrequencies.clear();
 		longestWordsByCharacters.clear();
 		longestWordsBySyllabes.clear();

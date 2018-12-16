@@ -1,6 +1,5 @@
 package unit731.hunspeller;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -33,7 +32,6 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
@@ -41,6 +39,8 @@ import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.XChartPanel;
 import org.knowm.xchart.style.CategoryStyler;
 import org.knowm.xchart.style.Styler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryStatistics;
@@ -49,8 +49,9 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 
 
-@Slf4j
 public class DictionaryStatisticsDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
 
 	private static final long serialVersionUID = 5762751368059394067l;
 
@@ -146,12 +147,12 @@ public class DictionaryStatisticsDialog extends JDialog{
       contractedWordsOutputLabel.setText("...");
 
       lengthsModeLabel.setLabelFor(lengthsModeOutputLabel);
-      lengthsModeLabel.setText("Mode of words' length:");
+      lengthsModeLabel.setText("Mode of wordsʼ length:");
 
       lengthsModeOutputLabel.setText("...");
 
       syllabeLengthsModeLabel.setLabelFor(syllabeLengthsModeOutputLabel);
-      syllabeLengthsModeLabel.setText("Mode of words' syllabe:");
+      syllabeLengthsModeLabel.setText("Mode of wordsʼ syllabe:");
 
       syllabeLengthsModeOutputLabel.setText("...");
 
@@ -211,8 +212,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       exportButton.setText("Export");
       exportButton.addActionListener(new java.awt.event.ActionListener() {
-         @Override
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
             exportButtonActionPerformed(evt);
          }
       });
@@ -262,12 +262,12 @@ public class DictionaryStatisticsDialog extends JDialog{
                .addGroup(layout.createSequentialGroup()
                   .addComponent(contractedWordsLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                  .addComponent(contractedWordsOutputLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                  .addGap(0, 0, Short.MAX_VALUE)
+                  .addComponent(exportButton)
+                  .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(exportButton)
-            .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -328,7 +328,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				exportToFile(outputFile);
 			}
 			catch(Exception e){
-				log.error("Cannot export statistics", e);
+				LOGGER.error("Cannot export statistics", e);
 			}
 
 			exportButton.setEnabled(true);
@@ -358,7 +358,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		});
 	}
 
-	@SuppressFBWarnings(value = "BC_UNCONFIRMED_CAST", justification = "It really is a XChartPanel")
 	private void fillStatisticDatas(){
 		long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){
@@ -523,7 +522,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -554,7 +553,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}

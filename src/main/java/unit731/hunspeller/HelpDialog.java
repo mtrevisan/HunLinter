@@ -18,7 +18,8 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -26,8 +27,9 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
  * @see <a href="https://pixabay.com/en/tree-kahl-winter-aesthetic-530324/">Tree logo</a>
  * @see <a href="http://blog.soebes.de/blog/2014/01/02/version-information-into-your-appas-with-maven/">Version informations into your apps with maven</a>
  */
-@Slf4j
 public class HelpDialog extends JDialog{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(HelpDialog.class);
 
 	private static final long serialVersionUID = -9151942201399886892L;
 
@@ -67,13 +69,13 @@ public class HelpDialog extends JDialog{
 		lblReleaseDateOut.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
 		lblManagedOptionsTextArea.setText(
 			"General:\n"
-				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n"
+				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n\n"
 			+ "Suggestions:\n"
-				+ "REP\n"
+				+ "\tREP\n\n"
 			+ "Compounding:\n"
-				+ "\tCOMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n"
+				+ "\tCOMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n\n"
 			+ "Affix creation:\n"
-				+ "\tPFX, SFX\n"
+				+ "\tPFX, SFX\n\n"
 			+ "Others:\n"
 				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
 		lblManagedOptionsTextArea.setCaretPosition(0);
@@ -90,11 +92,12 @@ public class HelpDialog extends JDialog{
       lblCopyrightOut = new javax.swing.JLabel();
       lblProductNameOut = new javax.swing.JLabel();
       lblLogo = new javax.swing.JLabel();
-      lblManagedOptionsLabel = new javax.swing.JLabel();
+      lblSupportedOptionsLabel = new javax.swing.JLabel();
       jScrollPane1 = new javax.swing.JScrollPane();
       lblManagedOptionsTextArea = new javax.swing.JTextArea();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+      setResizable(false);
 
       lblProductVersion.setLabelFor(lblProductVersionOut);
       lblProductVersion.setText("Product Version:");
@@ -113,15 +116,17 @@ public class HelpDialog extends JDialog{
 
       lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-      lblManagedOptionsLabel.setText("Managed options:");
+      lblSupportedOptionsLabel.setText("Supported options:");
 
       jScrollPane1.setEnabled(false);
 
       lblManagedOptionsTextArea.setEditable(false);
       lblManagedOptionsTextArea.setColumns(20);
       lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      lblManagedOptionsTextArea.setLineWrap(true);
       lblManagedOptionsTextArea.setRows(5);
       lblManagedOptionsTextArea.setTabSize(3);
+      lblManagedOptionsTextArea.setWrapStyleWord(true);
       jScrollPane1.setViewportView(lblManagedOptionsTextArea);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -151,7 +156,7 @@ public class HelpDialog extends JDialog{
                   .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                .addComponent(lblCopyrightOut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                  .addComponent(lblManagedOptionsLabel)
+                  .addComponent(lblSupportedOptionsLabel)
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -173,7 +178,7 @@ public class HelpDialog extends JDialog{
                   .addGap(75, 75, 75))
                .addComponent(lblLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(lblManagedOptionsLabel)
+            .addComponent(lblSupportedOptionsLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
@@ -206,7 +211,7 @@ public class HelpDialog extends JDialog{
 			UIManager.setLookAndFeel(lookAndFeelName);
 		}
 		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			log.error(null, e);
+			LOGGER.error(null, e);
 		}
 		//</editor-fold>
 
@@ -224,7 +229,7 @@ public class HelpDialog extends JDialog{
 				dialog.setVisible(true);
 			}
 			catch(IllegalArgumentException e){
-				log.error(null, e);
+				LOGGER.error(null, e);
 			}
 		});
 	}
@@ -233,12 +238,12 @@ public class HelpDialog extends JDialog{
    private javax.swing.JScrollPane jScrollPane1;
    private javax.swing.JLabel lblCopyrightOut;
    private javax.swing.JLabel lblLogo;
-   private javax.swing.JLabel lblManagedOptionsLabel;
    private javax.swing.JTextArea lblManagedOptionsTextArea;
    private javax.swing.JLabel lblProductNameOut;
    private javax.swing.JLabel lblProductVersion;
    private javax.swing.JLabel lblProductVersionOut;
    private javax.swing.JLabel lblReleaseDate;
    private javax.swing.JLabel lblReleaseDateOut;
+   private javax.swing.JLabel lblSupportedOptionsLabel;
    // End of variables declaration//GEN-END:variables
 }

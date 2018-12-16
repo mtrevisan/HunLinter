@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -102,12 +103,9 @@ public class WordGeneratorCompoundRuleTest{
 			"b/B",
 			"c/BC"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 40);
+		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
-			createProduction("c", null, "pa:c st:c"),
 			createProduction("aa", null, "pa:a st:a pa:a st:a"),
 			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("ac", null, "pa:a st:a pa:c st:c"),
@@ -168,13 +166,10 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
-			createProduction("c", null, "pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
@@ -201,15 +196,12 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
-			createProduction("c", null, "pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
-			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
-			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
-			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
+			createProduction("bc", null, "pa:b st:b pa:c st:c"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
+			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
+			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
 		);
 		Assert.assertEquals(expected, words);
 	}
@@ -234,13 +226,10 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 37);
 
 		List<Production> expected = Arrays.asList(
-			createProduction("a", null, "pa:a st:a"),
-			createProduction("b", null, "pa:b st:b"),
-			createProduction("c", null, "pa:c st:c"),
-			createProduction("ab", null, "pa:a st:a pa:b st:b"),
-			createProduction("ac", null, "pa:a st:a pa:c st:c"),
 			createProduction("bc", null, "pa:b st:b pa:c st:c"),
 			createProduction("cc", null, "pa:c st:c pa:c st:c"),
+			createProduction("ac", null, "pa:a st:a pa:c st:c"),
+			createProduction("ab", null, "pa:a st:a pa:b st:b"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
@@ -302,7 +291,7 @@ public class WordGeneratorCompoundRuleTest{
 			"scheu/wU"
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
-//words.forEach(stem -> System.out.println(stem));
+//words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")

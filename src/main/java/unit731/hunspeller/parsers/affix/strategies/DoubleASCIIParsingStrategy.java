@@ -1,11 +1,8 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
@@ -19,11 +16,10 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 	private static final Pattern PATTERN = PatternHelper.pattern("(?<=\\G.{2})");
 
-	private static final Matcher COMPOUND_RULE = PatternHelper.matcher("\\(..\\)[*?]?");
+	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((..)\\)|([?*])");
 
 
 	@Override
-	@SuppressFBWarnings(value = "PZLA_PREFER_ZERO_LENGTH_ARRAYS", justification = "Deliberate")
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
 			return null;
@@ -52,8 +48,14 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 	@Override
-	public List<String> extractCompoundRule(String compoundRule){
-		return PatternHelper.extract(compoundRule, COMPOUND_RULE);
+	public String[] extractCompoundRule(String compoundRule){
+		String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+
+		for(String part : parts)
+			if(part.length() != 2 && (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?'))
+				throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : " + compoundRule);
+
+		return parts;
 	}
 
 }

@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
 
 
 public class Affixes{
@@ -11,14 +10,16 @@ public class Affixes{
 	private final String[] prefixes;
 	private final String[] suffixes;
 	private final String[] terminalAffixes;
-	private final String[] compoundAffixes;
 
 
-	public Affixes(List<String> prefixes, List<String> suffixes, List<String> terminalAffixes, List<String> compoundAffixes){
+	public Affixes(List<String> prefixes, List<String> suffixes, List<String> terminalAffixes){
 		this.prefixes = prefixes.toArray(new String[prefixes.size()]);
 		this.suffixes = suffixes.toArray(new String[suffixes.size()]);
 		this.terminalAffixes = terminalAffixes.toArray(new String[terminalAffixes.size()]);
-		this.compoundAffixes = compoundAffixes.toArray(new String[compoundAffixes.size()]);
+	}
+
+	public String[] getTerminalAffixes(){
+		return terminalAffixes;
 	}
 
 	public List<String[]> extractAllAffixes(boolean reverseAffixes){
@@ -28,12 +29,7 @@ public class Affixes{
 		if(reverseAffixes)
 			Collections.reverse(applyAffixes);
 		applyAffixes.add(terminalAffixes);
-		applyAffixes.add(compoundAffixes);
 		return applyAffixes;
-	}
-
-	public String[] extractTerminals(){
-		return ArrayUtils.addAll(terminalAffixes, compoundAffixes);
 	}
 
 }

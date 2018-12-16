@@ -15,10 +15,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 
 
@@ -41,8 +37,6 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	private static final String GRAPHVIZ_STYLE_BEGIN = " [";
@@ -60,11 +54,15 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
 
 
-	@AllArgsConstructor
 	private class TraverseElement{
 
 		protected final RadixTreeNode<S, V> node;
 		protected final S prefix;
+
+		TraverseElement(RadixTreeNode<S, V> node, S prefix){
+			this.node = node;
+			this.prefix = prefix;
+		}
 
 	}
 
@@ -80,17 +78,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		}
 
 	}
-
-	private final RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
-		@Override
-		public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-			V value = node.getValue();
-			Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
-			result.add(entry);
-
-			return false;
-		}
-	};
 
 
 	/** The root node in this tree */
@@ -115,6 +102,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		tree.noDuplicatesAllowed = true;
 		return tree;
 	}
+
+	protected RadixTree(){}
 
 	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
@@ -320,12 +309,21 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
 
-		synchronized(visitorEntries){
-			visitorEntries.getResult().clear();
-			visitPrefixedBy(visitorEntries, prefix);
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+				result.add(entry);
 
-			return visitorEntries.getResult();
-		}
+				return false;
+			}
+		};
+
+		visitorEntries.getResult().clear();
+		visitPrefixedBy(visitorEntries, prefix);
+
+		return visitorEntries.getResult();
 	}
 
 	/**
@@ -383,12 +381,21 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public List<Map.Entry<S, V>> getEntries(S prefix){
 		Objects.requireNonNull(prefix);
 
-		synchronized(visitorEntries){
-			visitorEntries.getResult().clear();
-			visit(visitorEntries, prefix);
+		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
+			@Override
+			public boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(wholeKey, value);
+				result.add(entry);
 
-			return visitorEntries.getResult();
-		}
+				return false;
+			}
+		};
+
+		visitorEntries.getResult().clear();
+		visit(visitorEntries, prefix);
+
+		return visitorEntries.getResult();
 	}
 
 	/**

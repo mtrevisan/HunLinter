@@ -1,6 +1,5 @@
 package unit731.hunspeller;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.awt.Desktop;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.io.File;
@@ -14,32 +13,32 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.Deflater;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
-import unit731.hunspeller.languages.CorrectnessChecker;
+import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.DictionaryBaseData;
-import unit731.hunspeller.languages.builders.CorrectnessCheckerBuilder;
-import unit731.hunspeller.languages.builders.DictionaryBaseDataBuilder;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.AbstractHyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.services.ZipManager;
 import unit731.hunspeller.services.filelistener.FileChangeListener;
 import unit731.hunspeller.services.filelistener.FileListenerManager;
 
 
-@Slf4j
 public class Backbone implements FileChangeListener{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Backbone.class);
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 
@@ -61,23 +60,15 @@ public class Backbone implements FileChangeListener{
 
 	private File affFile;
 
-	@Getter
 	private final AffixParser affParser;
-	@Getter
 	private final AidParser aidParser;
-	@Getter
 	private DictionaryParser dicParser;
-	@Getter
 	private final ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
-	@Getter
-	private AbstractHyphenator hyphenator;
-	@Getter
+	private HyphenatorInterface hyphenator;
 	private DictionaryBaseData dictionaryBaseData;
-	@Getter
-	private CorrectnessChecker checker;
-	@Getter
+	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
 
 	private final Hunspellable hunspellable;
@@ -93,6 +84,38 @@ public class Backbone implements FileChangeListener{
 		flm = new FileListenerManager();
 	}
 
+	public AffixParser getAffParser(){
+		return affParser;
+	}
+
+	public AidParser getAidParser(){
+		return aidParser;
+	}
+
+	public DictionaryParser getDicParser(){
+		return dicParser;
+	}
+
+	public ThesaurusParser getTheParser(){
+		return theParser;
+	}
+
+	public HyphenatorInterface getHyphenator(){
+		return hyphenator;
+	}
+
+	public DictionaryBaseData getDictionaryBaseData(){
+		return dictionaryBaseData;
+	}
+
+	public DictionaryCorrectnessChecker getChecker(){
+		return checker;
+	}
+
+	public WordGenerator getWordGenerator(){
+		return wordGenerator;
+	}
+
 	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
 		clear();
 
@@ -101,7 +124,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = getDictionaryFile();
 		prepareDictionaryFile(dicFile);
@@ -113,14 +136,14 @@ public class Backbone implements FileChangeListener{
 		openThesaurusFile(theFile);
 	}
 
-	/** NOTE: used in test */
+	/* NOTE: used for testing purposes */
 	public void loadFile(String affixFilePath, String dictionaryFilePath) throws FileNotFoundException, IOException{
 		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = CorrectnessCheckerBuilder.getParser(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
 
 		File dicFile = new File(dictionaryFilePath);
 		prepareDictionaryFile(dicFile);
@@ -165,16 +188,16 @@ public class Backbone implements FileChangeListener{
 			throw new FileNotFoundException("The file does not exists");
 		}
 
-		log.info(MARKER_APPLICATION, "Opening Affix file for parsing: {}", affFile.getName());
+		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());
 
 		affParser.parse(affFile);
 
-		log.info(MARKER_APPLICATION, "Finished reading Affix file");
+		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
 	private void openHyphenationFile(File hypFile) throws IOException{
 		if(hypFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Hyphenation file for parsing: {}", hypFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
 			hypParser = new HyphenationParser(affParser.getLanguage());
 			hypParser.parse(hypFile);
@@ -184,7 +207,7 @@ public class Backbone implements FileChangeListener{
 			if(hunspellable != null)
 				hunspellable.clearHyphenationParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Hyphenation file");
 		}
 		else if(hypParser != null)
 			hypParser.clear();
@@ -202,20 +225,20 @@ public class Backbone implements FileChangeListener{
 		else if(dicParser != null)
 			dicParser.clear();
 
-		dictionaryBaseData = DictionaryBaseDataBuilder.getDictionaryBaseData(affParser.getLanguage());
+		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affParser.getLanguage());
 		wordGenerator = new WordGenerator(affParser, dicParser, dictionaryBaseData);
 	}
 
 	private void openAidFile(File aidFile) throws IOException{
 		if(aidFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Aid file for parsing: {}", aidFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Aid file: {}", aidFile.getName());
 
 			aidParser.parse(aidFile);
 
 			if(hunspellable != null)
 				hunspellable.clearAidParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Aid file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Aid file");
 		}
 		else
 			aidParser.clear();
@@ -223,14 +246,14 @@ public class Backbone implements FileChangeListener{
 
 	private void openThesaurusFile(File theFile) throws IOException{
 		if(theFile.exists()){
-			log.info(MARKER_APPLICATION, "Opening Thesaurus file for parsing: {}", theFile.getName());
+			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theFile.getName());
 
 			theParser.parse(theFile);
 
 			if(hunspellable != null)
 				hunspellable.clearThesaurusParser();
 
-			log.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
+			LOGGER.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
 		}
 		else
 			theParser.clear();
@@ -284,7 +307,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileDeleted(Path path){
-		log.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
+		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.toFile().getName());
 
 		String absolutePath = affFile.getParent() + File.separator + path.toString();
 		if(hasAFFExtension(absolutePath)){
@@ -303,7 +326,7 @@ public class Backbone implements FileChangeListener{
 
 	@Override
 	public void fileModified(Path path){
-		log.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
+		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
 		if(hunspellable != null)
 			hunspellable.loadFileInternal(affFile.getAbsolutePath());
@@ -313,12 +336,10 @@ public class Backbone implements FileChangeListener{
 		return path.endsWith(EXTENSION_AFF);
 	}
 
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean hasDICExtension(String path){
 		return path.endsWith(EXTENSION_DIC);
 	}
 
-	@SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "Deliberate")
 	private boolean isHyphenationFile(String path){
 		String baseName = FilenameUtils.getBaseName(path);
 		return (baseName.startsWith(PREFIX_HYPHENATION) && path.endsWith(EXTENSION_DIC));
@@ -334,22 +355,22 @@ public class Backbone implements FileChangeListener{
 
 		//package entire folder with ZIP
 		if(basePath != null){
-			log.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Found base path on {}", basePath.toString());
 
 			try{
 				String outputFilename = basePath.toString() + File.separator + basePath.getName(basePath.getNameCount() - 1) + ".zip";
 				ZIPPER.zipDirectory(basePath.toFile(), Deflater.BEST_COMPRESSION, outputFilename);
 
-				log.info(Backbone.MARKER_APPLICATION, "Package created");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Package created");
 
 				//open directory
 				if(Desktop.isDesktopSupported())
 					Desktop.getDesktop().open(new File(basePath.toString()));
 			}
 			catch(IOException e){
-				log.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
-				log.error("Something very bad happend while creating package", e);
+				LOGGER.error("Something very bad happend while creating package", e);
 			}
 		}
 	}

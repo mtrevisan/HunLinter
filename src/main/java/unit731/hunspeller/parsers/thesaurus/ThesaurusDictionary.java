@@ -10,17 +10,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.services.PatternHelper;
 
 
-@Getter
 public class ThesaurusDictionary{
 
-	private static final Matcher PART_OF_SPEECH = PatternHelper.matcher("\\([^)]+\\)");
+	private static final Pattern PATTERN_PART_OF_SPEECH = PatternHelper.pattern("\\([^)]+\\)");
 
 
 	@JsonProperty
@@ -29,6 +27,14 @@ public class ThesaurusDictionary{
 	@JsonIgnore
 	private boolean modified;
 
+
+	public List<ThesaurusEntry> getSynonyms(){
+		return synonyms;
+	}
+
+	public boolean isModified(){
+		return modified;
+	}
 
 	public boolean add(String partOfSpeech, List<String> meanings){
 		boolean result = false;
@@ -40,7 +46,7 @@ public class ThesaurusDictionary{
 				.forEachOrdered(sj::add);
 			String mm = sj.toString();
 
-			String mean = PatternHelper.replaceAll(meaning, PART_OF_SPEECH, StringUtils.EMPTY);
+			String mean = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			ThesaurusEntry foundSynonym = findByMeaning(mean);
 
 			MeaningEntry entry = new MeaningEntry(mm);
