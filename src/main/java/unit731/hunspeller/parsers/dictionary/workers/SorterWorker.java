@@ -90,14 +90,15 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 		}
-		catch(Exception e){
-			if(e instanceof ClosedChannelException)
-				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
-			else{
-				String message = ExceptionHelper.getMessage(e);
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
-			}
+		catch(ClosedChannelException e){
+			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
+			cancel(true);
+		}
+		catch(Exception e){
+			String message = ExceptionHelper.getMessage(e);
+			LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			cancel(true);
