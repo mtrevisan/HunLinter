@@ -7,4 +7,7 @@ I created this project in order to help me construct my hunspell language files 
 The name I give to the project is temporary...
 
 ## Whant the application do
-This application is able to do many correctness checks about the files structure and content. It is able to tell you if some rule is missing or redundant. You can also test hyphenation and eventually add rules. It is also able to manage thesaurus.
+This application is able to do many correctness checks about the files structure and content. It is able to tell you if some rule is missing or redundant. You can test rules and compound rules. You can also test hyphenation and eventually add rules. It is also able to manage thesaurus.
+
+## How to enhance its capabilities
+You can customize the tests the application made by simply add another package along with `vec`, named as the ISO639-3 code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunspeller/languages/CorrectnessChecker.java), [Orthography](src/main/java/unit731/hunspeller/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunspeller/languages/DictionaryBaseData.java) classes.
