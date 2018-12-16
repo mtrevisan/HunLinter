@@ -13,7 +13,7 @@ I created this project in order to help me construct my hunspell language files 
 
 
 ## Whant the application can do
-This application is able to do many correctness checks about the files structure and its content. It is able to tell you if some rule is missing or redundant. You can test rules and compound rules. You can also test hyphenation and eventually add rules. It is also able to manage thesaurus.
+This application is able to do many correctness checks about the files structure and its content. It is able to tell you if some rule is missing or redundant. You can test rules and compound rules. You can also test hyphenation and eventually add rules. It is also able to manage and build the thesaurus.
 
 
 ## How to enhance its capabilities
