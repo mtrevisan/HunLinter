@@ -14,4 +14,4 @@ You can customize the tests the application made by simply add another package a
 
 Along with these classes you can insert your `rules.properties`, a file that describes variuos constraints about the rules in the `.dic` file.
 
-After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunspeller/languages/BaseBuilder.java) class and adding a [LanguageData](src/main/java/unit731/hunspeller/languages/BaseBuilder.java#LanguageData) to the `DATAS` hashmap.
+After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunspeller/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
