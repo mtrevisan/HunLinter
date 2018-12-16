@@ -111,21 +111,13 @@ public class WordGenerator{
 
 		//extract suffixed productions
 		List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affParser.isComplexPrefixes());
-		if(LOGGER.isDebugEnabled() && !onefoldProductions.isEmpty()){
-			LOGGER.debug("Suffix productions:");
-			onefoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
-				production.getRulesSequence()));
-		}
+		printProductions((affParser.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), onefoldProductions);
 
 		List<Production> twofoldProductions = Collections.<Production>emptyList();
 		if(!isCompound || affParser.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affParser.isComplexPrefixes());
-			if(LOGGER.isDebugEnabled() && !twofoldProductions.isEmpty()){
-				LOGGER.debug("Prefix productions:");
-				twofoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
-					production.getRulesSequence()));
-			}
+			printProductions((affParser.isComplexPrefixes()? "Suffix productions:": "Prefix productions:"), twofoldProductions);
 		}
 
 		//extract lastfold productions
@@ -134,11 +126,7 @@ public class WordGenerator{
 		lastfoldProductions.addAll(onefoldProductions);
 		lastfoldProductions.addAll(twofoldProductions);
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affParser.isComplexPrefixes());
-		if(LOGGER.isDebugEnabled() && !lastfoldProductions.isEmpty()){
-			LOGGER.debug("Twofold productions:");
-			lastfoldProductions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
-				production.getRulesSequence()));
-		}
+		printProductions("Twofold productions:", lastfoldProductions);
 
 		checkTwofoldCorrectness(lastfoldProductions);
 
@@ -164,6 +152,14 @@ public class WordGenerator{
 		return productions;
 	}
 
+
+	private void printProductions(String title, List<Production> productions){
+		if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
+			LOGGER.debug(title);
+			productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
+				production.getRulesSequence()));
+		}
+	}
 
 	/**
 	 * Generates a list of stems for the provided rule from words in the dictionary marked with AffixTag.COMPOUND_RULE
