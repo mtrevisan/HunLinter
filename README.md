@@ -21,3 +21,7 @@ Along with these classes you can insert your `rules.properties`, a file that des
 After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/unit731/hunspeller/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
+
+## Screenshots
+![alt text][img1]
+[img1]: https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking"
