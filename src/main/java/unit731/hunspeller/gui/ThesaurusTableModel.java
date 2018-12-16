@@ -19,7 +19,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String TAG_START = "<html>";
 	private static final String TAG_END = "</html>";
-	static final String TAG_NEW_LINE = "<br>";
+	private static final String TAG_NEW_LINE = "<br>";
 
 
 	private List<ThesaurusEntry> synonyms;

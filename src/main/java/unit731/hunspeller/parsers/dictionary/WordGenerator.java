@@ -391,24 +391,22 @@ public class WordGenerator{
 							break;
 						}
 					}
-					if(sb.length() > 0){
-						if(forbidDifferentCasesInCompound){
-							if(lastWordCasing == null)
-								lastWordCasing = StringHelper.classifyCasing(sb.toString());
-							StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
+					if(sb.length() > 0 && forbidDifferentCasesInCompound){
+						if(lastWordCasing == null)
+							lastWordCasing = StringHelper.classifyCasing(sb.toString());
+						StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
 
-							char lastChar = sb.charAt(sb.length() - 1);
-							char nextChar = nextCompound.charAt(0);
-							if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
-								Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
-								//convert nextChar to lowercase/uppercase and go on
-								if(collisions != null && collisions.contains(nextWord))
-									nextCompound = (Character.isUpperCase(lastChar)? StringUtils.capitalize(nextCompound):
-										StringUtils.uncapitalize(nextCompound));
-							}
-
-							lastWordCasing = nextWord;
+						char lastChar = sb.charAt(sb.length() - 1);
+						char nextChar = nextCompound.charAt(0);
+						if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
+							Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
+							//convert nextChar to lowercase/uppercase and go on
+							if(collisions != null && collisions.contains(nextWord))
+								nextCompound = (Character.isUpperCase(lastChar)? StringUtils.capitalize(nextCompound):
+									StringUtils.uncapitalize(nextCompound));
 						}
+
+						lastWordCasing = nextWord;
 					}
 					sb.append(nextCompound);
 				}
