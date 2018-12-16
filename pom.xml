@@ -43,6 +43,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<additionalOptions>-html5</additionalOptions>
+				</configuration>
 			</plugin>
 			<!-- Templating Maven Plugin -->
 			<plugin>
