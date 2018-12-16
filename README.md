@@ -17,7 +17,7 @@ This application is able to do many correctness checks about the files structure
 
 
 ## How to enhance its capabilities
-You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunspeller/languages/CorrectnessChecker.java), [Orthography](src/main/java/unit731/hunspeller/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunspeller/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
+You can customize the tests the application made by simply add another package along with `vec`, named as the [ISO 639-3](https://en.wikipedia.org/wiki/ISO_639-3) or [ISO 639-2](https://en.wikipedia.org/wiki/ISO_639-2) code, and extending the [DictionaryCorrectnessChecker](src/main/java/unit731/hunspeller/languages/CorrectnessChecker.java), [Orthography](src/main/java/unit731/hunspeller/languages/Orthography.java), and [DictionaryBaseData](src/main/java/unit731/hunspeller/languages/DictionaryBaseData.java) classes (this last class is used to drive the Bloom filter).
 
 Along with these classes you can insert your `rules.properties`, a file that describes variuos constraints about the rules in the `.dic` file.
 
