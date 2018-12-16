@@ -22,6 +22,18 @@ After that you have to tell the application that exists those files editing the 
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
 
+## Recognized flags
+### General
+SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
+### Suggestions
+REP
+### Compounding
+COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
+### Affix creation
+PFX, SFX
+### Others
+CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
+
 ## Screenshots
 ### Production
 ![alt text](https://i.postimg.cc/25DLks6s/Production.png "Production")
@@ -34,3 +46,6 @@ The application automatically recognize which checker to use based on the code i
 
 ### Hyphenation
 ![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
+
+### Help
+![alt text](https://i.postimg.cc/k5SrcHvg/Help.png "Help")
