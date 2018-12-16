@@ -47,5 +47,3 @@ CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
 ### Hyphenation
 ![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
 
-### Help
-![alt text](https://i.postimg.cc/k5SrcHvg/Help.png "Help")
