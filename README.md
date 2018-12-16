@@ -23,5 +23,4 @@ After that you have to tell the application that exists those files editing the 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
 
 ## Screenshots
-![alt text][img1]
-[img1]: https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking"
+![alt text](https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking")
