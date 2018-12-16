@@ -26,3 +26,7 @@ The application automatically recognize which checker to use based on the code i
 ![alt text](https://i.postimg.cc/25DLks6s/Production.png "Production")
 
 ![alt text](https://i.postimg.cc/6QcJ7ZW9/Dictionary-correctness-checking.png "Dictionary correctness checking")
+
+![alt text](https://i.postimg.cc/Jz67gSX3/Thesaurus.png "Thesaurus")
+
+![alt text](https://i.postimg.cc/k5SrcHvg/Hyphenation.png "Hyphenation")
