@@ -73,13 +73,13 @@ public class BaseBuilder{
 	}
 
 	public static Properties getRulesProperties(String language) throws IOException{
+		Properties rulesProperties = new Properties();
 		Class<? extends DictionaryCorrectnessChecker> cl = DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
-		InputStream is = cl.getResourceAsStream("rules.properties");
-
-		Properties rulesProperties = new Properties();
-		if(is != null)
-			rulesProperties.load(is);
+		try(InputStream is = cl.getResourceAsStream("rules.properties")){
+			if(is != null)
+				rulesProperties.load(is);
+		}
 		return rulesProperties;
 	}
 
