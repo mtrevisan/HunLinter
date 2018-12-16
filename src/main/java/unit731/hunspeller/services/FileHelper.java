@@ -75,7 +75,12 @@ public class FileHelper{
 		}
 	}
 
-	/** Ignore any BOM marker */
+	/**
+	 * Ignore any BOM marker
+	 * 
+	 * @param line	The line from which to strip the BOM marker
+	 * @return	The stripped line
+	 */
 	public static String clearBOMMarker(String line){
 		return (line.startsWith(BOM_MARKER)? line.substring(1): line);
 	}

@@ -22,7 +22,12 @@ public class PatternHelper{
 		return Pattern.compile(pattern, flags);
 	}
 
-	/** Returns the delimiters along with the splitted elements */
+	/**
+	 * Returns the delimiters along with the splitted elements
+	 * 
+	 * @param delimitersRegex	regex stating the delimiters
+	 * @return	The pattern to be used to split a string
+	 */
 	public static Pattern splitterWithDelimiters(String delimitersRegex){
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
 	}

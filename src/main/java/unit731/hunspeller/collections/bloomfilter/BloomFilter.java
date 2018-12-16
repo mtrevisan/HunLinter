@@ -96,7 +96,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param bitArrayType					The type of the bit array
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link DEFAULT_HASHER} will be used
+	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link HASHER_DEFAULT} will be used
 	 */
 	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
 			Decomposer<T> decomposer, HashFunction hasher){

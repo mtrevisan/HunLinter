@@ -98,7 +98,7 @@ import unit731.hunspeller.services.RecentItems;
  * @see <a href="https://github.com/nuspell/nuspell">Nuspell on github</a>
  * @see <a href="https://github.com/hunspell/hyphen">Hyphen on github</a>
  * 
- * @see <a href="https://www.shareicon.net/"Share icon></a>
+ * @see <a href="https://www.shareicon.net/">Share icon</a>
  * @see <a href="https://www.iloveimg.com/resize-image/resize-png">PNG resizer</a>
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>

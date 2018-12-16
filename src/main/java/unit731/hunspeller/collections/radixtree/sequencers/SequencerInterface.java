@@ -14,7 +14,7 @@ public interface SequencerInterface<S>{
 	 * @param prefix	The prefix.
 	 * @return	{@code true} if the sequence represented by the argument is a prefix of the sequence represented by this sequence; {@code false} otherwise.
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
-	 *				determined by the {@link #equals(Object)} method.
+	 *				determined by the {@link #equals} method.
 	 */
 	boolean startsWith(S sequence, S prefix);
 

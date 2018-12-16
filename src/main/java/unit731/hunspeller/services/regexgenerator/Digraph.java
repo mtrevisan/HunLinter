@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * It supports the following two primary operations: add an edge to the digraph, iterate over all of the vertices adjacent from a given vertex.
  * Parallel edges and self-loops are permitted.
  * <p>
- * This implementation uses an adjacency-lists representation, which is a vertex-indexed array of {@link Bag} objects.
+ * This implementation uses an adjacency-lists representation, which is a vertex-indexed array of {@link Pair} objects.
  * All operations take constant time (in the worst case) except iterating over the vertices adjacent from a given vertex, which takes
  * time proportional to the number of such vertices.
  * <p>

@@ -36,7 +36,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	/**
 	 * Performs hyphenation
-	 * NOTE: Calling the method {@link Orthography.#correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography.#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @return the hyphenation object(s)
@@ -54,7 +54,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	/**
 	 * Performs hyphenation including an additional rule
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography.#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
 	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation

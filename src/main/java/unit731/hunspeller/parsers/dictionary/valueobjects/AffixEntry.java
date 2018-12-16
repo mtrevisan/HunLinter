@@ -172,6 +172,9 @@ public class AffixEntry{
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
 	 * Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
 	 * 	removed by splitting rules
+	 * 
+	 * @param dicEntry	The dictionary entry to combine from
+	 * @return	The list of new morphological fields
 	 */
 	public String[] combineMorphologicalFields(DictionaryEntry dicEntry){
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
