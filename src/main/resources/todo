@@ -1,6 +1,5 @@
-high priority
-https://github.com/thomas-joiner/HunspellBridJ
-https://github.com/lopusz/hunspell-stemmer/blob/master/src/hunspell_stemmer/Stemmer.java
+high priority:
+ - stemming
 
-low priority
-https://github.com/Dakta/Synonymizer
+low priority:
+ - 
