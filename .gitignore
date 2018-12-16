@@ -1,1 +1,5 @@
 target/
+nbactions.xml
+nbactions-nexus.xml
+nbactions-release-profile.xml
+nb-configuration.xml
