@@ -1,6 +1,6 @@
 Hunspeller
 
-[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://niceue.com/licenses/MIT-LICENSE.txt)&nbsp;[![Codacy Badge](https://api.codacy.com/project/badge/grade/1335b9b55ebd40bc934789ea5f5af751)](https://www.codacy.com/app/mauro-trevisan/library)&nbsp;<a href="https://codeclimate.com/github/mtrevisan/Hunspeller/maintainability"><img src="https://api.codeclimate.com/v1/badges/78fbcee7524a9fbe1d47/maintainability" /></a>
+[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](http://niceue.com/licenses/MIT-LICENSE.txt)&nbsp;[![Codacy Badge](https://api.codacy.com/project/badge/grade/1335b9b55ebd40bc934789ea5f5af751)](https://www.codacy.com/app/mauro-trevisan/Hunspeller)&nbsp;<a href="https://codeclimate.com/github/mtrevisan/Hunspeller/maintainability"><img src="https://api.codeclimate.com/v1/badges/78fbcee7524a9fbe1d47/maintainability" /></a>
 ==========
 
 ## Motivation
