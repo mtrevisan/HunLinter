@@ -1,4 +1,5 @@
 target/
+dependency-reduced-pom.xml
 nbactions.xml
 nbactions-nexus.xml
 nbactions-release-profile.xml
