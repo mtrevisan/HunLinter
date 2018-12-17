@@ -68,6 +68,50 @@ public class WordGenerator{
 		this.dictionaryBaseData = dictionaryBaseData;
 	}
 
+	public List<Production> applySingleAffixRule(String line){
+		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
+		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+
+		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
+		dicEntry.applyConversionTable(affParser::applyInputConversionTable);
+
+		List<Production> productions = Collections.<Production>emptyList();
+		String circumfixFlag = affParser.getCircumfixFlag();
+		if(!dicEntry.hasContinuationFlag(circumfixFlag)){
+			String forbiddenWordFlag = affParser.getForbiddenWordFlag();
+			if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
+				return Collections.<Production>emptyList();
+
+			//extract suffixed productions
+			boolean isCompound = false;
+			productions = getOnefoldProductions(dicEntry, isCompound, !affParser.isComplexPrefixes());
+			if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
+				LOGGER.debug("Suffix productions:");
+				productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affParser.getFlagParsingStrategy()),
+					production.getRulesSequence()));
+			}
+
+			//remove rules that invalidate the onlyInCompound rule
+			if(isCompound)
+				enforceOnlyInCompound(productions);
+
+			//remove rules that invalidate the affix rule
+			enforceNeedAffixFlag(productions);
+
+			//convert using output table
+			int size = productions.size();
+			for(int i = 0; i < size; i ++){
+				Production production = productions.get(i);
+				production.applyConversionTable(affParser::applyInputConversionTable);
+			}
+
+			if(LOGGER.isTraceEnabled())
+				productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
+		}
+		return productions;
+	}
+
 	public List<Production> applyAffixRules(String line){
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
@@ -84,6 +128,9 @@ public class WordGenerator{
 			Production production = productions.get(i);
 			production.applyConversionTable(affParser::applyInputConversionTable);
 		}
+
+		if(LOGGER.isTraceEnabled())
+			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}
@@ -145,9 +192,6 @@ public class WordGenerator{
 
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
-
-		if(LOGGER.isTraceEnabled())
-			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 
 		return productions;
 	}

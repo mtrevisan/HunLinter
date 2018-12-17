@@ -117,9 +117,6 @@ public class MemoryMappedFileBitArray implements BitArray{
 		}
 	}
 
-	/**
-	 * Method that 
-	 */
 	private void closeDirectBuffer(){
 		//helps unmap a memory-mapped file before being garbage-collected.
 		if(buffer != null && buffer.isDirect()){
