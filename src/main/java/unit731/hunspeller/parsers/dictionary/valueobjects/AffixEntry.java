@@ -31,7 +31,7 @@ public class AffixEntry{
 	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("\t.*$");
 
 	public static final String DOT = ".";
-	private static final String ZERO = "0";
+	public static final String ZERO = "0";
 
 
 	public static enum Type{

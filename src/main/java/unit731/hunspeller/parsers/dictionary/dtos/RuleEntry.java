@@ -7,7 +7,8 @@ import java.util.Objects;
 
 public class RuleEntry{
 
-	private static final char YES = 'Y';
+	public static final char COMBINEABLE = 'Y';
+	public static final char NOT_COMBINEABLE = 'N';
 
 
 	private final boolean suffix;
@@ -23,7 +24,7 @@ public class RuleEntry{
 		Objects.requireNonNull(entries);
 
 		this.suffix = suffix;
-		this.combineable = (combineable == YES);
+		this.combineable = (combineable == COMBINEABLE);
 		this.entries = entries;
 	}
 

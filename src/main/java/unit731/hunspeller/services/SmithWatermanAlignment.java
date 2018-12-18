@@ -11,11 +11,11 @@ import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Smith-Waterman local alignment algorithm with gap penalty
- * Runtime complexity: O(n^2 * m), assuming n > m
+ * Runtime complexity: O(n^2 * m), assuming n &gt; m
  * Space complexity: O(n * m)
  * 
- * @see {@link http://www.cs.bgu.ac.il/~michaluz/seminar/Gotoh.pdf}
- * @see {@link http://www.akira.ruc.dk/~keld/teaching/algoritmedesign_f03/Artikler/05/Hirschberg75.pdf}
+ * @see <a href="http://www.cs.bgu.ac.il/~michaluz/seminar/Gotoh.pdf">Gotoh</a>
+ * @see <a href="http://www.akira.ruc.dk/~keld/teaching/algoritmedesign_f03/Artikler/05/Hirschberg75.pdf">Hirschberg75</a>
  * 
  * https://github.com/mkleen/SmithWaterman/blob/master/SmithWaterman.java
  * https://github.com/eshamusi/Smith-Waterman-Local-Alignment/blob/master/SmithWaterman.java
