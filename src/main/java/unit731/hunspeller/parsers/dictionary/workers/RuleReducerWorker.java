@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
@@ -56,38 +58,63 @@ String flag = "&0";
 						String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 						String addition = producedWord.substring(lastCommonLetter);
 						String condition = (lastCommonLetter < wordLength? removal: lastLetter);
-						newAffixEntry = composeLine(AffixEntry.Type.SUFFIX, flag, removal, addition, condition);
+						newAffixEntry = composeLine(removal, addition, condition);
 					}
 					else{
-						//TODO
-						newAffixEntry = StringUtils.EMPTY;
+						int firstCommonLetter;
+						String producedWord = production.getWord();
+						for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
+							if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
+								break;
+						String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
+						String addition = producedWord.substring(0, firstCommonLetter);
+						String condition = (firstCommonLetter < wordLength? removal: lastLetter);
+						newAffixEntry = composeLine(removal, addition, condition);
 					}
 					newAffixEntries.add(newAffixEntry);
 				});
 			}
 		};
 		Runnable completed = () -> {
-			newAffixEntries.forEach(System.out::println);
+			//aggregate rules
+			Set<String> aggregatedAffixEntries = new HashSet<>();
+
+			List<String> entries = new ArrayList<>(newAffixEntries);
+			while(!entries.isEmpty()){
+				String affixEntry = entries.get(0);
+				String affixEntryCondition = affixEntry.substring(affixEntry.lastIndexOf(' ') + 1);
+				entries.remove(0);
+
+				//collect all the entries that have affixEntry as last part of the condition
+				Set<String> collisions = new HashSet<>();
+				int size = entries.size();
+				for(int i = 0; i < size; i ++){
+					String targetAffixEntry = entries.get(i);
+					if(targetAffixEntry.endsWith(affixEntryCondition))
+						collisions.add(targetAffixEntry);
+				}
+
+				System.out.println("collisions for " + affixEntry);
+				if(!collisions.isEmpty())
+					collisions.forEach(System.out::println);
+				System.out.println("\n");
+				//TODO
+				//if every one else does not ends with affixEntry, then accept, otherwise collect all that matches and modify accordingly
+
+//				System.out.println(affixEntry);
+			}
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
 
-	public static void main(String[] args){
-		String flag = "&0";
-		String word = "mano";
-		String producedWord = "maneta";
-		boolean isSuffix = true;
-
-		int lastCommonLetter;
-		for(lastCommonLetter = 0; lastCommonLetter < Math.min(word.length(), producedWord.length()); lastCommonLetter ++)
-			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-				break;
-		String removal = (lastCommonLetter < word.length()? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = producedWord.substring(lastCommonLetter);
-		String condition = (lastCommonLetter < word.length()? removal: AffixEntry.DOT);
-		String newAffixEntry = composeLine((isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX), flag, removal, addition, condition);
-
-		System.out.println(newAffixEntry);
+	public static String composeLine(String removal, String addition, String condition){
+		StringBuilder sb = new StringBuilder();
+		return sb.append(removal)
+			.append(StringUtils.SPACE)
+			.append(addition)
+			.append(StringUtils.SPACE)
+			.append(condition)
+			.toString();
 	}
 
 	public static String composeLine(AffixEntry.Type type, String flag, String removal, String addition, String condition){
