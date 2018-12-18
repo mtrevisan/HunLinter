@@ -2,13 +2,17 @@ package unit731.hunspeller.services;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.tuple.Pair;
 
 
 /**
- * Smith-Waterman local alignment algorithm
+ * Smith-Waterman local alignment algorithm with gap penalty
+ * Runtime complexity: O(n^2 * m), assuming n > m
+ * Space complexity: O(n * m)
  * 
  * @see {@link http://www.cs.bgu.ac.il/~michaluz/seminar/Gotoh.pdf}
  * @see {@link http://www.akira.ruc.dk/~keld/teaching/algoritmedesign_f03/Artikler/05/Hirschberg75.pdf}
@@ -33,6 +37,15 @@ public class SmithWatermanAlignment{
 	private static final double GAP_EXTENSION_PENALTY = -1. / 3.;
 
 
+	public class Trace{
+		private int firstIndexA;
+		private int firstIndexB;
+		private int lastIndexA;
+		private int lastIndexB;
+		private Deque<Character> operations;
+	}
+
+
 	private final String[] x;
 	private final int n;
 	private final String[] y;
@@ -55,7 +68,7 @@ public class SmithWatermanAlignment{
 			scores[0][j] = j * COST_INSERTION;
 	}
 
-	public Stack<Trace> align(){
+	public Set<Trace> align(){
 		//calculate scores:
 		double maxScore = 0.;
 		for(int j = 1; j <= m; j ++)
@@ -67,11 +80,11 @@ public class SmithWatermanAlignment{
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		Stack<Trace> traces = new Stack<>();
+		Set<Trace> traces = new HashSet<>();
 		Stack<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
 		maxScoreIndices.forEach(score -> {
 			//extract edit operations
-			traces.push(traceback(score.getLeft(), score.getRight()));
+			traces.add(traceback(score.getLeft(), score.getRight()));
 		});
 		return traces;
 	}
@@ -118,14 +131,6 @@ public class SmithWatermanAlignment{
 				if(scores[i][j] == maxScore)
 					maxScores.push(Pair.of(i, j));
 		return maxScores;
-	}
-
-	class Trace{
-		int firstIndexA;
-		int firstIndexB;
-		int lastIndexA;
-		int lastIndexB;
-		Deque<Character> operations;
 	}
 
 	private Trace traceback(int lastIndexA, int lastIndexB){
