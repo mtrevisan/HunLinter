@@ -118,20 +118,20 @@ String flag = "&0";
 						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
 					bucket.get(1).set(0, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
 
+//TODO manage condition.length > 2 (òno with condition.charAt = n)
 					list = bucket.get(affixEntryCondition.length() + 2);
 					//strip affixEntry's condition and collect
 					otherConditions = list.stream()
 						.map(Pair::getRight)
-						//TODO manage condition.length > 2 (òno with condition.charAt = n)
 						.map(condition -> condition.charAt(condition.length() - 2))
 						.map(String::valueOf)
 						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
 					bucket.get(1).add(Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
-					//TODO
+//TODO
 
 System.out.print("collisions: ");
 collisions.forEach(System.out::println);
-					//TODO
+//TODO
 break;
 				}
 				else
