@@ -9,9 +9,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeTraverser;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -93,33 +90,25 @@ String flag = "&0";
 				String affixEntryCondition = affixEntry.getRight();
 
 				//collect all the entries that have affixEntry as last part of the condition
-				RadixTree<String, Pair<String, String>> collisions = RadixTree.createTree(new StringSequencer());
-				collisions.put(StringUtils.reverse(affixEntryCondition), affixEntry);
+				List<Pair<String, String>> collisions = new ArrayList<>();
+				collisions.add(affixEntry);
 				for(int i = 1; i < entries.size(); i ++){
 					Pair<String, String> targetAffixEntry = entries.get(i);
 					String targetAffixEntryCondition = targetAffixEntry.getRight();
 					if(targetAffixEntryCondition.endsWith(affixEntryCondition))
-						collisions.put(StringUtils.reverse(targetAffixEntryCondition), targetAffixEntry);
+						collisions.add(Pair.of(targetAffixEntry.getLeft(), targetAffixEntryCondition));
 				}
 
 				//remove matched entries
-				collisions.forEach((condition, pair) -> entries.remove(pair));
+				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
+					//sort entries by shortest condition
+					collisions.sort((entry1, entry2) ->
+						Integer.compare(entry1.getRight().length(), entry2.getRight().length())
+					);
 System.out.print("collisions: ");
-RadixTreeTraverser<String, Pair<String, String>> traverser = (wholeKey, node, parent) -> {
-	if(node.getChildren().isEmpty()){
-		//close key
-		System.out.println("empty children");
-	}
-	else{
-		//open a new key [?]
-		System.out.println("non-empty children");
-	}
-	System.out.println(node);
-};
-collisions.traverseBFS(traverser);
-collisions.forEach((condition, pair) -> System.out.println(condition + ": " + pair));
+collisions.forEach(System.out::println);
 					//TODO
 break;
 				}
