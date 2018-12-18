@@ -1,12 +1,15 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -103,10 +106,17 @@ String flag = "&0";
 				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
-					//sort entries by shortest condition
-					collisions.sort((entry1, entry2) ->
-						Integer.compare(entry1.getRight().length(), entry2.getRight().length())
-					);
+					//generate regex from input
+					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
+					List<Pair<String, String>> list = bucket.get(2);
+					//strip affixEntry's condition and collect
+					String otherConditions = list.stream()
+						.map(Pair::getRight)
+						.map(condition -> condition.substring(0, condition.length() - affixEntryCondition.length()))
+						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
+					bucket.get(1).set(0, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+					//TODO
+
 System.out.print("collisions: ");
 collisions.forEach(System.out::println);
 					//TODO
@@ -123,6 +133,14 @@ break;
 //aggregatedAffixEntries.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
+	}
+
+	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries){
+		Map<Integer, List<Pair<String, String>>> bucket = new HashMap<>();
+		for(Pair<String, String> entry : entries)
+			bucket.computeIfAbsent(entry.getRight().length(), k -> new ArrayList<>())
+				.add(entry);
+		return bucket;
 	}
 
 	public static String composeLine(String removal, String addition){
