@@ -79,6 +79,10 @@ String flag = "&0";
 			Set<String> aggregatedAffixEntries = new HashSet<>();
 
 			List<String> entries = new ArrayList<>(newAffixEntries);
+			//order entries by shortest condition
+			entries.sort((entry1, entry2) ->
+				Integer.compare(entry1.substring(entry1.lastIndexOf(' ') + 1).length(), entry2.substring(entry2.lastIndexOf(' ') + 1).length())
+			);
 			while(!entries.isEmpty()){
 				String affixEntry = entries.get(0);
 				String affixEntryCondition = affixEntry.substring(affixEntry.lastIndexOf(' ') + 1);
@@ -94,9 +98,9 @@ String flag = "&0";
 						collisions.add(targetAffixEntry);
 				}
 
+				if(collisions.size() > 1){
 System.out.print("collisions: ");
 collisions.forEach(System.out::println);
-				if(collisions.size() > 1){
 					//TODO
 				}
 				else
@@ -106,6 +110,7 @@ collisions.forEach(System.out::println);
 
 //				System.out.println(affixEntry);
 			}
+System.out.println("--");
 aggregatedAffixEntries.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
