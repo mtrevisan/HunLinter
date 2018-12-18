@@ -37,6 +37,7 @@ public class SmithWatermanAlignment{
 	private static final double GAP_EXTENSION_PENALTY = -1. / 3.;
 
 
+	//TODO introduce getters
 	public class Trace{
 		private int firstIndexA;
 		private int firstIndexB;
