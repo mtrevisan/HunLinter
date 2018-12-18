@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -35,7 +36,7 @@ String flag = "&0";
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-		Set<String> newAffixEntries = new HashSet<>();
+		Set<Pair<String, String>> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
@@ -48,6 +49,7 @@ String flag = "&0";
 
 				productions.forEach(production -> {
 					String newAffixEntry;
+					String condition;
 					if(isSuffix){
 						int lastCommonLetter;
 						String producedWord = production.getWord();
@@ -56,8 +58,8 @@ String flag = "&0";
 								break;
 						String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 						String addition = producedWord.substring(lastCommonLetter);
-						String condition = (lastCommonLetter < wordLength? removal: lastLetter);
-						newAffixEntry = composeLine(removal, addition, condition);
+						condition = (lastCommonLetter < wordLength? removal: lastLetter);
+						newAffixEntry = composeLine(removal, addition);
 					}
 					else{
 						int firstCommonLetter;
@@ -67,36 +69,37 @@ String flag = "&0";
 								break;
 						String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
 						String addition = producedWord.substring(0, firstCommonLetter);
-						String condition = (firstCommonLetter < wordLength? removal: lastLetter);
-						newAffixEntry = composeLine(removal, addition, condition);
+						condition = (firstCommonLetter < wordLength? removal: lastLetter);
+						newAffixEntry = composeLine(removal, addition);
 					}
-					newAffixEntries.add(newAffixEntry);
+					newAffixEntries.add(Pair.of(newAffixEntry, condition));
 				});
 			}
 		};
 		Runnable completed = () -> {
 			//aggregate rules
-			Set<String> aggregatedAffixEntries = new HashSet<>();
+			Set<Pair<String, String>> aggregatedAffixEntries = new HashSet<>();
 
-			List<String> entries = new ArrayList<>(newAffixEntries);
-			//order entries by shortest condition
+			List<Pair<String, String>> entries = new ArrayList<>(newAffixEntries);
+			//sort entries by shortest condition
 			entries.sort((entry1, entry2) ->
-				Integer.compare(entry1.substring(entry1.lastIndexOf(' ') + 1).length(), entry2.substring(entry2.lastIndexOf(' ') + 1).length())
+				Integer.compare(entry1.getRight().length(), entry2.getRight().length())
 			);
 			while(!entries.isEmpty()){
-				String affixEntry = entries.get(0);
-				String affixEntryCondition = affixEntry.substring(affixEntry.lastIndexOf(' ') + 1);
-				entries.remove(0);
+				Pair<String, String> affixEntry = entries.get(0);
+				String affixEntryCondition = affixEntry.getRight();
 
 				//collect all the entries that have affixEntry as last part of the condition
-				Set<String> collisions = new HashSet<>();
+				Set<Pair<String, String>> collisions = new HashSet<>();
 				collisions.add(affixEntry);
-				int size = entries.size();
-				for(int i = 0; i < size; i ++){
-					String targetAffixEntry = entries.get(i);
-					if(targetAffixEntry.endsWith(affixEntryCondition))
+				for(int i = 1; i < entries.size(); i ++){
+					Pair<String, String> targetAffixEntry = entries.get(i);
+					if(targetAffixEntry.getValue().endsWith(affixEntryCondition))
 						collisions.add(targetAffixEntry);
 				}
+
+				//remove matched entries
+				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
 System.out.print("collisions: ");
@@ -116,13 +119,11 @@ aggregatedAffixEntries.forEach(System.out::println);
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
 
-	public static String composeLine(String removal, String addition, String condition){
+	public static String composeLine(String removal, String addition){
 		StringBuilder sb = new StringBuilder();
 		return sb.append(removal)
 			.append(StringUtils.SPACE)
 			.append(addition)
-			.append(StringUtils.SPACE)
-			.append(condition)
 			.toString();
 	}
 
