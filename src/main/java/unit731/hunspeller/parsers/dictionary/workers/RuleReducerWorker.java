@@ -108,7 +108,7 @@ String flag = "&0";
 				if(collisions.size() > 1){
 					//generate regex from input
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
-					List<Pair<String, String>> list = bucket.get(2);
+					List<Pair<String, String>> list = bucket.get(affixEntryCondition.length() + 1);
 					//strip affixEntry's condition and collect
 					String otherConditions = list.stream()
 						.map(Pair::getRight)
