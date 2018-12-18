@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.tree.RadixTreeTraverser;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -108,13 +107,18 @@ String flag = "&0";
 
 				if(collisions.size() > 1){
 System.out.print("collisions: ");
-//RadixTreeTraverser<String, Pair<String, String>> traverser = new RadixTreeTraverser<String, Pair<String, String>>(){
-//	@Override
-//	public void traverse(String wholeKey, RadixTreeNode<String, Pair<String, String>> node, RadixTreeNode<String, Pair<String, String>> parent){
-//		System.out.println(node);
-//	}
-//};
-//collisions.traverseBFS(traverser);
+RadixTreeTraverser<String, Pair<String, String>> traverser = (wholeKey, node, parent) -> {
+	if(node.getChildren().isEmpty()){
+		//close key
+		System.out.println("empty children");
+	}
+	else{
+		//open a new key [?]
+		System.out.println("non-empty children");
+	}
+	System.out.println(node);
+};
+collisions.traverseBFS(traverser);
 collisions.forEach((condition, pair) -> System.out.println(condition + ": " + pair));
 					//TODO
 break;
