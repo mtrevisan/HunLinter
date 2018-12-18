@@ -90,12 +90,15 @@ String flag = "&0";
 				String affixEntryCondition = affixEntry.getRight();
 
 				//collect all the entries that have affixEntry as last part of the condition
-				Set<Pair<String, String>> collisions = new HashSet<>();
+				List<Pair<String, String>> collisions = new ArrayList<>();
 				collisions.add(affixEntry);
 				for(int i = 1; i < entries.size(); i ++){
 					Pair<String, String> targetAffixEntry = entries.get(i);
-					if(targetAffixEntry.getValue().endsWith(affixEntryCondition))
-						collisions.add(targetAffixEntry);
+					String targetAffixEntryCondition = targetAffixEntry.getRight();
+					if(targetAffixEntryCondition.endsWith(affixEntryCondition)){
+						String strippedCondition = targetAffixEntryCondition.substring(0, targetAffixEntryCondition.length() - affixEntryCondition.length());
+						collisions.add(Pair.of(targetAffixEntry.getLeft(), strippedCondition));
+					}
 				}
 
 				//remove matched entries
@@ -105,6 +108,7 @@ String flag = "&0";
 System.out.print("collisions: ");
 collisions.forEach(System.out::println);
 					//TODO
+break;
 				}
 				else
 					aggregatedAffixEntries.add(affixEntry);
@@ -113,8 +117,8 @@ collisions.forEach(System.out::println);
 
 //				System.out.println(affixEntry);
 			}
-System.out.println("--");
-aggregatedAffixEntries.forEach(System.out::println);
+//System.out.println("--");
+//aggregatedAffixEntries.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
