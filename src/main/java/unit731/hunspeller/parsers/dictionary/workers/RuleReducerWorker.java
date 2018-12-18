@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Map;
@@ -107,26 +108,38 @@ String flag = "&0";
 
 				if(collisions.size() > 1){
 					//generate regex from input
-					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
-					int length = affixEntryCondition.length() + 1;
-					List<Pair<String, String>> list = bucket.get(length);
-					//strip affixEntry's condition and collect
-					String otherConditions = list.stream()
-						.map(Pair::getRight)
-						.map(condition -> condition.charAt(condition.length() - 2))
-						.map(String::valueOf)
-						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
-					bucket.get(1).set(0, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+//					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
+//					int length = affixEntryCondition.length() + 1;
+//					List<Pair<String, String>> list = bucket.get(length);
+//					//strip affixEntry's condition and collect
+//					String otherConditions = list.stream()
+//						.map(Pair::getRight)
+//						.map(condition -> condition.charAt(condition.length() - 2))
+//						.map(String::valueOf)
+//						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
+//					bucket.get(1).set(0, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
 
 //TODO manage condition.length > 2 (òno with condition.charAt = n)
-					list = bucket.get(affixEntryCondition.length() + 2);
-					//strip affixEntry's condition and collect
-					otherConditions = list.stream()
-						.map(Pair::getRight)
-						.map(condition -> condition.charAt(condition.length() - 2))
-						.map(String::valueOf)
-						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
-					bucket.get(1).add(Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
+					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
+					List<Pair<String, String>> startingList = itr.next();
+					while(itr.hasNext()){
+						List<Pair<String, String>> nextList = itr.next();
+						for(int i = 0; i < startingList.size(); i ++){
+							String startingCondition = startingList.get(i).getRight();
+							//strip affixEntry's condition and collect
+							String otherConditions = nextList.stream()
+								.map(Pair::getRight)
+								.filter(condition -> condition.endsWith(startingCondition))
+								.map(condition -> condition.charAt(condition.length() - 2))
+								.map(String::valueOf)
+								.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
+							if(otherConditions.length() > 3)
+								startingList.set(i, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+						}
+
+						startingList = nextList;
+					}
 //TODO
 
 System.out.print("collisions: ");
