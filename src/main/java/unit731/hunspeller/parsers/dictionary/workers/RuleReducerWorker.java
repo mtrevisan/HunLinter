@@ -1,11 +1,12 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.util.HashSet;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -33,6 +34,7 @@ String flag = "&0";
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		Set<String> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
@@ -44,22 +46,32 @@ String flag = "&0";
 				//TODO
 productions.forEach(production -> {
 	//TODO
-	int lastCommonLetter;
-	String producedWord = production.getWord();
-	for(lastCommonLetter = 0; lastCommonLetter < Math.min(word.length(), producedWord.length()); lastCommonLetter ++)
-		if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-			break;
-	String removal = (lastCommonLetter < word.length()? word.substring(lastCommonLetter): AffixEntry.ZERO);
-	String addition = producedWord.substring(lastCommonLetter);
-	String condition = (lastCommonLetter < word.length()? removal: AffixEntry.DOT);
-	String newAffixEntry = composeLine((isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX), flag, removal, addition, condition);
-
-	System.out.println(word + " / " + production.getWord() + ": " + newAffixEntry);
+	String newAffixEntry;
+	if(isSuffix){
+		int lastCommonLetter;
+		String producedWord = production.getWord();
+		int wordLength = word.length();
+		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
+			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
+				break;
+		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+		String addition = producedWord.substring(lastCommonLetter);
+		String condition = (lastCommonLetter < wordLength? removal: word.substring(wordLength - 1));
+		newAffixEntry = composeLine(AffixEntry.Type.SUFFIX, flag, removal, addition, condition);
+	}
+	else{
+		//TODO
+		newAffixEntry = StringUtils.EMPTY;
+	}
+	newAffixEntries.add(newAffixEntry);
 });
 				//productions.forEach(production -> checker.checkProduction(production));
 			}
 		};
-		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null, lockable);
+		Runnable completed = () -> {
+			newAffixEntries.forEach(System.out::println);
+		};
+		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
 
 	public static void main(String[] args){
