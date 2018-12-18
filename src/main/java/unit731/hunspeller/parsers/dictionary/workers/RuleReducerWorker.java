@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
@@ -87,6 +86,7 @@ String flag = "&0";
 
 				//collect all the entries that have affixEntry as last part of the condition
 				Set<String> collisions = new HashSet<>();
+				collisions.add(affixEntry);
 				int size = entries.size();
 				for(int i = 0; i < size; i ++){
 					String targetAffixEntry = entries.get(i);
@@ -94,15 +94,19 @@ String flag = "&0";
 						collisions.add(targetAffixEntry);
 				}
 
-				System.out.println("collisions for " + affixEntry);
-				if(!collisions.isEmpty())
-					collisions.forEach(System.out::println);
-				System.out.println("\n");
+System.out.print("collisions: ");
+collisions.forEach(System.out::println);
+				if(collisions.size() > 1){
+					//TODO
+				}
+				else
+					aggregatedAffixEntries.add(affixEntry);
 				//TODO
 				//if every one else does not ends with affixEntry, then accept, otherwise collect all that matches and modify accordingly
 
 //				System.out.println(affixEntry);
 			}
+aggregatedAffixEntries.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
