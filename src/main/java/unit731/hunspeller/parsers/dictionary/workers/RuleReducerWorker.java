@@ -41,31 +41,29 @@ String flag = "&0";
 
 			if(dicEntry.hasContinuationFlag(flag)){
 				String word = dicEntry.getWord();
+				int wordLength = word.length();
+				String lastLetter = word.substring(wordLength - 1);
 				List<Production> productions = wordGenerator.applySingleAffixRule(word + "/" + flag);
 
-				//TODO
-productions.forEach(production -> {
-	//TODO
-	String newAffixEntry;
-	if(isSuffix){
-		int lastCommonLetter;
-		String producedWord = production.getWord();
-		int wordLength = word.length();
-		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
-			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-				break;
-		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = producedWord.substring(lastCommonLetter);
-		String condition = (lastCommonLetter < wordLength? removal: word.substring(wordLength - 1));
-		newAffixEntry = composeLine(AffixEntry.Type.SUFFIX, flag, removal, addition, condition);
-	}
-	else{
-		//TODO
-		newAffixEntry = StringUtils.EMPTY;
-	}
-	newAffixEntries.add(newAffixEntry);
-});
-				//productions.forEach(production -> checker.checkProduction(production));
+				productions.forEach(production -> {
+					String newAffixEntry;
+					if(isSuffix){
+						int lastCommonLetter;
+						String producedWord = production.getWord();
+						for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
+							if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
+								break;
+						String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+						String addition = producedWord.substring(lastCommonLetter);
+						String condition = (lastCommonLetter < wordLength? removal: lastLetter);
+						newAffixEntry = composeLine(AffixEntry.Type.SUFFIX, flag, removal, addition, condition);
+					}
+					else{
+						//TODO
+						newAffixEntry = StringUtils.EMPTY;
+					}
+					newAffixEntries.add(newAffixEntry);
+				});
 			}
 		};
 		Runnable completed = () -> {
