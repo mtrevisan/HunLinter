@@ -29,6 +29,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Rule reducer";
 
+	private static final String NOT_GROUP_STARTING = "[^";
+	private static final String NOT_GROUP_ENDING = "]";
+
 
 	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(affParser);
@@ -52,31 +55,12 @@ String flag = "&0";
 				List<Production> productions = wordGenerator.applySingleAffixRule(word + "/" + flag);
 
 				productions.forEach(production -> {
-					String newAffixEntry;
-					String condition;
-					if(isSuffix){
-						int lastCommonLetter;
-						String producedWord = production.getWord();
-						for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
-							if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-								break;
-						String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-						String addition = producedWord.substring(lastCommonLetter);
-						condition = (lastCommonLetter < wordLength? removal: lastLetter);
-						newAffixEntry = composeLine(removal, addition);
-					}
-					else{
-						int firstCommonLetter;
-						String producedWord = production.getWord();
-						for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
-							if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
-								break;
-						String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
-						String addition = producedWord.substring(0, firstCommonLetter);
-						condition = (firstCommonLetter < wordLength? removal: lastLetter);
-						newAffixEntry = composeLine(removal, addition);
-					}
-					newAffixEntries.add(Pair.of(newAffixEntry, condition));
+					Pair<String, String> entry;
+					if(isSuffix)
+						entry = createSuffixEntry(production, wordLength, word, lastLetter);
+					else
+						entry = createPrefixEntry(production, wordLength, word, lastLetter);
+					newAffixEntries.add(entry);
 				});
 			}
 		};
@@ -114,17 +98,20 @@ String flag = "&0";
 					List<Pair<String, String>> startingList = itr.next();
 					while(itr.hasNext()){
 						List<Pair<String, String>> nextList = itr.next();
-						for(int i = 0; i < startingList.size(); i ++){
-							String startingCondition = startingList.get(i).getRight();
-							//strip affixEntry's condition and collect
-							String otherConditions = nextList.stream()
-								.map(Pair::getRight)
-								.filter(condition -> condition.endsWith(startingCondition))
-								.map(condition -> condition.charAt(condition.length() - 2))
-								.map(String::valueOf)
-								.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
-							if(otherConditions.length() > 3)
-								startingList.set(i, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+						if(!nextList.isEmpty()){
+							int discriminatorIndex = nextList.get(0).getRight().length() - 2;
+							for(int i = 0; i < startingList.size(); i ++){
+								String startingCondition = startingList.get(i).getRight();
+								//strip affixEntry's condition and collect
+								String otherConditions = nextList.stream()
+									.map(Pair::getRight)
+									.filter(condition -> condition.endsWith(startingCondition))
+									.map(condition -> condition.charAt(discriminatorIndex))
+									.map(String::valueOf)
+									.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, NOT_GROUP_ENDING));
+								if(otherConditions.length() > 3)
+									startingList.set(i, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+							}
 						}
 
 						startingList = nextList;
@@ -147,6 +134,36 @@ break;
 //aggregatedAffixEntries.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
+	}
+
+	private Pair<String, String> createSuffixEntry(Production production, int wordLength, String word, String lastLetter){
+		Pair<String, String> entry;
+		int lastCommonLetter;
+		String producedWord = production.getWord();
+		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
+			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
+				break;
+		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+		String addition = producedWord.substring(lastCommonLetter);
+		String condition = (lastCommonLetter < wordLength? removal: lastLetter);
+		String newAffixEntry = composeLine(removal, addition);
+		entry = Pair.of(newAffixEntry, condition);
+		return entry;
+	}
+
+	private Pair<String, String> createPrefixEntry(Production production, int wordLength, String word, String lastLetter){
+		Pair<String, String> entry;
+		int firstCommonLetter;
+		String producedWord = production.getWord();
+		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
+			if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
+				break;
+		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
+		String addition = producedWord.substring(0, firstCommonLetter);
+		String condition = (firstCommonLetter < wordLength? removal: lastLetter);
+		String newAffixEntry = composeLine(removal, addition);
+		entry = Pair.of(newAffixEntry, condition);
+		return entry;
 	}
 
 	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries){
