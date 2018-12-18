@@ -108,17 +108,6 @@ String flag = "&0";
 
 				if(collisions.size() > 1){
 					//generate regex from input
-//					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
-//					int length = affixEntryCondition.length() + 1;
-//					List<Pair<String, String>> list = bucket.get(length);
-//					//strip affixEntry's condition and collect
-//					String otherConditions = list.stream()
-//						.map(Pair::getRight)
-//						.map(condition -> condition.charAt(condition.length() - 2))
-//						.map(String::valueOf)
-//						.collect(Collectors.joining(StringUtils.EMPTY, "[^", "]"));
-//					bucket.get(1).set(0, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
-
 //TODO manage condition.length > 2 (òno with condition.charAt = n)
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
 					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
