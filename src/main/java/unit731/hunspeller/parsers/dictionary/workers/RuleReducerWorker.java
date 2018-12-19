@@ -78,6 +78,7 @@ String flag = "&0";
 			);
 			while(!entries.isEmpty()){
 				Pair<String, String> affixEntry = entries.get(0);
+				String affixEntryLine = affixEntry.getLeft();
 				String affixEntryCondition = affixEntry.getRight();
 
 				//collect all the entries that have affixEntry as last part of the condition
@@ -95,13 +96,15 @@ String flag = "&0";
 
 				if(collisions.size() > 1){
 //TODO manage condition.length > 2 (òno with condition.charAt = n)
-					//generate regex from input, perform a one-leap step through the buckets
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
+
+					//generate regex from input, perform a one-leap step through the buckets
 					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
 					List<Pair<String, String>> startingList = itr.next();
 					while(itr.hasNext()){
 						List<Pair<String, String>> nextList = itr.next();
 						if(!nextList.isEmpty()){
+							//extract the prior-to-last letter
 							int discriminatorIndex = nextList.get(0).getRight().length() - 2;
 							for(int i = 0; i < startingList.size(); i ++){
 								String startingCondition = startingList.get(i).getRight();
@@ -113,8 +116,12 @@ String flag = "&0";
 									.map(String::valueOf)
 									.sorted(comparator)
 									.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, NOT_GROUP_ENDING));
-								if(otherConditions.length() > 3)
-									startingList.set(i, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
+								if(otherConditions.length() > NOT_GROUP_STARTING.length() + NOT_GROUP_ENDING.length()){
+									//if this condition.length > affixEntryCondition + 1, then add in-between rules
+									//TODO
+
+									startingList.set(i, Pair.of(affixEntryLine, otherConditions + startingCondition));
+								}
 							}
 						}
 
@@ -125,7 +132,7 @@ String flag = "&0";
 System.out.print("collisions: ");
 collisions.forEach(System.out::println);
 //TODO
-break;
+//break;
 				}
 				else
 					aggregatedAffixEntries.add(affixEntry);
