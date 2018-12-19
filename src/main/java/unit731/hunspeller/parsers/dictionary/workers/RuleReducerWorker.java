@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,6 +14,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -43,6 +45,7 @@ String flag = "&0";
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		Comparator<String> comparator = BaseBuilder.getComparator(affParser.getLanguage());
 		Set<Pair<String, String>> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
@@ -91,8 +94,8 @@ String flag = "&0";
 				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
-					//generate regex from input
 //TODO manage condition.length > 2 (òno with condition.charAt = n)
+					//generate regex from input, perform a one-leap step through the buckets
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
 					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
 					List<Pair<String, String>> startingList = itr.next();
@@ -108,6 +111,7 @@ String flag = "&0";
 									.filter(condition -> condition.endsWith(startingCondition))
 									.map(condition -> condition.charAt(discriminatorIndex))
 									.map(String::valueOf)
+									.sorted(comparator)
 									.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, NOT_GROUP_ENDING));
 								if(otherConditions.length() > 3)
 									startingList.set(i, Pair.of(affixEntry.getLeft(), otherConditions + affixEntry.getRight()));
