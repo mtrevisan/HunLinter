@@ -140,20 +140,16 @@ String flag = "&0";
 
 					bucket.values()
 						.forEach(aggregatedAffixEntries::addAll);
-System.out.print("collisions: ");
-aggregatedAffixEntries.forEach(System.out::println);
-//TODO
-break;
 				}
 				else
 					aggregatedAffixEntries.add(affixEntry);
-				//TODO
-				//if every one else does not ends with affixEntry, then accept, otherwise collect all that matches and modify accordingly
-
-//				System.out.println(affixEntry);
 			}
-//System.out.println("--");
-//aggregatedAffixEntries.forEach(System.out::println);
+System.out.println("--");
+AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+System.out.println(composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
+aggregatedAffixEntries.stream()
+	.map(entry -> composeLine(type, flag, entry))
+	.forEach(System.out::println);
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
@@ -239,7 +235,7 @@ break;
 		return bucket.values();
 	}
 
-	public static String composeLine(String removal, String addition){
+	private String composeLine(String removal, String addition){
 		StringBuilder sb = new StringBuilder();
 		return sb.append(removal)
 			.append(StringUtils.SPACE)
@@ -247,17 +243,27 @@ break;
 			.toString();
 	}
 
-	public static String composeLine(AffixEntry.Type type, String flag, String removal, String addition, String condition){
+	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
 		StringBuilder sb = new StringBuilder();
 		return sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)
 			.append(StringUtils.SPACE)
-			.append(removal)
+			.append(isCombineable? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE)
 			.append(StringUtils.SPACE)
-			.append(addition)
+			.append(size)
+			.toString();
+	}
+
+	private String composeLine(AffixEntry.Type type, String flag, Pair<String, String> partialLine){
+		StringBuilder sb = new StringBuilder();
+		return sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
-			.append(condition)
+			.append(flag)
+			.append(StringUtils.SPACE)
+			.append(partialLine.getLeft())
+			.append(StringUtils.SPACE)
+			.append(partialLine.getRight())
 			.toString();
 	}
 
