@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.languages.BaseBuilder;
@@ -32,7 +35,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Rule reducer";
 
 	private static final String NOT_GROUP_STARTING = "[^";
-	private static final String NOT_GROUP_ENDING = "]";
+	private static final String GROUP_STARTING = "[";
+	private static final String GROUP_ENDING = "]";
 
 
 	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
@@ -95,7 +99,6 @@ String flag = "&0";
 				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
-//TODO manage condition.length > 2 (òno with condition.charAt = n)
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
 
 					//generate regex from input, perform a one-leap step through the buckets
@@ -113,12 +116,19 @@ String flag = "&0";
 									.map(Pair::getRight)
 									.filter(condition -> condition.endsWith(startingCondition))
 									.map(condition -> condition.charAt(discriminatorIndex))
+									.distinct()
 									.map(String::valueOf)
 									.sorted(comparator)
-									.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, NOT_GROUP_ENDING));
-								if(otherConditions.length() > NOT_GROUP_STARTING.length() + NOT_GROUP_ENDING.length()){
-									//if this condition.length > affixEntryCondition + 1, then add in-between rules
-									//TODO
+									.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, GROUP_ENDING));
+								if(otherConditions.length() > NOT_GROUP_STARTING.length() + GROUP_ENDING.length()){
+									//if this condition.length > startingCondition.length + 1, then add in-between rules
+									if(discriminatorIndex + 1 > startingCondition.length()){
+										//collect intermediate letters
+										Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
+
+										for(String letter : letterBucket)
+											startingList.add(Pair.of(affixEntryLine, letter));
+									}
 
 									startingList.set(i, Pair.of(affixEntryLine, otherConditions + startingCondition));
 								}
@@ -127,12 +137,13 @@ String flag = "&0";
 
 						startingList = nextList;
 					}
-//TODO
 
+					bucket.values()
+						.forEach(aggregatedAffixEntries::addAll);
 System.out.print("collisions: ");
-collisions.forEach(System.out::println);
+aggregatedAffixEntries.forEach(System.out::println);
 //TODO
-//break;
+break;
 				}
 				else
 					aggregatedAffixEntries.add(affixEntry);
@@ -183,6 +194,49 @@ collisions.forEach(System.out::println);
 			bucket.computeIfAbsent(entry.getRight().length(), k -> new ArrayList<>())
 				.add(entry);
 		return bucket;
+	}
+
+	private Collection<String> bucketForLetter(List<Pair<String, String>> entries, int index, Comparator<String> comparator){
+		//collect by letter at given index
+		Map<String, String> bucket = new HashMap<>();
+		for(Pair<String, String> entry : entries){
+			String condition = entry.getRight();
+			String key = String.valueOf(condition.charAt(index));
+			String bag = bucket.get(key);
+			if(bag != null)
+				condition = Arrays.asList(bag.charAt(index - 1), condition.charAt(index - 1)).stream()
+					.map(String::valueOf)
+					.sorted(comparator)
+					.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, GROUP_ENDING))
+					+ condition.substring(index);
+			bucket.put(key, condition);
+		}
+
+		//convert non-merged conditions
+		List<String> valuesBucket = bucket.values().stream()
+			.map(condition -> (condition.charAt(0) == '['? condition: NOT_GROUP_STARTING + condition.charAt(0) + GROUP_ENDING + condition.substring(index)))
+			.collect(Collectors.toList());
+		bucket.clear();
+
+		//merge non-merged conditions
+		for(String condition : valuesBucket){
+			int idx = condition.indexOf(GROUP_ENDING);
+			String key = condition.substring(0, idx + 1);
+			String bag = bucket.get(key);
+			if(bag != null){
+				String[] letters = (bag.charAt(idx + 1) == '['?
+					bag.substring(idx + 2, bag.indexOf(']', idx + 2)).split(StringUtils.EMPTY):
+					new String[]{String.valueOf(bag.charAt(idx + 1))});
+				letters = ArrayUtils.add(letters, String.valueOf(condition.charAt(idx + 1)));
+				condition = key
+					+ Arrays.asList(letters).stream()
+					.sorted(comparator)
+					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_STARTING, GROUP_ENDING))
+					+ condition.substring(idx + 2);
+			}
+			bucket.put(key, condition);
+		}
+		return bucket.values();
 	}
 
 	public static String composeLine(String removal, String addition){
