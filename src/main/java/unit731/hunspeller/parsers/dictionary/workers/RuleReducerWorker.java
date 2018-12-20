@@ -80,8 +80,8 @@ String flag = "v1";
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
 				productions.forEach(production -> 
-					newAffixEntries.add(isSuffix? createSuffixEntry(production, wordLength, word, lastLetter):
-						createPrefixEntry(production, wordLength, word, lastLetter))
+					newAffixEntries.add(isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
+						createPrefixEntry(production, wordLength, word, lastLetter, strategy))
 				);
 			}
 		};
@@ -234,9 +234,9 @@ String flag = "v1";
 		SFX v1 o sta/A2 o
 	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
 	*/
-	private Pair<String, String> createSuffixEntry(Production production, int wordLength, String word, String lastLetter){
+	private Pair<String, String> createSuffixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int lastCommonLetter;
-		String producedWord = production.getWord();
+		String producedWord = production.toDictionaryLine(strategy);
 		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
 			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
 				break;
@@ -248,19 +248,18 @@ String flag = "v1";
 		return Pair.of(newAffixEntry, condition);
 	}
 
-	private Pair<String, String> createPrefixEntry(Production production, int wordLength, String word, String lastLetter){
-		Pair<String, String> entry;
+	private Pair<String, String> createPrefixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int firstCommonLetter;
-		String producedWord = production.getWord();
+		String producedWord = production.toDictionaryLine(strategy);
 		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
 			if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
 				break;
+
 		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
 		String addition = producedWord.substring(0, firstCommonLetter);
 		String condition = (firstCommonLetter < wordLength? removal: lastLetter);
 		String newAffixEntry = composeLine(removal, addition);
-		entry = Pair.of(newAffixEntry, condition);
-		return entry;
+		return Pair.of(newAffixEntry, condition);
 	}
 
 	private String composeLine(String removal, String addition){

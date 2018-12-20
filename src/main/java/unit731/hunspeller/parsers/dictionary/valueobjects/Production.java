@@ -3,15 +3,25 @@ package unit731.hunspeller.parsers.dictionary.valueobjects;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.services.PatternHelper;
 
 
 public class Production extends DictionaryEntry{
+
+	private static final Pattern PATTERN_STEM = PatternHelper.pattern(MorphologicalTag.TAG_STEM + "[^\\s]+( |$)");
+
+	private static final String TAB = "\t";
+	private static final String FROM = "from";
+	private static final String LEADS_TO = " > ";
+
 
 	private List<AffixEntry> appliedRules;
 
@@ -131,7 +141,7 @@ public class Production extends DictionaryEntry{
 	public String getRulesSequence(){
 		return (appliedRules != null? appliedRules.stream()
 			.map(AffixEntry::getFlag)
-			.collect(Collectors.joining(" > ")):
+			.collect(Collectors.joining(LEADS_TO)):
 			StringUtils.EMPTY);
 	}
 
@@ -162,20 +172,40 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public String toString(){
-		return toString(null);
+		StringJoiner sj = new StringJoiner(TAB);
+		sj.add(super.toString());
+		if(hasProductionRules()){
+			sj.add(FROM);
+			sj.add(appliedRules.stream()
+				.map(AffixEntry::getFlag)
+				.collect(Collectors.joining(LEADS_TO)));
+		}
+		return sj.toString();
 	}
 
 	@Override
 	public String toString(FlagParsingStrategy strategy){
-		StringJoiner sj = new StringJoiner("\t");
+		Objects.requireNonNull(strategy);
+
+		StringJoiner sj = new StringJoiner(TAB);
 		sj.add(super.toString(strategy));
 		if(hasProductionRules()){
-			sj.add("from");
+			sj.add(FROM);
 			sj.add(appliedRules.stream()
 				.map(AffixEntry::getFlag)
-				.collect(Collectors.joining(" > ")));
+				.collect(Collectors.joining(LEADS_TO)));
 		}
 		return sj.toString();
+	}
+
+	public String toDictionaryLine(FlagParsingStrategy strategy){
+		Objects.requireNonNull(strategy);
+
+		StringJoiner sj = new StringJoiner(TAB);
+		sj.add(super.toString(strategy));
+		String line = sj.toString();
+		//remove stem
+		return PatternHelper.clear(line, PATTERN_STEM);
 	}
 
 }
