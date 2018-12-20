@@ -48,11 +48,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
+	/** NOTE: this works only if the rules produce only one output! */
 	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);
 
-String flag = "&0";
+String flag = "mf";
 		RuleEntry originalRuleEntry = (RuleEntry)affParser.getData(flag);
 		boolean isSuffix = originalRuleEntry.isSuffix();
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
@@ -69,6 +70,9 @@ String flag = "&0";
 				int wordLength = word.length();
 				String lastLetter = word.substring(wordLength - 1);
 				List<Production> productions = wordGenerator.applySingleAffixRule(word + "/" + flag);
+
+				if(productions.size() > 1)
+					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
 				productions.forEach(production -> {
 					Pair<String, String> entry;
@@ -101,8 +105,6 @@ String flag = "&0";
 
 				if(collisions.size() > 1){
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions, comparator);
-//if(bucket.size() == 3)
-//	bucket.remove(2);
 
 					//generate regex from input:
 					//perform a one-leap step through the buckets
@@ -132,23 +134,17 @@ String flag = "&0";
 
 					bucket.values()
 						.forEach(aggregatedAffixEntries::addAll);
-
-//System.out.print("collisions: ");
-//collisions.forEach(System.out::println);
-//aggregatedAffixEntries.forEach(System.out::println);
-//break;
 				}
 				else
 					aggregatedAffixEntries.add(affixEntry);
 			}
-System.out.println("--");
 AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
 aggregatedAffixEntries.stream()
 	.map(entry -> composeLine(type, flag, entry))
 	.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
-		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
 
 	private List<Pair<String, String>> collectEntries(Pair<String, String> affixEntry, List<Pair<String, String>> entries, String affixEntryCondition){
@@ -192,7 +188,7 @@ aggregatedAffixEntries.stream()
 						startingList.add(Pair.of(affixEntryLine, letter));
 
 					//merge conditions
-					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 2).split(""));
+					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 1).split(StringUtils.EMPTY));
 					other = Stream.concat(startingConditionStream, otherConditions.stream())
 						.distinct();
 					affixEntryCondition = StringUtils.join(ArrayUtils.remove(startingCondition, 0));
@@ -226,7 +222,7 @@ aggregatedAffixEntries.stream()
 				break;
 
 		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = producedWord.substring(lastCommonLetter);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
 		String condition = (lastCommonLetter < wordLength? removal: lastLetter);
 		String newAffixEntry = composeLine(removal, addition);
 		return Pair.of(newAffixEntry, condition);
