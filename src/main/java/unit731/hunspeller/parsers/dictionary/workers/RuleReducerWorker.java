@@ -76,36 +76,27 @@ String flag = "mf";
 				if(productions.size() > 1)
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
-				productions.forEach(production -> {
-					Pair<String, String> entry;
-					if(isSuffix)
-						entry = createSuffixEntry(production, wordLength, word, lastLetter);
-					else
-						entry = createPrefixEntry(production, wordLength, word, lastLetter);
-					newAffixEntries.add(entry);
-				});
+				productions.forEach(production -> 
+					newAffixEntries.add(isSuffix? createSuffixEntry(production, wordLength, word, lastLetter):
+						createPrefixEntry(production, wordLength, word, lastLetter))
+				);
 			}
 		};
 		Runnable completed = () -> {
 			//aggregate rules
 			List<Pair<String, String>> aggregatedAffixEntries = new ArrayList<>();
-
-			List<Pair<String, String>> entries = new ArrayList<>(newAffixEntries);
-			//sort entries by shortest condition
-			entries.sort((entry1, entry2) ->
-				Integer.compare(entry1.getRight().length(), entry2.getRight().length())
-			);
+			List<Pair<String, String>> entries = sortEntries(newAffixEntries);
 			while(!entries.isEmpty()){
 				Pair<String, String> affixEntry = entries.get(0);
-				String affixEntryLine = affixEntry.getLeft();
-				String affixEntryCondition = affixEntry.getRight();
 
-				List<Pair<String, String>> collisions = collectEntries(affixEntry, entries, affixEntryCondition);
+				List<Pair<String, String>> collisions = collectEntries(affixEntry, entries);
 
 				//remove matched entries
 				collisions.forEach(entry -> entries.remove(entry));
 
+				//if there are more than one collisions
 				if(collisions.size() > 1){
+					//bucket collisions by length
 					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions, comparator);
 
 					//generate regex from input:
@@ -115,7 +106,7 @@ String flag = "mf";
 					while(itr.hasNext()){
 						List<Pair<String, String>> nextList = itr.next();
 						if(!nextList.isEmpty())
-							joinConditionLists(startingList, nextList, comparator);
+							joinCollisions(startingList, nextList, comparator);
 
 						startingList = nextList;
 					}
@@ -127,30 +118,45 @@ String flag = "mf";
 						while(itr.hasNext()){
 							List<Pair<String, String>> nextList = itr.next();
 							if(!nextList.isEmpty())
-								joinConditionLists(startingList, nextList, comparator);
+								joinCollisions(startingList, nextList, comparator);
 
 							startingList = intermediateList;
 							intermediateList = nextList;
 						}
 					}
+					//three-leaps? n-leaps?
+					//TODO
 
+					//store aggregated entries
 					bucket.values()
 						.forEach(aggregatedAffixEntries::addAll);
 				}
+				//otherwise store entry and pass to the next
 				else
 					aggregatedAffixEntries.add(affixEntry);
 			}
-AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
-aggregatedAffixEntries.stream()
-	.map(entry -> composeLine(type, flag, entry))
-	.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
+
+			AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
+			aggregatedAffixEntries.stream()
+				.map(entry -> composeLine(type, flag, entry))
+				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
 		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
 
-	private List<Pair<String, String>> collectEntries(Pair<String, String> affixEntry, List<Pair<String, String>> entries, String affixEntryCondition){
+	/** Sort entries by shortest condition */
+	private List<Pair<String, String>> sortEntries(Set<Pair<String, String>> set){
+		List<Pair<String, String>> sortedList = new ArrayList<>(set);
+		sortedList.sort((entry1, entry2) ->
+			Integer.compare(entry1.getRight().length(), entry2.getRight().length())
+		);
+		return sortedList;
+	}
+
+	private List<Pair<String, String>> collectEntries(Pair<String, String> affixEntry, List<Pair<String, String>> entries){
 		//collect all the entries that have affixEntry as last part of the condition
+		String affixEntryCondition = affixEntry.getRight();
 		List<Pair<String, String>> collisions = new ArrayList<>();
 		collisions.add(affixEntry);
 		for(int i = 1; i < entries.size(); i ++){
@@ -162,7 +168,7 @@ aggregatedAffixEntries.stream()
 		return collisions;
 	}
 
-	private void joinConditionLists(List<Pair<String, String>> startingList, List<Pair<String, String>> nextList, Comparator<String> comparator){
+	private void joinCollisions(List<Pair<String, String>> startingList, List<Pair<String, String>> nextList, Comparator<String> comparator){
 		//extract the prior-to-last letter
 		int discriminatorIndex = nextList.get(0).getRight().length() - 2;
 		int size = startingList.size();
