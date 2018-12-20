@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -32,6 +32,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
@@ -66,7 +67,7 @@ String flag = "v1";
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 		Comparator<String> comparator = BaseBuilder.getComparator(affParser.getLanguage());
-		Set<Pair<String, String>> newAffixEntries = new HashSet<>();
+		Set<LineEntry> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
@@ -88,12 +89,12 @@ String flag = "v1";
 		};
 		Runnable completed = () -> {
 			//aggregate rules
-			List<Pair<String, String>> aggregatedAffixEntries = new ArrayList<>();
-			List<Pair<String, String>> entries = sortEntries(newAffixEntries);
+			List<LineEntry> aggregatedAffixEntries = new ArrayList<>();
+			List<LineEntry> entries = sortEntries(newAffixEntries);
 			while(!entries.isEmpty()){
-				Pair<String, String> affixEntry = entries.get(0);
+				LineEntry affixEntry = entries.get(0);
 
-				List<Pair<String, String>> collisions = collectEntries(affixEntry, entries);
+				List<LineEntry> collisions = collectEntries(affixEntry, entries);
 
 				//remove matched entries
 				collisions.forEach(entry -> entries.remove(entry));
@@ -101,14 +102,14 @@ String flag = "v1";
 				//if there are more than one collisions
 				if(collisions.size() > 1){
 					//bucket collisions by length
-					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions, comparator);
+					Map<Integer, List<LineEntry>> bucket = bucketForLength(collisions, comparator);
 
 					//generate regex from input:
 					//perform a one-leap step through the buckets
-					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
-					List<Pair<String, String>> startingList = itr.next();
+					Iterator<List<LineEntry>> itr = bucket.values().iterator();
+					List<LineEntry> startingList = itr.next();
 					while(itr.hasNext()){
-						List<Pair<String, String>> nextList = itr.next();
+						List<LineEntry> nextList = itr.next();
 						if(!nextList.isEmpty())
 							joinCollisions(startingList, nextList, comparator);
 
@@ -118,9 +119,9 @@ String flag = "v1";
 					itr = bucket.values().iterator();
 					startingList = itr.next();
 					if(itr.hasNext()){
-						List<Pair<String, String>> intermediateList = itr.next();
+						List<LineEntry> intermediateList = itr.next();
 						while(itr.hasNext()){
-							List<Pair<String, String>> nextList = itr.next();
+							List<LineEntry> nextList = itr.next();
 							if(!nextList.isEmpty())
 								joinCollisions(startingList, nextList, comparator);
 
@@ -150,40 +151,40 @@ String flag = "v1";
 	}
 
 	/** Sort entries by shortest condition */
-	private List<Pair<String, String>> sortEntries(Set<Pair<String, String>> set){
-		List<Pair<String, String>> sortedList = new ArrayList<>(set);
+	private List<LineEntry> sortEntries(Set<LineEntry> set){
+		List<LineEntry> sortedList = new ArrayList<>(set);
 		sortedList.sort((entry1, entry2) ->
-			Integer.compare(entry1.getRight().length(), entry2.getRight().length())
+			Integer.compare(entry1.condition.length(), entry2.condition.length())
 		);
 		return sortedList;
 	}
 
-	private List<Pair<String, String>> collectEntries(Pair<String, String> affixEntry, List<Pair<String, String>> entries){
+	private List<LineEntry> collectEntries(LineEntry affixEntry, List<LineEntry> entries){
 		//collect all the entries that have affixEntry as last part of the condition
-		String affixEntryCondition = affixEntry.getRight();
-		List<Pair<String, String>> collisions = new ArrayList<>();
+		String affixEntryCondition = affixEntry.condition;
+		List<LineEntry> collisions = new ArrayList<>();
 		collisions.add(affixEntry);
 		for(int i = 1; i < entries.size(); i ++){
-			Pair<String, String> targetAffixEntry = entries.get(i);
-			String targetAffixEntryCondition = targetAffixEntry.getRight();
+			LineEntry targetAffixEntry = entries.get(i);
+			String targetAffixEntryCondition = targetAffixEntry.condition;
 			if(targetAffixEntryCondition.endsWith(affixEntryCondition))
-				collisions.add(Pair.of(targetAffixEntry.getLeft(), targetAffixEntryCondition));
+				collisions.add(new LineEntry(targetAffixEntry.affixEntry, targetAffixEntryCondition));
 		}
 		return collisions;
 	}
 
-	private void joinCollisions(List<Pair<String, String>> startingList, List<Pair<String, String>> nextList, Comparator<String> comparator){
+	private void joinCollisions(List<LineEntry> startingList, List<LineEntry> nextList, Comparator<String> comparator){
 		//extract the prior-to-last letter
-		int discriminatorIndex = nextList.get(0).getRight().length() - 2;
+		int discriminatorIndex = nextList.get(0).condition.length() - 2;
 		int size = startingList.size();
 		for(int i = 0; i < size; i ++){
-			Pair<String, String> affixEntry = startingList.get(i);
-			String affixEntryCondition = affixEntry.getRight();
+			LineEntry affixEntry = startingList.get(i);
+			String affixEntryCondition = affixEntry.condition;
 			String[] startingCondition = RegExpSequencer.splitSequence(affixEntryCondition);
-			String affixEntryLine = affixEntry.getLeft();
+			String affixEntryLine = affixEntry.affixEntry;
 			//strip affixEntry's condition and collect
 			List<String> otherConditions = nextList.stream()
-				.map(Pair::getRight)
+				.map(entry -> entry.condition)
 				.filter(condition -> SEQUENCER.endsWith(RegExpSequencer.splitSequence(condition), startingCondition))
 				.map(condition -> condition.charAt(discriminatorIndex))
 				.distinct()
@@ -197,7 +198,7 @@ String flag = "v1";
 					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
 
 					for(String letter : letterBucket)
-						startingList.add(Pair.of(affixEntryLine, letter));
+						startingList.add(new LineEntry(affixEntryLine, letter));
 
 					//merge conditions
 					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 1).split(StringUtils.EMPTY));
@@ -210,7 +211,7 @@ String flag = "v1";
 					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
 
 					for(String letter : letterBucket)
-						startingList.add(Pair.of(affixEntryLine, letter));
+						startingList.add(new LineEntry(affixEntryLine, letter));
 
 					other = otherConditions.stream();
 				}
@@ -221,8 +222,46 @@ String flag = "v1";
 				String otherCondition = other
 					.sorted(comparator)
 					.collect(Collectors.joining());
-				startingList.set(i, Pair.of(affixEntryLine, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
+				startingList.set(i, new LineEntry(affixEntryLine, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
 			}
+		}
+	}
+
+	private class LineEntry{
+		private final String originalWord;
+		private final String affixEntry;
+		private final String condition;
+
+		LineEntry(String affixEntry, String condition){
+			this(affixEntry, condition, null);
+		}
+
+		LineEntry(String affixEntry, String condition, String originalWord){
+			this.originalWord = originalWord;
+			this.affixEntry = affixEntry;
+			this.condition = condition;
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(affixEntry)
+				.append(condition)
+				.toHashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj){
+			if(this == obj)
+				return true;
+			if(obj == null || getClass() != obj.getClass())
+				return false;
+
+			final LineEntry other = (LineEntry)obj;
+			return new EqualsBuilder()
+				.append(affixEntry, other.affixEntry)
+				.append(condition, other.condition)
+				.isEquals();
 		}
 	}
 
@@ -235,7 +274,7 @@ String flag = "v1";
 		SFX v1 o sta/A2 o
 	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
 	*/
-	private Pair<String, String> createSuffixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
+	private LineEntry createSuffixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int lastCommonLetter;
 		String producedWord = production.toDictionaryLine(strategy);
 		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
@@ -246,10 +285,10 @@ String flag = "v1";
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
 		String condition = (lastCommonLetter < wordLength? removal: lastLetter);
 		String newAffixEntry = composeLine(removal, addition);
-		return Pair.of(newAffixEntry, condition);
+		return new LineEntry(newAffixEntry, condition, word);
 	}
 
-	private Pair<String, String> createPrefixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
+	private LineEntry createPrefixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int firstCommonLetter;
 		String producedWord = production.toDictionaryLine(strategy);
 		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
@@ -260,7 +299,7 @@ String flag = "v1";
 		String addition = producedWord.substring(0, firstCommonLetter);
 		String condition = (firstCommonLetter < wordLength? removal: lastLetter);
 		String newAffixEntry = composeLine(removal, addition);
-		return Pair.of(newAffixEntry, condition);
+		return new LineEntry(newAffixEntry, condition, word);
 	}
 
 	private String composeLine(String removal, String addition){
@@ -271,23 +310,23 @@ String flag = "v1";
 			.toString();
 	}
 
-	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries, Comparator<String> comparator){
-		Map<Integer, List<Pair<String, String>>> bucket = new HashMap<>();
-		for(Pair<String, String> entry : entries)
-			bucket.computeIfAbsent(entry.getRight().length(), k -> new ArrayList<>())
+	private Map<Integer, List<LineEntry>> bucketForLength(List<LineEntry> entries, Comparator<String> comparator){
+		Map<Integer, List<LineEntry>> bucket = new HashMap<>();
+		for(LineEntry entry : entries)
+			bucket.computeIfAbsent(entry.condition.length(), k -> new ArrayList<>())
 				.add(entry);
 		//order lists
-		Comparator<Pair<String, String>> comp = (pair1, pair2) -> comparator.compare(pair1.getValue(), pair2.getValue());
-		for(Map.Entry<Integer, List<Pair<String, String>>> bag : bucket.entrySet())
+		Comparator<LineEntry> comp = (pair1, pair2) -> comparator.compare(pair1.condition, pair2.condition);
+		for(Map.Entry<Integer, List<LineEntry>> bag : bucket.entrySet())
 			bag.getValue().sort(comp);
 		return bucket;
 	}
 
-	private Collection<String> bucketForLetter(List<Pair<String, String>> entries, int index, Comparator<String> comparator){
+	private Collection<String> bucketForLetter(List<LineEntry> entries, int index, Comparator<String> comparator){
 		//collect by letter at given index
 		Map<String, String> bucket = new HashMap<>();
-		for(Pair<String, String> entry : entries){
-			String condition = entry.getRight();
+		for(LineEntry entry : entries){
+			String condition = entry.condition;
 			String key = String.valueOf(condition.charAt(index));
 			String bag = bucket.get(key);
 			if(bag != null)
@@ -338,24 +377,24 @@ String flag = "v1";
 			.toString();
 	}
 
-	private String composeLine(AffixEntry.Type type, String flag, Pair<String, String> partialLine){
+	private String composeLine(AffixEntry.Type type, String flag, LineEntry partialLine){
 		StringBuilder sb = new StringBuilder();
 		sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)
 			.append(StringUtils.SPACE);
-		String lineEnding = partialLine.getLeft();
+		String lineEnding = partialLine.affixEntry;
 		int idx = lineEnding.indexOf(TAB);
 		if(idx >= 0)
 			sb.append(lineEnding.substring(0, idx))
 				.append(StringUtils.SPACE)
-				.append(partialLine.getRight())
+				.append(partialLine.condition)
 				.append(TAB)
 				.append(lineEnding.substring(idx + 1));
 		else
 			sb.append(lineEnding)
 				.append(StringUtils.SPACE)
-				.append(partialLine.getRight());
+				.append(partialLine.condition);
 		return sb.toString();
 	}
 
