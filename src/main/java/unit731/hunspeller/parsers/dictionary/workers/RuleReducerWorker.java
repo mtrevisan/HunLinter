@@ -41,6 +41,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Rule reducer";
 
+	private static final String SLASH = "/";
+
 	private static final String NOT_GROUP_STARTING = "[^";
 	private static final String GROUP_STARTING = "[";
 	private static final String GROUP_ENDING = "]";
@@ -48,7 +50,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
-	/** NOTE: this works only if the rules produce only one output! */
+	/** NOTE: this works only if the rules produce only one output! ... for now */
 	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);
@@ -69,7 +71,7 @@ String flag = "mf";
 				String word = dicEntry.getWord();
 				int wordLength = word.length();
 				String lastLetter = word.substring(wordLength - 1);
-				List<Production> productions = wordGenerator.applySingleAffixRule(word + "/" + flag);
+				List<Production> productions = wordGenerator.applySingleAffixRule(word + SLASH + flag);
 
 				if(productions.size() > 1)
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");

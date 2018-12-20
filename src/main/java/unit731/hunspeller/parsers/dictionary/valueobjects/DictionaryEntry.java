@@ -35,6 +35,8 @@ public class DictionaryEntry{
 
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
+	private static final String TAB = "\t";
+	private static final String COMMA = ",";
 
 
 	protected String word;
@@ -258,17 +260,26 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		return toString(null);
-	}
-
-	public String toString(FlagParsingStrategy strategy){
 		StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, ","));
+			sb.append(StringUtils.join(continuationFlags, COMMA));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append("\t").append(StringUtils.join(morphologicalFields, " "));
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+		return sb.toString();
+	}
+
+	public String toString(FlagParsingStrategy strategy){
+		Objects.requireNonNull(strategy);
+
+		StringBuilder sb = new StringBuilder(word);
+		if(continuationFlags != null && continuationFlags.length > 0){
+			sb.append(SLASH);
+			sb.append(strategy.joinFlags(continuationFlags));
+		}
+		if(morphologicalFields != null && morphologicalFields.length > 0)
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
 	}
 
