@@ -95,7 +95,8 @@ String flag = "&0";
 //if(bucket.size() == 3)
 //	bucket.remove(2);
 
-					//generate regex from input, perform a one-leap step through the buckets
+					//generate regex from input:
+					//perform a one-leap step through the buckets
 					Iterator<List<Pair<String, String>>> itr = bucket.values().iterator();
 					List<Pair<String, String>> startingList = itr.next();
 					while(itr.hasNext()){
@@ -104,6 +105,20 @@ String flag = "&0";
 							joinConditionLists(startingList, nextList, comparator);
 
 						startingList = nextList;
+					}
+					//perform a two-leaps step through the buckets
+					itr = bucket.values().iterator();
+					startingList = itr.next();
+					if(itr.hasNext()){
+						List<Pair<String, String>> intermediateList = itr.next();
+						while(itr.hasNext()){
+							List<Pair<String, String>> nextList = itr.next();
+							if(!nextList.isEmpty())
+								joinConditionLists(startingList, nextList, comparator);
+
+							startingList = intermediateList;
+							intermediateList = nextList;
+						}
 					}
 
 					bucket.values()
