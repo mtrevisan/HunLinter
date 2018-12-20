@@ -55,8 +55,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(wordGenerator);
 
-String flag = "mf";
+String flag = "v1";
 		RuleEntry originalRuleEntry = (RuleEntry)affParser.getData(flag);
+		if(originalRuleEntry == null)
+			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+
 		boolean isSuffix = originalRuleEntry.isSuffix();
 		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
 		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
@@ -251,6 +254,14 @@ String flag = "mf";
 		return entry;
 	}
 
+	private String composeLine(String removal, String addition){
+		StringBuilder sb = new StringBuilder();
+		return sb.append(removal)
+			.append(StringUtils.SPACE)
+			.append(addition)
+			.toString();
+	}
+
 	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries, Comparator<String> comparator){
 		Map<Integer, List<Pair<String, String>>> bucket = new HashMap<>();
 		for(Pair<String, String> entry : entries)
@@ -304,14 +315,6 @@ String flag = "mf";
 			bucket.put(key, condition);
 		}
 		return bucket.values();
-	}
-
-	private String composeLine(String removal, String addition){
-		StringBuilder sb = new StringBuilder();
-		return sb.append(removal)
-			.append(StringUtils.SPACE)
-			.append(addition)
-			.toString();
 	}
 
 	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
