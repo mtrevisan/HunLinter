@@ -42,6 +42,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Rule reducer";
 
 	private static final String SLASH = "/";
+	private static final String TAB = "\t";
 
 	private static final String NOT_GROUP_STARTING = "[^";
 	private static final String GROUP_STARTING = "[";
@@ -339,14 +340,23 @@ String flag = "v1";
 
 	private String composeLine(AffixEntry.Type type, String flag, Pair<String, String> partialLine){
 		StringBuilder sb = new StringBuilder();
-		return sb.append(type.getFlag().getCode())
+		sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)
-			.append(StringUtils.SPACE)
-			.append(partialLine.getLeft())
-			.append(StringUtils.SPACE)
-			.append(partialLine.getRight())
-			.toString();
+			.append(StringUtils.SPACE);
+		String lineEnding = partialLine.getLeft();
+		int idx = lineEnding.indexOf(TAB);
+		if(idx >= 0)
+			sb.append(lineEnding.substring(0, idx))
+				.append(StringUtils.SPACE)
+				.append(partialLine.getRight())
+				.append(TAB)
+				.append(lineEnding.substring(idx + 1));
+		else
+			sb.append(lineEnding)
+				.append(StringUtils.SPACE)
+				.append(partialLine.getRight());
+		return sb.toString();
 	}
 
 }
