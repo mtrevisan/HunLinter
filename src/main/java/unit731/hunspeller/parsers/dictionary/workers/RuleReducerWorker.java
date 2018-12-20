@@ -225,6 +225,15 @@ String flag = "v1";
 		}
 	}
 
+	/*
+	problem:
+		SFX v1 o ista/A2 [^i]o	po:noun
+		SFX v1 o sta/A2 io	po:noun
+	would be reduced to
+		SFX v1 o ista/A2 o	po:noun
+		SFX v1 o sta/A2 o	po:noun
+	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
+	*/
 	private Pair<String, String> createSuffixEntry(Production production, int wordLength, String word, String lastLetter){
 		int lastCommonLetter;
 		String producedWord = production.getWord();
