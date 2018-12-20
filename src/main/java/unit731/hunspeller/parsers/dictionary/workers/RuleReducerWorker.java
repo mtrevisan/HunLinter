@@ -14,9 +14,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunspeller.Backbone;
+import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -32,11 +37,15 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 public class RuleReducerWorker extends WorkerDictionaryBase{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(RuleReducerWorker.class);
+
 	public static final String WORKER_NAME = "Rule reducer";
 
 	private static final String NOT_GROUP_STARTING = "[^";
 	private static final String GROUP_STARTING = "[";
 	private static final String GROUP_ENDING = "]";
+
+	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
 	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
@@ -91,7 +100,7 @@ String flag = "&0";
 				collisions.forEach(entry -> entries.remove(entry));
 
 				if(collisions.size() > 1){
-					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions);
+					Map<Integer, List<Pair<String, String>>> bucket = bucketForLength(collisions, comparator);
 //if(bucket.size() == 3)
 //	bucket.remove(2);
 
@@ -134,10 +143,10 @@ String flag = "&0";
 			}
 System.out.println("--");
 AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-System.out.println(composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
+LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
 aggregatedAffixEntries.stream()
 	.map(entry -> composeLine(type, flag, entry))
-	.forEach(System.out::println);
+	.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
 		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
 	}
@@ -161,28 +170,50 @@ aggregatedAffixEntries.stream()
 		int size = startingList.size();
 		for(int i = 0; i < size; i ++){
 			Pair<String, String> affixEntry = startingList.get(i);
-			String startingCondition = affixEntry.getRight();
+			String affixEntryCondition = affixEntry.getRight();
+			String[] startingCondition = RegExpSequencer.splitSequence(affixEntryCondition);
 			String affixEntryLine = affixEntry.getLeft();
 			//strip affixEntry's condition and collect
-			String otherConditions = nextList.stream()
+			List<String> otherConditions = nextList.stream()
 				.map(Pair::getRight)
-				.filter(condition -> condition.endsWith(startingCondition))
+				.filter(condition -> SEQUENCER.endsWith(RegExpSequencer.splitSequence(condition), startingCondition))
 				.map(condition -> condition.charAt(discriminatorIndex))
 				.distinct()
 				.map(String::valueOf)
-				.sorted(comparator)
-				.collect(Collectors.joining(StringUtils.EMPTY, NOT_GROUP_STARTING, GROUP_ENDING));
-			if(otherConditions.length() > NOT_GROUP_STARTING.length() + GROUP_ENDING.length()){
+				.collect(Collectors.toList());
+			if(!otherConditions.isEmpty()){
+				Stream<String> other;
 				//if this condition.length > startingCondition.length + 1, then add in-between rules
-				if(discriminatorIndex + 1 > startingCondition.length()){
+				if(discriminatorIndex > 0 && discriminatorIndex + 1 == SEQUENCER.length(startingCondition)){
 					//collect intermediate letters
 					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
-					
+
 					for(String letter : letterBucket)
 						startingList.add(Pair.of(affixEntryLine, letter));
+
+					//merge conditions
+					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 2).split(""));
+					other = Stream.concat(startingConditionStream, otherConditions.stream())
+						.distinct();
+					affixEntryCondition = StringUtils.join(ArrayUtils.remove(startingCondition, 0));
 				}
-				
-				startingList.set(i, Pair.of(affixEntryLine, otherConditions + startingCondition));
+				else if(discriminatorIndex + 1 > SEQUENCER.length(startingCondition)){
+					//collect intermediate letters
+					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
+
+					for(String letter : letterBucket)
+						startingList.add(Pair.of(affixEntryLine, letter));
+
+					other = otherConditions.stream();
+				}
+				else{
+					other = otherConditions.stream();
+				}
+
+				String otherCondition = other
+					.sorted(comparator)
+					.collect(Collectors.joining());
+				startingList.set(i, Pair.of(affixEntryLine, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
 			}
 		}
 	}
@@ -216,11 +247,15 @@ aggregatedAffixEntries.stream()
 		return entry;
 	}
 
-	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries){
+	private Map<Integer, List<Pair<String, String>>> bucketForLength(List<Pair<String, String>> entries, Comparator<String> comparator){
 		Map<Integer, List<Pair<String, String>>> bucket = new HashMap<>();
 		for(Pair<String, String> entry : entries)
 			bucket.computeIfAbsent(entry.getRight().length(), k -> new ArrayList<>())
 				.add(entry);
+		//order lists
+		Comparator<Pair<String, String>> comp = (pair1, pair2) -> comparator.compare(pair1.getValue(), pair2.getValue());
+		for(Map.Entry<Integer, List<Pair<String, String>>> bag : bucket.entrySet())
+			bag.getValue().sort(comp);
 		return bucket;
 	}
 

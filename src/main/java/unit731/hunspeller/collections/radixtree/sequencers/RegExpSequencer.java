@@ -45,6 +45,18 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	}
 
 	@Override
+	public boolean endsWith(String[] sequence, String[] prefix){
+		int count = prefix.length;
+		if(count > sequence.length)
+			return false;
+
+		for(int i = 1; i <= count; i ++)
+			if(!matches(sequence[sequence.length - i], prefix[prefix.length - i]))
+				return false;
+		return true;
+	}
+
+	@Override
 	public boolean equals(String[] sequenceA, String[] sequenceB){
 		if(sequenceA.length != sequenceB.length)
 			return false;

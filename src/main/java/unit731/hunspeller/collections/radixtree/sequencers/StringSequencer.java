@@ -21,6 +21,11 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
+	public boolean endsWith(String sequence, String prefix){
+		return sequence.endsWith(prefix);
+	}
+
+	@Override
 	public boolean equalsAtIndex(String sequenceA, String sequenceB, int indexA, int indexB){
 		return (sequenceA.charAt(indexA) == sequenceB.charAt(indexB));
 	}
