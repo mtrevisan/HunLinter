@@ -87,8 +87,22 @@ String flag = "v1";
 					//search newAffixEntries for collisions on condition
 					for(LineEntry entry : newAffixEntries)
 						if(entry.condition.equals(affixEntry.condition)){
-							//TODO
+							//find last different character from entry.originalWord and affixEntry.originalWord
+							int idx;
+							for(idx = 1; idx <= Math.min(entry.originalWord.length(), affixEntry.originalWord.length()); idx ++)
+								if(entry.originalWord.charAt(entry.originalWord.length() - idx) != affixEntry.originalWord.charAt(affixEntry.originalWord.length() - idx))
+									break;
 
+							if(entry.addition.endsWith(affixEntry.addition)){
+								//add another letter to the condition of entry
+								entry.condition = entry.originalWord.substring(entry.originalWord.length() - idx);
+								affixEntry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + entry.condition.substring(1);
+							}
+							else{
+								//add another letter to the condition of affixEntry
+								affixEntry.condition = affixEntry.originalWord.substring(affixEntry.originalWord.length() - idx);
+								entry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + affixEntry.condition.substring(1);
+							}
 							break;
 						}
 /*
@@ -195,7 +209,8 @@ add the negated char to the other rule (ista/A2 [^i]o)
 
 	private void joinCollisions(List<LineEntry> startingList, List<LineEntry> nextList, Comparator<String> comparator){
 		//extract the prior-to-last letter
-		int discriminatorIndex = nextList.get(0).condition.length() - 2;
+		//FIXME
+		int discriminatorIndex = RegExpSequencer.splitSequence(nextList.get(0).condition).length - 2;
 		int size = startingList.size();
 		for(int i = 0; i < size; i ++){
 			LineEntry affixEntry = startingList.get(i);
@@ -206,8 +221,9 @@ add the negated char to the other rule (ista/A2 [^i]o)
 			//strip affixEntry's condition and collect
 			List<String> otherConditions = nextList.stream()
 				.map(entry -> entry.condition)
-				.filter(condition -> SEQUENCER.endsWith(RegExpSequencer.splitSequence(condition), startingCondition))
-				.map(condition -> condition.charAt(discriminatorIndex))
+				.map(RegExpSequencer::splitSequence)
+				.filter(condition -> SEQUENCER.endsWith(condition, startingCondition))
+				.map(condition -> condition[discriminatorIndex])
 				.distinct()
 				.map(String::valueOf)
 				.collect(Collectors.toList());
@@ -252,7 +268,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 		private final String originalWord;
 		private final String removal;
 		private final String addition;
-		private final String condition;
+		private String condition;
 
 		LineEntry(String removal, String addition, String condition){
 			this(removal, addition, condition, null);
