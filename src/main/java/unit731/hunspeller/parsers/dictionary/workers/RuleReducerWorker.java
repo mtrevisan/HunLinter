@@ -272,7 +272,9 @@ String flag = "v1";
 	would be reduced to
 		SFX v1 o ista/A2 o
 		SFX v1 o sta/A2 o
-	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)? when there are addition parts that mismatches?
+	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
+	if conditions are equals and the adding parts are one inside the other, take the shorter (sta/A2), add another char to the condition (io),
+	add the negated char to the other rule (ista/A2 [^i]o)
 	*/
 	private LineEntry createSuffixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int lastCommonLetter;
