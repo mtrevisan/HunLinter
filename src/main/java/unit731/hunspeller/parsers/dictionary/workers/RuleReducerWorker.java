@@ -81,10 +81,30 @@ String flag = "v1";
 				if(productions.size() > 1)
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
-				productions.forEach(production -> 
-					newAffixEntries.add(isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
-						createPrefixEntry(production, wordLength, word, lastLetter, strategy))
-				);
+				productions.forEach(production -> {
+					LineEntry affixEntry = isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
+						createPrefixEntry(production, wordLength, word, lastLetter, strategy);
+					//search newAffixEntries for collisions on condition
+					for(LineEntry entry : newAffixEntries)
+						if(entry.condition.equals(affixEntry.condition)){
+							//TODO
+
+							break;
+						}
+/*
+problem:
+	SFX v1 o ista/A2 [^i]o
+	SFX v1 o sta/A2 io
+would be reduced to
+	SFX v1 o ista/A2 o
+	SFX v1 o sta/A2 o
+how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
+if conditions are equals and the adding parts are one inside the other, take the shorter (sta/A2), add another char to the condition (io),
+add the negated char to the other rule (ista/A2 [^i]o)
+*/
+
+					newAffixEntries.add(affixEntry);
+				});
 			}
 		};
 		Runnable completed = () -> {
@@ -168,7 +188,7 @@ String flag = "v1";
 			LineEntry targetAffixEntry = entries.get(i);
 			String targetAffixEntryCondition = targetAffixEntry.condition;
 			if(targetAffixEntryCondition.endsWith(affixEntryCondition))
-				collisions.add(new LineEntry(targetAffixEntry.affixEntry, targetAffixEntryCondition));
+				collisions.add(new LineEntry(targetAffixEntry.removal, targetAffixEntry.addition, targetAffixEntryCondition));
 		}
 		return collisions;
 	}
@@ -181,7 +201,8 @@ String flag = "v1";
 			LineEntry affixEntry = startingList.get(i);
 			String affixEntryCondition = affixEntry.condition;
 			String[] startingCondition = RegExpSequencer.splitSequence(affixEntryCondition);
-			String affixEntryLine = affixEntry.affixEntry;
+			String affixEntryRemoval = affixEntry.removal;
+			String affixEntryAddition = affixEntry.addition;
 			//strip affixEntry's condition and collect
 			List<String> otherConditions = nextList.stream()
 				.map(entry -> entry.condition)
@@ -198,7 +219,7 @@ String flag = "v1";
 					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
 
 					for(String letter : letterBucket)
-						startingList.add(new LineEntry(affixEntryLine, letter));
+						startingList.add(new LineEntry(affixEntryRemoval, affixEntryAddition, letter));
 
 					//merge conditions
 					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 1).split(StringUtils.EMPTY));
@@ -211,7 +232,7 @@ String flag = "v1";
 					Collection<String> letterBucket = bucketForLetter(nextList, discriminatorIndex, comparator);
 
 					for(String letter : letterBucket)
-						startingList.add(new LineEntry(affixEntryLine, letter));
+						startingList.add(new LineEntry(affixEntryRemoval, affixEntryAddition, letter));
 
 					other = otherConditions.stream();
 				}
@@ -222,30 +243,33 @@ String flag = "v1";
 				String otherCondition = other
 					.sorted(comparator)
 					.collect(Collectors.joining());
-				startingList.set(i, new LineEntry(affixEntryLine, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
+				startingList.set(i, new LineEntry(affixEntryRemoval, affixEntryAddition, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
 			}
 		}
 	}
 
 	private class LineEntry{
 		private final String originalWord;
-		private final String affixEntry;
+		private final String removal;
+		private final String addition;
 		private final String condition;
 
-		LineEntry(String affixEntry, String condition){
-			this(affixEntry, condition, null);
+		LineEntry(String removal, String addition, String condition){
+			this(removal, addition, condition, null);
 		}
 
-		LineEntry(String affixEntry, String condition, String originalWord){
+		LineEntry(String removal, String addition, String condition, String originalWord){
 			this.originalWord = originalWord;
-			this.affixEntry = affixEntry;
+			this.removal = removal;
+			this.addition = addition;
 			this.condition = condition;
 		}
 
 		@Override
 		public int hashCode(){
 			return new HashCodeBuilder()
-				.append(affixEntry)
+				.append(removal)
+				.append(addition)
 				.append(condition)
 				.toHashCode();
 		}
@@ -259,23 +283,13 @@ String flag = "v1";
 
 			final LineEntry other = (LineEntry)obj;
 			return new EqualsBuilder()
-				.append(affixEntry, other.affixEntry)
+				.append(removal, other.removal)
+				.append(addition, other.addition)
 				.append(condition, other.condition)
 				.isEquals();
 		}
 	}
 
-	/*
-	problem:
-		SFX v1 o ista/A2 [^i]o
-		SFX v1 o sta/A2 io
-	would be reduced to
-		SFX v1 o ista/A2 o
-		SFX v1 o sta/A2 o
-	how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
-	if conditions are equals and the adding parts are one inside the other, take the shorter (sta/A2), add another char to the condition (io),
-	add the negated char to the other rule (ista/A2 [^i]o)
-	*/
 	private LineEntry createSuffixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
 		int lastCommonLetter;
 		String producedWord = production.toDictionaryLine(strategy);
@@ -286,8 +300,7 @@ String flag = "v1";
 		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
 		String condition = (lastCommonLetter < wordLength? removal: lastLetter);
-		String newAffixEntry = composeLine(removal, addition);
-		return new LineEntry(newAffixEntry, condition, word);
+		return new LineEntry(removal, addition, condition, word);
 	}
 
 	private LineEntry createPrefixEntry(Production production, int wordLength, String word, String lastLetter, FlagParsingStrategy strategy){
@@ -300,16 +313,7 @@ String flag = "v1";
 		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
 		String addition = producedWord.substring(0, firstCommonLetter);
 		String condition = (firstCommonLetter < wordLength? removal: lastLetter);
-		String newAffixEntry = composeLine(removal, addition);
-		return new LineEntry(newAffixEntry, condition, word);
-	}
-
-	private String composeLine(String removal, String addition){
-		StringBuilder sb = new StringBuilder();
-		return sb.append(removal)
-			.append(StringUtils.SPACE)
-			.append(addition)
-			.toString();
+		return new LineEntry(removal, addition, condition, word);
 	}
 
 	private Map<Integer, List<LineEntry>> bucketForLength(List<LineEntry> entries, Comparator<String> comparator){
@@ -384,17 +388,17 @@ String flag = "v1";
 		sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)
-			.append(StringUtils.SPACE);
-		String lineEnding = partialLine.affixEntry;
-		int idx = lineEnding.indexOf(TAB);
+			.append(StringUtils.SPACE)
+			.append(partialLine.removal);
+		int idx = partialLine.addition.indexOf(TAB);
 		if(idx >= 0)
-			sb.append(lineEnding.substring(0, idx))
+			sb.append(partialLine.addition.substring(0, idx))
 				.append(StringUtils.SPACE)
 				.append(partialLine.condition)
 				.append(TAB)
-				.append(lineEnding.substring(idx + 1));
+				.append(partialLine.addition.substring(idx + 1));
 		else
-			sb.append(lineEnding)
+			sb.append(partialLine.addition)
 				.append(StringUtils.SPACE)
 				.append(partialLine.condition);
 		return sb.toString();
