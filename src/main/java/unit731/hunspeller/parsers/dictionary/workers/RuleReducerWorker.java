@@ -209,13 +209,12 @@ add the negated char to the other rule (ista/A2 [^i]o)
 
 	private void joinCollisions(List<LineEntry> startingList, List<LineEntry> nextList, Comparator<String> comparator){
 		//extract the prior-to-last letter
-		//FIXME
-		int discriminatorIndex = RegExpSequencer.splitSequence(nextList.get(0).condition).length - 2;
 		int size = startingList.size();
 		for(int i = 0; i < size; i ++){
 			LineEntry affixEntry = startingList.get(i);
 			String affixEntryCondition = affixEntry.condition;
 			String[] startingCondition = RegExpSequencer.splitSequence(affixEntryCondition);
+			int discriminatorIndex = startingCondition.length;
 			String affixEntryRemoval = affixEntry.removal;
 			String affixEntryAddition = affixEntry.addition;
 			//strip affixEntry's condition and collect
@@ -223,7 +222,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 				.map(entry -> entry.condition)
 				.map(RegExpSequencer::splitSequence)
 				.filter(condition -> SEQUENCER.endsWith(condition, startingCondition))
-				.map(condition -> condition[discriminatorIndex])
+				.map(condition -> condition[condition.length - discriminatorIndex])
 				.distinct()
 				.map(String::valueOf)
 				.collect(Collectors.toList());
