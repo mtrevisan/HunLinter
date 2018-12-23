@@ -78,7 +78,8 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		for(String part : parts){
 			int size = part.length();
 			if(size != 2 && (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?'))
-				throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : " + compoundRule);
+				throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : "
+					+ compoundRule);
 		}
 
 		return parts;

@@ -76,10 +76,14 @@ class ASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] extractCompoundRule(String compoundRule){
-		if(!ASCII_ENCODER.canEncode(compoundRule))
-			throw new IllegalArgumentException("Compound rule must be in ASCII encoding: " + compoundRule);
+		checkCompoundValidity(compoundRule);
 
 		return compoundRule.split(StringUtils.EMPTY);
+	}
+
+	private void checkCompoundValidity(String compoundRule) throws IllegalArgumentException{
+		if(!ASCII_ENCODER.canEncode(compoundRule))
+			throw new IllegalArgumentException("Compound rule must be in ASCII encoding: " + compoundRule);
 	}
 
 }

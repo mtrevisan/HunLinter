@@ -37,11 +37,23 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(textFlags))
 			return null;
 
+		//extract flags
 		String[] flags = StringUtils.split(textFlags, COMMA);
+
+		checkForDuplication(flags, textFlags);
+
+		checkForBounds(flags, textFlags);
+
+		return flags;
+	}
+
+	private void checkForDuplication(String[] flags, String textFlags) throws IllegalArgumentException{
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(unduplicatedFlags.size() < flags.length)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+	}
 
+	private void checkForBounds(String[] flags, String textFlags) throws IllegalArgumentException{
 		for(String flag : flags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);
@@ -52,7 +64,6 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 				throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + textFlags);
 			}
 		}
-		return flags;
 	}
 
 	@Override
@@ -60,29 +71,39 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
+		checkValidity(textFlags);
+
+		return String.join(COMMA, textFlags);
+	}
+
+	private void checkValidity(String[] textFlags) throws IllegalArgumentException{
 		for(String flag : textFlags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);
 				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + Arrays.deepToString(textFlags));
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from "
+						+ Arrays.deepToString(textFlags));
 			}
 			catch(NumberFormatException e){
 				throw new IllegalArgumentException("Each flag must be an integer number: " + flag + " from " + Arrays.deepToString(textFlags));
 			}
 		}
-
-		return String.join(COMMA, textFlags);
 	}
 
 	@Override
 	public String[] extractCompoundRule(String compoundRule){
 		String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
-		for(String part : parts)
-			if((part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?') && !NumberUtils.isCreatable(part))
-				throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': " + compoundRule);
+		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
+	}
+
+	private void checkCompoundValidity(String[] parts, String compoundRule) throws IllegalArgumentException{
+		for(String part : parts)
+			if((part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?') && !NumberUtils.isCreatable(part))
+				throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': "
+					+ compoundRule);
 	}
 
 }
