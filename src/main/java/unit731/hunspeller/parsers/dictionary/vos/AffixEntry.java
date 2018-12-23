@@ -45,7 +45,7 @@ public class AffixEntry{
 			this.flag = flag;
 		}
 
-		public static Type toEnum(String code){
+		public static Type createFromCode(String code){
 			return Arrays.stream(values())
 				.filter(tag -> tag.flag.getCode().equals(code))
 				.findFirst()
@@ -100,7 +100,7 @@ public class AffixEntry{
 		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
-		type = Type.toEnum(ruleType);
+		type = Type.createFromCode(ruleType);
 		String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);

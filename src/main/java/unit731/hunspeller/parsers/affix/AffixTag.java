@@ -156,7 +156,7 @@ public enum AffixTag{
 		this.code = code;
 	}
 
-	public static AffixTag toEnum(String code){
+	public static AffixTag createFromCode(String code){
 		return Arrays.stream(values())
 			.filter(tag -> tag.code.equals(code))
 			.findFirst()

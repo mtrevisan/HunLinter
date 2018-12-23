@@ -68,7 +68,7 @@ public class AffixParser extends ReadWriteLockable{
 			this.flag = flag;
 		}
 
-		public static AliasesType toEnum(String code){
+		public static AliasesType createFromCode(String code){
 			return Arrays.stream(values())
 				.filter(tag -> tag.flag.getCode().equals(code))
 				.findFirst()
@@ -98,7 +98,7 @@ public class AffixParser extends ReadWriteLockable{
 			this.flag = flag;
 		}
 
-		public static ConversionTableType toEnum(String code){
+		public static ConversionTableType createFromCode(String code){
 			return Arrays.stream(values())
 				.filter(tag -> tag.flag.getCode().equals(code))
 				.findFirst()
@@ -145,7 +145,7 @@ public class AffixParser extends ReadWriteLockable{
 				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
-				AffixTag tag = AffixTag.toEnum(lineParts[0]);
+				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.COMPOUND_RULE)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched compound rule type (expected "
 						+ AffixTag.COMPOUND_RULE + ")");
@@ -169,7 +169,7 @@ public class AffixParser extends ReadWriteLockable{
 	};
 	private final Consumer<ParsingContext> funAffix = context -> {
 		try{
-			AffixEntry.Type ruleType = AffixEntry.Type.toEnum(context.getRuleType());
+			AffixEntry.Type ruleType = AffixEntry.Type.createFromCode(context.getRuleType());
 			BufferedReader br = context.getReader();
 			boolean isSuffix = AffixEntry.Type.SUFFIX.is(context.getRuleType());
 			String ruleFlag = context.getFirstParameter();
@@ -243,7 +243,7 @@ public class AffixParser extends ReadWriteLockable{
 				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
-				AffixTag tag = AffixTag.toEnum(lineParts[0]);
+				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.BREAK)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
 						+ AffixTag.BREAK + ")");
@@ -266,7 +266,7 @@ public class AffixParser extends ReadWriteLockable{
 	};
 	private final Consumer<ParsingContext> funAliases = context -> {
 		try{
-			AliasesType aliasesType = AliasesType.toEnum(context.getRuleType());
+			AliasesType aliasesType = AliasesType.createFromCode(context.getRuleType());
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
@@ -299,7 +299,7 @@ public class AffixParser extends ReadWriteLockable{
 	};
 	private final Consumer<ParsingContext> funConversionTable = context -> {
 		try{
-			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
+			ConversionTableType conversionTableType = ConversionTableType.createFromCode(context.getRuleType());
 			AffixTag tag = conversionTableType.getFlag();
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -440,7 +440,7 @@ public class AffixParser extends ReadWriteLockable{
 						encodingRead = true;
 
 					ParsingContext context = new ParsingContext(line, br);
-					AffixTag ruleType = AffixTag.toEnum(context.getRuleType());
+					AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
 					Consumer<ParsingContext> fun = ruleFunction.get(ruleType);
 					if(fun != null){
 						try{
