@@ -25,7 +25,7 @@ import unit731.hunspeller.services.Memoizer;
  */
 public class Frequency<T>{
 
-	private final Function<Integer, Long> FN_SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
+	private final Function<Integer, Long> SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
 
 
 	private final TreeMap<T, Long> frequencies = new TreeMap<>();
@@ -136,7 +136,7 @@ public class Frequency<T>{
 	 * @return	the total frequency count.
 	 */
 	public long getSumOfFrequencies(){
-		return FN_SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
+		return SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
 	}
 
 	private long sumOfFrequencies(int hashCode){

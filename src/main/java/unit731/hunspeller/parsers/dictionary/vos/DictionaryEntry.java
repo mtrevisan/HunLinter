@@ -45,25 +45,6 @@ public class DictionaryEntry{
 	private final boolean combineable;
 
 
-	/* Clone constructor */
-	protected DictionaryEntry(DictionaryEntry dicEntry){
-		Objects.requireNonNull(dicEntry);
-
-		word = dicEntry.word;
-		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
-		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
-		combineable = dicEntry.combineable;
-	}
-
-	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
-		Objects.requireNonNull(word);
-
-		this.word = word;
-		this.continuationFlags = continuationFlags;
-		this.morphologicalFields = morphologicalFields;
-		this.combineable = combineable;
-	}
-
 	public static DictionaryEntry createFromDictionaryLine(String line, FlagParsingStrategy strategy){
 		return createFromDictionaryLineWithAliases(line, strategy, null, null);
 	}
@@ -85,6 +66,28 @@ public class DictionaryEntry{
 		String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
 		boolean combineable = true;
 		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combineable);
+	}
+
+	public static DictionaryEntry clone(DictionaryEntry dicEntry){
+		return new DictionaryEntry(dicEntry);
+	}
+
+	protected DictionaryEntry(DictionaryEntry dicEntry){
+		Objects.requireNonNull(dicEntry);
+
+		word = dicEntry.word;
+		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
+		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
+		combineable = dicEntry.combineable;
+	}
+
+	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
+		Objects.requireNonNull(word);
+
+		this.word = word;
+		this.continuationFlags = continuationFlags;
+		this.morphologicalFields = morphologicalFields;
+		this.combineable = combineable;
 	}
 
 	private static String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{

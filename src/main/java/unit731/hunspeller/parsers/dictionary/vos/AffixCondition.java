@@ -41,6 +41,7 @@ public class AffixCondition{
 				if(firstChar != '.'){
 					if(firstChar == '['){
 						boolean negatedGroup = (conditionPart.charAt(1) == '^');
+						//extract inside of group
 						conditionPart = conditionPart.substring(1 + (negatedGroup? 1: 0), conditionPart.length() - 1);
 						match = (negatedGroup ^ conditionPart.indexOf(word.charAt(idxWord)) >= 0);
 					}
