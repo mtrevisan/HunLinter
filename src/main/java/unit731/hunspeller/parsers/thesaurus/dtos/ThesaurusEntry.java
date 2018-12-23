@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.thesaurus.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import unit731.hunspeller.services.FileHelper;
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public static final String PIPE = "|";
-	public static final String POS_MEANS = PIPE + ":";
+	public static final String POS_AND_MEANS = PIPE + ":";
 	public static final String MEANS = PIPE + ",";
 
 
@@ -35,6 +36,28 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		this.meanings = meanings;
 	}
 
+	public ThesaurusEntry(String line, LineNumberReader br) throws IOException{
+		Objects.requireNonNull(line);
+		Objects.requireNonNull(br);
+
+		String[] data = StringUtils.split(line, POS_AND_MEANS);
+
+		synonym = data[0];
+		int numEntries = Integer.parseInt(data[1]);
+		meanings = new ArrayList<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			String meaning = br.readLine();
+			if(meaning == null)
+				throw new EOFException("Unexpected EOF while reading Thesaurus file");
+
+			//ignore any BOM marker on first line
+			if(i == 0)
+				meaning = FileHelper.clearBOMMarker(meaning);
+
+			meanings.add(new MeaningEntry(meaning));
+		}
+	}
+
 	public String getSynonym(){
 		return synonym;
 	}
@@ -45,28 +68,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	public void setMeanings(List<MeaningEntry> meanings){
 		this.meanings = meanings;
-	}
-
-	public ThesaurusEntry(String line, LineNumberReader br) throws IOException{
-		Objects.requireNonNull(line);
-		Objects.requireNonNull(br);
-
-		String[] data = StringUtils.split(line, POS_MEANS);
-
-		synonym = data[0];
-		int numEntries = Integer.parseInt(data[1]);
-		meanings = new ArrayList<>(numEntries);
-		for(int i = 0; i < numEntries; i ++){
-			String meaning = br.readLine();
-			if(meaning == null)
-				throw new IllegalArgumentException("Unexpected EOF while reading Thesaurus file");
-
-			//ignore any BOM marker on first line
-			if(i == 0)
-				meaning = FileHelper.clearBOMMarker(meaning);
-
-			meanings.add(new MeaningEntry(meaning));
-		}
 	}
 
 	@Override

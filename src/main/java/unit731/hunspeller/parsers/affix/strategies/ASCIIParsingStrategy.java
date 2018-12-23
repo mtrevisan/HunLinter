@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,18 +13,22 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
+	private static final CharsetEncoder ASCII_ENCODER = StandardCharsets.US_ASCII.newEncoder();
+
+
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
 			return null;
 
-		if(!StandardCharsets.US_ASCII.newEncoder().canEncode(textFlags))
+		if(!ASCII_ENCODER.canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in ASCII encoding: " + textFlags);
 
 		int size = textFlags.length();
 		String[] flags = new String[size];
 		for(int i = 0; i < size; i ++)
 			flags[i] = Character.toString(textFlags.charAt(i));
+
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(unduplicatedFlags.size() < size)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
@@ -39,7 +44,7 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!StandardCharsets.US_ASCII.newEncoder().canEncode(flag))
+			if(!ASCII_ENCODER.canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in ASCII encoding");
 		}
 
@@ -48,6 +53,9 @@ public class ASCIIParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] extractCompoundRule(String compoundRule){
+		if(!ASCII_ENCODER.canEncode(compoundRule))
+			throw new IllegalArgumentException("Compound rule must be in ASCII encoding: " + compoundRule);
+
 		return compoundRule.split(StringUtils.EMPTY);
 	}
 

@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -110,7 +111,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = br.readLine();
 			if(line == null)
-				throw new IllegalArgumentException("Dictionary file empty");
+				throw new EOFException("Unexpected EOF while reading Dictionary file");
 			
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 			

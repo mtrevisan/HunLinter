@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -22,19 +23,12 @@ public interface FlagParsingStrategy{
 
 		public static Type toEnum(String flag){
 			Type type = ASCII;
-			if(!StringUtils.isBlank(flag)){
-				type = null;
-				for(Type t : values())
-					if(flag.equals(t.getCode())){
-						type = t;
-						break;
-					}
-			}
+			if(!StringUtils.isBlank(flag))
+				type = Arrays.stream(values())
+					.filter(tag -> flag.equals(tag.code))
+					.findFirst()
+					.orElse(ASCII);
 			return type;
-		}
-
-		public String getCode(){
-			return code;
 		}
 
 		public FlagParsingStrategy getStategy(){

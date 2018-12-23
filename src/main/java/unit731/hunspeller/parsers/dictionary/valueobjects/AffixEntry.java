@@ -53,6 +53,10 @@ public class AffixEntry{
 			return null;
 		}
 
+		public boolean is(String flag){
+			return this.flag.getCode().equals(flag);
+		}
+
 		public AffixTag getFlag(){
 			return flag;
 		}

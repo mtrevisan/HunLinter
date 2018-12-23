@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -119,6 +120,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		File dicFile = dicParser.getDicFile();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = br.readLine();
+			if(line == null)
+				throw new EOFException("Unexpected EOF while reading Dictionary file");
 
 			long readSoFar = line.getBytes(charset).length + 2;
 
@@ -184,8 +187,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
 					line = FileHelper.clearBOMMarker(line);
-				if(!NumberUtils.isCreatable(line))
-					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 				int lineIndex = 1;
 				long totalSize = dicFile.length();

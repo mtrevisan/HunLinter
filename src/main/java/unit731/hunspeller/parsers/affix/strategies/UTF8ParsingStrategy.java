@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,12 +13,15 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
+	private static final CharsetEncoder UTF_8_ENCODER = StandardCharsets.UTF_8.newEncoder();
+
+
 	@Override
 	public String[] parseFlags(String textFlags){
 		if(StringUtils.isBlank(textFlags))
 			return null;
 
-		if(!StandardCharsets.UTF_8.newEncoder().canEncode(textFlags))
+		if(!UTF_8_ENCODER.canEncode(textFlags))
 			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
 
 		int size = textFlags.length();
@@ -39,7 +43,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!StandardCharsets.UTF_8.newEncoder().canEncode(flag))
+			if(!UTF_8_ENCODER.canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
 		}
 
@@ -48,7 +52,7 @@ public class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	@Override
 	public String[] extractCompoundRule(String compoundRule){
-		if(!StandardCharsets.UTF_8.newEncoder().canEncode(compoundRule))
+		if(!UTF_8_ENCODER.canEncode(compoundRule))
 			throw new IllegalArgumentException("Compound rule must be in UTF-8 encoding: " + compoundRule);
 
 		return compoundRule.split(StringUtils.EMPTY);

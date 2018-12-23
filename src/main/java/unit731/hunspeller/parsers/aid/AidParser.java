@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import unit731.hunspeller.services.FileHelper;
@@ -25,10 +26,11 @@ public class AidParser extends ReadWriteLockable{
 	public void parse(File aidFile) throws IOException{
 		acquireWriteLock();
 		try{
-			clear();
+			lines.clear();
 
-			Charset charset = FileHelper.determineCharset(aidFile.toPath());
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(aidFile.toPath(), charset))){
+			Path path = aidFile.toPath();
+			Charset charset = FileHelper.determineCharset(path);
+			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(path, charset))){
 				String line;
 				while((line = br.readLine()) != null){
 					//ignore any BOM marker on first line

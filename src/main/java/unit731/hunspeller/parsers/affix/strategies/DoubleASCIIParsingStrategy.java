@@ -40,6 +40,7 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	public String joinFlags(String[] textFlags){
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
+
 		for(String flag : textFlags)
 			if(flag == null || flag.length() != 2)
 				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
@@ -51,9 +52,11 @@ public class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	public String[] extractCompoundRule(String compoundRule){
 		String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
-		for(String part : parts)
-			if(part.length() != 2 && (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?'))
+		for(String part : parts){
+			int size = part.length();
+			if(size != 2 && (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?'))
 				throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : " + compoundRule);
+		}
 
 		return parts;
 	}

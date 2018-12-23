@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.affix;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -10,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,16 +67,20 @@ public class AffixParser extends ReadWriteLockable{
 
 		private final AffixTag flag;
 
+
 		AliasesType(AffixTag flag){
 			this.flag = flag;
 		}
 
-		public static AliasesType toEnum(String flag){
-			AliasesType[] types = AliasesType.values();
-			for(AliasesType type : types)
-				if(type.getFlag().getCode().equals(flag))
-					return type;
-			return null;
+		public static AliasesType toEnum(String code){
+			return Arrays.stream(values())
+				.filter(tag -> tag.flag.getCode().equals(code))
+				.findFirst()
+				.orElse(null);
+		}
+
+		public boolean is(String flag){
+			return this.flag.getCode().equals(flag);
 		}
 
 		public AffixTag getFlag(){
@@ -91,16 +97,16 @@ public class AffixParser extends ReadWriteLockable{
 
 		private final AffixTag flag;
 
+
 		ConversionTableType(AffixTag flag){
 			this.flag = flag;
 		}
 
-		public static ConversionTableType toEnum(String flag){
-			ConversionTableType[] types = ConversionTableType.values();
-			for(ConversionTableType type : types)
-				if(type.getFlag().getCode().equals(flag))
-					return type;
-			return null;
+		public static ConversionTableType toEnum(String code){
+			return Arrays.stream(values())
+				.filter(tag -> tag.flag.getCode().equals(code))
+				.findFirst()
+				.orElse(null);
 		}
 
 		public AffixTag getFlag(){
@@ -140,6 +146,9 @@ public class AffixParser extends ReadWriteLockable{
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
 				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
@@ -169,7 +178,7 @@ public class AffixParser extends ReadWriteLockable{
 		try{
 			AffixEntry.Type ruleType = AffixEntry.Type.toEnum(context.getRuleType());
 			BufferedReader br = context.getReader();
-			boolean isSuffix = context.isSuffix();
+			boolean isSuffix = AffixEntry.Type.SUFFIX.is(context.getRuleType());
 			String ruleFlag = context.getFirstParameter();
 			char combineable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
@@ -187,6 +196,9 @@ public class AffixParser extends ReadWriteLockable{
 			List<AffixEntry> entries = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
 				line = DictionaryParser.cleanLine(line);
 
 				AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
@@ -236,6 +248,9 @@ public class AffixParser extends ReadWriteLockable{
 			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
 				line = DictionaryParser.cleanLine(line);
 
 				String[] lineParts = StringUtils.split(line);
@@ -275,13 +290,16 @@ public class AffixParser extends ReadWriteLockable{
 			List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
 				line = DictionaryParser.cleanLine(line);
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 2)
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
-				if(!aliasesType.getFlag().getCode().equals(parts[0]))
+				if(!aliasesType.is(parts[0]))
 					throw new IllegalArgumentException("Error reading line \"" + context.toString()
 						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
 
@@ -310,6 +328,9 @@ public class AffixParser extends ReadWriteLockable{
 			List<Pair<String, String>> conversionTable = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
 				line = DictionaryParser.cleanLine(line);
 
 				String[] parts = StringUtils.split(line);

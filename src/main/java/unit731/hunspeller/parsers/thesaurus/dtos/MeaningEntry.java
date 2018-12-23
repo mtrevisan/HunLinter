@@ -28,35 +28,31 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		this.meanings = meanings;
 	}
 
-	public MeaningEntry(String synonymAndMeanings){
-		Objects.requireNonNull(synonymAndMeanings);
+	public MeaningEntry(String partOfSpeechAndMeanings){
+		Objects.requireNonNull(partOfSpeechAndMeanings);
 
 		try{
-			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
+			String[] components = StringUtils.split(partOfSpeechAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 
-			partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-			if(!partOfSpeech.startsWith("(") || !partOfSpeech.endsWith(")"))
-				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + synonymAndMeanings);
+			partOfSpeech = StringUtils.strip(components[0]);
+			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
+				throw new IllegalArgumentException("Part of speech is not in parenthesis: " + partOfSpeechAndMeanings);
 
-			this.meanings = Arrays.stream(StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.POS_MEANS))
+			meanings = Arrays.stream(StringUtils.split(components[1], ThesaurusEntry.POS_AND_MEANS))
 				.map(String::trim)
 				.filter(StringUtils::isNotBlank)
 				.distinct()
 				.collect(Collectors.toList());
-			if(this.meanings.size() < 1)
-				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
+			if(meanings.size() < 1)
+				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + partOfSpeechAndMeanings);
 		}
 		catch(ArrayIndexOutOfBoundsException e){
-			throw new IllegalArgumentException(e.getMessage() + " with input \"" + synonymAndMeanings + "\"");
+			throw new IllegalArgumentException(e.getMessage() + " with input \"" + partOfSpeechAndMeanings + "\"");
 		}
 	}
 
 	public String getPartOfSpeech(){
 		return partOfSpeech;
-	}
-
-	public List<String> getMeanings(){
-		return meanings;
 	}
 
 	@Override

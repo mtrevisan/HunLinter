@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.hyphenation;
 
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -211,6 +212,9 @@ public class HyphenationParser extends ReadWriteLockable{
 			Charset charset = FileHelper.determineCharset(hypPath);
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(hypPath, charset))){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Hyphenation file");
+
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
 					line = FileHelper.clearBOMMarker(line);

@@ -5,6 +5,7 @@ import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -93,6 +94,9 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 			Charset charset = FileHelper.determineCharset(theFile.toPath());
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
 				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Thesaurus file");
+
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
 					line = FileHelper.clearBOMMarker(line);
@@ -138,7 +142,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
 		acquireWriteLock();
 		try{
-			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_MEANS, 2);
+			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 			if(partOfSpeechAndMeanings.length != 2)
 				throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
 

@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -86,7 +87,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					){
 				String line = br.readLine();
 				if(line == null)
-					throw new IllegalArgumentException("Dictionary file empty");
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
 
 				long readSoFar = line.getBytes(charset).length + 2;
 

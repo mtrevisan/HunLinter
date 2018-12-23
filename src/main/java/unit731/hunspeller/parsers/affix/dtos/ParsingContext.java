@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.affix.dtos;
 
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.io.BufferedReader;
 import java.util.Arrays;
 import java.util.Objects;
@@ -31,10 +30,6 @@ public class ParsingContext{
 		return definitionParts[0];
 	}
 
-	public boolean isSuffix(){
-		return AffixEntry.Type.SUFFIX.getFlag().getCode().equals(getRuleType());
-	}
-
 	public String getFirstParameter(){
 		return definitionParts[1];
 	}
@@ -51,7 +46,7 @@ public class ParsingContext{
 		return String.join(StringUtils.SPACE, Arrays.asList(definitionParts).subList(1, definitionParts.length));
 	}
 
-	public int getRuleLength(){
+	public int getRuleSize(){
 		String part = getFirstParameter();
 		return (StringUtils.isNumeric(part)? Integer.parseInt(part): 0);
 	}
