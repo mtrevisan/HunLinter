@@ -10,17 +10,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -123,25 +119,22 @@ public class AffixParser extends ReadWriteLockable{
 	private final Set<String> terminalAffixes = new HashSet<>();
 
 
-	private final Consumer<ParsingContext> FUN_COPY_OVER = context -> {
+	private final Consumer<ParsingContext> funCopyOver = context -> {
 		addData(context.getRuleType(), context.getAllButFirstParameter());
 	};
-	private final Consumer<ParsingContext> FUN_COPY_OVER_AS_NUMBER = context -> {
+	private final Consumer<ParsingContext> funCopyOverAsNumber = context -> {
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException("Error reading line \"" + context.toString()
-				+ "\": The first parameter is not a number");
+			throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 		addData(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
 	};
-	private final Consumer<ParsingContext> FUN_COMPOUND_RULE = context -> {
+	private final Consumer<ParsingContext> funCompoundRule = context -> {
 		try{
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ "\": The first parameter is not a number");
+				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -174,7 +167,7 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-	private final Consumer<ParsingContext> FUN_AFFIX = context -> {
+	private final Consumer<ParsingContext> funAffix = context -> {
 		try{
 			AffixEntry.Type ruleType = AffixEntry.Type.toEnum(context.getRuleType());
 			BufferedReader br = context.getReader();
@@ -182,12 +175,10 @@ public class AffixParser extends ReadWriteLockable{
 			String ruleFlag = context.getFirstParameter();
 			char combineable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ "\": The third parameter is not a number");
+				throw new IllegalArgumentException("Error reading line \"" + context + "\": The third parameter is not a number");
 			int numEntries = Integer.parseInt(context.getThirdParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 //List<AffixEntry> prefixEntries = new ArrayList<>();
 //List<AffixEntry> suffixEntries = new ArrayList<>();
@@ -234,16 +225,14 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-	private final Consumer<ParsingContext> FUN_WORD_BREAK_TABLE = context -> {
+	private final Consumer<ParsingContext> funWordBreakTable = context -> {
 		try{
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ "\": The first parameter is not a number");
+				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -275,17 +264,15 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-	private final Consumer<ParsingContext> FUN_ALIASES = context -> {
+	private final Consumer<ParsingContext> funAliases = context -> {
 		try{
 			AliasesType aliasesType = AliasesType.toEnum(context.getRuleType());
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ "\": The first parameter is not a number");
+				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 			List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -297,11 +284,9 @@ public class AffixParser extends ReadWriteLockable{
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 2)
-					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
+					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be <tag> <flag/morphological field>");
 				if(!aliasesType.is(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
+					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad tag, it must be " + aliasesType.getFlag().getCode());
 
 				aliases.add(parts[1]);
 			}
@@ -312,18 +297,16 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-	private final Consumer<ParsingContext> FUN_CONVERSION_TABLE = context -> {
+	private final Consumer<ParsingContext> funConversionTable = context -> {
 		try{
 			ConversionTableType conversionTableType = ConversionTableType.toEnum(context.getRuleType());
 			AffixTag tag = conversionTableType.getFlag();
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ "\": The first parameter is not a number");
+				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 			int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context.toString()
-					+ ": Bad number of entries, it must be a positive integer");
+				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 			List<Pair<String, String>> conversionTable = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -335,11 +318,9 @@ public class AffixParser extends ReadWriteLockable{
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 3)
-					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
+					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
 				if(!tag.getCode().equals(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context.toString()
-						+ ": Bad tag, it must be " + tag.getCode());
+					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad tag, it must be " + tag.getCode());
 
 				conversionTable.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
@@ -351,77 +332,81 @@ public class AffixParser extends ReadWriteLockable{
 		}
 	};
 
-	private final Map<AffixTag, Consumer<ParsingContext>> RULE_FUNCTION = new HashMap<>();
+	private final Map<AffixTag, Consumer<ParsingContext>> ruleFunction = new HashMap<>();
+
+	private ConversionTable replacementTable;
+	private ConversionTable inputConversionTable;
+	private ConversionTable outputConversionTable;
 
 
 	public AffixParser(){
 		//General options
-//		RULE_FUNCTION.put("NAME", FUN_COPY_OVER);
-//		RULE_FUNCTION.put("VERSION", FUN_COPY_OVER);
-//		RULE_FUNCTION.put("HOME", FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.CHARACTER_SET, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPLEX_PREFIXES, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.LANGUAGE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.IGNORE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.ALIASES_FLAG, FUN_ALIASES);
-		RULE_FUNCTION.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, FUN_ALIASES);
+//		ruleFunction.put("NAME", funCopyOver);
+//		ruleFunction.put("VERSION", funCopyOver);
+//		ruleFunction.put("HOME", funCopyOver);
+		ruleFunction.put(AffixTag.CHARACTER_SET, funCopyOver);
+		ruleFunction.put(AffixTag.FLAG, funCopyOver);
+		ruleFunction.put(AffixTag.COMPLEX_PREFIXES, funCopyOver);
+		ruleFunction.put(AffixTag.LANGUAGE, funCopyOver);
+//		ruleFunction.put(AffixTag.IGNORE, funCopyOver);
+		ruleFunction.put(AffixTag.ALIASES_FLAG, funAliases);
+		ruleFunction.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, funAliases);
 
 		//Options for suggestions
-//		RULE_FUNCTION.put(AffixTag.KEY, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.TRY, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.NO_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.MAX_COMPOUND_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.MAX_NGRAM_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.NO_SPLIT_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.NO_NGRAM_SUGGEST, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.SUGGESTIONS_WITH_DOTS, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.REPLACEMENT_TABLE, FUN_CONVERSION_TABLE);
-//		RULE_FUNCTION.put(AffixTag.MAP_TABLE, FUN_MAP);
-//		RULE_FUNCTION.put(AffixTag.PHONE_TABLE, FUN_MAP);
-//		RULE_FUNCTION.put(AffixTag.WARN, FUN_MAP);
-//		RULE_FUNCTION.put(AffixTag.FORBID_WARN, FUN_MAP);
+//		ruleFunction.put(AffixTag.KEY, funCopyOver);
+//		ruleFunction.put(AffixTag.TRY, funCopyOver);
+		ruleFunction.put(AffixTag.NO_SUGGEST, funCopyOver);
+//		ruleFunction.put(AffixTag.MAX_COMPOUND_SUGGEST, funCopyOver);
+//		ruleFunction.put(AffixTag.MAX_NGRAM_SUGGEST, funCopyOver);
+//		ruleFunction.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, funCopyOver);
+//		ruleFunction.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, funCopyOver);
+//		ruleFunction.put(AffixTag.NO_SPLIT_SUGGEST, funCopyOver);
+//		ruleFunction.put(AffixTag.NO_NGRAM_SUGGEST, funCopyOver);
+//		ruleFunction.put(AffixTag.SUGGESTIONS_WITH_DOTS, funCopyOver);
+		ruleFunction.put(AffixTag.REPLACEMENT_TABLE, funConversionTable);
+//		ruleFunction.put(AffixTag.MAP_TABLE, funMap);
+//		ruleFunction.put(AffixTag.PHONE_TABLE, funMap);
+//		ruleFunction.put(AffixTag.WARN, funMap);
+//		ruleFunction.put(AffixTag.FORBID_WARN, funMap);
 
 		//Options for compounding
-		RULE_FUNCTION.put(AffixTag.BREAK, FUN_WORD_BREAK_TABLE);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_RULE, FUN_COMPOUND_RULE);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_MIN, FUN_COPY_OVER_AS_NUMBER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_BEGIN, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_MIDDLE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_END, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.ONLY_IN_COMPOUND, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_PERMIT_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_FORBID_FLAG, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_MORE_SUFFIXES, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_ROOT, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.COMPOUND_WORD_MAX, FUN_COPY_OVER_AS_NUMBER);
-		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_DUPLICATION, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_CASE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_TRIPLE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.SIMPLIFIED_TRIPLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.CHECK_COMPOUND_PATTERN, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.FORCE_UPPERCASE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.COMPOUND_SYLLABLE, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.SYLLABLE_NUMBER, FUN_COPY_OVER);
+		ruleFunction.put(AffixTag.BREAK, funWordBreakTable);
+		ruleFunction.put(AffixTag.COMPOUND_RULE, funCompoundRule);
+		ruleFunction.put(AffixTag.COMPOUND_MIN, funCopyOverAsNumber);
+		ruleFunction.put(AffixTag.COMPOUND_FLAG, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_BEGIN, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_MIDDLE, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_END, funCopyOver);
+		ruleFunction.put(AffixTag.ONLY_IN_COMPOUND, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_PERMIT_FLAG, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_FORBID_FLAG, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_MORE_SUFFIXES, funCopyOver);
+//		ruleFunction.put(AffixTag.COMPOUND_ROOT, funCopyOver);
+		ruleFunction.put(AffixTag.COMPOUND_WORD_MAX, funCopyOverAsNumber);
+		ruleFunction.put(AffixTag.CHECK_COMPOUND_DUPLICATION, funCopyOver);
+		ruleFunction.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, funCopyOver);
+		ruleFunction.put(AffixTag.CHECK_COMPOUND_CASE, funCopyOver);
+		ruleFunction.put(AffixTag.CHECK_COMPOUND_TRIPLE, funCopyOver);
+		ruleFunction.put(AffixTag.SIMPLIFIED_TRIPLE, funCopyOver);
+//		ruleFunction.put(AffixTag.CHECK_COMPOUND_PATTERN, funCopyOver);
+		ruleFunction.put(AffixTag.FORCE_UPPERCASE, funCopyOver);
+//		ruleFunction.put(AffixTag.COMPOUND_SYLLABLE, funCopyOver);
+//		ruleFunction.put(AffixTag.SYLLABLE_NUMBER, funCopyOver);
 
 //Options for affix creation
-		RULE_FUNCTION.put(AffixTag.PREFIX, FUN_AFFIX);
-		RULE_FUNCTION.put(AffixTag.SUFFIX, FUN_AFFIX);
+		ruleFunction.put(AffixTag.PREFIX, funAffix);
+		ruleFunction.put(AffixTag.SUFFIX, funAffix);
 
 		//Other options
-		RULE_FUNCTION.put(AffixTag.CIRCUMFIX, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.FORBIDDEN_WORD, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.FULLSTRIP, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.KEEP_CASE, FUN_COPY_OVER);
-		RULE_FUNCTION.put(AffixTag.INPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
-		RULE_FUNCTION.put(AffixTag.OUTPUT_CONVERSION_TABLE, FUN_CONVERSION_TABLE);
-		RULE_FUNCTION.put(AffixTag.NEED_AFFIX, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.WORD_CHARS, FUN_COPY_OVER);
-//		RULE_FUNCTION.put(AffixTag.CHECK_SHARPS, FUN_COPY_OVER);
+		ruleFunction.put(AffixTag.CIRCUMFIX, funCopyOver);
+		ruleFunction.put(AffixTag.FORBIDDEN_WORD, funCopyOver);
+		ruleFunction.put(AffixTag.FULLSTRIP, funCopyOver);
+		ruleFunction.put(AffixTag.KEEP_CASE, funCopyOver);
+		ruleFunction.put(AffixTag.INPUT_CONVERSION_TABLE, funConversionTable);
+		ruleFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, funConversionTable);
+		ruleFunction.put(AffixTag.NEED_AFFIX, funCopyOver);
+//		ruleFunction.put(AffixTag.WORD_CHARS, funCopyOver);
+//		ruleFunction.put(AffixTag.CHECK_SHARPS, funCopyOver);
 	}
 
 	/**
@@ -456,7 +441,7 @@ public class AffixParser extends ReadWriteLockable{
 
 					ParsingContext context = new ParsingContext(line, br);
 					AffixTag ruleType = AffixTag.toEnum(context.getRuleType());
-					Consumer<ParsingContext> fun = RULE_FUNCTION.get(ruleType);
+					Consumer<ParsingContext> fun = ruleFunction.get(ruleType);
 					if(fun != null){
 						try{
 							fun.accept(context);
@@ -533,6 +518,10 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getKeepCaseFlag());
 			terminalAffixes.add(getNeedAffixFlag());
+
+			replacementTable = new ConversionTable(getData(AffixTag.REPLACEMENT_TABLE));
+			inputConversionTable = new ConversionTable(getData(AffixTag.INPUT_CONVERSION_TABLE));
+			outputConversionTable = new ConversionTable(getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 		}
 		finally{
 			releaseWriteLock();
@@ -714,108 +703,15 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	public String applyReplacementTable(String word){
-		return applyConversionTable(word, getData(AffixTag.REPLACEMENT_TABLE));
+		return replacementTable.applyConversionTable(word);
 	}
 
 	public String applyInputConversionTable(String word){
-		return applyConversionTable(word, getData(AffixTag.INPUT_CONVERSION_TABLE));
+		return inputConversionTable.applyConversionTable(word);
 	}
 
 	public String applyOutputConversionTable(String word){
-		return applyConversionTable(word, getData(AffixTag.OUTPUT_CONVERSION_TABLE));
-	}
-
-	private String applyConversionTable(String word, List<Pair<String, String>> table){
-		if(table != null){
-			//collect input patterns that matches the given word
-			List<Pair<String, String>> appliablePatterns = collectInputPatterns(table, word);
-
-			for(Pair<String, String> entry : appliablePatterns){
-				String key = entry.getKey();
-				String value = entry.getValue();
-
-				if(key.charAt(0) == '^')
-					word = value + word.substring(key.length() - 1);
-				else if(key.charAt(key.length() - 1) == '$')
-					word = word.substring(0, word.length() - key.length() + 1) + value;
-				else
-					word = StringUtils.replace(word, key, value);
-			}
-		}
-		return word;
-	}
-
-	private List<Pair<String, String>> collectInputPatterns(List<Pair<String, String>> table, String word){
-		List<Pair<String, String>> startPatterns = new ArrayList<>();
-		List<Pair<String, String>> insidePatterns = new ArrayList<>();
-		List<Pair<String, String>> endPatterns = new ArrayList<>();
-		StringBuilder sb = new StringBuilder();
-		for(Pair<String, String> entry : table){
-			String key = entry.getKey();
-			String value = entry.getValue();
-			
-			if(key.charAt(0) == '^'){
-				key = key.substring(1);
-				if(word.startsWith(key))
-					startPatterns.add(Pair.of(key, value));
-			}
-			else if(key.charAt(key.length() - 1) == '$'){
-				key = key.substring(0, key.length() - 1);
-				if(word.endsWith(key)){
-					sb.setLength(0);
-					key = sb.append(key)
-						.reverse()
-						.toString();
-					endPatterns.add(Pair.of(key, value));
-				}
-			}
-			else if(word.contains(key))
-				insidePatterns.add(Pair.of(key, value));
-		}
-
-		//keep only the longest input pattern
-		startPatterns = keepLongestInputPattern(startPatterns, key -> {
-			sb.setLength(0);
-			return sb.append('^').append(key).toString();
-		});
-		insidePatterns = keepLongestInputPattern(insidePatterns, Function.identity());
-		endPatterns = keepLongestInputPattern(endPatterns, key -> {
-			sb.setLength(0);
-			return sb.append(key).reverse().append('$').toString();
-		});
-
-		startPatterns.addAll(insidePatterns);
-		startPatterns.addAll(endPatterns);
-		return startPatterns;
-	}
-
-	private List<Pair<String, String>> keepLongestInputPattern(List<Pair<String, String>> table, Function<String, String> keyRemapper){
-		List<Pair<String, String>> result = table;
-		if(!table.isEmpty()){
-			table.sort(Comparator.comparing(entry -> entry.getKey().length()));
-
-			int size = table.size();
-			for(int i = 0; i < size; i ++){
-				Pair<String, String> entry = table.get(i);
-				if(entry != null){
-					String key = entry.getKey();
-					for(int j = i + 1; j < size; j ++){
-						Pair<String, String> entry2 = table.get(j);
-						if(entry2 != null){
-							String key2 = entry2.getKey();
-							if(key2.startsWith(key))
-								table.set(i, null);
-						}
-					}
-				}
-			}
-
-			result = table.stream()
-				.filter(Objects::nonNull)
-				.map(entry -> Pair.of(keyRemapper.apply(entry.getKey()), entry.getValue()))
-				.collect(Collectors.toList());
-		}
-		return result;
+		return outputConversionTable.applyConversionTable(word);
 	}
 
 	public Set<String> getWordBreakCharacters(){
