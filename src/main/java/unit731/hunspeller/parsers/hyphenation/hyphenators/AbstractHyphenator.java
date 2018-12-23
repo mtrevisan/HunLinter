@@ -16,7 +16,7 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
-import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptions;
+import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 import unit731.hunspeller.services.PatternHelper;
 
 

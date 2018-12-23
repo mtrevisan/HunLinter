@@ -13,7 +13,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 

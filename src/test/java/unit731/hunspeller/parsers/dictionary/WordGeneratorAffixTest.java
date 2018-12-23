@@ -10,7 +10,7 @@ import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.FileHelper;
 
 

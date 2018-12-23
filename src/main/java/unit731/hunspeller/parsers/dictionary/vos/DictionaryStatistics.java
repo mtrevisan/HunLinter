@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary.valueobjects;
+package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.hyphenation.valueobjects;
+package unit731.hunspeller.parsers.hyphenation.vos;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

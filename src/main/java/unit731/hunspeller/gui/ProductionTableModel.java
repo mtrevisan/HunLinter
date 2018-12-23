@@ -6,8 +6,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
 public class ProductionTableModel extends AbstractTableModel implements HunspellerTableModel<Production>{

@@ -1,10 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.util.AbstractMap;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
-import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +24,10 @@ import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.PermutationsWithRepetitions;

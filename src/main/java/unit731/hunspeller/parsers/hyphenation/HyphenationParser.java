@@ -31,7 +31,7 @@ import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.hyphenation.valueobjects.HyphenationOptionsParser;
+import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;

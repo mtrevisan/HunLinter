@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
-import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -12,7 +11,8 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 

@@ -1,7 +1,7 @@
 package unit731.hunspeller.languages.valueobjects;
 
 import java.text.MessageFormat;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
 public class LetterMatcherEntry{

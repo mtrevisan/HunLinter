@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
 public class Duplicate{

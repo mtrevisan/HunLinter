@@ -29,9 +29,9 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.DictionaryEntry;
-import unit731.hunspeller.parsers.dictionary.valueobjects.Production;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
+import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 

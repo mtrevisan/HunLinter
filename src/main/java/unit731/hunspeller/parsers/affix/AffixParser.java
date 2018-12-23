@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.affix;
 
-import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
@@ -28,11 +26,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.parsers.dictionary.valueobjects.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
+import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
