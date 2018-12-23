@@ -23,8 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
-import unit731.hunspeller.parsers.affix.strategies.ASCIIParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -114,7 +114,7 @@ public class AffixParser extends ReadWriteLockable{
 
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
-	private FlagParsingStrategy strategy = new ASCIIParsingStrategy();
+	private FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 
 	private final Set<String> terminalAffixes = new HashSet<>();
 
@@ -449,7 +449,7 @@ public class AffixParser extends ReadWriteLockable{
 							if(ruleType == AffixTag.FLAG){
 								String flag = getFlag();
 								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
-								strategy = FlagParsingStrategy.Type.toEnum(flag).getStategy();
+								strategy = ParsingStrategyFactory.createFromFlag(flag);
 								if(strategy == null)
 									throw new IllegalArgumentException("Unknown flag type: " + flag);
 							}
@@ -568,7 +568,7 @@ public class AffixParser extends ReadWriteLockable{
 		acquireWriteLock();
 		try{
 			data.clear();
-			strategy = new ASCIIParsingStrategy();
+			strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 			terminalAffixes.clear();
 		}
 		finally{

@@ -13,7 +13,7 @@ import unit731.hunspeller.services.PatternHelper;
  * Implementation of {@link FlagParsingStrategy} that assumes each flag is encoded in its numerical form. In the case
  * of multiple flags, each number is separated by a comma.
  */
-public class NumericalParsingStrategy implements FlagParsingStrategy{
+class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final int MAX_NUMERICAL_FLAG = 65_000;
 
@@ -21,6 +21,16 @@ public class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private static final Pattern COMPOUND_RULE_SPLITTER = PatternHelper.pattern("\\((\\d+)\\)|([?*])");
 
+	private static class SingletonHelper{
+		private static final NumericalParsingStrategy INSTANCE = new NumericalParsingStrategy();
+	}
+
+
+	public static synchronized NumericalParsingStrategy getInstance(){
+		return SingletonHelper.INSTANCE;
+	}
+
+	private NumericalParsingStrategy(){}
 
 	@Override
 	public String[] parseFlags(String textFlags){

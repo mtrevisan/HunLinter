@@ -1,15 +1,15 @@
 package unit731.hunspeller.parsers.strategies;
 
-import unit731.hunspeller.parsers.affix.strategies.NumericalParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
 public class NumericalParsingStrategyTest{
 
-	private final FlagParsingStrategy strategy = new NumericalParsingStrategy();
+	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createNumericalParsingStrategy();
 
 
 	@Test

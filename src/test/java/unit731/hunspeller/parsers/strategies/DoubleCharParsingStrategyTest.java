@@ -1,15 +1,15 @@
 package unit731.hunspeller.parsers.strategies;
 
-import unit731.hunspeller.parsers.affix.strategies.DoubleASCIIParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
 public class DoubleCharParsingStrategyTest{
 
-	private final FlagParsingStrategy strategy = new DoubleASCIIParsingStrategy();
+	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createDoubleASCIIParsingStrategy();
 
 
 	@Test

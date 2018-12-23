@@ -1,42 +1,8 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
-import java.util.Arrays;
-import org.apache.commons.lang3.StringUtils;
-
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files */
 public interface FlagParsingStrategy{
-
-	static enum Type{
-		ASCII(null, new ASCIIParsingStrategy()),
-		UTF_8("UTF-8", new UTF8ParsingStrategy()),
-		LONG("long", new DoubleASCIIParsingStrategy()),
-		NUMERIC("num", new NumericalParsingStrategy());
-
-		private final String code;
-		private final FlagParsingStrategy stategy;
-
-		Type(String code, FlagParsingStrategy stategy){
-			this.code = code;
-			this.stategy = stategy;
-		}
-
-		public static Type toEnum(String flag){
-			Type type = ASCII;
-			if(!StringUtils.isBlank(flag))
-				type = Arrays.stream(values())
-					.filter(tag -> flag.equals(tag.code))
-					.findFirst()
-					.orElse(ASCII);
-			return type;
-		}
-
-		public FlagParsingStrategy getStategy(){
-			return stategy;
-		}
-
-	};
-
 
 	/**
 	 * Parses the given String into multiple flags

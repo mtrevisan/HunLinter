@@ -11,10 +11,20 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Simple implementation of {@link FlagParsingStrategy} that treats the chars in each String as a individual flags.
  */
-public class UTF8ParsingStrategy implements FlagParsingStrategy{
+class UTF8ParsingStrategy implements FlagParsingStrategy{
 
 	private static final CharsetEncoder UTF_8_ENCODER = StandardCharsets.UTF_8.newEncoder();
 
+	private static class SingletonHelper{
+		private static final UTF8ParsingStrategy INSTANCE = new UTF8ParsingStrategy();
+	}
+
+
+	public static synchronized UTF8ParsingStrategy getInstance(){
+		return SingletonHelper.INSTANCE;
+	}
+
+	private UTF8ParsingStrategy(){}
 
 	@Override
 	public String[] parseFlags(String textFlags){

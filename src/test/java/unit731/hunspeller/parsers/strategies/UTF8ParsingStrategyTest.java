@@ -1,15 +1,15 @@
 package unit731.hunspeller.parsers.strategies;
 
-import unit731.hunspeller.parsers.affix.strategies.UTF8ParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
 public class UTF8ParsingStrategyTest{
 
-	private final FlagParsingStrategy strategy = new UTF8ParsingStrategy();
+	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createUTF8ParsingStrategy();
 
 
 	@Test
