@@ -446,13 +446,9 @@ public class AffixParser extends ReadWriteLockable{
 						try{
 							fun.accept(context);
 
-							if(ruleType == AffixTag.FLAG){
-								String flag = getFlag();
+							if(ruleType == AffixTag.FLAG)
 								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
-								strategy = ParsingStrategyFactory.createFromFlag(flag);
-								if(strategy == null)
-									throw new IllegalArgumentException("Unknown flag type: " + flag);
-							}
+								strategy = ParsingStrategyFactory.createFromFlag(getFlag());
 						}
 						catch(RuntimeException e){
 							throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
