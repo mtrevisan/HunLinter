@@ -85,38 +85,18 @@ public class AffixParser extends ReadWriteLockable{
 
 	}
 
-	private static enum ConversionTableType{
-		REPLACEMENT(AffixTag.REPLACEMENT_TABLE),
-		INPUT(AffixTag.INPUT_CONVERSION_TABLE),
-		OUTPUT(AffixTag.OUTPUT_CONVERSION_TABLE);
-
-
-		private final AffixTag flag;
-
-
-		ConversionTableType(AffixTag flag){
-			this.flag = flag;
-		}
-
-		public static ConversionTableType createFromCode(String code){
-			return Arrays.stream(values())
-				.filter(tag -> tag.flag.getCode().equals(code))
-				.findFirst()
-				.orElse(null);
-		}
-
-		public AffixTag getFlag(){
-			return flag;
-		}
-
-	}
-
 
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
 	private FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 
 	private final Set<String> terminalAffixes = new HashSet<>();
+
+	private final Map<AffixTag, Consumer<ParsingContext>> ruleFunction = new HashMap<>();
+
+	private final ConversionTable replacementTable = new ConversionTable(AffixTag.REPLACEMENT_TABLE);
+	private final ConversionTable inputConversionTable = new ConversionTable(AffixTag.INPUT_CONVERSION_TABLE);
+	private final ConversionTable outputConversionTable = new ConversionTable(AffixTag.OUTPUT_CONVERSION_TABLE);
 
 
 	private final Consumer<ParsingContext> funCopyOver = context -> {
@@ -297,46 +277,6 @@ public class AffixParser extends ReadWriteLockable{
 			throw new RuntimeException(e.getMessage());
 		}
 	};
-	private final Consumer<ParsingContext> funConversionTable = context -> {
-		try{
-			ConversionTableType conversionTableType = ConversionTableType.createFromCode(context.getRuleType());
-			AffixTag tag = conversionTableType.getFlag();
-			BufferedReader br = context.getReader();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-
-			List<Pair<String, String>> conversionTable = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
-
-				String[] parts = StringUtils.split(line);
-				if(parts.length != 3)
-					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
-				if(!tag.getCode().equals(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad tag, it must be " + tag.getCode());
-
-				conversionTable.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
-			}
-
-			addData(tag, conversionTable);
-		}
-		catch(IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	};
-
-	private final Map<AffixTag, Consumer<ParsingContext>> ruleFunction = new HashMap<>();
-
-	private ConversionTable replacementTable;
-	private ConversionTable inputConversionTable;
-	private ConversionTable outputConversionTable;
 
 
 	public AffixParser(){
@@ -363,7 +303,7 @@ public class AffixParser extends ReadWriteLockable{
 //		ruleFunction.put(AffixTag.NO_SPLIT_SUGGEST, funCopyOver);
 //		ruleFunction.put(AffixTag.NO_NGRAM_SUGGEST, funCopyOver);
 //		ruleFunction.put(AffixTag.SUGGESTIONS_WITH_DOTS, funCopyOver);
-		ruleFunction.put(AffixTag.REPLACEMENT_TABLE, funConversionTable);
+		ruleFunction.put(AffixTag.REPLACEMENT_TABLE, replacementTable::parseConversionTable);
 //		ruleFunction.put(AffixTag.MAP_TABLE, funMap);
 //		ruleFunction.put(AffixTag.PHONE_TABLE, funMap);
 //		ruleFunction.put(AffixTag.WARN, funMap);
@@ -402,8 +342,8 @@ public class AffixParser extends ReadWriteLockable{
 		ruleFunction.put(AffixTag.FORBIDDEN_WORD, funCopyOver);
 		ruleFunction.put(AffixTag.FULLSTRIP, funCopyOver);
 		ruleFunction.put(AffixTag.KEEP_CASE, funCopyOver);
-		ruleFunction.put(AffixTag.INPUT_CONVERSION_TABLE, funConversionTable);
-		ruleFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, funConversionTable);
+		ruleFunction.put(AffixTag.INPUT_CONVERSION_TABLE, inputConversionTable::parseConversionTable);
+		ruleFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, outputConversionTable::parseConversionTable);
 		ruleFunction.put(AffixTag.NEED_AFFIX, funCopyOver);
 //		ruleFunction.put(AffixTag.WORD_CHARS, funCopyOver);
 //		ruleFunction.put(AffixTag.CHECK_SHARPS, funCopyOver);
@@ -420,6 +360,10 @@ public class AffixParser extends ReadWriteLockable{
 		acquireWriteLock();
 		try{
 			clearData();
+
+			addData(replacementTable.getAffixTag().getCode(), replacementTable);
+			addData(inputConversionTable.getAffixTag().getCode(), inputConversionTable);
+			addData(outputConversionTable.getAffixTag().getCode(), outputConversionTable);
 
 			boolean encodingRead = false;
 			charset = FileHelper.determineCharset(affFile.toPath());
@@ -514,10 +458,6 @@ public class AffixParser extends ReadWriteLockable{
 			terminalAffixes.add(getCircumfixFlag());
 			terminalAffixes.add(getKeepCaseFlag());
 			terminalAffixes.add(getNeedAffixFlag());
-
-			replacementTable = new ConversionTable(getData(AffixTag.REPLACEMENT_TABLE));
-			inputConversionTable = new ConversionTable(getData(AffixTag.INPUT_CONVERSION_TABLE));
-			outputConversionTable = new ConversionTable(getData(AffixTag.OUTPUT_CONVERSION_TABLE));
 		}
 		finally{
 			releaseWriteLock();
@@ -694,7 +634,7 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	//FIXME to remove?
-	public List<Pair<String, String>> getReplacementTable(){
+	public ConversionTable getReplacementTable(){
 		return getData(AffixTag.REPLACEMENT_TABLE);
 	}
 

@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -28,7 +29,8 @@ public class DictionaryParserTest{
 			"REP alot a_lot");
 		affParser.parse(affFile);
 
-		List<Pair<String, String>> replacementTable = affParser.getData(AffixTag.REPLACEMENT_TABLE);
+		ConversionTable table = affParser.getData(AffixTag.REPLACEMENT_TABLE);
+		List<Pair<String, String>> replacementTable = table.getTable();
 
 		List<Pair<String, String>> expected = new ArrayList<>();
 		expected.add(Pair.of("^b", "bb"));

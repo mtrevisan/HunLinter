@@ -23,6 +23,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
@@ -103,7 +104,7 @@ public class WordGenerator{
 			int size = productions.size();
 			for(int i = 0; i < size; i ++){
 				Production production = productions.get(i);
-				production.applyConversionTable(affParser::applyInputConversionTable);
+				production.applyConversionTable(affParser::applyOutputConversionTable);
 			}
 
 			if(LOGGER.isTraceEnabled())
@@ -126,7 +127,7 @@ public class WordGenerator{
 		int size = productions.size();
 		for(int i = 0; i < size; i ++){
 			Production production = productions.get(i);
-			production.applyConversionTable(affParser::applyInputConversionTable);
+			production.applyConversionTable(affParser::applyOutputConversionTable);
 		}
 
 		if(LOGGER.isTraceEnabled())
@@ -540,7 +541,8 @@ public class WordGenerator{
 			if(word.contains(cr))
 				return true;
 
-		List<Pair<String, String>> replacementTable = affParser.getReplacementTable();
+		ConversionTable table = affParser.getReplacementTable();
+		List<Pair<String, String>> replacementTable = table.getTable();
 		if(word.length() >= 2 && replacementTable != null && !replacementTable.isEmpty())
 			for(Pair<String, String> entry : replacementTable){
 				String pattern = entry.getKey();

@@ -1,5 +1,8 @@
 package unit731.hunspeller.parsers.affix;
 
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -7,16 +10,64 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class ConversionTable{
 
-	private final List<Pair<String, String>> table;
+	private final AffixTag affixTag;
+	private List<Pair<String, String>> table;
 
 
-	public ConversionTable(List<Pair<String, String>> table){
-		this.table = table;
+	public ConversionTable(AffixTag affixTag){
+		this.affixTag = affixTag;
+	}
+
+	public AffixTag getAffixTag(){
+		return affixTag;
+	}
+
+	//FIXME do not expose this table!
+	public List<Pair<String, String>> getTable(){
+		return table;
+	}
+
+	public void parseConversionTable(ParsingContext context){
+		try{
+			BufferedReader br = context.getReader();
+			if(!NumberUtils.isCreatable(context.getFirstParameter()))
+				throw new IllegalArgumentException("Error reading line \"" + context
+					+ "\": The first parameter is not a number");
+			int numEntries = Integer.parseInt(context.getFirstParameter());
+			if(numEntries <= 0)
+				throw new IllegalArgumentException("Error reading line \"" + context
+					+ ": Bad number of entries, it must be a positive integer");
+
+			table = new ArrayList<>(numEntries);
+			for(int i = 0; i < numEntries; i ++){
+				String line = br.readLine();
+				if(line == null)
+					throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+				line = DictionaryParser.cleanLine(line);
+
+				String[] parts = StringUtils.split(line);
+				if(parts.length != 3)
+					throw new IllegalArgumentException("Error reading line \"" + context
+						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
+				if(!affixTag.getCode().equals(parts[0]))
+					throw new IllegalArgumentException("Error reading line \"" + context
+						+ ": Bad tag, it must be " + affixTag.getCode());
+
+				table.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
+			}
+		}
+		catch(IOException e){
+			throw new RuntimeException(e.getMessage());
+		}
 	}
 
 	public String applyConversionTable(String word){

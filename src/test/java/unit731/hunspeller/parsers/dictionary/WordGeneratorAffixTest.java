@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.FileHelper;
@@ -51,7 +52,8 @@ public class WordGeneratorAffixTest{
 			"	 # tab+space");
 		loadData(affFile.getAbsolutePath());
 
-		List<Pair<String, String>> outputConversionTable = backbone.getAffParser().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		ConversionTable table = backbone.getAffParser().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		List<Pair<String, String>> outputConversionTable = table.getTable();
 
 		List<Pair<String, String>> expected = new ArrayList<>();
 		expected.add(Pair.of("a", "A"));
