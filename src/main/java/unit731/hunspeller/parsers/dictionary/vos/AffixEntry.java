@@ -45,12 +45,11 @@ public class AffixEntry{
 			this.flag = flag;
 		}
 
-		public static Type toEnum(String flag){
-			Type[] types = Type.values();
-			for(Type type : types)
-				if(type.getFlag().getCode().equals(flag))
-					return type;
-			return null;
+		public static Type toEnum(String code){
+			return Arrays.stream(values())
+				.filter(tag -> tag.flag.getCode().equals(code))
+				.findFirst()
+				.orElse(null);
 		}
 
 		public boolean is(String flag){
