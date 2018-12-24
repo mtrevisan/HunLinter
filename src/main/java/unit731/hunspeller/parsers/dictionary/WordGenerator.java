@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -541,29 +540,16 @@ public class WordGenerator{
 			if(word.contains(cr))
 				return true;
 
-		ConversionTable table = affParser.getReplacementTable();
-		List<Pair<String, String>> replacementTable = table.getTable();
-		if(word.length() >= 2 && replacementTable != null && !replacementTable.isEmpty())
-			for(Pair<String, String> entry : replacementTable){
-				String pattern = entry.getKey();
-				String value = entry.getValue();
+		if(word.length() >= 2){
+			ConversionTable table = affParser.getReplacementTable();
+			List<String> conversions = table.generateConversions(word);
+			for(String candidate : conversions)
+				if(dicInclusionTestWorker.isInDictionary(candidate)){
+					compoundAsReplacement.add(word);
 
-				int idx = -1;
-				int patternLength = pattern.length();
-				StringBuilder sb = new StringBuilder();
-				//search every occurence of the pattern in the word
-				while((idx = word.indexOf(pattern, idx + 1)) >= 0){
-					sb.setLength(0);
-					sb.append(word);
-					sb.replace(idx, idx + patternLength, value);
-					String candidate = sb.toString();
-					if(dicInclusionTestWorker.isInDictionary(candidate)){
-						compoundAsReplacement.add(word);
-
-						return true;
-					}
+					return true;
 				}
-			}
+		}
 		return exists;
 	}
 

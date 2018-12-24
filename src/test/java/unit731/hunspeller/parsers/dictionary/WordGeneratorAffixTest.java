@@ -53,17 +53,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		ConversionTable table = backbone.getAffParser().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
-		List<Pair<String, String>> outputConversionTable = table.getTable();
-
-		List<Pair<String, String>> expected = new ArrayList<>();
-		expected.add(Pair.of("a", "A"));
-		expected.add(Pair.of("á", "Á"));
-		expected.add(Pair.of("b", "B"));
-		expected.add(Pair.of("c", "C"));
-		expected.add(Pair.of("d", "D"));
-		expected.add(Pair.of("e", "E"));
-		expected.add(Pair.of("é", "É"));
-		Assert.assertEquals(expected, outputConversionTable);
+		Assert.assertEquals("[affixTag=OUTPUT_CONVERSION_TABLE,table=[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]]", table.toString());
 	}
 
 

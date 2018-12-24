@@ -30,11 +30,6 @@ public class ConversionTable{
 		return affixTag;
 	}
 
-	//FIXME do not expose this table!
-	public List<Pair<String, String>> getTable(){
-		return table;
-	}
-
 	public void parseConversionTable(ParsingContext context){
 		try{
 			BufferedReader br = context.getReader();
@@ -161,6 +156,35 @@ public class ConversionTable{
 				.collect(Collectors.toList());
 		}
 		return result;
+	}
+
+	public List<String> generateConversions(String word){
+		List<String> conversions = new ArrayList<>();
+		if(table != null && !table.isEmpty())
+			for(Pair<String, String> entry : table){
+				String pattern = entry.getKey();
+				String value = entry.getValue();
+
+				int idx = -1;
+				int patternLength = pattern.length();
+				StringBuilder sb = new StringBuilder();
+				//search every occurence of the pattern in the word
+				while((idx = word.indexOf(pattern, idx + 1)) >= 0){
+					sb.setLength(0);
+					sb.append(word);
+					sb.replace(idx, idx + patternLength, value);
+					conversions.add(sb.toString());
+				}
+			}
+		return conversions;
+	}
+
+	@Override
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("[affixTag=").append(affixTag).append(',');
+		sb.append("table=").append(table).append(']');
+		return sb.toString();
 	}
 
 }

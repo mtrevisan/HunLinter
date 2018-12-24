@@ -2,9 +2,6 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -30,14 +27,7 @@ public class DictionaryParserTest{
 		affParser.parse(affFile);
 
 		ConversionTable table = affParser.getData(AffixTag.REPLACEMENT_TABLE);
-		List<Pair<String, String>> replacementTable = table.getTable();
-
-		List<Pair<String, String>> expected = new ArrayList<>();
-		expected.add(Pair.of("^b", "bb"));
-		expected.add(Pair.of("e$", "ee"));
-		expected.add(Pair.of("ij", "IJ"));
-		expected.add(Pair.of("alot", "a lot"));
-		Assert.assertEquals(expected, replacementTable);
+		Assert.assertEquals("[affixTag=REPLACEMENT_TABLE,table=[(^b,bb), (e$,ee), (ij,IJ), (alot,a lot)]]", table.toString());
 
 		String replaced = affParser.applyReplacementTable("clea");
 		Assert.assertEquals("clea", replaced);
