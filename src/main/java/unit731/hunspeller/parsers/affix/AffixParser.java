@@ -181,7 +181,7 @@ public class AffixParser extends ReadWriteLockable{
 
 					ParsingContext context = new ParsingContext(line, br);
 					AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
-					Handler handler = PARSING_HANDLERS.get(ruleType);
+					Handler handler = lookupHandlerByRuleType(ruleType);
 					if(handler != null){
 						try{
 							handler.parse(context, strategy, this::addData, this::getData);
@@ -251,6 +251,10 @@ public class AffixParser extends ReadWriteLockable{
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B
+	}
+
+	private Handler lookupHandlerByRuleType(AffixTag ruleType){
+		return PARSING_HANDLERS.get(ruleType);
 	}
 
 	public void clear(){

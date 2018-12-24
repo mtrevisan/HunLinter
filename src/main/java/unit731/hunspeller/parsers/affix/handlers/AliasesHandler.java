@@ -33,12 +33,8 @@ public class AliasesHandler implements Handler{
 				String line = extractLine(br);
 
 				String[] parts = StringUtils.split(line);
-				if(parts.length != 2)
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
-				if(!context.getRuleType().equals(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad tag, it must be " + context.getRuleType());
+
+				checkValidity(parts, context);
 
 				aliases.add(parts[1]);
 			}
@@ -48,6 +44,15 @@ public class AliasesHandler implements Handler{
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	private void checkValidity(String[] parts, ParsingContext context) throws IllegalArgumentException{
+		if(parts.length != 2)
+			throw new IllegalArgumentException("Error reading line \"" + context
+				+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
+		if(!context.getRuleType().equals(parts[0]))
+			throw new IllegalArgumentException("Error reading line \"" + context
+				+ ": Bad tag, it must be " + context.getRuleType());
 	}
 
 	private String extractLine(BufferedReader br) throws IOException, EOFException{

@@ -42,11 +42,13 @@ public class WordBreakTableHandler implements Handler{
 				if(tag != AffixTag.BREAK)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
 						+ AffixTag.BREAK + ")");
+
 				String breakCharacter = lineParts[1];
-				if(StringUtils.isBlank(breakCharacter))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
 				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
 					breakCharacter = HyphenationParser.EN_DASH;
+
+				if(StringUtils.isBlank(breakCharacter))
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
 
 				boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)

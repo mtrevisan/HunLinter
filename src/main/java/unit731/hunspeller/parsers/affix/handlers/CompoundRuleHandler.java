@@ -34,18 +34,15 @@ public class CompoundRuleHandler implements Handler{
 				String line = extractLine(br);
 
 				String[] lineParts = StringUtils.split(line);
+
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.COMPOUND_RULE)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
 						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
+
 				String rule = lineParts[1];
-				if(StringUtils.isBlank(rule))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": compound rule type cannot be empty");
-				String[] compounds = strategy.extractCompoundRule(rule);
-				if(compounds.length == 0)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": compound rule is bad formatted");
+
+				checkValidity(rule, line, i, strategy);
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
@@ -66,6 +63,16 @@ public class CompoundRuleHandler implements Handler{
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
 	
 		return DictionaryParser.cleanLine(line);
+	}
+
+	private void checkValidity(String rule, String line, int i, FlagParsingStrategy strategy) throws IllegalArgumentException{
+		if(StringUtils.isBlank(rule))
+			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+				+ ": compound rule type cannot be empty");
+		String[] compounds = strategy.extractCompoundRule(rule);
+		if(compounds.length == 0)
+			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+				+ ": compound rule is bad formatted");
 	}
 	
 }
