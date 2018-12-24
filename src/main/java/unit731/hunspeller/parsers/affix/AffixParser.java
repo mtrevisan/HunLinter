@@ -60,108 +60,93 @@ public class AffixParser extends ReadWriteLockable{
 	private static final Pattern PATTERN_ISO639_1 = PatternHelper.pattern("([a-z]{2})");
 	private static final Pattern PATTERN_ISO639_2 = PatternHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
+	private static final Handler COPY_OVER = new CopyOverHandler();
+	private static final Handler COPY_OVER_AS_NUMBER = new CopyOverAsNumberHandler();
+	private static final Handler COMPOUND_RULE = new CompoundRuleHandler();
+	private static final Handler AFFIX = new AffixHandler();
+	private static final Handler WORD_BREAK_TABLE = new WordBreakTableHandler();
+	private static final Handler ALIASES = new AliasesHandler();
+	private static final Handler REPLACEMENT_TABLE = new ConversionTableHandler(AffixTag.REPLACEMENT_TABLE);
+	private static final Handler INPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixTag.INPUT_CONVERSION_TABLE);
+	private static final Handler OUTPUT_CONVERSION_TABLE = new ConversionTableHandler(AffixTag.OUTPUT_CONVERSION_TABLE);
+
+	private static final Map<AffixTag, Handler> PARSING_HANDLERS = new HashMap<>();
+	static{
+		//General options
+//		PARSING_HANDLERS.put("NAME", COPY_OVER);
+//		PARSING_HANDLERS.put("VERSION", COPY_OVER);
+//		PARSING_HANDLERS.put("HOME", COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.CHARACTER_SET, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPLEX_PREFIXES, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.LANGUAGE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.IGNORE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.ALIASES_FLAG, ALIASES);
+		PARSING_HANDLERS.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, ALIASES);
+
+		//Options for suggestions
+//		PARSING_HANDLERS.put(AffixTag.KEY, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.TRY, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.NO_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.MAX_COMPOUND_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.NO_SPLIT_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.NO_NGRAM_SUGGEST, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.SUGGESTIONS_WITH_DOTS, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.REPLACEMENT_TABLE, REPLACEMENT_TABLE);
+//		PARSING_HANDLERS.put(AffixTag.MAP_TABLE, MAP);
+//		PARSING_HANDLERS.put(AffixTag.PHONE_TABLE, MAP);
+//		PARSING_HANDLERS.put(AffixTag.WARN, MAP);
+//		PARSING_HANDLERS.put(AffixTag.FORBID_WARN, MAP);
+
+		//Options for compounding
+		PARSING_HANDLERS.put(AffixTag.BREAK, WORD_BREAK_TABLE);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_RULE, COMPOUND_RULE);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIN, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_BEGIN, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIDDLE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_END, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.ONLY_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_PERMIT_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_FORBID_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MORE_SUFFIXES, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.COMPOUND_ROOT, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_WORD_MAX, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_DUPLICATION, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_CASE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_TRIPLE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.SIMPLIFIED_TRIPLE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_PATTERN, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORCE_UPPERCASE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.COMPOUND_SYLLABLE, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.SYLLABLE_NUMBER, COPY_OVER);
+
+		//Options for affix creation
+		PARSING_HANDLERS.put(AffixTag.PREFIX, AFFIX);
+		PARSING_HANDLERS.put(AffixTag.SUFFIX, AFFIX);
+
+		//Other options
+		PARSING_HANDLERS.put(AffixTag.CIRCUMFIX, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBIDDEN_WORD, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FULLSTRIP, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.KEEP_CASE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.INPUT_CONVERSION_TABLE, INPUT_CONVERSION_TABLE);
+		PARSING_HANDLERS.put(AffixTag.OUTPUT_CONVERSION_TABLE, OUTPUT_CONVERSION_TABLE);
+		PARSING_HANDLERS.put(AffixTag.NEED_AFFIX, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.WORD_CHARS, COPY_OVER);
+//		PARSING_HANDLERS.put(AffixTag.CHECK_SHARPS, COPY_OVER);
+	}
+
 
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
 	private FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-
 	private final Set<String> terminalAffixes = new HashSet<>();
 
-	private final Map<AffixTag, String> parsingFunction = new HashMap<>();
-
-	private static final String PARSING_HANDLER_KEY_COPY_OVER = "copyOver";
-	private static final String PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER = "copyOverAsNumber";
-	private static final String PARSING_HANDLER_KEY_COMPOUND_RULE = "compoundRule";
-	private static final String PARSING_HANDLER_KEY_AFFIX = "affix";
-	private static final String PARSING_HANDLER_KEY_WORD_BREAK_TABLE = "wordBreakTable";
-	private static final String PARSING_HANDLER_KEY_ALIASES = "aliases";
-	private static final String PARSING_HANDLER_KEY_REPLACEMENT_TABLE = "replacementTable";
-	private static final String PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE = "inputConversionTable";
-	private static final String PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE = "outputConversionTable";
-
-	private static final Map<String, Handler> PARSING_HANDLERS = new HashMap<>();
-	static{
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COPY_OVER, new CopyOverHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER, new CopyOverAsNumberHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COMPOUND_RULE, new CompoundRuleHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_AFFIX, new AffixHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_WORD_BREAK_TABLE, new WordBreakTableHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_ALIASES, new AliasesHandler());
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_REPLACEMENT_TABLE, new ConversionTableHandler(AffixTag.REPLACEMENT_TABLE));
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE, new ConversionTableHandler(AffixTag.INPUT_CONVERSION_TABLE));
-		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE, new ConversionTableHandler(AffixTag.OUTPUT_CONVERSION_TABLE));
-	}
-
-
-	public AffixParser(){
-		//General options
-//		ruleFunction.put("NAME", PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put("VERSION", PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put("HOME", PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.CHARACTER_SET, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.FLAG, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPLEX_PREFIXES, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.LANGUAGE, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.IGNORE, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.ALIASES_FLAG, PARSING_HANDLER_KEY_ALIASES);
-		parsingFunction.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, PARSING_HANDLER_KEY_ALIASES);
-
-		//Options for suggestions
-//		ruleFunction.put(AffixTag.KEY, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.TRY, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.NO_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.MAX_COMPOUND_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.MAX_NGRAM_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.NO_SPLIT_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.NO_NGRAM_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.SUGGESTIONS_WITH_DOTS, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.REPLACEMENT_TABLE, PARSING_HANDLER_KEY_REPLACEMENT_TABLE);
-//		ruleFunction.put(AffixTag.MAP_TABLE, PARSING_HANDLER_KEY_MAP);
-//		ruleFunction.put(AffixTag.PHONE_TABLE, PARSING_HANDLER_KEY_MAP);
-//		ruleFunction.put(AffixTag.WARN, PARSING_HANDLER_KEY_MAP);
-//		ruleFunction.put(AffixTag.FORBID_WARN, PARSING_HANDLER_KEY_MAP);
-
-		//Options for compounding
-		parsingFunction.put(AffixTag.BREAK, PARSING_HANDLER_KEY_WORD_BREAK_TABLE);
-		parsingFunction.put(AffixTag.COMPOUND_RULE, PARSING_HANDLER_KEY_COMPOUND_RULE);
-		parsingFunction.put(AffixTag.COMPOUND_MIN, PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER);
-		parsingFunction.put(AffixTag.COMPOUND_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_BEGIN, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_MIDDLE, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_END, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.ONLY_IN_COMPOUND, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_PERMIT_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_FORBID_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_MORE_SUFFIXES, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.COMPOUND_ROOT, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.COMPOUND_WORD_MAX, PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER);
-		parsingFunction.put(AffixTag.CHECK_COMPOUND_DUPLICATION, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.CHECK_COMPOUND_CASE, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.CHECK_COMPOUND_TRIPLE, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.SIMPLIFIED_TRIPLE, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.CHECK_COMPOUND_PATTERN, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.FORCE_UPPERCASE, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.COMPOUND_SYLLABLE, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.SYLLABLE_NUMBER, PARSING_HANDLER_KEY_COPY_OVER);
-
-//Options for affix creation
-		parsingFunction.put(AffixTag.PREFIX, PARSING_HANDLER_KEY_AFFIX);
-		parsingFunction.put(AffixTag.SUFFIX, PARSING_HANDLER_KEY_AFFIX);
-
-		//Other options
-		parsingFunction.put(AffixTag.CIRCUMFIX, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.FORBIDDEN_WORD, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.FULLSTRIP, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.KEEP_CASE, PARSING_HANDLER_KEY_COPY_OVER);
-		parsingFunction.put(AffixTag.INPUT_CONVERSION_TABLE, PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE);
-		parsingFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE);
-		parsingFunction.put(AffixTag.NEED_AFFIX, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.WORD_CHARS, PARSING_HANDLER_KEY_COPY_OVER);
-//		ruleFunction.put(AffixTag.CHECK_SHARPS, PARSING_HANDLER_KEY_COPY_OVER);
-	}
 
 	/**
 	 * Parse the rules out from a .aff file.
@@ -195,10 +180,9 @@ public class AffixParser extends ReadWriteLockable{
 
 					ParsingContext context = new ParsingContext(line, br);
 					AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
-					String funKey = parsingFunction.get(ruleType);
-					if(funKey != null){
+					Handler handler = PARSING_HANDLERS.get(ruleType);
+					if(handler != null){
 						try{
-							Handler handler = PARSING_HANDLERS.get(funKey);
 							handler.parse(context, strategy, this::addData, this::getData);
 
 							if(ruleType == AffixTag.FLAG)
