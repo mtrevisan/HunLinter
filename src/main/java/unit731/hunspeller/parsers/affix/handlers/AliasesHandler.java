@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -18,42 +17,10 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 public class AliasesHandler implements Handler{
 
-	//FIXME remove this enum
-	private static enum AliasesType{
-		FLAG(AffixTag.ALIASES_FLAG),
-		MORPHOLOGICAL_FIELD(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-
-
-		private final AffixTag flag;
-
-
-		AliasesType(AffixTag flag){
-			this.flag = flag;
-		}
-
-		public static AliasesType createFromCode(String code){
-			return Arrays.stream(values())
-				.filter(tag -> tag.flag.getCode().equals(code))
-				.findFirst()
-				.orElse(null);
-		}
-
-		public boolean is(String flag){
-			return this.flag.getCode().equals(flag);
-		}
-
-		public AffixTag getFlag(){
-			return flag;
-		}
-
-	}
-
-
 	@Override
 	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
 			Function<AffixTag, List<String>> getData){
 		try{
-			AliasesType aliasesType = AliasesType.createFromCode(context.getRuleType());
 			BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
@@ -73,14 +40,14 @@ public class AliasesHandler implements Handler{
 				if(parts.length != 2)
 					throw new IllegalArgumentException("Error reading line \"" + context
 						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
-				if(!aliasesType.is(parts[0]))
+				if(!context.getRuleType().equals(parts[0]))
 					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
+						+ ": Bad tag, it must be " + context.getRuleType());
 
 				aliases.add(parts[1]);
 			}
 
-			addData.accept(aliasesType.getFlag().getCode(), aliases);
+			addData.accept(context.getRuleType(), aliases);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
