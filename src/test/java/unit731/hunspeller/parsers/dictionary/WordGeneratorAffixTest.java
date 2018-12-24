@@ -2,9 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.Backbone;

@@ -1,7 +1,5 @@
 package unit731.hunspeller.parsers.affix;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -9,19 +7,24 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
+import unit731.hunspeller.parsers.affix.handlers.AffixHandler;
+import unit731.hunspeller.parsers.affix.handlers.AliasesHandler;
+import unit731.hunspeller.parsers.affix.handlers.CompoundRuleHandler;
+import unit731.hunspeller.parsers.affix.handlers.ConversionTableHandler;
+import unit731.hunspeller.parsers.affix.handlers.CopyOverAsNumberHandler;
+import unit731.hunspeller.parsers.affix.handlers.CopyOverHandler;
+import unit731.hunspeller.parsers.affix.handlers.Handler;
+import unit731.hunspeller.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -57,38 +60,6 @@ public class AffixParser extends ReadWriteLockable{
 	private static final Pattern PATTERN_ISO639_1 = PatternHelper.pattern("([a-z]{2})");
 	private static final Pattern PATTERN_ISO639_2 = PatternHelper.pattern("([a-z]{2,3}(?:[-_\\/][a-z]{2,3})?)");
 
-	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
-
-
-	private static enum AliasesType{
-		FLAG(AffixTag.ALIASES_FLAG),
-		MORPHOLOGICAL_FIELD(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-
-
-		private final AffixTag flag;
-
-
-		AliasesType(AffixTag flag){
-			this.flag = flag;
-		}
-
-		public static AliasesType createFromCode(String code){
-			return Arrays.stream(values())
-				.filter(tag -> tag.flag.getCode().equals(code))
-				.findFirst()
-				.orElse(null);
-		}
-
-		public boolean is(String flag){
-			return this.flag.getCode().equals(flag);
-		}
-
-		public AffixTag getFlag(){
-			return flag;
-		}
-
-	}
-
 
 	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
@@ -96,266 +67,100 @@ public class AffixParser extends ReadWriteLockable{
 
 	private final Set<String> terminalAffixes = new HashSet<>();
 
-	private final Map<AffixTag, Consumer<ParsingContext>> ruleFunction = new HashMap<>();
+	private final Map<AffixTag, String> parsingFunction = new HashMap<>();
 
-	private final ConversionTable replacementTable = new ConversionTable(AffixTag.REPLACEMENT_TABLE);
-	private final ConversionTable inputConversionTable = new ConversionTable(AffixTag.INPUT_CONVERSION_TABLE);
-	private final ConversionTable outputConversionTable = new ConversionTable(AffixTag.OUTPUT_CONVERSION_TABLE);
+	private static final String PARSING_HANDLER_KEY_COPY_OVER = "copyOver";
+	private static final String PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER = "copyOverAsNumber";
+	private static final String PARSING_HANDLER_KEY_COMPOUND_RULE = "compoundRule";
+	private static final String PARSING_HANDLER_KEY_AFFIX = "affix";
+	private static final String PARSING_HANDLER_KEY_WORD_BREAK_TABLE = "wordBreakTable";
+	private static final String PARSING_HANDLER_KEY_ALIASES = "aliases";
+	private static final String PARSING_HANDLER_KEY_REPLACEMENT_TABLE = "replacementTable";
+	private static final String PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE = "inputConversionTable";
+	private static final String PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE = "outputConversionTable";
 
-
-	private final Consumer<ParsingContext> funCopyOver = context -> {
-		addData(context.getRuleType(), context.getAllButFirstParameter());
-	};
-	private final Consumer<ParsingContext> funCopyOverAsNumber = context -> {
-		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-		addData(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
-	};
-	private final Consumer<ParsingContext> funCompoundRule = context -> {
-		try{
-			BufferedReader br = context.getReader();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-
-			Set<String> compoundRules = new HashSet<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
-
-				String[] lineParts = StringUtils.split(line);
-				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
-				if(tag != AffixTag.COMPOUND_RULE)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
-				String rule = lineParts[1];
-				if(StringUtils.isBlank(rule))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": compound rule type cannot be empty");
-				String[] compounds = strategy.extractCompoundRule(rule);
-				if(compounds.length == 0)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": compound rule is bad formatted");
-
-				boolean inserted = compoundRules.add(rule);
-				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
-						+ ": duplicated line");
-			}
-
-			addData(AffixTag.COMPOUND_RULE, compoundRules);
-		}
-		catch(IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	};
-	private final Consumer<ParsingContext> funAffix = context -> {
-		try{
-			AffixEntry.Type ruleType = AffixEntry.Type.createFromCode(context.getRuleType());
-			BufferedReader br = context.getReader();
-			boolean isSuffix = AffixEntry.Type.SUFFIX.is(context.getRuleType());
-			String ruleFlag = context.getFirstParameter();
-			char combineable = context.getSecondParameter().charAt(0);
-			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The third parameter is not a number");
-			int numEntries = Integer.parseInt(context.getThirdParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-
-//List<AffixEntry> prefixEntries = new ArrayList<>();
-//List<AffixEntry> suffixEntries = new ArrayList<>();
-			List<String> aliasesFlag = getData(AffixTag.ALIASES_FLAG);
-			List<String> aliasesMorphologicalField = getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-			List<AffixEntry> entries = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
-
-				AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
-				if(entry.getType() != ruleType)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule type (expected "
-						+ ruleType + ")");
-				if(!ruleFlag.equals(entry.getFlag()))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched rule flag (expected "
-						+ ruleFlag + ")");
-				if(!entry.containsUniqueContinuationFlags())
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": multiple rule flags");
-
-				boolean inserted = entries.add(entry);
-				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
-
-//String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
-//String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
-//List<AffixEntry> lst = new ArrayList<>();
-//lst.add(entry);
-//if(entry.isSuffix()){
-//	ArrayUtils.reverse(arr);
-//	suffixEntries.add(arr, lst);
-//}
-//else
-//	prefixEntries.put(arr, lst);
-			}
-
-			addData(ruleFlag, new RuleEntry(isSuffix, combineable, entries));
-//addData(ruleFlag, new RuleEntry(isSuffix, combineable, entries, prefixEntries, suffixEntries));
-		}
-		catch(IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	};
-	private final Consumer<ParsingContext> funWordBreakTable = context -> {
-		try{
-			BufferedReader br = context.getReader();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-
-			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
-
-				String[] lineParts = StringUtils.split(line);
-				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
-				if(tag != AffixTag.BREAK)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
-						+ AffixTag.BREAK + ")");
-				String breakCharacter = lineParts[1];
-				if(StringUtils.isBlank(breakCharacter))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
-				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
-					breakCharacter = HyphenationParser.EN_DASH;
-
-				boolean inserted = wordBreakCharacters.add(breakCharacter);
-				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
-			}
-
-			addData(AffixTag.BREAK, wordBreakCharacters);
-		}
-		catch(IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	};
-	private final Consumer<ParsingContext> funAliases = context -> {
-		try{
-			AliasesType aliasesType = AliasesType.createFromCode(context.getRuleType());
-			BufferedReader br = context.getReader();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-
-			List<String> aliases = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
-
-				String[] parts = StringUtils.split(line);
-				if(parts.length != 2)
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
-				if(!aliasesType.is(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
-
-				aliases.add(parts[1]);
-			}
-
-			addData(aliasesType.getFlag(), aliases);
-		}
-		catch(IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	};
+	private static final Map<String, Handler> PARSING_HANDLERS = new HashMap<>();
+	static{
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COPY_OVER, new CopyOverHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER, new CopyOverAsNumberHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_COMPOUND_RULE, new CompoundRuleHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_AFFIX, new AffixHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_WORD_BREAK_TABLE, new WordBreakTableHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_ALIASES, new AliasesHandler());
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_REPLACEMENT_TABLE, new ConversionTableHandler(AffixTag.REPLACEMENT_TABLE));
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE, new ConversionTableHandler(AffixTag.INPUT_CONVERSION_TABLE));
+		PARSING_HANDLERS.put(PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE, new ConversionTableHandler(AffixTag.OUTPUT_CONVERSION_TABLE));
+	}
 
 
 	public AffixParser(){
 		//General options
-//		ruleFunction.put("NAME", funCopyOver);
-//		ruleFunction.put("VERSION", funCopyOver);
-//		ruleFunction.put("HOME", funCopyOver);
-		ruleFunction.put(AffixTag.CHARACTER_SET, funCopyOver);
-		ruleFunction.put(AffixTag.FLAG, funCopyOver);
-		ruleFunction.put(AffixTag.COMPLEX_PREFIXES, funCopyOver);
-		ruleFunction.put(AffixTag.LANGUAGE, funCopyOver);
-//		ruleFunction.put(AffixTag.IGNORE, funCopyOver);
-		ruleFunction.put(AffixTag.ALIASES_FLAG, funAliases);
-		ruleFunction.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, funAliases);
+//		ruleFunction.put("NAME", PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put("VERSION", PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put("HOME", PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.CHARACTER_SET, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.FLAG, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPLEX_PREFIXES, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.LANGUAGE, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.IGNORE, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.ALIASES_FLAG, PARSING_HANDLER_KEY_ALIASES);
+		parsingFunction.put(AffixTag.ALIASES_MORPHOLOGICAL_FIELD, PARSING_HANDLER_KEY_ALIASES);
 
 		//Options for suggestions
-//		ruleFunction.put(AffixTag.KEY, funCopyOver);
-//		ruleFunction.put(AffixTag.TRY, funCopyOver);
-		ruleFunction.put(AffixTag.NO_SUGGEST, funCopyOver);
-//		ruleFunction.put(AffixTag.MAX_COMPOUND_SUGGEST, funCopyOver);
-//		ruleFunction.put(AffixTag.MAX_NGRAM_SUGGEST, funCopyOver);
-//		ruleFunction.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, funCopyOver);
-//		ruleFunction.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, funCopyOver);
-//		ruleFunction.put(AffixTag.NO_SPLIT_SUGGEST, funCopyOver);
-//		ruleFunction.put(AffixTag.NO_NGRAM_SUGGEST, funCopyOver);
-//		ruleFunction.put(AffixTag.SUGGESTIONS_WITH_DOTS, funCopyOver);
-		ruleFunction.put(AffixTag.REPLACEMENT_TABLE, replacementTable::parseConversionTable);
-//		ruleFunction.put(AffixTag.MAP_TABLE, funMap);
-//		ruleFunction.put(AffixTag.PHONE_TABLE, funMap);
-//		ruleFunction.put(AffixTag.WARN, funMap);
-//		ruleFunction.put(AffixTag.FORBID_WARN, funMap);
+//		ruleFunction.put(AffixTag.KEY, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.TRY, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.NO_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.MAX_COMPOUND_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.MAX_NGRAM_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.ONLY_MAX_NGRAM_SIMILARITY_FACTOR, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.NO_SPLIT_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.NO_NGRAM_SUGGEST, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.SUGGESTIONS_WITH_DOTS, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.REPLACEMENT_TABLE, PARSING_HANDLER_KEY_REPLACEMENT_TABLE);
+//		ruleFunction.put(AffixTag.MAP_TABLE, PARSING_HANDLER_KEY_MAP);
+//		ruleFunction.put(AffixTag.PHONE_TABLE, PARSING_HANDLER_KEY_MAP);
+//		ruleFunction.put(AffixTag.WARN, PARSING_HANDLER_KEY_MAP);
+//		ruleFunction.put(AffixTag.FORBID_WARN, PARSING_HANDLER_KEY_MAP);
 
 		//Options for compounding
-		ruleFunction.put(AffixTag.BREAK, funWordBreakTable);
-		ruleFunction.put(AffixTag.COMPOUND_RULE, funCompoundRule);
-		ruleFunction.put(AffixTag.COMPOUND_MIN, funCopyOverAsNumber);
-		ruleFunction.put(AffixTag.COMPOUND_FLAG, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_BEGIN, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_MIDDLE, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_END, funCopyOver);
-		ruleFunction.put(AffixTag.ONLY_IN_COMPOUND, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_PERMIT_FLAG, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_FORBID_FLAG, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_MORE_SUFFIXES, funCopyOver);
-//		ruleFunction.put(AffixTag.COMPOUND_ROOT, funCopyOver);
-		ruleFunction.put(AffixTag.COMPOUND_WORD_MAX, funCopyOverAsNumber);
-		ruleFunction.put(AffixTag.CHECK_COMPOUND_DUPLICATION, funCopyOver);
-		ruleFunction.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, funCopyOver);
-		ruleFunction.put(AffixTag.CHECK_COMPOUND_CASE, funCopyOver);
-		ruleFunction.put(AffixTag.CHECK_COMPOUND_TRIPLE, funCopyOver);
-		ruleFunction.put(AffixTag.SIMPLIFIED_TRIPLE, funCopyOver);
-//		ruleFunction.put(AffixTag.CHECK_COMPOUND_PATTERN, funCopyOver);
-		ruleFunction.put(AffixTag.FORCE_UPPERCASE, funCopyOver);
-//		ruleFunction.put(AffixTag.COMPOUND_SYLLABLE, funCopyOver);
-//		ruleFunction.put(AffixTag.SYLLABLE_NUMBER, funCopyOver);
+		parsingFunction.put(AffixTag.BREAK, PARSING_HANDLER_KEY_WORD_BREAK_TABLE);
+		parsingFunction.put(AffixTag.COMPOUND_RULE, PARSING_HANDLER_KEY_COMPOUND_RULE);
+		parsingFunction.put(AffixTag.COMPOUND_MIN, PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER);
+		parsingFunction.put(AffixTag.COMPOUND_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_BEGIN, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_MIDDLE, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_END, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.ONLY_IN_COMPOUND, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_PERMIT_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_FORBID_FLAG, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_MORE_SUFFIXES, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.COMPOUND_ROOT, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.COMPOUND_WORD_MAX, PARSING_HANDLER_KEY_COPY_OVER_AS_NUMBER);
+		parsingFunction.put(AffixTag.CHECK_COMPOUND_DUPLICATION, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.CHECK_COMPOUND_CASE, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.CHECK_COMPOUND_TRIPLE, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.SIMPLIFIED_TRIPLE, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.CHECK_COMPOUND_PATTERN, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.FORCE_UPPERCASE, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.COMPOUND_SYLLABLE, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.SYLLABLE_NUMBER, PARSING_HANDLER_KEY_COPY_OVER);
 
 //Options for affix creation
-		ruleFunction.put(AffixTag.PREFIX, funAffix);
-		ruleFunction.put(AffixTag.SUFFIX, funAffix);
+		parsingFunction.put(AffixTag.PREFIX, PARSING_HANDLER_KEY_AFFIX);
+		parsingFunction.put(AffixTag.SUFFIX, PARSING_HANDLER_KEY_AFFIX);
 
 		//Other options
-		ruleFunction.put(AffixTag.CIRCUMFIX, funCopyOver);
-		ruleFunction.put(AffixTag.FORBIDDEN_WORD, funCopyOver);
-		ruleFunction.put(AffixTag.FULLSTRIP, funCopyOver);
-		ruleFunction.put(AffixTag.KEEP_CASE, funCopyOver);
-		ruleFunction.put(AffixTag.INPUT_CONVERSION_TABLE, inputConversionTable::parseConversionTable);
-		ruleFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, outputConversionTable::parseConversionTable);
-		ruleFunction.put(AffixTag.NEED_AFFIX, funCopyOver);
-//		ruleFunction.put(AffixTag.WORD_CHARS, funCopyOver);
-//		ruleFunction.put(AffixTag.CHECK_SHARPS, funCopyOver);
+		parsingFunction.put(AffixTag.CIRCUMFIX, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.FORBIDDEN_WORD, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.FULLSTRIP, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.KEEP_CASE, PARSING_HANDLER_KEY_COPY_OVER);
+		parsingFunction.put(AffixTag.INPUT_CONVERSION_TABLE, PARSING_HANDLER_KEY_INPUT_CONVERSION_TABLE);
+		parsingFunction.put(AffixTag.OUTPUT_CONVERSION_TABLE, PARSING_HANDLER_KEY_OUTPUT_CONVERSION_TABLE);
+		parsingFunction.put(AffixTag.NEED_AFFIX, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.WORD_CHARS, PARSING_HANDLER_KEY_COPY_OVER);
+//		ruleFunction.put(AffixTag.CHECK_SHARPS, PARSING_HANDLER_KEY_COPY_OVER);
 	}
 
 	/**
@@ -369,10 +174,6 @@ public class AffixParser extends ReadWriteLockable{
 		acquireWriteLock();
 		try{
 			clearData();
-
-			addData(replacementTable.getAffixTag().getCode(), replacementTable);
-			addData(inputConversionTable.getAffixTag().getCode(), inputConversionTable);
-			addData(outputConversionTable.getAffixTag().getCode(), outputConversionTable);
 
 			boolean encodingRead = false;
 			charset = FileHelper.determineCharset(affFile.toPath());
@@ -394,10 +195,11 @@ public class AffixParser extends ReadWriteLockable{
 
 					ParsingContext context = new ParsingContext(line, br);
 					AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
-					Consumer<ParsingContext> fun = ruleFunction.get(ruleType);
-					if(fun != null){
+					String funKey = parsingFunction.get(ruleType);
+					if(funKey != null){
 						try{
-							fun.accept(context);
+							Handler handler = PARSING_HANDLERS.get(funKey);
+							handler.parse(context, strategy, this::addData, this::getData);
 
 							if(ruleType == AffixTag.FLAG)
 								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
@@ -648,15 +450,18 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	public String applyReplacementTable(String word){
-		return replacementTable.applyConversionTable(word);
+		ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
+		return (table != null? table.applyConversionTable(word): word);
 	}
 
 	public String applyInputConversionTable(String word){
-		return inputConversionTable.applyConversionTable(word);
+		ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
+		return (table != null? table.applyConversionTable(word): word);
 	}
 
 	public String applyOutputConversionTable(String word){
-		return outputConversionTable.applyConversionTable(word);
+		ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		return (table != null? table.applyConversionTable(word): word);
 	}
 
 	public Set<String> getWordBreakCharacters(){
