@@ -93,9 +93,7 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 
 			Charset charset = FileHelper.determineCharset(theFile.toPath());
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Thesaurus file");
+				String line = extractLine(br);
 
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -119,6 +117,14 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 		}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
+	}
+
+	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Thesaurus file");
+
+		return line;
 	}
 
 	public int getSynonymsCounter(){

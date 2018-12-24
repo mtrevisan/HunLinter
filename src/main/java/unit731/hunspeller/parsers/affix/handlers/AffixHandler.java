@@ -39,11 +39,7 @@ public class AffixHandler implements Handler{
 			List<String> aliasesMorphologicalField = getData.apply(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 			List<AffixEntry> entries = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
+				String line = extractLine(br);
 
 				AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 				if(entry.getType() != ruleType)
@@ -77,6 +73,14 @@ public class AffixHandler implements Handler{
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	private String extractLine(BufferedReader br) throws EOFException, IOException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+		return DictionaryParser.cleanLine(line);
 	}
 	
 }

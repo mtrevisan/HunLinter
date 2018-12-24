@@ -211,9 +211,7 @@ public class HyphenationParser extends ReadWriteLockable{
 			Path hypPath = hypFile.toPath();
 			Charset charset = FileHelper.determineCharset(hypPath);
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(hypPath, charset))){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Hyphenation file");
+				String line = extractLine(br);
 
 				//ignore any BOM marker on first line
 				if(br.getLineNumber() == 1)
@@ -303,6 +301,30 @@ public class HyphenationParser extends ReadWriteLockable{
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
+//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
+//103 352 B compact trie
+//106 800 B basic trie
 		}
 		catch(Throwable t){
 			String message = ExceptionHelper.getMessage(t);
@@ -314,6 +336,14 @@ public class HyphenationParser extends ReadWriteLockable{
 
 			releaseWriteLock();
 		}
+	}
+
+	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Hyphenation file");
+
+		return line;
 	}
 
 	public static boolean isAugmentedRule(String line){

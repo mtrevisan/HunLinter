@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -240,19 +241,9 @@ public class AffixParser extends ReadWriteLockable{
 //				addData(AffixTag.WORD_CHARS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 
 
-			terminalAffixes.add(getNoSuggestFlag());
-			terminalAffixes.add(getCompoundFlag());
-			terminalAffixes.add(getForbiddenWordFlag());
-			terminalAffixes.add(getCompoundBeginFlag());
-			terminalAffixes.add(getCompoundMiddleFlag());
-			terminalAffixes.add(getCompoundEndFlag());
-			terminalAffixes.add(getOnlyInCompoundFlag());
-			terminalAffixes.add(getPermitCompoundFlag());
-			terminalAffixes.add(getForbidCompoundFlag());
-			terminalAffixes.add(getForceCompoundUppercaseFlag());
-			terminalAffixes.add(getCircumfixFlag());
-			terminalAffixes.add(getKeepCaseFlag());
-			terminalAffixes.add(getNeedAffixFlag());
+			terminalAffixes.addAll(Arrays.asList(getNoSuggestFlag(), getCompoundFlag(), getForbiddenWordFlag(), getCompoundBeginFlag(),
+				getCompoundMiddleFlag(), getCompoundEndFlag(), getOnlyInCompoundFlag(), getPermitCompoundFlag(), getForbidCompoundFlag(),
+				getForceCompoundUppercaseFlag(), getCircumfixFlag(), getKeepCaseFlag(), getNeedAffixFlag()));
 		}
 		finally{
 			releaseWriteLock();

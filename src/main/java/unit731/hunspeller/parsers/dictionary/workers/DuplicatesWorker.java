@@ -119,9 +119,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		setProgress(0);
 		File dicFile = dicParser.getDicFile();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
-			String line = br.readLine();
-			if(line == null)
-				throw new EOFException("Unexpected EOF while reading Dictionary file");
+			String line = extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + 2;
 
@@ -171,6 +169,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		return duplicatesBloomFilter;
 	}
 
+	private String extractLine(final LineNumberReader br) throws EOFException, IOException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+		return DictionaryParser.cleanLine(line);
+	}
+
 	private List<Duplicate> extractDuplicates(BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
 		List<Duplicate> result = new ArrayList<>();
 
@@ -183,10 +189,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				String line = br.readLine();
 
 				long readSoFar = line.getBytes(charset).length + 2;
-
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
 
 				int lineIndex = 1;
 				long totalSize = dicFile.length();

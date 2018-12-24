@@ -43,11 +43,7 @@ public class ConversionTable{
 
 			table = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
+				String line = extractLine(br);
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 3)
@@ -63,6 +59,14 @@ public class ConversionTable{
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	private String extractLine(BufferedReader br) throws IOException, EOFException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+		return DictionaryParser.cleanLine(line);
 	}
 
 	public String applyConversionTable(String word){

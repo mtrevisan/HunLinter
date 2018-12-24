@@ -85,9 +85,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()));
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
+				String line = extractLine(br);
 
 				long readSoFar = line.getBytes(charset).length + 2;
 
@@ -253,6 +251,14 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		}
 
 		return null;
+	}
+
+	private String extractLine(final LineNumberReader br) throws EOFException, IOException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+		return DictionaryParser.cleanLine(line);
 	}
 
 	private int getProgress(double index, double total){

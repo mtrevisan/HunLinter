@@ -31,11 +31,7 @@ public class CompoundRuleHandler implements Handler{
 
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = br.readLine();
-				if(line == null)
-					throw new EOFException("Unexpected EOF while reading Dictionary file");
-
-				line = DictionaryParser.cleanLine(line);
+				String line = extractLine(br);
 
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
@@ -62,6 +58,14 @@ public class CompoundRuleHandler implements Handler{
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
+	}
+
+	private String extractLine(BufferedReader br) throws IOException, EOFException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+	
+		return DictionaryParser.cleanLine(line);
 	}
 	
 }

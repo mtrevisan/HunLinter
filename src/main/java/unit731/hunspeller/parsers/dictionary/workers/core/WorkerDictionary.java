@@ -109,9 +109,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		List<Pair<Integer, String>> lines = new ArrayList<>();
 		long totalSize = dicFile.length();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
-			String line = br.readLine();
-			if(line == null)
-				throw new EOFException("Unexpected EOF while reading Dictionary file");
+			String line = extractLine(br);
 			
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 			
@@ -147,6 +145,14 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 			lockable.releaseReadLock();
 		}
 		return lines;
+	}
+
+	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+		String line = br.readLine();
+		if(line == null)
+			throw new EOFException("Unexpected EOF while reading Dictionary file");
+
+		return DictionaryParser.cleanLine(line);
 	}
 
 	private void readProcess(List<Pair<Integer, String>> lines){
