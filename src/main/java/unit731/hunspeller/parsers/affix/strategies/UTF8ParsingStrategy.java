@@ -31,14 +31,18 @@ class UTF8ParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(textFlags))
 			return null;
 
-		if(!UTF_8_ENCODER.canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
+		checkValidity(textFlags);
 
 		String[] flags = extractFlags(textFlags);
 
 		checkForDuplication(flags, textFlags);
 
 		return flags;
+	}
+
+	private void checkValidity(String textFlags) throws IllegalArgumentException{
+		if(!UTF_8_ENCODER.canEncode(textFlags))
+			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
 	}
 
 	private String[] extractFlags(String textFlags){
@@ -60,12 +64,12 @@ class UTF8ParsingStrategy implements FlagParsingStrategy{
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkValidity(textFlags);
+		checkJoinValidity(textFlags);
 
 		return String.join(StringUtils.EMPTY, textFlags);
 	}
 
-	private void checkValidity(String[] textFlags) throws IllegalArgumentException{
+	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");

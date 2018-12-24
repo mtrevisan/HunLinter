@@ -34,14 +34,18 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		if(StringUtils.isBlank(textFlags))
 			return null;
 
-		if(textFlags.length() % 2 != 0)
-			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
+		checkValidity(textFlags);
 
 		String[] flags = extractFlags(textFlags);
 
 		checkForDuplication(flags, textFlags);
 
 		return flags;
+	}
+
+	private void checkValidity(String textFlags) throws IllegalArgumentException{
+		if(textFlags.length() % 2 != 0)
+			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
 	}
 
 	private String[] extractFlags(String textFlags){
@@ -59,12 +63,12 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkValidity(textFlags);
+		checkJoinValidity(textFlags);
 
 		return String.join(StringUtils.EMPTY, textFlags);
 	}
 
-	private void checkValidity(String[] textFlags) throws IllegalArgumentException{
+	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
 		for(String flag : textFlags)
 			if(flag == null || flag.length() != 2)
 				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));

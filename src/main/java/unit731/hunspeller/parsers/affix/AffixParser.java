@@ -21,7 +21,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
@@ -36,12 +35,17 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 /**
  * Managed options:
- *		SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
- *		NOSUGGEST (only read), REP
- *		BREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX,
- *			CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
- *		PFX, SFX
- *		CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
+ *		General:
+ *			SET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
+ *		Suggestions:
+ *			NOSUGGEST (only read), REP
+ *		Compounding:
+ *			BREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES,
+ *			COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
+ *		Affix creation:
+ *			PFX, SFX
+ *		Others:
+ *			CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
  */
 public class AffixParser extends ReadWriteLockable{
 
@@ -127,18 +131,21 @@ public class AffixParser extends ReadWriteLockable{
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.COMPOUND_RULE)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched compound rule type (expected "
-						+ AffixTag.COMPOUND_RULE + ")");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
 				String rule = lineParts[1];
 				if(StringUtils.isBlank(rule))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule type cannot be empty");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+						+ ": compound rule type cannot be empty");
 				String[] compounds = strategy.extractCompoundRule(rule);
 				if(compounds.length == 0)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": compound rule is bad formatted");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+						+ ": compound rule is bad formatted");
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+						+ ": duplicated line");
 			}
 
 			addData(AffixTag.COMPOUND_RULE, compoundRules);
@@ -264,9 +271,11 @@ public class AffixParser extends ReadWriteLockable{
 
 				String[] parts = StringUtils.split(line);
 				if(parts.length != 2)
-					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be <tag> <flag/morphological field>");
+					throw new IllegalArgumentException("Error reading line \"" + context
+						+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
 				if(!aliasesType.is(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context + ": Bad tag, it must be " + aliasesType.getFlag().getCode());
+					throw new IllegalArgumentException("Error reading line \"" + context
+						+ ": Bad tag, it must be " + aliasesType.getFlag().getCode());
 
 				aliases.add(parts[1]);
 			}

@@ -71,12 +71,12 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(textFlags == null || textFlags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkValidity(textFlags);
+		checkJoinValidity(textFlags);
 
 		return String.join(COMMA, textFlags);
 	}
 
-	private void checkValidity(String[] textFlags) throws IllegalArgumentException{
+	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
 		for(String flag : textFlags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);
