@@ -31,7 +31,7 @@ public enum AffixTag{
 //	KEY("KEY"),
 //	TRY("TRY"),
 	/** Words signed with this flag are not suggested (but still accepted when typed correctly) */
-	NO_SUGGEST("NOSUGGEST"),
+	NO_SUGGEST_FLAG("NOSUGGEST"),
 //	MAX_COMPOUND_SUGGEST("MAXCPDSUGS"),
 //	MAX_NGRAM_SUGGEST("MAXNGRAMSUGS"),
 //	MAX_NGRAM_SIMILARITY_FACTOR("MAXDIFF"),
@@ -53,51 +53,51 @@ public enum AffixTag{
 	 * Define new break points for breaking words and checking word parts separately (use ^ and $ to delete characters at end
 	 * and start of the word)
 	 */
-	BREAK("BREAK"),
+	WORD_BREAK_CHARACTERS("BREAK"),
 	/** Define custom compound patterns */
 	COMPOUND_RULE("COMPOUNDRULE"),
 	/** Minimum length of words in compound words */
-	COMPOUND_MIN("COMPOUNDMIN"),
+	COMPOUND_MINIMUM_LENGTH("COMPOUNDMIN"),
 	/**
 	 * Words with this flag may be in compound words (except when word shorter than COMPOUNDMIN).
 	 * Affixes with COMPOUNDFLAG also permits compounding of affixed words.
 	 */
 	COMPOUND_FLAG("COMPOUNDFLAG"),
 	/** Word signed with this flag (or with a signed affix) may be the first element in compound words */
-	COMPOUND_BEGIN("COMPOUNDBEGIN"),
+	COMPOUND_BEGIN_FLAG("COMPOUNDBEGIN"),
 	/** Word signed with this flag (or with a signed affix) may be the middle element in compound words */
-	COMPOUND_MIDDLE("COMPOUNDMIDDLE"),
+	COMPOUND_MIDDLE_FLAG("COMPOUNDMIDDLE"),
 	/** Word signed with this flag (or with a signed affix) may be the last element in compound words */
-	COMPOUND_END("COMPOUNDEND"),
+	COMPOUND_END_FLAG("COMPOUNDEND"),
 	/** Suffixes signed this flag may be only inside of compounds (this flag works also with words) */
-	ONLY_IN_COMPOUND("ONLYINCOMPOUND"),
+	ONLY_IN_COMPOUND_FLAG("ONLYINCOMPOUND"),
 	/**
 	 * Affixes with this flag may be present inside of compounds (normally, prefixes and suffixes are allowed respectively at the beginning and
 	 * at the end of compounds only).
 	 * <code>(prefix)?(root)+(affix)?</code>
 	 */
-	COMPOUND_PERMIT_FLAG("COMPOUNDPERMITFLAG"),
+	PERMIT_COMPOUND_FLAG("COMPOUNDPERMITFLAG"),
 	/** Affixes with this flag forbid compounding of the affixed word */
-	COMPOUND_FORBID_FLAG("COMPOUNDFORBIDFLAG"),
+	FORBID_COMPOUND_FLAG("COMPOUNDFORBIDFLAG"),
 	/** Allow twofold suffixes within compounds */
-	COMPOUND_MORE_SUFFIXES("COMPOUNDMORESUFFIXES"),
+	ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND("COMPOUNDMORESUFFIXES"),
 	/** Signs the compounds in the dictionary */
 //	COMPOUND_ROOT("COMPOUNDROOT"),
 	/** Set maximum word count in a compound word (default is unlimited) */
-	COMPOUND_WORD_MAX("COMPOUNDWORDMAX"),
+	COMPOUND_MAX_WORD_COUNT("COMPOUNDWORDMAX"),
 	/** Forbid word duplication in compounds */
-	CHECK_COMPOUND_DUPLICATION("CHECKCOMPOUNDDUP"),
+	FORBID_DUPLICATIONS_IN_COMPOUND("CHECKCOMPOUNDDUP"),
 	/**
 	 * Forbid compounding if the (usually bad) compound word may be a non-compound word with a REP substitution (useful for languages with
 	 * 'compound friendly' orthography)
 	 */
 	CHECK_COMPOUND_REPLACEMENT("CHECKCOMPOUNDREP"),
 	/** Forbid upper case characters at word bound in compounds */
-	CHECK_COMPOUND_CASE("CHECKCOMPOUNDCASE"),
+	FORBID_DIFFERENT_CASES_IN_COMPOUND("CHECKCOMPOUNDCASE"),
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
-	CHECK_COMPOUND_TRIPLE("CHECKCOMPOUNDTRIPLE"),
+	FORBIT_TRIPLES_IN_COMPOUND("CHECKCOMPOUNDTRIPLE"),
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -&gt; Schiffahrt) */
-	SIMPLIFIED_TRIPLE("SIMPLIFIEDTRIPLE"),
+	SIMPLIFIED_TRIPLES_IN_COMPOUND("SIMPLIFIEDTRIPLE"),
 	/**
 	 * Forbid compounding, if the first word in the compound ends with <endchars>, and next word begins with <beginchars> and (optionally)
 	 * they have the requested flags. The optional replacement parameter allows simplified compound form.
@@ -106,7 +106,7 @@ public enum AffixTag{
 	 */
 //	CHECK_COMPOUND_PATTERN("CHECKCOMPOUNDPATTERN"),
 	/** The last word of a compound with this flag forces capitalization of the whole compound word */
-	FORCE_UPPERCASE("FORCEUCASE"),
+	FORCE_COMPOUND_UPPERCASE_FLAG("FORCEUCASE"),
 	/**
 	 * Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound,
 	 * if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables)
@@ -121,13 +121,13 @@ public enum AffixTag{
 
 	//Other options
 	/** Affixes signed with this flag may be on a word when this word also has a prefix with CIRCUMFIX flag and vice versa */
-	CIRCUMFIX("CIRCUMFIX"),
+	CIRCUMFIX_FLAG("CIRCUMFIX"),
 	/** Signs forbidden word form (affixed forms are also forbidden, excepts root homonyms) */
-	FORBIDDEN_WORD("FORBIDDENWORD"),
+	FORBIDDEN_WORD_FLAG("FORBIDDENWORD"),
 	/** With this flag the affix rules can strip full words, not only one less characters */
 	FULLSTRIP("FULLSTRIP"),
 	/** Forbid uppercased and capitalized forms of words signed with this flag */
-	KEEP_CASE("KEEPCASE"),
+	KEEP_CASE_FLAG("KEEPCASE"),
 	/** Define input conversion table */
 	INPUT_CONVERSION_TABLE("ICONV"),
 	/** Define output conversion table */
@@ -136,7 +136,7 @@ public enum AffixTag{
 	 * Signs virtual stems in the dictionary, words are valid only when affixed, except if the dictionary word has a homonym or a zero affix
 	 * (it works also with prefixes and prefix + suffix combinations)
 	 */
-	NEED_AFFIX("NEEDAFFIX");
+	NEED_AFFIX_FLAG("NEEDAFFIX");
 	/** Signs affix rules and dictionary words (allomorphs) not used in morphological generation and root words removed from suggestion */
 //	SUB_STANDARD("SUBSTANDARD"),
 	/** Extends tokenizer of Hunspell command line interface with additional word character */

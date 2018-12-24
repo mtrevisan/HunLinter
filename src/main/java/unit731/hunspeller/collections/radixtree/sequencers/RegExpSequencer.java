@@ -15,11 +15,11 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> FN_SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternHelper.split(seq, PATTERN)));
+	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: PatternHelper.split(seq, PATTERN)));
 
 
 	public static String[] splitSequence(String sequence){
-		return FN_SPLIT_SEQUENCE.apply(sequence);
+		return SPLIT_SEQUENCE.apply(sequence);
 	}
 
 	@Override

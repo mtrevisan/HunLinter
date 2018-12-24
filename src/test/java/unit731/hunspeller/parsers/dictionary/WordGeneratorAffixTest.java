@@ -24,7 +24,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
+		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
 		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 
@@ -50,7 +50,7 @@ public class WordGeneratorAffixTest{
 			"	 # tab+space");
 		loadData(affFile.getAbsolutePath());
 
-		ConversionTable table = backbone.getAffParser().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		ConversionTable table = backbone.getAffixData().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
 		Assert.assertEquals("[affixTag=OUTPUT_CONVERSION_TABLE,table=[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]]", table.toString());
 	}
 

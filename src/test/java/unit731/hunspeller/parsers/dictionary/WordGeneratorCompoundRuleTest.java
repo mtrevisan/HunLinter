@@ -23,7 +23,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	private Production createProduction(String word, String continuationFlags, String morphologicalFields){
-		FlagParsingStrategy strategy = backbone.getAffParser().getFlagParsingStrategy();
+		FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
 		return new Production(word, continuationFlags, morphologicalFields, null, strategy);
 	}
 

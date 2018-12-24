@@ -65,6 +65,7 @@ import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -1366,8 +1367,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(StringUtils.isNotBlank(inputText)){
 			try{
 				List<Production> words;
-				if(backbone.getAffParser().getCompoundFlag().equals(inputText)){
-					Integer maxCompounds = backbone.getAffParser().getCompoundMaxWordCount();
+				AffixData affixData = backbone.getAffixData();
+				if(affixData.getCompoundFlag().equals(inputText)){
+					Integer maxCompounds = affixData.getCompoundMaxWordCount();
 					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
 				}
 				else
@@ -1568,11 +1570,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//affix file:
-			Set<String> compoundRules = backbone.getAffParser().getCompoundRules();
+			AffixData affixData = backbone.getAffixData();
+			Set<String> compoundRules = affixData.getCompoundRules();
 			if(compoundRules != null && !compoundRules.isEmpty()){
 				cmpInputComboBox.removeAllItems();
 				compoundRules.forEach(cmpInputComboBox::addItem);
-				String compoundFlag = backbone.getAffParser().getCompoundFlag();
+				String compoundFlag = affixData.getCompoundFlag();
 				if(compoundFlag != null)
 					cmpInputComboBox.addItem(compoundFlag);
 				cmpInputComboBox.setEnabled(true);
@@ -1660,7 +1663,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private void hyphenate(HunspellerFrame frame){
-		String language = frame.backbone.getAffParser().getLanguage();
+		String language = frame.backbone.getAffixData().getLanguage();
 		Orthography orthography = BaseBuilder.getOrthography(language);
 		String text = orthography.correctOrthography(frame.hypWordTextField.getText());
 		if(formerHyphenationText != null && formerHyphenationText.equals(text))
@@ -1699,7 +1702,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void hyphenateAddRule(HunspellerFrame frame){
-		String language = frame.backbone.getAffParser().getLanguage();
+		String language = frame.backbone.getAffixData().getLanguage();
 		Orthography orthography = BaseBuilder.getOrthography(language);
 		String addedRuleText = orthography.correctOrthography(frame.hypWordTextField.getText());
 		String addedRule = orthography.correctOrthography(frame.hypAddRuleTextField.getText().toLowerCase(Locale.ROOT));
@@ -1772,8 +1775,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffParser().getLanguage(), backbone.getDicParser(), backbone.getWordGenerator(),
-					backbone.getDictionaryBaseData(), outputFile);
+				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
+					backbone.getWordGenerator(), backbone.getDictionaryBaseData(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1786,7 +1789,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			ruleReducerWorker = new RuleReducerWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getWordGenerator(), backbone.getAffParser());
+			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator(),
+				backbone.getAffParser());
 			ruleReducerWorker.addPropertyChangeListener(this);
 			ruleReducerWorker.execute();
 		}
@@ -1845,7 +1849,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffParser().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
+				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
 					backbone.getWordGenerator(), outputFile, backbone.getAffParser());
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
@@ -1863,12 +1867,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainProgressBar.setValue(0);
 
 			AffixParser affParser = backbone.getAffParser();
-			FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-			String compoundFlag = affParser.getCompoundFlag();
+			AffixData affixData = affParser.getAffixData();
+			FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+			String compoundFlag = affixData.getCompoundFlag();
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
 				String word = production.getWord();
-				if(!production.distributeByCompoundRule(affParser).isEmpty() || production.hasContinuationFlag(compoundFlag))
+				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
 			Runnable completed = () -> {

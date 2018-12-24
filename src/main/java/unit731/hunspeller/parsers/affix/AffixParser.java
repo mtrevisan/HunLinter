@@ -6,16 +6,12 @@ import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.handlers.AffixHandler;
@@ -26,10 +22,7 @@ import unit731.hunspeller.parsers.affix.handlers.CopyOverAsNumberHandler;
 import unit731.hunspeller.parsers.affix.handlers.CopyOverHandler;
 import unit731.hunspeller.parsers.affix.handlers.Handler;
 import unit731.hunspeller.parsers.affix.handlers.WordBreakTableHandler;
-import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileHelper;
@@ -88,7 +81,7 @@ public class AffixParser extends ReadWriteLockable{
 		//Options for suggestions
 //		PARSING_HANDLERS.put(AffixTag.KEY, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.TRY, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.NO_SUGGEST, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.NO_SUGGEST_FLAG, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.MAX_COMPOUND_SUGGEST, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SUGGEST, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.MAX_NGRAM_SIMILARITY_FACTOR, COPY_OVER);
@@ -103,26 +96,26 @@ public class AffixParser extends ReadWriteLockable{
 //		PARSING_HANDLERS.put(AffixTag.FORBID_WARN, MAP);
 
 		//Options for compounding
-		PARSING_HANDLERS.put(AffixTag.BREAK, WORD_BREAK_TABLE);
+		PARSING_HANDLERS.put(AffixTag.WORD_BREAK_CHARACTERS, WORD_BREAK_TABLE);
 		PARSING_HANDLERS.put(AffixTag.COMPOUND_RULE, COMPOUND_RULE);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIN, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MINIMUM_LENGTH, COPY_OVER_AS_NUMBER);
 		PARSING_HANDLERS.put(AffixTag.COMPOUND_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_BEGIN, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIDDLE, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_END, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.ONLY_IN_COMPOUND, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_PERMIT_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_FORBID_FLAG, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_MORE_SUFFIXES, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_BEGIN_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MIDDLE_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_END_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.ONLY_IN_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.PERMIT_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBID_COMPOUND_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.COMPOUND_ROOT, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.COMPOUND_WORD_MAX, COPY_OVER_AS_NUMBER);
-		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_DUPLICATION, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.COMPOUND_MAX_WORD_COUNT, COPY_OVER_AS_NUMBER);
+		PARSING_HANDLERS.put(AffixTag.FORBID_DUPLICATIONS_IN_COMPOUND, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_CASE, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_TRIPLE, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.SIMPLIFIED_TRIPLE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBID_DIFFERENT_CASES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBIT_TRIPLES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.SIMPLIFIED_TRIPLES_IN_COMPOUND, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_PATTERN, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORCE_UPPERCASE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.COMPOUND_SYLLABLE, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.SYLLABLE_NUMBER, COPY_OVER);
 
@@ -131,22 +124,20 @@ public class AffixParser extends ReadWriteLockable{
 		PARSING_HANDLERS.put(AffixTag.SUFFIX, AFFIX);
 
 		//Other options
-		PARSING_HANDLERS.put(AffixTag.CIRCUMFIX, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBIDDEN_WORD, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.CIRCUMFIX_FLAG, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBIDDEN_WORD_FLAG, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.FULLSTRIP, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.KEEP_CASE, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.KEEP_CASE_FLAG, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.INPUT_CONVERSION_TABLE, INPUT_CONVERSION_TABLE);
 		PARSING_HANDLERS.put(AffixTag.OUTPUT_CONVERSION_TABLE, OUTPUT_CONVERSION_TABLE);
-		PARSING_HANDLERS.put(AffixTag.NEED_AFFIX, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.NEED_AFFIX_FLAG, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.WORD_CHARS, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.CHECK_SHARPS, COPY_OVER);
 	}
 
 
-	private final Map<String, Object> data = new HashMap<>();
 	private Charset charset;
-	private FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-	private final Set<String> terminalAffixes = new HashSet<>();
+	private final AffixData data = new AffixData();
 
 
 	/**
@@ -159,7 +150,7 @@ public class AffixParser extends ReadWriteLockable{
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
 		acquireWriteLock();
 		try{
-			clearData();
+			data.clear();
 
 			boolean encodingRead = false;
 			charset = FileHelper.determineCharset(affFile.toPath());
@@ -184,11 +175,7 @@ public class AffixParser extends ReadWriteLockable{
 					Handler handler = lookupHandlerByRuleType(ruleType);
 					if(handler != null){
 						try{
-							handler.parse(context, strategy, this::addData, this::getData);
-
-							if(ruleType == AffixTag.FLAG)
-								//determines the appropriate {@link FlagParsingStrategy} based on the FLAG definition line taken from the affix file
-								strategy = ParsingStrategyFactory.createFromFlag(getFlag());
+							handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 						}
 						catch(RuntimeException e){
 							throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
@@ -197,43 +184,43 @@ public class AffixParser extends ReadWriteLockable{
 				}
 			}
 
-			if(!containsData(AffixTag.COMPOUND_MIN))
-				addData(AffixTag.COMPOUND_MIN, 3);
+			if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
+				data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
 			else{
-				int compoundMin = getData(AffixTag.COMPOUND_MIN);
+				int compoundMin = data.getData(AffixTag.COMPOUND_MINIMUM_LENGTH);
 				if(compoundMin < 1)
-					addData(AffixTag.COMPOUND_MIN, 1);
+					data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 1);
 			}
 			//apply default charset
-			if(!containsData(AffixTag.CHARACTER_SET))
-				addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
-			if(!containsData(AffixTag.LANGUAGE)){
+			if(!data.containsData(AffixTag.CHARACTER_SET))
+				data.addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
+			if(!data.containsData(AffixTag.LANGUAGE)){
 				//try to infer language from filename
 				String filename = FilenameUtils.removeExtension(affFile.getName());
 				String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
 				if(languages.length == 0)
 					languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
 				String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
-				addData(AffixTag.LANGUAGE, language);
+				data.addData(AffixTag.LANGUAGE, language);
 			}
-			if(!containsData(AffixTag.BREAK)){
+			if(!data.containsData(AffixTag.WORD_BREAK_CHARACTERS)){
 				Set<String> wordBreakCharacters = new HashSet<>(3);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
 				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
-				addData(AffixTag.BREAK, wordBreakCharacters);
+				data.addData(AffixTag.WORD_BREAK_CHARACTERS, wordBreakCharacters);
 			}
 			//swap tags:
-			if(isComplexPrefixes()){
+			if(data.isComplexPrefixes()){
 //				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN);
 //				String compoundEnd = getData(AffixTag.COMPOUND_END);
 //				addData(AffixTag.COMPOUND_BEGIN, compoundEnd);
 //				addData(AffixTag.COMPOUND_END, compoundBegin);
 
-				RuleEntry prefixes = getData(AffixTag.PREFIX);
-				RuleEntry suffixes = getData(AffixTag.SUFFIX);
-				addData(AffixTag.PREFIX, suffixes);
-				addData(AffixTag.SUFFIX, prefixes);
+				RuleEntry prefixes = data.getData(AffixTag.PREFIX);
+				RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
+				data.addData(AffixTag.PREFIX, suffixes);
+				data.addData(AffixTag.SUFFIX, prefixes);
 			}
 //			if(!containsData(AffixTag.KEY))
 //				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
@@ -241,9 +228,7 @@ public class AffixParser extends ReadWriteLockable{
 //				addData(AffixTag.WORD_CHARS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 
 
-			terminalAffixes.addAll(Arrays.asList(getNoSuggestFlag(), getCompoundFlag(), getForbiddenWordFlag(), getCompoundBeginFlag(),
-				getCompoundMiddleFlag(), getCompoundEndFlag(), getOnlyInCompoundFlag(), getPermitCompoundFlag(), getForbidCompoundFlag(),
-				getForceCompoundUppercaseFlag(), getCircumfixFlag(), getKeepCaseFlag(), getNeedAffixFlag()));
+			data.close();
 		}
 		finally{
 			releaseWriteLock();
@@ -257,254 +242,18 @@ public class AffixParser extends ReadWriteLockable{
 		return PARSING_HANDLERS.get(ruleType);
 	}
 
+	public AffixData getAffixData(){
+		return data;
+	}
+
 	public void clear(){
-		clearData();
-	}
-
-	private boolean containsData(AffixTag key){
-		return containsData(key.getCode());
-	}
-
-	private boolean containsData(String key){
-		return data.containsKey(key);
-	}
-
-	public <T> T getData(AffixTag key){
-		return getData(key.getCode());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T getData(String key){
-		return (T)data.get(key);
-	}
-
-	private <T> void addData(AffixTag key, T value){
-		addData(key.getCode(), value);
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> void addData(String key, T value){
-		T prevValue = (T)data.put(key, value);
-
-		if(prevValue != null)
-			throw new IllegalArgumentException("Duplicated flag: " + key);
-	}
-
-	private void clearData(){
 		acquireWriteLock();
 		try{
 			data.clear();
-			strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-			terminalAffixes.clear();
 		}
 		finally{
 			releaseWriteLock();
 		}
-	}
-
-	public String getLanguage(){
-		return getData(AffixTag.LANGUAGE);
-	}
-
-	public String getKeepCaseFlag(){
-		return getData(AffixTag.KEEP_CASE);
-	}
-
-	public String getNeedAffixFlag(){
-		return getData(AffixTag.NEED_AFFIX);
-	}
-
-	public boolean isTerminalAffix(String flag){
-		return terminalAffixes.contains(flag);
-	}
-
-	public Set<String> getCompoundRules(){
-		return getData(AffixTag.COMPOUND_RULE);
-	}
-
-	public boolean isManagedByCompoundRule(String flag){
-		boolean found = false;
-		Set<String> compoundRules = getCompoundRules();
-		if(compoundRules != null)
-			for(String rule : compoundRules)
-				if(isManagedByCompoundRule(rule, flag)){
-					found = true;
-					break;
-				}
-		return found;
-	}
-
-	public boolean isManagedByCompoundRule(String compoundRule, String flag){
-		String[] flags = strategy.extractCompoundRule(compoundRule);
-		return ArrayUtils.contains(flags, flag);
-	}
-
-	public Charset getCharset(){
-		return Charset.forName(getData(AffixTag.CHARACTER_SET));
-	}
-
-	public boolean isFullstrip(){
-		return containsData(AffixTag.FULLSTRIP);
-	}
-
-	/**
-	 * 2-stage prefix plus 1-stage suffix instead of 2-stage suffix plus 1-stage prefix
-	 * 
-	 * @return Whether the prefix is complex
-	 */
-	public boolean isComplexPrefixes(){
-		return containsData(AffixTag.COMPLEX_PREFIXES);
-	}
-
-	public Boolean isSuffix(String affixCode){
-		Boolean isSuffix = null;
-		Object affix = getData(affixCode);
-		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
-			isSuffix = ((RuleEntry)affix).isSuffix();
-		return isSuffix;
-	}
-
-	public boolean isForbidDifferentCasesInCompound(){
-		return containsData(AffixTag.CHECK_COMPOUND_CASE);
-	}
-
-	public boolean isForbidTriplesInCompound(){
-		return containsData(AffixTag.CHECK_COMPOUND_TRIPLE);
-	}
-
-	public boolean isSimplifyTriplesInCompound(){
-		return containsData(AffixTag.SIMPLIFIED_TRIPLE);
-	}
-
-	public Set<String> getProductiveAffixes(){
-		//keeps only items with RuleEntry as value
-		Set<String> affixes = new HashSet<>();
-		Set<String> keys = data.keySet();
-		for(String key : keys){
-			Object affix = getData(key);
-			if(RuleEntry.class.isAssignableFrom(affix.getClass()))
-				affixes.add(key);
-		}
-		return affixes;
-	}
-
-	public String getFlag(){
-		return getData(AffixTag.FLAG);
-	}
-
-	public FlagParsingStrategy getFlagParsingStrategy(){
-		return strategy;
-	}
-
-	public boolean isAffixProductive(String word, String affix){
-		word = applyInputConversionTable(word);
-
-		boolean productive;
-		RuleEntry rule = getData(affix);
-		if(rule != null){
-			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
-			productive = !applicableAffixes.isEmpty();
-		}
-		else
-			productive = isManagedByCompoundRule(affix);
-		return productive;
-	}
-
-	public static List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
-		//extract the list of applicable affixes...
-		List<AffixEntry> applicableAffixes = new ArrayList<>();
-		for(AffixEntry entry : entries)
-			if(entry.match(word))
-				applicableAffixes.add(entry);
-		return applicableAffixes;
-	}
-
-	public String getNoSuggestFlag(){
-		return getData(AffixTag.NO_SUGGEST);
-	}
-
-	//FIXME to remove?
-	public ConversionTable getReplacementTable(){
-		return getData(AffixTag.REPLACEMENT_TABLE);
-	}
-
-	public String applyReplacementTable(String word){
-		ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
-	}
-
-	public String applyInputConversionTable(String word){
-		ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
-	}
-
-	public String applyOutputConversionTable(String word){
-		ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
-	}
-
-	public Set<String> getWordBreakCharacters(){
-		return getData(AffixTag.BREAK);
-	}
-
-	public String getCompoundBeginFlag(){
-		return getData(AffixTag.COMPOUND_BEGIN);
-	}
-
-	public String getCompoundMiddleFlag(){
-		return getData(AffixTag.COMPOUND_MIDDLE);
-	}
-
-	public String getCompoundEndFlag(){
-		return getData(AffixTag.COMPOUND_END);
-	}
-
-	public String getOnlyInCompoundFlag(){
-		return getData(AffixTag.ONLY_IN_COMPOUND);
-	}
-
-	public boolean allowTwofoldAffixesInCompound(){
-		return containsData(AffixTag.COMPOUND_MORE_SUFFIXES);
-	}
-
-	public String getPermitCompoundFlag(){
-		return getData(AffixTag.COMPOUND_PERMIT_FLAG);
-	}
-
-	public String getForbidCompoundFlag(){
-		return getData(AffixTag.COMPOUND_FORBID_FLAG);
-	}
-
-	public int getCompoundMaxWordCount(){
-		return getData(AffixTag.COMPOUND_WORD_MAX);
-	}
-
-	public boolean isForbidDuplicationsInCompound(){
-		return containsData(AffixTag.CHECK_COMPOUND_DUPLICATION);
-	}
-
-	public boolean isCheckCompoundReplacement(){
-		return containsData(AffixTag.CHECK_COMPOUND_REPLACEMENT);
-	}
-
-	public int getCompoundMinimumLength(){
-		return getData(AffixTag.COMPOUND_MIN);
-	}
-
-	public String getCompoundFlag(){
-		return getData(AffixTag.COMPOUND_FLAG);
-	}
-
-	public String getCircumfixFlag(){
-		return getData(AffixTag.CIRCUMFIX);
-	}
-
-	public String getForbiddenWordFlag(){
-		return getData(AffixTag.FORBIDDEN_WORD);
-	}
-
-	public String getForceCompoundUppercaseFlag(){
-		return getData(AffixTag.FORCE_UPPERCASE);
 	}
 
 }

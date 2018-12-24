@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -53,24 +53,24 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	/** NOTE: this works only if the rules produce only one output! ... for now */
-	public RuleReducerWorker(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
-		Objects.requireNonNull(affParser);
+	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
+		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
 
 String flag = "v1";
-		RuleEntry originalRuleEntry = (RuleEntry)affParser.getData(flag);
+		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
 		boolean isSuffix = originalRuleEntry.isSuffix();
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
-		List<String> aliasesFlag = affParser.getData(AffixTag.ALIASES_FLAG);
-		List<String> aliasesMorphologicalField = affParser.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-		Comparator<String> comparator = BaseBuilder.getComparator(affParser.getLanguage());
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
+		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		Set<LineEntry> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-			dicEntry.applyConversionTable(affParser::applyInputConversionTable);
+			dicEntry.applyConversionTable(affixData::applyInputConversionTable);
 
 			if(dicEntry.hasContinuationFlag(flag)){
 				String word = dicEntry.getWord();

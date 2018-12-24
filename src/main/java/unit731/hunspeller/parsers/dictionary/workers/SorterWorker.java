@@ -44,7 +44,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
-		comparator  = BaseBuilder.getComparator(backbone.getAffParser().getLanguage());
+		comparator  = BaseBuilder.getComparator(backbone.getAffixData().getLanguage());
 	}
 
 	@Override

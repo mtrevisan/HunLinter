@@ -11,7 +11,7 @@ import unit731.hunspeller.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunspeller.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.OrthographyVEC;
 import unit731.hunspeller.languages.vec.WordVEC;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 
@@ -24,7 +24,7 @@ public class BaseBuilder{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
 		private Comparator<String> comparator;
 		private DictionaryBaseData dictionaryBaseData;
-		private BiFunction<AffixParser, HyphenatorInterface, DictionaryCorrectnessChecker> checker;
+		private BiFunction<AffixData, HyphenatorInterface, DictionaryCorrectnessChecker> checker;
 		private Orthography orthography;
 	}
 
@@ -33,7 +33,7 @@ public class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.baseClass = DictionaryCorrectnessChecker.class;
 		LANGUAGE_DATA_DEFAULT.comparator = COMPARATOR_DEFAULT;
 		LANGUAGE_DATA_DEFAULT.dictionaryBaseData = DictionaryBaseData.getInstance();
-		LANGUAGE_DATA_DEFAULT.checker = (affParser, hyphenator) -> new DictionaryCorrectnessChecker(affParser, hyphenator);
+		LANGUAGE_DATA_DEFAULT.checker = (affixData, hyphenator) -> new DictionaryCorrectnessChecker(affixData, hyphenator);
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 	}
 	private static final Map<String, LanguageData> DATAS = new HashMap<>();
@@ -42,7 +42,7 @@ public class BaseBuilder{
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
 		langData.comparator = WordVEC.sorterComparator();
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();
-		langData.checker = (affParser, hyphenator) -> new DictionaryCorrectnessCheckerVEC(affParser, hyphenator);
+		langData.checker = (affixData, hyphenator) -> new DictionaryCorrectnessCheckerVEC(affixData, hyphenator);
 		langData.orthography = OrthographyVEC.getInstance();
 		DATAS.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
 	}
@@ -60,9 +60,9 @@ public class BaseBuilder{
 			.dictionaryBaseData;
 	}
 
-	public static DictionaryCorrectnessChecker getCorrectnessChecker(AffixParser affParser, HyphenatorInterface hyphenator) throws IOException{
-		DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affParser.getLanguage(), LANGUAGE_DATA_DEFAULT)
-			.checker.apply(affParser, hyphenator);
+	public static DictionaryCorrectnessChecker getCorrectnessChecker(AffixData affixData, HyphenatorInterface hyphenator) throws IOException{
+		DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
+			.checker.apply(affixData, hyphenator);
 		checker.loadRules();
 		return checker;
 	}

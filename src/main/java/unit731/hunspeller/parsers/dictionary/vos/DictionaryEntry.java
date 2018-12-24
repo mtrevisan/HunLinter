@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
@@ -144,13 +144,13 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * @param affParser	The Affix Parser used to determine if a flag is a terminal
+	 * @param affixData	The Affix Data used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasNonTerminalContinuationFlags(AffixParser affParser){
+	public boolean hasNonTerminalContinuationFlags(AffixData affixData){
 		if(continuationFlags != null)
 			for(String flag : continuationFlags)
-				if(!affParser.isTerminalAffix(flag))
+				if(!affixData.isTerminalAffix(flag))
 					return true;
 		return false;
 	}
@@ -167,14 +167,14 @@ public class DictionaryEntry{
 		return false;
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixParser affParser){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixData affixData){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
-			.filter(affParser::isManagedByCompoundRule)
+			.filter(affixData::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(AffixParser affParser, String compoundBeginFlag,
-			String compoundMiddleFlag, String compoundEndFlag){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(String compoundBeginFlag, String compoundMiddleFlag,
+			String compoundEndFlag){
 		Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
@@ -202,36 +202,36 @@ public class DictionaryEntry{
 				fun.accept(morphologicalField);
 	}
 
-	public void removeAffixes(AffixParser affParser){
-		Affixes affixes = separateAffixes(affParser);
+	public void removeAffixes(AffixData affixData){
+		Affixes affixes = separateAffixes(affixData);
 		continuationFlags = affixes.getTerminalAffixes();
 	}
 
-	public List<String[]> extractAllAffixes(AffixParser affParser, boolean reverse){
-		Affixes affixes = separateAffixes(affParser);
+	public List<String[]> extractAllAffixes(AffixData affixData, boolean reverse){
+		Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
 
 	/**
 	 * Separate the prefixes from the suffixes and from the terminals
 	 * 
-	 * @param affParser	The {@link AffixParser}
+	 * @param affixData	The {@link AffixData}
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
-	private Affixes separateAffixes(AffixParser affParser) throws IllegalArgumentException{
+	private Affixes separateAffixes(AffixData affixData) throws IllegalArgumentException{
 		List<String> terminalAffixes = new ArrayList<>();
 		List<String> prefixes = new ArrayList<>();
 		List<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null)
 			for(String affix : continuationFlags){
-				if(affParser.isTerminalAffix(affix)){
+				if(affixData.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
 					continue;
 				}
 
-				Object rule = affParser.getData(affix);
+				Object rule = affixData.getData(affix);
 				if(rule == null){
-					if(affParser.isManagedByCompoundRule(affix))
+					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
 					String parentFlag = null;

@@ -42,6 +42,7 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Frequency;
@@ -529,7 +530,9 @@ public class DictionaryStatisticsDialog extends JDialog{
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
 				Backbone backbone = new Backbone(null, null);
-				DictionaryStatistics stats = new DictionaryStatistics(backbone.getAffParser().getLanguage(), backbone.getAffParser().getCharset(), backbone.getDictionaryBaseData());
+				AffixData affixData = backbone.getAffixData();
+				DictionaryStatistics stats = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset(),
+					backbone.getDictionaryBaseData());
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));

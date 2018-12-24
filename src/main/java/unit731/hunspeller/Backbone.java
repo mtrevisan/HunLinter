@@ -23,6 +23,7 @@ import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.BaseBuilder;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -88,6 +89,10 @@ public class Backbone implements FileChangeListener{
 		return affParser;
 	}
 
+	public AffixData getAffixData(){
+		return affParser.getAffixData();
+	}
+
 	public AidParser getAidParser(){
 		return aidParser;
 	}
@@ -124,7 +129,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
 
 		File dicFile = getDictionaryFile();
 		prepareDictionaryFile(dicFile);
@@ -143,7 +148,7 @@ public class Backbone implements FileChangeListener{
 		File hypFile = getHyphenationFile();
 		openHyphenationFile(hypFile);
 
-		checker = BaseBuilder.getCorrectnessChecker(affParser, hyphenator);
+		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
 
 		File dicFile = new File(dictionaryFilePath);
 		prepareDictionaryFile(dicFile);
@@ -199,7 +204,7 @@ public class Backbone implements FileChangeListener{
 		if(hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
-			hypParser = new HyphenationParser(affParser.getLanguage());
+			hypParser = new HyphenationParser(affParser.getAffixData().getLanguage());
 			hypParser.parse(hypFile);
 
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
@@ -214,9 +219,10 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private void prepareDictionaryFile(File dicFile){
+		AffixData affixData = affParser.getAffixData();
 		if(dicFile.exists()){
-			String language = affParser.getLanguage();
-			Charset charset = affParser.getCharset();
+			String language = affixData.getLanguage();
+			Charset charset = affixData.getCharset();
 			dicParser = new DictionaryParser(dicFile, language, charset);
 
 			if(hunspellable != null)
@@ -225,7 +231,7 @@ public class Backbone implements FileChangeListener{
 		else if(dicParser != null)
 			dicParser.clear();
 
-		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affParser.getLanguage());
+		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affixData.getLanguage());
 		wordGenerator = new WordGenerator(affParser, dicParser, dictionaryBaseData);
 	}
 
@@ -282,7 +288,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getAidFile(){
-		return new File(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getLanguage() + EXTENSION_AID);
+		return new File(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getAffixData().getLanguage() + EXTENSION_AID);
 	}
 
 	private String getCurrentWorkingDirectory(){
@@ -293,15 +299,15 @@ public class Backbone implements FileChangeListener{
 	}
 
 	private File getThesaurusIndexFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
+		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
 	}
 
 	private File getThesaurusDataFile(){
-		return getFile(PREFIX_THESAURUS + affParser.getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
+		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
 	}
 
 	private File getHyphenationFile(){
-		return getFile(PREFIX_HYPHENATION + affParser.getLanguage() + EXTENSION_DIC);
+		return getFile(PREFIX_HYPHENATION + affParser.getAffixData().getLanguage() + EXTENSION_DIC);
 	}
 
 
@@ -398,7 +404,7 @@ public class Backbone implements FileChangeListener{
 
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
-		String[] lines = Files.lines(dicFile.toPath(), affParser.getCharset())
+		String[] lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
 		return lines;

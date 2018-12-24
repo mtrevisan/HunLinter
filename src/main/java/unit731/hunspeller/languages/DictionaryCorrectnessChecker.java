@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
@@ -19,25 +20,21 @@ public class DictionaryCorrectnessChecker{
 	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("Word {0} has an unknown morphological field value: {1}");
 
 
-	protected AffixParser affParser;
+	protected AffixData affixData;
 	protected final HyphenatorInterface hyphenator;
 
 	protected RulesLoader rulesLoader;
 
 
-	public DictionaryCorrectnessChecker(AffixParser affParser, HyphenatorInterface hyphenator){
-		Objects.requireNonNull(affParser);
+	public DictionaryCorrectnessChecker(AffixData affixData, HyphenatorInterface hyphenator){
+		Objects.requireNonNull(affixData);
 
-		this.affParser = affParser;
+		this.affixData = affixData;
 		this.hyphenator = hyphenator;
 	}
 
 	public void loadRules() throws IOException{
-		rulesLoader = new RulesLoader(affParser.getLanguage(), affParser.getFlagParsingStrategy());
-	}
-
-	public AffixParser getAffParser(){
-		return affParser;
+		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 
 	public HyphenatorInterface getHyphenator(){
@@ -47,9 +44,9 @@ public class DictionaryCorrectnessChecker{
 	//used by the correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
 		try{
-			String forbidCompoundFlag = affParser.getForbidCompoundFlag();
+			String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 			if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-				throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.COMPOUND_FORBID_FLAG.getCode());
+				throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
 
 			if(rulesLoader.isMorphologicalFieldsCheck())
 				morphologicalFieldCheck(production);

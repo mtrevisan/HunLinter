@@ -26,16 +26,16 @@ public class DictionaryParserTest{
 			"REP alot a_lot");
 		affParser.parse(affFile);
 
-		ConversionTable table = affParser.getData(AffixTag.REPLACEMENT_TABLE);
+		ConversionTable table = affParser.getAffixData().getData(AffixTag.REPLACEMENT_TABLE);
 		Assert.assertEquals("[affixTag=REPLACEMENT_TABLE,table=[(^b,bb), (e$,ee), (ij,IJ), (alot,a lot)]]", table.toString());
 
-		String replaced = affParser.applyReplacementTable("clea");
+		String replaced = affParser.getAffixData().applyReplacementTable("clea");
 		Assert.assertEquals("clea", replaced);
 
-		replaced = affParser.applyReplacementTable("bcijde");
+		replaced = affParser.getAffixData().applyReplacementTable("bcijde");
 		Assert.assertEquals("bbcIJdee", replaced);
 
-		replaced = affParser.applyReplacementTable("alot");
+		replaced = affParser.getAffixData().applyReplacementTable("alot");
 		Assert.assertEquals("a lot", replaced);
 	}
 
@@ -49,7 +49,7 @@ public class DictionaryParserTest{
 			"REP ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("abacc");
+		String replaced = affParser.getAffixData().applyReplacementTable("abacc");
 		Assert.assertEquals("a3c", replaced);
 	}
 
@@ -63,7 +63,7 @@ public class DictionaryParserTest{
 			"REP ^ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("bacc");
+		String replaced = affParser.getAffixData().applyReplacementTable("bacc");
 		Assert.assertEquals("3c", replaced);
 	}
 
@@ -77,7 +77,7 @@ public class DictionaryParserTest{
 			"REP ab$ 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.applyReplacementTable("ccab");
+		String replaced = affParser.getAffixData().applyReplacementTable("ccab");
 		Assert.assertEquals("c3", replaced);
 	}
 

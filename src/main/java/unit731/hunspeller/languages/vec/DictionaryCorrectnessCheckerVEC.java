@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.RulesLoader;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
@@ -83,19 +83,19 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String[] pluralFlags;
 
 
-	public DictionaryCorrectnessCheckerVEC(AffixParser affParser, HyphenatorInterface hyphenator){
-		super(affParser, hyphenator);
+	public DictionaryCorrectnessCheckerVEC(AffixData affixData, HyphenatorInterface hyphenator){
+		super(affixData, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
 	}
 
 	@Override
 	public void loadRules() throws IOException{
-		rulesLoader = new RulesLoader(affParser.getLanguage(), affParser.getFlagParsingStrategy());
+		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 
 		Properties rulesProperties = rulesLoader.getRulesPorperties();
 		String pluralFlagsValue = rulesLoader.readProperty(rulesProperties, "pluralFlags");
-		FlagParsingStrategy strategy = affParser.getFlagParsingStrategy();
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
 
 		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty(rulesProperties, "patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
@@ -119,7 +119,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			incompatibilityCheck(production);
 
 //FIXME move this in super?
-			if(production.hasNonTerminalContinuationFlags(affParser) && !production.hasPartOfSpeech(POS_VERB)
+			if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
 					&& !production.hasPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production);
 
@@ -167,7 +167,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED_HANDLE.format(new Object[]{METAPHONESIS_RULE}));
 			else{
-				boolean canHaveMetaphonesis = affParser.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
+				boolean canHaveMetaphonesis = affixData.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
 				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
 					if(canHaveMetaphonesis && hasPluralFlag)
 						throw new IllegalArgumentException(METAPHONESIS_MISSING.format(new Object[]{METAPHONESIS_RULE}));
@@ -188,7 +188,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			boolean hasPluralFlag = hasPluralFlag(production);
 			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE) && !word.endsWith(MAN)
-				&& affParser.isAffixProductive(word, rule));
+				&& affixData.isAffixProductive(word, rule));
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
 				if(canHaveNorthernPlural)
 					throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));

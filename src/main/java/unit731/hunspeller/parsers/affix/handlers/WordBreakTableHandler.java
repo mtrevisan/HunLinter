@@ -39,9 +39,9 @@ public class WordBreakTableHandler implements Handler{
 
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
-				if(tag != AffixTag.BREAK)
+				if(tag != AffixTag.WORD_BREAK_CHARACTERS)
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
-						+ AffixTag.BREAK + ")");
+						+ AffixTag.WORD_BREAK_CHARACTERS + ")");
 
 				String breakCharacter = lineParts[1];
 				if(DOUBLE_MINUS_SIGN.equals(breakCharacter))
@@ -55,7 +55,7 @@ public class WordBreakTableHandler implements Handler{
 					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
 			}
 
-			addData.accept(AffixTag.BREAK.getCode(), wordBreakCharacters);
+			addData.accept(AffixTag.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
 		}
 		catch(IOException e){
 			throw new RuntimeException(e.getMessage());
