@@ -28,9 +28,10 @@ public class AffixData{
 
 
 	void close(){
-		terminalAffixes.addAll(Arrays.asList(getNoSuggestFlag(), getCompoundFlag(), getForbiddenWordFlag(), getCompoundBeginFlag(),
-			getCompoundMiddleFlag(), getCompoundEndFlag(), getOnlyInCompoundFlag(), getPermitCompoundFlag(), getForbidCompoundFlag(),
-			getForceCompoundUppercaseFlag(), getCircumfixFlag(), getKeepCaseFlag(), getNeedAffixFlag()));
+		terminalAffixes.addAll(getStringData(AffixTag.NO_SUGGEST_FLAG, AffixTag.COMPOUND_FLAG, AffixTag.FORBIDDEN_WORD_FLAG,
+			AffixTag.COMPOUND_BEGIN_FLAG, AffixTag.COMPOUND_MIDDLE_FLAG, AffixTag.COMPOUND_END_FLAG, AffixTag.ONLY_IN_COMPOUND_FLAG,
+			AffixTag.PERMIT_COMPOUND_FLAG, AffixTag.FORBID_COMPOUND_FLAG, AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, AffixTag.CIRCUMFIX_FLAG,
+			AffixTag.KEEP_CASE_FLAG, AffixTag.NEED_AFFIX_FLAG));
 	}
 
 	void clear(){
@@ -53,6 +54,13 @@ public class AffixData{
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key){
 		return (T)data.get(key);
+	}
+
+	private List<String> getStringData(AffixTag... keys){
+		List<String> result = new ArrayList<>(keys.length);
+		for(AffixTag key : keys)
+			result.add(getData(key));
+		return result;
 	}
 
 	public <T> void addData(AffixTag key, T value){
