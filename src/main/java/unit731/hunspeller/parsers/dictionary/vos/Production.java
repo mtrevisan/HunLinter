@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
@@ -168,6 +169,10 @@ public class Production extends DictionaryEntry{
 			.filter(df -> df.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH))
 			.sorted()
 			.collect(Collectors.joining(StringUtils.SPACE));
+	}
+
+	public void applyOutputConversionTable(AffixData affixData){
+		word = affixData.applyOutputConversionTable(word);
 	}
 
 	@Override

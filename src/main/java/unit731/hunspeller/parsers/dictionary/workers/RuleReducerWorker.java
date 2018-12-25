@@ -70,7 +70,7 @@ String flag = "v1";
 		Set<LineEntry> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-			dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+			dicEntry.applyInputConversionTable(affixData);
 
 			if(dicEntry.hasContinuationFlag(flag)){
 				String word = dicEntry.getWord();

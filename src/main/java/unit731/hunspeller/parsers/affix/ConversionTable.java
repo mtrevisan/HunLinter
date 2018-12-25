@@ -4,11 +4,7 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,12 +42,8 @@ public class ConversionTable{
 				String line = extractLine(br);
 
 				String[] parts = StringUtils.split(line);
-				if(parts.length != 3)
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
-				if(!affixTag.getCode().equals(parts[0]))
-					throw new IllegalArgumentException("Error reading line \"" + context
-						+ ": Bad tag, it must be " + affixTag.getCode());
+
+				checkValidity(parts, context);
 
 				table.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
@@ -69,118 +61,65 @@ public class ConversionTable{
 		return DictionaryParser.cleanLine(line);
 	}
 
-	public String applyConversionTable(String word){
-		if(table != null){
-			//collect input patterns that matches the given word
-			List<Pair<String, String>> appliablePatterns = collectInputPatterns(table, word);
+	private void checkValidity(String[] parts, ParsingContext context) throws IllegalArgumentException{
+		if(parts.length != 3)
+			throw new IllegalArgumentException("Error reading line \"" + context
+				+ ": Bad number of entries, it must be <tag> <pattern-from> <pattern-to>");
+		if(!affixTag.getCode().equals(parts[0]))
+			throw new IllegalArgumentException("Error reading line \"" + context
+				+ ": Bad tag, it must be " + affixTag.getCode());
+	}
 
-			for(Pair<String, String> entry : appliablePatterns){
+	/** NOTE: does not include the original word! */
+	public List<String> applyConversionTable(String word){
+		List<String> conversions = new ArrayList<>();
+		if(table != null){
+			for(Pair<String, String> entry : table){
 				String key = entry.getKey();
 				String value = entry.getValue();
 
-				if(key.charAt(0) == '^')
-					word = value + word.substring(key.length() - 1);
-				else if(key.charAt(key.length() - 1) == '$')
-					word = word.substring(0, word.length() - key.length() + 1) + value;
-				else
-					word = StringUtils.replace(word, key, value);
-			}
-		}
-		return word;
-	}
-
-	private List<Pair<String, String>> collectInputPatterns(List<Pair<String, String>> table, String word){
-		List<Pair<String, String>> startPatterns = new ArrayList<>();
-		List<Pair<String, String>> insidePatterns = new ArrayList<>();
-		List<Pair<String, String>> endPatterns = new ArrayList<>();
-		StringBuilder sb = new StringBuilder();
-		for(Pair<String, String> entry : table){
-			String key = entry.getKey();
-			String value = entry.getValue();
-			
-			if(key.charAt(0) == '^'){
-				key = key.substring(1);
-				if(word.startsWith(key))
-					startPatterns.add(Pair.of(key, value));
-			}
-			else if(key.charAt(key.length() - 1) == '$'){
-				key = key.substring(0, key.length() - 1);
-				if(word.endsWith(key)){
-					sb.setLength(0);
-					key = sb.append(key)
-						.reverse()
-						.toString();
-					endPatterns.add(Pair.of(key, value));
+				int keyLength = key.length();
+				if(isStarting(key)){
+					//starts with
+					if(!isEnding(key)){
+						if(word.startsWith(key.substring(1)))
+							conversions.add(value + word.substring(keyLength - 1));
+					}
+					//whole
+					else if(word.equals(key.substring(1, keyLength - 1)))
+						conversions.add(value);
 				}
-			}
-			else if(word.contains(key))
-				insidePatterns.add(Pair.of(key, value));
-		}
-
-		//keep only the longest input pattern
-		startPatterns = keepLongestInputPattern(startPatterns, key -> {
-			sb.setLength(0);
-			return sb.append('^').append(key).toString();
-		});
-		insidePatterns = keepLongestInputPattern(insidePatterns, Function.identity());
-		endPatterns = keepLongestInputPattern(endPatterns, key -> {
-			sb.setLength(0);
-			return sb.append(key).reverse().append('$').toString();
-		});
-
-		startPatterns.addAll(insidePatterns);
-		startPatterns.addAll(endPatterns);
-		return startPatterns;
-	}
-
-	private List<Pair<String, String>> keepLongestInputPattern(List<Pair<String, String>> table, Function<String, String> keyRemapper){
-		List<Pair<String, String>> result = table;
-		if(!table.isEmpty()){
-			table.sort(Comparator.comparing(entry -> entry.getKey().length()));
-
-			int size = table.size();
-			for(int i = 0; i < size; i ++){
-				Pair<String, String> entry = table.get(i);
-				if(entry != null){
-					String key = entry.getKey();
-					for(int j = i + 1; j < size; j ++){
-						Pair<String, String> entry2 = table.get(j);
-						if(entry2 != null){
-							String key2 = entry2.getKey();
-							if(key2.startsWith(key))
-								table.set(i, null);
+				else{
+					//ends with
+					if(isEnding(key)){
+						if(word.endsWith(key.substring(0, keyLength - 1)))
+							conversions.add(word.substring(0, word.length() - keyLength + 1) + value);
+					}
+					//inside
+					//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
+					else if(word.contains(key)){
+						//search every occurence of the pattern in the word
+						int idx = -1;
+						StringBuilder sb = new StringBuilder();
+						while((idx = word.indexOf(key, idx + 1)) >= 0){
+							sb.setLength(0);
+							sb.append(word);
+							sb.replace(idx, idx + keyLength, value);
+							conversions.add(sb.toString());
 						}
 					}
 				}
 			}
-
-			result = table.stream()
-				.filter(Objects::nonNull)
-				.map(entry -> Pair.of(keyRemapper.apply(entry.getKey()), entry.getValue()))
-				.collect(Collectors.toList());
 		}
-		return result;
+		return conversions;
 	}
 
-	public List<String> generateConversions(String word){
-		List<String> conversions = new ArrayList<>();
-		if(table != null && !table.isEmpty())
-			for(Pair<String, String> entry : table){
-				String pattern = entry.getKey();
-				String value = entry.getValue();
+	private boolean isStarting(String key){
+		return (key.charAt(0) == '^');
+	}
 
-				int idx = -1;
-				int patternLength = pattern.length();
-				StringBuilder sb = new StringBuilder();
-				//search every occurence of the pattern in the word
-				while((idx = word.indexOf(pattern, idx + 1)) >= 0){
-					sb.setLength(0);
-					sb.append(word);
-					sb.replace(idx, idx + patternLength, value);
-					conversions.add(sb.toString());
-				}
-			}
-		return conversions;
+	private boolean isEnding(String key){
+		return (key.charAt(key.length() - 1) == '$');
 	}
 
 	@Override

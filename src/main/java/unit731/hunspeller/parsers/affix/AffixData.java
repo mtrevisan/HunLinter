@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.affix;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -198,24 +199,35 @@ public class AffixData{
 		return getData(AffixTag.NO_SUGGEST_FLAG);
 	}
 
-	//FIXME to remove
-	public ConversionTable getReplacementTable(){
-		return getData(AffixTag.REPLACEMENT_TABLE);
-	}
-
-	public String applyReplacementTable(String word){
+	public List<String> applyReplacementTable(String word){
 		ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
+		return (table != null? table.applyConversionTable(word): Collections.<String>emptyList());
 	}
 
 	public String applyInputConversionTable(String word){
 		ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
+		if(table != null){
+			List<String> conversions = table.applyConversionTable(word);
+			if(conversions.size() > 1)
+				throw new IllegalArgumentException("Cannot input convert word " + word + ", too much appliable rules");
+
+			if(!conversions.isEmpty())
+				word = conversions.get(0);
+		}
+		return word;
 	}
 
 	public String applyOutputConversionTable(String word){
 		ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
-		return (table != null? table.applyConversionTable(word): word);
+		if(table != null){
+			List<String> conversions = table.applyConversionTable(word);
+			if(conversions.size() > 1)
+				throw new IllegalArgumentException("Cannot output convert word " + word + ", too much appliable rules");
+
+			if(!conversions.isEmpty())
+				word = conversions.get(0);
+		}
+		return word;
 	}
 
 	public Set<String> getWordBreakCharacters(){

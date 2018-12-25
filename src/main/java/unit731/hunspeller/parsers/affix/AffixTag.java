@@ -41,7 +41,6 @@ public enum AffixTag{
 	/** Similar to NOSUGGEST, but it forbids to use the word in n-gram based (more, than 1-character distance) suggestions */
 //	NO_NGRAM_SUGGEST("NONGRAMSUGGEST"),
 //	SUGGESTIONS_WITH_DOTS("SUGSWITHDOTS"),
-	/** If space is used then all the words must be present in the dictionary */
 	REPLACEMENT_TABLE("REP"),
 //	MAP_TABLE("MAP"),
 //	PHONE_TABLE("PHONE"),

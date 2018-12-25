@@ -2,6 +2,9 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -29,14 +32,14 @@ public class DictionaryParserTest{
 		ConversionTable table = affParser.getAffixData().getData(AffixTag.REPLACEMENT_TABLE);
 		Assert.assertEquals("[affixTag=REPLACEMENT_TABLE,table=[(^b,bb), (e$,ee), (ij,IJ), (alot,a lot)]]", table.toString());
 
-		String replaced = affParser.getAffixData().applyReplacementTable("clea");
-		Assert.assertEquals("clea", replaced);
+		List<String> replaced = affParser.getAffixData().applyReplacementTable("clea");
+		Assert.assertTrue(replaced.isEmpty());
 
 		replaced = affParser.getAffixData().applyReplacementTable("bcijde");
-		Assert.assertEquals("bbcIJdee", replaced);
+		Assert.assertEquals(Arrays.asList("bbcijde", "bcijdee", "bcIJde"), replaced);
 
 		replaced = affParser.getAffixData().applyReplacementTable("alot");
-		Assert.assertEquals("a lot", replaced);
+		Assert.assertEquals(Collections.singletonList("a lot"), replaced);
 	}
 
 	@Test
@@ -49,8 +52,8 @@ public class DictionaryParserTest{
 			"REP ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.getAffixData().applyReplacementTable("abacc");
-		Assert.assertEquals("a3c", replaced);
+		List<String> replaced = affParser.getAffixData().applyReplacementTable("abacc");
+		Assert.assertEquals(Arrays.asList("a1acc", "a3c", "a2cc"), replaced);
 	}
 
 	@Test
@@ -63,8 +66,8 @@ public class DictionaryParserTest{
 			"REP ^ba 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.getAffixData().applyReplacementTable("bacc");
-		Assert.assertEquals("3c", replaced);
+		List<String> replaced = affParser.getAffixData().applyReplacementTable("bacc");
+		Assert.assertEquals(Arrays.asList("1acc", "3c", "2cc"), replaced);
 	}
 
 	@Test
@@ -77,8 +80,8 @@ public class DictionaryParserTest{
 			"REP ab$ 2");
 		affParser.parse(affFile);
 
-		String replaced = affParser.getAffixData().applyReplacementTable("ccab");
-		Assert.assertEquals("c3", replaced);
+		List<String> replaced = affParser.getAffixData().applyReplacementTable("ccab");
+		Assert.assertEquals(Arrays.asList("cca1", "c3", "cc2"), replaced);
 	}
 
 }

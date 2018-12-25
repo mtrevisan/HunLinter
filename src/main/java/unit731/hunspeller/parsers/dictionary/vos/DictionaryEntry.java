@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -123,10 +122,8 @@ public class DictionaryEntry{
 		return combineable;
 	}
 
-	public void applyConversionTable(Function<String, String> inputConversion){
-		if(inputConversion != null)
-			//convert using input table
-			word = inputConversion.apply(word);
+	public void applyInputConversionTable(AffixData affixData){
+		word = affixData.applyInputConversionTable(word);
 	}
 
 	public boolean removeContinuationFlag(String continuationFlagToRemove){

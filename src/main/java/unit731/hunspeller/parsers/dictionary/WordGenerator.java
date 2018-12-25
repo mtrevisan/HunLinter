@@ -23,7 +23,6 @@ import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
-import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
@@ -77,7 +76,7 @@ public class WordGenerator{
 		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
 		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-		dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+		dicEntry.applyInputConversionTable(affixData);
 
 		List<Production> productions = Collections.<Production>emptyList();
 		String circumfixFlag = affixData.getCircumfixFlag();
@@ -103,11 +102,8 @@ public class WordGenerator{
 			enforceNeedAffixFlag(productions);
 
 			//convert using output table
-			int size = productions.size();
-			for(int i = 0; i < size; i ++){
-				Production production = productions.get(i);
-				production.applyConversionTable(affixData::applyOutputConversionTable);
-			}
+			for(Production production : productions)
+				production.applyOutputConversionTable(affixData);
 
 			if(LOGGER.isTraceEnabled())
 				productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
@@ -121,16 +117,13 @@ public class WordGenerator{
 		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
 		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-		dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+		dicEntry.applyInputConversionTable(affixData);
 
 		List<Production> productions = applyAffixRules(dicEntry, false);
 
 		//convert using output table
-		int size = productions.size();
-		for(int i = 0; i < size; i ++){
-			Production production = productions.get(i);
-			production.applyConversionTable(affixData::applyOutputConversionTable);
-		}
+		for(Production production : productions)
+			production.applyOutputConversionTable(affixData);
 
 		if(LOGGER.isTraceEnabled())
 			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
@@ -254,7 +247,7 @@ public class WordGenerator{
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
-			dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+			dicEntry.applyInputConversionTable(affixData);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);
 			//merge the distribution with the others
@@ -327,7 +320,7 @@ public class WordGenerator{
 		List<DictionaryEntry> result = new ArrayList<>();
 		for(String inputCompound : inputCompounds){
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
-			dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+			dicEntry.applyInputConversionTable(affixData);
 
 			//filter input set by minimum length and forbidden flag
 			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
@@ -500,7 +493,7 @@ public class WordGenerator{
 
 		//convert using output table
 		for(Production production : productions){
-			production.applyConversionTable(affixData::applyOutputConversionTable);
+			production.applyOutputConversionTable(affixData);
 			production.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			production.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
@@ -544,8 +537,7 @@ public class WordGenerator{
 				return true;
 
 		if(word.length() >= 2){
-			ConversionTable table = affixData.getReplacementTable();
-			List<String> conversions = table.generateConversions(word);
+			List<String> conversions = affixData.applyReplacementTable(word);
 			for(String candidate : conversions)
 				if(dicInclusionTestWorker.isInDictionary(candidate)){
 					compoundAsReplacement.add(word);
@@ -606,7 +598,7 @@ public class WordGenerator{
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(String inputCompound : inputCompounds){
 			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
-			dicEntry.applyConversionTable(affixData::applyInputConversionTable);
+			dicEntry.applyInputConversionTable(affixData);
 
 			List<Production> productions = applyAffixRules(dicEntry, false);
 			for(Production production : productions){

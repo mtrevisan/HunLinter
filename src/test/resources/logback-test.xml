@@ -6,7 +6,7 @@
 		</encoder>
 	</appender>
 
-	<logger name="unit731.hunspeller" level="debug" />
+	<logger name="unit731.hunspeller" level="trace" />
 <!--	<logger name="unit731.hunspeller.parsers" level="info" />-->
 
 	<logger name="sun.misc" level="off" />
