@@ -184,49 +184,7 @@ public class AffixParser extends ReadWriteLockable{
 				}
 			}
 
-			if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
-				data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
-			else{
-				int compoundMin = data.getData(AffixTag.COMPOUND_MINIMUM_LENGTH);
-				if(compoundMin < 1)
-					data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 1);
-			}
-			//apply default charset
-			if(!data.containsData(AffixTag.CHARACTER_SET))
-				data.addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
-			if(!data.containsData(AffixTag.LANGUAGE)){
-				//try to infer language from filename
-				String filename = FilenameUtils.removeExtension(affFile.getName());
-				String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
-				if(languages.length == 0)
-					languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
-				String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
-				data.addData(AffixTag.LANGUAGE, language);
-			}
-			if(!data.containsData(AffixTag.WORD_BREAK_CHARACTERS)){
-				Set<String> wordBreakCharacters = new HashSet<>(3);
-				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
-				wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
-				wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
-				data.addData(AffixTag.WORD_BREAK_CHARACTERS, wordBreakCharacters);
-			}
-			//swap tags:
-			if(data.isComplexPrefixes()){
-//				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN_FLAG);
-//				String compoundEnd = getData(AffixTag.COMPOUND_END_FLAG);
-//				addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
-//				addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
-
-				RuleEntry prefixes = data.getData(AffixTag.PREFIX);
-				RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
-				data.addData(AffixTag.PREFIX, suffixes);
-				data.addData(AffixTag.SUFFIX, prefixes);
-			}
-//			if(!containsData(AffixTag.KEY))
-//				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
-//			if(!containsData(AffixTag.WORD_CHARS))
-//				addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
-
+			postProccessData(affFile);
 
 			data.close();
 		}
@@ -236,6 +194,51 @@ public class AffixParser extends ReadWriteLockable{
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B
+	}
+
+	private void postProccessData(File affFile){
+		if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
+			data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
+		else{
+			int compoundMin = data.getData(AffixTag.COMPOUND_MINIMUM_LENGTH);
+			if(compoundMin < 1)
+				data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 1);
+		}
+		//apply default charset
+		if(!data.containsData(AffixTag.CHARACTER_SET))
+			data.addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
+		if(!data.containsData(AffixTag.LANGUAGE)){
+			//try to infer language from filename
+			String filename = FilenameUtils.removeExtension(affFile.getName());
+			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
+			if(languages.length == 0)
+				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
+			String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
+			data.addData(AffixTag.LANGUAGE, language);
+		}
+		if(!data.containsData(AffixTag.WORD_BREAK_CHARACTERS)){
+			Set<String> wordBreakCharacters = new HashSet<>(3);
+			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
+			wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
+			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
+			data.addData(AffixTag.WORD_BREAK_CHARACTERS, wordBreakCharacters);
+		}
+		//swap tags:
+		if(data.isComplexPrefixes()){
+//			String compoundBegin = getData(AffixTag.COMPOUND_BEGIN_FLAG);
+//			String compoundEnd = getData(AffixTag.COMPOUND_END_FLAG);
+//			addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
+//			addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
+
+RuleEntry prefixes = data.getData(AffixTag.PREFIX);
+RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
+data.addData(AffixTag.PREFIX, suffixes);
+data.addData(AffixTag.SUFFIX, prefixes);
+		}
+//		if(!containsData(AffixTag.KEY))
+//			addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+//		if(!containsData(AffixTag.WORD_CHARS))
+//			addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 	}
 
 	private Handler lookupHandlerByRuleType(AffixTag ruleType){
