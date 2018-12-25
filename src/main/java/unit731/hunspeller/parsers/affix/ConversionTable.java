@@ -70,10 +70,15 @@ public class ConversionTable{
 				+ ": Bad tag, it must be " + affixTag.getCode());
 	}
 
-	/** NOTE: does not include the original word! */
+	/**
+	 * NOTE: does not include the original word!
+	 * 
+	 * @param word	Word to be converted
+	 * @return	The list of conversions
+	 */
 	public List<String> applyConversionTable(String word){
 		List<String> conversions = new ArrayList<>();
-		if(table != null){
+		if(table != null)
 			for(Pair<String, String> entry : table){
 				String key = entry.getKey();
 				String value = entry.getValue();
@@ -110,7 +115,6 @@ public class ConversionTable{
 					}
 				}
 			}
-		}
 		return conversions;
 	}
 

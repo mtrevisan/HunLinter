@@ -212,10 +212,10 @@ public class AffixParser extends ReadWriteLockable{
 			}
 			//swap tags:
 			if(data.isComplexPrefixes()){
-//				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN);
-//				String compoundEnd = getData(AffixTag.COMPOUND_END);
-//				addData(AffixTag.COMPOUND_BEGIN, compoundEnd);
-//				addData(AffixTag.COMPOUND_END, compoundBegin);
+//				String compoundBegin = getData(AffixTag.COMPOUND_BEGIN_FLAG);
+//				String compoundEnd = getData(AffixTag.COMPOUND_END_FLAG);
+//				addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
+//				addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
 
 				RuleEntry prefixes = data.getData(AffixTag.PREFIX);
 				RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
@@ -225,7 +225,7 @@ public class AffixParser extends ReadWriteLockable{
 //			if(!containsData(AffixTag.KEY))
 //				addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 //			if(!containsData(AffixTag.WORD_CHARS))
-//				addData(AffixTag.WORD_CHARS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
+//				addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 
 
 			data.close();
