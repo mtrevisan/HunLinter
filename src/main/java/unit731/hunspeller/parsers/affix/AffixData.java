@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.affix;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +38,7 @@ public class AffixData{
 		terminalAffixes.clear();
 	}
 
-	public boolean containsData(AffixTag key){
+	boolean containsData(AffixTag key){
 		return containsData(key.getCode());
 	}
 
@@ -63,17 +62,18 @@ public class AffixData{
 		return result;
 	}
 
-	public <T> void addData(AffixTag key, T value){
+	<T> void addData(AffixTag key, T value){
 		addData(key.getCode(), value);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> void addData(String key, T value){
+	<T> void addData(String key, T value){
 		T prevValue = (T)data.put(key, value);
 
 		if(prevValue != null)
 			throw new IllegalArgumentException("Duplicated flag: " + key);
 	}
+
 
 	public String getLanguage(){
 		return getData(AffixTag.LANGUAGE);
