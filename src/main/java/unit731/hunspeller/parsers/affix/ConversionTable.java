@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -13,6 +15,20 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class ConversionTable{
+
+	@FunctionalInterface
+	public interface ConversionFunction{
+		void convert(String word, Pair<String, String> entry, List<String> conversions);
+	}
+
+	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>();
+	static{
+		CONVERSION_TABLE_ADD_METHODS.put("  ", ConversionTable::convertInside);
+		CONVERSION_TABLE_ADD_METHODS.put("^ ", ConversionTable::convertStartsWith);
+		CONVERSION_TABLE_ADD_METHODS.put(" $", ConversionTable::convertEndsWith);
+		CONVERSION_TABLE_ADD_METHODS.put("^$", ConversionTable::convertWhole);
+	}
+
 
 	private final AffixTag affixTag;
 	private List<Pair<String, String>> table;
@@ -80,48 +96,40 @@ public class ConversionTable{
 		List<String> conversions = new ArrayList<>();
 		if(table != null)
 			for(Pair<String, String> entry : table){
-				String key = entry.getKey();
-
-				if(isStarting(key)){
-					//whole
-					if(isEnding(key))
-						convertWhole(entry, word, conversions);
-					//starts with
-					else
-						convertStartsWith(entry, word, conversions);
-				}
-				else{
-					//ends with
-					if(isEnding(key))
-						convertEndsWith(entry, word, conversions);
-					//inside
-					else
-						convertInside(entry, word, conversions);
-				}
+				String reducedKey = reduceKey(entry.getKey());
+				ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(reducedKey);
+				fun.convert(word, entry, conversions);
 			}
 		return conversions;
 	}
 
-	private void convertWhole(Pair<String, String> entry, String word, List<String> conversions){
+	private String reduceKey(String key){
+		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
+	}
+
+	private static void convertWhole(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
-		if(word.equals(key.substring(1, key.length() - 1)))
+		String strippedKey = key.substring(1, key.length() - 1);
+		if(word.equals(strippedKey))
 			conversions.add(entry.getValue());
 	}
 
-	private void convertStartsWith(Pair<String, String> entry, String word, List<String> conversions){
+	private static void convertStartsWith(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
-		if(word.startsWith(key.substring(1)))
+		String strippedKey = key.substring(1);
+		if(word.startsWith(strippedKey))
 			conversions.add(entry.getValue() + word.substring(key.length() - 1));
 	}
 
-	private void convertEndsWith(Pair<String, String> entry, String word, List<String> conversions){
+	private static void convertEndsWith(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
-		int keyLength = key.length();
-		if(word.endsWith(key.substring(0, keyLength - 1)))
-			conversions.add(word.substring(0, word.length() - keyLength + 1) + entry.getValue());
+		int keyLength = key.length() - 1;
+		String strippedKey = key.substring(0, keyLength);
+		if(word.endsWith(strippedKey))
+			conversions.add(word.substring(0, word.length() - keyLength) + entry.getValue());
 	}
 
-	private void convertInside(Pair<String, String> entry, String word, List<String> conversions){
+	private static void convertInside(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
 		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
 		if(word.contains(key)){
