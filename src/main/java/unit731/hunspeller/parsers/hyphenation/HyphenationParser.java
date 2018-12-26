@@ -417,41 +417,55 @@ public class HyphenationParser extends ReadWriteLockable{
 	 * @param level	Level to add the rule to
 	 */
 	public static void validateRule(String rule, Level level){
+		validateBasicRules(rule);
+
+		String cleanedRule = rule;
+		int augmentedIndex = rule.indexOf('/');
+		if(augmentedIndex >= 0){
+			cleanedRule = rule.substring(0, augmentedIndex);
+			validateAugmentedRule(cleanedRule, rule);
+		}
+
+		Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
+		ensureUniqueness(reducedPatterns, cleanedRule, rule);
+
+		reducedPatterns.add(cleanedRule);
+	}
+
+	private static void validateBasicRules(String rule) throws IllegalArgumentException{
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE))
 			throw new IllegalArgumentException("Rule " + rule + " has an invalid format");
 		if(!PatternHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
 			throw new IllegalArgumentException("Rule " + rule + " has no hyphenation point(s)");
 		if(PatternHelper.find(rule, PATTERN_INVALID_RULE_START) || PatternHelper.find(rule, PATTERN_INVALID_RULE_END))
 			throw new IllegalArgumentException("Rule " + rule + " is invalid, the hyphenation point should not be adjacent to a dot");
+	}
 
-		String cleanedRule = rule;
-		int augmentedIndex = rule.indexOf('/');
-		if(augmentedIndex >= 0){
-			cleanedRule = rule.substring(0, augmentedIndex);
-			int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
-			if(count != 1)
-				throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
-
-			String[] parts = StringUtils.split(rule, COMMA);
-			if(parts.length > 1){
-				int index = getIndexOfBreakpoint(rule);
-
-				int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
-				int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
-				if(startIndex < 0 || startIndex >= index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
-				if(length < 0 || startIndex + length < index)
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
-				if(startIndex + length >= parts[0].length())
-					throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
-			}
+	private static void validateAugmentedRule(String cleanedRule, String rule) throws IllegalArgumentException{
+		int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
+		if(count != 1)
+			throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
+		String[] parts = StringUtils.split(rule, COMMA);
+		if(parts.length > 1){
+			int index = getIndexOfBreakpoint(rule);
+			
+			int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
+			int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
+			if(startIndex < 0 || startIndex >= index)
+				throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
+			if(length < 0 || startIndex + length < index)
+				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
+			if(startIndex + length >= parts[0].length())
+				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 		}
+	}
 
-
-		//a standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
-		//(for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
+	/**
+	 * A standard and a non–standard hyphenation pattern matching the same hyphenation point must not be on the same hyphenation level
+	 * (for instance, c1 and zuc1ker/k=k,3,2 are invalid, while c1 and zuc3ker/k=k,3,2 are valid extended hyphenation patterns)
+	 */
+	private static void ensureUniqueness(Set<String> reducedPatterns, String cleanedRule, String rule) throws IllegalArgumentException{
 		String alreadyPresentRule = null;
-		Set<String> reducedPatterns = REDUCED_PATTERNS.get(level);
 		for(String pattern : reducedPatterns)
 			if(pattern.contains(cleanedRule) || cleanedRule.contains(pattern)){
 				alreadyPresentRule = pattern;
@@ -459,8 +473,6 @@ public class HyphenationParser extends ReadWriteLockable{
 			}
 		if(alreadyPresentRule != null)
 			throw new IllegalArgumentException("Pattern " + rule + " already present as " + alreadyPresentRule);
-
-		reducedPatterns.add(cleanedRule);
 	}
 
 	public static int getIndexOfBreakpoint(String rule){
