@@ -81,41 +81,60 @@ public class ConversionTable{
 		if(table != null)
 			for(Pair<String, String> entry : table){
 				String key = entry.getKey();
-				String value = entry.getValue();
 
-				int keyLength = key.length();
 				if(isStarting(key)){
-					//starts with
-					if(!isEnding(key)){
-						if(word.startsWith(key.substring(1)))
-							conversions.add(value + word.substring(keyLength - 1));
-					}
 					//whole
-					else if(word.equals(key.substring(1, keyLength - 1)))
-						conversions.add(value);
+					if(isEnding(key))
+						convertWhole(entry, word, conversions);
+					//starts with
+					else
+						convertStartsWith(entry, word, conversions);
 				}
 				else{
 					//ends with
-					if(isEnding(key)){
-						if(word.endsWith(key.substring(0, keyLength - 1)))
-							conversions.add(word.substring(0, word.length() - keyLength + 1) + value);
-					}
+					if(isEnding(key))
+						convertEndsWith(entry, word, conversions);
 					//inside
-					//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
-					else if(word.contains(key)){
-						//search every occurence of the pattern in the word
-						int idx = -1;
-						StringBuilder sb = new StringBuilder();
-						while((idx = word.indexOf(key, idx + 1)) >= 0){
-							sb.setLength(0);
-							sb.append(word);
-							sb.replace(idx, idx + keyLength, value);
-							conversions.add(sb.toString());
-						}
-					}
+					else
+						convertInside(entry, word, conversions);
 				}
 			}
 		return conversions;
+	}
+
+	private void convertWhole(Pair<String, String> entry, String word, List<String> conversions){
+		String key = entry.getKey();
+		if(word.equals(key.substring(1, key.length() - 1)))
+			conversions.add(entry.getValue());
+	}
+
+	private void convertStartsWith(Pair<String, String> entry, String word, List<String> conversions){
+		String key = entry.getKey();
+		if(word.startsWith(key.substring(1)))
+			conversions.add(entry.getValue() + word.substring(key.length() - 1));
+	}
+
+	private void convertEndsWith(Pair<String, String> entry, String word, List<String> conversions){
+		String key = entry.getKey();
+		int keyLength = key.length();
+		if(word.endsWith(key.substring(0, keyLength - 1)))
+			conversions.add(word.substring(0, word.length() - keyLength + 1) + entry.getValue());
+	}
+
+	private void convertInside(Pair<String, String> entry, String word, List<String> conversions){
+		String key = entry.getKey();
+		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
+		if(word.contains(key)){
+			//search every occurence of the pattern in the word
+			int idx = -1;
+			StringBuilder sb = new StringBuilder();
+			while((idx = word.indexOf(key, idx + 1)) >= 0){
+				sb.setLength(0);
+				sb.append(word);
+				sb.replace(idx, idx + key.length(), entry.getValue());
+				conversions.add(sb.toString());
+			}
+		}
 	}
 
 	private boolean isStarting(String key){
