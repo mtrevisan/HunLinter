@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
@@ -58,12 +57,16 @@ public class DictionaryCorrectnessChecker{
 				checkCompoundProduction(subword, production);
 		}
 		catch(IllegalArgumentException e){
-			StringBuilder sb = new StringBuilder(e.getMessage());
-			if(production.hasProductionRules())
-				sb.append(" (via ").append(production.getRulesSequence()).append(")");
-			sb.append(" for ").append(production.getWord());
-			throw new IllegalArgumentException(sb.toString());
+			manageException(e, production);
 		}
+	}
+
+	protected void manageException(IllegalArgumentException e, Production production) throws IllegalArgumentException{
+		StringBuilder sb = new StringBuilder(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		sb.append(" for ").append(production.getWord());
+		throw new IllegalArgumentException(sb.toString());
 	}
 
 	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{

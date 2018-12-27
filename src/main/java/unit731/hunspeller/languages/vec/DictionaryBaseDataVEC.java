@@ -15,11 +15,11 @@ public class DictionaryBaseDataVEC extends DictionaryBaseData{
 	}
 
 
-	private DictionaryBaseDataVEC(){}
-
 	public static synchronized DictionaryBaseData getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
+
+	private DictionaryBaseDataVEC(){}
 
 	@Override
 	public int getExpectedNumberOfElements(){
