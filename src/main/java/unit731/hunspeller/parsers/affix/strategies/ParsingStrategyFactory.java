@@ -8,8 +8,8 @@ public class ParsingStrategyFactory{
 
 	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>();
 	static{
-		STRATEGIES.put(null, ASCIIParsingStrategy.getInstance());
-		STRATEGIES.put("UTF-8", UTF8ParsingStrategy.getInstance());
+		STRATEGIES.put(null, CharsetParsingStrategy.getASCIIInstance());
+		STRATEGIES.put("UTF-8", CharsetParsingStrategy.getUTF8Instance());
 		STRATEGIES.put("long", DoubleASCIIParsingStrategy.getInstance());
 		STRATEGIES.put("num", NumericalParsingStrategy.getInstance());
 	}
@@ -26,7 +26,7 @@ public class ParsingStrategyFactory{
 	}
 
 	public static FlagParsingStrategy createASCIIParsingStrategy(){
-		return ASCIIParsingStrategy.getInstance();
+		return CharsetParsingStrategy.getASCIIInstance();
 	}
 
 	public static FlagParsingStrategy createDoubleASCIIParsingStrategy(){
@@ -38,7 +38,7 @@ public class ParsingStrategyFactory{
 	}
 
 	public static FlagParsingStrategy createUTF8ParsingStrategy(){
-		return UTF8ParsingStrategy.getInstance();
+		return CharsetParsingStrategy.getUTF8Instance();
 	}
 
 }

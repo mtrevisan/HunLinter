@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -725,10 +726,10 @@ public class WordGenerator{
 				if(rulesContainsCircumfixFlag){
 					//check if at least one SFX and one PFX have the circumfix flag
 					boolean suffixWithCircumfix = appliedRules.stream()
-						.filter(rule -> rule.isSuffix())
+						.filter(AffixEntry::isSuffix)
 						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
 					boolean prefixWithCircumfix = appliedRules.stream()
-						.filter(rule -> !rule.isSuffix())
+						.filter(Predicate.not(AffixEntry::isSuffix))
 						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
 					if(suffixWithCircumfix ^ prefixWithCircumfix)
 						itr.remove();
