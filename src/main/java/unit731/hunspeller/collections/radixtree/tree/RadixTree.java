@@ -125,11 +125,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 				for(int i = 0; i < keySize; i ++){
 					S subkey = sequencer.subSequence(currentKey, i);
 
-					//find the deepest node labeled by a proper suffix of the current child
-					RadixTreeNode<S, V> state;
-					RadixTreeNode<S, V> fail = parent.getFailNode();
-					while((state = transit(fail, subkey)) == null)
-						fail = fail.getFailNode();
+					RadixTreeNode<S, V> state = findDeepestNode(subkey, parent);
 
 					S stateKey = state.getKey();
 					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
@@ -154,6 +150,15 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 				if(node.getFailNode() == null)
 					node.setFailNode(root);
+			}
+
+			/** Find the deepest node labeled by a proper suffix of the current child */
+			private RadixTreeNode<S, V> findDeepestNode(S subkey, RadixTreeNode<S, V> parent){
+				RadixTreeNode<S, V> state;
+				RadixTreeNode<S, V> fail = parent.getFailNode();
+				while((state = transit(fail, subkey)) == null)
+					fail = fail.getFailNode();
+				return state;
 			}
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
@@ -536,58 +541,70 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		int lcpLength = longestCommonPrefixLength(key, nodeKey);
 		int keyLength = sequencer.length(key);
 		int nodeKeyLength = sequencer.length(nodeKey);
-		if(lcpLength == nodeKeyLength && lcpLength == keyLength){
-			//found a node with an exact match
-			ret = node.getValue();
-			if(noDuplicatesAllowed && ret != null)
-				throw new DuplicateKeyException();
+		if(lcpLength == nodeKeyLength && lcpLength == keyLength)
+			ret = putExactMatch(node, value);
+		else if(lcpLength == 0 || lcpLength < keyLength && lcpLength >= nodeKeyLength)
+			ret = putKeyLonger(key, lcpLength, keyLength, node, value);
+		else if(lcpLength < nodeKeyLength)
+			ret = putSplitNode(node, lcpLength, keyLength, value, key);
+		else
+			putAddChild(key, lcpLength, keyLength, value, node);
 
-			node.setValue(value);
-		}
-		else if(lcpLength == 0 || lcpLength < keyLength && lcpLength >= nodeKeyLength){
-			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix,
-			//and if not, we just add a new node to this node
-			S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
+		return ret;
+	}
 
-			boolean found = false;
-			for(RadixTreeNode<S, V> child : node)
-				if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
-					found = true;
-					ret = put(leftoverKey, value, child);
-					break;
-				}
+	private V putExactMatch(RadixTreeNode<S, V> node, V value) throws DuplicateKeyException{
+		//found a node with an exact match
+		V ret = node.getValue();
+		if(noDuplicatesAllowed && ret != null)
+			throw new DuplicateKeyException();
 
-			if(!found){
-				//no child exists with any prefix of the given key, so add a new one
-				RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
-				node.addChild(n);
+		node.setValue(value);
+		return ret;
+	}
+
+	private V putKeyLonger(S key, int lcpLength, int keyLength, RadixTreeNode<S, V> node, V value){
+		V ret = null;
+		//key is longer than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix,
+		//and if not, we just add a new node to this node
+		S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
+		boolean found = false;
+		for(RadixTreeNode<S, V> child : node)
+			if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
+				found = true;
+				ret = put(leftoverKey, value, child);
+				break;
 			}
-		}
-		else if(lcpLength < nodeKeyLength){
-			//key and node.getPrefix() share a prefix, so split node
-			node.split(lcpLength, sequencer);
-
-			if(lcpLength == keyLength){
-				//the largest prefix is equal to the key, so set this node's value
-				ret = node.getValue();
-				node.setValue(value);
-			}
-			else{
-				//there's a leftover suffix on the key, so add another child 
-				S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
-				RadixTreeNode<S, V> keyNode = new RadixTreeNode<>(leftoverKey, value);
-				node.addChild(keyNode);
-				node.setValue(null);
-			}
-		}
-		else{
-			//node.getPrefix() is a prefix of key, so add as child
-			S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
+		if(!found){
+			//no child exists with any prefix of the given key, so add a new one
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
 			node.addChild(n);
 		}
-
 		return ret;
+	}
+
+	private V putSplitNode(RadixTreeNode<S, V> node, int lcpLength, int keyLength, V value, S key){
+		V ret = null;
+		//key and node.getPrefix() share a prefix, so split node
+		node.split(lcpLength, sequencer);
+		if(lcpLength == keyLength){
+			//the largest prefix is equal to the key, so set this node's value
+			ret = node.getValue();
+			node.setValue(value);
+		}
+		else{
+			//there's a leftover suffix on the key, so add another child
+			putAddChild(key, lcpLength, keyLength, value, node);
+			node.setValue(null);
+		}
+		return ret;
+	}
+
+	private void putAddChild(S key, int lcpLength, int keyLength, V value, RadixTreeNode<S, V> node){
+		//node.getPrefix() is a prefix of key, so add as child
+		S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
+		RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
+		node.addChild(n);
 	}
 
 	/**
