@@ -42,7 +42,7 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
-import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Frequency;
@@ -529,17 +529,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				Backbone backbone = new Backbone(null, null);
-				AffixData affixData = backbone.getAffixData();
-				DictionaryStatistics stats = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset(),
-					backbone.getDictionaryBaseData());
+				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8, DictionaryBaseDataVEC.getInstance());
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("ma" + HyphenationParser.EN_DASH + "paba", new Hyphenation(Arrays.asList("ma", "bà", "pa"), Arrays.asList("ma", "bàpa"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("paè", new Hyphenation(Arrays.asList("pa", "è"), Arrays.asList("paè"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("monta", new Hyphenation(Arrays.asList("món", "ta"), Arrays.asList("mónta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("sko" + HyphenationParser.EN_DASH + "dando", new Hyphenation(Arrays.asList("sko", "dàn", "do"), Arrays.asList("sko", "dàndo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("sko" + HyphenationParser.EN_DASH + "dando", new Hyphenation(Arrays.asList("sko", "dàn", "do"), Arrays.asList("sko", "dàndo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("pérdendolo", new Hyphenation(Arrays.asList("pér", "den", "do", "lo"), Arrays.asList("pérdendolo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
 				stats.addData("pérdendoto", new Hyphenation(Arrays.asList("pér", "den", "do", "to"), Arrays.asList("pérdendoto"), rules, errors, HyphenationParser.SOFT_HYPHEN));
