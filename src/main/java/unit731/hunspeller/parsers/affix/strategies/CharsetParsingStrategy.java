@@ -15,17 +15,20 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	private final String type;
 
 
-	private static class SingletonHelper{
-		private static final CharsetParsingStrategy INSTANCE_ASCII = new CharsetParsingStrategy(StandardCharsets.US_ASCII);
-		private static final CharsetParsingStrategy INSTANCE_UTF_8 = new CharsetParsingStrategy(StandardCharsets.UTF_8);
+	private static class SingletonHelperASCII{
+		private static final CharsetParsingStrategy INSTANCE = new CharsetParsingStrategy(StandardCharsets.US_ASCII);
+	}
+
+	private static class SingletonHelperUTF8{
+		private static final CharsetParsingStrategy INSTANCE = new CharsetParsingStrategy(StandardCharsets.UTF_8);
 	}
 
 	public static synchronized CharsetParsingStrategy getASCIIInstance(){
-		return SingletonHelper.INSTANCE_ASCII;
+		return SingletonHelperASCII.INSTANCE;
 	}
 
 	public static synchronized CharsetParsingStrategy getUTF8Instance(){
-		return SingletonHelper.INSTANCE_UTF_8;
+		return SingletonHelperUTF8.INSTANCE;
 	}
 
 	private CharsetParsingStrategy(Charset charset){
