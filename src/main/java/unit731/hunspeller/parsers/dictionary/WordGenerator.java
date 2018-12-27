@@ -250,18 +250,7 @@ public class WordGenerator{
 			dicEntry.applyInputConversionTable(affixData);
 
 			Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);
-			//merge the distribution with the others
-			compoundRules = Stream.of(compoundRules, distribution)
-				.flatMap(m -> m.entrySet().stream())
-				.map(m -> {
-					String key = m.getKey();
-					Set<DictionaryEntry> value = m.getValue().stream()
-						.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-						.collect(Collectors.toSet());
-					return new AbstractMap.SimpleEntry<>(key, value);
-				})
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-					(entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
+			compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 		}
 		return compoundRules;
 	}
@@ -381,6 +370,7 @@ public class WordGenerator{
 		return entries;
 	}
 
+	//FIXME refactor
 	private List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
@@ -604,19 +594,26 @@ public class WordGenerator{
 			for(Production production : productions){
 				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
-				//merge the distribution with the others
-				compoundRules = Stream.of(compoundRules, distribution)
-					.flatMap(m -> m.entrySet().stream())
-					.map(m -> {
-						String key = m.getKey();
-						Set<DictionaryEntry> value = m.getValue().stream()
-							.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
-							.collect(Collectors.toSet());
-						return new AbstractMap.SimpleEntry<>(key, value);
-					})
-					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
+				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 			}
 		}
+		return compoundRules;
+	}
+
+	/** Merge the distribution with the others */
+	private Map<String, Set<DictionaryEntry>> mergeDistributions(Map<String, Set<DictionaryEntry>> compoundRules,
+			Map<String, Set<DictionaryEntry>> distribution, int compoundMinimumLength, String forbiddenWordFlag){
+		compoundRules = Stream.of(compoundRules, distribution)
+			.flatMap(m -> m.entrySet().stream())
+			.map(m -> {
+				String key = m.getKey();
+				Set<DictionaryEntry> value = m.getValue().stream()
+					.filter(entry -> entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+					.collect(Collectors.toSet());
+				return new AbstractMap.SimpleEntry<>(key, value);
+			})
+			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+				(entries1, entries2) -> { entries1.addAll(entries2); return entries1; }));
 		return compoundRules;
 	}
 

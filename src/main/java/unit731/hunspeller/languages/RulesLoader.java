@@ -16,8 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.languages.valueobjects.LetterMatcherEntry;
-import unit731.hunspeller.languages.valueobjects.RuleMatcherEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.dictionary.vos.Production;

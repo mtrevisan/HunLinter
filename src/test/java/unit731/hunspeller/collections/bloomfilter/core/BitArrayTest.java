@@ -2,8 +2,8 @@ package unit731.hunspeller.collections.bloomfilter.core;
 
 import java.io.File;
 import java.io.IOException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class BitArrayTest{
@@ -15,11 +15,11 @@ public class BitArrayTest{
 	public void java() throws IOException{
 		try(JavaBitArray bits = new JavaBitArray(MAX)){
 			for(int i = 0; i < MAX; i ++){
-				Assert.assertFalse(bits.get(i));
+				Assertions.assertFalse(bits.get(i));
 				bits.set(i);
-				Assert.assertTrue(bits.get(i));
+				Assertions.assertTrue(bits.get(i));
 				bits.clear(i);
-				Assert.assertFalse(bits.get(i));
+				Assertions.assertFalse(bits.get(i));
 			}
 		}
 	}
@@ -30,11 +30,11 @@ public class BitArrayTest{
 		file.deleteOnExit();
 		try(MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX)){
 			for(int i = 0; i < MAX; i ++){
-				Assert.assertFalse(bits.get(i));
+				Assertions.assertFalse(bits.get(i));
 				bits.set(i);
-				Assert.assertTrue(bits.get(i));
+				Assertions.assertTrue(bits.get(i));
 				bits.clear(i);
-				Assert.assertFalse(bits.get(i));
+				Assertions.assertFalse(bits.get(i));
 			}
 		}
 	}

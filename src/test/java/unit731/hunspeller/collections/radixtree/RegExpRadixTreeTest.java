@@ -1,7 +1,6 @@
 package unit731.hunspeller.collections.radixtree;
 
 import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
-import org.junit.Assert;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -11,7 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 
 
@@ -24,8 +24,8 @@ public class RegExpRadixTreeTest{
 	public void testEmptyTree(){
 		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
 
-		Assert.assertTrue(tree.isEmpty());
-		Assert.assertEquals(0, tree.size());
+		Assertions.assertTrue(tree.isEmpty());
+		Assertions.assertEquals(0, tree.size());
 	}
 
 	@Test
@@ -34,10 +34,10 @@ public class RegExpRadixTreeTest{
 
 		tree.put("test", 1);
 
-		Assert.assertEquals(1, tree.size());
-		Assert.assertTrue(tree.containsKey("test"));
-		Assert.assertFalse(tree.containsKey("tes"));
-		Assert.assertFalse(tree.containsKey("testt"));
+		Assertions.assertEquals(1, tree.size());
+		Assertions.assertTrue(tree.containsKey("test"));
+		Assertions.assertFalse(tree.containsKey("tes"));
+		Assertions.assertFalse(tree.containsKey("testt"));
 	}
 
 	@Test
@@ -49,11 +49,11 @@ public class RegExpRadixTreeTest{
 		tree.put("tank", 3);
 		tree.put("rest", 4);
 
-		Assert.assertEquals(4, tree.size());
-		Assert.assertEquals(1, tree.get("test").intValue());
-		Assert.assertEquals(2, tree.get("tent").intValue());
-		Assert.assertEquals(3, tree.get("tank").intValue());
-		Assert.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(4, tree.size());
+		Assertions.assertEquals(1, tree.get("test").intValue());
+		Assertions.assertEquals(2, tree.get("tent").intValue());
+		Assertions.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(4, tree.get("rest").intValue());
 	}
 
 	@Test
@@ -65,19 +65,19 @@ public class RegExpRadixTreeTest{
 		tree.put("tank", 3);
 		tree.put("rest", 4);
 
-		Assert.assertEquals(4, tree.size());
-		Assert.assertEquals(1, tree.get("test").intValue());
-		Assert.assertEquals(2, tree.get("tent").intValue());
-		Assert.assertEquals(3, tree.get("tank").intValue());
-		Assert.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(4, tree.size());
+		Assertions.assertEquals(1, tree.get("test").intValue());
+		Assertions.assertEquals(2, tree.get("tent").intValue());
+		Assertions.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(4, tree.get("rest").intValue());
 
 		tree.put("test", 9);
 
-		Assert.assertEquals(4, tree.size());
-		Assert.assertEquals(9, tree.get("test").intValue());
-		Assert.assertEquals(2, tree.get("tent").intValue());
-		Assert.assertEquals(3, tree.get("tank").intValue());
-		Assert.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(4, tree.size());
+		Assertions.assertEquals(9, tree.get("test").intValue());
+		Assertions.assertEquals(2, tree.get("tent").intValue());
+		Assertions.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(4, tree.get("rest").intValue());
 	}
 
 	@Test
@@ -89,11 +89,11 @@ public class RegExpRadixTreeTest{
 		tree.put("rest", 3);
 		tree.put("tank", 4);
 
-		Assert.assertEquals(4, tree.size());
+		Assertions.assertEquals(4, tree.size());
 		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values()));
 		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
 		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
-		Assert.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
+		Assertions.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
 	}
 
 	@Test
@@ -103,8 +103,8 @@ public class RegExpRadixTreeTest{
 		tree.put("pook", 1);
 		tree.put("spook", 2);
 
-		Assert.assertEquals(2, tree.size());
-		Assert.assertEquals(tree.keySet().stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
+		Assertions.assertEquals(2, tree.size());
+		Assertions.assertEquals(tree.keySet().stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
 			new HashSet<>(Arrays.asList("pook", "spook")));
 	}
 
@@ -116,20 +116,20 @@ public class RegExpRadixTreeTest{
 		tree.put("tent", 2);
 		tree.put("tank", 3);
 
-		Assert.assertEquals(3, tree.size());
-		Assert.assertTrue(tree.containsKey("tent"));
+		Assertions.assertEquals(3, tree.size());
+		Assertions.assertTrue(tree.containsKey("tent"));
 
 		tree.remove("key");
 
-		Assert.assertEquals(3, tree.size());
-		Assert.assertTrue(tree.containsKey("tent"));
+		Assertions.assertEquals(3, tree.size());
+		Assertions.assertTrue(tree.containsKey("tent"));
 
 		tree.remove("tent");
 
-		Assert.assertEquals(2, tree.size());
-		Assert.assertEquals(1, tree.get("test").intValue());
-		Assert.assertFalse(tree.containsKey("tent"));
-		Assert.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(2, tree.size());
+		Assertions.assertEquals(1, tree.get("test").intValue());
+		Assertions.assertFalse(tree.containsKey("tent"));
+		Assertions.assertEquals(3, tree.get("tank").intValue());
 	}
 
 	@Test
@@ -142,8 +142,8 @@ public class RegExpRadixTreeTest{
 		List<BigInteger> strings = generateRandomStrings(n);
 		strings.forEach(x -> tree.put(x.toString(32), x));
 
-		Assert.assertEquals(strings.size(), tree.size());
-		strings.forEach(x -> Assert.assertTrue(tree.containsKey(x.toString(32))));
+		Assertions.assertEquals(strings.size(), tree.size());
+		strings.forEach(x -> Assertions.assertTrue(tree.containsKey(x.toString(32))));
 		assertEqualsWithSort(strings, new ArrayList<>(tree.values()));
 	}
 
@@ -167,9 +167,9 @@ public class RegExpRadixTreeTest{
 		tree.put("ac", 3);
 		tree.put("a", 4);
 
-		Assert.assertTrue(tree.containsKey("a"));
-		Assert.assertFalse(tree.containsKey("ab"));
-		Assert.assertFalse(tree.containsKey("c"));
+		Assertions.assertTrue(tree.containsKey("a"));
+		Assertions.assertFalse(tree.containsKey("ab"));
+		Assertions.assertFalse(tree.containsKey("c"));
 	}
 
 	@Test
@@ -179,11 +179,11 @@ public class RegExpRadixTreeTest{
 		tree.put("abc", 1);
 		tree.put("abc", 2);
 
-		Assert.assertFalse(tree.containsKey("a"));
-		Assert.assertFalse(tree.containsKey("ab"));
-		Assert.assertTrue(tree.containsKey("abc"));
-		Assert.assertEquals(2, tree.get("abc").intValue());
-		Assert.assertFalse(tree.containsKey("c"));
+		Assertions.assertFalse(tree.containsKey("a"));
+		Assertions.assertFalse(tree.containsKey("ab"));
+		Assertions.assertTrue(tree.containsKey("abc"));
+		Assertions.assertEquals(2, tree.get("abc").intValue());
+		Assertions.assertFalse(tree.containsKey("c"));
 	}
 
 	@Test
@@ -200,35 +200,35 @@ public class RegExpRadixTreeTest{
 		Integer[] datas = prefixes.stream()
 			.sorted()
 			.toArray(Integer[]::new);
-		Assert.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
+		Assertions.assertArrayEquals(new Integer[]{1, 2, 5}, datas);
 	}
 
 	@Test
 	public void emptyConstructor(){
 		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
 
-		Assert.assertTrue(tree.isEmpty());
-		Assert.assertFalse(tree.containsKey("word"));
-		Assert.assertFalse(tree.containsKey(StringUtils.EMPTY));
+		Assertions.assertTrue(tree.isEmpty());
+		Assertions.assertFalse(tree.containsKey("word"));
+		Assertions.assertFalse(tree.containsKey(StringUtils.EMPTY));
 	}
 
 	@Test
 	public void defaultValueConstructor(){
 		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
 
-		Assert.assertNull(tree.get("meow"));
+		Assertions.assertNull(tree.get("meow"));
 
 		tree.put("meow", Boolean.TRUE);
 
-		Assert.assertEquals(Boolean.TRUE, tree.get("meow"));
-		Assert.assertNull(tree.get("world"));
+		Assertions.assertEquals(Boolean.TRUE, tree.get("meow"));
+		Assertions.assertNull(tree.get("world"));
 	}
 
 	@Test
 	public void simplePut(){
 		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
 
-		Assert.assertTrue(tree.isEmpty());
+		Assertions.assertTrue(tree.isEmpty());
 
 		tree.put("java.lang.", Boolean.TRUE);
 		tree.put("java.i", Boolean.TRUE);
@@ -237,13 +237,13 @@ public class RegExpRadixTreeTest{
 		tree.put("java.util.", Boolean.FALSE);
 		tree.put("java.lang.Boolean", Boolean.FALSE);
 
-		Assert.assertFalse(tree.isEmpty());
-		Assert.assertEquals(1, tree.getValues("java.lang.Integer").size());
-		Assert.assertEquals(1, tree.getValues("java.lang.Long").size());
-		Assert.assertEquals(2, tree.getValues("java.lang.Boolean").size());
-		Assert.assertEquals(2, tree.getValues("java.io.InputStream").size());
-		Assert.assertEquals(1, tree.getValues("java.util.ArrayList").size());
-		Assert.assertEquals(2, tree.getValues("java.util.concurrent.ConcurrentHashMap").size());
+		Assertions.assertFalse(tree.isEmpty());
+		Assertions.assertEquals(1, tree.getValues("java.lang.Integer").size());
+		Assertions.assertEquals(1, tree.getValues("java.lang.Long").size());
+		Assertions.assertEquals(2, tree.getValues("java.lang.Boolean").size());
+		Assertions.assertEquals(2, tree.getValues("java.io.InputStream").size());
+		Assertions.assertEquals(1, tree.getValues("java.util.ArrayList").size());
+		Assertions.assertEquals(2, tree.getValues("java.util.concurrent.ConcurrentHashMap").size());
 	}
 
 	@Test
@@ -253,7 +253,7 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(1, tree.getValues("wowzacowza").size());
+		Assertions.assertEquals(1, tree.getValues("wowzacowza").size());
 	}
 
 	@Test
@@ -263,7 +263,7 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertTrue(tree.containsKey("wowza"));
+		Assertions.assertTrue(tree.containsKey("wowza"));
 	}
 
 	@Test
@@ -273,8 +273,8 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(1, tree.getValues("wowzacowza").size());
-		Assert.assertEquals(1, tree.getValues("bookshelfmania").size());
+		Assertions.assertEquals(1, tree.getValues("wowzacowza").size());
+		Assertions.assertEquals(1, tree.getValues("bookshelfmania").size());
 	}
 
 	@Test
@@ -284,9 +284,9 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assert.assertEquals(Boolean.FALSE, tree.get("wowza"));
-		Assert.assertEquals(Boolean.TRUE, tree.get("bookshelf"));
-		Assert.assertNull(tree.get("bookshelf2"));
+		Assertions.assertEquals(Boolean.FALSE, tree.get("wowza"));
+		Assertions.assertEquals(Boolean.TRUE, tree.get("bookshelf"));
+		Assertions.assertNull(tree.get("bookshelf2"));
 	}
 
 	@Test
@@ -296,16 +296,16 @@ public class RegExpRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertEquals(1, tree.get("hello world").intValue());
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertEquals(1, tree.get("hello world").intValue());
 
 		Integer r1 = tree.remove("hello world");
 
-		Assert.assertNotNull(r1);
-		Assert.assertEquals(1, r1.intValue());
+		Assertions.assertNotNull(r1);
+		Assertions.assertEquals(1, r1.intValue());
 
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertNull(tree.get("hello world"));
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertNull(tree.get("hello world"));
 	}
 
 	@Test
@@ -315,16 +315,16 @@ public class RegExpRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertEquals(1, tree.get("hello world").intValue());
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertEquals(1, tree.get("hello world").intValue());
 
 		Integer r0 = tree.remove("hello world");
 
-		Assert.assertNotNull(r0);
-		Assert.assertEquals(1, r0.intValue());
+		Assertions.assertNotNull(r0);
+		Assertions.assertEquals(1, r0.intValue());
 
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertNull(tree.get("hello world"));
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertNull(tree.get("hello world"));
 	}
 
 	@Test
@@ -335,31 +335,31 @@ public class RegExpRadixTreeTest{
 		tree.put("hello world", 1);
 		tree.put("hello, clarice", 2);
 
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertEquals(1, tree.get("hello world").intValue());
-		Assert.assertEquals(2, tree.get("hello, clarice").intValue());
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertEquals(1, tree.get("hello world").intValue());
+		Assertions.assertEquals(2, tree.get("hello, clarice").intValue());
 
 		Integer r0 = tree.remove("hello world");
 
-		Assert.assertNotNull(r0);
-		Assert.assertEquals(1, r0.intValue());
+		Assertions.assertNotNull(r0);
+		Assertions.assertEquals(1, r0.intValue());
 
-		Assert.assertNull(tree.get("hello world"));
-		Assert.assertEquals(0, tree.get("hello").intValue());
-		Assert.assertEquals(2, tree.get("hello, clarice").intValue());
+		Assertions.assertNull(tree.get("hello world"));
+		Assertions.assertEquals(0, tree.get("hello").intValue());
+		Assertions.assertEquals(2, tree.get("hello, clarice").intValue());
 	}
 
 
 	public static <T extends Comparable<? super T>> void assertEqualsWithSort(List<T> a, List<T> b){
 		Collections.sort(a);
 		Collections.sort(b);
-		Assert.assertEquals(a, b);
+		Assertions.assertEquals(a, b);
 	}
 
 	public static <T extends Comparable<? super T>> void assertEqualsWithSort(T[] a, T[] b){
 		Arrays.sort(a);
 		Arrays.sort(b);
-		Assert.assertArrayEquals(a, b);
+		Assertions.assertArrayEquals(a, b);
 	}
 
 
@@ -370,8 +370,8 @@ public class RegExpRadixTreeTest{
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
 
-		Assert.assertEquals(0, tree.getValuesPrefixedBy("abe").size());
-		Assert.assertEquals(0, tree.getValuesPrefixedBy("abd").size());
+		Assertions.assertEquals(0, tree.getValuesPrefixedBy("abe").size());
+		Assertions.assertEquals(0, tree.getValuesPrefixedBy("abd").size());
 	}
 
 	@Test
@@ -381,8 +381,8 @@ public class RegExpRadixTreeTest{
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
 
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("abcd").size());
-		Assert.assertEquals(1, tree.getValuesPrefixedBy("abce").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedBy("abcd").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedBy("abce").size());
 	}
 
 	@Test
@@ -392,8 +392,8 @@ public class RegExpRadixTreeTest{
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
 
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("ab").size());
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("a").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedBy("ab").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedBy("a").size());
 	}
 
 	@Test
@@ -403,7 +403,7 @@ public class RegExpRadixTreeTest{
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
 
-		Assert.assertEquals(2, tree.getValuesPrefixedBy("abc").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedBy("abc").size());
 	}
 
 //	@Test
@@ -416,11 +416,11 @@ public class RegExpRadixTreeTest{
 //		tree.put("bath", "bath");
 //		tree.put("banana", "banana");
 //
-//		Assert.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("ple"), "apple"), tree.find("apple"));
-//		Assert.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("t"), "bat"), tree.find("bat"));
-//		Assert.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("e"), "ape"), tree.find("ape"));
-//		Assert.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("h"), "bath"), tree.find("bath"));
-//		Assert.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("nana"), "banana"), tree.find("banana"));
+//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("ple"), "apple"), tree.find("apple"));
+//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("t"), "bat"), tree.find("bat"));
+//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("e"), "ape"), tree.find("ape"));
+//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("h"), "bath"), tree.find("bath"));
+//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("nana"), "banana"), tree.find("banana"));
 //	}
 
 	@Test
@@ -430,11 +430,11 @@ public class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assert.assertFalse(tree.containsKey("apple"));
+		Assertions.assertFalse(tree.containsKey("apple"));
 
 		tree.put("apple", "apple");
 
-		Assert.assertTrue(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKey("apple"));
 	}
 
 	@Test
@@ -446,10 +446,10 @@ public class RegExpRadixTreeTest{
 		try{
 			tree.put("apple", "apple2");
 
-			Assert.assertTrue(true);
+			Assertions.assertTrue(true);
 		}
 		catch(DuplicateKeyException e){
-			Assert.fail("Duplicate should have been allowed");
+			Assertions.fail("Duplicate should have been allowed");
 		}
 	}
 
@@ -462,10 +462,10 @@ public class RegExpRadixTreeTest{
 		try{
 			tree.put("apple", "apple2");
 
-			Assert.fail("Duplicate should not have been allowed");
+			Assertions.fail("Duplicate should not have been allowed");
 		}
 		catch(DuplicateKeyException e){
-			Assert.assertEquals("Duplicate key: 'apple'", e.getMessage());
+			Assertions.assertEquals("Duplicate key: 'apple'", e.getMessage());
 		}
 	}
 
@@ -486,7 +486,7 @@ public class RegExpRadixTreeTest{
 		tree.put("360 xbox games 360", "360 xbox games 360");
 		tree.put("xbox xbox 361", "xbox xbox 361");
 
-		Assert.assertEquals(12, tree.size());
+		Assertions.assertEquals(12, tree.size());
 	}
 
 	@Test
@@ -495,7 +495,7 @@ public class RegExpRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assert.assertNotNull(tree.remove("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -505,9 +505,9 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
 
-		Assert.assertNotNull(tree.remove("apple"));
-		Assert.assertTrue(tree.containsKey("applepie"));
-		Assert.assertFalse(tree.containsKey("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
+		Assertions.assertTrue(tree.containsKey("applepie"));
+		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
@@ -518,17 +518,17 @@ public class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assert.assertNotNull(tree.remove("apple"));
-		Assert.assertTrue(tree.containsKey("applepie"));
-		Assert.assertTrue(tree.containsKey("applecrisp"));
-		Assert.assertFalse(tree.containsKey("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
+		Assertions.assertTrue(tree.containsKey("applepie"));
+		Assertions.assertTrue(tree.containsKey("applecrisp"));
+		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
 	public void testCantDeleteSomethingThatDoesntExist(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assert.assertNull(tree.remove("apple"));
+		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -538,7 +538,7 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.remove("apple");
 
-		Assert.assertNull(tree.remove("apple"));
+		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -552,10 +552,10 @@ public class RegExpRadixTreeTest{
 
 		tree.remove("apple");
 
-		Assert.assertTrue(tree.containsKey("appleshack"));
-		Assert.assertTrue(tree.containsKey("applepie"));
-		Assert.assertTrue(tree.containsKey("ape"));
-		Assert.assertFalse(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKey("appleshack"));
+		Assertions.assertTrue(tree.containsKey("applepie"));
+		Assertions.assertTrue(tree.containsKey("ape"));
+		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
@@ -567,7 +567,7 @@ public class RegExpRadixTreeTest{
 
 		tree.remove("apple");
 
-		Assert.assertTrue(tree.containsKey("ball"));
+		Assertions.assertTrue(tree.containsKey("ball"));
 	}
 
 	@Test
@@ -577,14 +577,14 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assert.assertNull(tree.remove("ap"));
+		Assertions.assertNull(tree.remove("ap"));
 	}
 
 	@Test
 	public void testCantFindRootNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assert.assertNull(tree.findPrefixedBy(""));
+		Assertions.assertNull(tree.findPrefixedBy(""));
 	}
 
 	@Test
@@ -593,7 +593,7 @@ public class RegExpRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assert.assertNotNull(tree.findPrefixedBy("apple"));
+		Assertions.assertNotNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
@@ -602,7 +602,7 @@ public class RegExpRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assert.assertTrue(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKey("apple"));
 	}
 
 	@Test
@@ -614,9 +614,9 @@ public class RegExpRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assert.assertNotNull(tree.findPrefixedBy("appletree"));
-		Assert.assertNotNull(tree.findPrefixedBy("appleshackcream"));
-		Assert.assertNotNull(tree.containsKey("ape"));
+		Assertions.assertNotNull(tree.findPrefixedBy("appletree"));
+		Assertions.assertNotNull(tree.findPrefixedBy("appleshackcream"));
+		Assertions.assertNotNull(tree.containsKey("ape"));
 	}
 
 	@Test
@@ -630,15 +630,15 @@ public class RegExpRadixTreeTest{
 		tree.put("hat", "hat");
 		tree.put("cat", "cat");
 
-		Assert.assertFalse(tree.getValues("helloworld").isEmpty());
-		Assert.assertTrue(tree.getValues("helloworld").contains("h"));
-		Assert.assertTrue(tree.getValues("helloworld").contains("hell"));
-		Assert.assertTrue(tree.getValues("helloworld").contains("hello"));
-		Assert.assertTrue(!tree.getValues("helloworld").contains("he"));
-		Assert.assertTrue(!tree.getValues("helloworld").contains("hat"));
-		Assert.assertTrue(!tree.getValues("helloworld").contains("cat"));
-		Assert.assertTrue(!tree.getValues("helloworld").contains("hey"));
-		Assert.assertTrue(tree.getValues("animal").isEmpty());
+		Assertions.assertFalse(tree.getValues("helloworld").isEmpty());
+		Assertions.assertTrue(tree.getValues("helloworld").contains("h"));
+		Assertions.assertTrue(tree.getValues("helloworld").contains("hell"));
+		Assertions.assertTrue(tree.getValues("helloworld").contains("hello"));
+		Assertions.assertTrue(!tree.getValues("helloworld").contains("he"));
+		Assertions.assertTrue(!tree.getValues("helloworld").contains("hat"));
+		Assertions.assertTrue(!tree.getValues("helloworld").contains("cat"));
+		Assertions.assertTrue(!tree.getValues("helloworld").contains("hey"));
+		Assertions.assertTrue(tree.getValues("animal").isEmpty());
 	}
 
 	@Test
@@ -650,23 +650,23 @@ public class RegExpRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assert.assertTrue(tree.containsKey("appletree"));
-		Assert.assertTrue(tree.containsKey("appleshackcream"));
-		Assert.assertTrue(tree.containsKey("ape"));
+		Assertions.assertTrue(tree.containsKey("appletree"));
+		Assertions.assertTrue(tree.containsKey("appleshackcream"));
+		Assertions.assertTrue(tree.containsKey("ape"));
 	}
 
 	@Test
 	public void testCantFindNonexistantNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assert.assertNull(tree.findPrefixedBy("apple"));
+		Assertions.assertNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
 	public void testDoesntContainNonexistantNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assert.assertFalse(tree.containsKey("apple"));
+		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
@@ -676,7 +676,7 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assert.assertNull(tree.findPrefixedBy("ap"));
+		Assertions.assertNull(tree.findPrefixedBy("ap"));
 	}
 
 	@Test
@@ -686,7 +686,7 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assert.assertFalse(tree.containsKey("ap"));
+		Assertions.assertFalse(tree.containsKey("ap"));
 	}
 
 	@Test
@@ -700,12 +700,12 @@ public class RegExpRadixTreeTest{
 		tree.put("ape", "ape");
 
 		List<String> result = tree.getValuesPrefixedBy("app");
-		Assert.assertEquals(4, result.size());
+		Assertions.assertEquals(4, result.size());
 
-		Assert.assertTrue(result.contains("appleshack"));
-		Assert.assertTrue(result.contains("appleshackcream"));
-		Assert.assertTrue(result.contains("applepie"));
-		Assert.assertTrue(result.contains("apple"));
+		Assertions.assertTrue(result.contains("appleshack"));
+		Assertions.assertTrue(result.contains("appleshackcream"));
+		Assertions.assertTrue(result.contains("applepie"));
+		Assertions.assertTrue(result.contains("apple"));
 	}
 
 	@Test
@@ -719,11 +719,11 @@ public class RegExpRadixTreeTest{
 		tree.put("ape", "ape");
 
 		List<String> result = tree.getValuesPrefixedBy("appl");
-		Assert.assertEquals(4, result.size());
+		Assertions.assertEquals(4, result.size());
 
-		Assert.assertTrue(result.contains("appleshack"));
-		Assert.assertTrue(result.contains("applepie"));
-		Assert.assertTrue(result.contains("apple"));
+		Assertions.assertTrue(result.contains("appleshack"));
+		Assertions.assertTrue(result.contains("applepie"));
+		Assertions.assertTrue(result.contains("apple"));
 	}
 
 	@Test
@@ -736,7 +736,7 @@ public class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("ape", "ape");
 
-		Assert.assertTrue(tree.size() == 5);
+		Assertions.assertTrue(tree.size() == 5);
 	}
 
 	@Test
@@ -748,26 +748,26 @@ public class RegExpRadixTreeTest{
 
 		tree.remove("appleshack");
 
-		Assert.assertTrue(tree.size() == 1);
+		Assertions.assertTrue(tree.size() == 1);
 	}
 
 
 	@Test
 	public void splitting(){
 		String[] parts = RegExpSequencer.splitSequence("abd");
-		Assert.assertArrayEquals(new String[]{"a", "b", "d"}, parts);
+		Assertions.assertArrayEquals(new String[]{"a", "b", "d"}, parts);
 
 		parts = RegExpSequencer.splitSequence("a[b]d");
-		Assert.assertArrayEquals(new String[]{"a", "[b]", "d"}, parts);
+		Assertions.assertArrayEquals(new String[]{"a", "[b]", "d"}, parts);
 
 		parts = RegExpSequencer.splitSequence("a[bc]d");
-		Assert.assertArrayEquals(new String[]{"a", "[bc]", "d"}, parts);
+		Assertions.assertArrayEquals(new String[]{"a", "[bc]", "d"}, parts);
 
 		parts = RegExpSequencer.splitSequence("a[^b]d");
-		Assert.assertArrayEquals(new String[]{"a", "[^b]", "d"}, parts);
+		Assertions.assertArrayEquals(new String[]{"a", "[^b]", "d"}, parts);
 
 		parts = RegExpSequencer.splitSequence("a[^bc]d");
-		Assert.assertArrayEquals(new String[]{"a", "[^bc]", "d"}, parts);
+		Assertions.assertArrayEquals(new String[]{"a", "[^bc]", "d"}, parts);
 	}
 
 	@Test
@@ -779,13 +779,13 @@ public class RegExpRadixTreeTest{
 		tree.put("a[^bcd]", 3);
 		tree.put("a", 4);
 
-		Assert.assertTrue(tree.containsKey("a"));
-		Assert.assertTrue(tree.containsKey("abc"));
-		Assert.assertTrue(tree.containsKey("adc"));
-		Assert.assertFalse(tree.containsKey("aec"));
-		Assert.assertTrue(tree.containsKey("ae"));
-		Assert.assertFalse(tree.containsKey("ac"));
-		Assert.assertFalse(tree.containsKey("c"));
+		Assertions.assertTrue(tree.containsKey("a"));
+		Assertions.assertTrue(tree.containsKey("abc"));
+		Assertions.assertTrue(tree.containsKey("adc"));
+		Assertions.assertFalse(tree.containsKey("aec"));
+		Assertions.assertTrue(tree.containsKey("ae"));
+		Assertions.assertFalse(tree.containsKey("ac"));
+		Assertions.assertFalse(tree.containsKey("c"));
 	}
 
 	@Test
@@ -795,11 +795,11 @@ public class RegExpRadixTreeTest{
 		tree.put("a[bc]c", 1);
 		tree.put("a[bc]c", 2);
 
-		Assert.assertFalse(tree.containsKey("a"));
-		Assert.assertFalse(tree.containsKey("ab"));
-		Assert.assertTrue(tree.containsKey("abc"));
-		Assert.assertEquals(2, tree.get("acc").intValue());
-		Assert.assertFalse(tree.containsKey("c"));
+		Assertions.assertFalse(tree.containsKey("a"));
+		Assertions.assertFalse(tree.containsKey("ab"));
+		Assertions.assertTrue(tree.containsKey("abc"));
+		Assertions.assertEquals(2, tree.get("acc").intValue());
+		Assertions.assertFalse(tree.containsKey("c"));
 	}
 
 	@Test
@@ -812,8 +812,8 @@ public class RegExpRadixTreeTest{
 		tree.put("cd", 4);
 		tree.put("aec", 5);
 
-		Assert.assertArrayEquals(new Integer[]{1, 2}, tree.getValues("abcd").toArray(new Integer[2]));
-		Assert.assertArrayEquals(new Integer[]{3}, tree.getValues("ec").toArray(new Integer[1]));
+		Assertions.assertArrayEquals(new Integer[]{1, 2}, tree.getValues("abcd").toArray(new Integer[2]));
+		Assertions.assertArrayEquals(new Integer[]{3}, tree.getValues("ec").toArray(new Integer[1]));
 	}
 
 }

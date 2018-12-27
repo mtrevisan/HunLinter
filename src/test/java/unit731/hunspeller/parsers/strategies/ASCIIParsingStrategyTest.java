@@ -1,8 +1,8 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
@@ -16,21 +16,21 @@ public class ASCIIParsingStrategyTest{
 	public void ok(){
 		String[] flags = strategy.parseFlags("ab");
 
-		Assert.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
+		Assertions.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
 	}
 
 	@Test
 	public void empty(){
 		String[] flags = strategy.parseFlags("");
 
-		Assert.assertNull(flags);
+		Assertions.assertNull(flags);
 	}
 
 	@Test
 	public void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
-		Assert.assertNull(flags);
+		Assertions.assertNull(flags);
 	}
 
 	@Test
@@ -38,31 +38,39 @@ public class ASCIIParsingStrategyTest{
 		String[] flags = new String[]{"a", "b"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("ab", continuationFlags);
+		Assertions.assertEquals("ab", continuationFlags);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithError(){
-		String[] flags = new String[]{"a", "ab"};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"a", "ab"};
+			strategy.joinFlags(flags);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithNoASCII(){
-		String[] flags = new String[]{"ŧ"};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"ŧ"};
+			strategy.joinFlags(flags);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithEmpty(){
-		String[] flags = new String[]{"a", ""};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"a", ""};
+			strategy.joinFlags(flags);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithNull(){
-		String[] flags = new String[]{"a", null};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"a", null};
+			strategy.joinFlags(flags);
+		});
 	}
 
 	@Test
@@ -70,14 +78,14 @@ public class ASCIIParsingStrategyTest{
 		String[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertTrue(continuationFlags.isEmpty());
+		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
 
 	@Test
 	public void joinNullFlags(){
 		String continuationFlags = strategy.joinFlags(null);
 
-		Assert.assertTrue(continuationFlags.isEmpty());
+		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
 	
 }

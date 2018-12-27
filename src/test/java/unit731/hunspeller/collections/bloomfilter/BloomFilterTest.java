@@ -4,9 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
@@ -35,13 +34,13 @@ public class BloomFilterTest{
 		//now start checking
 		contained.stream()
 			.map(filter::contains)
-			.forEach(Assert::assertTrue);
+			.forEach(Assertions::assertTrue);
 		int fpp = 0;
 		for(String uuid : unused){
 			boolean present = filter.contains(uuid);
 			if(present){
 				//false positive
-				Assert.assertEquals(false, contained.contains(uuid));
+				Assertions.assertEquals(false, contained.contains(uuid));
 				fpp ++;
 			}
 		}
@@ -55,13 +54,13 @@ public class BloomFilterTest{
 		//check again
 		contained.stream()
 			.map(filter::contains)
-			.forEach(Assert::assertTrue);
+			.forEach(Assertions::assertTrue);
 		for(int index = 0; index < MAX; index ++){
 			String uuid = UUID.randomUUID().toString();
 			boolean present = filter.contains(uuid);
 			if(present){
 				// false positive
-				Assert.assertEquals(false, contained.contains(uuid));
+				Assertions.assertEquals(false, contained.contains(uuid));
 				fpp ++;
 			}
 		}

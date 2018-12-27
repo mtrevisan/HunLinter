@@ -2,8 +2,8 @@ package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.io.File;
 import java.io.IOException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.services.FileHelper;
 
@@ -26,65 +26,65 @@ public class DictionaryEntryTest{
 		String line = "abcdef";
 		DictionaryEntry entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abcdef", entry.getWord());
-		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
+		Assertions.assertEquals("abcdef", entry.getWord());
+		Assertions.assertNull(entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
 
 
 		line = "abcdef/ABC";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abcdef", entry.word);
-		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
+		Assertions.assertEquals("abcdef", entry.word);
+		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
 
 
 		line = "abcdef	po:noun";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abcdef", entry.word);
-		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertEquals("abcdef", entry.word);
+		Assertions.assertNull(entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
 
 
 		line = "abcdef/ABC	po:noun";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abcdef", entry.word);
-		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertEquals("abcdef", entry.word);
+		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abc/def", entry.getWord());
-		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
+		Assertions.assertEquals("abc/def", entry.getWord());
+		Assertions.assertNull(entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def/ABC";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abc/def", entry.word);
-		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
+		Assertions.assertEquals("abc/def", entry.word);
+		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def	po:noun";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abc/def", entry.word);
-		Assert.assertNull(entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertEquals("abc/def", entry.word);
+		Assertions.assertNull(entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
 
 
 		line = "abc\\/def/ABC	po:noun";
 		entry = DictionaryEntry.createFromDictionaryLine(line, affParser.getAffixData().getFlagParsingStrategy());
 
-		Assert.assertEquals("abc/def", entry.word);
-		Assert.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
-		Assert.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertEquals("abc/def", entry.word);
+		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
 	}
 
 }

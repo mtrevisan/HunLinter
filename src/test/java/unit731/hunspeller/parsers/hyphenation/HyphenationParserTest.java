@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
@@ -570,7 +570,7 @@ public class HyphenationParserTest{
 		HyphenatorInterface hyphenator = HyphenatorFactory.createHyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
-		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
+		Assertions.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());
 	}
 
 }
