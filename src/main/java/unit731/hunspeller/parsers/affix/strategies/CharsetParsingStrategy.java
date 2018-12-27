@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -8,23 +9,29 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 
-/**
- * Simple implementation of {@link FlagParsingStrategy} that treats the chars in each String as a individual flags.
- */
-class UTF8ParsingStrategy implements FlagParsingStrategy{
+class CharsetParsingStrategy implements FlagParsingStrategy{
 
-	private static final CharsetEncoder UTF_8_ENCODER = StandardCharsets.UTF_8.newEncoder();
+	private final CharsetEncoder encoder;
+	private final String type;
+
 
 	private static class SingletonHelper{
-		private static final UTF8ParsingStrategy INSTANCE = new UTF8ParsingStrategy();
+		private static final CharsetParsingStrategy INSTANCE_ASCII = new CharsetParsingStrategy(StandardCharsets.US_ASCII);
+		private static final CharsetParsingStrategy INSTANCE_UTF_8 = new CharsetParsingStrategy(StandardCharsets.UTF_8);
 	}
 
-
-	public static synchronized UTF8ParsingStrategy getInstance(){
-		return SingletonHelper.INSTANCE;
+	public static synchronized CharsetParsingStrategy getASCIIInstance(){
+		return SingletonHelper.INSTANCE_ASCII;
 	}
 
-	private UTF8ParsingStrategy(){}
+	public static synchronized CharsetParsingStrategy getUTF8Instance(){
+		return SingletonHelper.INSTANCE_UTF_8;
+	}
+
+	private CharsetParsingStrategy(Charset charset){
+		encoder = charset.newEncoder();
+		type = charset.displayName();
+	}
 
 	@Override
 	public String[] parseFlags(String textFlags){
@@ -41,8 +48,8 @@ class UTF8ParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkValidity(String textFlags) throws IllegalArgumentException{
-		if(!UTF_8_ENCODER.canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in UTF-8 encoding: " + textFlags);
+		if(!encoder.canEncode(textFlags))
+			throw new IllegalArgumentException("Each flag must be in " + type + " encoding: " + textFlags);
 	}
 
 	private String[] extractFlags(String textFlags){
@@ -73,8 +80,8 @@ class UTF8ParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!UTF_8_ENCODER.canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in UTF-8 encoding");
+			if(!encoder.canEncode(flag))
+				throw new IllegalArgumentException("Each flag must be in " + type + " encoding");
 		}
 	}
 
@@ -86,8 +93,8 @@ class UTF8ParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkCompoundValidity(String compoundRule) throws IllegalArgumentException{
-		if(!UTF_8_ENCODER.canEncode(compoundRule))
-			throw new IllegalArgumentException("Compound rule must be in UTF-8 encoding: " + compoundRule);
+		if(!encoder.canEncode(compoundRule))
+			throw new IllegalArgumentException("Compound rule must be in " + type + " encoding: " + compoundRule);
 	}
 
 }

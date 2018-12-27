@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +134,7 @@ public class ThesaurusDictionary{
 		Set<String> allItems = new HashSet<>();
 		return synonyms.stream()
 			.map(ThesaurusEntry::getSynonym)
-			.filter(s -> !allItems.add(s))
+			.filter(Predicate.not(allItems::add))
 			.collect(Collectors.toList());
 	}
 

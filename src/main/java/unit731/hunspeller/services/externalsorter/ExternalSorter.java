@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
@@ -233,7 +234,7 @@ public class ExternalSorter{
 	private int mergeSortedFiles(BufferedWriter writer, ExternalSorterOptions options, List<BinaryFileBuffer> buffers) throws IOException{
 		PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
 		buffers.stream()
-			.filter(buffer -> !buffer.empty())
+			.filter(Predicate.not(BinaryFileBuffer::empty))
 			.forEachOrdered(queue::add);
 		int rowCounter = 0;
 		try{
