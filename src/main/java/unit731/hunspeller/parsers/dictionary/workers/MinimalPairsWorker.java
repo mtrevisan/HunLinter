@@ -236,7 +236,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		}
 		catch(Throwable t){
 			if(t instanceof ClosedChannelException)
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs thread interrupted");
 			else{
 				String message = ExceptionHelper.getMessage(t);
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);

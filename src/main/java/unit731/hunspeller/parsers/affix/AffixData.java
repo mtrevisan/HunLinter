@@ -206,23 +206,19 @@ public class AffixData{
 
 	public String applyInputConversionTable(String word){
 		ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
-		if(table != null){
-			List<String> conversions = table.applyConversionTable(word);
-			if(conversions.size() > 1)
-				throw new IllegalArgumentException("Cannot input convert word " + word + ", too much appliable rules");
-
-			if(!conversions.isEmpty())
-				word = conversions.get(0);
-		}
-		return word;
+		return applyConversionTable(word, table, "input");
 	}
 
 	public String applyOutputConversionTable(String word){
 		ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+		return applyConversionTable(word, table, "output");
+	}
+
+	private String applyConversionTable(String word, ConversionTable table, String type){
 		if(table != null){
 			List<String> conversions = table.applyConversionTable(word);
 			if(conversions.size() > 1)
-				throw new IllegalArgumentException("Cannot output convert word " + word + ", too much appliable rules");
+				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too much appliable rules");
 
 			if(!conversions.isEmpty())
 				word = conversions.get(0);

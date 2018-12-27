@@ -131,11 +131,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			syllabationCheck(production);
 		}
 		catch(IllegalArgumentException e){
-			StringBuilder sb = new StringBuilder(e.getMessage());
-			if(production.hasProductionRules())
-				sb.append(" (via ").append(production.getRulesSequence()).append(")");
-			sb.append(" for ").append(production.getWord());
-			throw new IllegalArgumentException(sb.toString());
+			manageException(e, production);
 		}
 	}
 

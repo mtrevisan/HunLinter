@@ -13,11 +13,11 @@ public class DictionaryBaseData{
 	}
 
 
-	protected DictionaryBaseData(){}
-
 	public static synchronized DictionaryBaseData getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
+
+	protected DictionaryBaseData(){}
 
 	public int getExpectedNumberOfElements(){
 		return EXPECTED_NUMBER_OF_ELEMENTS;

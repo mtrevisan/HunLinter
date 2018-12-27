@@ -130,16 +130,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 			}
 		}
 		catch(Exception e){
-			if(e instanceof ClosedChannelException)
-				LOGGER.warn("Thread interrupted");
-			else{
-				String message = ExceptionHelper.getMessage(e);
-				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
-			}
-			
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
-			
-			cancel(true);
+			cancelWorker(e);
 		}
 		finally{
 			lockable.releaseReadLock();
@@ -243,17 +234,21 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
 		}
 		catch(Exception e){
-			if(e instanceof ClosedChannelException)
-				LOGGER.warn("Thread interrupted");
-			else{
-				String message = ExceptionHelper.getMessage(e);
-				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
-			}
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
-
-			cancel(true);
+			cancelWorker(e);
 		}
+	}
+
+	private void cancelWorker(Exception e){
+		if(e instanceof ClosedChannelException)
+			LOGGER.warn("Thread interrupted");
+		else{
+			String message = ExceptionHelper.getMessage(e);
+			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
+		}
+		
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
+		
+		cancel(true);
 	}
 
 	private int getProgress(double index, double total){
