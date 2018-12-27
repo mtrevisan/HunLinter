@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
@@ -134,7 +134,7 @@ words.forEach(System.out::println);
 			createProduction("Arbeitarbeitcomputer", "D-PVWX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit pa:Computer st:Computer"),
 			createProduction("Arbeitarbeitarbeit", "D-WX", "pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit pa:Arbeit st:Arbeit")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 }

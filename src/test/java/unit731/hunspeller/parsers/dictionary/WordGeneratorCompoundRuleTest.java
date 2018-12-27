@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
@@ -58,7 +58,7 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("arbeitsscheuem", null, "pa:arbeits st:arbeits pa:scheu st:scheu"),
 			createProduction("arbeitsscheues", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("accb", null, "pa:a st:a pa:c st:c pa:c st:c pa:b st:b"),
 			createProduction("accc", null, "pa:a st:a pa:c st:c pa:c st:c pa:c st:c")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -172,7 +172,7 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -202,7 +202,7 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c"),
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -232,25 +232,27 @@ public class WordGeneratorCompoundRuleTest{
 			createProduction("abc", null, "pa:a st:a pa:b st:b pa:c st:c"),
 			createProduction("acc", null, "pa:a st:a pa:c st:c pa:c st:c")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void forbiddenWordMissingRule() throws IOException{
-		String language = "xxx";
-		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
-			"SET UTF-8",
-			"COMPOUNDRULE 1",
-			"COMPOUNDRULE vw");
-		loadData(affFile.getAbsolutePath());
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String language = "xxx";
+			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
+				"SET UTF-8",
+				"COMPOUNDRULE 1",
+				"COMPOUNDRULE vw");
+			loadData(affFile.getAbsolutePath());
 
-		String line = "vw";
-		String[] inputCompounds = new String[]{
-			"arbeits/v",
-			"scheu/v"
-		};
-		backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+			String line = "vw";
+			String[] inputCompounds = new String[]{
+				"arbeits/v",
+				"scheu/v"
+			};
+			backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
+		});
 	}
 
 	@Test
@@ -270,7 +272,7 @@ public class WordGeneratorCompoundRuleTest{
 		};
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
 
-		Assert.assertTrue(words.isEmpty());
+		Assertions.assertTrue(words.isEmpty());
 	}
 
 
@@ -295,7 +297,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> expected = Arrays.asList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 }

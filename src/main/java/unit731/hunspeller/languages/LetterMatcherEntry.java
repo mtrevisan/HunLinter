@@ -1,4 +1,4 @@
-package unit731.hunspeller.languages.valueobjects;
+package unit731.hunspeller.languages;
 
 import java.text.MessageFormat;
 import unit731.hunspeller.parsers.dictionary.vos.Production;

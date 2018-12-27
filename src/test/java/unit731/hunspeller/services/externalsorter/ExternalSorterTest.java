@@ -4,9 +4,9 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Comparator;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 public class ExternalSorterTest{
@@ -18,7 +18,7 @@ public class ExternalSorterTest{
 	private File outputFile;
 
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception{
 		inputFile = new File(getClass().getClassLoader().getResource("external-sorter-test-file.txt").toURI());
 
@@ -37,7 +37,7 @@ public class ExternalSorterTest{
 
 		sorter.sort(in, options, outputFile);
 
-		Assert.assertEquals(0, outputFile.length());
+		Assertions.assertEquals(0, outputFile.length());
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assert.assertTrue(outputFile.length() == 27);
+		Assertions.assertTrue(outputFile.length() == 27);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assert.assertTrue(outputFile.length() == 27);
+		Assertions.assertTrue(outputFile.length() == 27);
 	}
 
 	@Test
@@ -74,8 +74,8 @@ public class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assert.assertTrue(outputFile.length() == 21);
-		Assert.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
+		Assertions.assertTrue(outputFile.length() == 21);
+		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
 	}
 
 	@Test
@@ -88,8 +88,8 @@ public class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assert.assertTrue(outputFile.length() == 27);
-		Assert.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
+		Assertions.assertTrue(outputFile.length() == 27);
+		Assertions.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
 	}
 
 }

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
@@ -61,7 +61,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("xyfoo", null, "pa:xy st:xy pa:foo st:foo"),
 			createProduction("xybar", null, "pa:xy st:xy pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("barfoo", null, "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", null, "pa:bar st:bar pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("eeleel", null, "pa:eel st:eel pa:eel st:eel"),
 			createProduction("eelbare", null, "pa:eel st:eel pa:bare st:bare")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -144,7 +144,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("glassko", null, "pa:glass st:glass pa:sko st:sko"),
 			createProduction("skoglass", null, "pa:sko st:sko pa:glass st:glass")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -172,7 +172,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("yzfoo", null, "pa:yz st:yz pa:foo st:foo"),
 			createProduction("yzbar", null, "pa:yz st:yz pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -190,14 +190,14 @@ public class WordGeneratorCompoundFlagTest{
 		String line = "foo/XPS";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assert.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "P", "st:foo po:suf"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo po:suf"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("prefoo", "S", "po:pre st:foo"), words.get(2));
-		Assert.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo po:suf"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "S", "po:pre st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo po:suf"), words.get(3));
 		//lastfold productions
 
 
@@ -225,7 +225,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("prebarbar", "S", "po:pre pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", null, "po:pre pa:bar st:bar pa:bar st:bar po:suf")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -245,17 +245,17 @@ public class WordGeneratorCompoundFlagTest{
 		String line = "foo/XPS";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assert.assertEquals(6, words.size());
+		Assertions.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
 		//lastfold productions
-		Assert.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
-		Assert.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
-		Assert.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
+		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
 
 
 		String[] inputCompounds = new String[]{
@@ -282,7 +282,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("prebarbar", "S", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -303,17 +303,17 @@ public class WordGeneratorCompoundFlagTest{
 		String line = "foo/XPS";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assert.assertEquals(6, words.size());
+		Assertions.assertEquals(6, words.size());
 		//base production
-		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PT", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("foosufsff", "P", "st:foo"), words.get(2));
 		//lastfold productions
-		Assert.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
-		Assert.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
-		Assert.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
+		Assertions.assertEquals(createProduction("prefoo", "S", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoosuf", "T", "st:foo"), words.get(4));
+		Assertions.assertEquals(createProduction("prefoosufsff", null, "st:foo"), words.get(5));
 
 
 		String[] inputCompounds = new String[]{
@@ -348,7 +348,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("prebarbarsuf", "T", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("prebarbarsufsff", null, "pa:bar st:bar pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -367,14 +367,14 @@ public class WordGeneratorCompoundFlagTest{
 		String line = "foo/XPS";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assert.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "PY", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PY", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("prefoo", "SY", "st:foo"), words.get(2));
-		Assert.assertEquals(createProduction("prefoosuf", "Y", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "SY", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("prefoosuf", "Y", "st:foo"), words.get(3));
 		//lastfold productions
 
 
@@ -450,7 +450,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("prebarsufprebar", "SY", "pa:prebarsuf st:bar pa:prebar st:bar"),
 			createProduction("prebarsufprebarsuf", "Y", "pa:prebarsuf st:bar pa:prebarsuf st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -469,14 +469,14 @@ public class WordGeneratorCompoundFlagTest{
 		String line = "foo/XPS";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assert.assertEquals(4, words.size());
+		Assertions.assertEquals(4, words.size());
 		//base production
-		Assert.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
+		Assertions.assertEquals(createProduction("foo", "XPS", "st:foo"), words.get(0));
 		//onefold productions
-		Assert.assertEquals(createProduction("foosuf", "PZ", "st:foo"), words.get(1));
+		Assertions.assertEquals(createProduction("foosuf", "PZ", "st:foo"), words.get(1));
 		//twofold productions
-		Assert.assertEquals(createProduction("prefoo", "SZ", "st:foo"), words.get(2));
-		Assert.assertEquals(createProduction("prefoosuf", "Z", "st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoo", "SZ", "st:foo"), words.get(2));
+		Assertions.assertEquals(createProduction("prefoosuf", "Z", "st:foo"), words.get(3));
 		//lastfold productions
 
 
@@ -492,7 +492,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -596,7 +596,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("--BAZ", null, "pa:- st:- pa:- st:- pa:BAZ st:BAZ"),
 			createProduction("---", null, "pa:- st:- pa:- st:- pa:- st:-")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -659,7 +659,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("vízvízkocsi", null, "pa:víz st:víz pa:víz st:víz pa:kocsi st:kocsi"),
 			createProduction("vízvízszerviz", null, "pa:víz st:víz pa:víz st:víz pa:szerviz st:szerviz")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 
@@ -701,7 +701,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("barbar", "S", "pa:bar st:bar po:4 pa:bar st:bar po:4"),
 			createProduction("barbars", null, "pa:bar st:bar po:4 pa:bar st:bar po:4")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 
@@ -760,7 +760,7 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("bazbazbar", null, "pa:baz st:baz pa:baz st:baz pa:bar st:bar"),
 			createProduction("Bazbazbaz", null, "pa:baz st:baz pa:baz st:baz pa:baz st:baz")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 }

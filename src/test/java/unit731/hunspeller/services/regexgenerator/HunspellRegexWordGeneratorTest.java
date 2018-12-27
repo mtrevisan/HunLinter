@@ -2,8 +2,8 @@ package unit731.hunspeller.services.regexgenerator;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
 public class HunspellRegexWordGeneratorTest{
@@ -18,7 +18,7 @@ public class HunspellRegexWordGeneratorTest{
 		List<List<String>> expected = Arrays.asList(
 			Arrays.asList("abc", "de", "a")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class HunspellRegexWordGeneratorTest{
 			Arrays.asList("abc", "a", "a"),
 			Arrays.asList("abc", "de", "a", "a")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class HunspellRegexWordGeneratorTest{
 			Arrays.asList("abc", "de"),
 			Arrays.asList("abc", "de", "a")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -74,7 +74,7 @@ public class HunspellRegexWordGeneratorTest{
 			Arrays.asList("abc", "a"),
 			Arrays.asList("abc", "de")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class HunspellRegexWordGeneratorTest{
 			Arrays.asList("abc", "de"),
 			Arrays.asList("abc", "de", "a")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class HunspellRegexWordGeneratorTest{
 			Arrays.asList("abc", "a"),
 			Arrays.asList("de", "de")
 		);
-		Assert.assertEquals(expected, words);
+		Assertions.assertEquals(expected, words);
 	}
 
 }

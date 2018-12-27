@@ -1,8 +1,8 @@
 package unit731.hunspeller.parsers.strategies;
 
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
@@ -16,26 +16,28 @@ public class DoubleCharParsingStrategyTest{
 	public void ok(){
 		String[] flags = strategy.parseFlags("abcd");
 
-		Assert.assertEquals(Arrays.asList("ab", "cd"), Arrays.asList(flags));
+		Assertions.assertEquals(Arrays.asList("ab", "cd"), Arrays.asList(flags));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void notOk(){
-		strategy.parseFlags("abc");
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			strategy.parseFlags("abc");
+		});
 	}
 
 	@Test
 	public void empty(){
 		String[] flags = strategy.parseFlags("");
 
-		Assert.assertNull(flags);
+		Assertions.assertNull(flags);
 	}
 
 	@Test
 	public void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
-		Assert.assertNull(flags);
+		Assertions.assertNull(flags);
 	}
 
 	@Test
@@ -43,25 +45,31 @@ public class DoubleCharParsingStrategyTest{
 		String[] flags = new String[]{"ab", "cd"};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertEquals("abcd", continuationFlags);
+		Assertions.assertEquals("abcd", continuationFlags);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithError(){
-		String[] flags = new String[]{"ab", "c"};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"ab", "c"};
+			strategy.joinFlags(flags);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithEmpty(){
-	String[] flags = new String[]{"ab", ""};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"ab", ""};
+			strategy.joinFlags(flags);
+		});
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void joinFlagsWithNull(){
-		String[] flags = new String[]{"ab", null};
-		strategy.joinFlags(flags);
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			String[] flags = new String[]{"ab", null};
+			strategy.joinFlags(flags);
+		});
 	}
 
 	@Test
@@ -69,14 +77,14 @@ public class DoubleCharParsingStrategyTest{
 		String[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
-		Assert.assertTrue(continuationFlags.isEmpty());
+		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
 
 	@Test
 	public void joinNullFlags(){
 		String continuationFlags = strategy.joinFlags(null);
 
-		Assert.assertTrue(continuationFlags.isEmpty());
+		Assertions.assertTrue(continuationFlags.isEmpty());
 	}
 	
 }
