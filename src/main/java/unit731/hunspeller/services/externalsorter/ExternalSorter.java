@@ -237,55 +237,64 @@ public class ExternalSorter{
 			.forEachOrdered(queue::add);
 		int rowCounter = 0;
 		try{
-			if(options.isRemoveDuplicates()){
-				String lastLine = null;
-				if(!queue.isEmpty()){
-					BinaryFileBuffer buffer = queue.poll();
-					lastLine = buffer.pop();
-					writer.write(lastLine);
-					writer.newLine();
-					rowCounter ++;
-					if(buffer.empty())
-						buffer.br.close();
-					else
-						//add it back
-						queue.add(buffer);
-				}
-				while(!queue.isEmpty()){
-					BinaryFileBuffer bfb = queue.poll();
-					String line = bfb.pop();
-					//skip duplicated lines
-					if(!line.equals(lastLine)){
-						writer.write(line);
-						writer.newLine();
-						lastLine = line;
-					}
-					rowCounter ++;
-					if(bfb.empty())
-						bfb.br.close();
-					else
-						//add it back
-						queue.add(bfb);
-				}
-			}
+			if(options.isRemoveDuplicates())
+				rowCounter = mergeSortRemoveDulicates(queue, writer, rowCounter);
 			else
-				while(!queue.isEmpty()){
-					BinaryFileBuffer buffer = queue.poll();
-					String line = buffer.pop();
-					writer.write(line);
-					writer.newLine();
-					rowCounter ++;
-					if(buffer.empty())
-						buffer.br.close();
-					else
-						//add it back
-						queue.add(buffer);
-				}
+				rowCounter = mergeSort(queue, writer, rowCounter);
 		}
 		finally{
 			writer.close();
 			for(BinaryFileBuffer buffer : queue)
 				buffer.close();
+		}
+		return rowCounter;
+	}
+
+	private int mergeSortRemoveDulicates(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
+		String lastLine = null;
+		if(!queue.isEmpty()){
+			BinaryFileBuffer buffer = queue.poll();
+			lastLine = buffer.pop();
+			writer.write(lastLine);
+			writer.newLine();
+			rowCounter ++;
+			if(buffer.empty())
+				buffer.br.close();
+			else
+				//add it back
+				queue.add(buffer);
+		}
+		while(!queue.isEmpty()){
+			BinaryFileBuffer bfb = queue.poll();
+			String line = bfb.pop();
+			//skip duplicated lines
+			if(!line.equals(lastLine)){
+				writer.write(line);
+				writer.newLine();
+				lastLine = line;
+			}
+			rowCounter ++;
+			if(bfb.empty())
+				bfb.br.close();
+			else
+				//add it back
+				queue.add(bfb);
+		}
+		return rowCounter;
+	}
+
+	private int mergeSort(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
+		while(!queue.isEmpty()){
+			BinaryFileBuffer buffer = queue.poll();
+			String line = buffer.pop();
+			writer.write(line);
+			writer.newLine();
+			rowCounter ++;
+			if(buffer.empty())
+				buffer.br.close();
+			else
+				//add it back
+				queue.add(buffer);
 		}
 		return rowCounter;
 	}

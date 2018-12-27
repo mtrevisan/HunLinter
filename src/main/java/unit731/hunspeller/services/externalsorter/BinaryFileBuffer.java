@@ -8,13 +8,13 @@ import java.util.Objects;
 /**
  * This is essentially a thin wrapper on top of a BufferedReader which keeps the last line in memory.
  */
-public class BinaryFileBuffer{
+class BinaryFileBuffer{
 
 	public BufferedReader br;
 	private String cache;
 
 
-	public BinaryFileBuffer(BufferedReader r) throws IOException{
+	BinaryFileBuffer(BufferedReader r) throws IOException{
 		Objects.requireNonNull(r);
 
 		br = r;

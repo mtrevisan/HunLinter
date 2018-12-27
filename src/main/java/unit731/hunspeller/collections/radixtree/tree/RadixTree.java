@@ -48,9 +48,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	private static final String GRAPHVIZ_STYLE_ARROW = " -> ";
 	private static final String GRAPHVIZ_STYLE_LABEL = "label=";
 	private static final String GRAPHVIZ_STYLE_SHAPE = "shape=";
-	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = GRAPHVIZ_STYLE_BEGIN + "style=dashed, color=gray, constraint=false" + GRAPHVIZ_STYLE_END;
-	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "circle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
-	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "doublecircle" + GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY;
+	private static final String GRAPHVIZ_STYLE_FAILURE_TRANSITION = GRAPHVIZ_STYLE_BEGIN + "style=dashed, color=gray, constraint=false"
+		+ GRAPHVIZ_STYLE_END;
+	private static final String GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "circle"
+		+ GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_STRING_BOUNDARY
+		+ GRAPHVIZ_STYLE_END;
+	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL = GRAPHVIZ_STYLE_BEGIN + GRAPHVIZ_STYLE_SHAPE + "doublecircle"
+		+ GRAPHVIZ_ATTRIBUTE_SEPARATOR + GRAPHVIZ_STYLE_LABEL + GRAPHVIZ_STYLE_STRING_BOUNDARY;
 	private static final String GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL = GRAPHVIZ_STYLE_STRING_BOUNDARY + GRAPHVIZ_STYLE_END;
 
 
@@ -541,8 +545,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 			node.setValue(value);
 		}
 		else if(lcpLength == 0 || lcpLength < keyLength && lcpLength >= nodeKeyLength){
-			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix, and if not, we just add
-			//a new node to this node
+			//key is bigger than the prefix located at this node, so we need to see if there's a child that can possibly share a prefix,
+			//and if not, we just add a new node to this node
 			S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
 
 			boolean found = false;
@@ -790,7 +794,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		traverseBFS(traverserForward);
 
 		if(prepared){
-			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node, displayEdgesToInitialState);
+			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphvizAppendFailureTransitions(sb, node,
+				displayEdgesToInitialState);
 			traverseBFS(traverserFailure);
 		}
 
@@ -825,7 +830,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	private void graphvizAppendNode(StringBuilder sb, RadixTreeNode<S, V> node){
 		sb.append(GRAPHVIZ_TAB)
 			.append(System.identityHashCode(node))
-			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL + node.getValue() + GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL: GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
+			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL + node.getValue() + GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL:
+				GRAPHVIZ_STYLE_STATE_WITHOUT_OUTPUT)
 			.append(GRAPHVIZ_NEW_LINE);
 	}
 

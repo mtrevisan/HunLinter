@@ -9,10 +9,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
-import unit731.hunspeller.services.PatternHelper;
 
 
-public class Hyphenator extends AbstractHyphenator{
+class Hyphenator extends AbstractHyphenator{
 
 	public Hyphenator(HyphenationParser hypParser, String breakCharacter){
 		super(hypParser, breakCharacter);
@@ -26,35 +25,12 @@ public class Hyphenator extends AbstractHyphenator{
 		int normalizedWordSize = getNormalizedLength(word);
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		int leftMin = options.getLeftMin();
-		int rightMin = options.getRightMin();
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.getValues(w.substring(i).toLowerCase(Locale.ROOT));
 
-			for(String rule : prefixes){
-				int j = -1;
-				//remove non–standard part
-				String reducedData = PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
-				int ruleSize = reducedData.length();
-				//cycle the pattern's characters searching for numbers
-				for(int k = 0; k < ruleSize; k ++){
-					int idx = i + j;
-					char chr = reducedData.charAt(k);
-					if(!Character.isDigit(chr))
-						j ++;
-					else{
-						//check if a break point should be skipped based on left and right min options
-						int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
-						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
-							int dd = Character.digit(chr, 10);
-							//check if the break number is great than the one stored so far
-							if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
-								indexesAndRules.put(idx, Pair.of(dd, rule));
-						}
-					}
-				}
-			}
+			for(String rule : prefixes)
+				indexesAndRules = extractSyllabe(rule, i, word, normalizedWordSize, options, indexesAndRules);
 		}
 
 		return new HyphenationBreak(indexesAndRules, wordSize);

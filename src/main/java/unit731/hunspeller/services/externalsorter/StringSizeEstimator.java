@@ -1,7 +1,7 @@
 package unit731.hunspeller.services.externalsorter;
 
 
-public class StringSizeEstimator{
+class StringSizeEstimator{
 
 	private static final int OBJ_OVERHEAD;
 	static{

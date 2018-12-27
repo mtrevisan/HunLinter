@@ -48,6 +48,7 @@ public class HyphenationBreak{
 			.collect(Collectors.toList());
 	}
 
+	//FIXME refactor
 	public void enforceNoHyphens(List<String> syllabes, Set<String> noHyphen){
 		int syllabesCount = syllabes.size();
 		if(syllabesCount > 1){
