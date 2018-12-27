@@ -277,11 +277,44 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	}
 
 
-	protected static int getNormalizedLength(String word){
+	//FIXME method firm is awful
+	protected Map<Integer, Pair<Integer, String>> extractSyllabe(String rule, int startingIndex, String word, int normalizedWordSize,
+			HyphenationOptions options, Map<Integer, Pair<Integer, String>> indexesAndRules){
+		int leftMin = options.getLeftMin();
+		int rightMin = options.getRightMin();
+
+		int wordSize = word.length();
+		String reducedRule = removeNonStandardPart(rule);
+
+		//cycle the pattern's characters searching for numbers
+		int j = -1;
+		for(char chr : reducedRule.toCharArray()){
+			if(!Character.isDigit(chr))
+				j ++;
+			else{
+				//check if a break point should be skipped based on left and right min options
+				int idx = startingIndex + j;
+				int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
+				if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
+					int dd = Character.digit(chr, 10);
+					//check if the break number is great than the one stored so far
+					if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
+						indexesAndRules.put(idx, Pair.of(dd, rule));
+				}
+			}
+		}
+		return indexesAndRules;
+	}
+
+	private String removeNonStandardPart(String rule){
+		return PatternHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
+	}
+
+	protected int getNormalizedLength(String word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 
-	protected static int getNormalizedLength(String word, int index){
+	private static int getNormalizedLength(String word, int index){
 		return Normalizer.normalize(word.substring(0, index - 1), Normalizer.Form.NFKC).length() + 1;
 	}
 
