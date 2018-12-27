@@ -6,7 +6,7 @@ import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
 
-public class EmptyHyphenator extends AbstractHyphenator{
+class EmptyHyphenator extends AbstractHyphenator{
 
 	private static class SingletonHelper{
 		private static final EmptyHyphenator INSTANCE = new EmptyHyphenator();

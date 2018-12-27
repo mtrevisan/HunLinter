@@ -29,7 +29,7 @@ import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.services.ZipManager;
@@ -207,7 +207,7 @@ public class Backbone implements FileChangeListener{
 			hypParser = new HyphenationParser(affParser.getAffixData().getLanguage());
 			hypParser.parse(hypFile);
 
-			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
+			hyphenator = HyphenatorFactory.createHyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
 			if(hunspellable != null)
 				hunspellable.clearHyphenationParser();

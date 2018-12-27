@@ -280,51 +280,6 @@ public class HyphenationParser extends ReadWriteLockable{
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
 		}
 		catch(Throwable t){
 			String message = ExceptionHelper.getMessage(t);

@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation;
 
-import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import java.util.Arrays;
@@ -12,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -567,7 +567,7 @@ public class HyphenationParserTest{
 	}
 
 	private void check(HyphenationParser parser, String word, String ... hyphs){
-		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
+		HyphenatorInterface hyphenator = HyphenatorFactory.createHyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
 		Assert.assertEquals(Arrays.asList(hyphs), hyphenation.getSyllabes());

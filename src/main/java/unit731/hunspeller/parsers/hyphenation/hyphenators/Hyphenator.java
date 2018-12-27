@@ -11,7 +11,7 @@ import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
 
-public class Hyphenator extends AbstractHyphenator{
+class Hyphenator extends AbstractHyphenator{
 
 	public Hyphenator(HyphenationParser hypParser, String breakCharacter){
 		super(hypParser, breakCharacter);
