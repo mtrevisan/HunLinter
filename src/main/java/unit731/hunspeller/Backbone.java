@@ -253,7 +253,7 @@ public class Backbone implements FileChangeListener{
 			dicParser.clear();
 
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affixData.getLanguage());
-		wordGeneratorAffixRules = new WordGeneratorAffixRules(affParser, dicParser, dictionaryBaseData);
+		wordGeneratorAffixRules = new WordGeneratorAffixRules(affParser);
 		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affParser, dicParser, dictionaryBaseData);
 		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affParser, dicParser, dictionaryBaseData);
 		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affParser, dicParser, dictionaryBaseData);

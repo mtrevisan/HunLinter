@@ -47,8 +47,20 @@ public class WordGeneratorCompound extends WordGenerator{
 	}
 
 
+	protected final AffixParser affParser;
+	protected final DictionaryParser dicParser;
+	protected final DictionaryBaseData dictionaryBaseData;
+
+	protected DictionaryInclusionTestWorker dicInclusionTestWorker;
+	protected final Set<String> compoundAsReplacement = new HashSet<>();
+
+
 	protected WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
-		super(affParser, dicParser, dictionaryBaseData);
+		super(affParser.getAffixData());
+
+		this.affParser = affParser;
+		this.dicParser = dicParser;
+		this.dictionaryBaseData = dictionaryBaseData;
 	}
 
 	protected List<List<List<Production>>> generateCompounds(List<List<String>> permutations, Map<String, Set<DictionaryEntry>> inputs){
@@ -272,7 +284,7 @@ public class WordGeneratorCompound extends WordGenerator{
 			Objects.requireNonNull(dicParser);
 			Objects.requireNonNull(dictionaryBaseData);
 
-			WordGeneratorAffixRules wordGeneratorAffixeRules = new WordGeneratorAffixRules(affParser, dicParser,  dictionaryBaseData);
+			WordGeneratorAffixRules wordGeneratorAffixeRules = new WordGeneratorAffixRules(affParser);
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, wordGeneratorAffixeRules, dictionaryBaseData, affParser);
 
 			try{

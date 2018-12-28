@@ -2,25 +2,18 @@ package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.NoApplicableRuleException;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
 
 
 public class WordGenerator{
@@ -28,22 +21,11 @@ public class WordGenerator{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGenerator.class);
 
 
-	protected final AffixParser affParser;
 	protected final AffixData affixData;
-	protected final DictionaryParser dicParser;
-	protected final DictionaryBaseData dictionaryBaseData;
-
-	protected DictionaryInclusionTestWorker dicInclusionTestWorker;
-	protected final Set<String> compoundAsReplacement = new HashSet<>();
 
 
-	protected WordGenerator(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
-		Objects.requireNonNull(affParser);
-
-		this.affParser = affParser;
-		this.affixData = affParser.getAffixData();
-		this.dicParser = dicParser;
-		this.dictionaryBaseData = dictionaryBaseData;
+	protected WordGenerator(AffixData affixData){
+		this.affixData = affixData;
 	}
 
 	/**
