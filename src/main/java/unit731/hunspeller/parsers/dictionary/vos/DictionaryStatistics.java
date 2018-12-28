@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -43,9 +43,8 @@ public class DictionaryStatistics implements Closeable{
 
 
 	public DictionaryStatistics(String language, Charset charset){
-		DictionaryBaseData dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData.getExpectedNumberOfElements(),
-			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
+		BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 		orthography = BaseBuilder.getOrthography(language);
 	}
 
