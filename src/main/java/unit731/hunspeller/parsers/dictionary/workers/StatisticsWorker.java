@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.DictionaryStatisticsDialog;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -27,17 +26,16 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 
 	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
-			DictionaryBaseData dictionaryBaseData, boolean performHyphenationStatistics, Frame parent){
+			boolean performHyphenationStatistics, Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(dictionaryBaseData);
 		Objects.requireNonNull(parent);
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
 		AffixData affixData = affParser.getAffixData();
-		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset(), dictionaryBaseData);
+		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset());
 
 
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {

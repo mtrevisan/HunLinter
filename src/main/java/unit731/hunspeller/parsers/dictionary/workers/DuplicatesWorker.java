@@ -46,27 +46,26 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
-	private final DictionaryBaseData dictionaryBaseData;
 	private final File outputFile;
+
 	private final Comparator<String> comparator;
+	private final DictionaryBaseData dictionaryBaseData;
 
 
-	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
-			File outputFile){
+	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(dictionaryBaseData);
 		Objects.requireNonNull(outputFile);
 
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
-		this.dictionaryBaseData = dictionaryBaseData;
 		this.outputFile = outputFile;
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
 		comparator = BaseBuilder.getComparator(language);
+		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 	}
 
 	@Override

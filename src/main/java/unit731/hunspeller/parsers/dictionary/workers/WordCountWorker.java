@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -27,12 +28,12 @@ public class WordCountWorker extends WorkerDictionaryBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
-			ReadWriteLockable lockable){
+	public WordCountWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(lockable);
 
+		DictionaryBaseData dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData.getExpectedNumberOfElements(),
 			dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
 

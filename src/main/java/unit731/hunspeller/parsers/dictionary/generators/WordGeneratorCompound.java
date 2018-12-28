@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -48,20 +48,17 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	protected final AffixParser affParser;
 	protected final DictionaryParser dicParser;
-	protected final DictionaryBaseData dictionaryBaseData;
 	protected final WordGenerator wordGenerator;
 
 	protected DictionaryInclusionTestWorker dicInclusionTestWorker;
 	protected final Set<String> compoundAsReplacement = new HashSet<>();
 
 
-	WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData,
-			WordGenerator wordGenerator){
+	WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
 		super(affParser.getAffixData());
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
-		this.dictionaryBaseData = dictionaryBaseData;
 		this.wordGenerator = wordGenerator;
 	}
 
@@ -283,10 +280,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	protected void loadDictionaryForInclusionTest(){
 		boolean checkCompoundReplacement = affixData.isCheckCompoundReplacement();
 		if(checkCompoundReplacement && dicInclusionTestWorker == null){
-			Objects.requireNonNull(dicParser);
-			Objects.requireNonNull(dictionaryBaseData);
-
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, wordGenerator, dictionaryBaseData, affParser);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator, affParser);
 
 			try{
 				dicInclusionTestWorker.executeInline();

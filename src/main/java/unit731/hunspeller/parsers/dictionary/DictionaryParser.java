@@ -48,10 +48,10 @@ public class DictionaryParser{
 
 
 	private final File dicFile;
-	private final String language;
 	private final Charset charset;
-	private final ExternalSorter sorter = new ExternalSorter();
 
+	private final Comparator<String> comparator;
+	private final ExternalSorter sorter = new ExternalSorter();
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
@@ -60,16 +60,13 @@ public class DictionaryParser{
 		Objects.requireNonNull(charset);
 
 		this.dicFile = dicFile;
-		this.language = language;
 		this.charset = charset;
+
+		comparator = BaseBuilder.getComparator(language);
 	}
 
 	public File getDicFile(){
 		return dicFile;
-	}
-
-	public String getLanguage(){
-		return language;
 	}
 
 	public Charset getCharset(){
@@ -129,7 +126,6 @@ public class DictionaryParser{
 				String line;
 				int startSection = -1;
 				boolean needSorting = false;
-				Comparator<String> comparator = BaseBuilder.getComparator(language);
 				while((line = br.readLine()) != null){
 					if(isComment(line) || StringUtils.isBlank(line)){
 						if(startSection >= 0){

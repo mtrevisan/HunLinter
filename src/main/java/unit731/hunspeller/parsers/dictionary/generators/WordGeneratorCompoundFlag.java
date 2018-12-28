@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -17,9 +16,8 @@ import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	WordGeneratorCompoundFlag(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData,
-			WordGenerator wordGenerator){
-		super(affParser, dicParser, dictionaryBaseData, wordGenerator);
+	WordGeneratorCompoundFlag(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
+		super(affParser, dicParser, wordGenerator);
 	}
 
 	/**
