@@ -4,7 +4,6 @@ import java.util.List;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.NoApplicableRuleException;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
