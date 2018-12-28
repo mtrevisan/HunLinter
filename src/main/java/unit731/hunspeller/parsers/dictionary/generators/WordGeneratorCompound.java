@@ -93,14 +93,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	protected List<Production> applyCompound(List<List<List<Production>>> entries, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		String compoundFlag = affixData.getCompoundFlag();
 		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
-		boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
-		boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		boolean checkCompoundReplacement = affixData.isCheckCompoundReplacement();
-		boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		compoundAsReplacement.clear();
 
@@ -117,38 +113,16 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					List<String> continuationFlags = extractCompoundFlagsByComponents(compoundEntries, compoundFlag);
 					if(!continuationFlags.contains(forbiddenWordFlag)){
-						String word = sb.toString();
-						String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
-						Production p = Production.createFromCompound(word, flags, compoundEntries, strategy);
-						if(hasForbidCompoundFlag || hasPermitCompoundFlag)
-							productions.add(p);
-						else{
-							//add boundary affixes
-							List<Production> prods = applyAffixRules(p, false);
-
-							//remove twofold because they're not allowed in compounds
-							if(!allowTwofoldAffixesInCompound)
-								removeTwofolds(prods);
-
-							productions.addAll(prods);
-						}
+						String compoundWord = sb.toString();
+						addToProductions(compoundWord, compoundEntries, continuationFlags, productions);
 
 						if(productions.size() >= limit)
-							completed = true;
+							break;
 					}
 				}
 
 
-				//obtain next tuple
-				for(int i = indexes.length - 1; !completed && i >= 0; i --){
-					indexes[i] ++;
-					if(indexes[i] < entry.get(i).size())
-						break;
-
-					indexes[i] = 0;
-					if(i == 0)
-						completed = true;
-				}
+				completed = getNextTuple(indexes, entry);
 			}
 		}
 
@@ -168,6 +142,29 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		if(response.size() > limit)
 			response = response.subList(0, limit);
 		return response;
+	}
+
+	private void addToProductions(String compoundWord, List<DictionaryEntry> compoundEntries, List<String> continuationFlags,
+			Set<Production> productions) throws IllegalArgumentException{
+		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
+		boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
+		boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
+
+		String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
+		Production p = Production.createFromCompound(compoundWord, flags, compoundEntries, strategy);
+		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
+			productions.add(p);
+		else{
+			//add boundary affixes
+			List<Production> prods = applyAffixRules(p, false);
+			
+			//remove twofold because they're not allowed in compounds
+			if(!allowTwofoldAffixesInCompound)
+				removeTwofolds(prods);
+			
+			productions.addAll(prods);
+		}
 	}
 
 	private List<DictionaryEntry> composeCompound(int[] indexes, List<List<Production>> entry, StringBuilder sb){
@@ -293,6 +290,21 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				}
 		}
 		return exists;
+	}
+
+	private boolean getNextTuple(int[] indexes, List<List<Production>> entry){
+		//obtain next tuple
+		boolean completed = false;
+		for(int i = indexes.length - 1; !completed && i >= 0; i --){
+			indexes[i] ++;
+			if(indexes[i] < entry.get(i).size())
+				break;
+			
+			indexes[i] = 0;
+			if(i == 0)
+				completed = true;
+		}
+		return completed;
 	}
 
 	/** Merge the distribution with the others */
