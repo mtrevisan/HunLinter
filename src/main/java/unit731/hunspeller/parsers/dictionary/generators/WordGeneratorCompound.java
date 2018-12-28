@@ -30,7 +30,7 @@ import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.StringHelper;
 
 
-public class WordGeneratorCompound extends WordGenerator{
+class WordGeneratorCompound extends WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorCompound.class);
 
@@ -50,17 +50,20 @@ public class WordGeneratorCompound extends WordGenerator{
 	protected final AffixParser affParser;
 	protected final DictionaryParser dicParser;
 	protected final DictionaryBaseData dictionaryBaseData;
+	protected final WordGenerator wordGenerator;
 
 	protected DictionaryInclusionTestWorker dicInclusionTestWorker;
 	protected final Set<String> compoundAsReplacement = new HashSet<>();
 
 
-	protected WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
+	WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData,
+			WordGenerator wordGenerator){
 		super(affParser.getAffixData());
 
 		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.dictionaryBaseData = dictionaryBaseData;
+		this.wordGenerator = wordGenerator;
 	}
 
 	protected List<List<List<Production>>> generateCompounds(List<List<String>> permutations, Map<String, Set<DictionaryEntry>> inputs){
@@ -284,8 +287,7 @@ public class WordGeneratorCompound extends WordGenerator{
 			Objects.requireNonNull(dicParser);
 			Objects.requireNonNull(dictionaryBaseData);
 
-			WordGeneratorAffixRules wordGeneratorAffixeRules = new WordGeneratorAffixRules(affParser);
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, wordGeneratorAffixeRules, dictionaryBaseData, affParser);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(dicParser, wordGenerator, dictionaryBaseData, affParser);
 
 			try{
 				dicInclusionTestWorker.executeInline();

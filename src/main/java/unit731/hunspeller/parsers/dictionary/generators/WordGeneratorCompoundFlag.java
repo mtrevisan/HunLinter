@@ -16,10 +16,11 @@ import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 
-public class WordGeneratorCompoundFlag extends WordGeneratorCompound{
+class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	public WordGeneratorCompoundFlag(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
-		super(affParser, dicParser, dictionaryBaseData);
+	WordGeneratorCompoundFlag(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData,
+			WordGenerator wordGenerator){
+		super(affParser, dicParser, dictionaryBaseData, wordGenerator);
 	}
 
 	/**
@@ -31,7 +32,7 @@ public class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<Production> applyCompoundFlag(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
+	List<Production> applyCompoundFlag(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)

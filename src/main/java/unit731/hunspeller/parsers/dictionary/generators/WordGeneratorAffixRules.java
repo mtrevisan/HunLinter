@@ -11,16 +11,16 @@ import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
-public class WordGeneratorAffixRules extends WordGenerator{
+class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	public WordGeneratorAffixRules(AffixParser affParser){
+	WordGeneratorAffixRules(AffixParser affParser){
 		super(affParser.getAffixData());
 	}
 
-	public List<Production> applySingleAffixRule(String line){
+	List<Production> applySingleAffixRule(String line){
 		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
@@ -61,7 +61,7 @@ public class WordGeneratorAffixRules extends WordGenerator{
 		return productions;
 	}
 
-	public List<Production> applyAffixRules(String line){
+	List<Production> applyAffixRules(String line){
 		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);

@@ -24,7 +24,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
 import unit731.hunspeller.services.ExceptionHelper;
@@ -44,14 +44,14 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private static final String SLASH = "/";
 
 	private final DictionaryCorrectnessChecker checker;
-	private final WordGeneratorAffixRules wordGenerator;
+	private final WordGenerator wordGenerator;
 	private final DictionaryParser dicParser;
 	private final File outputFile;
 	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(String language, DictionaryParser dicParser, DictionaryCorrectnessChecker checker,
-			WordGeneratorAffixRules wordGenerator, File outputFile, ReadWriteLockable lockable){
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator,
+			File outputFile, ReadWriteLockable lockable){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);

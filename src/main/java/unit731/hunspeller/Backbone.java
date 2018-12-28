@@ -27,10 +27,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorCompoundBeginMiddleEnd;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorCompoundFlag;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorCompoundRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
@@ -73,10 +70,7 @@ public class Backbone implements FileChangeListener{
 	private HyphenatorInterface hyphenator;
 	private DictionaryBaseData dictionaryBaseData;
 	private DictionaryCorrectnessChecker checker;
-	private WordGeneratorAffixRules wordGeneratorAffixRules;
-	private WordGeneratorCompoundRules wordGeneratorCompoundRules;
-	private WordGeneratorCompoundFlag wordGeneratorCompoundFlag;
-	private WordGeneratorCompoundBeginMiddleEnd wordGeneratorCompoundBeginMiddleEnd;
+	private WordGenerator wordGenerator;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -123,20 +117,8 @@ public class Backbone implements FileChangeListener{
 		return checker;
 	}
 
-	public WordGeneratorAffixRules getWordGeneratorAffixRules(){
-		return wordGeneratorAffixRules;
-	}
-
-	public WordGeneratorCompoundRules getWordGeneratorCompoundRules(){
-		return wordGeneratorCompoundRules;
-	}
-
-	public WordGeneratorCompoundFlag getWordGeneratorCompoundFlag(){
-		return wordGeneratorCompoundFlag;
-	}
-
-	public WordGeneratorCompoundBeginMiddleEnd getWordGeneratorCompoundBeginMiddleEnd(){
-		return wordGeneratorCompoundBeginMiddleEnd;
+	public WordGenerator getWordGenerator(){
+		return wordGenerator;
 	}
 
 	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
@@ -182,10 +164,7 @@ public class Backbone implements FileChangeListener{
 		hyphenator = null;
 		dictionaryBaseData = null;
 		checker = null;
-		wordGeneratorAffixRules = null;
-		wordGeneratorCompoundRules = null;
-		wordGeneratorCompoundFlag = null;
-		wordGeneratorCompoundBeginMiddleEnd = null;
+		wordGenerator = null;
 	}
 
 	public void registerFileListener() throws IOException{
@@ -253,10 +232,7 @@ public class Backbone implements FileChangeListener{
 			dicParser.clear();
 
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affixData.getLanguage());
-		wordGeneratorAffixRules = new WordGeneratorAffixRules(affParser);
-		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affParser, dicParser, dictionaryBaseData);
-		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affParser, dicParser, dictionaryBaseData);
-		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affParser, dicParser, dictionaryBaseData);
+		wordGenerator = new WordGenerator(affParser, dicParser, dictionaryBaseData);
 	}
 
 	private void openAidFile(File aidFile) throws IOException{

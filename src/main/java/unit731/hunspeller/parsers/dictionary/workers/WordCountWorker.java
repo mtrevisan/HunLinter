@@ -12,7 +12,7 @@ import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
@@ -27,7 +27,7 @@ public class WordCountWorker extends WorkerDictionaryBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(DictionaryParser dicParser, WordGeneratorAffixRules wordGenerator, DictionaryBaseData dictionaryBaseData,
+	public WordCountWorker(DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
 			ReadWriteLockable lockable){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);

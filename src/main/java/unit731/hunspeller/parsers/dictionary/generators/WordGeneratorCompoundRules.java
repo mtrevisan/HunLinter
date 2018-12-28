@@ -16,10 +16,11 @@ import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
-public class WordGeneratorCompoundRules extends WordGeneratorCompound{
+class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	public WordGeneratorCompoundRules(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
-		super(affParser, dicParser, dictionaryBaseData);
+	WordGeneratorCompoundRules(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData,
+			WordGenerator wordGenerator){
+		super(affParser, dicParser, dictionaryBaseData, wordGenerator);
 	}
 
 	/**
@@ -31,7 +32,7 @@ public class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @return	The list of productions for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	public List<Production> applyCompoundRules(String[] inputCompounds, String compoundRule, int limit) throws IllegalArgumentException,
+	List<Production> applyCompoundRules(String[] inputCompounds, String compoundRule, int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		Objects.requireNonNull(compoundRule);

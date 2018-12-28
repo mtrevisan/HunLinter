@@ -27,7 +27,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
@@ -53,7 +53,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	/** NOTE: this works only if the rules produce only one output! ... for now */
-	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGeneratorAffixRules wordGenerator, ReadWriteLockable lockable){
+	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
 
