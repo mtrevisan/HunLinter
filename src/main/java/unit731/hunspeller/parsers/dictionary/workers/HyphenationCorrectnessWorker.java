@@ -9,7 +9,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
@@ -29,7 +29,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
+	public HyphenationCorrectnessWorker(DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGeneratorAffixRules wordGenerator,
 			ReadWriteLockable lockable) throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);

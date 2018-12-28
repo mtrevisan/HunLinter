@@ -25,7 +25,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
@@ -45,13 +45,13 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 
 	private final DictionaryParser dicParser;
-	private final WordGenerator wordGenerator;
+	private final WordGeneratorAffixRules wordGenerator;
 	private final DictionaryBaseData dictionaryBaseData;
 	private final File outputFile;
 	private final Comparator<String> comparator;
 
 
-	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
+	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGeneratorAffixRules wordGenerator, DictionaryBaseData dictionaryBaseData,
 			File outputFile){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);

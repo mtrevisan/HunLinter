@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;
@@ -16,7 +16,7 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Dictionary correctness checking";
 
 
-	public DictionaryCorrectnessWorker(DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator,
+	public DictionaryCorrectnessWorker(DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGeneratorAffixRules wordGenerator,
 			ReadWriteLockable lockable){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);

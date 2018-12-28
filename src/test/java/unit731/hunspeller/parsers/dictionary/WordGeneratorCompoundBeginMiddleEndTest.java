@@ -64,7 +64,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 			"-/W",
 			"Arbeitsnehmer/Z"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundBeginMiddleEnd(inputCompounds, 62);
+		List<Production> words = backbone.getWordGeneratorCompoundBeginMiddleEnd().applyCompoundBeginMiddleEnd(inputCompounds, 62);
 words.forEach(System.out::println);
 
 //good: Computerarbeits-, Computercomputern, Arbeitscomputern, Computerarbeitscomputerns, Computerarbeits-Computer,

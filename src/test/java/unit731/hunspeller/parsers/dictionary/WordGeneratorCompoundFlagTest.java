@@ -47,7 +47,7 @@ public class WordGeneratorCompoundFlagTest{
 			"xy/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 10, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -78,7 +78,7 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -104,7 +104,7 @@ public class WordGeneratorCompoundFlagTest{
 			"eel/A",
 			"bare/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 12, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -137,7 +137,7 @@ public class WordGeneratorCompoundFlagTest{
 			"glass/A",
 			"sko/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 3, PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("glassglass", null, "pa:glass st:glass pa:glass st:glass"),
@@ -162,7 +162,7 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/A",
 			"yz/A"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foobar", null, "pa:foo st:foo pa:bar st:bar"),
@@ -188,7 +188,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		List<Production> words = backbone.getWordGeneratorAffixRules().applyAffixRules(line);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -205,7 +205,7 @@ public class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 20, 2);
+		words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 20, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -243,7 +243,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		List<Production> words = backbone.getWordGeneratorAffixRules().applyAffixRules(line);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -262,7 +262,7 @@ public class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 20, 2);
+		words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 20, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -301,7 +301,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		List<Production> words = backbone.getWordGeneratorAffixRules().applyAffixRules(line);
 
 		Assertions.assertEquals(6, words.size());
 		//base production
@@ -320,7 +320,7 @@ public class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 30, 2);
+		words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 30, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -365,7 +365,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		List<Production> words = backbone.getWordGeneratorAffixRules().applyAffixRules(line);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -382,7 +382,7 @@ public class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 70, 2);
+		words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 70, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -467,7 +467,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 		String line = "foo/XPS";
-		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+		List<Production> words = backbone.getWordGeneratorAffixRules().applyAffixRules(line);
 
 		Assertions.assertEquals(4, words.size());
 		//base production
@@ -484,7 +484,7 @@ public class WordGeneratorCompoundFlagTest{
 			"foo/XPS",
 			"bar/XPS"
 		};
-		words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 4, 2);
+		words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 4, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
@@ -512,7 +512,7 @@ public class WordGeneratorCompoundFlagTest{
 			"-/A"
 		};
 
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 100, 3);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", null, "pa:foo st:foo pa:foo st:foo"),
@@ -622,7 +622,7 @@ public class WordGeneratorCompoundFlagTest{
 			"kocsi/A",
 			"szerviz"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 40, 3);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 40, 3);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("szerszer", null, "pa:szer st:szer pa:szer st:szer"),
@@ -682,7 +682,7 @@ public class WordGeneratorCompoundFlagTest{
 			"bars/X",
 			"foos/X"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 2);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 100, 2);
 
 		List<Production> expected = Arrays.asList(
 			createProduction("foofoo", "S", "pa:foo st:foo po:1 pa:foo st:foo po:1"),
@@ -719,7 +719,7 @@ public class WordGeneratorCompoundFlagTest{
 			"bar/C",
 			"baz/CA"
 		};
-		List<Production> words = backbone.getWordGenerator().applyCompoundFlag(inputCompounds, 100, 3);
+		List<Production> words = backbone.getWordGeneratorCompoundFlag().applyCompoundFlag(inputCompounds, 100, 3);
 //words.forEach(System.out::println);
 
 		List<Production> expected = Arrays.asList(
