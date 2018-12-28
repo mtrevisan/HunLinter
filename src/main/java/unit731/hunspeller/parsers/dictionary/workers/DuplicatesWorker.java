@@ -25,7 +25,7 @@ import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;

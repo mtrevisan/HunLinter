@@ -11,7 +11,7 @@ import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;

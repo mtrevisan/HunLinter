@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.WordGeneratorAffixRules;
+import unit731.hunspeller.parsers.dictionary.generators.WordGeneratorAffixRules;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.concurrency.ReadWriteLockable;

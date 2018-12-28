@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,12 +8,14 @@ import java.util.Set;
 import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.NoApplicableRuleException;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 
-public class WordGeneratorCompoundBeginMiddleEnd extends WordGenerator{
+public class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 	public WordGeneratorCompoundBeginMiddleEnd(AffixParser affParser, DictionaryParser dicParser, DictionaryBaseData dictionaryBaseData){
 		super(affParser, dicParser, dictionaryBaseData);

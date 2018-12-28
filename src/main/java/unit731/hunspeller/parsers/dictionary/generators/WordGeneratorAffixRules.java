@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,6 +8,7 @@ import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
