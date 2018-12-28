@@ -1778,7 +1778,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
-					backbone.getWordGenerator(), backbone.getDictionaryBaseData(), outputFile);
+					backbone.getWordGenerator(), outputFile);
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
@@ -1804,8 +1804,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getDictionaryBaseData(),
-				backbone.getAffParser());
+			dicWordCountWorker = new WordCountWorker(backbone.getAffParser().getAffixData().getLanguage(), backbone.getDicParser(),
+				backbone.getWordGenerator(), backbone.getAffParser());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1821,7 +1821,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainProgressBar.setValue(0);
 
 			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
-				backbone.getWordGenerator(), backbone.getDictionaryBaseData(), performHyphenationStatistics, this);
+				backbone.getWordGenerator(), performHyphenationStatistics, this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
@@ -1896,8 +1896,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void checkHyphenationCorrectness(){
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
 			try{
-				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(),
-					backbone.getWordGenerator(), backbone.getAffParser());
+				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
+					backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(), backbone.getAffParser());
 				hypCorrectnessWorker.addPropertyChangeListener(this);
 				hypCorrectnessWorker.execute();
 

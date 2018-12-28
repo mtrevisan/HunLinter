@@ -1,9 +1,9 @@
 package unit731.hunspeller.languages.vec;
 
-import unit731.hunspeller.languages.DictionaryBaseData;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterParameters;
 
 
-public class DictionaryBaseDataVEC extends DictionaryBaseData{
+public class DictionaryBaseDataVEC extends BloomFilterParameters{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 50_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
@@ -11,11 +11,11 @@ public class DictionaryBaseDataVEC extends DictionaryBaseData{
 
 
 	private static class SingletonHelper{
-		private static final DictionaryBaseData INSTANCE = new DictionaryBaseDataVEC();
+		private static final DictionaryBaseDataVEC INSTANCE = new DictionaryBaseDataVEC();
 	}
 
 
-	public static synchronized DictionaryBaseData getInstance(){
+	public static synchronized DictionaryBaseDataVEC getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 

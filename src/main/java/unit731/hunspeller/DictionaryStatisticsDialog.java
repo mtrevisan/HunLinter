@@ -42,7 +42,6 @@ import org.knowm.xchart.style.Styler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.GUIUtils;
-import unit731.hunspeller.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Frequency;
@@ -529,7 +528,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		java.awt.EventQueue.invokeLater(() -> {
 			try{
-				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8, DictionaryBaseDataVEC.getInstance());
+				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
 				List<String> rules = Collections.<String>emptyList();
 				boolean[] errors = new boolean[0];
 				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));

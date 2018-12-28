@@ -21,7 +21,6 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
@@ -68,7 +67,6 @@ public class Backbone implements FileChangeListener{
 	private HyphenationParser hypParser;
 
 	private HyphenatorInterface hyphenator;
-	private DictionaryBaseData dictionaryBaseData;
 	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
 
@@ -107,10 +105,6 @@ public class Backbone implements FileChangeListener{
 
 	public HyphenatorInterface getHyphenator(){
 		return hyphenator;
-	}
-
-	public DictionaryBaseData getDictionaryBaseData(){
-		return dictionaryBaseData;
 	}
 
 	public DictionaryCorrectnessChecker getChecker(){
@@ -162,7 +156,6 @@ public class Backbone implements FileChangeListener{
 
 	public void clear(){
 		hyphenator = null;
-		dictionaryBaseData = null;
 		checker = null;
 		wordGenerator = null;
 	}
@@ -231,8 +224,7 @@ public class Backbone implements FileChangeListener{
 		else if(dicParser != null)
 			dicParser.clear();
 
-		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(affixData.getLanguage());
-		wordGenerator = new WordGenerator(affParser, dicParser, dictionaryBaseData);
+		wordGenerator = new WordGenerator(affParser, dicParser);
 	}
 
 	private void openAidFile(File aidFile) throws IOException{

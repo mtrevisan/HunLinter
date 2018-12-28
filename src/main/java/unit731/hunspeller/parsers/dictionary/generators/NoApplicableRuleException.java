@@ -1,4 +1,4 @@
-package unit731.hunspeller.parsers.dictionary;
+package unit731.hunspeller.parsers.dictionary.generators;
 
 
 public class NoApplicableRuleException extends IllegalArgumentException{

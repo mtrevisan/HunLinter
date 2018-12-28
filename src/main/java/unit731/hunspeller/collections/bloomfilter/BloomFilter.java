@@ -66,26 +66,34 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * Create a new bloom filter.
 	 *
 	 * @param charset							The {@link Charset} to be used
-	 * @param expectedNumberOfElements	The number of max expected insertions
-	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param bitArrayType					The type of the bit array
+	 * @param parameters						The parameters object
 	 */
-	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType){
-		this(charset, expectedNumberOfElements, falsePositiveProbability, bitArrayType, null, null);
+	public BloomFilter(Charset charset, BloomFilterParameters parameters){
+		this(charset, parameters, null, null);
 	}
 
 	/**
 	 * Create a new bloom filter.
 	 *
 	 * @param charset							The {@link Charset} to be used
-	 * @param expectedNumberOfElements	The number of max expected insertions
-	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param bitArrayType					The type of the bit array
+	 * @param parameters						The parameters object
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 */
-	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
-			Decomposer<T> decomposer){
-		this(charset, expectedNumberOfElements, falsePositiveProbability, bitArrayType, decomposer, null);
+	public BloomFilter(Charset charset, BloomFilterParameters parameters, Decomposer<T> decomposer){
+		this(charset, parameters, decomposer, null);
+	}
+
+	/**
+	 * Create a new bloom filter.
+	 *
+	 * @param charset							The {@link Charset} to be used
+	 * @param parameters						The parameters object
+	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link HASHER_DEFAULT} will be used
+	 */
+	public BloomFilter(Charset charset, BloomFilterParameters parameters, Decomposer<T> decomposer, HashFunction hasher){
+		this(charset, parameters.getExpectedNumberOfElements(), parameters.getFalsePositiveProbability(), parameters.getBitArrayType(),
+			decomposer, hasher);
 	}
 
 	/**
@@ -98,7 +106,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link HASHER_DEFAULT} will be used
 	 */
-	public BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
+	protected BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
 			Decomposer<T> decomposer, HashFunction hasher){
 		Objects.nonNull(charset);
 		Objects.nonNull(bitArrayType);

@@ -29,12 +29,12 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
+	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
 			ReadWriteLockable lockable) throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
-		RulesLoader rulesLoader = new RulesLoader(dicParser.getLanguage(), null);
+		RulesLoader rulesLoader = new RulesLoader(language, null);
 
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);

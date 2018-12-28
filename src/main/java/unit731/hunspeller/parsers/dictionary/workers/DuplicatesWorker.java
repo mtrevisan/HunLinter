@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.bloomfilter.BloomFilterInterface;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunspeller.collections.bloomfilter.ScalableInMemoryBloomFilter;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -38,35 +38,62 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
-	public static final String WORKER_NAME = "Duplications extraction";
 
-	private static final int EXPECTED_NUMBER_OF_DUPLICATIONS = 1_000_000;
-	private static final double FALSE_POSITIVE_PROBABILITY_DUPLICATIONS = 0.000_000_4;
+	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
+
+		private static class SingletonHelper{
+			private static final DuplicatesDictionaryBaseData INSTANCE = new DuplicatesDictionaryBaseData();
+		}
+
+
+		public static synchronized DuplicatesDictionaryBaseData getInstance(){
+			return SingletonHelper.INSTANCE;
+		}
+
+		protected DuplicatesDictionaryBaseData(){}
+
+		@Override
+		public int getExpectedNumberOfElements(){
+			return 1_000_000;
+		}
+
+		@Override
+		public double getFalsePositiveProbability(){
+			return 0.000_000_4;
+		}
+
+		@Override
+		public double getGrowRatioWhenFull(){
+			return 1.3;
+		}
+
+	}
+
+	public static final String WORKER_NAME = "Duplications extraction";
 
 
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
-	private final DictionaryBaseData dictionaryBaseData;
 	private final File outputFile;
+
 	private final Comparator<String> comparator;
+	private final BloomFilterParameters dictionaryBaseData;
 
 
-	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, DictionaryBaseData dictionaryBaseData,
-			File outputFile){
+	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(dictionaryBaseData);
 		Objects.requireNonNull(outputFile);
 
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
-		this.dictionaryBaseData = dictionaryBaseData;
 		this.outputFile = outputFile;
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
 		comparator = BaseBuilder.getComparator(language);
+		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 	}
 
 	@Override
@@ -112,10 +139,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
-			dictionaryBaseData.getExpectedNumberOfElements(), dictionaryBaseData.getFalsePositiveProbability(), dictionaryBaseData.getGrowRatioWhenFull());
+		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
-			EXPECTED_NUMBER_OF_DUPLICATIONS, FALSE_POSITIVE_PROBABILITY_DUPLICATIONS, dictionaryBaseData.getGrowRatioWhenFull());
+			DuplicatesDictionaryBaseData.getInstance());
 
 		setProgress(0);
 		File dicFile = dicParser.getDicFile();

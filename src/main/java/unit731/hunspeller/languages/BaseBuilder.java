@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiFunction;
+import unit731.hunspeller.collections.bloomfilter.BloomFilterParameters;
 import unit731.hunspeller.languages.vec.DictionaryBaseDataVEC;
 import unit731.hunspeller.languages.vec.DictionaryCorrectnessCheckerVEC;
 import unit731.hunspeller.languages.vec.OrthographyVEC;
@@ -23,7 +24,7 @@ public class BaseBuilder{
 	private static class LanguageData{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
 		private Comparator<String> comparator;
-		private DictionaryBaseData dictionaryBaseData;
+		private BloomFilterParameters dictionaryBaseData;
 		private BiFunction<AffixData, HyphenatorInterface, DictionaryCorrectnessChecker> checker;
 		private Orthography orthography;
 	}
@@ -55,7 +56,7 @@ public class BaseBuilder{
 			.comparator;
 	}
 
-	public static DictionaryBaseData getDictionaryBaseData(String language){
+	public static BloomFilterParameters getDictionaryBaseData(String language){
 		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.dictionaryBaseData;
 	}
