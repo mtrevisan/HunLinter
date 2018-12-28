@@ -17,8 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.languages.DictionaryBaseData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -101,10 +99,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
 		boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
-		boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
 		boolean checkCompoundReplacement = affixData.isCheckCompoundReplacement();
-		boolean forbidTriples = affixData.isForbidTriplesInCompound();
-		boolean simplifyTriples = affixData.isSimplifyTriplesInCompound();
 		boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
 
 		compoundAsReplacement.clear();
@@ -117,50 +112,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			boolean completed = false;
 			int[] indexes = new int[entry.size()];
 			while(!completed){
-				sb.setLength(0);
-				List<DictionaryEntry> compoundEntries = new ArrayList<>();
-				StringHelper.Casing lastWordCasing = null;
-				for(int i = 0; i < indexes.length; i ++){
-					Production next = entry.get(i).get(indexes[i]);
-					if(next.hasContinuationFlag(forbiddenWordFlag)){
-						sb.setLength(0);
-						break;
-					}
-					compoundEntries.add(next);
-
-					String nextCompound = next.getWord();
-					if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
-						//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
-						if(simplifyTriples)
-							nextCompound = nextCompound.substring(1);
-						//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
-						else if(forbidTriples){
-							sb.setLength(0);
-							break;
-						}
-					}
-					if(sb.length() > 0 && forbidDifferentCasesInCompound){
-						if(lastWordCasing == null)
-							lastWordCasing = StringHelper.classifyCasing(sb.toString());
-						StringHelper.Casing nextWord = StringHelper.classifyCasing(nextCompound);
-
-						char lastChar = sb.charAt(sb.length() - 1);
-						char nextChar = nextCompound.charAt(0);
-						if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
-							Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
-							//convert nextChar to lowercase/uppercase and go on
-							if(collisions != null && collisions.contains(nextWord))
-								nextCompound = (Character.isUpperCase(lastChar)? StringUtils.capitalize(nextCompound):
-									StringUtils.uncapitalize(nextCompound));
-						}
-
-						lastWordCasing = nextWord;
-					}
-					sb.append(nextCompound);
-				}
+				List<DictionaryEntry> compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(sb.length() > 0 && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
-					List<String> continuationFlags = extractAffixesComponents(compoundEntries, compoundFlag);
+					List<String> continuationFlags = extractCompoundFlagsByComponents(compoundEntries, compoundFlag);
 					if(!continuationFlags.contains(forbiddenWordFlag)){
 						String word = sb.toString();
 						String flags = (!continuationFlags.isEmpty()? String.join(StringUtils.EMPTY, continuationFlags): null);
@@ -172,12 +127,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 							List<Production> prods = applyAffixRules(p, false);
 
 							//remove twofold because they're not allowed in compounds
-							if(!allowTwofoldAffixesInCompound){
-								Iterator<Production> itr = prods.iterator();
-								while(itr.hasNext())
-									if(itr.next().isTwofolded())
-										itr.remove();
-							}
+							if(!allowTwofoldAffixesInCompound)
+								removeTwofolds(prods);
 
 							productions.addAll(prods);
 						}
@@ -219,6 +170,55 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return response;
 	}
 
+	private List<DictionaryEntry> composeCompound(int[] indexes, List<List<Production>> entry, StringBuilder sb){
+		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
+		boolean forbidTriples = affixData.isForbidTriplesInCompound();
+		boolean simplifyTriples = affixData.isSimplifyTriplesInCompound();
+
+		List<DictionaryEntry> compoundEntries = new ArrayList<>();
+
+		sb.setLength(0);
+		StringHelper.Casing lastWordCasing = null;
+		for(int i = 0; i < indexes.length; i ++){
+			Production next = entry.get(i).get(indexes[i]);
+			
+			//skip forbidden words
+			if(next.hasContinuationFlag(forbiddenWordFlag)){
+				sb.setLength(0);
+				break;
+			}
+			
+			compoundEntries.add(next);
+			
+			String nextCompound = next.getWord();
+			if((simplifyTriples || forbidTriples) && containsTriple(sb, nextCompound)){
+				//enforce simplification of triples if SIMPLIFIEDTRIPLE is set
+				if(simplifyTriples)
+					nextCompound = nextCompound.substring(1);
+				//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
+				else if(forbidTriples){
+					sb.setLength(0);
+					break;
+				}
+			}
+			//enforce forbidden case if CHECKCOMPOUNDCASE is set
+			if(sb.length() > 0 && forbidDifferentCasesInCompound){
+				if(lastWordCasing == null)
+					lastWordCasing = StringHelper.classifyCasing(sb.toString());
+				StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
+				
+				char lastChar = sb.charAt(sb.length() - 1);
+				nextCompound = enforceNextCompoundCase(lastChar, nextCompound, lastWordCasing, nextWordCasing);
+				
+				lastWordCasing = nextWordCasing;
+			}
+			
+			sb.append(nextCompound);
+		}
+		return compoundEntries;
+	}
+
 	private boolean containsTriple(StringBuilder sb, String compound){
 		int count = 0;
 		int size = sb.length() - 1;
@@ -238,6 +238,41 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			}
 		}
 		return (count >= 3);
+	}
+
+	private String enforceNextCompoundCase(char lastChar, String nextCompound, StringHelper.Casing lastWordCasing,
+			StringHelper.Casing nextWordCasing){
+		char nextChar = nextCompound.charAt(0);
+		if(Character.isAlphabetic(lastChar) && Character.isAlphabetic(nextChar)){
+			Set<StringHelper.Casing> collisions = COMPOUND_WORD_BOUNDARY_COLLISIONS.get(lastWordCasing);
+			//convert nextChar to lowercase/uppercase and go on
+			if(collisions != null && collisions.contains(nextWordCasing))
+				nextCompound = (Character.isUpperCase(lastChar)? StringUtils.capitalize(nextCompound):
+					StringUtils.uncapitalize(nextCompound));
+		}
+		return nextCompound;
+	}
+
+	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
+	private List<String> extractCompoundFlagsByComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
+		List<String[]> prefixes = compoundEntries.get(0).extractAllAffixes(affixData, false);
+		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAllAffixes(affixData, false);
+
+		Set<String> terminals = new HashSet<>(Arrays.asList(prefixes.get(2)));
+		terminals.addAll(Arrays.asList(suffixes.get(2)));
+		terminals.remove(compoundFlag);
+
+		String compoundPrefixes = String.join(StringUtils.EMPTY, prefixes.get(0));
+		String compoundSuffixes = String.join(StringUtils.EMPTY, suffixes.get(1));
+		String compoundTerminals = String.join(StringUtils.EMPTY, terminals);
+		return Arrays.asList(compoundPrefixes, compoundSuffixes, compoundTerminals);
+	}
+
+	private void removeTwofolds(List<Production> prods){
+		Iterator<Production> itr = prods.iterator();
+		while(itr.hasNext())
+			if(itr.next().isTwofolded())
+				itr.remove();
 	}
 
 	//is word a non compound with a REP substitution (see checkcompoundrep)?
@@ -290,21 +325,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				LOGGER.error("Cannot read dictionary", e);
 			}
 		}
-	}
-
-	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both */
-	private List<String> extractAffixesComponents(List<DictionaryEntry> compoundEntries, String compoundFlag){
-		List<String[]> prefixes = compoundEntries.get(0).extractAllAffixes(affixData, false);
-		List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAllAffixes(affixData, false);
-
-		Set<String> terminals = new HashSet<>(Arrays.asList(prefixes.get(2)));
-		terminals.addAll(Arrays.asList(suffixes.get(2)));
-		terminals.remove(compoundFlag);
-
-		String compoundPrefixes = String.join(StringUtils.EMPTY, prefixes.get(0));
-		String compoundSuffixes = String.join(StringUtils.EMPTY, suffixes.get(1));
-		String compoundTerminals = String.join(StringUtils.EMPTY, terminals);
-		return Arrays.asList(compoundPrefixes, compoundSuffixes, compoundTerminals);
 	}
 
 }
