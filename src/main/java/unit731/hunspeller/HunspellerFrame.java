@@ -1761,7 +1761,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(), backbone.getAffParser());
+			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(),
+				backbone.getAffParser());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1803,7 +1804,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getDictionaryBaseData(), backbone.getAffParser());
+			dicWordCountWorker = new WordCountWorker(backbone.getDicParser(), backbone.getWordGenerator(), backbone.getDictionaryBaseData(),
+				backbone.getAffParser());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1894,8 +1896,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void checkHyphenationCorrectness(){
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
 			try{
-				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(),
-					backbone.getAffParser());
+				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getDicParser(), backbone.getHyphenator(),
+					backbone.getWordGenerator(), backbone.getAffParser());
 				hypCorrectnessWorker.addPropertyChangeListener(this);
 				hypCorrectnessWorker.execute();
 
