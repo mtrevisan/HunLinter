@@ -87,6 +87,20 @@ public class ConversionTable{
 	}
 
 	/**
+	 * NOTE: returns the original word if no conversion has been applied!
+	 * 
+	 * @param word	Word to be converted
+	 * @return	The conversion
+	 */
+	public String applySingleConversionTable(String word){
+		List<String> conversions = applyConversionTable(word);
+		if(conversions.size() > 1)
+			throw new IllegalArgumentException("Cannot convert word " + word + ", too much appliable rules");
+
+		return (!conversions.isEmpty()? conversions.get(0): word);
+	}
+
+	/**
 	 * NOTE: does not include the original word!
 	 * 
 	 * @param word	Word to be converted

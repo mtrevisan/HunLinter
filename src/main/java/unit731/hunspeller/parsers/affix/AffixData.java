@@ -216,12 +216,12 @@ public class AffixData{
 
 	private String applyConversionTable(String word, ConversionTable table, String type){
 		if(table != null){
-			List<String> conversions = table.applyConversionTable(word);
-			if(conversions.size() > 1)
+			try{
+				word = table.applySingleConversionTable(word);
+			}
+			catch(IllegalArgumentException e){
 				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too much appliable rules");
-
-			if(!conversions.isEmpty())
-				word = conversions.get(0);
+			}
 		}
 		return word;
 	}
