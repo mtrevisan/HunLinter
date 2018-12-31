@@ -57,7 +57,7 @@ public class AffixHandler implements Handler{
 
 			AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
-			checkValidity(entry, line, i, ruleType, ruleFlag);
+			checkValidity(entry, ruleType, ruleFlag, line, i);
 
 			boolean inserted = entries.add(entry);
 			if(!inserted)
@@ -85,7 +85,7 @@ public class AffixHandler implements Handler{
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private void checkValidity(AffixEntry entry, String line, int index, AffixEntry.Type ruleType, String ruleFlag)
+	private void checkValidity(AffixEntry entry, AffixEntry.Type ruleType, String ruleFlag, String line, int index)
 			throws IllegalArgumentException{
 		if(entry.getType() != ruleType)
 			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + index + ": mismatched rule type (expected "
