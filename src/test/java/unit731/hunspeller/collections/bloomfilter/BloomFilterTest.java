@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunspeller.collections.bloomfilter.core.BitArrayBuilder;
 
 
 public class BloomFilterTest{
@@ -18,7 +17,18 @@ public class BloomFilterTest{
 
 	@Test
 	public void defaultFilter(){
-		BloomFilterInterface<String> filter = new BloomFilter<>(StandardCharsets.UTF_8, 10 * MAX, FPP, BitArrayBuilder.Type.JAVA);
+		BloomFilterParameters params = new BloomFilterParameters(){
+			@Override
+			public int getExpectedNumberOfElements(){
+				return 10 * MAX;
+			}
+
+			@Override
+			public double getFalsePositiveProbability(){
+				return FPP;
+			}
+		};
+		BloomFilterInterface<String> filter = new BloomFilter<>(StandardCharsets.UTF_8, params);
 
 		//generate two one-million uuid arrays
 		List<String> contained = new ArrayList<>();
