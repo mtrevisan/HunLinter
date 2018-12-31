@@ -111,6 +111,13 @@ public class AffixEntry{
 
 		if(continuationFlags != null)
 			Arrays.sort(continuationFlags);
+
+		checkValidity(cond, removal, line);
+
+		entry = PatternHelper.clear(line, PATTERN_ENTRY);
+	}
+
+	private void checkValidity(String cond, String removal, String line) throws IllegalArgumentException{
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
@@ -125,8 +132,6 @@ public class AffixEntry{
 					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
 			}
 		}
-
-		entry = PatternHelper.clear(line, PATTERN_ENTRY);
 	}
 
 	public Type getType(){
