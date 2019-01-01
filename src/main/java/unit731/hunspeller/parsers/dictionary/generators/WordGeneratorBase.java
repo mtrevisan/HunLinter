@@ -220,9 +220,6 @@ class WordGeneratorBase{
 	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound)
 			throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
-		//add COMPOUNDBEGIN, COMPOUNDMIDDLE, and COMPOUNDEND flags
-		//FIXME
-//		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
 		String[] postponedAffixes = applyAffixes.get(1);
 
 		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
@@ -240,12 +237,8 @@ class WordGeneratorBase{
 					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
-					String parentFlag = null;
-					if(dicEntry instanceof Production){
-						List<AffixEntry> appliedRules = ((Production)dicEntry).getAppliedRules();
-						if(!appliedRules.isEmpty())
-							parentFlag = appliedRules.get(0).getFlag();
-					}
+					List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
+					String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found"
 						+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
@@ -254,59 +247,19 @@ class WordGeneratorBase{
 				if(applicableAffixes.isEmpty())
 					throw new NoApplicableRuleException("No applicable rules for " + affix + " from " + dicEntry.getWord());
 
-//List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
-//List<AffixEntry> en1 = new ArrayList<>();
-//String[] arr = RegExpTrieSequencer.extractCharacters(word);
-//Collection<TrieNode<String[], String, List<AffixEntry>>> lst;
-//if(isSuffix){
-//	ArrayUtils.reverse(arr);
-//	for(AffixEntry entry : rule.getSuffixEntries()){
-//		Matcher match = entry.getMatch();
-//		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
-//			en1.add(entry);
-//	}
-//}
-//else{
-//	for(AffixEntry entry : rule.getPrefixEntries()){
-//		Matcher match = entry.getMatch();
-//		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
-//			en1.add(entry);
-//	}
-//}
-//en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//en1.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-				//List<RegExpPrefix<AffixEntry>> rePrefixes = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word));
-				//List<AffixEntry> applicableAffixes = rePrefixes.stream()
-				//	.map(RegExpPrefix::getNode)
-				//	.map(RegExpTrieNode::getData)
-				//	.flatMap(List::stream)
-				//	.collect(Collectors.toList());
-
 				for(AffixEntry entry : applicableAffixes){
-					boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
-					boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
-//if("SFX A 0 0/WXD .".equals(entry.toString()))
-//	System.out.println("");
-					if(isCompound && (hasForbidFlag || !hasPermitFlag))
-						continue;
-//					if(isCompound && hasForbidFlag)
-//						continue;
-
+					if(isCompound){
+						boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
+						boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
+						if(hasForbidFlag || !hasPermitFlag)
+							continue;
+					}
 
 					//produce the new word
 					String newWord = entry.applyRule(word, affixData.isFullstrip());
-
 					Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
 					if(!production.hasContinuationFlag(forbiddenWordFlag))
 						productions.add(production);
-//					if(!production.hasContinuationFlag(forbiddenWordFlag)){
-//						if(isCompound && !hasPermitFlag)
-//							production.removeAffixes(affParser);
-//
-//						productions.add(production);
-//					}
 				}
 			}
 		}
