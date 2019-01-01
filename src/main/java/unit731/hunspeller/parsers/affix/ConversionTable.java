@@ -121,11 +121,20 @@ public class ConversionTable{
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private static void convertWhole(String word, Pair<String, String> entry, List<String> conversions){
+	private static void convertInside(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
-		String strippedKey = key.substring(1, key.length() - 1);
-		if(word.equals(strippedKey))
-			conversions.add(entry.getValue());
+		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
+		if(word.contains(key)){
+			//search every occurence of the pattern in the word
+			int idx = -1;
+			StringBuilder sb = new StringBuilder();
+			while((idx = word.indexOf(key, idx + 1)) >= 0){
+				sb.setLength(0);
+				sb.append(word);
+				sb.replace(idx, idx + key.length(), entry.getValue());
+				conversions.add(sb.toString());
+			}
+		}
 	}
 
 	private static void convertStartsWith(String word, Pair<String, String> entry, List<String> conversions){
@@ -143,20 +152,11 @@ public class ConversionTable{
 			conversions.add(word.substring(0, word.length() - keyLength) + entry.getValue());
 	}
 
-	private static void convertInside(String word, Pair<String, String> entry, List<String> conversions){
+	private static void convertWhole(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
-		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
-		if(word.contains(key)){
-			//search every occurence of the pattern in the word
-			int idx = -1;
-			StringBuilder sb = new StringBuilder();
-			while((idx = word.indexOf(key, idx + 1)) >= 0){
-				sb.setLength(0);
-				sb.append(word);
-				sb.replace(idx, idx + key.length(), entry.getValue());
-				conversions.add(sb.toString());
-			}
-		}
+		String strippedKey = key.substring(1, key.length() - 1);
+		if(word.equals(strippedKey))
+			conversions.add(entry.getValue());
 	}
 
 	private boolean isStarting(String key){
