@@ -172,11 +172,11 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 				for(String nohyp : hypParser.getOptParser().getNoHyphen()){
 					int nohypLength = nohyp.length();
-					if(nohyp.charAt(0) == '^'){
+					if(isStarting(nohyp)){
 						if(response.get(0).equals(nohyp.substring(1)))
 							response.remove(0);
 					}
-					else if(nohyp.charAt(nohypLength - 1) == '$'){
+					else if(isEnding(nohyp)){
 						if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
 							response.remove(response.size() - 1);
 					}
@@ -198,6 +198,14 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		finally{
 			hypParser.releaseReadLock();
 		}
+	}
+
+	private boolean isStarting(String key){
+		return (key.charAt(0) == '^');
+	}
+
+	private boolean isEnding(String key){
+		return (key.charAt(key.length() - 1) == '$');
 	}
 
 	protected List<String> createHyphenatedWord(String word, HyphenationBreak hyphBreak){
