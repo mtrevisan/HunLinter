@@ -60,10 +60,7 @@ class WordGeneratorBase{
 		}
 
 		//extract lastfold productions
-		List<Production> lastfoldProductions = new ArrayList<>();
-		lastfoldProductions.add(baseProduction);
-		lastfoldProductions.addAll(onefoldProductions);
-		lastfoldProductions.addAll(twofoldProductions);
+		List<Production> lastfoldProductions = collectProductions(baseProduction, onefoldProductions, twofoldProductions, null);
 		lastfoldProductions = getTwofoldProductions(lastfoldProductions, isCompound, affixData.isComplexPrefixes());
 		printProductions("Twofold productions:", lastfoldProductions);
 
@@ -72,11 +69,7 @@ class WordGeneratorBase{
 		//remove rules that invalidate the circumfix rule
 		enforceCircumfix(lastfoldProductions);
 
-		List<Production> productions = new ArrayList<>();
-		productions.add(baseProduction);
-		productions.addAll(onefoldProductions);
-		productions.addAll(twofoldProductions);
-		productions.addAll(lastfoldProductions);
+		List<Production> productions = collectProductions(baseProduction, onefoldProductions, twofoldProductions, lastfoldProductions);
 
 		//remove rules that invalidate the onlyInCompound rule
 		if(isCompound)
@@ -85,6 +78,17 @@ class WordGeneratorBase{
 		//remove rules that invalidate the affix rule
 		enforceNeedAffixFlag(productions);
 
+		return productions;
+	}
+
+	private List<Production> collectProductions(Production baseProduction, List<Production> onefoldProductions,
+			List<Production> twofoldProductions, List<Production> lastfoldProductions){
+		List<Production> productions = new ArrayList<>();
+		productions.add(baseProduction);
+		productions.addAll(onefoldProductions);
+		productions.addAll(twofoldProductions);
+		if(lastfoldProductions != null)
+			productions.addAll(lastfoldProductions);
 		return productions;
 	}
 
