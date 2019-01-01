@@ -75,7 +75,7 @@ public class HyphenationBreak{
 
 				String reducedKey = reduceKey(nohyp);
 				NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
-				fun.manage(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);
+				syllabesCount = fun.manage(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);
 			}
 		}
 	}
