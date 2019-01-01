@@ -225,20 +225,20 @@ public class AffixParser extends ReadWriteLockable{
 		}
 		//swap tags:
 		if(data.isComplexPrefixes()){
-//			String compoundBegin = getData(AffixTag.COMPOUND_BEGIN_FLAG);
-//			String compoundEnd = getData(AffixTag.COMPOUND_END_FLAG);
-//			addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
-//			addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
+			String compoundBegin = data.getData(AffixTag.COMPOUND_BEGIN_FLAG);
+			String compoundEnd = data.getData(AffixTag.COMPOUND_END_FLAG);
+			data.addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
+			data.addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
 
-RuleEntry prefixes = data.getData(AffixTag.PREFIX);
-RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
-data.addData(AffixTag.PREFIX, suffixes);
-data.addData(AffixTag.SUFFIX, prefixes);
+			RuleEntry prefixes = data.getData(AffixTag.PREFIX);
+			RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
+			data.addData(AffixTag.PREFIX, suffixes);
+			data.addData(AffixTag.SUFFIX, prefixes);
 		}
 //		if(!containsData(AffixTag.KEY))
-//			addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
+//			data.addData(AffixTag.KEY, "qwertyuiop|asdfghjkl|zxcvbnm");
 //		if(!containsData(AffixTag.WORD_CHARS))
-//			addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
+//			data.addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 	}
 
 	private Handler lookupHandlerByRuleType(AffixTag ruleType){

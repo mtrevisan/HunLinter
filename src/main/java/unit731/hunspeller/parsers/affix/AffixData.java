@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -25,6 +24,7 @@ public class AffixData{
 
 	private final Map<String, Object> data = new HashMap<>();
 	private final Set<String> terminalAffixes = new HashSet<>();
+	private boolean closed;
 
 
 	void close(){
@@ -32,11 +32,18 @@ public class AffixData{
 			AffixTag.COMPOUND_BEGIN_FLAG, AffixTag.COMPOUND_MIDDLE_FLAG, AffixTag.COMPOUND_END_FLAG, AffixTag.ONLY_IN_COMPOUND_FLAG,
 			AffixTag.PERMIT_COMPOUND_FLAG, AffixTag.FORBID_COMPOUND_FLAG, AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, AffixTag.CIRCUMFIX_FLAG,
 			AffixTag.KEEP_CASE_FLAG, AffixTag.NEED_AFFIX_FLAG));
+
+		closed = true;
+	}
+
+	public boolean isClosed(){
+		return closed;
 	}
 
 	void clear(){
 		data.clear();
 		terminalAffixes.clear();
+		closed = false;
 	}
 
 	boolean containsData(AffixTag key){
@@ -69,6 +76,9 @@ public class AffixData{
 
 	@SuppressWarnings("unchecked")
 	<T> void addData(String key, T value){
+		if(closed)
+			throw new IllegalArgumentException("Cannot add data, container is closed");
+
 		T prevValue = (T)data.put(key, value);
 
 		if(prevValue != null)
