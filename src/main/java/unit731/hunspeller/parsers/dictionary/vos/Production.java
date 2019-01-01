@@ -82,6 +82,7 @@ public class Production extends DictionaryEntry{
 		return (entries != null? new ArrayList<>(entries): null);
 	}
 
+	@Override
 	public List<AffixEntry> getAppliedRules(){
 		return appliedRules;
 	}

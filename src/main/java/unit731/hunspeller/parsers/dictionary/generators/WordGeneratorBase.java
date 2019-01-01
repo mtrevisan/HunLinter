@@ -145,7 +145,7 @@ class WordGeneratorBase{
 	protected List<Production> enforceOnlyInCompound(List<Production> productions){
 		String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 
-		if(StringUtils.isNotBlank(onlyInCompoundFlag)){
+		if(onlyInCompoundFlag != null){
 			Iterator<Production> itr = productions.iterator();
 			while(itr.hasNext()){
 				Production production = itr.next();
@@ -164,23 +164,29 @@ class WordGeneratorBase{
 			while(itr.hasNext()){
 				Production production = itr.next();
 
-				List<AffixEntry> appliedRules = production.getAppliedRules();
-				boolean rulesContainsCircumfixFlag = appliedRules.stream()
-					.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
-				if(rulesContainsCircumfixFlag){
-					//check if at least one SFX and one PFX have the circumfix flag
-					boolean suffixWithCircumfix = appliedRules.stream()
-						.filter(AffixEntry::isSuffix)
-						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
-					boolean prefixWithCircumfix = appliedRules.stream()
-						.filter(Predicate.not(AffixEntry::isSuffix))
-						.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
-					if(suffixWithCircumfix ^ prefixWithCircumfix)
-						itr.remove();
-				}
+				if(affixWithCircumfix(production, circumfixFlag))
+					itr.remove();
 			}
 		}
 		return lastfoldProductions;
+	}
+
+	private boolean affixWithCircumfix(Production production, String circumfixFlag){
+		boolean affixWithCircumfix = false;
+		List<AffixEntry> appliedRules = production.getAppliedRules();
+		boolean rulesContainsCircumfixFlag = appliedRules.stream()
+			.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
+		if(rulesContainsCircumfixFlag){
+			//check if at least one SFX and one PFX have the circumfix flag
+			boolean suffixWithCircumfix = appliedRules.stream()
+				.filter(AffixEntry::isSuffix)
+				.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
+			boolean prefixWithCircumfix = appliedRules.stream()
+				.filter(Predicate.not(AffixEntry::isSuffix))
+				.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
+			affixWithCircumfix = (suffixWithCircumfix ^ prefixWithCircumfix);
+		}
+		return affixWithCircumfix;
 	}
 
 	protected void enforceNeedAffixFlag(List<Production> productions){
@@ -190,39 +196,40 @@ class WordGeneratorBase{
 			while(itr.hasNext()){
 				Production production = itr.next();
 
-				boolean hasNeedAffixFlag = false;
-				List<AffixEntry> appliedRules = production.getAppliedRules();
-				if(appliedRules != null){
-					//check that last suffix and last prefix shouldn't have the needaffix flag
-					boolean lastSuffix = false;
-					boolean lastPrefix = false;
-					boolean lastSuffixNeedAffix = false;
-					boolean lastPrefixNeedAffix = false;
-					for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
-						AffixEntry appliedRule = appliedRules.get(i);
-						if(!lastSuffix && appliedRule.isSuffix()){
-							lastSuffix = true;
-							lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
-						}
-						else if(!lastPrefix && !appliedRule.isSuffix()){
-							lastPrefix = true;
-							lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
-						}
-					}
-					hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
-				}
-				if(hasNeedAffixFlag)
+				if(hasNeedAffixFlag(production, needAffixFlag))
 					itr.remove();
 			}
 		}
 	}
 
+	private boolean hasNeedAffixFlag(Production production, String needAffixFlag){
+		boolean hasNeedAffixFlag = false;
+		List<AffixEntry> appliedRules = production.getAppliedRules();
+		if(appliedRules != null){
+			//check that last suffix and last prefix don't have the needaffix flag
+			boolean lastSuffix = false;
+			boolean lastPrefix = false;
+			boolean lastSuffixNeedAffix = false;
+			boolean lastPrefixNeedAffix = false;
+			for(int i = appliedRules.size() - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
+				AffixEntry appliedRule = appliedRules.get(i);
+				if(appliedRule.isSuffix() && !lastSuffix){
+					lastSuffix = true;
+					lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
+				}
+				if(!appliedRule.isSuffix() && !lastPrefix){
+					lastPrefix = true;
+					lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
+				}
+			}
+			hasNeedAffixFlag = (!lastSuffix || lastSuffixNeedAffix) && (!lastPrefix || lastPrefixNeedAffix);
+		}
+		return hasNeedAffixFlag;
+	}
+
 	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound)
 			throws NoApplicableRuleException{
 		String[] appliedAffixes = applyAffixes.get(0);
-		//add COMPOUNDBEGIN, COMPOUNDMIDDLE, and COMPOUNDEND flags
-		//FIXME
-//		String[] postponedAffixes = ArrayUtils.addAll(applyAffixes.get(1), applyAffixes.get(3));
 		String[] postponedAffixes = applyAffixes.get(1);
 
 		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
@@ -240,73 +247,29 @@ class WordGeneratorBase{
 					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
-					String parentFlag = null;
-					if(dicEntry instanceof Production){
-						List<AffixEntry> appliedRules = ((Production)dicEntry).getAppliedRules();
-						if(!appliedRules.isEmpty())
-							parentFlag = appliedRules.get(0).getFlag();
-					}
+					List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
+					String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found"
 						+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
 				List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("No applicable rules for " + affix + " from " + dicEntry.getWord());
-
-//List<AffixEntry> en0 = new ArrayList<>(applicableAffixes);
-//List<AffixEntry> en1 = new ArrayList<>();
-//String[] arr = RegExpTrieSequencer.extractCharacters(word);
-//Collection<TrieNode<String[], String, List<AffixEntry>>> lst;
-//if(isSuffix){
-//	ArrayUtils.reverse(arr);
-//	for(AffixEntry entry : rule.getSuffixEntries()){
-//		Matcher match = entry.getMatch();
-//		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
-//			en1.add(entry);
-//	}
-//}
-//else{
-//	for(AffixEntry entry : rule.getPrefixEntries()){
-//		Matcher match = entry.getMatch();
-//		//... only if it matches the given word
-//		if(match == null || PatternService.find(arr, match))
-//			en1.add(entry);
-//	}
-//}
-//en0.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-//en1.sort((a1, a2) -> a1.toString().compareTo(a2.toString()));
-				//List<RegExpPrefix<AffixEntry>> rePrefixes = (isSuffix? rule.getSuffixEntries().findSuffix(word): rule.getPrefixEntries().findPrefix(word));
-				//List<AffixEntry> applicableAffixes = rePrefixes.stream()
-				//	.map(RegExpPrefix::getNode)
-				//	.map(RegExpTrieNode::getData)
-				//	.flatMap(List::stream)
-				//	.collect(Collectors.toList());
+					throw new NoApplicableRuleException("No applicable rules found for " + affix + " from " + dicEntry.getWord());
 
 				for(AffixEntry entry : applicableAffixes){
-					boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
-					boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
-//if("SFX A 0 0/WXD .".equals(entry.toString()))
-//	System.out.println("");
-					if(isCompound && (hasForbidFlag || !hasPermitFlag))
-						continue;
-//					if(isCompound && hasForbidFlag)
-//						continue;
-
+					if(isCompound){
+						boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
+						boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
+						if(hasForbidFlag || !hasPermitFlag)
+							continue;
+					}
 
 					//produce the new word
 					String newWord = entry.applyRule(word, affixData.isFullstrip());
-
 					Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
 					if(!production.hasContinuationFlag(forbiddenWordFlag))
 						productions.add(production);
-//					if(!production.hasContinuationFlag(forbiddenWordFlag)){
-//						if(isCompound && !hasPermitFlag)
-//							production.removeAffixes(affParser);
-//
-//						productions.add(production);
-//					}
 				}
 			}
 		}

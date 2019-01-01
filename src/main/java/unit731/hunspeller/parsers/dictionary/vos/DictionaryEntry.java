@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -164,6 +165,10 @@ public class DictionaryEntry{
 		return false;
 	}
 
+	public List<AffixEntry> getAppliedRules(){
+		return Collections.<AffixEntry>emptyList();
+	}
+
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixData affixData){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affixData::isManagedByCompoundRule)
@@ -231,12 +236,8 @@ public class DictionaryEntry{
 					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
-					String parentFlag = null;
-					if(this instanceof Production){
-						List<AffixEntry> appliedRules = ((Production)this).getAppliedRules();
-						if(appliedRules != null && !appliedRules.isEmpty())
-							parentFlag = appliedRules.get(0).getFlag();
-					}
+					List<AffixEntry> appliedRules = getAppliedRules();
+					String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
 						StringUtils.EMPTY));
 				}

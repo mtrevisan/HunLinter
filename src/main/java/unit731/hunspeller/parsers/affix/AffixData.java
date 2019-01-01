@@ -82,7 +82,7 @@ public class AffixData{
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
 		String flag = getFlag();
-		return (StringUtils.isNotBlank(flag)? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
+		return (flag != null? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
 	}
 
 	public String getKeepCaseFlag(){
