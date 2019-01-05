@@ -78,11 +78,12 @@ public class DictionaryCorrectnessChecker{
 				throw new IllegalArgumentException(WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 
-			Set<String> morphologicalFieldTypes = rulesLoader.getDataField(morphologicalField.substring(0, 3));
-			if(morphologicalFieldTypes == null)
+			String key = morphologicalField.substring(0, 3);
+			if(!rulesLoader.containsDataField(key))
 				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
-			if(!morphologicalFieldTypes.contains(morphologicalField.substring(3)))
+			Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
+			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
 				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
 					morphologicalField}));
 		});

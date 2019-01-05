@@ -26,7 +26,10 @@ public class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéí" + GraphemeVEC.PHONEME_I_UMLAUT + "òóúh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = PatternHelper.pattern("^i(?=[aeiouàèéíòóú])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = PatternHelper.pattern("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
-	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(PatternHelper.pattern("b[ae]roi[aeèi]r"));
+	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
+		PatternHelper.pattern("b[ae]roi[aeèi]r"),
+		PatternHelper.pattern("re[sŧ]ei[ou]r[aeio]?")
+	);
 	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = PatternHelper.pattern("[aeiouàèéíòóú]i(o|([oó]n|on-)([gmnstv].{1,3}|[ei])?([lƚ][oiae])?|é(-?[ou])?|e[dg]e(-[ou])?|omi|ent[eoi]?-?([gmnstv].{1,3})?([lƚ][oiae])?|inti)$");
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = PatternHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Pattern PATTERN_LH_INSIDE_INTO_L = PatternHelper.pattern("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");

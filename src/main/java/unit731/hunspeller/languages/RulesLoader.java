@@ -132,6 +132,10 @@ public class RulesLoader{
 		return wordCanHaveMultipleAccents;
 	}
 
+	public boolean containsDataField(String key){
+		return dataFields.containsKey(key);
+	}
+
 	public Set<String> getDataField(String key){
 		return dataFields.get(key);
 	}
