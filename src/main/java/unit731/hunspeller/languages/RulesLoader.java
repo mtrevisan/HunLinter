@@ -46,9 +46,9 @@ public class RulesLoader{
 
 		rulesProperties = BaseBuilder.getRulesProperties(language);
 
-		morphologicalFieldsCheck = Boolean.getBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
-		enableVerbSyllabationCheck = Boolean.getBoolean((String)rulesProperties.get("verbSyllabationCheck"));
-		wordCanHaveMultipleAccents = Boolean.getBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
+		morphologicalFieldsCheck = Boolean.parseBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
+		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
+		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
 
 		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet(rulesProperties, "partOfSpeeches", ','));
 		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet(rulesProperties, "inflectionalSuffixes", ','));
