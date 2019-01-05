@@ -118,7 +118,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 			incompatibilityCheck(production);
 
-//FIXME move this in super?
 			if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
 					&& !production.hasPartOfSpeech(POS_ADVERB)){
 				metaphonesisCheck(production);

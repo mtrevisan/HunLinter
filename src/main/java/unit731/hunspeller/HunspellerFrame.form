@@ -286,9 +286,9 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="mainProgressBar" alignment="0" max="-2" attributes="0"/>
                   <Component id="mainTabbedPane" alignment="0" max="32767" attributes="0"/>
                   <Component id="parsingResultScrollPane" alignment="1" max="32767" attributes="0"/>
+                  <Component id="mainProgressBar" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>

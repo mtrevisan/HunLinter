@@ -1002,9 +1002,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          .addGroup(layout.createSequentialGroup()
             .addContainerGap()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-               .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                .addComponent(mainTabbedPane)
-               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING))
+               .addComponent(parsingResultScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+               .addComponent(mainProgressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
       );
       layout.setVerticalGroup(
