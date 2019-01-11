@@ -191,8 +191,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
-				&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
+		if(isSyllabable(production)){
 			String word = production.getWord();
 			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
 				word = word.toLowerCase(Locale.ROOT);
@@ -208,6 +207,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				}
 			}
 		}
+	}
+
+	private boolean isSyllabable(Production production){
+		return ((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
+			&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
 
 	@Override
