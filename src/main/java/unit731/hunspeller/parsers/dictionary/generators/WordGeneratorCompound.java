@@ -128,16 +128,24 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 		compoundAsReplacement.clear();
 
+		applyOutputConversions(productions, forceCompoundUppercaseFlag);
+
+		if(LOGGER.isTraceEnabled())
+			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
+
+		return limitResponse(productions, limit);
+	}
+
+	private void applyOutputConversions(Set<Production> productions, String forceCompoundUppercaseFlag){
 		//convert using output table
 		for(Production production : productions){
 			production.applyOutputConversionTable(affixData);
 			production.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			production.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
+	}
 
-		if(LOGGER.isTraceEnabled())
-			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
-
+	private List<Production> limitResponse(Set<Production> productions, int limit){
 		List<Production> response = new ArrayList<>(productions);
 		if(response.size() > limit)
 			response = response.subList(0, limit);
