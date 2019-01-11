@@ -224,36 +224,34 @@ public class HyphenationParser{
 					if(line.isEmpty())
 						continue;
 
-					if(!line.isEmpty()){
-						boolean parsedLine = optParser.parseLine(line);
-						if(!parsedLine){
-							if(line.startsWith(NEXT_LEVEL)){
-								if(level == Level.COMPOUND)
-									throw new IllegalArgumentException("Cannot have more than two levels");
+					boolean parsedLine = optParser.parseLine(line);
+					if(!parsedLine){
+						if(line.startsWith(NEXT_LEVEL)){
+							if(level == Level.COMPOUND)
+								throw new IllegalArgumentException("Cannot have more than two levels");
 
-								//start with non–compound level
-								level = Level.COMPOUND;
-								secondLevelPresent = true;
-								REDUCED_PATTERNS.get(level).clear();
-							}
-							else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
-								String key = PatternHelper.clear(line, PATTERN_EQUALS);
-								if(customHyphenations.get(level).containsKey(key))
-									throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
+							//start with non–compound level
+							level = Level.COMPOUND;
+							secondLevelPresent = true;
+							REDUCED_PATTERNS.get(level).clear();
+						}
+						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
+							String key = PatternHelper.clear(line, PATTERN_EQUALS);
+							if(customHyphenations.get(level).containsKey(key))
+								throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-								customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, MINUS_SIGN));
-							}
-							else{
-								validateRule(line, level);
+							customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, MINUS_SIGN));
+						}
+						else{
+							validateRule(line, level);
 
-								String key = getKeyFromData(line);
-								boolean duplicatedRule = isRuleDuplicated(key, line, level);
-								if(duplicatedRule)
-									throw new IllegalArgumentException("Duplication found: " + line);
-								else
-									//insert current pattern into the radix tree (remove all numbers)
-									patterns.get(level).put(key, line);
-							}
+							String key = getKeyFromData(line);
+							boolean duplicatedRule = isRuleDuplicated(key, line, level);
+							if(duplicatedRule)
+								throw new IllegalArgumentException("Duplication found: " + line);
+							else
+								//insert current pattern into the radix tree (remove all numbers)
+								patterns.get(level).put(key, line);
 						}
 					}
 				}
