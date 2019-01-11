@@ -108,8 +108,8 @@ class WordGeneratorBase{
 
 	protected List<Production> getOnefoldProductions(DictionaryEntry dicEntry, boolean isCompound, boolean reverse)
 			throws NoApplicableRuleException{
-		List<String[]> applyAffixes = dicEntry.extractAllAffixes(affixData, reverse);
-		return applyAffixRules(dicEntry, applyAffixes, isCompound);
+		List<String[]> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		return applyAffixRules(dicEntry, allAffixes, isCompound);
 	}
 
 	private List<Production> getTwofoldProductions(List<Production> onefoldProductions, boolean isCompound, boolean reverse)
@@ -227,54 +227,68 @@ class WordGeneratorBase{
 		return hasNeedAffixFlag;
 	}
 
-	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> applyAffixes, boolean isCompound)
-			throws NoApplicableRuleException{
-		String[] appliedAffixes = applyAffixes.get(0);
-		String[] postponedAffixes = applyAffixes.get(1);
+	private List<Production> applyAffixRules(DictionaryEntry dicEntry, List<String[]> allAffixes, boolean isCompound) throws NoApplicableRuleException{
+		String[] appliedAffixes = allAffixes.get(0);
+		String[] postponedAffixes = allAffixes.get(1);
 
 		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		List<Production> productions = new ArrayList<>();
-		if(appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag)){
-			String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-			String permitCompoundFlag = affixData.getPermitCompoundFlag();
-
-			String word = dicEntry.getWord();
-
+		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(String affix : appliedAffixes){
-				RuleEntry rule = affixData.getData(affix);
-				if(rule == null){
-					if(affixData.isManagedByCompoundRule(affix))
-						continue;
-
-					List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
-					String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
-					throw new IllegalArgumentException("Non–existent rule " + affix + " found"
-						+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
-				}
-
-				List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
-				if(applicableAffixes.isEmpty())
-					throw new NoApplicableRuleException("No applicable rules found for " + affix + " from " + dicEntry.getWord());
-
-				for(AffixEntry entry : applicableAffixes){
-					if(isCompound){
-						boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
-						boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
-						if(hasForbidFlag || !hasPermitFlag)
-							continue;
-					}
-
-					//produce the new word
-					String newWord = entry.applyRule(word, affixData.isFullstrip());
-					Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
-					if(!production.hasContinuationFlag(forbiddenWordFlag))
-						productions.add(production);
-				}
+				List<Production> subProductions = applyAffixRule(dicEntry, affix, postponedAffixes, isCompound);
+				productions.addAll(subProductions);
 			}
-		}
 
 		return productions;
+	}
+
+	private List<Production> applyAffixRule(DictionaryEntry dicEntry, String affix, String[] postponedAffixes, boolean isCompound) throws NoApplicableRuleException{
+		RuleEntry rule = affixData.getData(affix);
+		if(rule == null){
+			if(affixData.isManagedByCompoundRule(affix))
+				return Collections.<Production>emptyList();
+
+			List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
+			String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
+			throw new IllegalArgumentException("Non–existent rule " + affix + " found"
+				+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
+		}
+
+		String forbidCompoundFlag = affixData.getForbidCompoundFlag();
+		String permitCompoundFlag = affixData.getPermitCompoundFlag();
+		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+
+		String word = dicEntry.getWord();
+		List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
+		if(applicableAffixes.isEmpty())
+			throw new NoApplicableRuleException("No applicable rules found for " + affix + " from " + word);
+
+		List<Production> productions = new ArrayList<>();
+		for(AffixEntry entry : applicableAffixes)
+			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
+				//produce the new word
+				String newWord = entry.applyRule(word, affixData.isFullstrip());
+				Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
+				if(!production.hasContinuationFlag(forbiddenWordFlag))
+					productions.add(production);
+			}
+		return productions;
+	}
+
+	private boolean hasToBeExpanded(DictionaryEntry dicEntry, String[] appliedAffixes, String forbiddenWordFlag){
+		return (appliedAffixes.length > 0 && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
+	}
+
+	private boolean shouldApplyEntry(AffixEntry entry, String forbidCompoundFlag, String permitCompoundFlag, boolean isCompound){
+		boolean shouldApply = true;
+		if(isCompound){
+			boolean hasForbidFlag = entry.hasContinuationFlag(forbidCompoundFlag);
+			boolean hasPermitFlag = entry.hasContinuationFlag(permitCompoundFlag);
+			if(hasForbidFlag || !hasPermitFlag)
+				shouldApply = false;
+		}
+		return shouldApply;
 	}
 
 }
