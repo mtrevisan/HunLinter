@@ -146,7 +146,8 @@ public class HyphenationParser{
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
+	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations,
+			HyphenationOptionsParser optParser){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
@@ -388,19 +389,28 @@ public class HyphenationParser{
 		int count = PatternHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
 			throw new IllegalArgumentException("Augmented rule " + rule + " has not exactly one hyphenation point");
+
 		String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
 			int index = getIndexOfBreakpoint(rule);
 			
-			int startIndex = (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
-			int length = (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
+			int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has the index number not less than the hyphenation point");
+			int length = extractLength(parts);
 			if(length < 0 || startIndex + length < index)
 				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number not less than the hyphenation point");
 			if(startIndex + length >= parts[0].length())
 				throw new IllegalArgumentException("Augmented rule " + rule + " has the length number that exceeds the length of the rule");
 		}
+	}
+
+	private static int extractStartIndex(String[] parts) throws NumberFormatException{
+		return (parts[1] != null? Integer.parseInt(parts[1]) - 1: -1);
+	}
+
+	private static int extractLength(String[] parts) throws NumberFormatException{
+		return (parts.length > 2 && parts[2] != null? Integer.parseInt(parts[2]): 0);
 	}
 
 	/**
