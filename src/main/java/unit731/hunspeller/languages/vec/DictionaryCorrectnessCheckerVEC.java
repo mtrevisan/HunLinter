@@ -171,27 +171,29 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void northernPluralCheck(Production production) throws IllegalArgumentException{
-		String word = production.getWord();
-		if(!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
-				&& hyphenator.hyphenate(word).countSyllabes() > 1){
+		if(hasToCheckForNorthernPlural(production)){
+			String word = production.getWord();
 			List<String> subwords = hyphenator.splitIntoCompounds(word);
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
-			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			boolean hasPluralFlag = hasPluralFlag(production);
 			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE) && !word.endsWith(MAN)
 				&& affixData.isAffixProductive(word, rule));
-			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
-				if(canHaveNorthernPlural)
-					throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
-				if(!canHaveNorthernPlural)
-					throw new IllegalArgumentException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{}));
-			}
+			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
+			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
+				throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
+			if(!canHaveNorthernPlural && hasNorthernPluralFlag)
+				throw new IllegalArgumentException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{}));
 		}
 	}
 
+	private boolean hasToCheckForNorthernPlural(Production production){
+		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
+			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
+	}
+
 	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if(isSyllabable(production)){
+		if(hasToCheckForSyllabation(production)){
 			String word = production.getWord();
 			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
 				word = word.toLowerCase(Locale.ROOT);
@@ -209,7 +211,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
-	private boolean isSyllabable(Production production){
+	private boolean hasToCheckForSyllabation(Production production){
 		return ((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB)) && !production.hasPartOfSpeech(POS_NUMERAL_LATIN)
 			&& !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
