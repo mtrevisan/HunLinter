@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,46 +32,44 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
-	protected boolean parallelProcessing;
-	protected boolean preventExceptionRelaunch;
+	protected final boolean parallelProcessing;
+	protected final boolean preventExceptionRelaunch;
 
 	private final File dicFile;
 	private final File outputFile;
 
 
-	public WorkerDictionary(String workerName, File dicFile, Charset charset,
-			BiConsumer<String, Integer> readLineProcessor,
-			Runnable completed, Runnable cancelled){
-		this(workerName, dicFile, null, charset, readLineProcessor, null, completed, cancelled);
-
+	public static final WorkerDictionary createReadWorker(WorkerData workerData, BiConsumer<String, Integer> readLineProcessor){
 		Objects.requireNonNull(readLineProcessor);
+
+		return new WorkerDictionary(workerData, readLineProcessor, null, null);
 	}
 
-	public WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
-			Runnable completed, Runnable cancelled){
-		this(workerName, dicFile, outputFile, charset, null, writeLineProcessor, completed, cancelled);
-
-		Objects.requireNonNull(outputFile);
+	public static final WorkerDictionary createWriteWorker(WorkerData workerData, BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, File outputFile){
 		Objects.requireNonNull(writeLineProcessor);
+		Objects.requireNonNull(outputFile);
+
+		return new WorkerDictionary(workerData, null, writeLineProcessor, outputFile);
 	}
 
-	private WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
-			BiConsumer<String, Integer> readLineProcessor,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(workerName);
-		Objects.requireNonNull(dicFile);
-		Objects.requireNonNull(charset);
+	private WorkerDictionary(WorkerData workerData, BiConsumer<String, Integer> readLineProcessor,
+			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, File outputFile){
+		Objects.requireNonNull(workerData);
+		Objects.requireNonNull(workerData.workerName);
+		Objects.requireNonNull(workerData.dicParser);
+		Objects.requireNonNull(workerData.dicParser.getDicFile());
+		Objects.requireNonNull(workerData.dicParser.getCharset());
 
-		this.workerName = workerName;
-		this.dicFile = dicFile;
+		this.workerName = workerData.workerName;
+		this.dicFile = workerData.dicParser.getDicFile();
 		this.outputFile = outputFile;
-		this.charset = charset;
+		this.charset = workerData.dicParser.getCharset();
 		this.readLineProcessor = readLineProcessor;
 		this.writeLineProcessor = writeLineProcessor;
-		this.completed = completed;
-		this.cancelled = cancelled;
+		this.completed = workerData.completed;
+		this.cancelled = workerData.cancelled;
+		this.parallelProcessing = workerData.parallelProcessing;
+		this.preventExceptionRelaunch = workerData.preventExceptionRelaunch;
 	}
 
 	public boolean isParallelProcessing(){

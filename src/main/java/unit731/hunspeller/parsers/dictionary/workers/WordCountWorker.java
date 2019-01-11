@@ -15,6 +15,7 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 
 
 public class WordCountWorker extends WorkerDictionaryBase{
@@ -56,7 +57,8 @@ public class WordCountWorker extends WorkerDictionaryBase{
 		Runnable cancelled = () -> {
 			dictionary.close();
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, cancelled);
+		createReadWorker(data, lineProcessor);
 	}
 
 	@Override

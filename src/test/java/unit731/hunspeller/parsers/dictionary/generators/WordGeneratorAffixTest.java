@@ -369,7 +369,7 @@ public class WordGeneratorAffixTest{
 
 	@Test
 	public void stemsInvalidFullstrip() throws IOException{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
@@ -379,6 +379,7 @@ public class WordGeneratorAffixTest{
 			String line = "a/A";
 			backbone.getWordGenerator().applyAffixRules(line);
 		});
+		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP tag", exception.getMessage());
 	}
 
 	@Test
@@ -403,7 +404,7 @@ public class WordGeneratorAffixTest{
 
 	@Test
 	public void stemsInvalidTwofold1() throws IOException{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
 				"FLAG long",
@@ -422,11 +423,12 @@ public class WordGeneratorAffixTest{
 			String line = "aa/S1";
 			backbone.getWordGenerator().applyAffixRules(line);
 		});
+		Assertions.assertEquals("Twofold rule violated for 'p1aas1/P2,S2	st:aa	from	S1 > P1 from S1 > P1' (S1 > P1 still has rules P2)", exception.getMessage());
 	}
 
 	@Test
 	public void stemsInvalidTwofold2() throws IOException{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
 				"SFX A Y 1",
@@ -450,6 +452,7 @@ public class WordGeneratorAffixTest{
 			String line = "a/ABCDEFGH";
 			backbone.getWordGenerator().applyAffixRules(line);
 		});
+		Assertions.assertEquals("Twofold rule violated for 'ga/A,B,C,D,E	st:a	from	G from G' (G still has rules E)", exception.getMessage());
 	}
 
 
@@ -544,7 +547,7 @@ public class WordGeneratorAffixTest{
 
 	@Test
 	public void complexPrefixesInvalidTwofold() throws IOException{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
 				"COMPLEXPREFIXES",
@@ -569,6 +572,7 @@ public class WordGeneratorAffixTest{
 			String line = "a/ABCDEFGH";
 			backbone.getWordGenerator().applyAffixRules(line);
 		});
+		Assertions.assertEquals("Twofold rule violated for 'ag/A,B,C,D,E	st:a	from	G from G' (G still has rules E)", exception.getMessage());
 	}
 
 

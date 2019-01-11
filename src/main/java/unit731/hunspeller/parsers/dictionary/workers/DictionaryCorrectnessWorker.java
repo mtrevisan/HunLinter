@@ -7,6 +7,7 @@ import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 
 
@@ -24,7 +25,8 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};
-		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null);
+		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		createReadWorker(data, lineProcessor);
 	}
 
 }

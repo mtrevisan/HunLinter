@@ -21,9 +21,10 @@ public class DoubleCharParsingStrategyTest{
 
 	@Test
 	public void notOk(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("abc");
 		});
+		Assertions.assertEquals("Flag must be of length multiple of two: abc", exception.getMessage());
 	}
 
 	@Test
@@ -50,26 +51,29 @@ public class DoubleCharParsingStrategyTest{
 
 	@Test
 	public void joinFlagsWithError(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length two: c from [ab, c]", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithEmpty(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length two:  from [ab, ]", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNull(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length two: null from [ab, null]", exception.getMessage());
 	}
 
 	@Test

@@ -238,7 +238,7 @@ public class WordGeneratorCompoundRuleTest{
 
 	@Test
 	public void forbiddenWordMissingRule() throws IOException{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 				"SET UTF-8",
@@ -253,6 +253,7 @@ public class WordGeneratorCompoundRuleTest{
 			};
 			backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
 		});
+		Assertions.assertEquals("Missing word(s) for rule w in compound rule vw", exception.getMessage());
 	}
 
 	@Test

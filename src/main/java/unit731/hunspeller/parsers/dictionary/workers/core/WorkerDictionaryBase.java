@@ -4,11 +4,9 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
 public class WorkerDictionaryBase{
@@ -16,53 +14,12 @@ public class WorkerDictionaryBase{
 	private WorkerDictionary worker;
 
 
-	public final void createReadWorker(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(dicParser);
-
-		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
-			completed, cancelled);
+	public final void createReadWorker(WorkerData workerData, BiConsumer<String, Integer> lineProcessor){
+		worker = WorkerDictionary.createReadWorker(workerData, lineProcessor);
 	}
 
-	public final void createReadWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(dicParser);
-
-		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
-			completed, cancelled);
-		worker.preventExceptionRelaunch = true;
-	}
-
-	public final void createReadParallelWorker(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(dicParser);
-
-		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
-			completed, cancelled);
-		worker.parallelProcessing = true;
-	}
-
-	public final void createReadParallelWorkerPreventExceptionRelaunch(String workerName, DictionaryParser dicParser,
-			BiConsumer<String, Integer> lineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(dicParser);
-
-		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), dicParser.getCharset(), lineProcessor,
-			completed, cancelled);
-		worker.parallelProcessing = true;
-		worker.preventExceptionRelaunch = true;
-	}
-
-	public final void createReadWriteWorker(String workerName, DictionaryParser dicParser, File outputFile,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor,
-			Runnable completed, Runnable cancelled){
-		Objects.requireNonNull(dicParser);
-
-		worker = new WorkerDictionary(workerName, dicParser.getDicFile(), outputFile, dicParser.getCharset(), lineProcessor,
-			completed, cancelled);
+	public final void createWriteWorker(WorkerData workerData, BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor, File outputFile){
+		worker = WorkerDictionary.createWriteWorker(workerData, lineProcessor, outputFile);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener){

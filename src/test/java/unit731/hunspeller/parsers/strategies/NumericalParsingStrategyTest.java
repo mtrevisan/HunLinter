@@ -21,16 +21,18 @@ public class NumericalParsingStrategyTest{
 
 	@Test
 	public void notOk1(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("ab");
 		});
+		Assertions.assertEquals("Flag must be an integer number: ab from ab", exception.getMessage());
 	}
 
 	@Test
 	public void notOk2(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("1.2");
 		});
+		Assertions.assertEquals("Flag must be an integer number: 1.2 from 1.2", exception.getMessage());
 	}
 
 	@Test
@@ -57,34 +59,38 @@ public class NumericalParsingStrategyTest{
 
 	@Test
 	public void joinFlagsWithError1(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", "c"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be an integer number: c from [1, c]", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithError2(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", "1.2"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be an integer number: 1.2 from [1, 1.2]", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithEmpty(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", ""};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be an integer number:  from [1, ]", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNull(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be an integer number: ab from [ab, null]", exception.getMessage());
 	}
 
 	@Test

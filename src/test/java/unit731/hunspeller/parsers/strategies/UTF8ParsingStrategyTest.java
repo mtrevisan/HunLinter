@@ -43,34 +43,38 @@ public class UTF8ParsingStrategyTest{
 
 	@Test
 	public void joinFlagsWithError(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNoUTF8(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"\\x{FFFD}"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithEmpty(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNull(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ŧ", null};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test

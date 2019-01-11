@@ -13,6 +13,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.FileHelper;
 
@@ -53,7 +54,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		createReadWriteWorker(WORKER_NAME, dicParser, outputFile, lineProcessor, completed, null);
+		WorkerData data = WorkerData.create(WORKER_NAME, dicParser, completed);
+		createWriteWorker(data, lineProcessor, outputFile);
 	}
 
 }

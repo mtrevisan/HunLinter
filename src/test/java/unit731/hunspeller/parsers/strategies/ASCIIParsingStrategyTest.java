@@ -43,34 +43,38 @@ public class ASCIIParsingStrategyTest{
 
 	@Test
 	public void joinFlagsWithError(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNoASCII(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be in US-ASCII encoding", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithEmpty(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test
 	public void joinFlagsWithNull(){
-		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
+		Assertions.assertEquals("Each flag must be of length one", exception.getMessage());
 	}
 
 	@Test

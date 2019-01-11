@@ -32,6 +32,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 
 
@@ -180,7 +181,8 @@ add the negated char to the other rule (ista/A2 [^i]o)
 				.map(entry -> composeLine(type, flag, entry))
 				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, null);
+		createReadWorker(data, lineProcessor);
 	}
 
 	/** Sort entries by shortest condition */

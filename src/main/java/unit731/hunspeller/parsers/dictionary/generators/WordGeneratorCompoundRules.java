@@ -79,7 +79,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 			char chr = (component.length() == 1? component.charAt(0): 0);
 			if(chr != '*' && chr != '?' && inputs.get(component) == null)
 				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
-					+ StringUtils.join(compoundAsReplacement, StringUtils.EMPTY));
+					+ StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
 		}
 	}
 

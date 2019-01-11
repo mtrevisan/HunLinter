@@ -6,6 +6,7 @@ import java.util.function.BiConsumer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 
 
@@ -24,7 +25,8 @@ public class CompoundRulesWorker extends WorkerDictionaryBase{
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, null);
+		createReadWorker(data, lineProcessor);
 	}
 
 }

@@ -13,6 +13,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
@@ -75,7 +76,8 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			}
 			catch(IOException e){}
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, cancelled);
+		createReadWorker(data, lineProcessor);
 	}
 
 	public boolean isPerformHyphenationStatistics(){
