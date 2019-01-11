@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.Duplicate;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.TimeWatch;
@@ -90,8 +92,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerName = WORKER_NAME;
-		charset = dicParser.getCharset();
+		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 	}
@@ -145,6 +146,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 		setProgress(0);
 		File dicFile = dicParser.getDicFile();
+		Charset charset = getCharset();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 			String line = extractLine(br);
 
@@ -212,6 +214,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			setProgress(0);
 
 			File dicFile = dicParser.getDicFile();
+			Charset charset = getCharset();
 			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 

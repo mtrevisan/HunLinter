@@ -40,4 +40,11 @@ public class WorkerData{
 		this.preventExceptionRelaunch = preventExceptionRelaunch;
 	}
 
+	public void validate() throws NullPointerException{
+		Objects.requireNonNull(workerName);
+		Objects.requireNonNull(dicParser);
+		Objects.requireNonNull(dicParser.getDicFile());
+		Objects.requireNonNull(dicParser.getCharset());
+	}
+
 }

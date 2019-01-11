@@ -17,6 +17,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
@@ -42,8 +43,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		dicParser = backbone.getDicParser();
 		this.lineIndex = lineIndex;
 
-		workerName = WORKER_NAME;
-		charset = dicParser.getCharset();
+		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator  = BaseBuilder.getComparator(backbone.getAffixData().getLanguage());
 	}
 

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +33,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
-	protected final boolean parallelProcessing;
-	protected final boolean preventExceptionRelaunch;
-
-	private final File dicFile;
 	private final File outputFile;
 
 
@@ -55,29 +52,12 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private WorkerDictionary(WorkerData workerData, BiConsumer<String, Integer> readLineProcessor,
 			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, File outputFile){
 		Objects.requireNonNull(workerData);
-		Objects.requireNonNull(workerData.workerName);
-		Objects.requireNonNull(workerData.dicParser);
-		Objects.requireNonNull(workerData.dicParser.getDicFile());
-		Objects.requireNonNull(workerData.dicParser.getCharset());
+		workerData.validate();
 
-		this.workerName = workerData.workerName;
-		this.dicFile = workerData.dicParser.getDicFile();
+		this.workerData = workerData;
 		this.outputFile = outputFile;
-		this.charset = workerData.dicParser.getCharset();
 		this.readLineProcessor = readLineProcessor;
 		this.writeLineProcessor = writeLineProcessor;
-		this.completed = workerData.completed;
-		this.cancelled = workerData.cancelled;
-		this.parallelProcessing = workerData.parallelProcessing;
-		this.preventExceptionRelaunch = workerData.preventExceptionRelaunch;
-	}
-
-	public boolean isParallelProcessing(){
-		return parallelProcessing;
-	}
-
-	public boolean isPreventExceptionRelaunch(){
-		return preventExceptionRelaunch;
 	}
 
 	@Override
@@ -99,6 +79,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private List<Pair<Integer, String>> readLines(){
 		List<Pair<Integer, String>> lines = new ArrayList<>();
+		File dicFile = getDicFile();
+		Charset charset = getCharset();
 		long totalSize = dicFile.length();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
 			String line = extractLine(br);
@@ -137,7 +119,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private void readProcess(List<Pair<Integer, String>> lines){
 		try{
-			LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
+			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 			setProgress(0);
 
 			int totalLines = lines.size();
@@ -156,11 +138,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-					if(!preventExceptionRelaunch)
+					if(!isPreventExceptionRelaunch())
 						throw e;
 				}
 			};
-			if(parallelProcessing)
+			if(isParallelProcessing())
 				lines.parallelStream()
 					.forEach(processor);
 			else
@@ -189,12 +171,13 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	private void writeProcess(List<Pair<Integer, String>> lines){
-		LOGGER.info(Backbone.MARKER_APPLICATION, workerName + " (pass 2/2)");
+		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 
 		setProgress(0);
 
 		int writtenSoFar = 0;
 		int totalLines = lines.size();
+		Charset charset = getCharset();
 		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			for(Pair<Integer, String> rowLine : lines){
 				if(isCancelled())
@@ -210,7 +193,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
-					if(!preventExceptionRelaunch)
+					if(!isPreventExceptionRelaunch())
 						throw e;
 				}
 			}
@@ -246,10 +229,10 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	@Override
 	protected void done(){
-		if(!isCancelled() && completed != null)
-			completed.run();
-		else if(isCancelled() && cancelled != null)
-			cancelled.run();
+		if(!isCancelled() && getCompleted() != null)
+			getCompleted().run();
+		else if(isCancelled() && getCancelled() != null)
+			getCancelled().run();
 	}
 
 }

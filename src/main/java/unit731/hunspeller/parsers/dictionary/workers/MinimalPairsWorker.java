@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.channels.ClosedChannelException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,6 +28,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerBase;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
@@ -61,8 +63,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
 
-		workerName = WORKER_NAME;
-		charset = dicParser.getCharset();
+		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		comparator = BaseBuilder.getComparator(language);
 	}
 
@@ -73,6 +74,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		watch = TimeWatch.start();
 
 		setProgress(0);
+		Charset charset = getCharset();
 		try{
 			File dicFile = dicParser.getDicFile();
 			try(
