@@ -35,7 +35,6 @@ import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 /**
@@ -47,7 +46,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
  * @see <a href="https://github.com/hunspell/hyphen">C source code</a>
  * @see <a href="https://wiki.openoffice.org/wiki/Documentation/SL/Using_TeX_hyphenation_patterns_in_OpenOffice.org">Using TeX hyphenation patterns in OpenOffice.org</a>
  */
-public class HyphenationParser extends ReadWriteLockable{
+public class HyphenationParser{
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -202,7 +201,6 @@ public class HyphenationParser extends ReadWriteLockable{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
 	public void parse(File hypFile) throws IOException, IllegalArgumentException{
-		acquireWriteLock();
 		try{
 			clearInternal();
 
@@ -288,8 +286,6 @@ public class HyphenationParser extends ReadWriteLockable{
 		finally{
 			for(Level level : Level.values())
 				REDUCED_PATTERNS.get(level).clear();
-
-			releaseWriteLock();
 		}
 	}
 
@@ -330,13 +326,7 @@ public class HyphenationParser extends ReadWriteLockable{
 	}
 
 	public void clear(){
-		acquireWriteLock();
-		try{
-			clearInternal();
-		}
-		finally{
-			releaseWriteLock();
-		}
+		clearInternal();
 	}
 
 	private void clearInternal(){

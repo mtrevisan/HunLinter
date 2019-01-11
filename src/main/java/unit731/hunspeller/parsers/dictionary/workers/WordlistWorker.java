@@ -15,7 +15,6 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.FileHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WordlistWorker extends WorkerDictionaryBase{
@@ -25,11 +24,10 @@ public class WordlistWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile, ReadWriteLockable lockable){
+	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
-		Objects.requireNonNull(lockable);
 
 
 		BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
@@ -55,7 +53,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		createReadWriteWorker(WORKER_NAME, dicParser, outputFile, lineProcessor, completed, null, lockable);
+		createReadWriteWorker(WORKER_NAME, dicParser, outputFile, lineProcessor, completed, null);
 	}
 
 }

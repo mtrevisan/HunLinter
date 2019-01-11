@@ -6,7 +6,6 @@ import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.services.TimeWatch;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
@@ -19,7 +18,6 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 	protected BiConsumer<BufferedWriter, Pair<Integer, S>> writeLineProcessor;
 	protected Runnable completed;
 	protected Runnable cancelled;
-	protected ReadWriteLockable lockable;
 
 	protected TimeWatch watch = TimeWatch.start();
 

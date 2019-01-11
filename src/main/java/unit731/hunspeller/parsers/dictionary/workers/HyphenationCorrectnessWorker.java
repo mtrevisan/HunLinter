@@ -13,7 +13,6 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
@@ -29,8 +28,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
-			ReadWriteLockable lockable) throws IOException{
+	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator) throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
@@ -56,7 +54,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 				}
 			});
 		};
-		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null, lockable);
+		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null);
 	}
 
 }

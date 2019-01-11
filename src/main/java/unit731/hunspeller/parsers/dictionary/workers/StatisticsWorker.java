@@ -75,7 +75,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			}
 			catch(IOException e){}
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled, affParser);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled);
 	}
 
 	public boolean isPerformHyphenationStatistics(){

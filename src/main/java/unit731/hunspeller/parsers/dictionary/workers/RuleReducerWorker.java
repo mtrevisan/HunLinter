@@ -33,7 +33,6 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class RuleReducerWorker extends WorkerDictionaryBase{
@@ -53,7 +52,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	/** NOTE: this works only if the rules produce only one output! ... for now */
-	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
+	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
 
@@ -181,7 +180,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 				.map(entry -> composeLine(type, flag, entry))
 				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null, lockable);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, null);
 	}
 
 	/** Sort entries by shortest condition */

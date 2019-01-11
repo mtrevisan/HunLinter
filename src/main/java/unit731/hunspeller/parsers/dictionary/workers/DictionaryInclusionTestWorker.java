@@ -14,7 +14,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
@@ -26,7 +25,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public DictionaryInclusionTestWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
+	public DictionaryInclusionTestWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
@@ -53,7 +52,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 		Runnable cancelled = () -> {
 			dictionary.close();
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled, lockable);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled);
 	}
 
 	@Override

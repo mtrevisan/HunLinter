@@ -27,7 +27,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 /**
@@ -44,7 +43,7 @@ import unit731.hunspeller.services.concurrency.ReadWriteLockable;
  *		Others:
  *			CIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX
  */
-public class AffixParser extends ReadWriteLockable{
+public class AffixParser{
 
 	private static final String NO_LANGUAGE = "xxx";
 
@@ -148,49 +147,43 @@ public class AffixParser extends ReadWriteLockable{
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
 	public void parse(File affFile) throws IOException, IllegalArgumentException{
-		acquireWriteLock();
-		try{
-			data.clear();
+		data.clear();
 
-			boolean encodingRead = false;
-			charset = FileHelper.determineCharset(affFile.toPath());
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
-				String line;
-				while((line = br.readLine()) != null){
-					//ignore any BOM marker on first line
-					if(br.getLineNumber() == 1)
-						line = FileHelper.clearBOMMarker(line);
+		boolean encodingRead = false;
+		charset = FileHelper.determineCharset(affFile.toPath());
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
+			String line;
+			while((line = br.readLine()) != null){
+				//ignore any BOM marker on first line
+				if(br.getLineNumber() == 1)
+					line = FileHelper.clearBOMMarker(line);
 
-					line = DictionaryParser.cleanLine(line);
-					if(line.isEmpty())
-						continue;
+				line = DictionaryParser.cleanLine(line);
+				if(line.isEmpty())
+					continue;
 
-					if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET.getCode() + StringUtils.SPACE))
-						throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
-					else
-						encodingRead = true;
+				if(!encodingRead && !line.startsWith(AffixTag.CHARACTER_SET.getCode() + StringUtils.SPACE))
+					throw new IllegalArgumentException("The first non–comment line in the affix file must be a 'SET charset', was: '" + line + "'");
+				else
+					encodingRead = true;
 
-					ParsingContext context = new ParsingContext(line, br);
-					AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
-					Handler handler = lookupHandlerByRuleType(ruleType);
-					if(handler != null){
-						try{
-							handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
-						}
-						catch(RuntimeException e){
-							throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
-						}
+				ParsingContext context = new ParsingContext(line, br);
+				AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
+				Handler handler = lookupHandlerByRuleType(ruleType);
+				if(handler != null){
+					try{
+						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
+					}
+					catch(RuntimeException e){
+						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
 					}
 				}
 			}
-
-			postProccessData(affFile);
-
-			data.close();
 		}
-		finally{
-			releaseWriteLock();
-		}
+
+		postProccessData(affFile);
+
+		data.close();
 
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(data));
 //7 490 848 B
@@ -250,13 +243,7 @@ public class AffixParser extends ReadWriteLockable{
 	}
 
 	public void clear(){
-		acquireWriteLock();
-		try{
-			data.clear();
-		}
-		finally{
-			releaseWriteLock();
-		}
+		data.clear();
 	}
 
 }

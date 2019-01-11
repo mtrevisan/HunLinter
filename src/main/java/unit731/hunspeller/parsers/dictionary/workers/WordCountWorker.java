@@ -15,7 +15,6 @@ import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class WordCountWorker extends WorkerDictionaryBase{
@@ -28,10 +27,9 @@ public class WordCountWorker extends WorkerDictionaryBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, ReadWriteLockable lockable){
+	public WordCountWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(lockable);
 
 		BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
@@ -58,7 +56,7 @@ public class WordCountWorker extends WorkerDictionaryBase{
 		Runnable cancelled = () -> {
 			dictionary.close();
 		};
-		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled, lockable);
+		createReadParallelWorker(WORKER_NAME, dicParser, lineProcessor, completed, cancelled);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
 public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
@@ -16,8 +15,7 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Dictionary correctness checking";
 
 
-	public DictionaryCorrectnessWorker(DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator,
-			ReadWriteLockable lockable){
+	public DictionaryCorrectnessWorker(DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);
 
@@ -26,7 +24,7 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 
 			productions.forEach(production -> checker.checkProduction(production));
 		};
-		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null, lockable);
+		createReadParallelWorkerPreventExceptionRelaunch(WORKER_NAME, dicParser, lineProcessor, null, null);
 	}
 
 }

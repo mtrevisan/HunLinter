@@ -31,7 +31,6 @@ import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.HammingDistance;
 import unit731.hunspeller.services.TimeWatch;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.externalsorter.ExternalSorterOptions;
 
 
@@ -50,20 +49,17 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(String language, DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator,
-			File outputFile, ReadWriteLockable lockable){
+	public MinimalPairsWorker(String language, DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator, File outputFile){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(checker);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
-		Objects.requireNonNull(lockable);
 
 		this.dicParser = dicParser;
 		this.checker = checker;
 		this.wordGenerator = wordGenerator;
 		this.outputFile = outputFile;
-		this.lockable = lockable;
 
 		workerName = WORKER_NAME;
 		charset = dicParser.getCharset();
@@ -75,8 +71,6 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
 		watch = TimeWatch.start();
-
-		lockable.acquireReadLock();
 
 		setProgress(0);
 		try{
@@ -245,9 +239,6 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			cancel(true);
-		}
-		finally{
-			lockable.releaseReadLock();
 		}
 
 		return null;

@@ -9,10 +9,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import unit731.hunspeller.services.FileHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-public class AidParser extends ReadWriteLockable{
+public class AidParser{
 
 	private final List<String> lines = new ArrayList<>();
 
@@ -24,47 +23,29 @@ public class AidParser extends ReadWriteLockable{
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File aidFile) throws IOException{
-		acquireWriteLock();
-		try{
-			lines.clear();
+		lines.clear();
 
-			Path path = aidFile.toPath();
-			Charset charset = FileHelper.determineCharset(path);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(path, charset))){
-				String line;
-				while((line = br.readLine()) != null){
-					//ignore any BOM marker on first line
-					if(br.getLineNumber() == 1)
-						line = FileHelper.clearBOMMarker(line);
+		Path path = aidFile.toPath();
+		Charset charset = FileHelper.determineCharset(path);
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(path, charset))){
+			String line;
+			while((line = br.readLine()) != null){
+				//ignore any BOM marker on first line
+				if(br.getLineNumber() == 1)
+					line = FileHelper.clearBOMMarker(line);
 
-					if(!line.isEmpty())
-						lines.add(line);
-				}
+				if(!line.isEmpty())
+					lines.add(line);
 			}
-		}
-		finally{
-			releaseWriteLock();
 		}
 	}
 
 	public void clear(){
-		acquireWriteLock();
-		try{
-			lines.clear();
-		}
-		finally{
-			releaseWriteLock();
-		}
+		lines.clear();
 	}
 
 	public List<String> getLines(){
-		acquireReadLock();
-		try{
-			return lines;
-		}
-		finally{
-			releaseReadLock();
-		}
+		return lines;
 	}
 
 }

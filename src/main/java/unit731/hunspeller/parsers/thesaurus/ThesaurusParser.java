@@ -26,12 +26,11 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 import unit731.hunspeller.services.memento.OriginatorInterface;
 
 
-public class ThesaurusParser extends ReadWriteLockable implements OriginatorInterface<ThesaurusParser.Memento>{
+public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Memento>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
 
@@ -87,34 +86,28 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	 * @throws IOException	If an I/O error occurse
 	 */
 	public void parse(File theFile) throws IOException{
-		acquireWriteLock();
-		try{
-			clearInternal();
+		clearInternal();
 
-			Charset charset = FileHelper.determineCharset(theFile.toPath());
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
-				String line = extractLine(br);
+		Charset charset = FileHelper.determineCharset(theFile.toPath());
+		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
+			String line = extractLine(br);
 
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
+			//ignore any BOM marker on first line
+			if(br.getLineNumber() == 1)
+				line = FileHelper.clearBOMMarker(line);
 
-				//line should be a charset
-				try{ Charsets.toCharset(line); }
-				catch(UnsupportedCharsetException e){
-					throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
-				}
-
-				while((line = br.readLine()) != null)
-					if(!line.isEmpty())
-						dictionary.add(new ThesaurusEntry(line, br));
+			//line should be a charset
+			try{ Charsets.toCharset(line); }
+			catch(UnsupportedCharsetException e){
+				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
 			}
-		}
-		finally{
-			dictionary.resetModified();
 
-			releaseWriteLock();
+			while((line = br.readLine()) != null)
+				if(!line.isEmpty())
+					dictionary.add(new ThesaurusEntry(line, br));
 		}
+
+		dictionary.resetModified();
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(theParser.synonyms));
 //6 035 792 B
 	}
@@ -146,51 +139,45 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		acquireWriteLock();
-		try{
-			String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
-			if(partOfSpeechAndMeanings.length != 2)
-				throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
+		String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
+		if(partOfSpeechAndMeanings.length != 2)
+			throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
 
-			String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-			StringBuilder sb = new StringBuilder();
-			if(!partOfSpeech.startsWith("("))
-				sb.append('(');
-			sb.append(partOfSpeech);
-			if(!partOfSpeech.endsWith(")"))
-				sb.append(')');
-			partOfSpeech = sb.toString();
+		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
+		StringBuilder sb = new StringBuilder();
+		if(!partOfSpeech.startsWith("("))
+			sb.append('(');
+		sb.append(partOfSpeech);
+		if(!partOfSpeech.endsWith(")"))
+			sb.append(')');
+		partOfSpeech = sb.toString();
 
-			String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
-			List<String> meanings = Arrays.stream(means)
-				.filter(StringUtils::isNotBlank)
-				.map(String::trim)
-				.distinct()
-				.collect(Collectors.toList());
-			if(meanings.size() < 2)
-				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
+		String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
+		List<String> meanings = Arrays.stream(means)
+			.filter(StringUtils::isNotBlank)
+			.map(String::trim)
+			.distinct()
+			.collect(Collectors.toList());
+		if(meanings.size() < 2)
+			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
 
-			DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
+		DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
 
-			if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
-				try{
-					undoCaretaker.pushMemento(createMemento());
+		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
+			try{
+				undoCaretaker.pushMemento(createMemento());
 
-					if(undoable != null)
-						undoable.onUndoChange(true);
-				}
-				catch(IOException e){
-					LOGGER.warn("Error while storing a memento", e);
-				}
-
-				dictionary.add(partOfSpeech, meanings);
+				if(undoable != null)
+					undoable.onUndoChange(true);
+			}
+			catch(IOException e){
+				LOGGER.warn("Error while storing a memento", e);
 			}
 
-			return duplicationResult;
+			dictionary.add(partOfSpeech, meanings);
 		}
-		finally{
-			releaseWriteLock();
-		}
+
+		return duplicationResult;
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
@@ -224,7 +211,6 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	}
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
-		acquireWriteLock();
 		try{
 			undoCaretaker.pushMemento(createMemento());
 
@@ -253,32 +239,23 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 
 			LOGGER.warn("Error while modifying the meanings", e);
 		}
-		finally{
-			releaseWriteLock();
-		}
 	}
 
 	public void deleteMeanings(int[] selectedRowIDs){
-		acquireWriteLock();
-		try{
-			int count = selectedRowIDs.length;
-			if(count > 0){
-				try{
-					undoCaretaker.pushMemento(createMemento());
+		int count = selectedRowIDs.length;
+		if(count > 0){
+			try{
+				undoCaretaker.pushMemento(createMemento());
 
-					if(undoable != null)
-						undoable.onUndoChange(true);
-				}
-				catch(IOException e){
-					LOGGER.warn("Error while storing a memento", e);
-				}
-
-				for(int i = 0; i < count; i ++)
-					dictionary.remove(selectedRowIDs[i] - i);
+				if(undoable != null)
+					undoable.onUndoChange(true);
 			}
-		}
-		finally{
-			releaseWriteLock();
+			catch(IOException e){
+				LOGGER.warn("Error while storing a memento", e);
+			}
+
+			for(int i = 0; i < count; i ++)
+				dictionary.remove(selectedRowIDs[i] - i);
 		}
 	}
 
@@ -295,69 +272,57 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
-		acquireWriteLock();
-		try{
-			//sort the synonyms
-			dictionary.sort();
+		//sort the synonyms
+		dictionary.sort();
 
-			//save index and data files
-			Charset charset = StandardCharsets.UTF_8;
-			try(
-					BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-					BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
-					){
-				//save charset
-				indexWriter.write(charset.name());
+		//save index and data files
+		Charset charset = StandardCharsets.UTF_8;
+		try(
+				BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
+				BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
+				){
+			//save charset
+			indexWriter.write(charset.name());
+			indexWriter.write(StringUtils.LF);
+			//save counter
+			indexWriter.write(Integer.toString(dictionary.size()));
+			indexWriter.write(StringUtils.LF);
+			//save charset
+			dataWriter.write(charset.name());
+			dataWriter.write(StringUtils.LF);
+			//save data
+			int idx = charset.name().length() + 1;
+			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+			for(ThesaurusEntry synonym : synonyms){
+				String syn = synonym.getSynonym();
+				indexWriter.write(syn);
+				indexWriter.write(ThesaurusEntry.PIPE);
+				indexWriter.write(Integer.toString(idx));
 				indexWriter.write(StringUtils.LF);
-				//save counter
-				indexWriter.write(Integer.toString(dictionary.size()));
-				indexWriter.write(StringUtils.LF);
-				//save charset
-				dataWriter.write(charset.name());
+
+				int meaningsCount = synonym.getMeanings().size();
+				dataWriter.write(syn);
+				dataWriter.write(ThesaurusEntry.PIPE);
+				dataWriter.write(Integer.toString(meaningsCount));
 				dataWriter.write(StringUtils.LF);
-				//save data
-				int idx = charset.name().length() + 1;
-				List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-				for(ThesaurusEntry synonym : synonyms){
-					String syn = synonym.getSynonym();
-					indexWriter.write(syn);
-					indexWriter.write(ThesaurusEntry.PIPE);
-					indexWriter.write(Integer.toString(idx));
-					indexWriter.write(StringUtils.LF);
-
-					int meaningsCount = synonym.getMeanings().size();
-					dataWriter.write(syn);
-					dataWriter.write(ThesaurusEntry.PIPE);
-					dataWriter.write(Integer.toString(meaningsCount));
+				List<MeaningEntry> meanings = synonym.getMeanings();
+				int meaningsLength = 1;
+				for(MeaningEntry meaning : meanings){
+					dataWriter.write(meaning.toString());
 					dataWriter.write(StringUtils.LF);
-					List<MeaningEntry> meanings = synonym.getMeanings();
-					int meaningsLength = 1;
-					for(MeaningEntry meaning : meanings){
-						dataWriter.write(meaning.toString());
-						dataWriter.write(StringUtils.LF);
 
-						meaningsLength += meaning.toString().getBytes(charset).length + 1;
-					}
-
-					idx += syn.getBytes(charset).length + meaningsLength + 2;
+					meaningsLength += meaning.toString().getBytes(charset).length + 1;
 				}
 
-				dictionary.resetModified();
+				idx += syn.getBytes(charset).length + meaningsLength + 2;
 			}
-		}
-		finally{
-			releaseWriteLock();
+
+			dictionary.resetModified();
 		}
 	}
 
 	public void clear(){
-		acquireWriteLock();
-		try{
-			clearInternal();
-		}
-		finally{
-			releaseWriteLock();
-		}
+		clearInternal();
 	}
 
 	private void clearInternal(){
@@ -365,71 +330,47 @@ public class ThesaurusParser extends ReadWriteLockable implements OriginatorInte
 	}
 
 	public boolean canUndo(){
-		acquireReadLock();
-		try{
-			return undoCaretaker.canUndo();
-		}
-		finally{
-			releaseReadLock();
-		}
+		return undoCaretaker.canUndo();
 	}
 
 	public boolean canRedo(){
-		acquireReadLock();
-		try{
-			return redoCaretaker.canUndo();
-		}
-		finally{
-			releaseReadLock();
-		}
+		return redoCaretaker.canUndo();
 	}
 
 	public boolean restorePreviousSnapshot() throws IOException{
-		acquireWriteLock();
-		try{
-			boolean restored = false;
-			if(canUndo()){
-				redoCaretaker.pushMemento(createMemento());
+		boolean restored = false;
+		if(canUndo()){
+			redoCaretaker.pushMemento(createMemento());
 
-				Memento memento = undoCaretaker.popMemento();
-				if(undoable != null){
-					undoable.onUndoChange(canUndo());
-					undoable.onRedoChange(true);
-				}
-
-				restoreMemento(memento);
-
-				restored = true;
+			Memento memento = undoCaretaker.popMemento();
+			if(undoable != null){
+				undoable.onUndoChange(canUndo());
+				undoable.onRedoChange(true);
 			}
-			return restored;
+
+			restoreMemento(memento);
+
+			restored = true;
 		}
-		finally{
-			releaseWriteLock();
-		}
+		return restored;
 	}
 
 	public boolean restoreNextSnapshot() throws IOException{
-		acquireWriteLock();
-		try{
-			boolean restored = false;
-			if(canRedo()){
-				undoCaretaker.pushMemento(createMemento());
+		boolean restored = false;
+		if(canRedo()){
+			undoCaretaker.pushMemento(createMemento());
 
-				Memento memento = redoCaretaker.popMemento();
-				if(undoable != null){
-					undoable.onUndoChange(true);
-					undoable.onRedoChange(canRedo());
-				}
-
-				restoreMemento(memento);
-
-				restored = true;
+			Memento memento = redoCaretaker.popMemento();
+			if(undoable != null){
+				undoable.onUndoChange(true);
+				undoable.onRedoChange(canRedo());
 			}
-			return restored;
+
+			restoreMemento(memento);
+
+			restored = true;
 		}
-		finally{
-			releaseWriteLock();
-		}
+		return restored;
 	}
 
 	@Override

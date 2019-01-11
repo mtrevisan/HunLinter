@@ -1761,8 +1761,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator(),
-				backbone.getAffParser());
+			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -1791,8 +1790,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator(),
-				backbone.getAffParser());
+			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator());
 			ruleReducerWorker.addPropertyChangeListener(this);
 			ruleReducerWorker.execute();
 		}
@@ -1804,8 +1802,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicWordCountWorker = new WordCountWorker(backbone.getAffParser().getAffixData().getLanguage(), backbone.getDicParser(),
-				backbone.getWordGenerator(), backbone.getAffParser());
+			dicWordCountWorker = new WordCountWorker(backbone.getAffParser().getAffixData().getLanguage(), backbone.getDicParser(), backbone.getWordGenerator());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
 		}
@@ -1836,7 +1833,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile, backbone.getAffParser());
+				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -1853,7 +1850,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
-					backbone.getWordGenerator(), outputFile, backbone.getAffParser());
+					backbone.getWordGenerator(), outputFile);
 				dicMinimalPairsWorker.addPropertyChangeListener(this);
 				dicMinimalPairsWorker.execute();
 			}
@@ -1885,8 +1882,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				cmpInputTextArea.setText(sj.toString());
 				cmpInputTextArea.setCaretPosition(0);
 			};
-			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader,
-				completed, affParser);
+			compoundRulesExtractorWorker = new CompoundRulesWorker(backbone.getDicParser(), backbone.getWordGenerator(), productionReader, completed);
 			compoundRulesExtractorWorker.addPropertyChangeListener(this);
 			compoundRulesExtractorWorker.execute();
 		}
@@ -1897,7 +1893,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(hypCorrectnessWorker == null || hypCorrectnessWorker.isDone()){
 			try{
 				hypCorrectnessWorker = new HyphenationCorrectnessWorker(backbone.getAffParser().getAffixData().getLanguage(),
-					backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator(), backbone.getAffParser());
+					backbone.getDicParser(), backbone.getHyphenator(), backbone.getWordGenerator());
 				hypCorrectnessWorker.addPropertyChangeListener(this);
 				hypCorrectnessWorker.execute();
 

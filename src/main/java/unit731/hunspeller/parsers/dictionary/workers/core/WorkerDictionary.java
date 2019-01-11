@@ -22,10 +22,9 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
-import unit731.hunspeller.services.concurrency.ReadWriteLockable;
 
 
-public class WorkerDictionary extends WorkerBase<String, Integer>{
+class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerDictionary.class);
 
@@ -43,16 +42,16 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	public WorkerDictionary(String workerName, File dicFile, Charset charset,
 			BiConsumer<String, Integer> readLineProcessor,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
-		this(workerName, dicFile, null, charset, readLineProcessor, null, completed, cancelled, lockable);
+			Runnable completed, Runnable cancelled){
+		this(workerName, dicFile, null, charset, readLineProcessor, null, completed, cancelled);
 
 		Objects.requireNonNull(readLineProcessor);
 	}
 
 	public WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
 			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
-		this(workerName, dicFile, outputFile, charset, null, writeLineProcessor, completed, cancelled, lockable);
+			Runnable completed, Runnable cancelled){
+		this(workerName, dicFile, outputFile, charset, null, writeLineProcessor, completed, cancelled);
 
 		Objects.requireNonNull(outputFile);
 		Objects.requireNonNull(writeLineProcessor);
@@ -61,11 +60,10 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	private WorkerDictionary(String workerName, File dicFile, File outputFile, Charset charset,
 			BiConsumer<String, Integer> readLineProcessor,
 			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor,
-			Runnable completed, Runnable cancelled, ReadWriteLockable lockable){
+			Runnable completed, Runnable cancelled){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
-		Objects.requireNonNull(lockable);
 
 		this.workerName = workerName;
 		this.dicFile = dicFile;
@@ -75,7 +73,6 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		this.writeLineProcessor = writeLineProcessor;
 		this.completed = completed;
 		this.cancelled = cancelled;
-		this.lockable = lockable;
 	}
 
 	public boolean isParallelProcessing(){
@@ -104,8 +101,6 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	private List<Pair<Integer, String>> readLines(){
-		lockable.acquireReadLock();
-
 		List<Pair<Integer, String>> lines = new ArrayList<>();
 		long totalSize = dicFile.length();
 		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
@@ -131,9 +126,6 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 		}
 		catch(Exception e){
 			cancelWorker(e);
-		}
-		finally{
-			lockable.releaseReadLock();
 		}
 		return lines;
 	}
@@ -241,7 +233,7 @@ public class WorkerDictionary extends WorkerBase<String, Integer>{
 	private void cancelWorker(Exception e){
 		if(e instanceof ClosedChannelException)
 			LOGGER.warn("Thread interrupted");
-		else{
+		else if(e != null){
 			String message = ExceptionHelper.getMessage(e);
 			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 		}
