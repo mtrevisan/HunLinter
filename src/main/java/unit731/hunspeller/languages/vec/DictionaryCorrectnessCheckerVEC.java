@@ -161,15 +161,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			boolean hasPluralFlag = hasPluralFlag(production);
 			if(hasMetaphonesisFlag && !hasPluralFlag)
 				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED_HANDLE.format(new Object[]{METAPHONESIS_RULE}));
-			else{
-				boolean canHaveMetaphonesis = affixData.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
-				if(canHaveMetaphonesis ^ hasMetaphonesisFlag){
-					if(canHaveMetaphonesis && hasPluralFlag)
-						throw new IllegalArgumentException(METAPHONESIS_MISSING.format(new Object[]{METAPHONESIS_RULE}));
-					else if(!canHaveMetaphonesis && !hasPluralFlag)
-						throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED.format(new Object[]{METAPHONESIS_RULE}));
-				}
-			}
+
+			boolean canHaveMetaphonesis = affixData.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
+			if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
+				throw new IllegalArgumentException(METAPHONESIS_MISSING.format(new Object[]{METAPHONESIS_RULE}));
+			if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
+				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED.format(new Object[]{METAPHONESIS_RULE}));
 		}
 	}
 
@@ -187,7 +184,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(canHaveNorthernPlural ^ hasNorthernPluralFlag){
 				if(canHaveNorthernPlural)
 					throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
-				else if(!canHaveNorthernPlural)
+				if(!canHaveNorthernPlural)
 					throw new IllegalArgumentException(NORTHERN_PLURAL_NOT_NEEDED.format(new Object[]{}));
 			}
 		}
@@ -233,7 +230,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 					.getFlag();
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
-				else if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
+				if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 			}
 		}
@@ -285,7 +282,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)
 //					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
-//				else if(!canHaveFinalSonorization)
+//				if(!canHaveFinalSonorization)
 //					throw new IllegalArgumentException("Final sonorization not needed for " + production.getWord() + ", remove " + FINAL_SONORIZATION_RULE);
 //			}
 //		}
