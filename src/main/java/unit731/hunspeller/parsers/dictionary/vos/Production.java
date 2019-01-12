@@ -87,6 +87,11 @@ public class Production extends DictionaryEntry{
 		return appliedRules;
 	}
 
+	@Override
+	public AffixEntry getLastAppliedRule(){
+		return (hasProductionRules()? appliedRules.get(appliedRules.size() - 1): null);
+	}
+
 	public List<DictionaryEntry> getCompoundEntries(){
 		return compoundEntries;
 	}

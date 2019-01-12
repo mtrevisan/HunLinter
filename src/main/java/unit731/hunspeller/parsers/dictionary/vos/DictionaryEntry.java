@@ -169,6 +169,10 @@ public class DictionaryEntry{
 		return Collections.<AffixEntry>emptyList();
 	}
 
+	public AffixEntry getLastAppliedRule(){
+		return null;
+	}
+
 	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixData affixData){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affixData::isManagedByCompoundRule)
