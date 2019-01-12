@@ -13,6 +13,9 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 public class DictionaryCorrectnessChecker{
 
+	protected static final String SYLLABE_SEPARATOR = "/";
+	protected static final String NON_SYLLABE_MARK = "*";
+
 	private static final MessageFormat WORD_HAS_NOT_MORPHOLOGICAL_FIELD = new MessageFormat("Word {0} does not have any morphological fields");
 	private static final MessageFormat WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("Word {0} has an invalid morphological field prefix: {1}");
 	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("Word {0} has an unknown morphological field prefix: {1}");
@@ -21,6 +24,7 @@ public class DictionaryCorrectnessChecker{
 
 	protected AffixData affixData;
 	protected final HyphenatorInterface hyphenator;
+	protected Orthography orthography;
 
 	protected RulesLoader rulesLoader;
 

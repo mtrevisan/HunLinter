@@ -29,6 +29,7 @@ public class RulesLoader{
 
 
 	private final Properties rulesProperties;
+
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;
 	private final boolean wordCanHaveMultipleAccents;
@@ -50,24 +51,24 @@ public class RulesLoader{
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
 		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
 
-		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet(rulesProperties, "partOfSpeeches", ','));
-		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet(rulesProperties, "inflectionalSuffixes", ','));
-		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet(rulesProperties, "terminalSuffixes", ','));
+		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
+		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
+		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
 		dataFields.put(MorphologicalTag.TAG_STEM, null);
 		dataFields.put(MorphologicalTag.TAG_ALLOMORPH, null);
 
-		unsyllabableWords = readPropertyAsSet(rulesProperties, "unsyllabableWords", ',');
-		multipleAccentedWords = readPropertyAsSet(rulesProperties, "multipleAccentedWords", ',');
+		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
+		multipleAccentedWords = readPropertyAsSet("multipleAccentedWords", ',');
 
 		if(strategy != null){
-			String[] flags = strategy.parseFlags(readProperty(rulesProperties, "hasToContainAccent"));
+			String[] flags = strategy.parseFlags(readProperty("hasToContainAccent"));
 			if(flags != null)
 				hasToContainAccent.addAll(Arrays.asList(flags));
-			flags = strategy.parseFlags(readProperty(rulesProperties, "cannotContainAccent"));
+			flags = strategy.parseFlags(readProperty("cannotContainAccent"));
 			if(flags != null)
 				cannotContainAccent.addAll(Arrays.asList(flags));
 
-			Iterator<String> rules = readPropertyAsIterator(rulesProperties, "notCombinableRules", '/');
+			Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
 			while(rules.hasNext()){
 				String masterFlag = rules.next();
 				String[] wrongFlags = strategy.parseFlags(rules.next());
@@ -76,7 +77,7 @@ public class RulesLoader{
 			}
 
 			String letter = null;
-			rules = readPropertyAsIterator(rulesProperties, "letterAndRulesNotCombinable", '/');
+			rules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
 			while(rules.hasNext()){
 				String elem = rules.next();
 				if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
@@ -93,22 +94,22 @@ public class RulesLoader{
 		}
 	}
 
-	public final String readProperty(Properties rulesProperties, String key){
+	public final String readProperty(String key){
 		return rulesProperties.getProperty(key, StringUtils.EMPTY);
 	}
 
-	public final Set<String> readPropertyAsSet(Properties rulesProperties, String key, char separator){
-		String line = readProperty(rulesProperties, key);
+	public final Set<String> readPropertyAsSet(String key, char separator){
+		String line = readProperty(key);
 		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
 	}
 
-	public final Iterator<String> readPropertyAsIterator(Properties rulesProperties, String key, char separator){
+	public final Iterator<String> readPropertyAsIterator(String key, char separator){
 		List<String> values = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
 		for(String k : keys)
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
-				String line = readProperty(rulesProperties, k);
+				String line = readProperty(k);
 				if(StringUtils.isNotEmpty(line))
 					values.addAll(Arrays.asList(StringUtils.split(line, separator)));
 			}
