@@ -151,17 +151,16 @@ add the negated char to the other rule (ista/A2 [^i]o)
 			Production production = itr.next();
 
 			AffixEntry lastAppliedRule = production.getLastAppliedRule();
-			if(lastAppliedRule == null || !lastAppliedRule.getFlag().equals(flag))
-				return;
+			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
+				String word = lastAppliedRule.undoRule(production.getWord());
+				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
 
-			String word = lastAppliedRule.undoRule(production.getWord());
-			LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
-
-			int index = newAffixEntries.indexOf(affixEntry);
-			if(index >= 0)
-				newAffixEntries.get(index).originalWords.add(word);
-			else
-				newAffixEntries.add(affixEntry);
+				int index = newAffixEntries.indexOf(affixEntry);
+				if(index >= 0)
+					newAffixEntries.get(index).originalWords.addAll(affixEntry.originalWords);
+				else
+					newAffixEntries.add(affixEntry);
+			}
 		}
 	}
 
