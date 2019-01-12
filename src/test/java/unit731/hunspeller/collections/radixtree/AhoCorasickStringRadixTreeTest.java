@@ -5,24 +5,27 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
+import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
+import unit731.hunspeller.collections.radixtree.tree.AhoCorasickTree;
+import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
+import unit731.hunspeller.collections.radixtree.tree.SearchResult;
 
 
-public class RegExpRadixTreeTest{
+public class AhoCorasickStringRadixTreeTest{
 
 	private final SecureRandom rng = new SecureRandom();
 
 
 	@Test
 	public void testEmptyTree(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertTrue(tree.isEmpty());
 		Assertions.assertEquals(0, tree.size());
@@ -30,7 +33,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSingleInsertion(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
 
@@ -42,7 +45,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testMultipleInsertions(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -57,8 +60,38 @@ public class RegExpRadixTreeTest{
 	}
 
 	@Test
+	public void testPrepare(){
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
+
+		tree.put("test", 1);
+		tree.put("tent", 2);
+		tree.put("tentest", 21);
+		tree.put("tank", 3);
+		tree.put("rest", 4);
+		tree.prepare();
+
+		Assertions.assertEquals(5, tree.size());
+		Assertions.assertEquals(1, tree.get("test").intValue());
+		Assertions.assertEquals(2, tree.get("tent").intValue());
+		Assertions.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(4, tree.get("rest").intValue());
+
+		Iterator<SearchResult<String, Integer>> itr = tree.search("resting in the test");
+		SearchResult<String, Integer> search = itr.next();
+		Assertions.assertEquals(0, search.getIndex());
+		Assertions.assertEquals(4, search.getNode().getValue().intValue());
+		search = itr.next();
+		Assertions.assertEquals(17, search.getIndex());
+		Assertions.assertEquals(1, search.getNode().getValue().intValue());
+		Assertions.assertFalse(itr.hasNext());
+
+		itr = tree.search("blah");
+		Assertions.assertFalse(itr.hasNext());
+	}
+
+	@Test
 	public void testMultipleInsertionOfTheSameKey(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -82,7 +115,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testPrefixFetch(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -98,19 +131,21 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSpook(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("pook", 1);
 		tree.put("spook", 2);
 
 		Assertions.assertEquals(2, tree.size());
-		Assertions.assertEquals(tree.keySet().stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
-			new HashSet<>(Arrays.asList("pook", "spook")));
+		assertEqualsWithSort(tree.keySet().toArray(new String[2]), new String[]{
+			"pook",
+			"spook"
+		});
 	}
 
 	@Test
 	public void testRemoval(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -134,7 +169,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testManyInsertions(){
-		RegExpRadixTree<BigInteger> tree = RegExpRadixTree.createTree();
+		RadixTree<String, BigInteger> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		//n in [100, 500]
 		int n = rng.nextInt(401) + 100;
@@ -160,7 +195,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void contains(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abc", 1);
 		tree.put("abb", 2);
@@ -174,7 +209,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void duplicatedEntry(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abc", 1);
 		tree.put("abc", 2);
@@ -188,7 +223,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void collectPrefixes(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("a", 1);
 		tree.put("ab", 2);
@@ -205,7 +240,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void emptyConstructor(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertTrue(tree.isEmpty());
 		Assertions.assertFalse(tree.containsKey("word"));
@@ -214,7 +249,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void defaultValueConstructor(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.get("meow"));
 
@@ -226,7 +261,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void simplePut(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertTrue(tree.isEmpty());
 
@@ -248,7 +283,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void hasStartsWithMatch(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -258,7 +293,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void hasExactMatch(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -268,7 +303,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void getStartsWithMatch(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -279,7 +314,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void getExactMatch(){
-		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Boolean> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -291,7 +326,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void removeBack(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -310,7 +345,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void removeFront(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -329,7 +364,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void removeFrontManyChildren(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
+		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -365,7 +400,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchForPartialParentAndLeafKeyWhenOverlapExists(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -376,7 +411,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchForLeafNodesWhenOverlapExists(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -387,7 +422,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchForStringSmallerThanSharedParentWhenOverlapExists(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -398,7 +433,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchForStringEqualToSharedParentWhenOverlapExists(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -406,26 +441,26 @@ public class RegExpRadixTreeTest{
 		Assertions.assertEquals(2, tree.getValuesPrefixedBy("abc").size());
 	}
 
-//	@Test
-//	public void testInsert(){
-//		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
-//
-//		tree.put("apple", "apple");
-//		tree.put("bat", "bat");
-//		tree.put("ape", "ape");
-//		tree.put("bath", "bath");
-//		tree.put("banana", "banana");
-//
-//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("ple"), "apple"), tree.find("apple"));
-//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("t"), "bat"), tree.find("bat"));
-//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("e"), "ape"), tree.find("ape"));
-//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("h"), "bath"), tree.find("bath"));
-//		Assertions.assertEquals(new RadixTreeNode(RegExpSequencer.splitSequence("nana"), "banana"), tree.find("banana"));
-//	}
+	@Test
+	public void testInsert(){
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
+
+		tree.put("apple", "apple");
+		tree.put("bat", "bat");
+		tree.put("ape", "ape");
+		tree.put("bath", "bath");
+		tree.put("banana", "banana");
+
+		Assertions.assertEquals(new RadixTreeNode<>("ple", "apple"), tree.findPrefixedBy("apple"));
+		Assertions.assertEquals(new RadixTreeNode<>("t", "bat"), tree.findPrefixedBy("bat"));
+		Assertions.assertEquals(new RadixTreeNode<>("e", "ape"), tree.findPrefixedBy("ape"));
+		Assertions.assertEquals(new RadixTreeNode<>("h", "bath"), tree.findPrefixedBy("bath"));
+		Assertions.assertEquals(new RadixTreeNode<>("nana", "banana"), tree.findPrefixedBy("banana"));
+	}
 
 	@Test
 	public void testInsertExistingUnrealNodeConvertsItToReal(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
@@ -439,7 +474,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDuplicatesAllowed(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 
@@ -455,7 +490,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDuplicatesNotAllowed(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTreeNoDuplicates();
+		RadixTree<String, String> tree = AhoCorasickTree.createTreeNoDuplicates(new StringSequencer());
 
 		tree.put("apple", "apple");
 
@@ -471,7 +506,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testInsertWithRepeatingPatternsInKey(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("xbox 360", "xbox 360");
 		tree.put("xbox", "xbox");
@@ -491,7 +526,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithNoChildren(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 
@@ -500,7 +535,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithOneChild(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
@@ -512,7 +547,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithMultipleChildren(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
@@ -526,14 +561,14 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testCantDeleteSomethingThatDoesntExist(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
 	public void testCantDeleteSomethingThatWasAlreadyDeleted(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.remove("apple");
@@ -543,7 +578,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testChildrenNotAffectedWhenOneIsDeleted(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -560,7 +595,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSiblingsNotAffectedWhenOneIsDeleted(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ball", "ball");
@@ -572,7 +607,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testCantDeleteUnrealNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -582,14 +617,14 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testCantFindRootNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.findPrefixedBy(""));
 	}
 
 	@Test
 	public void testFindSimpleInsert(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 
@@ -598,7 +633,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testContainsSimpleInsert(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 
@@ -607,7 +642,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testFindChildInsert(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -621,7 +656,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testGetPrefixes(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("h", "h");
 		tree.put("hey", "hey");
@@ -643,7 +678,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testContainsChildInsert(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -657,21 +692,21 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testCantFindNonexistantNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
 	public void testDoesntContainNonexistantNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
 	public void testCantFindUnrealNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -681,7 +716,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDoesntContainUnrealNode(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -691,7 +726,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchPrefix_LimitGreaterThanPossibleResults(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -710,7 +745,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testSearchPrefix_LimitLessThanPossibleResults(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -728,7 +763,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testGetSize(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -741,7 +776,7 @@ public class RegExpRadixTreeTest{
 
 	@Test
 	public void testDeleteReducesSize(){
-		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
+		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -749,71 +784,6 @@ public class RegExpRadixTreeTest{
 		tree.remove("appleshack");
 
 		Assertions.assertTrue(tree.size() == 1);
-	}
-
-
-	@Test
-	public void splitting(){
-		String[] parts = RegExpSequencer.splitSequence("abd");
-		Assertions.assertArrayEquals(new String[]{"a", "b", "d"}, parts);
-
-		parts = RegExpSequencer.splitSequence("a[b]d");
-		Assertions.assertArrayEquals(new String[]{"a", "[b]", "d"}, parts);
-
-		parts = RegExpSequencer.splitSequence("a[bc]d");
-		Assertions.assertArrayEquals(new String[]{"a", "[bc]", "d"}, parts);
-
-		parts = RegExpSequencer.splitSequence("a[^b]d");
-		Assertions.assertArrayEquals(new String[]{"a", "[^b]", "d"}, parts);
-
-		parts = RegExpSequencer.splitSequence("a[^bc]d");
-		Assertions.assertArrayEquals(new String[]{"a", "[^bc]", "d"}, parts);
-	}
-
-	@Test
-	public void containsRegExp(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
-
-		tree.put("a[bd]c", 1);
-		tree.put("a[bd]b", 2);
-		tree.put("a[^bcd]", 3);
-		tree.put("a", 4);
-
-		Assertions.assertTrue(tree.containsKey("a"));
-		Assertions.assertTrue(tree.containsKey("abc"));
-		Assertions.assertTrue(tree.containsKey("adc"));
-		Assertions.assertFalse(tree.containsKey("aec"));
-		Assertions.assertTrue(tree.containsKey("ae"));
-		Assertions.assertFalse(tree.containsKey("ac"));
-		Assertions.assertFalse(tree.containsKey("c"));
-	}
-
-	@Test
-	public void duplicatedEntryRegExp(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
-
-		tree.put("a[bc]c", 1);
-		tree.put("a[bc]c", 2);
-
-		Assertions.assertFalse(tree.containsKey("a"));
-		Assertions.assertFalse(tree.containsKey("ab"));
-		Assertions.assertTrue(tree.containsKey("abc"));
-		Assertions.assertEquals(2, tree.get("acc").intValue());
-		Assertions.assertFalse(tree.containsKey("c"));
-	}
-
-	@Test
-	public void collectPrefixesRegExp(){
-		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
-
-		tree.put("a", 1);
-		tree.put("a[bcd]", 2);
-		tree.put("[^ac]c", 3);
-		tree.put("cd", 4);
-		tree.put("aec", 5);
-
-		Assertions.assertArrayEquals(new Integer[]{1, 2}, tree.getValues("abcd").toArray(new Integer[2]));
-		Assertions.assertArrayEquals(new Integer[]{3}, tree.getValues("ec").toArray(new Integer[1]));
 	}
 
 }

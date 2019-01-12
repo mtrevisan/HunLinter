@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
@@ -22,17 +21,10 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * A radix tree.
  * Radix trees are key-value mappings which allow quick lookups on the strings. Radix trees also make it easy to grab the values
  * with a common prefix.
- * If {@link #prepare() prepare} is called, an implementation of the Aho-Corasick string matching algorithm (described in the paper
- * "Efficient String Matching: An Aid to Bibliographic Search", written by Alfred V. Aho and Margaret J. Corasick, Bell Laboratories, 1975)
- * is created, allowing for fast dictionary matching.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Radix_tree">Wikipedia</a>
  * @see <a href="https://github.com/thegedge/radix-tree">Radix Tree 1</a>
  * @see <a href="https://github.com/oroszgy/radixtree">Radix Tree 2</a>
- * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
- * @see <a href="http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf">Biosequence Algorithms, Spring 2005 - Lecture 4: Set Matching and Aho-Corasick Algorithm</a>
- * @see <a href="http://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2014-2015/Makalah2015/Makalah_IF221_Strategi_Algoritma_2015_032.pdf">Aho-Corasick Algorithm in Pattern Matching</a>
- * @see <a href="http://www.webgraphviz.com/">WebGraphviz online</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
@@ -43,8 +35,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	protected RadixTreeNode<S, V> root;
 	protected SequencerInterface<S> sequencer;
 	protected boolean noDuplicatesAllowed;
-
-	private boolean prepared;
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
@@ -61,94 +51,13 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		this.noDuplicatesAllowed = noDuplicatesAllowed;
 	}
 
-	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
-		//process children of the root
-		root.forEachChildren(child -> child.setFailNode(root));
-
-		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				if(parent == root)
-					return;
-
-				S currentKey = node.getKey();
-				int keySize = sequencer.length(currentKey);
-				for(int i = 0; i < keySize; i ++){
-					S subkey = sequencer.subSequence(currentKey, i);
-
-					RadixTreeNode<S, V> state = findDeepestNode(subkey, parent);
-
-					S stateKey = state.getKey();
-					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
-					if(lcpLength > 0){
-						int nodeKeyLength = sequencer.length(stateKey);
-						if(lcpLength < nodeKeyLength)
-							//split fail
-							state.split(lcpLength, sequencer);
-						if(lcpLength + i < keySize)
-							//split node
-							node.split(lcpLength + i, sequencer);
-
-						//link fail to node
-						node.setFailNode(state);
-
-						//out(u) += out(f(u))
-						node.addAdditionalValues(state);
-
-						break;
-					}
-				}
-
-				if(node.getFailNode() == null)
-					node.setFailNode(root);
-			}
-
-			/** Find the deepest node labeled by a proper suffix of the current child */
-			private RadixTreeNode<S, V> findDeepestNode(S subkey, RadixTreeNode<S, V> parent){
-				RadixTreeNode<S, V> state;
-				RadixTreeNode<S, V> fail = parent.getFailNode();
-				while((state = transit(fail, subkey)) == null)
-					fail = fail.getFailNode();
-				return state;
-			}
-
-			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
-				RadixTreeNode<S, V> result = root;
-				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
-				while(itr.hasNext()){
-					RadixTreeNode<S, V> child = itr.next();
-					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
-					if(lcpLength > 0){
-						result = child;
-						break;
-					}
-				}
-				return result;
-			}
-		};
-		traverseBFS(traverser);
-
-		prepared = true;
-	}
-
-	public boolean isAhoCorasickTree(){
-		return prepared;
+		throw new UnsupportedOperationException("Cannot prepare tree in a non-Aho-Corasick tree");
 	}
 
 	@Override
 	public void clear(){
 		root.clearChildren();
-	}
-
-	public void clearFailTransitions(){
-		RadixTreeTraverser<S, V> traverser = (wholeKey, node, parent) -> {
-			node.setFailNode(null);
-			node.clearAdditionalValues();
-		};
-		traverseBFS(traverser);
-
-		prepared = false;
 	}
 
 	@Override
@@ -191,58 +100,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
 	public Iterator<SearchResult<S, V>> search(S text){
-		Objects.requireNonNull(text);
-
-		if(!prepared)
-			throw new IllegalStateException("Cannot perform search until prepare() is called");
-
-		Iterator<SearchResult<S, V>> itr = new Iterator<SearchResult<S, V>>(){
-
-			private RadixTreeNode<S, V> lastMatchedNode = root;
-			private int currentIndex = 0;
-
-
-			@Override
-			public boolean hasNext(){
-				try{
-					RadixTreeNode<S, V> node = lastMatchedNode;
-					for(int i = currentIndex; i < sequencer.length(text); i ++){
-						node = node.getNextNode(text, i, sequencer);
-						if(node == null)
-							node = root;
-						else if(node.hasValue())
-							return true;
-						else
-							i += sequencer.length(node.getKey()) - 1;
-					}
-				}
-				catch(NoSuchElementException e){}
-				return false;
-			}
-
-			@Override
-			public SearchResult<S, V> next(){
-				for(int i = currentIndex; i < sequencer.length(text); i ++){
-					lastMatchedNode = lastMatchedNode.getNextNode(text, i, sequencer);
-					if(lastMatchedNode == null)
-						lastMatchedNode = root;
-					else if(lastMatchedNode.hasValue()){
-						currentIndex = i + 1;
-						return new SearchResult<>(lastMatchedNode, i);
-					}
-					else
-						i += sequencer.length(lastMatchedNode.getKey()) - 1;
-				}
-
-				throw new NoSuchElementException();
-			}
-
-			@Override
-			public void remove(){
-				throw new UnsupportedOperationException();
-			}
-		};
-		return itr;
+		throw new UnsupportedOperationException("Cannot perform search in a non-Aho-Corasick tree");
 	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
@@ -444,9 +302,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public void putAll(Map<? extends S, ? extends V> map){
 		Objects.requireNonNull(map);
 
-		if(prepared)
-			clearFailTransitions();
-
 		for(Map.Entry<? extends S, ? extends V> entry : map.entrySet())
 			put(entry.getKey(), entry.getValue());
 	}
@@ -463,9 +318,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	public V put(S key, V value){
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
-
-		if(prepared)
-			clearFailTransitions();
 
 		try{
 			V previousValue = put(key, value, root);
@@ -567,7 +419,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
-	private int longestCommonPrefixLength(S keyA, S keyB){
+	protected int longestCommonPrefixLength(S keyA, S keyB){
 		int len = 0;
 		int size = Math.min(sequencer.length(keyA), sequencer.length(keyB));
 		while(len < size){
@@ -589,9 +441,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	@SuppressWarnings("unchecked")
 	public V remove(Object key){
 		Objects.requireNonNull(key);
-
-		if(prepared)
-			clearFailTransitions();
 
 		RadixTreeVisitor<S, V, V> visitor = new RadixTreeVisitor<S, V, V>(null){
 			@Override

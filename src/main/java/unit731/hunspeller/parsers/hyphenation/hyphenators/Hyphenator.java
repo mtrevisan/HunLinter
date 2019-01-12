@@ -13,7 +13,7 @@ import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
 class Hyphenator extends AbstractHyphenator{
 
-	public Hyphenator(HyphenationParser hypParser, String breakCharacter){
+	Hyphenator(HyphenationParser hypParser, String breakCharacter){
 		super(hypParser, breakCharacter);
 	}
 

@@ -15,7 +15,7 @@ import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
 class AhoCorasickHyphenator extends AbstractHyphenator{
 
-	public AhoCorasickHyphenator(HyphenationParser hypParser, String breakCharacter){
+	AhoCorasickHyphenator(HyphenationParser hypParser, String breakCharacter){
 		super(hypParser, breakCharacter);
 
 		preparePatterns();

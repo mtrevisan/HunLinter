@@ -79,7 +79,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 */
 	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
 		//apply first level hyphenation
-		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND, hypParser.getOptParser().getNonCompoundOptions());
+		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND,
+			hypParser.getOptParser().getNonCompoundOptions());
 
 		List<String> compounds = createHyphenatedWord(word, hyphBreak);
 		List<String> syllabes = compounds;
@@ -94,7 +95,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			int i = 0;
 			int parentRulesSize = rules.size();
 			for(String compound : compounds){
-				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, hypParser.getOptParser().getCompoundOptions());
+				HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND,
+					hypParser.getOptParser().getCompoundOptions());
 
 				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
 				rules2ndLevel.addAll(subHyph.getRules());
@@ -123,7 +125,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param options	The hyphenation options
 	 * @return the hyphenation breakpoints object
 	 */
-	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns, HyphenationParser.Level level, HyphenationOptions options){
+	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns,
+			HyphenationParser.Level level, HyphenationOptions options){
 		//clear already present word boundaries' characters
 		word = PatternHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
 		int wordSize = word.length();
@@ -153,7 +156,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		List<String> response;
 		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non-compound
-			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND, hypParser.getOptParser().getNonCompoundOptions());
+			HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND,
+				hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 
 			for(String nohyp : hypParser.getOptParser().getNoHyphen()){
@@ -211,7 +215,8 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				//manage augmented patterns:
 				String augmentedPatternData = hyphBreak.getRule(endIndex);
 				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
-					int index = HyphenationParser.getIndexOfBreakpoint(PatternHelper.clear(augmentedPatternData, HyphenationParser.PATTERN_WORD_INITIAL));
+					int index = HyphenationParser.getIndexOfBreakpoint(PatternHelper.clear(augmentedPatternData,
+						HyphenationParser.PATTERN_WORD_INITIAL));
 
 					Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(augmentedPatternData);
 					if(m.find()){

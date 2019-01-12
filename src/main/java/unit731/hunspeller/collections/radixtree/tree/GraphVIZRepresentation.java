@@ -3,6 +3,9 @@ package unit731.hunspeller.collections.radixtree.tree;
 import java.io.Serializable;
 
 
+/**
+ * @see <a href="http://www.webgraphviz.com/">WebGraphviz online</a>
+ */
 public class GraphVIZRepresentation{
 
 	private static final String GRAPHVIZ_STYLE_BEGIN = " [";
@@ -49,7 +52,7 @@ public class GraphVIZRepresentation{
 		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphVIZAppendForwardTransition(sb, node, parent);
 		tree.traverseBFS(traverserForward);
 
-		if(tree.isAhoCorasickTree()){
+		if(tree instanceof AhoCorasickTree){
 			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphVIZAppendFailureTransitions(tree, sb, node,
 				displayEdgesToInitialState);
 			tree.traverseBFS(traverserFailure);

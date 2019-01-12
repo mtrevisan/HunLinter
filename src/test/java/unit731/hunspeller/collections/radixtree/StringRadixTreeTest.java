@@ -1,20 +1,18 @@
 package unit731.hunspeller.collections.radixtree;
 
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.tree.SearchResult;
+import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
 
 
 public class StringRadixTreeTest{
@@ -56,36 +54,6 @@ public class StringRadixTreeTest{
 		Assertions.assertEquals(2, tree.get("tent").intValue());
 		Assertions.assertEquals(3, tree.get("tank").intValue());
 		Assertions.assertEquals(4, tree.get("rest").intValue());
-	}
-
-	@Test
-	public void testPrepare(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
-
-		tree.put("test", 1);
-		tree.put("tent", 2);
-		tree.put("tentest", 21);
-		tree.put("tank", 3);
-		tree.put("rest", 4);
-		tree.prepare();
-
-		Assertions.assertEquals(5, tree.size());
-		Assertions.assertEquals(1, tree.get("test").intValue());
-		Assertions.assertEquals(2, tree.get("tent").intValue());
-		Assertions.assertEquals(3, tree.get("tank").intValue());
-		Assertions.assertEquals(4, tree.get("rest").intValue());
-
-		Iterator<SearchResult<String, Integer>> itr = tree.search("resting in the test");
-		SearchResult<String, Integer> search = itr.next();
-		Assertions.assertEquals(0, search.getIndex());
-		Assertions.assertEquals(4, search.getNode().getValue().intValue());
-		search = itr.next();
-		Assertions.assertEquals(17, search.getIndex());
-		Assertions.assertEquals(1, search.getNode().getValue().intValue());
-		Assertions.assertFalse(itr.hasNext());
-
-		itr = tree.search("blah");
-		Assertions.assertFalse(itr.hasNext());
 	}
 
 	@Test
