@@ -82,8 +82,8 @@ String flag = "v1";
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
 				productions.forEach(production -> {
-					LineEntry affixEntry = isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
-						createPrefixEntry(production, wordLength, word, lastLetter, strategy);
+					LineEntry affixEntry = (isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
+						createPrefixEntry(production, wordLength, word, lastLetter, strategy));
 					//search newAffixEntries for collisions on condition
 					for(LineEntry entry : newAffixEntries)
 						if(entry.condition.equals(affixEntry.condition)){
@@ -197,7 +197,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 	private List<LineEntry> collectEntries(LineEntry affixEntry, List<LineEntry> entries){
 		//collect all the entries that have affixEntry as last part of the condition
 		String affixEntryCondition = affixEntry.condition;
-		List<LineEntry> collisions = new ArrayList<>();
+		Set<LineEntry> collisions = new HashSet<>();
 		collisions.add(affixEntry);
 		for(int i = 1; i < entries.size(); i ++){
 			LineEntry targetAffixEntry = entries.get(i);
@@ -205,7 +205,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 			if(targetAffixEntryCondition.endsWith(affixEntryCondition))
 				collisions.add(new LineEntry(targetAffixEntry.removal, targetAffixEntry.addition, targetAffixEntryCondition));
 		}
-		return collisions;
+		return new ArrayList<>(collisions);
 	}
 
 	private void joinCollisions(List<LineEntry> startingList, List<LineEntry> nextList, Comparator<String> comparator){
@@ -334,9 +334,12 @@ add the negated char to the other rule (ista/A2 [^i]o)
 
 	private Map<Integer, List<LineEntry>> bucketForLength(List<LineEntry> entries, Comparator<String> comparator){
 		Map<Integer, List<LineEntry>> bucket = new HashMap<>();
-		for(LineEntry entry : entries)
-			bucket.computeIfAbsent(entry.condition.length(), k -> new ArrayList<>())
+		for(LineEntry entry : entries){
+			int entryLength = entry.condition.length() - (entry.condition.startsWith(NOT_GROUP_STARTING)? 3:
+				(entry.condition.startsWith(GROUP_STARTING)? 2: 0));
+			bucket.computeIfAbsent(entryLength, k -> new ArrayList<>())
 				.add(entry);
+		}
 		//order lists
 		Comparator<LineEntry> comp = (pair1, pair2) -> comparator.compare(pair1.condition, pair2.condition);
 		for(Map.Entry<Integer, List<LineEntry>> bag : bucket.entrySet())
