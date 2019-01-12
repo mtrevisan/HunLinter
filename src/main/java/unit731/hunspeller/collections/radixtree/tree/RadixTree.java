@@ -39,32 +39,6 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  */
 public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
-	private class TraverseElement{
-
-		protected final RadixTreeNode<S, V> node;
-		protected final S prefix;
-
-		TraverseElement(RadixTreeNode<S, V> node, S prefix){
-			this.node = node;
-			this.prefix = prefix;
-		}
-
-	}
-
-	private class VisitElement extends TraverseElement{
-
-		private final RadixTreeNode<S, V> parent;
-
-
-		VisitElement(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent, S prefix){
-			super(node, prefix);
-
-			this.parent = parent;
-		}
-
-	}
-
-
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
 	protected SequencerInterface<S> sequencer;
@@ -74,21 +48,18 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
-		RadixTree<K, T> tree = new RadixTree<>();
-		tree.root = RadixTreeNode.createEmptyNode(sequencer.getEmptySequence());
-		tree.sequencer = sequencer;
-		return tree;
+		return new RadixTree<>(sequencer, false);
 	}
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTreeNoDuplicates(SequencerInterface<K> sequencer){
-		RadixTree<K, T> tree = new RadixTree<>();
-		tree.root = RadixTreeNode.createEmptyNode(sequencer.getEmptySequence());
-		tree.sequencer = sequencer;
-		tree.noDuplicatesAllowed = true;
-		return tree;
+		return new RadixTree<>(sequencer, true);
 	}
 
-	protected RadixTree(){}
+	protected RadixTree(SequencerInterface<S> sequencer, boolean noDuplicatesAllowed){
+		root = RadixTreeNode.createEmptyNode(sequencer.getEmptySequence());
+		this.sequencer = sequencer;
+		this.noDuplicatesAllowed = noDuplicatesAllowed;
+	}
 
 	/** Initializes the fail transitions of all nodes (except for the root). */
 	public void prepare(){
@@ -671,10 +642,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @param traverser	The traverser
 	 */
 	public void traverseBFS(RadixTreeTraverser<S, V> traverser){
-		Queue<TraverseElement> queue = new ArrayDeque<>();
-		queue.add(new TraverseElement(root, root.getKey()));
+		Queue<TraverseElement<S, V>> queue = new ArrayDeque<>();
+		queue.add(new TraverseElement<>(root, root.getKey()));
 		while(!queue.isEmpty()){
-			TraverseElement elem = queue.remove();
+			TraverseElement<S, V> elem = queue.remove();
 			RadixTreeNode<S, V> parent = elem.node;
 			S prefix = elem.prefix;
 
@@ -682,7 +653,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 				S wholeSequence = sequencer.concat(prefix, child.getKey());
 				traverser.traverse(wholeSequence, child, parent);
 
-				queue.add(new TraverseElement(child, wholeSequence));
+				queue.add(new TraverseElement<>(child, wholeSequence));
 			}
 		}
 	}
@@ -747,10 +718,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
 	private void visit(RadixTreeVisitor<S, V, ?> visitor, S prefixAllowed, BiFunction<S, S, Boolean> condition){
-		Stack<VisitElement> stack = new Stack<>();
-		stack.push(new VisitElement(root, null, root.getKey()));
+		Stack<VisitElement<S, V>> stack = new Stack<>();
+		stack.push(new VisitElement<>(root, null, root.getKey()));
 		while(!stack.isEmpty()){
-			VisitElement elem = stack.pop();
+			VisitElement<S, V> elem = stack.pop();
 			RadixTreeNode<S, V> node = elem.node;
 			S prefix = elem.prefix;
 
@@ -764,7 +735,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 			for(RadixTreeNode<S, V> child : node){
 				S newPrefix = sequencer.concat(prefix, child.getKey());
 				if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
-					stack.push(new VisitElement(child, node, newPrefix));
+					stack.push(new VisitElement<>(child, node, newPrefix));
 			}
 		}
 	}

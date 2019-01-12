@@ -1,32 +1,26 @@
 package unit731.hunspeller.collections.radixtree;
 
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
 
 
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{
 
 	public static <T extends Serializable> RegExpRadixTree<T> createTree(){
-		return new RegExpRadixTree<>();
+		return new RegExpRadixTree<>(false);
 	}
 
 	public static <T extends Serializable> RegExpRadixTree<T> createTreeNoDuplicates(){
-		RegExpRadixTree<T> tree = new RegExpRadixTree<>();
-		tree.noDuplicatesAllowed = true;
-		return tree;
+		return new RegExpRadixTree<>(true);
 	}
 
-	private RegExpRadixTree(){
-		SequencerInterface<String[]> seq = new RegExpSequencer();
-
-		root = RadixTreeNode.createEmptyNode(seq.getEmptySequence());
-		this.sequencer = seq;
+	private RegExpRadixTree(boolean noDuplicatesAllowed){
+		super(new RegExpSequencer(), noDuplicatesAllowed);
 	}
 
 	public boolean containsKey(String keyToCheck){
