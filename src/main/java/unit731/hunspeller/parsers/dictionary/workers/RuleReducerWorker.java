@@ -24,7 +24,6 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -64,54 +63,33 @@ String flag = "v1";
 
 		boolean isSuffix = originalRuleEntry.isSuffix();
 		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
-		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 		Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		Set<LineEntry> newAffixEntries = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-			dicEntry.applyInputConversionTable(affixData);
+			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(line, strategy);
 
 			if(dicEntry.hasContinuationFlag(flag)){
-				String word = dicEntry.getWord();
-				int wordLength = word.length();
-				String lastLetter = word.substring(wordLength - 1);
+				String word = affixData.applyInputConversionTable(dicEntry.getWord());
+
 				List<Production> productions = wordGenerator.applySingleAffixRule(word + SLASH + flag);
 
 				if(productions.size() > 1)
 					throw new IllegalArgumentException("Rule " + flag + " produced more than one output, cannot reduce");
 
+				int wordLength = word.length();
+				String lastLetter = word.substring(wordLength - 1);
 				productions.forEach(production -> {
 					LineEntry affixEntry = (isSuffix? createSuffixEntry(production, wordLength, word, lastLetter, strategy):
 						createPrefixEntry(production, wordLength, word, lastLetter, strategy));
-					//search newAffixEntries for collisions on condition
-					for(LineEntry entry : newAffixEntries)
-						if(entry.condition.equals(affixEntry.condition)){
-							//find last different character from entry.originalWord and affixEntry.originalWord
-							int idx;
-							for(idx = 1; idx <= Math.min(entry.originalWord.length(), affixEntry.originalWord.length()); idx ++)
-								if(entry.originalWord.charAt(entry.originalWord.length() - idx) != affixEntry.originalWord.charAt(affixEntry.originalWord.length() - idx))
-									break;
 
-							if(entry.addition.endsWith(affixEntry.addition)){
-								//add another letter to the condition of entry
-								entry.condition = entry.originalWord.substring(entry.originalWord.length() - idx);
-								affixEntry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + entry.condition.substring(1);
-							}
-							else{
-								//add another letter to the condition of affixEntry
-								affixEntry.condition = affixEntry.originalWord.substring(affixEntry.originalWord.length() - idx);
-								entry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + affixEntry.condition.substring(1);
-							}
-							break;
-						}
+					manageCollision(affixEntry, newAffixEntries);
 /*
 problem:
-	SFX v1 o ista/A2 [^i]o
-	SFX v1 o sta/A2 io
+SFX v1 o ista/A2 [^i]o
+SFX v1 o sta/A2 io
 would be reduced to
-	SFX v1 o ista/A2 o
-	SFX v1 o sta/A2 o
+SFX v1 o ista/A2 o
+SFX v1 o sta/A2 o
 how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
 if conditions are equals and the adding parts are one inside the other, take the shorter (sta/A2), add another char to the condition (io),
 add the negated char to the other rule (ista/A2 [^i]o)
@@ -185,6 +163,30 @@ add the negated char to the other rule (ista/A2 [^i]o)
 		createReadWorker(data, lineProcessor);
 	}
 
+	private void manageCollision(LineEntry affixEntry, Set<LineEntry> newAffixEntries){
+		//search newAffixEntries for collisions on condition
+		for(LineEntry entry : newAffixEntries)
+			if(entry.condition.equals(affixEntry.condition)){
+				//find last different character from entry.originalWord and affixEntry.originalWord
+				int idx;
+				for(idx = 1; idx <= Math.min(entry.originalWord.length(), affixEntry.originalWord.length()); idx ++)
+					if(entry.originalWord.charAt(entry.originalWord.length() - idx) != affixEntry.originalWord.charAt(affixEntry.originalWord.length() - idx))
+						break;
+				
+				if(entry.addition.endsWith(affixEntry.addition)){
+					//add another letter to the condition of entry
+					entry.condition = entry.originalWord.substring(entry.originalWord.length() - idx);
+					affixEntry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + entry.condition.substring(1);
+				}
+				else{
+					//add another letter to the condition of affixEntry
+					affixEntry.condition = affixEntry.originalWord.substring(affixEntry.originalWord.length() - idx);
+					entry.condition = NOT_GROUP_STARTING + entry.condition.charAt(0) + GROUP_ENDING + affixEntry.condition.substring(1);
+				}
+				break;
+			}
+	}
+
 	/** Sort entries by shortest condition */
 	private List<LineEntry> sortEntries(Set<LineEntry> set){
 		List<LineEntry> sortedList = new ArrayList<>(set);
@@ -238,7 +240,8 @@ add the negated char to the other rule (ista/A2 [^i]o)
 						startingList.add(new LineEntry(affixEntryRemoval, affixEntryAddition, letter));
 
 					//merge conditions
-					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2, startingCondition[discriminatorIndex - 1].length() - 1).split(StringUtils.EMPTY));
+					Stream<String> startingConditionStream = Arrays.stream(startingCondition[discriminatorIndex - 1].substring(2,
+						startingCondition[discriminatorIndex - 1].length() - 1).split(StringUtils.EMPTY));
 					other = Stream.concat(startingConditionStream, otherConditions.stream())
 						.distinct();
 					affixEntryCondition = StringUtils.join(ArrayUtils.remove(startingCondition, 0));
@@ -259,7 +262,8 @@ add the negated char to the other rule (ista/A2 [^i]o)
 				String otherCondition = other
 					.sorted(comparator)
 					.collect(Collectors.joining());
-				startingList.set(i, new LineEntry(affixEntryRemoval, affixEntryAddition, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING + affixEntryCondition));
+				startingList.set(i, new LineEntry(affixEntryRemoval, affixEntryAddition, NOT_GROUP_STARTING + otherCondition + GROUP_ENDING
+					+ affixEntryCondition));
 			}
 		}
 	}
@@ -327,7 +331,7 @@ add the negated char to the other rule (ista/A2 [^i]o)
 				break;
 
 		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
-		String addition = producedWord.substring(0, firstCommonLetter);
+		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
 		String condition = (firstCommonLetter < wordLength? removal: lastLetter);
 		return new LineEntry(removal, addition, condition, word);
 	}
