@@ -3,12 +3,15 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
@@ -101,7 +104,7 @@ String flag = "v1";
 		Runnable completed = () -> {
 			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndingWithPlain(flaggedEntries);
 
-//			removeOverlappingRules(bucketedEntries);
+			removeOverlappingRules(bucketedEntries);
 
 //			List<LineEntry> reducedEntries = reduceEntriesToRules(bucketedEntries);
 
@@ -301,6 +304,7 @@ System.out.println("");
 			LineEntry entry = itr.next();
 			if(comparator.apply(entry.condition)){
 				itr.remove();
+
 				list.add(entry);
 			}
 		}
@@ -344,17 +348,33 @@ System.out.println("");
 		entries.sort(comparator);
 	}
 
-//	private void removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
-//		for(Map.Entry<String, List<LineEntry>> bucketEntry : bucketedEntries.entrySet()){
-//			List<LineEntry> aggregatedRules = bucketEntry.getValue();
-//			if(aggregatedRules.size() > 1){
-//				List<LineEntry> nonOverlappingRules = removeOverlappingConditions(aggregatedRules);
-//				bucketEntry.setValue(nonOverlappingRules);
-//			}
-//		}
-//	}
+	private void removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
+		for(List<LineEntry> aggregatedRules : bucketedEntries.values())
+			if(aggregatedRules.size() > 1){
+				List<LineEntry> nonOverlappingRules = removeOverlappingConditions(aggregatedRules);
 
-//	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
+				aggregatedRules.clear();
+				aggregatedRules.addAll(nonOverlappingRules);
+			}
+	}
+
+	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
+		//extract letters prior to first condition
+		Iterator<LineEntry> itr = aggregatedRules.iterator();
+		LineEntry firstRule = itr.next();
+		String firstCondition = firstRule.condition;
+		int firstConditionLength = firstCondition.length();
+		Set<Character> letters = new HashSet<>();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
+			char letter = entry.condition.charAt(entry.condition.length() - firstConditionLength - 1);
+			letters.add(letter);
+		}
+		String addedCondition = StringUtils.join(letters, StringUtils.EMPTY);
+		firstRule.condition = NOT_GROUP_STARTING + addedCondition + GROUP_ENDING + firstRule.condition;
+		//TODO
+
+
 //		Map<String, List<LineEntry>> bucket = bucketByConditionEqualsTo(aggregatedRules);
 //
 //		//resolve overlapping rules
@@ -393,7 +413,8 @@ System.out.println("");
 //		return bucket.values().stream()
 //			.flatMap(List::stream)
 //			.collect(Collectors.toList());
-//	}
+return aggregatedRules;
+	}
 
 //	private Map<String, List<LineEntry>> bucketByLetter(List<LineEntry> entries, int indexFromLast){
 //		//TODO
