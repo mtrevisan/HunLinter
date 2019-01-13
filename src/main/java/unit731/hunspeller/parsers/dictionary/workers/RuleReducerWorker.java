@@ -270,21 +270,12 @@ System.out.println("");
 
 		//resolve overlapping rules
 		for(Map.Entry<String, List<LineEntry>> entry : bucket.entrySet())
-			if(entry.getValue().size() > 1){
-				List<LineEntry> overlappingRules = entry.getValue();
-				//TODO
-
-/*
-a,ía,òda,ònia
-r,èr
-o,o > [^i]o,io / [gƚsŧtx]o,[^gƚsŧtx]o
-*/
-				entry.setValue(overlappingRules);
-			}
+			if(entry.getValue().size() > 1)
+				entry.setValue(reduceRules(entry.getValue()));
 
 		//retrieve list with non-overlapping rules
 		return bucket.values().stream()
-			.flatMap(entry -> entry.stream())
+			.flatMap(List::stream)
 			.collect(Collectors.toList());
 	}
 
@@ -299,6 +290,16 @@ o,o > [^i]o,io / [gƚsŧtx]o,[^gƚsŧtx]o
 			}
 		}
 		return list;
+	}
+
+	private List<LineEntry> reduceRules(List<LineEntry> value){
+		//TODO
+/*
+a,ía,òda,ònia
+r,èr
+o,o > [^i]o,io / [gƚsŧtx]o,[^gƚsŧtx]o
+*/
+return null;
 	}
 
 	private List<LineEntry> reduceEntriesToRules(Map<String, List<LineEntry>> aggregatedFlaggedEntries){
