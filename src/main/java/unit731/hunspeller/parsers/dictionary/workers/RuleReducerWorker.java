@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -98,7 +99,7 @@ String flag = "v1";
 			collectFlagProductions(productions, flag, flaggedEntries);
 		};
 		Runnable completed = () -> {
-			Map<String, LineEntry> bucketedEntries = bucketByConditionEndingWith(flaggedEntries);
+			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndingWithPlain(flaggedEntries);
 
 //			removeOverlappingRules(bucketedEntries);
 
@@ -231,6 +232,20 @@ System.out.println("");
 		return new LineEntry(removal, addition, condition, word);
 	}
 
+	private Map<String, List<LineEntry>> bucketByConditionEndingWithPlain(List<LineEntry> entries){
+		sortByShortestCondition(entries);
+
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!entries.isEmpty()){
+			//collect all entries that has the condition that ends with `condition`
+			String condition = entries.get(0).condition;
+			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
+
+			bucket.put(condition, list);
+		}
+		return bucket;
+	}
+
 	private Map<String, LineEntry> bucketByConditionEndingWith(List<LineEntry> entries){
 		sortByShortestCondition(entries);
 
@@ -319,6 +334,14 @@ System.out.println("");
 
 	private void sortByShortestCondition(List<LineEntry> entries){
 		entries.sort((entry1, entry2) -> Integer.compare(entry1.condition.length(), entry2.condition.length()));
+	}
+
+	private void sortWell(List<LineEntry> entries){
+		Comparator<LineEntry> comparator = Comparator.comparing(entry -> entry.condition.length());
+		comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.condition));
+		comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.removal.length()));
+		comparator = comparator.thenComparing(Comparator.comparing(entry -> entry.removal));
+		entries.sort(comparator);
 	}
 
 //	private void removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
