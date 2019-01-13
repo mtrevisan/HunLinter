@@ -229,31 +229,38 @@ System.out.println("");
 	}
 
 	private Map<String, List<LineEntry>> aggregateEntries(List<LineEntry> entries){
-		//sort entries by shortest condition
-		entries.sort((entry1, entry2) -> Integer.compare(entry1.condition.length(), entry2.condition.length()));
+		sortEntriesByShortestCondition(entries);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		while(!entries.isEmpty()){
-			List<LineEntry> list = new ArrayList<>();
-
 			//collect all entries that has the condition that ends with `condition`
 			String condition = entries.get(0).condition;
-			Iterator<LineEntry> itr = entries.iterator();
-			while(itr.hasNext()){
-				LineEntry entry = itr.next();
-				if(entry.condition.endsWith(condition)){
-					itr.remove();
-					list.add(entry);
-				}
-			}
-
+			List<LineEntry> list = collectByCondition(entries, condition);
 			bucket.put(condition, list);
 		}
 		return bucket;
 	}
 
+	private void sortEntriesByShortestCondition(List<LineEntry> entries){
+		entries.sort((entry1, entry2) -> Integer.compare(entry1.condition.length(), entry2.condition.length()));
+	}
+
+	private List<LineEntry> collectByCondition(List<LineEntry> entries, String condition){
+		List<LineEntry> list = new ArrayList<>();
+		Iterator<LineEntry> itr = entries.iterator();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
+			if(entry.condition.endsWith(condition)){
+				itr.remove();
+				list.add(entry);
+			}
+		}
+		return list;
+	}
+
 	private List<LineEntry> reduceEntriesToRules(Map<String, List<LineEntry>> aggregatedFlaggedEntries){
 		//TODO
+return null;
 	}
 
 //	private void manageCollision(LineEntry affixEntry, Set<LineEntry> newAffixEntries){
