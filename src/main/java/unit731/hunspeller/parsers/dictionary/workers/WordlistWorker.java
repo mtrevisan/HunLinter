@@ -54,7 +54,8 @@ public class WordlistWorker extends WorkerDictionaryBase{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		WorkerData data = WorkerData.create(WORKER_NAME, dicParser, completed);
+		WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		data.setCompletedCallback(completed);
 		createWriteWorker(data, lineProcessor, outputFile);
 	}
 

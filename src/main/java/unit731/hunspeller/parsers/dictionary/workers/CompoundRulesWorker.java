@@ -25,7 +25,8 @@ public class CompoundRulesWorker extends WorkerDictionaryBase{
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, null);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
 

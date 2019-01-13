@@ -57,7 +57,9 @@ public class WordCountWorker extends WorkerDictionaryBase{
 		Runnable cancelled = () -> {
 			dictionary.close();
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, cancelled);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		data.setCompletedCallback(completed);
+		data.setCancelledCallback(cancelled);
 		createReadWorker(data, lineProcessor);
 	}
 

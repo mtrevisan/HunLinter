@@ -184,7 +184,8 @@ System.out.println("");
 //				.map(entry -> composeLine(type, flag, entry))
 //				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, null);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
 

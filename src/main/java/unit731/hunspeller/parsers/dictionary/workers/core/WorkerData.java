@@ -8,36 +8,45 @@ public class WorkerData{
 
 	final String workerName;
 	final DictionaryParser dicParser;
-	final Runnable completed;
-	final Runnable cancelled;
+	Runnable completed;
+	Runnable cancelled;
 
 	final boolean parallelProcessing;
 	final boolean preventExceptionRelaunch;
 
 
-	public static final WorkerData create(String workerName, DictionaryParser dicParser, Runnable completed){
-		return new WorkerData(workerName, dicParser, completed, null, false, false);
+	public static final WorkerData create(String workerName, DictionaryParser dicParser){
+		return new WorkerData(workerName, dicParser, false, false);
 	}
 
-	public static final WorkerData createParallel(String workerName, DictionaryParser dicParser, Runnable completed, Runnable cancelled){
-		return new WorkerData(workerName, dicParser, completed, cancelled, true, false);
+	public static final WorkerData createParallel(String workerName, DictionaryParser dicParser){
+		return new WorkerData(workerName, dicParser, true, false);
 	}
 
 	public static final WorkerData createParallelPreventExceptionRelaunch(String workerName, DictionaryParser dicParser){
-		return new WorkerData(workerName, dicParser, null, null, true, true);
+		return new WorkerData(workerName, dicParser, true, true);
 	}
 
-	private WorkerData(String workerName, DictionaryParser dicParser, Runnable completed, Runnable cancelled, boolean parallelProcessing,
-			boolean preventExceptionRelaunch){
+	private WorkerData(String workerName, DictionaryParser dicParser, boolean parallelProcessing, boolean preventExceptionRelaunch){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicParser);
 
 		this.workerName = workerName;
 		this.dicParser = dicParser;
-		this.completed = completed;
-		this.cancelled = cancelled;
 		this.parallelProcessing = parallelProcessing;
 		this.preventExceptionRelaunch = preventExceptionRelaunch;
+	}
+
+	public void setCompletedCallback(Runnable completed){
+		Objects.requireNonNull(completed);
+
+		this.completed = completed;
+	}
+
+	public void setCancelledCallback(Runnable cancelled){
+		Objects.requireNonNull(cancelled);
+
+		this.cancelled = cancelled;
 	}
 
 	public void validate() throws NullPointerException{
