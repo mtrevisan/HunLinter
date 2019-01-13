@@ -20,9 +20,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -48,6 +46,50 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
+	private class LineEntry{
+		private final List<String> originalWords;
+		private final String removal;
+		private final String addition;
+		private String condition;
+
+		LineEntry(String removal, String addition, String condition){
+			this(removal, addition, condition, null);
+		}
+
+		LineEntry(String removal, String addition, String condition, String originalWord){
+			originalWords = new ArrayList<>();
+			originalWords.add(originalWord);
+			this.removal = removal;
+			this.addition = addition;
+			this.condition = condition;
+		}
+
+		@Override
+		public int hashCode(){
+			return new HashCodeBuilder()
+				.append(removal)
+				.append(addition)
+				.append(condition)
+				.toHashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj){
+			if(this == obj)
+				return true;
+			if(obj == null || getClass() != obj.getClass())
+				return false;
+
+			final LineEntry other = (LineEntry)obj;
+			return new EqualsBuilder()
+				.append(removal, other.removal)
+				.append(addition, other.addition)
+				.append(condition, other.condition)
+				.isEquals();
+		}
+	}
+
+
 	/** NOTE: this works only if the rules produce only one output! ... for now */
 	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
 		Objects.requireNonNull(affixData);
@@ -58,15 +100,17 @@ String flag = "v1";
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		boolean isSuffix = originalRuleEntry.isSuffix();
-		Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
-		List<LineEntry> newAffixEntries = new ArrayList<>();
+		List<LineEntry> flaggedEntries = new ArrayList<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			collectFlagProductions(productions, flag, newAffixEntries);
+			collectFlagProductions(productions, flag, flaggedEntries);
 		};
 		Runnable completed = () -> {
+			Map<String, List<LineEntry>> aggregatedFlaggedEntries = aggregateEntries(flaggedEntries);
+
+			List<LineEntry> reducedEntries = reduceEntriesToRules(aggregatedFlaggedEntries);
+
 //			manageCollision(affixEntry, newAffixEntries);
 /*
 problem:
@@ -80,64 +124,65 @@ if conditions are equals and the adding parts are one inside the other, take the
 add the negated char to the other rule (ista/A2 [^i]o)
 */
 
+System.out.println("");
 			//aggregate rules
-			List<LineEntry> aggregatedAffixEntries = new ArrayList<>();
-			List<LineEntry> entries = sortEntries(new HashSet<>(newAffixEntries));
-			while(!entries.isEmpty()){
-				LineEntry affixEntry = entries.get(0);
+//			List<LineEntry> aggregatedAffixEntries = new ArrayList<>();
+//			Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
+//			while(!entries.isEmpty()){
+//				LineEntry affixEntry = entries.get(0);
+//
+//				List<LineEntry> collisions = collectEntries(affixEntry, entries);
+//
+//				//remove matched entries
+//				collisions.forEach(entry -> entries.remove(entry));
+//
+//				//if there are more than one collisions
+//				if(collisions.size() > 1){
+//					//bucket collisions by length
+//					Map<Integer, List<LineEntry>> bucket = bucketForLength(collisions, comparator);
+//
+//					//generate regex from input:
+//					//perform a one-leap step through the buckets
+//					Iterator<List<LineEntry>> itr = bucket.values().iterator();
+//					List<LineEntry> startingList = itr.next();
+//					while(itr.hasNext()){
+//						List<LineEntry> nextList = itr.next();
+//						if(!nextList.isEmpty())
+//							joinCollisions(startingList, nextList, comparator);
+//
+//						startingList = nextList;
+//					}
+//					//perform a two-leaps step through the buckets
+//					itr = bucket.values().iterator();
+//					startingList = itr.next();
+//					if(itr.hasNext()){
+//						List<LineEntry> intermediateList = itr.next();
+//						while(itr.hasNext()){
+//							List<LineEntry> nextList = itr.next();
+//							if(!nextList.isEmpty())
+//								joinCollisions(startingList, nextList, comparator);
+//
+//							startingList = intermediateList;
+//							intermediateList = nextList;
+//						}
+//					}
+//					//three-leaps? n-leaps?
+//					//TODO
+//
+//					//store aggregated entries
+//					bucket.values()
+//						.forEach(aggregatedAffixEntries::addAll);
+//				}
+//				//otherwise store entry and pass to the next
+//				else
+//					aggregatedAffixEntries.add(affixEntry);
+//			}
 
-				List<LineEntry> collisions = collectEntries(affixEntry, entries);
-
-				//remove matched entries
-				collisions.forEach(entry -> entries.remove(entry));
-
-				//if there are more than one collisions
-				if(collisions.size() > 1){
-					//bucket collisions by length
-					Map<Integer, List<LineEntry>> bucket = bucketForLength(collisions, comparator);
-
-					//generate regex from input:
-					//perform a one-leap step through the buckets
-					Iterator<List<LineEntry>> itr = bucket.values().iterator();
-					List<LineEntry> startingList = itr.next();
-					while(itr.hasNext()){
-						List<LineEntry> nextList = itr.next();
-						if(!nextList.isEmpty())
-							joinCollisions(startingList, nextList, comparator);
-
-						startingList = nextList;
-					}
-					//perform a two-leaps step through the buckets
-					itr = bucket.values().iterator();
-					startingList = itr.next();
-					if(itr.hasNext()){
-						List<LineEntry> intermediateList = itr.next();
-						while(itr.hasNext()){
-							List<LineEntry> nextList = itr.next();
-							if(!nextList.isEmpty())
-								joinCollisions(startingList, nextList, comparator);
-
-							startingList = intermediateList;
-							intermediateList = nextList;
-						}
-					}
-					//three-leaps? n-leaps?
-					//TODO
-
-					//store aggregated entries
-					bucket.values()
-						.forEach(aggregatedAffixEntries::addAll);
-				}
-				//otherwise store entry and pass to the next
-				else
-					aggregatedAffixEntries.add(affixEntry);
-			}
-
-			AffixEntry.Type type = (isSuffix? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
-			aggregatedAffixEntries.stream()
-				.map(entry -> composeLine(type, flag, entry))
-				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
+//			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+//			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), aggregatedAffixEntries.size()));
+//			aggregatedAffixEntries.stream()
+//				.map(entry -> composeLine(type, flag, entry))
+//				.forEach(entry -> LOGGER.info(Backbone.MARKER_APPLICATION, entry));
 		};
 		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser, completed, null);
 		createReadWorker(data, lineProcessor);
@@ -164,6 +209,62 @@ add the negated char to the other rule (ista/A2 [^i]o)
 		}
 	}
 
+	private LineEntry createSuffixEntry(Production production, String word){
+		int lastCommonLetter;
+		int wordLength = word.length();
+		String producedWord = production.getWord();
+		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
+			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
+				break;
+
+		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
+		String condition = (lastCommonLetter < wordLength? removal: word.substring(wordLength - 1));
+		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private LineEntry createPrefixEntry(Production production, String word){
+		int firstCommonLetter;
+		int wordLength = word.length();
+		String producedWord = production.getWord();
+		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
+			if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
+				break;
+
+		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
+		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
+		String condition = (firstCommonLetter < wordLength? removal: word.substring(wordLength - 1));
+		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private Map<String, List<LineEntry>> aggregateEntries(List<LineEntry> entries){
+		//sort entries by shortest condition
+		entries.sort((entry1, entry2) -> Integer.compare(entry1.condition.length(), entry2.condition.length()));
+
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!entries.isEmpty()){
+			List<LineEntry> list = new ArrayList<>();
+
+			//collect all entries that has the condition that ends with `condition`
+			String condition = entries.get(0).condition;
+			Iterator<LineEntry> itr = entries.iterator();
+			while(itr.hasNext()){
+				LineEntry entry = itr.next();
+				if(entry.condition.endsWith(condition)){
+					itr.remove();
+					list.add(entry);
+				}
+			}
+
+			bucket.put(condition, list);
+		}
+		return bucket;
+	}
+
+	private List<LineEntry> reduceEntriesToRules(Map<String, List<LineEntry>> aggregatedFlaggedEntries){
+		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	}
+
 //	private void manageCollision(LineEntry affixEntry, Set<LineEntry> newAffixEntries){
 //		//search newAffixEntries for collisions on condition
 //		for(LineEntry entry : newAffixEntries)
@@ -187,15 +288,6 @@ add the negated char to the other rule (ista/A2 [^i]o)
 //				break;
 //			}
 //	}
-
-	/** Sort entries by shortest condition */
-	private List<LineEntry> sortEntries(Set<LineEntry> set){
-		List<LineEntry> sortedList = new ArrayList<>(set);
-		sortedList.sort((entry1, entry2) ->
-			Integer.compare(entry1.condition.length(), entry2.condition.length())
-		);
-		return sortedList;
-	}
 
 	private List<LineEntry> collectEntries(LineEntry affixEntry, List<LineEntry> entries){
 		//collect all the entries that have affixEntry as last part of the condition
@@ -267,77 +359,6 @@ add the negated char to the other rule (ista/A2 [^i]o)
 					+ affixEntryCondition));
 			}
 		}
-	}
-
-	private class LineEntry{
-		private final List<String> originalWords;
-		private final String removal;
-		private final String addition;
-		private String condition;
-
-		LineEntry(String removal, String addition, String condition){
-			this(removal, addition, condition, null);
-		}
-
-		LineEntry(String removal, String addition, String condition, String originalWord){
-			originalWords = new ArrayList<>();
-			originalWords.add(originalWord);
-			this.removal = removal;
-			this.addition = addition;
-			this.condition = condition;
-		}
-
-		@Override
-		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(removal)
-				.append(addition)
-				.append(condition)
-				.toHashCode();
-		}
-
-		@Override
-		public boolean equals(Object obj){
-			if(this == obj)
-				return true;
-			if(obj == null || getClass() != obj.getClass())
-				return false;
-
-			final LineEntry other = (LineEntry)obj;
-			return new EqualsBuilder()
-				.append(removal, other.removal)
-				.append(addition, other.addition)
-				.append(condition, other.condition)
-				.isEquals();
-		}
-	}
-
-	private LineEntry createSuffixEntry(Production production, String word){
-		int lastCommonLetter;
-		int wordLength = word.length();
-		String producedWord = production.getWord();
-		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
-			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-				break;
-
-		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
-		String condition = (lastCommonLetter < wordLength? removal: word.substring(wordLength - 1));
-		return new LineEntry(removal, addition, condition, word);
-	}
-
-	private LineEntry createPrefixEntry(Production production, String word){
-		int firstCommonLetter;
-		int wordLength = word.length();
-		String producedWord = production.getWord();
-		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
-			if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
-				break;
-
-		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
-		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
-		String condition = (firstCommonLetter < wordLength? removal: word.substring(wordLength - 1));
-		return new LineEntry(removal, addition, condition, word);
 	}
 
 	private Map<Integer, List<LineEntry>> bucketForLength(List<LineEntry> entries, Comparator<String> comparator){
