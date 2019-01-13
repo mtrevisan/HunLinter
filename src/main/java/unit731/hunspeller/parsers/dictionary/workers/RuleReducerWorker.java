@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
@@ -97,9 +99,11 @@ String flag = "v1";
 			collectFlagProductions(productions, flag, flaggedEntries);
 		};
 		Runnable completed = () -> {
-			Map<String, List<LineEntry>> aggregatedFlaggedEntries = aggregateEntries(flaggedEntries);
+			Map<String, List<LineEntry>> bucketedEntries = bucketByCondition(flaggedEntries);
 
-			List<LineEntry> reducedEntries = reduceEntriesToRules(aggregatedFlaggedEntries);
+			removeOverlappingRules(bucketedEntries);
+
+			List<LineEntry> reducedEntries = reduceEntriesToRules(bucketedEntries);
 
 //			manageCollision(affixEntry, newAffixEntries);
 /*
@@ -228,29 +232,68 @@ System.out.println("");
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private Map<String, List<LineEntry>> aggregateEntries(List<LineEntry> entries){
-		sortEntriesByShortestCondition(entries);
+	private Map<String, List<LineEntry>> bucketByCondition(List<LineEntry> entries){
+		sortByShortestCondition(entries);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		while(!entries.isEmpty()){
 			//collect all entries that has the condition that ends with `condition`
 			String condition = entries.get(0).condition;
-			List<LineEntry> list = collectByCondition(entries, condition);
+			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
 			bucket.put(condition, list);
 		}
 		return bucket;
 	}
 
-	private void sortEntriesByShortestCondition(List<LineEntry> entries){
+	private void sortByShortestCondition(List<LineEntry> entries){
 		entries.sort((entry1, entry2) -> Integer.compare(entry1.condition.length(), entry2.condition.length()));
 	}
 
-	private List<LineEntry> collectByCondition(List<LineEntry> entries, String condition){
+	private void removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
+		for(Map.Entry<String, List<LineEntry>> bucketEntry : bucketedEntries.entrySet()){
+			List<LineEntry> aggregatedRules = bucketEntry.getValue();
+			if(aggregatedRules.size() > 1){
+				List<LineEntry> nonOverlappingRules = removeOverlapping(aggregatedRules);
+				bucketEntry.setValue(nonOverlappingRules);
+			}
+		}
+	}
+
+	private List<LineEntry> removeOverlapping(List<LineEntry> aggregatedRules){
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!aggregatedRules.isEmpty()){
+			//collect all entries that has the condition that is `condition`
+			String condition = aggregatedRules.get(0).condition;
+			List<LineEntry> list = collectByCondition(aggregatedRules, a -> a.equals(condition));
+			bucket.put(condition, list);
+		}
+
+		//resolve overlapping rules
+		for(Map.Entry<String, List<LineEntry>> entry : bucket.entrySet())
+			if(entry.getValue().size() > 1){
+				List<LineEntry> overlappingRules = entry.getValue();
+				//TODO
+
+/*
+a,ía,òda,ònia
+r,èr
+o,o > [^i]o,io / [gƚsŧtx]o,[^gƚsŧtx]o
+*/
+				entry.setValue(overlappingRules);
+			}
+
+		//retrieve list with non-overlapping rules
+		return bucket.values().stream()
+			.flatMap(entry -> entry.stream())
+			.collect(Collectors.toList());
+	}
+
+	private List<LineEntry> collectByCondition(List<LineEntry> entries, Function<String, Boolean> comparator){
 		List<LineEntry> list = new ArrayList<>();
 		Iterator<LineEntry> itr = entries.iterator();
 		while(itr.hasNext()){
 			LineEntry entry = itr.next();
-			if(entry.condition.endsWith(condition)){
+			if(comparator.apply(entry.condition)){
 				itr.remove();
 				list.add(entry);
 			}
