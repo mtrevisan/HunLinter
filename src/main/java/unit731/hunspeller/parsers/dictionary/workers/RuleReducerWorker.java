@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -367,6 +368,25 @@ System.out.println("");
 		Set<Character> letters = new HashSet<>();
 		while(itr.hasNext()){
 			LineEntry entry = itr.next();
+
+			String additionalCondition = entry.condition.substring(0, entry.condition.length() - firstConditionLength);
+			//add letter additionalCondition.charAt(0) to [^...] * firstCondition
+			letters.add(additionalCondition.charAt(0));
+			int additionalConditionLength = additionalCondition.length();
+			//add another rule(s) with [^additionalCondition.charAt(2)] * additionalCondition.charAt(1) * additionalCondition.charAt(0) * firstCondition
+			String ongoingCondition = firstCondition;
+			for(int i = additionalConditionLength - 2; i >= 0; i --){
+				ongoingCondition = additionalCondition.charAt(i + 1) + ongoingCondition;
+				aggregatedRules.add(new LineEntry(entry.removal, entry.addition, NOT_GROUP_STARTING + additionalCondition.charAt(i) + GROUP_ENDING
+					+ ongoingCondition));
+			}
+			//TODO
+
+			char[] chrs = additionalCondition.toCharArray();
+			ArrayUtils.reverse(chrs);
+			for(char chr : chrs){
+//				letters.add(chr);
+			}
 			char letter = entry.condition.charAt(entry.condition.length() - firstConditionLength - 1);
 			letters.add(letter);
 		}
