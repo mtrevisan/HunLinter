@@ -11,8 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 class CharsetParsingStrategy implements FlagParsingStrategy{
 
-	private final CharsetEncoder encoder;
-	private final String type;
+	private final Charset charset;
 
 
 	private static class SingletonHelperASCII{
@@ -32,8 +31,7 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private CharsetParsingStrategy(Charset charset){
-		encoder = charset.newEncoder();
-		type = charset.displayName();
+		this.charset = charset;
 	}
 
 	@Override
@@ -51,8 +49,8 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkValidity(String textFlags) throws IllegalArgumentException{
-		if(!encoder.canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in " + type + " encoding: " + textFlags);
+		if(!canEncode(textFlags))
+			throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + textFlags);
 	}
 
 	private String[] extractFlags(String textFlags){
@@ -83,8 +81,8 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		for(String flag : textFlags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
-			if(!encoder.canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in " + type + " encoding");
+			if(!canEncode(flag))
+				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag + " in " + String.join(",", textFlags));
 		}
 	}
 
@@ -96,8 +94,14 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkCompoundValidity(String compoundRule) throws IllegalArgumentException{
-		if(!encoder.canEncode(compoundRule))
-			throw new IllegalArgumentException("Compound rule must be in " + type + " encoding: " + compoundRule);
+		if(!canEncode(compoundRule))
+			throw new IllegalArgumentException("Compound rule must be in " + charset.displayName() + " encoding: " + compoundRule);
+	}
+
+	public boolean canEncode(String cs){
+		CharsetEncoder encoder = charset.newEncoder();
+		//NOTE: encoder.canEncode is not thread-safe!
+		return encoder.canEncode(cs);
 	}
 
 }

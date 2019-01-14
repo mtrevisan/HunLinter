@@ -56,9 +56,11 @@ public class DictionaryCorrectnessChecker{
 
 			incompatibilityCheck(production);
 
-			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-			for(String subword : splittedWords)
-				checkCompoundProduction(subword, production);
+			if(hyphenator != null){
+				List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
+				for(String subword : splittedWords)
+					checkCompoundProduction(subword, production);
+			}
 		}
 		catch(IllegalArgumentException e){
 			manageException(e, production);

@@ -199,6 +199,31 @@ System.out.println("");
 			String condition = entries.get(0).condition;
 			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
 
+//TODO remove same conditions (ex. -o and -o)
+			//manage same condition rules (entry.condition == firstCondition)
+//			if(list.size() > 1){
+//				//find same condition entries
+//				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(list);
+//
+//				//expand same condition entries
+//				boolean expansionHappened = expandOverlappingRules(equalsBucket);
+//
+//				//expand again if needed
+//				while(expansionHappened){
+//					expansionHappened = false;
+//					for(List<LineEntry> set : equalsBucket.values()){
+//						equalsBucket = bucketByConditionEqualsTo(set);
+//
+//						//expand same condition entries
+//						expansionHappened |= expandOverlappingRules(equalsBucket);
+//					}
+//				}
+//				for(List<LineEntry> set : equalsBucket.values())
+//					for(LineEntry le : set)
+//						bucket.put(le.condition, le);
+//			}
+//			else
+//				bucket.put(condition, list.get(0));
 			bucket.put(condition, list);
 		}
 		return bucket;
@@ -248,13 +273,15 @@ System.out.println("");
 			char[] additionalCondition = entry.condition.substring(0, entry.condition.length() - firstConditionLength).toCharArray();
 			ArrayUtils.reverse(additionalCondition);
 
+//TODO manage same condition rules (entry.condition == firstCondition)
+
 			//add letter additionalCondition.charAt(0) to [^...] * firstCondition
 			letters.add(additionalCondition[0]);
 
 			//add another rule(s) with [^additionalCondition.charAt(2)] * additionalCondition.charAt(1) * additionalCondition.charAt(0) * firstCondition
 			String ongoingCondition = firstCondition;
 			for(int i = 0; i < additionalCondition.length - 1; i ++){
-				//TODO manage same condition rules ([^x]ongoingCondition and [^y]ongoingCondition)
+//TODO manage same condition rules ([^x]ongoingCondition and [^y]ongoingCondition)
 				ongoingCondition = additionalCondition[i] + ongoingCondition;
 				aggregatedRules.add(new LineEntry(firstRule.removal, firstRule.addition, NOT_GROUP_STARTING + additionalCondition[i + 1] + GROUP_ENDING
 					+ ongoingCondition));
