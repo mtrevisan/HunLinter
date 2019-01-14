@@ -199,32 +199,37 @@ System.out.println("");
 			String condition = entries.get(0).condition;
 			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
 
-//TODO remove same conditions (ex. -o and -o)
 			//manage same condition rules (entry.condition == firstCondition)
-//			if(list.size() > 1){
-//				//find same condition entries
-//				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(list);
-//
-//				//expand same condition entries
-//				boolean expansionHappened = expandOverlappingRules(equalsBucket);
-//
-//				//expand again if needed
-//				while(expansionHappened){
-//					expansionHappened = false;
-//					for(List<LineEntry> set : equalsBucket.values()){
-//						equalsBucket = bucketByConditionEqualsTo(set);
-//
-//						//expand same condition entries
-//						expansionHappened |= expandOverlappingRules(equalsBucket);
-//					}
-//				}
-//				for(List<LineEntry> set : equalsBucket.values())
-//					for(LineEntry le : set)
-//						bucket.put(le.condition, le);
-//			}
-//			else
-//				bucket.put(condition, list.get(0));
-			bucket.put(condition, list);
+			if(list.size() > 1){
+				//find same condition entries
+				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(list));
+
+				boolean hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+				if(hasSameConditions){
+					//expand same condition entries
+					boolean expansionHappened = expandOverlappingRules(equalsBucket);
+
+					//expand again if needed
+					while(expansionHappened){
+						expansionHappened = false;
+						for(List<LineEntry> set : equalsBucket.values()){
+							equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(set));
+
+							//expand same condition entries
+							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+							if(hasSameConditions)
+								expansionHappened |= expandOverlappingRules(equalsBucket);
+						}
+					}
+					for(List<LineEntry> set : equalsBucket.values())
+						for(LineEntry le : set)
+							bucket.put(le.condition, Collections.singletonList(le));
+				}
+				else
+					bucket.put(condition, list);
+			}
+			else
+				bucket.put(condition, list);
 		}
 		return bucket;
 	}
@@ -331,42 +336,42 @@ System.out.println("");
 //		return bucket;
 //	}
 
-//	private Map<String, List<LineEntry>> bucketByConditionEqualsTo(List<LineEntry> entries){
-//		Map<String, List<LineEntry>> bucket = new HashMap<>();
-//		while(!entries.isEmpty()){
-//			//collect all entries that has the condition that is `condition`
-//			String condition = entries.get(0).condition;
-//			List<LineEntry> list = collectByCondition(entries, a -> a.equals(condition));
-//
-//			bucket.put(condition, list);
-//		}
-//		return bucket;
-//	}
+	private Map<String, List<LineEntry>> bucketByConditionEqualsTo(List<LineEntry> entries){
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!entries.isEmpty()){
+			//collect all entries that has the condition that is `condition`
+			String condition = entries.get(0).condition;
+			List<LineEntry> list = collectByCondition(entries, a -> a.equals(condition));
 
-//	private boolean expandOverlappingRules(Map<String, List<LineEntry>> bucket){
-//		boolean expanded = false;
-//		for(List<LineEntry> entries : bucket.values())
-//			if(entries.size() > 1){
-//				//expand condition by one letter
-//				List<LineEntry> expandedEntries = new ArrayList<>();
-//				for(LineEntry en : entries)
-//					for(String originalWord : en.originalWords){
-//						int startingIndex = originalWord.length() - en.condition.length() - 1;
-//						String newCondition = originalWord.substring(startingIndex);
-//						LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
-//						int index = expandedEntries.indexOf(newEntry);
-//						if(index >= 0)
-//							expandedEntries.get(index).originalWords.add(originalWord);
-//						else
-//							expandedEntries.add(newEntry);
-//					}
-//				entries.clear();
-//				entries.addAll(expandedEntries);
-//
-//				expanded = true;
-//			}
-//		return expanded;
-//	}
+			bucket.put(condition, list);
+		}
+		return bucket;
+	}
+
+	private boolean expandOverlappingRules(Map<String, List<LineEntry>> bucket){
+		boolean expanded = false;
+		for(List<LineEntry> entries : bucket.values())
+			if(entries.size() > 1){
+				//expand condition by one letter
+				List<LineEntry> expandedEntries = new ArrayList<>();
+				for(LineEntry en : entries)
+					for(String originalWord : en.originalWords){
+						int startingIndex = originalWord.length() - en.condition.length() - 1;
+						String newCondition = originalWord.substring(startingIndex);
+						LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
+						int index = expandedEntries.indexOf(newEntry);
+						if(index >= 0)
+							expandedEntries.get(index).originalWords.add(originalWord);
+						else
+							expandedEntries.add(newEntry);
+					}
+				entries.clear();
+				entries.addAll(expandedEntries);
+
+				expanded = true;
+			}
+		return expanded;
+	}
 
 //	private void sortWell(List<LineEntry> entries){
 //		Comparator<LineEntry> comparator = Comparator.comparing(entry -> entry.condition.length());
