@@ -220,7 +220,7 @@ String flag = "v1";
 			//manage same condition rules (entry.condition == firstCondition)
 			if(list.size() > 1){
 				//find same condition entries
-				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(list));
+				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(list);
 
 				boolean hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
 				if(hasSameConditions){
@@ -231,7 +231,7 @@ String flag = "v1";
 					while(expansionHappened){
 						expansionHappened = false;
 						for(List<LineEntry> set : equalsBucket.values()){
-							equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(set));
+							equalsBucket = bucketByConditionEqualsTo(set);
 
 							//expand same condition entries
 							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
@@ -242,6 +242,12 @@ String flag = "v1";
 					for(List<LineEntry> set : equalsBucket.values())
 						for(LineEntry le : set)
 							bucket.put(le.condition, Collections.singletonList(le));
+				}
+				else if(list.size() > 1){
+					removeOverlappingConditions(list);
+
+					for(LineEntry en : list)
+						bucket.put(en.condition, Collections.singletonList(en));
 				}
 				else
 					bucket.put(condition, list);
@@ -316,11 +322,12 @@ String flag = "v1";
 	}
 
 	private Map<String, List<LineEntry>> bucketByConditionEqualsTo(List<LineEntry> entries){
+		List<LineEntry> copy = new ArrayList<>(entries);
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
-		while(!entries.isEmpty()){
+		while(!copy.isEmpty()){
 			//collect all entries that has the condition that is `condition`
-			String condition = entries.get(0).condition;
-			List<LineEntry> list = collectByCondition(entries, a -> a.equals(condition));
+			String condition = copy.get(0).condition;
+			List<LineEntry> list = collectByCondition(copy, a -> a.equals(condition));
 
 			bucket.put(condition, list);
 		}
