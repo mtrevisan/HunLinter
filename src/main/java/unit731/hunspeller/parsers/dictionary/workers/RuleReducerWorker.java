@@ -197,37 +197,41 @@ String flag = "v1";
 			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
 
 			//manage same condition rules (entry.condition == firstCondition)
-			if(list.size() > 1){
-				//find same condition entries
-				Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(list));
-
-				boolean hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
-				if(hasSameConditions){
-					//expand same condition entries
-					boolean expansionHappened = expandOverlappingRules(equalsBucket);
-
-					//expand again if needed
-					while(expansionHappened){
-						expansionHappened = false;
-						for(List<LineEntry> set : equalsBucket.values()){
-							equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(set));
-
-							//expand same condition entries
-							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
-							if(hasSameConditions)
-								expansionHappened |= expandOverlappingRules(equalsBucket);
-						}
-					}
-					for(List<LineEntry> set : equalsBucket.values())
-						for(LineEntry le : set)
-							bucket.put(le.condition, Collections.singletonList(le));
-				}
-				else
-					bucket.put(condition, list);
-			}
+			if(list.size() > 1)
+				manageSameCondition(list, bucket, condition);
 			else
 				bucket.put(condition, list);
 		}
+		return bucket;
+	}
+
+	private Map<String, List<LineEntry>> manageSameCondition(List<LineEntry> list, Map<String, List<LineEntry>> bucket, String condition){
+		//find same condition entries
+		Map<String, List<LineEntry>> equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(list));
+		
+		boolean hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+		if(hasSameConditions){
+			//expand same condition entries
+			boolean expansionHappened = expandOverlappingRules(equalsBucket);
+			
+			//expand again if needed
+			while(expansionHappened){
+				expansionHappened = false;
+				for(List<LineEntry> set : equalsBucket.values()){
+					equalsBucket = bucketByConditionEqualsTo(new ArrayList<>(set));
+					
+					//expand same condition entries
+					hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+					if(hasSameConditions)
+						expansionHappened |= expandOverlappingRules(equalsBucket);
+				}
+			}
+			for(List<LineEntry> set : equalsBucket.values())
+				for(LineEntry le : set)
+					bucket.put(le.condition, Collections.singletonList(le));
+		}
+		else
+			bucket.put(condition, list);
 		return bucket;
 	}
 
