@@ -90,7 +90,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 	}
 
+
 	private Comparator<String> comparator;
+	private Comparator<LineEntry> shortestConditionComparator;
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -99,6 +101,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(wordGenerator);
 
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
+		shortestConditionComparator = Comparator.comparing(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparing((LineEntry entry) -> entry.addition.length())
 			.thenComparing(Comparator.comparing(entry -> entry.addition))
 			.thenComparing(Comparator.comparing(entry -> entry.condition.length()))
@@ -125,19 +128,6 @@ String flag = "v1";
 			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
 			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
 
-/*
-problem:
-SFX v1 o ista/A2 [^i]o
-SFX v1 o sta/A2 io
-would be reduced to
-SFX v1 o ista/A2 o
-SFX v1 o sta/A2 o
-how do I know the -o condition is not enough but it is necessary another character (-[^i]o, -io)?
-if conditions are equals and the adding parts are one inside the other, take the shorter (sta/A2), add another char to the condition (io),
-add the negated char to the other rule (ista/A2 [^i]o)
-*/
-
-System.out.println("");
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
@@ -198,7 +188,7 @@ System.out.println("");
 	}
 
 	private Map<String, List<LineEntry>> bucketByConditionEndingWith(List<LineEntry> entries){
-		sortByShortestCondition(entries);
+		entries.sort(shortestConditionComparator);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		while(!entries.isEmpty()){
@@ -239,11 +229,6 @@ System.out.println("");
 				bucket.put(condition, list);
 		}
 		return bucket;
-	}
-
-	private void sortByShortestCondition(List<LineEntry> entries){
-		Comparator<LineEntry> comparator = Comparator.comparing(entry -> entry.condition.length());
-		entries.sort(comparator);
 	}
 
 	private List<LineEntry> collectByCondition(List<LineEntry> entries, Function<String, Boolean> comparator){
