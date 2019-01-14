@@ -1,6 +1,8 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -18,6 +21,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
@@ -360,14 +364,16 @@ System.out.println("");
 	}
 
 	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+
 		//extract letters prior to first condition
-		Iterator<LineEntry> itr = aggregatedRules.iterator();
-		LineEntry firstRule = itr.next();
+		LineEntry firstRule = aggregatedRules.get(0);
 		String firstCondition = firstRule.condition;
 		int firstConditionLength = firstCondition.length();
 		Set<Character> letters = new HashSet<>();
-		while(itr.hasNext()){
-			LineEntry entry = itr.next();
+		int size = aggregatedRules.size();
+		for(int index = 1; index < size; index ++){
+			LineEntry entry = aggregatedRules.get(index);
 
 			char[] additionalCondition = entry.condition.substring(0, entry.condition.length() - firstConditionLength).toCharArray();
 			ArrayUtils.reverse(additionalCondition);
@@ -378,15 +384,16 @@ System.out.println("");
 			//add another rule(s) with [^additionalCondition.charAt(2)] * additionalCondition.charAt(1) * additionalCondition.charAt(0) * firstCondition
 			String ongoingCondition = firstCondition;
 			for(int i = 0; i < additionalCondition.length - 1; i ++){
-				ongoingCondition = additionalCondition[i + 1] + ongoingCondition;
-				aggregatedRules.add(new LineEntry(entry.removal, entry.addition, NOT_GROUP_STARTING + additionalCondition[i] + GROUP_ENDING
+				ongoingCondition = additionalCondition[i] + ongoingCondition;
+				aggregatedRules.add(new LineEntry(firstRule.removal, firstRule.addition, NOT_GROUP_STARTING + additionalCondition[i + 1] + GROUP_ENDING
 					+ ongoingCondition));
 			}
-
-			//TODO
 		}
-		String addedCondition = StringUtils.join(letters, StringUtils.EMPTY);
+		List<String> sortedLetters = letters.stream().map(String::valueOf).collect(Collectors.toList());
+		Collections.sort(sortedLetters, comparator);
+		String addedCondition = StringUtils.join(sortedLetters, StringUtils.EMPTY);
 		firstRule.condition = NOT_GROUP_STARTING + addedCondition + GROUP_ENDING + firstRule.condition;
+
 		//TODO
 
 
