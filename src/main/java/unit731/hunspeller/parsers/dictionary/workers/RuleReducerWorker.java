@@ -369,26 +369,21 @@ System.out.println("");
 		while(itr.hasNext()){
 			LineEntry entry = itr.next();
 
-			String additionalCondition = entry.condition.substring(0, entry.condition.length() - firstConditionLength);
+			char[] additionalCondition = entry.condition.substring(0, entry.condition.length() - firstConditionLength).toCharArray();
+			ArrayUtils.reverse(additionalCondition);
+
 			//add letter additionalCondition.charAt(0) to [^...] * firstCondition
-			letters.add(additionalCondition.charAt(0));
-			int additionalConditionLength = additionalCondition.length();
+			letters.add(additionalCondition[0]);
+
 			//add another rule(s) with [^additionalCondition.charAt(2)] * additionalCondition.charAt(1) * additionalCondition.charAt(0) * firstCondition
 			String ongoingCondition = firstCondition;
-			for(int i = additionalConditionLength - 2; i >= 0; i --){
-				ongoingCondition = additionalCondition.charAt(i + 1) + ongoingCondition;
-				aggregatedRules.add(new LineEntry(entry.removal, entry.addition, NOT_GROUP_STARTING + additionalCondition.charAt(i) + GROUP_ENDING
+			for(int i = 0; i < additionalCondition.length - 1; i ++){
+				ongoingCondition = additionalCondition[i + 1] + ongoingCondition;
+				aggregatedRules.add(new LineEntry(entry.removal, entry.addition, NOT_GROUP_STARTING + additionalCondition[i] + GROUP_ENDING
 					+ ongoingCondition));
 			}
-			//TODO
 
-			char[] chrs = additionalCondition.toCharArray();
-			ArrayUtils.reverse(chrs);
-			for(char chr : chrs){
-//				letters.add(chr);
-			}
-			char letter = entry.condition.charAt(entry.condition.length() - firstConditionLength - 1);
-			letters.add(letter);
+			//TODO
 		}
 		String addedCondition = StringUtils.join(letters, StringUtils.EMPTY);
 		firstRule.condition = NOT_GROUP_STARTING + addedCondition + GROUP_ENDING + firstRule.condition;
