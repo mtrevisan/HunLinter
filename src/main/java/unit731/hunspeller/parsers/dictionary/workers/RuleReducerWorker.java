@@ -125,6 +125,27 @@ String flag = "v1";
 
 			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
 
+/*
+#SFX v1 o sta io
+#SFX v1 e ista e
+#SFX v1 0 ista l
+#SFX v1 0 ista n
+#SFX v1 o ista go
+#SFX v1 o ista so
+#SFX v1 o ista to
+#SFX v1 o ista xo
+#SFX v1 o ista ŧo
+#SFX v1 o ista ƚo
+#SFX v1 ía ista ía
+#SFX v1 0 ista [^è]r
+#SFX v1 a ista [^n]ia
+#SFX v1 a ista [^ò]da
+#SFX v1 a ista [^dií]a
+#SFX v1 a ista [^ò]nia
+#SFX v1 èr erista èr
+#SFX v1 òda odista òda
+#SFX v1 ònia onista ònia
+*/
 			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
 			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
 
