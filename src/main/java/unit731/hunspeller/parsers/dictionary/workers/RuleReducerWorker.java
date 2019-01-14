@@ -99,12 +99,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(wordGenerator);
 
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
-		lineEntryComparator = Comparator.comparing((LineEntry entry) -> entry.condition.length())
+		lineEntryComparator = Comparator.comparing((LineEntry entry) -> entry.addition.length())
+			.thenComparing(Comparator.comparing(entry -> entry.addition))
+			.thenComparing(Comparator.comparing(entry -> entry.condition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.condition))
 			.thenComparing(Comparator.comparing(entry -> entry.removal.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.removal))
-			.thenComparing(Comparator.comparing(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition));
+			.thenComparing(Comparator.comparing(entry -> entry.removal));
 
 String flag = "v1";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
