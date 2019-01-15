@@ -347,6 +347,7 @@ String flag = "v1";
 						updateEntriesCondition(entries, conditions, shortestSetIndex);
 					}
 					else{
+						List<LineEntry> commonRules = extractCommonRules(entries, intersection);
 						//entry1: AB
 						//entry2: CB
 						//extract B, keep the rules
@@ -380,6 +381,27 @@ throw new RuntimeException("to be tested");
 				expanded = true;
 			}
 		return expanded;
+	}
+
+	private List<LineEntry> extractCommonRules(List<LineEntry> entries, Set<Character> intersection){
+		Iterator<LineEntry> itr = entries.iterator();
+		List<LineEntry> commonRules = new ArrayList<>();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
+
+			boolean found = false;
+			for(String word : entry.originalWords){
+				char chr = (word.charAt(word.length() - entry.condition.length() - 1));
+				if(intersection.contains(chr)){
+					commonRules.add(new LineEntry(entry.removal, entry.addition, chr + entry.condition, word));
+
+					found = true;
+				}
+			}
+			if(found)
+				itr.remove();
+		}
+		return commonRules;
 	}
 
 	//expand conditions by one letter
