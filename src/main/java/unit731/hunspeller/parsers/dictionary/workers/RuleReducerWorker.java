@@ -386,15 +386,8 @@ throw new RuntimeException("to be tested");
 					else
 						expandedEntries.add(newEntry);
 				}
-				else{
-					//re-add the original line entry if no characters can be prepended
-					LineEntry newEntry = new LineEntry(en.removal, en.addition, en.condition, originalWord);
-					expandedEntries.add(newEntry);
-
-					//remove originalWord from originalWords
-					words.remove();
-throw new RuntimeException("to be tested");
-				}
+				else
+					throw new IllegalArgumentException("Cannot reduce rule (because of " + originalWord + ")");
 			}
 		}
 		entries.clear();
@@ -444,7 +437,8 @@ throw new RuntimeException("to be tested");
 		String shortestSet = conditions.get(shortestSetIndex);
 		entries.get(shortestSetIndex).condition = (shortestSet.length() > 1? GROUP_START + shortestSet + GROUP_END:
 			shortestSet) + entries.get(shortestSetIndex).condition;
-		entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END + entries.get((shortestSetIndex + 1) % 2).condition;
+		entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END
+			+ entries.get((shortestSetIndex + 1) % 2).condition;
 	}
 
 	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
