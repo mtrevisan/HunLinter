@@ -349,6 +349,11 @@ String flag = "v1";
 					else{
 						entries = expandConditions(entries);
 
+/*
+SFX v1 o sta io	po:noun
+SFX v1 o ista io	po:noun
+SFX v1 o ista [^i]o
+*/
 						//TODO collect next letters, if it's possible...
 
 throw new RuntimeException("to be tested");
@@ -356,9 +361,11 @@ throw new RuntimeException("to be tested");
 				}
 				else{
 /*
-#SFX v1 o sta io
-#SFX v1 o swa wo
-#SFX v1 o ista [^i]o
+SFX v1 o sta io
+SFX v1 o swa wo
+SFX v1 o ista [^i]o
+
+kanwo/v1	po:noun
 */
 throw new RuntimeException("to be tested");
 				}
@@ -386,8 +393,11 @@ throw new RuntimeException("to be tested");
 					else
 						expandedEntries.add(newEntry);
 				}
-				else
-					throw new IllegalArgumentException("Cannot reduce rule (because of " + originalWord + ")");
+				else{
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Cannot reduce rule (because of '{0}' that is too short)", originalWord);
+
+					throw new IllegalArgumentException("Cannot reduce rule");
+				}
 			}
 		}
 		entries.clear();
