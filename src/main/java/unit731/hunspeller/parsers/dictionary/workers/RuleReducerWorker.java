@@ -340,13 +340,20 @@ String flag = "v1";
 			if(entries.size() > 1){
 				if(entries.size() == 2){
 					List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
-					boolean emptyIntersection = hasEmptyIntersection(letters);
-					if(emptyIntersection){
+					Set<Character> intersection = calculateIntersection(letters);
+					if(intersection.isEmpty()){
 						List<String> conditions = convertSets(letters);
 						int shortestSetIndex = extractShortestSetIndex(conditions);
 						updateEntriesCondition(entries, conditions, shortestSetIndex);
 					}
 					else{
+						//entry1: AB
+						//entry2: CB
+						//extract B, keep the rules
+						//now I have
+						//entry1: A
+						//entry2: C
+						//add to A and C, [^B]
 						entries = expandConditions(entries);
 
 /*
@@ -428,12 +435,12 @@ throw new RuntimeException("to be tested");
 		return letters;
 	}
 
-	private boolean hasEmptyIntersection(List<Set<Character>> letters){
+	private Set<Character> calculateIntersection(List<Set<Character>> letters){
 		Iterator<Set<Character>> itr = letters.iterator();
 		Set<Character> intersection = new HashSet<>(itr.next());
 		while(itr.hasNext())
 			intersection.retainAll(itr.next());
-		return intersection.isEmpty();
+		return intersection;
 	}
 
 	private int extractShortestSetIndex(List<String> conditions){
