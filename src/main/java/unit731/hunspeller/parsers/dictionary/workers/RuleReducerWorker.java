@@ -338,10 +338,6 @@ String flag = "v1";
 		boolean expanded = false;
 		for(List<LineEntry> entries : bucket.values())
 			if(entries.size() > 1){
-		/*
-		#SFX v1 o sta io
-		#SFX v1 o ista [gƚstŧx]o
-		*/
 				if(entries.size() == 2){
 					List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
 					boolean emptyIntersection = hasEmptyIntersection(letters);
@@ -355,11 +351,16 @@ String flag = "v1";
 
 						//TODO collect next letters, if it's possible...
 
-						throw new RuntimeException("Aaaahhrg!");
+throw new RuntimeException("to be tested");
 					}
 				}
 				else{
-					throw new RuntimeException("Aaaahhrg!");
+/*
+#SFX v1 o sta io
+#SFX v1 o swa wo
+#SFX v1 o ista [^i]o
+*/
+throw new RuntimeException("to be tested");
 				}
 
 				expanded = true;
@@ -370,17 +371,32 @@ String flag = "v1";
 	//expand conditions by one letter
 	private List<LineEntry> expandConditions(List<LineEntry> entries){
 		List<LineEntry> expandedEntries = new ArrayList<>();
-		for(LineEntry en : entries)
-			for(String originalWord : en.originalWords){
+		for(LineEntry en : entries){
+			Iterator<String> words = en.originalWords.iterator();
+			while(words.hasNext()){
+				String originalWord = words.next();
+
 				int startingIndex = originalWord.length() - en.condition.length() - 1;
-				String newCondition = originalWord.substring(startingIndex);
-				LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
-				int index = expandedEntries.indexOf(newEntry);
-				if(index >= 0)
-					expandedEntries.get(index).originalWords.add(originalWord);
-				else
+				if(startingIndex >= 0){
+					String newCondition = originalWord.substring(startingIndex);
+					LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
+					int index = expandedEntries.indexOf(newEntry);
+					if(index >= 0)
+						expandedEntries.get(index).originalWords.add(originalWord);
+					else
+						expandedEntries.add(newEntry);
+				}
+				else{
+					//re-add the original line entry if no characters can be prepended
+					LineEntry newEntry = new LineEntry(en.removal, en.addition, en.condition, originalWord);
 					expandedEntries.add(newEntry);
+
+					//remove originalWord from originalWords
+					words.remove();
+throw new RuntimeException("to be tested");
+				}
 			}
+		}
 		entries.clear();
 		entries.addAll(expandedEntries);
 		return entries;
