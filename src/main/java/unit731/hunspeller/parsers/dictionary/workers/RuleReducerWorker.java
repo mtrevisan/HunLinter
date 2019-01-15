@@ -342,39 +342,48 @@ String flag = "v1";
 		#SFX v1 o sta io
 		#SFX v1 o ista [gƚstŧx]o
 		*/
-				List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
-				if(letters.size() == 2){
+				if(entries.size() == 2){
+					List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
 					boolean emptyIntersection = hasEmptyIntersection(letters);
 					if(emptyIntersection){
 						List<String> conditions = convertSets(letters);
 						int shortestSetIndex = extractShortestSetIndex(conditions);
 						updateEntriesCondition(entries, conditions, shortestSetIndex);
-System.out.println("");
+					}
+					else{
+						entries = expandConditions(entries);
+
+						//TODO collect next letters, if it's possible...
+
+						throw new RuntimeException("Aaaahhrg!");
 					}
 				}
 				else{
 					throw new RuntimeException("Aaaahhrg!");
 				}
 
-				//expand condition by one letter
-//				List<LineEntry> expandedEntries = new ArrayList<>();
-//				for(LineEntry en : entries)
-//					for(String originalWord : en.originalWords){
-//						int startingIndex = originalWord.length() - en.condition.length() - 1;
-//						String newCondition = originalWord.substring(startingIndex);
-//						LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
-//						int index = expandedEntries.indexOf(newEntry);
-//						if(index >= 0)
-//							expandedEntries.get(index).originalWords.add(originalWord);
-//						else
-//							expandedEntries.add(newEntry);
-//					}
-//				entries.clear();
-//				entries.addAll(expandedEntries);
-
 				expanded = true;
 			}
 		return expanded;
+	}
+
+	//expand conditions by one letter
+	private List<LineEntry> expandConditions(List<LineEntry> entries){
+		List<LineEntry> expandedEntries = new ArrayList<>();
+		for(LineEntry en : entries)
+			for(String originalWord : en.originalWords){
+				int startingIndex = originalWord.length() - en.condition.length() - 1;
+				String newCondition = originalWord.substring(startingIndex);
+				LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
+				int index = expandedEntries.indexOf(newEntry);
+				if(index >= 0)
+					expandedEntries.get(index).originalWords.add(originalWord);
+				else
+					expandedEntries.add(newEntry);
+			}
+		entries.clear();
+		entries.addAll(expandedEntries);
+		return entries;
 	}
 
 	private List<String> convertSets(List<Set<Character>> letters){
