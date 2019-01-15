@@ -346,18 +346,9 @@ String flag = "v1";
 				if(letters.size() == 2){
 					boolean emptyIntersection = hasEmptyIntersection(letters);
 					if(emptyIntersection){
-						List<String> conditions = letters.stream()
-							.map(set -> set.stream().map(String::valueOf).collect(Collectors.toList()))
-							.map(sortedSet -> {
-								Collections.sort(sortedSet, comparator);
-								return StringUtils.join(sortedSet, StringUtils.EMPTY);
-							})
-							.collect(Collectors.toList());
+						List<String> conditions = convertSets(letters);
 						int shortestSetIndex = extractShortestSetIndex(conditions);
-						String shortestSet = conditions.get(shortestSetIndex);
-						entries.get(shortestSetIndex).condition = (shortestSet.length() > 1? GROUP_START + shortestSet + GROUP_END:
-							shortestSet) + entries.get(shortestSetIndex).condition;
-						entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END + entries.get((shortestSetIndex + 1) % 2).condition;
+						updateEntriesCondition(entries, conditions, shortestSetIndex);
 System.out.println("");
 					}
 				}
@@ -386,6 +377,16 @@ System.out.println("");
 		return expanded;
 	}
 
+	private List<String> convertSets(List<Set<Character>> letters){
+		return letters.stream()
+			.map(set -> set.stream().map(String::valueOf).collect(Collectors.toList()))
+			.map(sortedSet -> {
+				Collections.sort(sortedSet, comparator);
+				return StringUtils.join(sortedSet, StringUtils.EMPTY);
+			})
+			.collect(Collectors.toList());
+	}
+
 	private List<Set<Character>> collectPreviousLettersOfCondition(List<LineEntry> entries){
 		List<Set<Character>> letters = new ArrayList<>();
 		for(LineEntry en : entries){
@@ -412,6 +413,13 @@ System.out.println("");
 			.min((set1, set2) -> Integer.compare(set1.length(), set2.length()))
 			.get();
 		return conditions.indexOf(shortest);
+	}
+
+	private void updateEntriesCondition(List<LineEntry> entries, List<String> conditions, int shortestSetIndex){
+		String shortestSet = conditions.get(shortestSetIndex);
+		entries.get(shortestSetIndex).condition = (shortestSet.length() > 1? GROUP_START + shortestSet + GROUP_END:
+			shortestSet) + entries.get(shortestSetIndex).condition;
+		entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END + entries.get((shortestSetIndex + 1) % 2).condition;
 	}
 
 	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
