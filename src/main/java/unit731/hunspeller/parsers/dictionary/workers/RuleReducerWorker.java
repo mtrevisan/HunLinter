@@ -121,7 +121,7 @@ String flag = "v1";
 			collectFlagProductions(productions, flag, flaggedEntries);
 		};
 		Runnable completed = () -> {
-			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndingWith(flaggedEntries);
+			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndsWith(flaggedEntries);
 
 			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
 
@@ -208,7 +208,7 @@ String flag = "v1";
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private Map<String, List<LineEntry>> bucketByConditionEndingWith(List<LineEntry> entries){
+	private Map<String, List<LineEntry>> bucketByConditionEndsWith(List<LineEntry> entries){
 		entries.sort(shortestConditionComparator);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
@@ -227,6 +227,7 @@ String flag = "v1";
 					//expand same condition entries
 					boolean expansionHappened = expandOverlappingRules(equalsBucket);
 
+//FIXME needed?
 					//expand again if needed
 					while(expansionHappened){
 						expansionHappened = false;
@@ -313,10 +314,7 @@ String flag = "v1";
 					+ ongoingCondition));
 			}
 		}
-		List<String> sortedLetters = letters.stream().map(String::valueOf).collect(Collectors.toList());
-		Collections.sort(sortedLetters, comparator);
-		String addedCondition = StringUtils.join(sortedLetters, StringUtils.EMPTY);
-		firstRule.condition = NOT_GROUP_START + addedCondition + GROUP_END + firstRule.condition;
+		addNotCondition(firstRule, letters);
 
 		return aggregatedRules;
 	}
@@ -348,14 +346,15 @@ String flag = "v1";
 					}
 					else{
 						List<LineEntry> commonRules = extractCommonRules(entries, intersection);
-						//entry1: AB
-						//entry2: CB
-						//extract B, keep the rules
-						//now I have
-						//entry1: A
-						//entry2: C
-						//add to A and C, [^B]?
-						entries = expandConditions(entries);
+
+						while(!commonRules.isEmpty()){
+							//collect all entries that has the condition that ends with `condition`
+							String condition = commonRules.get(0).condition;
+							List<LineEntry> list = collectByCondition(commonRules, a -> a.endsWith(condition));
+							bucket.put(condition, list);
+						}
+
+						bucket.putAll(bucketByConditionEndsWith(entries));
 
 /*
 SFX v1 o sta io	po:noun
@@ -364,7 +363,7 @@ SFX v1 o ista [^i]o
 */
 						//TODO collect next letters, if it's possible...
 
-throw new RuntimeException("to be tested");
+//throw new RuntimeException("to be tested");
 					}
 				}
 				else{
@@ -389,6 +388,7 @@ throw new RuntimeException("to be tested");
 		while(itr.hasNext()){
 			LineEntry entry = itr.next();
 
+			Set<Character> addedConditions = new HashSet<>();
 			Iterator<String> words = entry.originalWords.iterator();
 			while(words.hasNext()){
 				String word = words.next();
@@ -396,14 +396,26 @@ throw new RuntimeException("to be tested");
 				if(intersection.contains(chr)){
 					commonRules.add(new LineEntry(entry.removal, entry.addition, chr + entry.condition, word));
 
+					addedConditions.add(chr);
+
 					words.remove();
 				}
 			}
+			addNotCondition(entry, addedConditions);
 
 			if(entry.originalWords.isEmpty())
 				itr.remove();
 		}
 		return commonRules;
+	}
+
+	private void addNotCondition(LineEntry entry, Set<Character> addedConditions){
+		if(!addedConditions.isEmpty()){
+			List<String> sortedLetters = addedConditions.stream().map(String::valueOf).collect(Collectors.toList());
+			Collections.sort(sortedLetters, comparator);
+			String addedCondition = StringUtils.join(sortedLetters, StringUtils.EMPTY);
+			entry.condition = NOT_GROUP_START + addedCondition + GROUP_END + entry.condition;
+		}
 	}
 
 	//expand conditions by one letter
