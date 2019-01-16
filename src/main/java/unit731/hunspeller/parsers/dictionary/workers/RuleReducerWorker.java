@@ -150,6 +150,7 @@ String flag = "v1";
 			List<LineEntry> nonOverlappingEntries = bucketedEntries.values().stream()
 				.flatMap(List::stream)
 				.collect(Collectors.toList());
+			nonOverlappingEntries = mergeSameRule(nonOverlappingEntries);
 			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
 
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
@@ -218,7 +219,7 @@ String flag = "v1";
 		while(!entries.isEmpty()){
 			//collect all entries that has the condition that ends with `condition`
 			String condition = entries.get(0).condition;
-			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
+			List<LineEntry> list = collectBy(entries, e -> e.condition.endsWith(condition));
 
 			//manage same condition rules (entry.condition == firstCondition)
 			if(list.size() > 1){
@@ -259,20 +260,6 @@ String flag = "v1";
 				bucket.put(condition, list);
 		}
 		return bucket;
-	}
-
-	private List<LineEntry> collectByCondition(List<LineEntry> entries, Function<String, Boolean> comparator){
-		List<LineEntry> list = new ArrayList<>();
-		Iterator<LineEntry> itr = entries.iterator();
-		while(itr.hasNext()){
-			LineEntry entry = itr.next();
-			if(comparator.apply(entry.condition)){
-				itr.remove();
-
-				list.add(entry);
-			}
-		}
-		return list;
 	}
 
 //	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
@@ -327,7 +314,7 @@ String flag = "v1";
 		while(!copy.isEmpty()){
 			//collect all entries that has the condition that is `condition`
 			String condition = copy.get(0).condition;
-			List<LineEntry> list = collectByCondition(copy, a -> a.equals(condition));
+			List<LineEntry> list = collectBy(copy, e -> e.condition.equals(condition));
 
 			bucket.put(condition, list);
 		}
@@ -353,7 +340,7 @@ String flag = "v1";
 						while(!commonRules.isEmpty()){
 							//collect all entries that has the condition that ends with `condition`
 							String condition = commonRules.get(0).condition;
-							List<LineEntry> list = collectByCondition(commonRules, a -> a.endsWith(condition));
+							List<LineEntry> list = collectBy(commonRules, e -> e.condition.endsWith(condition));
 							bucket.put(condition, list);
 						}
 
@@ -366,9 +353,6 @@ SFX v1 o sta io	po:noun
 SFX v1 o ista io	po:noun
 SFX v1 o ista [^i]o
 */
-						//TODO collect next letters, if it's possible...
-
-//throw new RuntimeException("to be tested");
 					}
 				}
 				else{
@@ -499,6 +483,79 @@ throw new RuntimeException("to be tested");
 		entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END
 			+ entries.get((shortestSetIndex + 1) % 2).condition;
 	}
+
+	/** Collect same condition length, removal, and addition */
+	private List<LineEntry> mergeSameRule(List<LineEntry> entries){
+		Map<String, List<LineEntry>> bucket = bucketByConditionRemovalAddition(entries);
+
+		List<LineEntry> result = new ArrayList<>();
+		for(List<LineEntry> list : bucket.values()){
+			if(list.size() > 1){
+				//merge rules
+				Set<String> conditions = new HashSet<>();
+				for(LineEntry entry : list){
+					String[] condition = RegExpSequencer.splitSequence(entry.condition);
+					conditions.add(condition[0]);
+				}
+
+				//TODO exclude groups, for now
+				//if all [] then ok, merge inside
+				//if all [^] then ok, merge inside
+				//if some [] and no [^] then ok, merge inside
+				List<String> sortedConditions = new ArrayList<>(conditions);
+				Collections.sort(sortedConditions, comparator);
+				String addedCondition = StringUtils.join(sortedConditions, StringUtils.EMPTY);
+				if(addedCondition.length() == sortedConditions.size()){
+					String[] condition = RegExpSequencer.splitSequence(list.get(0).condition);
+					condition = ArrayUtils.remove(condition, 0);
+					list.get(0).condition = GROUP_START + addedCondition + GROUP_END + StringUtils.join(condition);
+				}
+			}
+			result.add(list.get(0));
+		}
+		return result;
+	}
+
+	private Map<String, List<LineEntry>> bucketByConditionRemovalAddition(List<LineEntry> entries){
+		List<LineEntry> copy = new ArrayList<>(entries);
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!copy.isEmpty()){
+			String[] condition = RegExpSequencer.splitSequence(copy.get(0).condition);
+			condition = ArrayUtils.remove(condition, 0);
+			String cond = StringUtils.join(condition);
+			String removal = copy.get(0).removal;
+			String addition = copy.get(0).addition;
+			List<LineEntry> list = collectBy(copy, e -> {
+				String[] econd = RegExpSequencer.splitSequence(e.condition);
+				econd = ArrayUtils.remove(econd, 0);
+				return (StringUtils.join(econd).equals(cond) && e.removal.equals(removal) && e.addition.equals(addition));
+			});
+
+			bucket.put(cond + "|" + removal + "|" + addition, list);
+		}
+		return bucket;
+	}
+
+	private List<LineEntry> collectBy(List<LineEntry> entries, Function<LineEntry, Boolean> comparator){
+		List<LineEntry> list = new ArrayList<>();
+		Iterator<LineEntry> itr = entries.iterator();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
+			if(comparator.apply(entry)){
+				itr.remove();
+
+				list.add(entry);
+			}
+		}
+		return list;
+	}
+
+//	private void addCondition(LineEntry entry, Set<String> conditions){
+//		List<String> sortedConditions = new ArrayList<>(conditions);
+//		Collections.sort(sortedConditions, comparator);
+//		String addedCondition = StringUtils.join(sortedConditions, StringUtils.EMPTY);
+//		entry.condition = GROUP_START + addedCondition + GROUP_END + entry.condition;
+//	}
 
 	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
 		int size = nonOverlappingBucketedEntries.size();
