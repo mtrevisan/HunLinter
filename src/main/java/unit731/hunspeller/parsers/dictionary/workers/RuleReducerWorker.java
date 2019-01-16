@@ -354,7 +354,7 @@ String flag = "v1";
 						//now I have
 						//entry1: A
 						//entry2: C
-						//add to A and C, [^B]
+						//add to A and C, [^B]?
 						entries = expandConditions(entries);
 
 /*
@@ -384,21 +384,23 @@ throw new RuntimeException("to be tested");
 	}
 
 	private List<LineEntry> extractCommonRules(List<LineEntry> entries, Set<Character> intersection){
-		Iterator<LineEntry> itr = entries.iterator();
 		List<LineEntry> commonRules = new ArrayList<>();
+		Iterator<LineEntry> itr = entries.iterator();
 		while(itr.hasNext()){
 			LineEntry entry = itr.next();
 
-			boolean found = false;
-			for(String word : entry.originalWords){
+			Iterator<String> words = entry.originalWords.iterator();
+			while(words.hasNext()){
+				String word = words.next();
 				char chr = (word.charAt(word.length() - entry.condition.length() - 1));
 				if(intersection.contains(chr)){
 					commonRules.add(new LineEntry(entry.removal, entry.addition, chr + entry.condition, word));
 
-					found = true;
+					words.remove();
 				}
 			}
-			if(found)
+
+			if(entry.originalWords.isEmpty())
 				itr.remove();
 		}
 		return commonRules;
