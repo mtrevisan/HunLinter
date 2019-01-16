@@ -104,7 +104,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> entry.addition.length())
 			.thenComparing(Comparator.comparing(entry -> entry.addition))
-			.thenComparing(Comparator.comparingInt(entry -> entry.condition.length()))
+			.thenComparing(Comparator.comparingInt(entry -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition))))
 			.thenComparing(Comparator.comparing(entry -> entry.condition))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal));
@@ -123,7 +123,7 @@ String flag = "v1";
 		Runnable completed = () -> {
 			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndsWith(flaggedEntries);
 
-			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
+//			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
 
 /*
 #SFX v1 o sta io
@@ -146,7 +146,10 @@ String flag = "v1";
 #SFX v1 òda odista òda
 #SFX v1 ònia onista ònia
 */
-			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
+//			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
+			List<LineEntry> nonOverlappingEntries = bucketedEntries.values().stream()
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
 			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
 
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
@@ -240,9 +243,8 @@ String flag = "v1";
 //								expansionHappened |= expandOverlappingRules(equalsBucket);
 //						}
 //					}
-					for(List<LineEntry> set : equalsBucket.values())
-						for(LineEntry le : set)
-							bucket.put(le.condition, Collections.singletonList(le));
+
+					bucket.putAll(equalsBucket);
 				}
 				else if(list.size() > 1){
 					removeOverlappingConditions(list);
@@ -273,21 +275,21 @@ String flag = "v1";
 		return list;
 	}
 
-	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
-		Map<String, LineEntry> nonOverlappingBucketedEntries = new HashMap<>();
-		for(Map.Entry<String, List<LineEntry>> entry : bucketedEntries.entrySet()){
-			List<LineEntry> aggregatedRules = entry.getValue();
-			if(aggregatedRules.size() > 1){
-				removeOverlappingConditions(aggregatedRules);
-
-				for(LineEntry en : aggregatedRules)
-					nonOverlappingBucketedEntries.put(en.condition, en);
-			}
-			else
-				nonOverlappingBucketedEntries.put(entry.getKey(), aggregatedRules.get(0));
-		}
-		return nonOverlappingBucketedEntries;
-	}
+//	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
+//		Map<String, LineEntry> nonOverlappingBucketedEntries = new HashMap<>();
+//		for(Map.Entry<String, List<LineEntry>> entry : bucketedEntries.entrySet()){
+//			List<LineEntry> aggregatedRules = entry.getValue();
+//			if(aggregatedRules.size() > 1){
+//				removeOverlappingConditions(aggregatedRules);
+//
+//				for(LineEntry en : aggregatedRules)
+//					nonOverlappingBucketedEntries.put(en.condition, en);
+//			}
+//			else
+//				nonOverlappingBucketedEntries.put(entry.getKey(), aggregatedRules.get(0));
+//		}
+//		return nonOverlappingBucketedEntries;
+//	}
 
 	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
 		//extract letters prior to first condition
@@ -423,34 +425,34 @@ throw new RuntimeException("to be tested");
 	}
 
 	//expand conditions by one letter
-	private List<LineEntry> expandConditions(List<LineEntry> entries){
-		List<LineEntry> expandedEntries = new ArrayList<>();
-		for(LineEntry en : entries){
-			Iterator<String> words = en.originalWords.iterator();
-			while(words.hasNext()){
-				String originalWord = words.next();
-
-				int startingIndex = originalWord.length() - en.condition.length() - 1;
-				if(startingIndex >= 0){
-					String newCondition = originalWord.substring(startingIndex);
-					LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
-					int index = expandedEntries.indexOf(newEntry);
-					if(index >= 0)
-						expandedEntries.get(index).originalWords.add(originalWord);
-					else
-						expandedEntries.add(newEntry);
-				}
-				else{
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Cannot reduce rule (because of '{0}' that is too short)", originalWord);
-
-					throw new IllegalArgumentException("Cannot reduce rule");
-				}
-			}
-		}
-		entries.clear();
-		entries.addAll(expandedEntries);
-		return entries;
-	}
+//	private List<LineEntry> expandConditions(List<LineEntry> entries){
+//		List<LineEntry> expandedEntries = new ArrayList<>();
+//		for(LineEntry en : entries){
+//			Iterator<String> words = en.originalWords.iterator();
+//			while(words.hasNext()){
+//				String originalWord = words.next();
+//
+//				int startingIndex = originalWord.length() - en.condition.length() - 1;
+//				if(startingIndex >= 0){
+//					String newCondition = originalWord.substring(startingIndex);
+//					LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
+//					int index = expandedEntries.indexOf(newEntry);
+//					if(index >= 0)
+//						expandedEntries.get(index).originalWords.add(originalWord);
+//					else
+//						expandedEntries.add(newEntry);
+//				}
+//				else{
+//					LOGGER.info(Backbone.MARKER_APPLICATION, "Cannot reduce rule (because of '{0}' that is too short)", originalWord);
+//
+//					throw new IllegalArgumentException("Cannot reduce rule");
+//				}
+//			}
+//		}
+//		entries.clear();
+//		entries.addAll(expandedEntries);
+//		return entries;
+//	}
 
 	private List<String> convertSets(List<Set<Character>> letters){
 		return letters.stream()
