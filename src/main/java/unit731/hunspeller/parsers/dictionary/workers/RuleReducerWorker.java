@@ -229,17 +229,17 @@ String flag = "v1";
 
 //FIXME needed?
 					//expand again if needed
-					while(expansionHappened){
-						expansionHappened = false;
-						for(List<LineEntry> set : equalsBucket.values()){
-							equalsBucket = bucketByConditionEqualsTo(set);
-
-							//expand same condition entries
-							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
-							if(hasSameConditions)
-								expansionHappened |= expandOverlappingRules(equalsBucket);
-						}
-					}
+//					while(expansionHappened){
+//						expansionHappened = false;
+//						for(List<LineEntry> set : equalsBucket.values()){
+//							equalsBucket = bucketByConditionEqualsTo(set);
+//
+//							//expand same condition entries
+//							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+//							if(hasSameConditions)
+//								expansionHappened |= expandOverlappingRules(equalsBucket);
+//						}
+//					}
 					for(List<LineEntry> set : equalsBucket.values())
 						for(LineEntry le : set)
 							bucket.put(le.condition, Collections.singletonList(le));
@@ -334,7 +334,8 @@ String flag = "v1";
 
 	private boolean expandOverlappingRules(Map<String, List<LineEntry>> bucket){
 		boolean expanded = false;
-		for(List<LineEntry> entries : bucket.values())
+		for(Map.Entry<String, List<LineEntry>> set : bucket.entrySet()){
+			List<LineEntry> entries = set.getValue();
 			if(entries.size() > 1){
 				if(entries.size() == 2){
 					List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
@@ -356,6 +357,8 @@ String flag = "v1";
 
 						bucket.putAll(bucketByConditionEndsWith(entries));
 
+						if(entries.isEmpty())
+							bucket.remove(set.getKey());
 /*
 SFX v1 o sta io	po:noun
 SFX v1 o ista io	po:noun
@@ -379,6 +382,7 @@ throw new RuntimeException("to be tested");
 
 				expanded = true;
 			}
+		}
 		return expanded;
 	}
 
