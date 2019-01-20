@@ -169,7 +169,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						List<Production> productions = wordGenerator.applyAffixRules(line);
 
 						productions.stream()
-							.map(Production::toStringWithPartOfSpeechFields)
+							.map(production -> production.toStringWithPartOfSpeechFields(comparator))
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
@@ -231,7 +231,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							List<Production> productions = wordGenerator.applyAffixRules(line);
 							String word = productions.get(0).getWord();
 							for(Production production : productions){
-								String text = production.toStringWithPartOfSpeechFields();
+								String text = production.toStringWithPartOfSpeechFields(comparator);
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, word, lineIndex));
 							}
