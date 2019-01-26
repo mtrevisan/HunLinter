@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -30,6 +31,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private static final int NEWLINE_SIZE = 2;
 
+
+	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 	private final AtomicInteger processingIndex = new AtomicInteger(0);
 
@@ -129,11 +132,21 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 					throw new RuntimeInterruptedException();
 
 				try{
-					processingIndex.incrementAndGet();
+					if(paused.get())
+						Thread.sleep(500l);
+					else{
+						processingIndex.incrementAndGet();
 
-					readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
+						readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
 
-					setProgress(getProgress(processingIndex.get(), totalLines));
+						setProgress(getProgress(processingIndex.get(), totalLines));
+					}
+				}
+				catch(InterruptedException e){
+					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+
+					if(!isPreventExceptionRelaunch())
+						throw new RuntimeException(e);
 				}
 				catch(Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
@@ -233,6 +246,16 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			getCompleted().run();
 		else if(isCancelled() && getCancelled() != null)
 			getCancelled().run();
+	}
+
+	public final void pause(){
+		if(!isDone() && paused.compareAndSet(false, true))
+			firePropertyChange("paused", false, true);
+	}
+
+	public final void resume(){
+		if(!isDone() && paused.compareAndSet(true, false))
+			firePropertyChange("paused", true, false);
 	}
 
 }
