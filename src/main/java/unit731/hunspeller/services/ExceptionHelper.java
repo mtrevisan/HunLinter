@@ -1,24 +1,31 @@
 package unit731.hunspeller.services;
 
-import org.apache.commons.lang3.StringUtils;
-
 
 public class ExceptionHelper{
-
-	private static final String DOT = ".";
-
 
 	private ExceptionHelper(){}
 
 	public static String getMessage(Throwable t){
-		String message = t.getMessage();
-		if(message == null){
-			StackTraceElement stackTrace = extractOwnCodeStackTrace(t);
-			String className = extractClassName(stackTrace);
-			message = String.join(StringUtils.EMPTY, className, DOT, stackTrace.getMethodName(), ":",
-				Integer.toString(stackTrace.getLineNumber()));
+		String message = composeExceptionMessage(t);
+		Throwable cause = t.getCause();
+		while(cause != null){
+			message += System.lineSeparator() + composeExceptionMessage(cause);
+
+			cause = cause.getCause();
 		}
 		return message;
+	}
+
+	private static String composeExceptionMessage(Throwable t){
+		String codePosition = extractExceptionPosition(t);
+		return extractExceptionName(t) + " at " + codePosition + " " + t.getMessage();
+	}
+
+	private static String extractExceptionPosition(Throwable t){
+		StackTraceElement stackTrace = extractOwnCodeStackTrace(t);
+		String filename = stackTrace.getFileName();
+		filename = filename.substring(0, filename.lastIndexOf('.'));
+		return filename + "." + stackTrace.getMethodName() + ":" + stackTrace.getLineNumber();
 	}
 
 	private static StackTraceElement extractOwnCodeStackTrace(Throwable t){
@@ -34,9 +41,8 @@ public class ExceptionHelper{
 		return stackTrace0;
 	}
 
-	private static String extractClassName(StackTraceElement stackTrace){
-		String classPackage = stackTrace.getFileName();
-		return classPackage.substring(0, classPackage.indexOf('.'));
+	private static String extractExceptionName(Throwable t){
+		return t.getClass().getSimpleName();
 	}
 
 }
