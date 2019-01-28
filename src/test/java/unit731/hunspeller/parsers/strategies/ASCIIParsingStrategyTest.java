@@ -56,7 +56,7 @@ public class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be in US-ASCII encoding", exception.getMessage());
+		Assertions.assertEquals("Each flag must be in US-ASCII encoding: ŧ", exception.getMessage());
 	}
 
 	@Test

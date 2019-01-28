@@ -82,7 +82,8 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
 			if(!canEncode(flag))
-				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag + " in " + String.join(",", textFlags));
+				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag
+					+ (textFlags.length > 1? " in " + String.join(",", textFlags): StringUtils.EMPTY));
 		}
 	}
 

@@ -36,7 +36,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	private static final Pattern PATTERN_PARENTHESIS = PatternHelper.pattern("\\([^)]+\\)");
 
-	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)\\|?|^\\||\\|$");
+	private static final Pattern PATTERN_FILTER_EMPTY = PatternHelper.pattern("^\\(.+?\\)\\|?|^\\||\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("\\|{2,}");
 
 	//NOTE: All members are private and accessible only by Originator

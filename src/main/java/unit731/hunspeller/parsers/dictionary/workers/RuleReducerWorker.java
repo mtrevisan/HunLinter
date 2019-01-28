@@ -104,7 +104,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> entry.addition.length())
 			.thenComparing(Comparator.comparing(entry -> entry.addition))
-			.thenComparing(Comparator.comparingInt(entry -> entry.condition.length()))
+			.thenComparing(Comparator.comparingInt(entry -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition))))
 			.thenComparing(Comparator.comparing(entry -> entry.condition))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal));
@@ -121,9 +121,9 @@ String flag = "v1";
 			collectFlagProductions(productions, flag, flaggedEntries);
 		};
 		Runnable completed = () -> {
-			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndingWith(flaggedEntries);
+			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndsWith(flaggedEntries);
 
-			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
+//			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
 
 /*
 #SFX v1 o sta io
@@ -146,7 +146,11 @@ String flag = "v1";
 #SFX v1 òda odista òda
 #SFX v1 ònia onista ònia
 */
-			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
+//			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
+			List<LineEntry> nonOverlappingEntries = bucketedEntries.values().stream()
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
+			nonOverlappingEntries = mergeSameRule(nonOverlappingEntries);
 			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
 
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
@@ -208,14 +212,14 @@ String flag = "v1";
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private Map<String, List<LineEntry>> bucketByConditionEndingWith(List<LineEntry> entries){
+	private Map<String, List<LineEntry>> bucketByConditionEndsWith(List<LineEntry> entries){
 		entries.sort(shortestConditionComparator);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		while(!entries.isEmpty()){
 			//collect all entries that has the condition that ends with `condition`
 			String condition = entries.get(0).condition;
-			List<LineEntry> list = collectByCondition(entries, a -> a.endsWith(condition));
+			List<LineEntry> list = collectBy(entries, e -> e.condition.endsWith(condition));
 
 			//manage same condition rules (entry.condition == firstCondition)
 			if(list.size() > 1){
@@ -227,21 +231,21 @@ String flag = "v1";
 					//expand same condition entries
 					boolean expansionHappened = expandOverlappingRules(equalsBucket);
 
+//FIXME needed?
 					//expand again if needed
-					while(expansionHappened){
-						expansionHappened = false;
-						for(List<LineEntry> set : equalsBucket.values()){
-							equalsBucket = bucketByConditionEqualsTo(set);
+//					while(expansionHappened){
+//						expansionHappened = false;
+//						for(List<LineEntry> set : equalsBucket.values()){
+//							equalsBucket = bucketByConditionEqualsTo(set);
+//
+//							//expand same condition entries
+//							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
+//							if(hasSameConditions)
+//								expansionHappened |= expandOverlappingRules(equalsBucket);
+//						}
+//					}
 
-							//expand same condition entries
-							hasSameConditions = equalsBucket.values().stream().map(List::size).anyMatch(count -> count > 1);
-							if(hasSameConditions)
-								expansionHappened |= expandOverlappingRules(equalsBucket);
-						}
-					}
-					for(List<LineEntry> set : equalsBucket.values())
-						for(LineEntry le : set)
-							bucket.put(le.condition, Collections.singletonList(le));
+					bucket.putAll(equalsBucket);
 				}
 				else if(list.size() > 1){
 					removeOverlappingConditions(list);
@@ -258,35 +262,21 @@ String flag = "v1";
 		return bucket;
 	}
 
-	private List<LineEntry> collectByCondition(List<LineEntry> entries, Function<String, Boolean> comparator){
-		List<LineEntry> list = new ArrayList<>();
-		Iterator<LineEntry> itr = entries.iterator();
-		while(itr.hasNext()){
-			LineEntry entry = itr.next();
-			if(comparator.apply(entry.condition)){
-				itr.remove();
-
-				list.add(entry);
-			}
-		}
-		return list;
-	}
-
-	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
-		Map<String, LineEntry> nonOverlappingBucketedEntries = new HashMap<>();
-		for(Map.Entry<String, List<LineEntry>> entry : bucketedEntries.entrySet()){
-			List<LineEntry> aggregatedRules = entry.getValue();
-			if(aggregatedRules.size() > 1){
-				removeOverlappingConditions(aggregatedRules);
-
-				for(LineEntry en : aggregatedRules)
-					nonOverlappingBucketedEntries.put(en.condition, en);
-			}
-			else
-				nonOverlappingBucketedEntries.put(entry.getKey(), aggregatedRules.get(0));
-		}
-		return nonOverlappingBucketedEntries;
-	}
+//	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
+//		Map<String, LineEntry> nonOverlappingBucketedEntries = new HashMap<>();
+//		for(Map.Entry<String, List<LineEntry>> entry : bucketedEntries.entrySet()){
+//			List<LineEntry> aggregatedRules = entry.getValue();
+//			if(aggregatedRules.size() > 1){
+//				removeOverlappingConditions(aggregatedRules);
+//
+//				for(LineEntry en : aggregatedRules)
+//					nonOverlappingBucketedEntries.put(en.condition, en);
+//			}
+//			else
+//				nonOverlappingBucketedEntries.put(entry.getKey(), aggregatedRules.get(0));
+//		}
+//		return nonOverlappingBucketedEntries;
+//	}
 
 	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
 		//extract letters prior to first condition
@@ -313,10 +303,7 @@ String flag = "v1";
 					+ ongoingCondition));
 			}
 		}
-		List<String> sortedLetters = letters.stream().map(String::valueOf).collect(Collectors.toList());
-		Collections.sort(sortedLetters, comparator);
-		String addedCondition = StringUtils.join(sortedLetters, StringUtils.EMPTY);
-		firstRule.condition = NOT_GROUP_START + addedCondition + GROUP_END + firstRule.condition;
+		addNotCondition(firstRule, letters);
 
 		return aggregatedRules;
 	}
@@ -327,7 +314,7 @@ String flag = "v1";
 		while(!copy.isEmpty()){
 			//collect all entries that has the condition that is `condition`
 			String condition = copy.get(0).condition;
-			List<LineEntry> list = collectByCondition(copy, a -> a.equals(condition));
+			List<LineEntry> list = collectBy(copy, e -> e.condition.equals(condition));
 
 			bucket.put(condition, list);
 		}
@@ -336,64 +323,120 @@ String flag = "v1";
 
 	private boolean expandOverlappingRules(Map<String, List<LineEntry>> bucket){
 		boolean expanded = false;
-		for(List<LineEntry> entries : bucket.values())
+		for(Map.Entry<String, List<LineEntry>> set : bucket.entrySet()){
+			List<LineEntry> entries = set.getValue();
 			if(entries.size() > 1){
 				if(entries.size() == 2){
 					List<Set<Character>> letters = collectPreviousLettersOfCondition(entries);
-					boolean emptyIntersection = hasEmptyIntersection(letters);
-					if(emptyIntersection){
+					Set<Character> intersection = calculateIntersection(letters);
+					if(intersection.isEmpty()){
 						List<String> conditions = convertSets(letters);
 						int shortestSetIndex = extractShortestSetIndex(conditions);
 						updateEntriesCondition(entries, conditions, shortestSetIndex);
 					}
 					else{
-						entries = expandConditions(entries);
+						List<LineEntry> commonRules = extractCommonRules(entries, intersection);
 
-						//TODO collect next letters, if it's possible...
+						while(!commonRules.isEmpty()){
+							//collect all entries that has the condition that ends with `condition`
+							String condition = commonRules.get(0).condition;
+							List<LineEntry> list = collectBy(commonRules, e -> e.condition.endsWith(condition));
+							bucket.put(condition, list);
+						}
 
-throw new RuntimeException("to be tested");
+						bucket.putAll(bucketByConditionEndsWith(entries));
+
+						if(entries.isEmpty())
+							bucket.remove(set.getKey());
+/*
+SFX v1 o sta io	po:noun
+SFX v1 o ista io	po:noun
+SFX v1 o ista [^i]o
+*/
 					}
 				}
 				else{
 /*
-#SFX v1 o sta io
-#SFX v1 o swa wo
-#SFX v1 o ista [^i]o
+SFX v1 o sta io
+SFX v1 o swa wo
+SFX v1 o ista [^i]o
+
+kanwo/v1	po:noun
 */
 throw new RuntimeException("to be tested");
 				}
 
 				expanded = true;
 			}
+		}
 		return expanded;
 	}
 
-	//expand conditions by one letter
-	private List<LineEntry> expandConditions(List<LineEntry> entries){
-		List<LineEntry> expandedEntries = new ArrayList<>();
-		for(LineEntry en : entries){
-			Iterator<String> words = en.originalWords.iterator();
-			while(words.hasNext()){
-				String originalWord = words.next();
+	private List<LineEntry> extractCommonRules(List<LineEntry> entries, Set<Character> intersection){
+		List<LineEntry> commonRules = new ArrayList<>();
+		Iterator<LineEntry> itr = entries.iterator();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
 
-				int startingIndex = originalWord.length() - en.condition.length() - 1;
-				if(startingIndex >= 0){
-					String newCondition = originalWord.substring(startingIndex);
-					LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
-					int index = expandedEntries.indexOf(newEntry);
-					if(index >= 0)
-						expandedEntries.get(index).originalWords.add(originalWord);
-					else
-						expandedEntries.add(newEntry);
+			Set<Character> addedConditions = new HashSet<>();
+			Iterator<String> words = entry.originalWords.iterator();
+			while(words.hasNext()){
+				String word = words.next();
+				char chr = (word.charAt(word.length() - entry.condition.length() - 1));
+				if(intersection.contains(chr)){
+					commonRules.add(new LineEntry(entry.removal, entry.addition, chr + entry.condition, word));
+
+					addedConditions.add(chr);
+
+					words.remove();
 				}
-				else
-					throw new IllegalArgumentException("Cannot reduce rule (because of " + originalWord + ")");
 			}
+			addNotCondition(entry, addedConditions);
+
+			if(entry.originalWords.isEmpty())
+				itr.remove();
 		}
-		entries.clear();
-		entries.addAll(expandedEntries);
-		return entries;
+		return commonRules;
 	}
+
+	private void addNotCondition(LineEntry entry, Set<Character> addedConditions){
+		if(!addedConditions.isEmpty()){
+			List<String> sortedLetters = addedConditions.stream().map(String::valueOf).collect(Collectors.toList());
+			Collections.sort(sortedLetters, comparator);
+			String addedCondition = StringUtils.join(sortedLetters, StringUtils.EMPTY);
+			entry.condition = NOT_GROUP_START + addedCondition + GROUP_END + entry.condition;
+		}
+	}
+
+	//expand conditions by one letter
+//	private List<LineEntry> expandConditions(List<LineEntry> entries){
+//		List<LineEntry> expandedEntries = new ArrayList<>();
+//		for(LineEntry en : entries){
+//			Iterator<String> words = en.originalWords.iterator();
+//			while(words.hasNext()){
+//				String originalWord = words.next();
+//
+//				int startingIndex = originalWord.length() - en.condition.length() - 1;
+//				if(startingIndex >= 0){
+//					String newCondition = originalWord.substring(startingIndex);
+//					LineEntry newEntry = new LineEntry(en.removal, en.addition, newCondition, originalWord);
+//					int index = expandedEntries.indexOf(newEntry);
+//					if(index >= 0)
+//						expandedEntries.get(index).originalWords.add(originalWord);
+//					else
+//						expandedEntries.add(newEntry);
+//				}
+//				else{
+//					LOGGER.info(Backbone.MARKER_APPLICATION, "Cannot reduce rule (because of '{0}' that is too short)", originalWord);
+//
+//					throw new IllegalArgumentException("Cannot reduce rule");
+//				}
+//			}
+//		}
+//		entries.clear();
+//		entries.addAll(expandedEntries);
+//		return entries;
+//	}
 
 	private List<String> convertSets(List<Set<Character>> letters){
 		return letters.stream()
@@ -418,12 +461,12 @@ throw new RuntimeException("to be tested");
 		return letters;
 	}
 
-	private boolean hasEmptyIntersection(List<Set<Character>> letters){
+	private Set<Character> calculateIntersection(List<Set<Character>> letters){
 		Iterator<Set<Character>> itr = letters.iterator();
 		Set<Character> intersection = new HashSet<>(itr.next());
 		while(itr.hasNext())
 			intersection.retainAll(itr.next());
-		return intersection.isEmpty();
+		return intersection;
 	}
 
 	private int extractShortestSetIndex(List<String> conditions){
@@ -440,6 +483,79 @@ throw new RuntimeException("to be tested");
 		entries.get((shortestSetIndex + 1) % 2).condition = NOT_GROUP_START + shortestSet + GROUP_END
 			+ entries.get((shortestSetIndex + 1) % 2).condition;
 	}
+
+	/** Collect same condition length, removal, and addition */
+	private List<LineEntry> mergeSameRule(List<LineEntry> entries){
+		Map<String, List<LineEntry>> bucket = bucketByConditionRemovalAddition(entries);
+
+		List<LineEntry> result = new ArrayList<>();
+		for(List<LineEntry> list : bucket.values()){
+			if(list.size() > 1){
+				//merge rules
+				Set<String> conditions = new HashSet<>();
+				for(LineEntry entry : list){
+					String[] condition = RegExpSequencer.splitSequence(entry.condition);
+					conditions.add(condition[0]);
+				}
+
+				//TODO exclude groups, for now
+				//if all [] then ok, merge inside
+				//if all [^] then ok, merge inside
+				//if some [] and no [^] then ok, merge inside
+				List<String> sortedConditions = new ArrayList<>(conditions);
+				Collections.sort(sortedConditions, comparator);
+				String addedCondition = StringUtils.join(sortedConditions, StringUtils.EMPTY);
+				if(addedCondition.length() == sortedConditions.size()){
+					String[] condition = RegExpSequencer.splitSequence(list.get(0).condition);
+					condition = ArrayUtils.remove(condition, 0);
+					list.get(0).condition = GROUP_START + addedCondition + GROUP_END + StringUtils.join(condition);
+				}
+			}
+			result.add(list.get(0));
+		}
+		return result;
+	}
+
+	private Map<String, List<LineEntry>> bucketByConditionRemovalAddition(List<LineEntry> entries){
+		List<LineEntry> copy = new ArrayList<>(entries);
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		while(!copy.isEmpty()){
+			String[] condition = RegExpSequencer.splitSequence(copy.get(0).condition);
+			condition = ArrayUtils.remove(condition, 0);
+			String cond = StringUtils.join(condition);
+			String removal = copy.get(0).removal;
+			String addition = copy.get(0).addition;
+			List<LineEntry> list = collectBy(copy, e -> {
+				String[] econd = RegExpSequencer.splitSequence(e.condition);
+				econd = ArrayUtils.remove(econd, 0);
+				return (StringUtils.join(econd).equals(cond) && e.removal.equals(removal) && e.addition.equals(addition));
+			});
+
+			bucket.put(cond + "|" + removal + "|" + addition, list);
+		}
+		return bucket;
+	}
+
+	private List<LineEntry> collectBy(List<LineEntry> entries, Function<LineEntry, Boolean> comparator){
+		List<LineEntry> list = new ArrayList<>();
+		Iterator<LineEntry> itr = entries.iterator();
+		while(itr.hasNext()){
+			LineEntry entry = itr.next();
+			if(comparator.apply(entry)){
+				itr.remove();
+
+				list.add(entry);
+			}
+		}
+		return list;
+	}
+
+//	private void addCondition(LineEntry entry, Set<String> conditions){
+//		List<String> sortedConditions = new ArrayList<>(conditions);
+//		Collections.sort(sortedConditions, comparator);
+//		String addedCondition = StringUtils.join(sortedConditions, StringUtils.EMPTY);
+//		entry.condition = GROUP_START + addedCondition + GROUP_END + entry.condition;
+//	}
 
 	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
 		int size = nonOverlappingBucketedEntries.size();

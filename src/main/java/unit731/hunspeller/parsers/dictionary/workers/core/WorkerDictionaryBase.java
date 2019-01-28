@@ -44,6 +44,14 @@ public class WorkerDictionaryBase{
 		return worker.getState();
 	}
 
+	public void pause(){
+		worker.pause();
+	}
+
+	public void resume(){
+		worker.resume();
+	}
+
 	public void cancel(){
 		worker.cancel(true);
 	}
