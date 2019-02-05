@@ -125,7 +125,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			manageException(e, production);
 		}
 
-		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
+		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
+				&& !production.hasPartOfSpeech(POS_ADVERB)){
 			try{
 				metaphonesisCheck(production);
 			}
@@ -200,8 +201,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 			boolean hasPluralFlag = hasPluralFlag(production);
-			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE) && !word.endsWith(NORTHERN_PLURAL_EXCEPTION)
-				&& affixData.isAffixProductive(word, rule));
+			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE)
+				&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
 				throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
