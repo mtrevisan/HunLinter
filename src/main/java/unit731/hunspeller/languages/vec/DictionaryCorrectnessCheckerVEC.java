@@ -113,18 +113,42 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		try{
 			vanishingElCheck(production);
+		}
+		catch(IllegalArgumentException e){
+			manageException(e, production);
+		}
 
+		try{
 			incompatibilityCheck(production);
+		}
+		catch(IllegalArgumentException e){
+			manageException(e, production);
+		}
 
-			if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
-					&& !production.hasPartOfSpeech(POS_ADVERB)){
+		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB)){
+			try{
 				metaphonesisCheck(production);
-
-				northernPluralCheck(production);
+			}
+			catch(IllegalArgumentException e){
+				manageException(e, production);
 			}
 
-			finalSonorizationCheck(production);
+			try{
+				northernPluralCheck(production);
+			}
+			catch(IllegalArgumentException e){
+				manageException(e, production);
+			}
+		}
 
+		try{
+			finalSonorizationCheck(production);
+		}
+		catch(IllegalArgumentException e){
+			manageException(e, production);
+		}
+
+		try{
 			syllabationCheck(production);
 		}
 		catch(IllegalArgumentException e){

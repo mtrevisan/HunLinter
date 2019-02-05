@@ -46,24 +46,38 @@ public class DictionaryCorrectnessChecker{
 
 	//used by the correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
-		try{
-			String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-			if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-				throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
+		String forbidCompoundFlag = affixData.getForbidCompoundFlag();
+		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag)){
+			IllegalArgumentException e = new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
+			manageException(e, production);
+		}
 
-			if(rulesLoader.isMorphologicalFieldsCheck())
+		if(rulesLoader.isMorphologicalFieldsCheck()){
+			try{
 				morphologicalFieldCheck(production);
-
-			incompatibilityCheck(production);
-
-			if(hyphenator != null){
-				List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-				for(String subword : splittedWords)
-					checkCompoundProduction(subword, production);
 			}
+			catch(IllegalArgumentException e){
+				manageException(e, production);
+			}
+		}
+
+		try{
+			incompatibilityCheck(production);
 		}
 		catch(IllegalArgumentException e){
 			manageException(e, production);
+		}
+
+		if(hyphenator != null){
+			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
+			for(String subword : splittedWords){
+				try{
+					checkCompoundProduction(subword, production);
+				}
+				catch(IllegalArgumentException e){
+					manageException(e, production);
+				}
+			}
 		}
 	}
 
