@@ -16,10 +16,10 @@ public class DictionaryCorrectnessChecker{
 	protected static final String SYLLABE_SEPARATOR = "/";
 	protected static final String NON_SYLLABE_MARK = "*";
 
-	private static final MessageFormat WORD_HAS_NOT_MORPHOLOGICAL_FIELD = new MessageFormat("Word {0} does not have any morphological fields");
-	private static final MessageFormat WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("Word {0} has an invalid morphological field prefix: {1}");
-	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("Word {0} has an unknown morphological field prefix: {1}");
-	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("Word {0} has an unknown morphological field value: {1}");
+	private static final MessageFormat WORD_HAS_NOT_MORPHOLOGICAL_FIELD = new MessageFormat("{0} does not have any morphological fields");
+	private static final MessageFormat WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an invalid morphological field prefix: {1}");
+	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an unknown morphological field prefix: {1}");
+	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("{0} has an unknown morphological field value: {1}");
 
 
 	protected AffixData affixData;
@@ -46,24 +46,38 @@ public class DictionaryCorrectnessChecker{
 
 	//used by the correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
-		try{
-			String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-			if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
-				throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
+		String forbidCompoundFlag = affixData.getForbidCompoundFlag();
+		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag)){
+			IllegalArgumentException e = new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
+			manageException(e, production);
+		}
 
-			if(rulesLoader.isMorphologicalFieldsCheck())
+		if(rulesLoader.isMorphologicalFieldsCheck()){
+			try{
 				morphologicalFieldCheck(production);
-
-			incompatibilityCheck(production);
-
-			if(hyphenator != null){
-				List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-				for(String subword : splittedWords)
-					checkCompoundProduction(subword, production);
 			}
+			catch(IllegalArgumentException e){
+				manageException(e, production);
+			}
+		}
+
+		try{
+			incompatibilityCheck(production);
 		}
 		catch(IllegalArgumentException e){
 			manageException(e, production);
+		}
+
+		if(hyphenator != null){
+			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
+			for(String subword : splittedWords){
+				try{
+					checkCompoundProduction(subword, production);
+				}
+				catch(IllegalArgumentException e){
+					manageException(e, production);
+				}
+			}
 		}
 	}
 

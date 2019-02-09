@@ -143,8 +143,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 					}
 				}
 				catch(InterruptedException e){
-					LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
-
 					if(!isPreventExceptionRelaunch())
 						throw new RuntimeException(e);
 				}
