@@ -85,7 +85,7 @@ public class DictionaryCorrectnessChecker{
 		StringBuilder sb = new StringBuilder(e.getMessage());
 		if(production.hasProductionRules())
 			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		sb.append(" for ").append(production.getWord());
+		sb.append(" to ").append(production.getWord());
 		throw new IllegalArgumentException(sb.toString());
 	}
 
