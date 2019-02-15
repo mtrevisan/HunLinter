@@ -136,15 +136,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicStatisticsMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dicStatisticsNoHyphenationMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" value="104"/>
-                <Property name="text" type="java.lang.String" value="Statistics without hyphenation"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicStatisticsNoHyphenationMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicStatisticsSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractDuplicatesMenuItem">
@@ -223,6 +214,20 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hypCheckCorrectnessMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="hypDuplicatesSeparator">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="hypStatisticsMenuItem">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_statistics.png"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="116"/>
+                <Property name="text" type="java.lang.String" value="Statistics"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="hypStatisticsMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
