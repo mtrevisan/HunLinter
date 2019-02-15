@@ -186,9 +186,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		});
 		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
-				dicStatisticsMenuItem.setEnabled(true);
+				hypStatisticsMenuItem.setEnabled(true);
 			else
-				dicStatisticsNoHyphenationMenuItem.setEnabled(true);
+				dicStatisticsMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
@@ -275,7 +275,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
-      dicStatisticsNoHyphenationMenuItem = new javax.swing.JMenuItem();
       dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
@@ -284,6 +283,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
+      hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
+      hypStatisticsMenuItem = new javax.swing.JMenuItem();
       hlpMenu = new javax.swing.JMenu();
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
@@ -901,15 +902,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       dicMenu.add(dicStatisticsMenuItem);
-
-      dicStatisticsNoHyphenationMenuItem.setMnemonic('h');
-      dicStatisticsNoHyphenationMenuItem.setText("Statistics without hyphenation");
-      dicStatisticsNoHyphenationMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicStatisticsNoHyphenationMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicStatisticsNoHyphenationMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
       dicExtractDuplicatesMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_duplicates.png"))); // NOI18N
@@ -975,6 +967,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       hypMenu.add(hypCheckCorrectnessMenuItem);
+      hypMenu.add(hypDuplicatesSeparator);
+
+      hypStatisticsMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_statistics.png"))); // NOI18N
+      hypStatisticsMenuItem.setMnemonic('t');
+      hypStatisticsMenuItem.setText("Statistics");
+      hypStatisticsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hypStatisticsMenuItemActionPerformed(evt);
+         }
+      });
+      hypMenu.add(hypStatisticsMenuItem);
 
       mainMenuBar.add(hypMenu);
 
@@ -1148,12 +1151,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		extractDictionaryDuplicates();
    }//GEN-LAST:event_dicExtractDuplicatesMenuItemActionPerformed
-
-   private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		extractDictionaryStatistics(true);
-   }//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
 
    private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1342,11 +1339,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
    }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
-   private void dicStatisticsNoHyphenationMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsNoHyphenationMenuItemActionPerformed
+   private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryStatistics(false);
-   }//GEN-LAST:event_dicStatisticsNoHyphenationMenuItemActionPerformed
+   }//GEN-LAST:event_dicStatisticsMenuItemActionPerformed
 
    private void dicWordCountMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicWordCountMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1408,6 +1405,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		reduceRules();
    }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
+
+   private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		extractDictionaryStatistics(true);
+   }//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
 
 
 	@Override
@@ -1505,9 +1508,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicStatisticsWorker.cancel();
 
 					if(dicStatisticsWorker.isPerformHyphenationStatistics())
-						dicStatisticsMenuItem.setEnabled(true);
+						hypStatisticsMenuItem.setEnabled(true);
 					else
-						dicStatisticsNoHyphenationMenuItem.setEnabled(true);
+						dicStatisticsMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
 
 					dicStatisticsWorker = null;
@@ -1627,7 +1630,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			//hyphenation file:
 			hypMenu.setEnabled(true);
-			dicStatisticsMenuItem.setEnabled(true);
+			hypStatisticsMenuItem.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, true);
 
 
@@ -1851,9 +1854,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void extractDictionaryStatistics(boolean performHyphenationStatistics){
 		if(dicStatisticsWorker == null || dicStatisticsWorker.isDone()){
 			if(performHyphenationStatistics)
-				dicStatisticsMenuItem.setEnabled(false);
+				hypStatisticsMenuItem.setEnabled(false);
 			else
-				dicStatisticsNoHyphenationMenuItem.setEnabled(false);
+				dicStatisticsMenuItem.setEnabled(false);
 
 			mainProgressBar.setValue(0);
 
@@ -1965,7 +1968,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		clearHyphenationFields();
 
 		hypMenu.setEnabled(false);
-		dicStatisticsMenuItem.setEnabled(false);
+		hypStatisticsMenuItem.setEnabled(false);
 		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
 	}
 
@@ -2119,7 +2122,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
-   private javax.swing.JMenuItem dicStatisticsNoHyphenationMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;
    private javax.swing.JTable dicTable;
    private javax.swing.JMenuItem dicWordCountMenuItem;
@@ -2141,10 +2143,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel hypAddRuleSyllabesCountOutputLabel;
    private javax.swing.JTextField hypAddRuleTextField;
    private javax.swing.JMenuItem hypCheckCorrectnessMenuItem;
+   private javax.swing.JPopupMenu.Separator hypDuplicatesSeparator;
    private javax.swing.JLayeredPane hypLayeredPane;
    private javax.swing.JMenu hypMenu;
    private javax.swing.JLabel hypRulesLabel;
    private javax.swing.JLabel hypRulesOutputLabel;
+   private javax.swing.JMenuItem hypStatisticsMenuItem;
    private javax.swing.JLabel hypSyllabationLabel;
    private javax.swing.JLabel hypSyllabationOutputLabel;
    private javax.swing.JLabel hypSyllabesCountLabel;

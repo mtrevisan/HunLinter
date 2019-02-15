@@ -29,7 +29,8 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator) throws IOException{
+	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator)
+			throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
