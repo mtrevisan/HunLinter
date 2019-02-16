@@ -20,7 +20,7 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 public class StatisticsWorker extends WorkerDictionaryBase{
 
-	public static final String WORKER_NAME = "Statistics";
+	public static final String WORKER_NAME = "Collecting statistics";
 
 	private final boolean performHyphenationStatistics;
 	private final DictionaryStatistics dicStatistics;
