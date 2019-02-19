@@ -174,7 +174,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							.forEach(duplicatesBloomFilter::add);
 					}
 					catch(IllegalArgumentException e){
-						LOGGER.error(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
+						LOGGER.error(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
 

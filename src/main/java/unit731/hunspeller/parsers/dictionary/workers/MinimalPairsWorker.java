@@ -110,7 +110,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 								}
 						}
 						catch(IllegalArgumentException e){
-							LOGGER.info(Backbone.MARKER_APPLICATION, "{} on line {}: {}", e.getMessage(), lineIndex, line);
+							LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 						}
 					}
 
