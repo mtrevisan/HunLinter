@@ -257,22 +257,29 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
-		int accents = WordVEC.countAccents(subword);
 		if(!rulesLoader.containsMultipleAccentedWords(subword)){
+			int accents = WordVEC.countAccents(subword);
 			if(!rulesLoader.isWordCanHaveMultipleAccents() && accents > 1)
 				throw new IllegalArgumentException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
-			List<AffixEntry> appliedRules = production.getAppliedRules();
-			if(appliedRules != null){
+			String appliedRuleFlag = getLastAppliedRule(production);
+			if(appliedRuleFlag != null){
 				//retrieve last applied rule
-				String appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
-					.getFlag();
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_MISSING_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 				if(accents > 0 && rulesLoader.containsCannotContainAccent(appliedRuleFlag))
 					throw new IllegalArgumentException(WORD_HAS_PRESENT_ACCENT.format(new Object[]{production.getWord(), appliedRuleFlag}));
 			}
 		}
+	}
+
+	private String getLastAppliedRule(Production production){
+		String appliedRuleFlag = null;
+		List<AffixEntry> appliedRules = production.getAppliedRules();
+		if(appliedRules != null)
+			appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
+				.getFlag();
+		return appliedRuleFlag;
 	}
 
 	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
