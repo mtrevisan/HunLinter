@@ -197,12 +197,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void northernPluralCheck(Production production) throws IllegalArgumentException{
 		if(hasToCheckForNorthernPlural(production)){
 			String word = production.getWord();
-			List<String> subwords = hyphenator.splitIntoCompounds(word);
-			String rule = (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
-				NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
-			boolean hasPluralFlag = hasPluralFlag(production);
-			boolean canHaveNorthernPlural = (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE)
-				&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
+			String rule = getRuleToCheckNorthernPlural(word);
+			boolean canHaveNorthernPlural = canHaveNorthernPlural(production, rule);
 			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
 				throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
@@ -215,6 +211,19 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private boolean hasToCheckForNorthernPlural(Production production){
 		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
 			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
+	}
+
+	private String getRuleToCheckNorthernPlural(String word){
+		List<String> subwords = hyphenator.splitIntoCompounds(word);
+		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
+			NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
+	}
+
+	private boolean canHaveNorthernPlural(Production production, String rule){
+		String word = production.getWord();
+		boolean hasPluralFlag = hasPluralFlag(production);
+		return (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE)
+			&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
 	}
 
 	private void orthographyAndSyllabationCheck(Production production) throws IllegalArgumentException{
