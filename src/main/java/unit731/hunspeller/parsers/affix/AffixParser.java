@@ -175,7 +175,7 @@ public class AffixParser{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
 					catch(RuntimeException e){
-						throw new IllegalArgumentException(e.getMessage() + " on line " + br.getLineNumber());
+						throw new IllegalArgumentException(e.getMessage() + ", line " + br.getLineNumber());
 					}
 				}
 			}

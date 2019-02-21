@@ -150,7 +150,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 
 		try{
-			syllabationCheck(production);
+			orthographyAndSyllabationCheck(production);
 		}
 		catch(IllegalArgumentException e){
 			manageException(e, production);
@@ -217,29 +217,36 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
 	}
 
-	private void syllabationCheck(Production production) throws IllegalArgumentException{
-		if(hasToCheckForSyllabation(production)){
+	private void orthographyAndSyllabationCheck(Production production) throws IllegalArgumentException{
+		if(hasToCheckForOrthographyAndSyllabation(production)){
 			String word = production.getWord();
 			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
 				word = word.toLowerCase(Locale.ROOT);
-				String correctedDerivedWord = orthography.correctOrthography(word);
-				if(!correctedDerivedWord.equals(word))
-					throw new IllegalArgumentException(WORD_IS_MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
+				orthographyCheck(word);
 
-				if(word.length() > 1){
-					Hyphenation hyphenation = hyphenator.hyphenate(word);
-					if(hyphenation.hasErrors())
-						throw new IllegalArgumentException(WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
-							hyphenation.formatHyphenation(new StringJoiner(SYLLABE_SEPARATOR),
-								syllabe -> NON_SYLLABE_MARK + syllabe + NON_SYLLABE_MARK)}));
-				}
+				if(word.length() > 1)
+					syllabationCheck(word);
 			}
 		}
 	}
 
-	private boolean hasToCheckForSyllabation(Production production){
+	private boolean hasToCheckForOrthographyAndSyllabation(Production production){
 		return ((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB))
 			&& !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
+	}
+
+	private void orthographyCheck(String word) throws IllegalArgumentException{
+		String correctedDerivedWord = orthography.correctOrthography(word);
+		if(!correctedDerivedWord.equals(word))
+			throw new IllegalArgumentException(WORD_IS_MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
+	}
+
+	private void syllabationCheck(String word) throws IllegalArgumentException{
+		Hyphenation hyphenation = hyphenator.hyphenate(word);
+		if(hyphenation.hasErrors())
+			throw new IllegalArgumentException(WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
+				hyphenation.formatHyphenation(new StringJoiner(SYLLABE_SEPARATOR),
+					syllabe -> NON_SYLLABE_MARK + syllabe + NON_SYLLABE_MARK)}));
 	}
 
 	@Override

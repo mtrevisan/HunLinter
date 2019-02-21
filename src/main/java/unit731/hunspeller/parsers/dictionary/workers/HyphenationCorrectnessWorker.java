@@ -50,7 +50,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 						StringBuilder sb = new StringBuilder(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
-						sb.append(" on line ").append(row);
+						sb.append(", line ").append(row);
 						throw new IllegalArgumentException(sb.toString());
 					}
 				}
