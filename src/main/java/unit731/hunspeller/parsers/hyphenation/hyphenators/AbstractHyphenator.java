@@ -135,7 +135,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		HyphenationBreak hyphBreak;
 		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
-			String[] hyphenations = customHyphenation.split(HyphenationParser.MINUS_SIGN);
+			String[] hyphenations = customHyphenation.split(HyphenationParser.HYPHEN_EQUALS);
 			Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = Normalizer.normalize(hyphenations[0], Normalizer.Form.NFKC).length();
 			for(int i = 1; i < hyphenations.length; i ++){

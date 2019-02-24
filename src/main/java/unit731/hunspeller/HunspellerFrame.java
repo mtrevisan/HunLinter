@@ -668,6 +668,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       hypAddRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
       hypAddRuleLevelComboBox.setEnabled(false);
+      hypAddRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            hypAddRuleLevelComboBoxActionPerformed(evt);
+         }
+      });
 
       hypAddRuleButton.setMnemonic('A');
       hypAddRuleButton.setText("Add rule");
@@ -1412,6 +1417,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		extractDictionaryStatistics(true);
    }//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
 
+   private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
+		hypAddRuleDebouncer.call(this);
+   }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -1779,9 +1788,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			if(alreadyHasRule || !ruleMatchesText)
 				addedRuleText = null;
-			boolean enableAddRule = (ruleMatchesText && hyphenationChanged && correctHyphenation);
-			frame.hypAddRuleLevelComboBox.setEnabled(enableAddRule);
-			frame.hypAddRuleButton.setEnabled(enableAddRule);
+			frame.hypAddRuleLevelComboBox.setEnabled(ruleMatchesText);
+			frame.hypAddRuleButton.setEnabled(ruleMatchesText && hyphenationChanged && correctHyphenation);
 		}
 		else{
 			addedRuleText = null;

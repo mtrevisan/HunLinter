@@ -241,7 +241,7 @@ public class HyphenationParser{
 							if(customHyphenations.get(level).containsKey(key))
 								throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
 
-							customHyphenations.get(level).put(key, StringUtils.replaceChars(line, HYPHEN_EQUALS, MINUS_SIGN));
+							customHyphenations.get(level).put(key, line);
 						}
 						else{
 							validateRule(line, level);
