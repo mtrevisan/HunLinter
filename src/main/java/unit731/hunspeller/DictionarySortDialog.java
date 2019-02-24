@@ -131,7 +131,7 @@ public class DictionarySortDialog extends JDialog{
 		int boundaryIndex = dicParser.getNextBoundaryIndex(lineIndex);
 		if(boundaryIndex >= 0){
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize() - 1);
 		}
 		else
 			boundaryIndex = 0;
@@ -144,7 +144,7 @@ public class DictionarySortDialog extends JDialog{
 		if(boundaryIndex < 0){
 			boundaryIndex = dicParser.getPreviousBoundaryIndex(list.getModel().getSize());
 			int visibleLines = list.getLastVisibleIndex() - list.getFirstVisibleIndex();
-			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize());
+			boundaryIndex = Math.min(boundaryIndex + visibleLines, list.getModel().getSize() - 1);
 		}
 		list.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
