@@ -70,12 +70,11 @@ public class HyphenationBreak{
 				.mapToInt(x -> x)
 				.sum();
 			for(String nohyp : noHyphen){
-				if(syllabesCount <= 1)
-					break;
-
 				String reducedKey = reduceKey(nohyp);
 				NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
 				syllabesCount = fun.manage(indexesAndRules, syllabes, nohyp, wordLength, syllabesCount);
+				if(syllabesCount <= 1)
+					break;
 			}
 		}
 	}

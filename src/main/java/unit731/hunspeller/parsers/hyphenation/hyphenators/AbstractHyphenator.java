@@ -166,23 +166,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				hypParser.getOptParser().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 
-			for(String nohyp : hypParser.getOptParser().getNoHyphen()){
-				int nohypLength = nohyp.length();
-				if(isStarting(nohyp)){
-					if(response.get(0).equals(nohyp.substring(1)))
-						response.remove(0);
-				}
-				else if(isEnding(nohyp)){
-					if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
-						response.remove(response.size() - 1);
-				}
-				else{
-					Iterator<String> itr = response.iterator();
-					while(itr.hasNext())
-						if(nohyp.equals(itr.next()))
-							itr.remove();
-				}
-			}
+			manageNoHyphen(response);
 		}
 		else if(hypParser.getPatternNoHyphen() != null)
 			//apply retro-compatibility word separators
@@ -190,6 +174,26 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		else
 			response = Collections.<String>emptyList();
 		return response;
+	}
+
+	private void manageNoHyphen(List<String> response){
+		for(String nohyp : hypParser.getOptParser().getNoHyphen()){
+			int nohypLength = nohyp.length();
+			if(isStarting(nohyp)){
+				if(response.get(0).equals(nohyp.substring(1)))
+					response.remove(0);
+			}
+			else if(isEnding(nohyp)){
+				if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
+					response.remove(response.size() - 1);
+			}
+			else{
+				Iterator<String> itr = response.iterator();
+				while(itr.hasNext())
+					if(nohyp.equals(itr.next()))
+						itr.remove();
+			}
+		}
 	}
 
 	private boolean isStarting(String key){
