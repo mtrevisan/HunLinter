@@ -1262,8 +1262,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			text = text.substring(text.indexOf(':') + 1);
 			text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
 		}
-		else
-			text = text.substring(text.indexOf(")|") + 2);
+		else{
+			int idx = text.indexOf(")|");
+			if(idx >= 0)
+				text = text.substring(idx + 2);
+		}
 		//remove all \s+([^)]+)
 		return PatternHelper.clear(text, THESAURUS_CLEAR_SEARCH);
 	}
