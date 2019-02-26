@@ -113,6 +113,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
+	private static final Pattern THESAURUS_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -1229,23 +1230,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}//GEN-LAST:event_theAddButtonActionPerformed
 
 	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
-		String text = theMeaningsTextField.getText();
-		theAddButton.setEnabled(text != null && !text.isEmpty());
-
 		theFilterDebouncer.call(this);
 	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
 	private void filterThesaurus(HunspellerFrame frame){
-		String text = StringUtils.strip(frame.theMeaningsTextField.getText());
+		String text = frame.theMeaningsTextField.getText();
+		text = clearThesaurusFilter(text);
+
 		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(text))
 			return;
 
-		//remove part of speech and format the search string
-		text = text.substring(text.indexOf(')') + 1)
-			.substring(text.indexOf(':') + 1);
-		text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
-
 		formerFilterThesaurusText = text;
+
+		theAddButton.setEnabled(text != null && !text.isEmpty());
 
 		@SuppressWarnings("unchecked")
 		TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)frame.theTable.getRowSorter();
@@ -1256,6 +1253,19 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			});
 		else
 			sorter.setRowFilter(null);
+	}
+
+	private String clearThesaurusFilter(String text){
+		text = StringUtils.strip(text);
+		//remove part of speech and format the search string
+		if(text.contains(":")){
+			text = text.substring(text.indexOf(':') + 1);
+			text = StringUtils.replaceChars(text, ",", ThesaurusEntry.PIPE);
+		}
+		else
+			text = text.substring(text.indexOf(")|") + 2);
+		//remove all \s+([^)]+)
+		return PatternHelper.clear(text, THESAURUS_CLEAR_SEARCH);
 	}
 
 	public void removeSelectedRowsFromThesaurus(){
