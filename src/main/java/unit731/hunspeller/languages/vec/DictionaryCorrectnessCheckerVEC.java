@@ -52,6 +52,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static String NORTHERN_PLURAL_STRESSED_RULE;
 	private static String NORTHERN_PLURAL_EXCEPTION;
 
+	private static final MessageFormat WORD_WITH_UNNECESSARY_STRESS = new MessageFormat("Word have unnecessary stress, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL = new MessageFormat("Word with ƚ cannot contain non–ƚ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE = new MessageFormat("Word with ƚ cannot contain rule {0} or {1}, {2}");
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH = new MessageFormat("Word with ƚ cannot contain đ or ŧ, {0}");
@@ -112,6 +113,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		super.checkProduction(production);
 
 		try{
+			stressCheck(production);
+		}
+		catch(IllegalArgumentException e){
+			manageException(e, production);
+		}
+
+		try{
 			vanishingElCheck(production);
 		}
 		catch(IllegalArgumentException e){
@@ -155,6 +163,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		catch(IllegalArgumentException e){
 			manageException(e, production);
 		}
+	}
+
+	private void stressCheck(Production production) throws IllegalArgumentException{
+		String derivedWord = production.getWord();
+		String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
+		if(!derivedWord.equals(unmarkedDefaultStressWord))
+			throw new IllegalArgumentException(WORD_WITH_UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
 	}
 
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
