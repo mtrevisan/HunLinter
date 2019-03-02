@@ -12,7 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.WindowEvent; 
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -1137,7 +1138,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
    private void dicSortDictionaryMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicSortDictionaryMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
-		dicSortDictionaryMenuItem.setEnabled(false);
 
 		try{
 			String[] lines = backbone.getDictionaryLines();
@@ -1148,8 +1148,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(IOException e){
 			LOGGER.error("Something very bad happend while sorting the dictionary", e);
 		}
-
-		dicSortDictionaryMenuItem.setEnabled(true);
    }//GEN-LAST:event_dicSortDictionaryMenuItemActionPerformed
 
    private void dicExtractDuplicatesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractDuplicatesMenuItemActionPerformed
