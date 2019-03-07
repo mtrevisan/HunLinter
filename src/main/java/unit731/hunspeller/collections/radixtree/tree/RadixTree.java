@@ -198,6 +198,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
 	public List<Map.Entry<S, V>> getEntries(S prefix){
+		//FIXME optimize me!
 		Objects.requireNonNull(prefix);
 
 		RadixTreeVisitor<S, V, List<Map.Entry<S, V>>> visitorEntries = new RadixTreeVisitor<S, V, List<Map.Entry<S, V>>>(new ArrayList<>()){
