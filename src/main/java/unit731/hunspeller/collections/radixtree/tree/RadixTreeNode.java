@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.ObjectUtils;
@@ -20,7 +19,7 @@ import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixTreeNode<S, V>>, Serializable{
+public class RadixTreeNode<S, V extends Serializable> implements Serializable{
 
 	private static final long serialVersionUID = -627223674493970063L;
 
@@ -200,11 +199,6 @@ public class RadixTreeNode<S, V extends Serializable> implements Iterable<RadixT
 		addChild(leafNode);
 
 		return leafNode;
-	}
-
-	@Override
-	public Iterator<RadixTreeNode<S, V>> iterator(){
-		return (children != null? children.iterator(): Collections.<RadixTreeNode<S, V>>emptyIterator());
 	}
 
 	@Override

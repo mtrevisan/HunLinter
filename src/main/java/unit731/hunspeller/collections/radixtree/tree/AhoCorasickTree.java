@@ -1,6 +1,7 @@
 package unit731.hunspeller.collections.radixtree.tree;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -92,13 +93,16 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 
 			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
 				RadixTreeNode<S, V> result = root;
-				Iterator<RadixTreeNode<S, V>> itr = node.iterator();
-				while(itr.hasNext()){
-					RadixTreeNode<S, V> child = itr.next();
-					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
-					if(lcpLength > 0){
-						result = child;
-						break;
+				Collection<RadixTreeNode<S, V>> children = node.getChildren();
+				if(children != null){
+					Iterator<RadixTreeNode<S, V>> itr = children.iterator();
+					while(itr.hasNext()){
+						RadixTreeNode<S, V> child = itr.next();
+						int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
+						if(lcpLength > 0){
+							result = child;
+							break;
+						}
 					}
 				}
 				return result;

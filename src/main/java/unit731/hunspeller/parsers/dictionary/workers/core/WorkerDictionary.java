@@ -153,10 +153,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 						throw e;
 				}
 			};
-			if(isParallelProcessing())
-				lines.parallelStream()
-					.forEach(processor);
-			else
+			//FIXME remove comment
+//			if(isParallelProcessing())
+//				lines.parallelStream()
+//					.forEach(processor);
+//			else
 				lines.stream()
 					.forEach(processor);
 			

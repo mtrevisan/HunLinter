@@ -197,7 +197,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
-	public List<Map.Entry<S, V>> getEntries(S prefix){
+	public List<Map.Entry<S, V>> getEntries2(S prefix){
 		//FIXME optimize me!
 		Objects.requireNonNull(prefix);
 
@@ -374,12 +374,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		//and if not, we just add a new node to this node
 		S leftoverKey = sequencer.subSequence(key, lcpLength, keyLength);
 		boolean found = false;
-		for(RadixTreeNode<S, V> child : node)
-			if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
-				found = true;
-				ret = put(leftoverKey, value, child);
-				break;
-			}
+		Collection<RadixTreeNode<S, V>> children = node.getChildren();
+		if(children != null)
+			for(RadixTreeNode<S, V> child : children)
+				if(sequencer.equalsAtIndex(child.getKey(), leftoverKey, 0)){
+					found = true;
+					ret = put(leftoverKey, value, child);
+					break;
+				}
 		if(!found){
 			//no child exists with any prefix of the given key, so add a new one
 			RadixTreeNode<S, V> n = new RadixTreeNode<>(leftoverKey, value);
@@ -466,17 +468,19 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		//if there is no children of the node we need to delete it from the its parent children list
 		if(children == null || children.isEmpty()){
 			S key = node.getKey();
-			Iterator<RadixTreeNode<S, V>> itr = parent.iterator();
-			while(itr.hasNext())
-				if(sequencer.equals(itr.next().getKey(), key)){
-					itr.remove();
-					break;
-				}
-
-			//if parent is not real node and has only one child then they need to be merged.
 			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
-			if(parentChildren != null && parentChildren.size() == 1 && !parent.hasValue() && parent != root)
-				parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
+			if(parentChildren != null){
+				Iterator<RadixTreeNode<S, V>> itr = parentChildren.iterator();
+				while(itr.hasNext())
+					if(sequencer.equals(itr.next().getKey(), key)){
+						itr.remove();
+						break;
+					}
+
+				//if parent is not real node and has only one child then they need to be merged.
+				if(parentChildren.size() == 1 && !parent.hasValue() && parent != root)
+					parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
+			}
 		}
 		else if(children.size() == 1)
 			//we need to merge the only child of this node with itself
@@ -499,12 +503,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 			RadixTreeNode<S, V> parent = elem.node;
 			S prefix = elem.prefix;
 
-			for(RadixTreeNode<S, V> child : parent){
-				S wholeSequence = sequencer.concat(prefix, child.getKey());
-				traverser.traverse(wholeSequence, child, parent);
+			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
+			if(parentChildren != null)
+				for(RadixTreeNode<S, V> child : parentChildren){
+					S wholeSequence = sequencer.concat(prefix, child.getKey());
+					traverser.traverse(wholeSequence, child, parent);
 
-				queue.add(new TraverseElement<>(child, wholeSequence));
-			}
+					queue.add(new TraverseElement<>(child, wholeSequence));
+				}
 		}
 	}
 
@@ -579,12 +585,46 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 			}
 
 			int prefixLen = sequencer.length(prefix);
-			for(RadixTreeNode<S, V> child : node){
+			Collection<RadixTreeNode<S, V>> children = node.getChildren();
+			if(children != null)
+				for(RadixTreeNode<S, V> child : children){
+					S newPrefix = sequencer.concat(prefix, child.getKey());
+					if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
+						stack.push(new VisitElement<>(child, node, newPrefix));
+				}
+		}
+	}
+
+
+	public List<Map.Entry<S, V>> getEntries(S prefixAllowed){
+		//FIXME optimize me!
+		List<Map.Entry<S, V>> result = new ArrayList<>();
+
+		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(preAllowed, prefix);
+
+		Stack<VisitElement<S, V>> stack = new Stack<>();
+		stack.push(new VisitElement<>(root, null, root.getKey()));
+		while(!stack.isEmpty()){
+			VisitElement<S, V> elem = stack.pop();
+			RadixTreeNode<S, V> node = elem.node;
+			S prefix = elem.prefix;
+
+			if(node.hasValue() && condition.apply(prefix, prefixAllowed)){
+				V value = node.getValue();
+				Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(prefix, value);
+				result.add(entry);
+			}
+
+			int prefixLen = sequencer.length(prefix);
+			if(node.getChildren() != null)
+			for(RadixTreeNode<S, V> child : node.getChildren()){
 				S newPrefix = sequencer.concat(prefix, child.getKey());
 				if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
 					stack.push(new VisitElement<>(child, node, newPrefix));
 			}
 		}
+
+		return result;
 	}
 
 }
