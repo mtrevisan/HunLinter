@@ -571,6 +571,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefixAllowed);
 
+		int prefixAllowedLength = sequencer.length(prefixAllowed);
+
 		Stack<VisitElement<S, V>> stack = new Stack<>();
 		stack.push(new VisitElement<>(root, null, root.getKey()));
 		while(!stack.isEmpty()){
@@ -584,14 +586,15 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 					break;
 			}
 
-			int prefixLen = sequencer.length(prefix);
 			Collection<RadixTreeNode<S, V>> children = node.getChildren();
-			if(children != null)
+			if(children != null){
+				int prefixLen = sequencer.length(prefix);
 				for(RadixTreeNode<S, V> child : children){
 					S newPrefix = sequencer.concat(prefix, child.getKey());
-					if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
+					if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
 						stack.push(new VisitElement<>(child, node, newPrefix));
 				}
+			}
 		}
 	}
 
@@ -601,6 +604,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		List<Map.Entry<S, V>> result = new ArrayList<>();
 
 		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(preAllowed, prefix);
+
+		int prefixAllowedLength = sequencer.length(prefixAllowed);
 
 		Stack<VisitElement<S, V>> stack = new Stack<>();
 		stack.push(new VisitElement<>(root, null, root.getKey()));
@@ -615,12 +620,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 				result.add(entry);
 			}
 
-			int prefixLen = sequencer.length(prefix);
-			if(node.getChildren() != null)
-			for(RadixTreeNode<S, V> child : node.getChildren()){
-				S newPrefix = sequencer.concat(prefix, child.getKey());
-				if(prefixLen >= sequencer.length(prefixAllowed) || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
-					stack.push(new VisitElement<>(child, node, newPrefix));
+			Collection<RadixTreeNode<S, V>> children = node.getChildren();
+			if(children != null){
+				int prefixLen = sequencer.length(prefix);
+				for(RadixTreeNode<S, V> child : children){
+					S newPrefix = sequencer.concat(prefix, child.getKey());
+					if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(newPrefix, prefixAllowed, prefixLen))
+						stack.push(new VisitElement<>(child, node, newPrefix));
+				}
 			}
 		}
 
