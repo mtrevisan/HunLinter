@@ -79,7 +79,7 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 
 	@Override
 	public String[] concat(String[] sequenceA, String[] sequenceB){
-		return ArrayUtils.addAll(sequenceA, sequenceB);
+		return (sequenceA.length > 0? ArrayUtils.addAll(sequenceA, sequenceB): sequenceB);
 	}
 
 	private boolean matches(String fieldA, String fieldB){

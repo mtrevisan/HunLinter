@@ -42,7 +42,7 @@ public class StringSequencer implements SequencerInterface<String>{
 
 	@Override
 	public String concat(String sequenceA, String sequenceB){
-		return sequenceA + sequenceB;
+		return (!sequenceA.isEmpty()? sequenceA + sequenceB: sequenceB);
 	}
 
 	@Override
