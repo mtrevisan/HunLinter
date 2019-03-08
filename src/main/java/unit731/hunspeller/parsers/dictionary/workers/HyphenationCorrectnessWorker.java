@@ -57,6 +57,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 			});
 		};
 		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+//WorkerData data = WorkerData.createPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 

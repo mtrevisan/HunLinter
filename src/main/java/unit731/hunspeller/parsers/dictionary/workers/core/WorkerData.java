@@ -19,6 +19,10 @@ public class WorkerData{
 		return new WorkerData(workerName, dicParser, false, false);
 	}
 
+	public static final WorkerData createPreventExceptionRelaunch(String workerName, DictionaryParser dicParser){
+		return new WorkerData(workerName, dicParser, false, true);
+	}
+
 	public static final WorkerData createParallel(String workerName, DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, false);
 	}
