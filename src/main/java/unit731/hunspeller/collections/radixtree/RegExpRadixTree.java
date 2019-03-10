@@ -26,11 +26,11 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public boolean containsKey(String keyToCheck){
-		return containsKey(RegExpSequencer.splitSequence(keyToCheck));
+		return containsKeyPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
 	public V get(String keyToCheck){
-		return get(RegExpSequencer.splitSequence(keyToCheck));
+		return getPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
 	public RadixTreeNode<String[], V> findPrefixedBy(String keyToCheck){
@@ -53,19 +53,19 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public RadixTreeNode<String[], V> find(String keyToCheck){
-		return find(RegExpSequencer.splitSequence(keyToCheck));
+		return findPrefixedTo(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
 	public List<VisitElement<String[], V>> getEntries(String prefix){
-		return getEntries(RegExpSequencer.splitSequence(prefix));
+		return getEntriesPrefixedTo(RegExpSequencer.splitSequence(prefix));
 	}
 
 	public List<V> getValues(String prefix){
-		return getValues(RegExpSequencer.splitSequence(prefix));
+		return getValuesPrefixedTo(RegExpSequencer.splitSequence(prefix));
 	}
 
 	public List<String[]> getKeys(String prefix){
-		return getKeys(RegExpSequencer.splitSequence(prefix));
+		return getKeysPrefixedTo(RegExpSequencer.splitSequence(prefix));
 	}
 
 	public void putAllWithFlatKey(Map<? extends String, ? extends V> map){
@@ -80,7 +80,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public V remove(String key){
-		return remove(RegExpSequencer.splitSequence(key));
+		return removePrefixedBy(RegExpSequencer.splitSequence(key));
 	}
 
 }

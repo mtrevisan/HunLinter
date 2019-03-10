@@ -41,7 +41,7 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree
  */
-public class RadixTree<S, V extends Serializable> implements Map<S, V>{
+public class RadixTree<S, V extends Serializable>{
 
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
@@ -63,28 +63,20 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		this.noDuplicatesAllowed = noDuplicatesAllowed;
 	}
 
-	public RadixTreeNode<S, V> getRoot(){
-		return root;
-	}
-
 	public void prepare(){
 		throw new UnsupportedOperationException("Cannot prepare tree in a non-Aho-Corasick tree");
 	}
 
-	@Override
 	public void clear(){
 		root.clearChildren();
 	}
 
-	@Override
-	public boolean containsKey(Object keyToCheck){
-		@SuppressWarnings("unchecked")
-		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
+	public boolean containsKeyPrefixedBy(S keyToCheck){
+		RadixTreeNode<S, V> foundNode = findPrefixedBy(keyToCheck);
 		return (foundNode != null);
 	}
 
-	@Override
-	public boolean containsValue(Object value){
+	public boolean containsValuePrefixedBy(S value){
 		Objects.requireNonNull(value);
 
 		AtomicBoolean result = new AtomicBoolean();
@@ -99,10 +91,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		return result.get();
 	}
 
-	@Override
-	public V get(Object keyToCheck){
-		@SuppressWarnings("unchecked")
-		RadixTreeNode<S, V> foundNode = findPrefixedBy((S)keyToCheck);
+	public V getPrefixedBy(S keyToCheck){
+		RadixTreeNode<S, V> foundNode = findPrefixedBy(keyToCheck);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
@@ -129,11 +119,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
 	public List<V> getValuesPrefixedBy(S prefix){
-		List<V> values = new ArrayList<>();
-		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(VisitElement<S, V> entry : entries)
-			values.add(entry.getNode().getValue());
-		return values;
+		return getEntriesPrefixedBy(prefix).stream()
+			.map(VisitElement::getNode)
+			.map(RadixTreeNode::getValue)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -144,11 +133,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
 	public List<S> getKeysPrefixedBy(S prefix){
-		List<S> keys = new ArrayList<>();
-		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(VisitElement<S, V> entry : entries)
-			keys.add(entry.getPrefix());
-		return keys;
+		return getEntriesPrefixedBy(prefix).stream()
+			.map(VisitElement::getPrefix)
+			.collect(Collectors.toList());
 	}
 
 	/**
@@ -173,8 +160,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		return result;
 	}
 
-	public RadixTreeNode<S, V> find(S keyToCheck){
-		return find(keyToCheck, this::visit);
+	public RadixTreeNode<S, V> findPrefixedTo(S keyToCheck){
+		return find(keyToCheck, this::visitPrefixedTo);
 	}
 
 	private RadixTreeNode<S, V> find(S keyToCheck, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visit){
@@ -197,9 +184,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
-	public List<V> getValues(S prefix){
+	public List<V> getValuesPrefixedTo(S prefix){
 		List<V> values = new ArrayList<>();
-		List<VisitElement<S, V>> entries = getEntries(prefix);
+		List<VisitElement<S, V>> entries = getEntriesPrefixedTo(prefix);
 		for(VisitElement<S, V> entry : entries)
 			values.add(entry.getNode().getValue());
 		return values;
@@ -212,9 +199,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The list of prefixes
 	 * @throws NullPointerException	If prefix is <code>null</code>
 	 */
-	public List<S> getKeys(S prefix){
+	public List<S> getKeysPrefixedTo(S prefix){
 		List<S> keys = new ArrayList<>();
-		List<VisitElement<S, V>> entries = getEntries(prefix);
+		List<VisitElement<S, V>> entries = getEntriesPrefixedTo(prefix);
 		for(VisitElement<S, V> entry : entries)
 			keys.add(entry.getPrefix());
 		return keys;
@@ -227,7 +214,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
-	public List<VisitElement<S, V>> getEntries(S prefix){
+	public List<VisitElement<S, V>> getEntriesPrefixedTo(S prefix){
 		Objects.requireNonNull(prefix);
 
 		List<VisitElement<S, V>> result = new ArrayList<>();
@@ -237,7 +224,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 			return false;
 		};
 
-		visit(visitorEntries, prefix);
+		RadixTree.this.visitPrefixedTo(visitorEntries, prefix);
 
 		return result;
 		//FIXME
@@ -269,12 +256,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 //		return result;
 	}
 
-	@Override
 	public boolean isEmpty(){
 		return root.isEmpty();
 	}
 
-	@Override
 	public int size(){
 		AtomicInteger result = new AtomicInteger(0);
 		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
@@ -287,16 +272,14 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		return result.get();
 	}
 
-	@Override
-	public Set<Map.Entry<S, V>> entrySet(){
+	public Set<Map.Entry<S, V>> entrySetPrefixedBy(){
 		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		return entries.stream()
 			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
 			.collect(Collectors.toSet());
 	}
 
-	@Override
-	public Set<S> keySet(){
+	public Set<S> keySetPrefixedBy(){
 		Set<S> keys = new HashSet<>();
 		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		for(VisitElement<S, V> entry : entries)
@@ -304,8 +287,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		return keys;
 	}
 
-	@Override
-	public Collection<V> values(){
+	public Collection<V> valuesPrefixedBy(){
 		Set<V> values = new HashSet<>();
 		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
 		for(VisitElement<S, V> entry : entries)
@@ -320,7 +302,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the given map is <code>null</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	@Override
 	public void putAll(Map<? extends S, ? extends V> map){
 		Objects.requireNonNull(map);
 
@@ -336,7 +317,6 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @throws NullPointerException	If the given key or value is <code>null</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	@Override
 	public V put(S key, V value){
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
@@ -461,14 +441,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @param key	The key to remove from the tree
 	 * @throws NullPointerException	If the given key is <code>null</code>
 	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public V remove(Object key){
+	public V removePrefixedBy(S key){
 		Objects.requireNonNull(key);
 
 		AtomicReference<V> result = new AtomicReference<>(null);
 		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
-			if(sequencer.equals(elem.getPrefix(), (S)key)){
+			if(sequencer.equals(elem.getPrefix(), key)){
 				result.set(elem.getNode().getValue());
 
 				removeNode(elem.getNode(), elem.getParent());
@@ -476,7 +454,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 			return (result.get() != null);
 		};
-		visitPrefixedBy(visitor, (S)key);
+		visitPrefixedBy(visitor, key);
 
 		return result.get();
 	}
@@ -561,8 +539,8 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 *
 	 * @param visitor	The visitor
 	 */
-	public void visit(Function<VisitElement<S, V>, Boolean> visitor){
-		visit(visitor, sequencer.getEmptySequence());
+	public void visitPrefixedTo(Function<VisitElement<S, V>, Boolean> visitor){
+		RadixTree.this.visitPrefixedTo(visitor, sequencer.getEmptySequence());
 	}
 
 	/**
@@ -572,7 +550,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @param visitor	The visitor
 	 * @param prefixAllowed	The prefix used to restrict visitation
 	 */
-	public void visit(Function<VisitElement<S, V>, Boolean> visitor, S prefixAllowed){
+	public void visitPrefixedTo(Function<VisitElement<S, V>, Boolean> visitor, S prefixAllowed){
 		BiFunction<S, S, Boolean> condition = (prefix, preAllowed) -> sequencer.startsWith(preAllowed, prefix);
 		visit(visitor, prefixAllowed, condition);
 	}

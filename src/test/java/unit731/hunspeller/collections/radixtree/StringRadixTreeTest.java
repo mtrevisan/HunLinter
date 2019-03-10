@@ -33,9 +33,9 @@ public class StringRadixTreeTest{
 		tree.put("test", 1);
 
 		Assertions.assertEquals(1, tree.size());
-		Assertions.assertTrue(tree.containsKey("test"));
-		Assertions.assertFalse(tree.containsKey("tes"));
-		Assertions.assertFalse(tree.containsKey("testt"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("test"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("tes"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("testt"));
 	}
 
 	@Test
@@ -48,10 +48,10 @@ public class StringRadixTreeTest{
 		tree.put("rest", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(1, tree.get("test").intValue());
-		Assertions.assertEquals(2, tree.get("tent").intValue());
-		Assertions.assertEquals(3, tree.get("tank").intValue());
-		Assertions.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
+		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
+		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
+		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
 	}
 
 	@Test
@@ -64,18 +64,18 @@ public class StringRadixTreeTest{
 		tree.put("rest", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(1, tree.get("test").intValue());
-		Assertions.assertEquals(2, tree.get("tent").intValue());
-		Assertions.assertEquals(3, tree.get("tank").intValue());
-		Assertions.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
+		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
+		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
+		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
 
 		tree.put("test", 9);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(9, tree.get("test").intValue());
-		Assertions.assertEquals(2, tree.get("tent").intValue());
-		Assertions.assertEquals(3, tree.get("tank").intValue());
-		Assertions.assertEquals(4, tree.get("rest").intValue());
+		Assertions.assertEquals(9, tree.getPrefixedBy("test").intValue());
+		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
+		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
+		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class StringRadixTreeTest{
 		tree.put("tank", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values()));
+		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.valuesPrefixedBy()));
 		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
 		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
 		Assertions.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
@@ -102,7 +102,7 @@ public class StringRadixTreeTest{
 		tree.put("spook", 2);
 
 		Assertions.assertEquals(2, tree.size());
-		assertEqualsWithSort(tree.keySet().toArray(new String[2]), new String[]{
+		assertEqualsWithSort(tree.keySetPrefixedBy().toArray(new String[2]), new String[]{
 			"pook",
 			"spook"
 		});
@@ -117,19 +117,19 @@ public class StringRadixTreeTest{
 		tree.put("tank", 3);
 
 		Assertions.assertEquals(3, tree.size());
-		Assertions.assertTrue(tree.containsKey("tent"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
 
-		tree.remove("key");
+		tree.removePrefixedBy("key");
 
 		Assertions.assertEquals(3, tree.size());
-		Assertions.assertTrue(tree.containsKey("tent"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
 
-		tree.remove("tent");
+		tree.removePrefixedBy("tent");
 
 		Assertions.assertEquals(2, tree.size());
-		Assertions.assertEquals(1, tree.get("test").intValue());
-		Assertions.assertFalse(tree.containsKey("tent"));
-		Assertions.assertEquals(3, tree.get("tank").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("tent"));
+		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
 	}
 
 	@Test
@@ -143,8 +143,8 @@ public class StringRadixTreeTest{
 		strings.forEach(x -> tree.put(x.toString(32), x));
 
 		Assertions.assertEquals(strings.size(), tree.size());
-		strings.forEach(x -> Assertions.assertTrue(tree.containsKey(x.toString(32))));
-		assertEqualsWithSort(strings, new ArrayList<>(tree.values()));
+		strings.forEach(x -> Assertions.assertTrue(tree.containsKeyPrefixedBy(x.toString(32))));
+		assertEqualsWithSort(strings, new ArrayList<>(tree.valuesPrefixedBy()));
 	}
 
 	private List<BigInteger> generateRandomStrings(int n){
@@ -167,9 +167,9 @@ public class StringRadixTreeTest{
 		tree.put("ac", 3);
 		tree.put("a", 4);
 
-		Assertions.assertTrue(tree.containsKey("a"));
-		Assertions.assertFalse(tree.containsKey("ab"));
-		Assertions.assertFalse(tree.containsKey("c"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("a"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("ab"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
 	}
 
 	@Test
@@ -179,11 +179,11 @@ public class StringRadixTreeTest{
 		tree.put("abc", 1);
 		tree.put("abc", 2);
 
-		Assertions.assertFalse(tree.containsKey("a"));
-		Assertions.assertFalse(tree.containsKey("ab"));
-		Assertions.assertTrue(tree.containsKey("abc"));
-		Assertions.assertEquals(2, tree.get("abc").intValue());
-		Assertions.assertFalse(tree.containsKey("c"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("a"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("ab"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("abc"));
+		Assertions.assertEquals(2, tree.getPrefixedBy("abc").intValue());
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
 	}
 
 	@Test
@@ -196,7 +196,7 @@ public class StringRadixTreeTest{
 		tree.put("cd", 4);
 		tree.put("abc", 5);
 
-		List<Integer> prefixes = tree.getValues("abcd");
+		List<Integer> prefixes = tree.getValuesPrefixedTo("abcd");
 		Integer[] datas = prefixes.stream()
 			.sorted()
 			.toArray(Integer[]::new);
@@ -208,20 +208,20 @@ public class StringRadixTreeTest{
 		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		Assertions.assertTrue(tree.isEmpty());
-		Assertions.assertFalse(tree.containsKey("word"));
-		Assertions.assertFalse(tree.containsKey(StringUtils.EMPTY));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("word"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy(StringUtils.EMPTY));
 	}
 
 	@Test
 	public void defaultValueConstructor(){
 		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
-		Assertions.assertNull(tree.get("meow"));
+		Assertions.assertNull(tree.getPrefixedBy("meow"));
 
 		tree.put("meow", Boolean.TRUE);
 
-		Assertions.assertEquals(Boolean.TRUE, tree.get("meow"));
-		Assertions.assertNull(tree.get("world"));
+		Assertions.assertEquals(Boolean.TRUE, tree.getPrefixedBy("meow"));
+		Assertions.assertNull(tree.getPrefixedBy("world"));
 	}
 
 	@Test
@@ -238,12 +238,12 @@ public class StringRadixTreeTest{
 		tree.put("java.lang.Boolean", Boolean.FALSE);
 
 		Assertions.assertFalse(tree.isEmpty());
-		Assertions.assertEquals(1, tree.getValues("java.lang.Integer").size());
-		Assertions.assertEquals(1, tree.getValues("java.lang.Long").size());
-		Assertions.assertEquals(2, tree.getValues("java.lang.Boolean").size());
-		Assertions.assertEquals(2, tree.getValues("java.io.InputStream").size());
-		Assertions.assertEquals(1, tree.getValues("java.util.ArrayList").size());
-		Assertions.assertEquals(2, tree.getValues("java.util.concurrent.ConcurrentHashMap").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("java.lang.Integer").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("java.lang.Long").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedTo("java.lang.Boolean").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedTo("java.io.InputStream").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("java.util.ArrayList").size());
+		Assertions.assertEquals(2, tree.getValuesPrefixedTo("java.util.concurrent.ConcurrentHashMap").size());
 	}
 
 	@Test
@@ -253,7 +253,7 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertEquals(1, tree.getValues("wowzacowza").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("wowzacowza").size());
 	}
 
 	@Test
@@ -263,7 +263,7 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertTrue(tree.containsKey("wowza"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("wowza"));
 	}
 
 	@Test
@@ -273,8 +273,8 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertEquals(1, tree.getValues("wowzacowza").size());
-		Assertions.assertEquals(1, tree.getValues("bookshelfmania").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("wowzacowza").size());
+		Assertions.assertEquals(1, tree.getValuesPrefixedTo("bookshelfmania").size());
 	}
 
 	@Test
@@ -284,9 +284,9 @@ public class StringRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertEquals(Boolean.FALSE, tree.get("wowza"));
-		Assertions.assertEquals(Boolean.TRUE, tree.get("bookshelf"));
-		Assertions.assertNull(tree.get("bookshelf2"));
+		Assertions.assertEquals(Boolean.FALSE, tree.getPrefixedBy("wowza"));
+		Assertions.assertEquals(Boolean.TRUE, tree.getPrefixedBy("bookshelf"));
+		Assertions.assertNull(tree.getPrefixedBy("bookshelf2"));
 	}
 
 	@Test
@@ -296,16 +296,16 @@ public class StringRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertEquals(1, tree.get("hello world").intValue());
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
 
-		Integer r1 = tree.remove("hello world");
+		Integer r1 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r1);
 		Assertions.assertEquals(1, r1.intValue());
 
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertNull(tree.get("hello world"));
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertNull(tree.getPrefixedBy("hello world"));
 	}
 
 	@Test
@@ -315,16 +315,16 @@ public class StringRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertEquals(1, tree.get("hello world").intValue());
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
 
-		Integer r0 = tree.remove("hello world");
+		Integer r0 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
 
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertNull(tree.get("hello world"));
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertNull(tree.getPrefixedBy("hello world"));
 	}
 
 	@Test
@@ -335,18 +335,18 @@ public class StringRadixTreeTest{
 		tree.put("hello world", 1);
 		tree.put("hello, clarice", 2);
 
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertEquals(1, tree.get("hello world").intValue());
-		Assertions.assertEquals(2, tree.get("hello, clarice").intValue());
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
+		Assertions.assertEquals(2, tree.getPrefixedBy("hello, clarice").intValue());
 
-		Integer r0 = tree.remove("hello world");
+		Integer r0 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
 
-		Assertions.assertNull(tree.get("hello world"));
-		Assertions.assertEquals(0, tree.get("hello").intValue());
-		Assertions.assertEquals(2, tree.get("hello, clarice").intValue());
+		Assertions.assertNull(tree.getPrefixedBy("hello world"));
+		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
+		Assertions.assertEquals(2, tree.getPrefixedBy("hello, clarice").intValue());
 	}
 
 
@@ -430,11 +430,11 @@ public class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assertions.assertFalse(tree.containsKey("apple"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 
 		tree.put("apple", "apple");
 
-		Assertions.assertTrue(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
@@ -495,7 +495,7 @@ public class StringRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assertions.assertNotNull(tree.remove("apple"));
+		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
 	}
 
 	@Test
@@ -505,9 +505,9 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
 
-		Assertions.assertNotNull(tree.remove("apple"));
-		Assertions.assertTrue(tree.containsKey("applepie"));
-		Assertions.assertFalse(tree.containsKey("apple"));
+		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
@@ -518,17 +518,17 @@ public class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assertions.assertNotNull(tree.remove("apple"));
-		Assertions.assertTrue(tree.containsKey("applepie"));
-		Assertions.assertTrue(tree.containsKey("applecrisp"));
-		Assertions.assertFalse(tree.containsKey("apple"));
+		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("applecrisp"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
 	public void testCantDeleteSomethingThatDoesntExist(){
 		StringRadixTree<String> tree = StringRadixTree.createTree();
 
-		Assertions.assertNull(tree.remove("apple"));
+		Assertions.assertNull(tree.removePrefixedBy("apple"));
 	}
 
 	@Test
@@ -536,9 +536,9 @@ public class StringRadixTreeTest{
 		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
-		tree.remove("apple");
+		tree.removePrefixedBy("apple");
 
-		Assertions.assertNull(tree.remove("apple"));
+		Assertions.assertNull(tree.removePrefixedBy("apple"));
 	}
 
 	@Test
@@ -550,12 +550,12 @@ public class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("ape", "ape");
 
-		tree.remove("apple");
+		tree.removePrefixedBy("apple");
 
-		Assertions.assertTrue(tree.containsKey("appleshack"));
-		Assertions.assertTrue(tree.containsKey("applepie"));
-		Assertions.assertTrue(tree.containsKey("ape"));
-		Assertions.assertFalse(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("appleshack"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("ape"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
@@ -565,9 +565,9 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ball", "ball");
 
-		tree.remove("apple");
+		tree.removePrefixedBy("apple");
 
-		Assertions.assertTrue(tree.containsKey("ball"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("ball"));
 	}
 
 	@Test
@@ -577,7 +577,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assertions.assertNull(tree.remove("ap"));
+		Assertions.assertNull(tree.removePrefixedBy("ap"));
 	}
 
 	@Test
@@ -602,7 +602,7 @@ public class StringRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assertions.assertTrue(tree.containsKey("apple"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
@@ -616,7 +616,7 @@ public class StringRadixTreeTest{
 
 		Assertions.assertNotNull(tree.findPrefixedBy("appletree"));
 		Assertions.assertNotNull(tree.findPrefixedBy("appleshackcream"));
-		Assertions.assertNotNull(tree.containsKey("ape"));
+		Assertions.assertNotNull(tree.containsKeyPrefixedBy("ape"));
 	}
 
 	@Test
@@ -630,15 +630,15 @@ public class StringRadixTreeTest{
 		tree.put("hat", "hat");
 		tree.put("cat", "cat");
 
-		Assertions.assertFalse(tree.getValues("helloworld").isEmpty());
-		Assertions.assertTrue(tree.getValues("helloworld").contains("h"));
-		Assertions.assertTrue(tree.getValues("helloworld").contains("hell"));
-		Assertions.assertTrue(tree.getValues("helloworld").contains("hello"));
-		Assertions.assertTrue(!tree.getValues("helloworld").contains("he"));
-		Assertions.assertTrue(!tree.getValues("helloworld").contains("hat"));
-		Assertions.assertTrue(!tree.getValues("helloworld").contains("cat"));
-		Assertions.assertTrue(!tree.getValues("helloworld").contains("hey"));
-		Assertions.assertTrue(tree.getValues("animal").isEmpty());
+		Assertions.assertFalse(tree.getValuesPrefixedTo("helloworld").isEmpty());
+		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("h"));
+		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("hell"));
+		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("hello"));
+		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("he"));
+		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("hat"));
+		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("cat"));
+		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("hey"));
+		Assertions.assertTrue(tree.getValuesPrefixedTo("animal").isEmpty());
 	}
 
 	@Test
@@ -650,9 +650,9 @@ public class StringRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assertions.assertTrue(tree.containsKey("appletree"));
-		Assertions.assertTrue(tree.containsKey("appleshackcream"));
-		Assertions.assertTrue(tree.containsKey("ape"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("appletree"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("appleshackcream"));
+		Assertions.assertTrue(tree.containsKeyPrefixedBy("ape"));
 	}
 
 	@Test
@@ -666,7 +666,7 @@ public class StringRadixTreeTest{
 	public void testDoesntContainNonexistantNode(){
 		StringRadixTree<String> tree = StringRadixTree.createTree();
 
-		Assertions.assertFalse(tree.containsKey("apple"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 	}
 
 	@Test
@@ -686,7 +686,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assertions.assertFalse(tree.containsKey("ap"));
+		Assertions.assertFalse(tree.containsKeyPrefixedBy("ap"));
 	}
 
 	@Test
@@ -746,7 +746,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
 
-		tree.remove("appleshack");
+		tree.removePrefixedBy("appleshack");
 
 		Assertions.assertTrue(tree.size() == 1);
 	}
