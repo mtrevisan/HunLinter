@@ -1,6 +1,6 @@
-package unit731.hunspeller.collections.radixtree.tree.utils;
+package unit731.hunspeller.collections.radixtree.utils;
 
-import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
+import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import java.io.Serializable;
 
 

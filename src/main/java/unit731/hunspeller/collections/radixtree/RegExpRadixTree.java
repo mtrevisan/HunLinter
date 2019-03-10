@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 
 
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{

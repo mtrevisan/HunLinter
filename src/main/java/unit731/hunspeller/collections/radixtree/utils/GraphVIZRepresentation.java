@@ -1,8 +1,8 @@
-package unit731.hunspeller.collections.radixtree.tree.utils;
+package unit731.hunspeller.collections.radixtree.utils;
 
 import java.io.Serializable;
-import unit731.hunspeller.collections.radixtree.tree.AhoCorasickTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.collections.radixtree.AhoCorasickTree;
+import unit731.hunspeller.collections.radixtree.RadixTree;
 
 
 /**

@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.collections.radixtree.tree.exceptions.DuplicateKeyException;
+import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
 
 
 public class RegExpRadixTreeTest{

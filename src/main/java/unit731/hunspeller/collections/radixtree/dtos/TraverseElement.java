@@ -1,7 +1,7 @@
-package unit731.hunspeller.collections.radixtree.tree.dtos;
+package unit731.hunspeller.collections.radixtree.dtos;
 
 import java.io.Serializable;
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
 
 
 public class TraverseElement<S, V extends Serializable>{

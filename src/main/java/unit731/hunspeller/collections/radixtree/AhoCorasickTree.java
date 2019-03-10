@@ -1,14 +1,14 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree;
 
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeTraverser;
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.dtos.SearchResult;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeTraverser;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
 
 
 /**

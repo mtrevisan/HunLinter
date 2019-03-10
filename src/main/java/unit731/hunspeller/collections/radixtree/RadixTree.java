@@ -1,10 +1,5 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree;
 
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeTraverser;
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeVisitor;
-import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.exceptions.DuplicateKeyException;
-import unit731.hunspeller.collections.radixtree.tree.dtos.SearchResult;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayDeque;
@@ -19,9 +14,14 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.BiFunction;
+import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
+import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
+import unit731.hunspeller.collections.radixtree.dtos.TraverseElement;
+import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
-import unit731.hunspeller.collections.radixtree.tree.dtos.TraverseElement;
-import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeTraverser;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeVisitor;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
 
 
 /**

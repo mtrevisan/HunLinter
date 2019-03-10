@@ -1,6 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
+import unit731.hunspeller.collections.radixtree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
