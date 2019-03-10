@@ -16,8 +16,10 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
 import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
 import unit731.hunspeller.collections.radixtree.dtos.TraverseElement;
@@ -116,16 +118,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S keyToCheck){
-		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
-		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
-			if(sequencer.equals(elem.getPrefix(), keyToCheck))
-				result.set(elem.getNode());
-
-			return (result.get() != null);
-		};
-		visitPrefixedBy(visitor, keyToCheck);
-
-		return result.get();
+		return find(keyToCheck, this::visitPrefixedBy);
 	}
 
 	/**
@@ -137,9 +130,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 */
 	public List<V> getValuesPrefixedBy(S prefix){
 		List<V> values = new ArrayList<>();
-		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			values.add(entry.getValue());
+		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(prefix);
+		for(VisitElement<S, V> entry : entries)
+			values.add(entry.getNode().getValue());
 		return values;
 	}
 
@@ -152,9 +145,9 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 */
 	public List<S> getKeysPrefixedBy(S prefix){
 		List<S> keys = new ArrayList<>();
-		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(prefix);
-		for(Map.Entry<S, V> entry : entries)
-			keys.add(entry.getKey());
+		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(prefix);
+		for(VisitElement<S, V> entry : entries)
+			keys.add(entry.getPrefix());
 		return keys;
 	}
 
@@ -165,14 +158,12 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
-	public List<Map.Entry<S, V>> getEntriesPrefixedBy(S prefix){
+	public List<VisitElement<S, V>> getEntriesPrefixedBy(S prefix){
 		Objects.requireNonNull(prefix);
 
-		List<Map.Entry<S, V>> result = new ArrayList<>();
+		List<VisitElement<S, V>> result = new ArrayList<>();
 		Function<VisitElement<S, V>, Boolean> visitorEntries = elem -> {
-			V value = elem.getNode().getValue();
-			Map.Entry<S, V> entry = new AbstractMap.SimpleEntry<>(elem.getPrefix(), value);
-			result.add(entry);
+			result.add(elem);
 
 			return false;
 		};
@@ -183,6 +174,10 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 	}
 
 	public RadixTreeNode<S, V> find(S keyToCheck){
+		return find(keyToCheck, this::visit);
+	}
+
+	private RadixTreeNode<S, V> find(S keyToCheck, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visit){
 		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
 		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
 			if(sequencer.equals(elem.getPrefix(), keyToCheck))
@@ -190,7 +185,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 			return (result.get() != null);
 		};
-		visit(visitor, keyToCheck);
+		visit.accept(visitor, keyToCheck);
 
 		return result.get();
 	}
@@ -294,25 +289,27 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 
 	@Override
 	public Set<Map.Entry<S, V>> entrySet(){
-		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		return new HashSet<>(entries);
+		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
+		return entries.stream()
+			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
+			.collect(Collectors.toSet());
 	}
 
 	@Override
 	public Set<S> keySet(){
 		Set<S> keys = new HashSet<>();
-		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		for(Map.Entry<S, V> entry : entries)
-			keys.add(entry.getKey());
+		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
+		for(VisitElement<S, V> entry : entries)
+			keys.add(entry.getPrefix());
 		return keys;
 	}
 
 	@Override
 	public Collection<V> values(){
 		Set<V> values = new HashSet<>();
-		List<Map.Entry<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
-		for(Map.Entry<S, V> entry : entries)
-			values.add(entry.getValue());
+		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
+		for(VisitElement<S, V> entry : entries)
+			values.add(entry.getNode().getValue());
 		return values;
 	}
 

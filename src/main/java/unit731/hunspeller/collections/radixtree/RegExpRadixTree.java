@@ -1,9 +1,11 @@
 package unit731.hunspeller.collections.radixtree;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
 import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
@@ -36,7 +38,10 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public List<Map.Entry<String[], V>> getEntriesPrefixedBy(String prefix){
-		return getEntriesPrefixedBy(RegExpSequencer.splitSequence(prefix));
+		List<VisitElement<String[], V>> entries = getEntriesPrefixedBy(RegExpSequencer.splitSequence(prefix));
+		return entries.stream()
+			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
+			.collect(Collectors.toList());
 	}
 
 	public List<V> getValuesPrefixedBy(String prefix){
