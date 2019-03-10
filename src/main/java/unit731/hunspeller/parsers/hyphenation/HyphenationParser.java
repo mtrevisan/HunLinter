@@ -22,12 +22,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.RadixTree;
-import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.utils.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import unit731.hunspeller.languages.Orthography;
@@ -101,18 +100,6 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^$|\\s*[%#].*$");
 
 	public static enum Level{NON_COMPOUND, COMPOUND}
-
-	/** Extract (compound) data from the radix tree */
-	private static RadixTreeVisitor<String, String, Map<Integer, List<String>>> SAVE_VISITOR = new RadixTreeVisitor<String, String, Map<Integer, List<String>>>(new HashMap<>()){
-		@Override
-		public boolean visit(VisitElement<String, String> elem){
-			String value = elem.getNode().getValue();
-			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
-				.add(value);
-
-			return false;
-		}
-	};
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
@@ -455,9 +442,18 @@ public class HyphenationParser{
 	}
 
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
-		patterns.get(level).visitPrefixedBy(SAVE_VISITOR);
+		/** Extract (compound) data from the radix tree */
+		Map<Integer, List<String>> result = new HashMap<>();
+		Function<VisitElement<String, String>, Boolean> saveVisitor = elem -> {
+			String value = elem.getNode().getValue();
+			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
+				.add(value);
 
-		Collection<List<String>> values = SAVE_VISITOR.getResult().values();
+			return false;
+		};
+		patterns.get(level).visitPrefixedBy(saveVisitor);
+
+		Collection<List<String>> values = result.values();
 		for(List<String> value : values){
 			//sort values
 			Collections.sort(value, comparator::compare);
