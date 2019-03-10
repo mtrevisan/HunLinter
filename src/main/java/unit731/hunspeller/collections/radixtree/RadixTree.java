@@ -254,6 +254,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		visit(visitorEntries, prefix);
 
 		return visitorEntries.getResult();
+		//FIXME
 //		Objects.requireNonNull(prefix);
 //
 //		List<VisitElement<S, V>> result = new ArrayList<>();
