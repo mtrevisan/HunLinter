@@ -26,9 +26,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeVisitor;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeVisitor;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
+import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
@@ -104,8 +105,8 @@ public class HyphenationParser{
 	/** Extract (compound) data from the radix tree */
 	private static RadixTreeVisitor<String, String, Map<Integer, List<String>>> SAVE_VISITOR = new RadixTreeVisitor<String, String, Map<Integer, List<String>>>(new HashMap<>()){
 		@Override
-		public boolean visit(String key, RadixTreeNode<String, String> node, RadixTreeNode<String, String> parent){
-			String value = node.getValue();
+		public boolean visit(VisitElement<String, String> elem){
+			String value = elem.getNode().getValue();
 			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
 				.add(value);
 

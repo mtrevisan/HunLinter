@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Objects;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
 
 
 public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[], V>{
@@ -51,7 +52,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		return find(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
-	public List<Map.Entry<String[], V>> getEntries(String prefix){
+	public List<VisitElement<String[], V>> getEntries(String prefix){
 		return getEntries(RegExpSequencer.splitSequence(prefix));
 	}
 

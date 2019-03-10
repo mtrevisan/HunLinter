@@ -1,4 +1,4 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree.tree.utils;
 
 import java.io.Serializable;
 

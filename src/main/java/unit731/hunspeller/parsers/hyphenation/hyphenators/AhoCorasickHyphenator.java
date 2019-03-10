@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.SearchResult;
+import unit731.hunspeller.collections.radixtree.tree.dtos.SearchResult;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 

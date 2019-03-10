@@ -1,6 +1,8 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree.tree.utils;
 
 import java.io.Serializable;
+import unit731.hunspeller.collections.radixtree.tree.AhoCorasickTree;
+import unit731.hunspeller.collections.radixtree.tree.RadixTree;
 
 
 /**
@@ -46,7 +48,7 @@ public class GraphVIZRepresentation{
 			.append(GRAPHVIZ_NEW_LINE);
 
 		RadixTreeTraverser<S, V> traverserNode = (wholeKey, node, parent) -> graphVIZAppendNode(sb, node);
-		graphVIZAppendNode(sb, tree.root);
+		graphVIZAppendNode(sb, tree.getRoot());
 		tree.traverseBFS(traverserNode);
 
 		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphVIZAppendForwardTransition(sb, node, parent);
@@ -78,7 +80,7 @@ public class GraphVIZRepresentation{
 
 	private <S, V extends Serializable> void graphVIZAppendFailureTransitions(RadixTree<S, V> tree, StringBuilder sb, RadixTreeNode<S, V> node,
 			boolean displayEdgesToInitialState){
-		if(displayEdgesToInitialState || node.getFailNode() != tree.root || node == tree.root)
+		if(displayEdgesToInitialState || node.getFailNode() != tree.getRoot() || node == tree.getRoot())
 			sb.append(GRAPHVIZ_TAB)
 				.append(System.identityHashCode(node))
 				.append(GRAPHVIZ_STYLE_ARROW)

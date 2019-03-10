@@ -1,5 +1,6 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree.tree.utils;
 
+import unit731.hunspeller.collections.radixtree.tree.dtos.VisitElement;
 import java.io.Serializable;
 
 
@@ -28,11 +29,10 @@ public abstract class RadixTreeVisitor<S, V extends Serializable, R>{
 	/**
 	 * Visits a node in a radix tree.
 	 *
-	 * @param wholeKey	The whole key of the node being visited
-	 * @param node	The node that is being visited
-	 * @param parent	The parent of the node being visited
+	 * @param elem	The element (where prefix is the whole key of the node being visited, node is the node that is being visited,
+	 * and parent is the parent of the node being visited
 	 * @return	Whether to stop visiting the tree
 	 */
-	public abstract boolean visit(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent);
+	public abstract boolean visit(VisitElement<S, V> elem);
 
 }

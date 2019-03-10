@@ -9,10 +9,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.exceptions.DuplicateKeyException;
 
 
 public class StringRadixTreeTest{
@@ -22,7 +20,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testEmptyTree(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		Assertions.assertTrue(tree.isEmpty());
 		Assertions.assertEquals(0, tree.size());
@@ -30,7 +28,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSingleInsertion(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("test", 1);
 
@@ -42,7 +40,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testMultipleInsertions(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -58,7 +56,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testMultipleInsertionOfTheSameKey(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -82,7 +80,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testPrefixFetch(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -98,7 +96,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSpook(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("pook", 1);
 		tree.put("spook", 2);
@@ -112,7 +110,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testRemoval(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("test", 1);
 		tree.put("tent", 2);
@@ -136,7 +134,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testManyInsertions(){
-		RadixTree<String, BigInteger> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<BigInteger> tree = StringRadixTree.createTree();
 
 		//n in [100, 500]
 		int n = rng.nextInt(401) + 100;
@@ -162,7 +160,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void contains(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("abc", 1);
 		tree.put("abb", 2);
@@ -176,7 +174,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void duplicatedEntry(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("abc", 1);
 		tree.put("abc", 2);
@@ -190,7 +188,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void collectPrefixes(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("a", 1);
 		tree.put("ab", 2);
@@ -207,7 +205,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void emptyConstructor(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		Assertions.assertTrue(tree.isEmpty());
 		Assertions.assertFalse(tree.containsKey("word"));
@@ -216,7 +214,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void defaultValueConstructor(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		Assertions.assertNull(tree.get("meow"));
 
@@ -228,7 +226,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void simplePut(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		Assertions.assertTrue(tree.isEmpty());
 
@@ -250,7 +248,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void hasStartsWithMatch(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -260,7 +258,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void hasExactMatch(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -270,7 +268,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void getStartsWithMatch(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -281,7 +279,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void getExactMatch(){
-		RadixTree<String, Boolean> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Boolean> tree = StringRadixTree.createTree();
 
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
@@ -293,7 +291,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void removeBack(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -312,7 +310,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void removeFront(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -331,7 +329,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void removeFrontManyChildren(){
-		RadixTree<String, Integer> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<Integer> tree = StringRadixTree.createTree();
 
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
@@ -367,7 +365,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchForPartialParentAndLeafKeyWhenOverlapExists(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -378,7 +376,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchForLeafNodesWhenOverlapExists(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -389,7 +387,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchForStringSmallerThanSharedParentWhenOverlapExists(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -400,7 +398,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchForStringEqualToSharedParentWhenOverlapExists(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("abcd", "abcd");
 		tree.put("abce", "abce");
@@ -410,7 +408,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testInsert(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("bat", "bat");
@@ -427,7 +425,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testInsertExistingUnrealNodeConvertsItToReal(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
@@ -441,7 +439,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDuplicatesAllowed(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 
@@ -457,7 +455,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDuplicatesNotAllowed(){
-		RadixTree<String, String> tree = RadixTree.createTreeNoDuplicates(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTreeNoDuplicates();
 
 		tree.put("apple", "apple");
 
@@ -473,7 +471,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testInsertWithRepeatingPatternsInKey(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("xbox 360", "xbox 360");
 		tree.put("xbox", "xbox");
@@ -493,7 +491,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithNoChildren(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 
@@ -502,7 +500,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithOneChild(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
@@ -514,7 +512,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDeleteNodeWithMultipleChildren(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
@@ -528,14 +526,14 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testCantDeleteSomethingThatDoesntExist(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
 	public void testCantDeleteSomethingThatWasAlreadyDeleted(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.remove("apple");
@@ -545,7 +543,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testChildrenNotAffectedWhenOneIsDeleted(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -562,7 +560,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSiblingsNotAffectedWhenOneIsDeleted(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ball", "ball");
@@ -574,7 +572,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testCantDeleteUnrealNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -584,14 +582,14 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testCantFindRootNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		Assertions.assertNull(tree.findPrefixedBy(""));
 	}
 
 	@Test
 	public void testFindSimpleInsert(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 
@@ -600,7 +598,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testContainsSimpleInsert(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 
@@ -609,7 +607,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testFindChildInsert(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -623,7 +621,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testGetPrefixes(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("h", "h");
 		tree.put("hey", "hey");
@@ -645,7 +643,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testContainsChildInsert(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -659,21 +657,21 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testCantFindNonexistantNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		Assertions.assertNull(tree.findPrefixedBy("apple"));
 	}
 
 	@Test
 	public void testDoesntContainNonexistantNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		Assertions.assertFalse(tree.containsKey("apple"));
 	}
 
 	@Test
 	public void testCantFindUnrealNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -683,7 +681,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDoesntContainUnrealNode(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
@@ -693,7 +691,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchPrefix_LimitGreaterThanPossibleResults(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -712,7 +710,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testSearchPrefix_LimitLessThanPossibleResults(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -730,7 +728,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testGetSize(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
@@ -743,7 +741,7 @@ public class StringRadixTreeTest{
 
 	@Test
 	public void testDeleteReducesSize(){
-		RadixTree<String, String> tree = RadixTree.createTree(new StringSequencer());
+		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");

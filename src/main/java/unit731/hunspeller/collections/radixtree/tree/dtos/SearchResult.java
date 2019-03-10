@@ -1,6 +1,7 @@
-package unit731.hunspeller.collections.radixtree.tree;
+package unit731.hunspeller.collections.radixtree.tree.dtos;
 
 import java.io.Serializable;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
 
 
 public class SearchResult<S, V extends Serializable>{

@@ -1,4 +1,4 @@
-package unit731.hunspeller.collections.radixtree;
+package unit731.hunspeller.collections.radixtree.tree;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -11,11 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.tree.AhoCorasickTree;
-import unit731.hunspeller.collections.radixtree.tree.RadixTreeNode;
-import unit731.hunspeller.collections.radixtree.tree.RadixTree;
-import unit731.hunspeller.collections.radixtree.tree.DuplicateKeyException;
-import unit731.hunspeller.collections.radixtree.tree.SearchResult;
+import unit731.hunspeller.collections.radixtree.tree.utils.RadixTreeNode;
+import unit731.hunspeller.collections.radixtree.tree.exceptions.DuplicateKeyException;
+import unit731.hunspeller.collections.radixtree.tree.dtos.SearchResult;
 
 
 public class AhoCorasickStringRadixTreeTest{
