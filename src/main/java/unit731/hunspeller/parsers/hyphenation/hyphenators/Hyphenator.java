@@ -27,7 +27,7 @@ class Hyphenator extends AbstractHyphenator{
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.getValuesPrefixedTo(w.substring(i).toLowerCase(Locale.ROOT));
+			List<String> prefixes = patterns.getValues(w.substring(i).toLowerCase(Locale.ROOT), RadixTree.PrefixType.PREFIXED_TO);
 
 			for(String rule : prefixes)
 				indexesAndRules = extractSyllabe(rule, i, word, normalizedWordSize, options, indexesAndRules);

@@ -33,19 +33,19 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		return getPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
-	public RadixTreeNode<String[], V> findPrefixedBy(String keyToCheck){
-		return findPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
+	public RadixTreeNode<String[], V> find(String keyToCheck, PrefixType type){
+		return find(RegExpSequencer.splitSequence(keyToCheck), type);
 	}
 
-	public List<Map.Entry<String[], V>> getEntriesPrefixedBy(String prefix){
-		List<VisitElement<String[], V>> entries = getEntriesPrefixedBy(RegExpSequencer.splitSequence(prefix));
+	public List<Map.Entry<String[], V>> getEntriesPrefixed(String prefix, PrefixType type){
+		List<VisitElement<String[], V>> entries = getEntries(RegExpSequencer.splitSequence(prefix), type);
 		return entries.stream()
 			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
 			.collect(Collectors.toList());
 	}
 
 	public List<V> getValuesPrefixedBy(String prefix){
-		return getValuesPrefixedBy(RegExpSequencer.splitSequence(prefix));
+		return getValues(RegExpSequencer.splitSequence(prefix), RadixTree.PrefixType.PREFIXED_BY);
 	}
 
 //	public List<String[]> getKeysPrefixedBy(String prefix){
@@ -56,12 +56,12 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 //		return findPrefixedTo(RegExpSequencer.splitSequence(keyToCheck));
 //	}
 
-	public List<VisitElement<String[], V>> getEntriesPrefixedTo(String prefix){
-		return getEntriesPrefixedTo(RegExpSequencer.splitSequence(prefix));
+	public List<VisitElement<String[], V>> getEntriesPrefixedTo(String prefix, PrefixType type){
+		return getEntries(RegExpSequencer.splitSequence(prefix), type);
 	}
 
 	public List<V> getValuesPrefixedTo(String prefix){
-		return getValuesPrefixedTo(RegExpSequencer.splitSequence(prefix));
+		return getValues(RegExpSequencer.splitSequence(prefix), RadixTree.PrefixType.PREFIXED_TO);
 	}
 
 //	public List<String[]> getKeysPrefixedTo(String prefix){

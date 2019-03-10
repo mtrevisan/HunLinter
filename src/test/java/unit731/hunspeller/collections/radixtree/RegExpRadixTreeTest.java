@@ -584,7 +584,7 @@ public class RegExpRadixTreeTest{
 	public void testCantFindRootNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assertions.assertNull(tree.findPrefixedBy(""));
+		Assertions.assertNull(tree.find("", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -593,7 +593,7 @@ public class RegExpRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assertions.assertNotNull(tree.findPrefixedBy("apple"));
+		Assertions.assertNotNull(tree.find("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -614,8 +614,8 @@ public class RegExpRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assertions.assertNotNull(tree.findPrefixedBy("appletree"));
-		Assertions.assertNotNull(tree.findPrefixedBy("appleshackcream"));
+		Assertions.assertNotNull(tree.find("appletree", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertNotNull(tree.find("appleshackcream", RadixTree.PrefixType.PREFIXED_BY));
 		Assertions.assertNotNull(tree.containsKeyPrefixedBy("ape"));
 	}
 
@@ -659,7 +659,7 @@ public class RegExpRadixTreeTest{
 	public void testCantFindNonexistantNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assertions.assertNull(tree.findPrefixedBy("apple"));
+		Assertions.assertNull(tree.find("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -676,7 +676,7 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assertions.assertNull(tree.findPrefixedBy("ap"));
+		Assertions.assertNull(tree.find("ap", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test

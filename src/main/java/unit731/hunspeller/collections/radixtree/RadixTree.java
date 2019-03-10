@@ -43,6 +43,9 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  */
 public class RadixTree<S, V extends Serializable>{
 
+	public static enum PrefixType{PREFIXED_BY, PREFIXED_TO};
+
+
 	/** The root node in this tree */
 	protected RadixTreeNode<S, V> root;
 	protected SequencerInterface<S> sequencer;
@@ -72,12 +75,12 @@ public class RadixTree<S, V extends Serializable>{
 	}
 
 	public boolean containsKeyPrefixedBy(S prefix){
-		RadixTreeNode<S, V> foundNode = findPrefixedBy(prefix);
+		RadixTreeNode<S, V> foundNode = find(prefix, PrefixType.PREFIXED_BY);
 		return (foundNode != null);
 	}
 
 	public V getPrefixedBy(S prefix){
-		RadixTreeNode<S, V> foundNode = findPrefixedBy(prefix);
+		RadixTreeNode<S, V> foundNode = find(prefix, PrefixType.PREFIXED_BY);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 
@@ -92,16 +95,8 @@ public class RadixTree<S, V extends Serializable>{
 		throw new UnsupportedOperationException("Cannot perform search in a non-Aho-Corasick tree");
 	}
 
-	public RadixTreeNode<S, V> findPrefixedBy(S prefix){
-		return findPrefixed(prefix, this::visitPrefixedBy);
-	}
-
-	public RadixTreeNode<S, V> findPrefixedTo(S prefix){
-		return findPrefixed(prefix, this::visitPrefixedTo);
-	}
-
 	/** Find the element with the given prefix */
-	private RadixTreeNode<S, V> findPrefixed(S prefix, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed){
+	public RadixTreeNode<S, V> find(S prefix, PrefixType type){
 		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
 		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
 			if(sequencer.equals(elem.getPrefix(), prefix))
@@ -109,6 +104,8 @@ public class RadixTree<S, V extends Serializable>{
 
 			return (result.get() != null);
 		};
+		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (type == PrefixType.PREFIXED_BY? this::visitPrefixedBy:
+			this::visitPrefixedTo);
 		visitPrefixed.accept(visitor, prefix);
 
 		return result.get();
@@ -121,23 +118,8 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
-	public List<V> getValuesPrefixedBy(S prefix){
-		return getValuesPrefixed(prefix, this::getEntriesPrefixedBy);
-	}
-
-	/**
-	 * Gets a list of values whose associated keys are a prefix of the given prefix, or are contained into the prefix.
-	 *
-	 * @param prefix	The prefix to look for
-	 * @return	The list of values
-	 * @throws NullPointerException	If the prefix is <code>null</code>
-	 */
-	public List<V> getValuesPrefixedTo(S prefix){
-		return getValuesPrefixed(prefix, this::getEntriesPrefixedTo);
-	}
-
-	private List<V> getValuesPrefixed(S prefix, Function<S, List<VisitElement<S, V>>> entriesPrefixed){
-		return entriesPrefixed.apply(prefix).stream()
+	public List<V> getValues(S prefix, PrefixType type){
+		return getEntries(prefix, type).stream()
 			.map(VisitElement::getNode)
 			.map(RadixTreeNode::getValue)
 			.collect(Collectors.toList());
@@ -176,22 +158,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The list of values
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
-	public List<VisitElement<S, V>> getEntriesPrefixedBy(S prefix){
-		return getEntriesPrefixed(prefix, this::visitPrefixedBy);
-	}
-
-	/**
-	 * Gets a list of entries whose associated keys are a prefix of the given prefix.
-	 *
-	 * @param prefix	The prefix to look for
-	 * @return	The list of values
-	 * @throws NullPointerException	If the given prefix is <code>null</code>
-	 */
-	public List<VisitElement<S, V>> getEntriesPrefixedTo(S prefix){
-		return getEntriesPrefixed(prefix, this::visitPrefixedTo);
-	}
-
-	private List<VisitElement<S, V>> getEntriesPrefixed(S prefix, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed){
+	public List<VisitElement<S, V>> getEntries(S prefix, PrefixType type){
 		Objects.requireNonNull(prefix);
 
 		List<VisitElement<S, V>> result = new ArrayList<>();
@@ -201,6 +168,8 @@ public class RadixTree<S, V extends Serializable>{
 			return false;
 		};
 
+		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (type == PrefixType.PREFIXED_BY? this::visitPrefixedBy:
+			this::visitPrefixedTo);
 		visitPrefixed.accept(visitorEntries, prefix);
 
 		return result;
@@ -230,13 +199,13 @@ public class RadixTree<S, V extends Serializable>{
 //	}
 
 	public Set<S> keySetPrefixedBy(){
-		return getEntriesPrefixedBy(sequencer.getEmptySequence()).stream()
+		return getEntries(sequencer.getEmptySequence(), RadixTree.PrefixType.PREFIXED_BY).stream()
 			.map(VisitElement::getPrefix)
 			.collect(Collectors.toSet());
 	}
 
 	public Collection<V> valuesPrefixedBy(){
-		return getEntriesPrefixedBy(sequencer.getEmptySequence()).stream()
+		return getEntries(sequencer.getEmptySequence(), RadixTree.PrefixType.PREFIXED_BY).stream()
 			.map(VisitElement::getNode)
 			.map(RadixTreeNode::getValue)
 			.collect(Collectors.toSet());
