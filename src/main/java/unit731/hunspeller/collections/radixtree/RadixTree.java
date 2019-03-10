@@ -488,7 +488,7 @@ public class RadixTree<S, V extends Serializable> implements Map<S, V>{
 		Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
 		//if there is no children of the node we need to delete it from the its parent children list
-		if(children == null || children.isEmpty()){
+		if(children == null){
 			S key = node.getKey();
 			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
 			if(parentChildren != null){
