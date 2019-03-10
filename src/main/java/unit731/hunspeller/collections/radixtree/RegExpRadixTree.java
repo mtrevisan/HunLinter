@@ -25,11 +25,11 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		super(new RegExpSequencer(), noDuplicatesAllowed);
 	}
 
-	public boolean containsKey(String keyToCheck){
+	public boolean containsKeyPrefixedBy(String keyToCheck){
 		return containsKeyPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
-	public V get(String keyToCheck){
+	public V getPrefixedBy(String keyToCheck){
 		return getPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
 	}
 
@@ -48,25 +48,25 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		return getValuesPrefixedBy(RegExpSequencer.splitSequence(prefix));
 	}
 
-	public List<String[]> getKeysPrefixedBy(String prefix){
-		return getKeysPrefixedBy(RegExpSequencer.splitSequence(prefix));
-	}
+//	public List<String[]> getKeysPrefixedBy(String prefix){
+//		return getKeysPrefixedBy(RegExpSequencer.splitSequence(prefix));
+//	}
 
-	public RadixTreeNode<String[], V> find(String keyToCheck){
-		return findPrefixedTo(RegExpSequencer.splitSequence(keyToCheck));
-	}
+//	public RadixTreeNode<String[], V> findPrefixedTo(String keyToCheck){
+//		return findPrefixedTo(RegExpSequencer.splitSequence(keyToCheck));
+//	}
 
-	public List<VisitElement<String[], V>> getEntries(String prefix){
+	public List<VisitElement<String[], V>> getEntriesPrefixedTo(String prefix){
 		return getEntriesPrefixedTo(RegExpSequencer.splitSequence(prefix));
 	}
 
-	public List<V> getValues(String prefix){
+	public List<V> getValuesPrefixedTo(String prefix){
 		return getValuesPrefixedTo(RegExpSequencer.splitSequence(prefix));
 	}
 
-	public List<String[]> getKeys(String prefix){
-		return getKeysPrefixedTo(RegExpSequencer.splitSequence(prefix));
-	}
+//	public List<String[]> getKeysPrefixedTo(String prefix){
+//		return getKeysPrefixedTo(RegExpSequencer.splitSequence(prefix));
+//	}
 
 	public void putAllWithFlatKey(Map<? extends String, ? extends V> map){
 		Objects.requireNonNull(map);
@@ -79,7 +79,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		return put(RegExpSequencer.splitSequence(key), value);
 	}
 
-	public V remove(String key){
+	public V removePrefixedBy(String key){
 		return removePrefixedBy(RegExpSequencer.splitSequence(key));
 	}
 
