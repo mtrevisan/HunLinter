@@ -93,7 +93,25 @@ public class RadixTree<S, V extends Serializable>{
 	}
 
 	public RadixTreeNode<S, V> findPrefixedBy(S prefix){
-		return find(prefix, this::visitPrefixedBy);
+		return findPrefixed(prefix, this::visitPrefixedBy);
+	}
+
+	public RadixTreeNode<S, V> findPrefixedTo(S prefix){
+		return findPrefixed(prefix, this::visitPrefixedTo);
+	}
+
+	/** Find the element with the given prefix */
+	private RadixTreeNode<S, V> findPrefixed(S prefix, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed){
+		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
+		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
+			if(sequencer.equals(elem.getPrefix(), prefix))
+				result.set(elem.getNode());
+
+			return (result.get() != null);
+		};
+		visitPrefixed.accept(visitor, prefix);
+
+		return result.get();
 	}
 
 	/**
@@ -104,7 +122,22 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
 	public List<V> getValuesPrefixedBy(S prefix){
-		return getEntriesPrefixedBy(prefix).stream()
+		return getValuesPrefixed(prefix, this::getEntriesPrefixedBy);
+	}
+
+	/**
+	 * Gets a list of values whose associated keys are a prefix of the given prefix, or are contained into the prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @return	The list of values
+	 * @throws NullPointerException	If the prefix is <code>null</code>
+	 */
+	public List<V> getValuesPrefixedTo(S prefix){
+		return getValuesPrefixed(prefix, this::getEntriesPrefixedTo);
+	}
+
+	private List<V> getValuesPrefixed(S prefix, Function<S, List<VisitElement<S, V>>> entriesPrefixed){
+		return entriesPrefixed.apply(prefix).stream()
 			.map(VisitElement::getNode)
 			.map(RadixTreeNode::getValue)
 			.collect(Collectors.toList());
@@ -123,59 +156,6 @@ public class RadixTree<S, V extends Serializable>{
 //			.collect(Collectors.toList());
 //	}
 
-	/**
-	 * Gets a list of entries whose associated keys have the given prefix.
-	 *
-	 * @param prefix	The prefix to look for
-	 * @return	The list of values
-	 * @throws NullPointerException	If the given prefix is <code>null</code>
-	 */
-	public List<VisitElement<S, V>> getEntriesPrefixedBy(S prefix){
-		Objects.requireNonNull(prefix);
-
-		List<VisitElement<S, V>> result = new ArrayList<>();
-		Function<VisitElement<S, V>, Boolean> visitorEntries = elem -> {
-			result.add(elem);
-
-			return false;
-		};
-
-		visitPrefixedBy(visitorEntries, prefix);
-
-		return result;
-	}
-
-//	public RadixTreeNode<S, V> findPrefixedTo(S keyToCheck){
-//		return find(keyToCheck, this::visitPrefixedTo);
-//	}
-
-	private RadixTreeNode<S, V> find(S keyToCheck, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visit){
-		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
-		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
-			if(sequencer.equals(elem.getPrefix(), keyToCheck))
-				result.set(elem.getNode());
-
-			return (result.get() != null);
-		};
-		visit.accept(visitor, keyToCheck);
-
-		return result.get();
-	}
-
-	/**
-	 * Gets a list of values whose associated keys are a prefix of the given prefix, or are contained into the prefix.
-	 *
-	 * @param prefix	The prefix to look for
-	 * @return	The list of values
-	 * @throws NullPointerException	If the prefix is <code>null</code>
-	 */
-	public List<V> getValuesPrefixedTo(S prefix){
-		return getEntriesPrefixedTo(prefix).stream()
-			.map(VisitElement::getNode)
-			.map(RadixTreeNode::getValue)
-			.collect(Collectors.toList());
-	}
-
 //	/**
 //	 * Gets a list of keys that are a prefix of the given prefix.
 //	 *
@@ -190,6 +170,17 @@ public class RadixTree<S, V extends Serializable>{
 //	}
 
 	/**
+	 * Gets a list of entries whose associated keys have the given prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @return	The list of values
+	 * @throws NullPointerException	If the given prefix is <code>null</code>
+	 */
+	public List<VisitElement<S, V>> getEntriesPrefixedBy(S prefix){
+		return getEntriesPrefixed(prefix, this::visitPrefixedBy);
+	}
+
+	/**
 	 * Gets a list of entries whose associated keys are a prefix of the given prefix.
 	 *
 	 * @param prefix	The prefix to look for
@@ -197,6 +188,10 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
 	public List<VisitElement<S, V>> getEntriesPrefixedTo(S prefix){
+		return getEntriesPrefixed(prefix, this::visitPrefixedTo);
+	}
+
+	private List<VisitElement<S, V>> getEntriesPrefixed(S prefix, BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed){
 		Objects.requireNonNull(prefix);
 
 		List<VisitElement<S, V>> result = new ArrayList<>();
@@ -206,36 +201,9 @@ public class RadixTree<S, V extends Serializable>{
 			return false;
 		};
 
-		visitPrefixedTo(visitorEntries, prefix);
+		visitPrefixed.accept(visitorEntries, prefix);
 
 		return result;
-		//FIXME
-//		Objects.requireNonNull(prefix);
-//
-//		List<VisitElement<S, V>> result = new ArrayList<>();
-//
-//		int prefixAllowedLength = sequencer.length(prefix);
-//
-//		Stack<VisitElement<S, V>> stack = new Stack<>();
-//		stack.push(new VisitElement<>(root, null, root.getKey()));
-//		while(!stack.isEmpty()){
-//			VisitElement<S, V> elem = stack.pop();
-//
-//			if(elem.getNode().hasValue() && sequencer.startsWith(prefix, elem.getPrefix()))
-//				result.add(elem);
-//
-//			Collection<RadixTreeNode<S, V>> children = elem.getNode().getChildren();
-//			if(children != null){
-//				int prefixLen = sequencer.length(elem.getPrefix());
-//				for(RadixTreeNode<S, V> child : children)
-//					if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
-//						S newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
-//						stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
-//					}
-//			}
-//		}
-//
-//		return result;
 	}
 
 	public boolean isEmpty(){
@@ -408,7 +376,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The value (if any) associated to the key just removed
 	 * @throws NullPointerException	If the given key is <code>null</code>
 	 */
-	public V removePrefixedBy(S key){
+	public V remove(S key){
 		Objects.requireNonNull(key);
 
 		AtomicReference<V> result = new AtomicReference<>(null);

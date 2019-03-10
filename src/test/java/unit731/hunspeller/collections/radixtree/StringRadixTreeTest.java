@@ -119,12 +119,12 @@ public class StringRadixTreeTest{
 		Assertions.assertEquals(3, tree.size());
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
 
-		tree.removePrefixedBy("key");
+		tree.remove("key");
 
 		Assertions.assertEquals(3, tree.size());
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
 
-		tree.removePrefixedBy("tent");
+		tree.remove("tent");
 
 		Assertions.assertEquals(2, tree.size());
 		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
@@ -299,7 +299,7 @@ public class StringRadixTreeTest{
 		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
 		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
 
-		Integer r1 = tree.removePrefixedBy("hello world");
+		Integer r1 = tree.remove("hello world");
 
 		Assertions.assertNotNull(r1);
 		Assertions.assertEquals(1, r1.intValue());
@@ -318,7 +318,7 @@ public class StringRadixTreeTest{
 		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
 		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
 
-		Integer r0 = tree.removePrefixedBy("hello world");
+		Integer r0 = tree.remove("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
@@ -339,7 +339,7 @@ public class StringRadixTreeTest{
 		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
 		Assertions.assertEquals(2, tree.getPrefixedBy("hello, clarice").intValue());
 
-		Integer r0 = tree.removePrefixedBy("hello world");
+		Integer r0 = tree.remove("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
@@ -495,7 +495,7 @@ public class StringRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -505,7 +505,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("applepie", "applepie");
 
-		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
 		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
 	}
@@ -518,7 +518,7 @@ public class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
+		Assertions.assertNotNull(tree.remove("apple"));
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("applecrisp"));
 		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
@@ -528,7 +528,7 @@ public class StringRadixTreeTest{
 	public void testCantDeleteSomethingThatDoesntExist(){
 		StringRadixTree<String> tree = StringRadixTree.createTree();
 
-		Assertions.assertNull(tree.removePrefixedBy("apple"));
+		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -536,9 +536,9 @@ public class StringRadixTreeTest{
 		StringRadixTree<String> tree = StringRadixTree.createTree();
 
 		tree.put("apple", "apple");
-		tree.removePrefixedBy("apple");
+		tree.remove("apple");
 
-		Assertions.assertNull(tree.removePrefixedBy("apple"));
+		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
@@ -550,7 +550,7 @@ public class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("ape", "ape");
 
-		tree.removePrefixedBy("apple");
+		tree.remove("apple");
 
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("appleshack"));
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
@@ -565,7 +565,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ball", "ball");
 
-		tree.removePrefixedBy("apple");
+		tree.remove("apple");
 
 		Assertions.assertTrue(tree.containsKeyPrefixedBy("ball"));
 	}
@@ -577,7 +577,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assertions.assertNull(tree.removePrefixedBy("ap"));
+		Assertions.assertNull(tree.remove("ap"));
 	}
 
 	@Test
@@ -746,7 +746,7 @@ public class StringRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("appleshack", "appleshack");
 
-		tree.removePrefixedBy("appleshack");
+		tree.remove("appleshack");
 
 		Assertions.assertTrue(tree.size() == 1);
 	}

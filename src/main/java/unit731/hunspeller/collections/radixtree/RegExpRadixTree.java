@@ -80,7 +80,7 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 	}
 
 	public V removePrefixedBy(String key){
-		return removePrefixedBy(RegExpSequencer.splitSequence(key));
+		return remove(RegExpSequencer.splitSequence(key));
 	}
 
 }

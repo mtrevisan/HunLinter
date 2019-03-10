@@ -198,11 +198,11 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 	}
 
 	@Override
-	public V removePrefixedBy(S key){
+	public V remove(S key){
 		if(prepared)
 			clearFailTransitions();
 
-		return super.removePrefixedBy(key);
+		return super.remove(key);
 	}
 
 }

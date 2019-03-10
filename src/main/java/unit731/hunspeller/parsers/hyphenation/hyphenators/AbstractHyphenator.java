@@ -65,7 +65,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 			hyph = hyphenate(word, patterns);
 
-			patterns.get(level).removePrefixedBy(key);
+			patterns.get(level).remove(key);
 		}
 		return hyph;
 	}
