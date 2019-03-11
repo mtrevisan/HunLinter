@@ -74,13 +74,13 @@ public class RadixTree<S, V extends Serializable>{
 		root.clearChildren();
 	}
 
-	public boolean containsKeyPrefixedBy(S prefix){
-		RadixTreeNode<S, V> foundNode = find(prefix, PrefixType.PREFIXED_BY);
+	public boolean containsKey(S prefix, PrefixType type){
+		RadixTreeNode<S, V> foundNode = find(prefix, type);
 		return (foundNode != null);
 	}
 
-	public V getPrefixedBy(S prefix){
-		RadixTreeNode<S, V> foundNode = find(prefix, PrefixType.PREFIXED_BY);
+	public V get(S prefix, PrefixType type){
+		RadixTreeNode<S, V> foundNode = find(prefix, type);
 		return (foundNode != null? foundNode.getValue(): null);
 	}
 

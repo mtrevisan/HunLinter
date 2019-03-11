@@ -35,9 +35,9 @@ public class RegExpRadixTreeTest{
 		tree.put("test", 1);
 
 		Assertions.assertEquals(1, tree.size());
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("test"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("tes"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("testt"));
+		Assertions.assertTrue(tree.containsKey("test", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("tes", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("testt", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -50,10 +50,10 @@ public class RegExpRadixTreeTest{
 		tree.put("rest", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
-		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
-		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
-		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
+		Assertions.assertEquals(1, tree.get("test", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(2, tree.get("tent", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(3, tree.get("tank", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(4, tree.get("rest", RadixTree.PrefixType.PREFIXED_BY).intValue());
 	}
 
 	@Test
@@ -66,18 +66,18 @@ public class RegExpRadixTreeTest{
 		tree.put("rest", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
-		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
-		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
-		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
+		Assertions.assertEquals(1, tree.get("test", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(2, tree.get("tent", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(3, tree.get("tank", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(4, tree.get("rest", RadixTree.PrefixType.PREFIXED_BY).intValue());
 
 		tree.put("test", 9);
 
 		Assertions.assertEquals(4, tree.size());
-		Assertions.assertEquals(9, tree.getPrefixedBy("test").intValue());
-		Assertions.assertEquals(2, tree.getPrefixedBy("tent").intValue());
-		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
-		Assertions.assertEquals(4, tree.getPrefixedBy("rest").intValue());
+		Assertions.assertEquals(9, tree.get("test", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(2, tree.get("tent", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(3, tree.get("tank", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(4, tree.get("rest", RadixTree.PrefixType.PREFIXED_BY).intValue());
 	}
 
 	@Test
@@ -117,19 +117,19 @@ public class RegExpRadixTreeTest{
 		tree.put("tank", 3);
 
 		Assertions.assertEquals(3, tree.size());
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
+		Assertions.assertTrue(tree.containsKey("tent", RadixTree.PrefixType.PREFIXED_BY));
 
 		tree.removePrefixedBy("key");
 
 		Assertions.assertEquals(3, tree.size());
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("tent"));
+		Assertions.assertTrue(tree.containsKey("tent", RadixTree.PrefixType.PREFIXED_BY));
 
 		tree.removePrefixedBy("tent");
 
 		Assertions.assertEquals(2, tree.size());
-		Assertions.assertEquals(1, tree.getPrefixedBy("test").intValue());
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("tent"));
-		Assertions.assertEquals(3, tree.getPrefixedBy("tank").intValue());
+		Assertions.assertEquals(1, tree.get("test", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertFalse(tree.containsKey("tent", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertEquals(3, tree.get("tank", RadixTree.PrefixType.PREFIXED_BY).intValue());
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class RegExpRadixTreeTest{
 		strings.forEach(x -> tree.put(x.toString(32), x));
 
 		Assertions.assertEquals(strings.size(), tree.size());
-		strings.forEach(x -> Assertions.assertTrue(tree.containsKeyPrefixedBy(x.toString(32))));
+		strings.forEach(x -> Assertions.assertTrue(tree.containsKey(x.toString(32), RadixTree.PrefixType.PREFIXED_BY)));
 		assertEqualsWithSort(strings, new ArrayList<>(tree.valuesPrefixedBy()));
 	}
 
@@ -167,9 +167,9 @@ public class RegExpRadixTreeTest{
 		tree.put("ac", 3);
 		tree.put("a", 4);
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("a"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("ab"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
+		Assertions.assertTrue(tree.containsKey("a", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("ab", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("c", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -179,11 +179,11 @@ public class RegExpRadixTreeTest{
 		tree.put("abc", 1);
 		tree.put("abc", 2);
 
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("a"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("ab"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("abc"));
-		Assertions.assertEquals(2, tree.getPrefixedBy("abc").intValue());
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
+		Assertions.assertFalse(tree.containsKey("a", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("ab", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("abc", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertEquals(2, tree.get("abc", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertFalse(tree.containsKey("c", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -208,20 +208,20 @@ public class RegExpRadixTreeTest{
 		RegExpRadixTree<Integer> tree = RegExpRadixTree.createTree();
 
 		Assertions.assertTrue(tree.isEmpty());
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("word"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy(StringUtils.EMPTY));
+		Assertions.assertFalse(tree.containsKey("word", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey(StringUtils.EMPTY, RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
 	public void defaultValueConstructor(){
 		RegExpRadixTree<Boolean> tree = RegExpRadixTree.createTree();
 
-		Assertions.assertNull(tree.getPrefixedBy("meow"));
+		Assertions.assertNull(tree.get("meow", RadixTree.PrefixType.PREFIXED_BY));
 
 		tree.put("meow", Boolean.TRUE);
 
-		Assertions.assertEquals(Boolean.TRUE, tree.getPrefixedBy("meow"));
-		Assertions.assertNull(tree.getPrefixedBy("world"));
+		Assertions.assertEquals(Boolean.TRUE, tree.get("meow", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertNull(tree.get("world", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -263,7 +263,7 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("wowza"));
+		Assertions.assertTrue(tree.containsKey("wowza", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -284,9 +284,9 @@ public class RegExpRadixTreeTest{
 		tree.put("bookshelf", Boolean.TRUE);
 		tree.put("wowza", Boolean.FALSE);
 
-		Assertions.assertEquals(Boolean.FALSE, tree.getPrefixedBy("wowza"));
-		Assertions.assertEquals(Boolean.TRUE, tree.getPrefixedBy("bookshelf"));
-		Assertions.assertNull(tree.getPrefixedBy("bookshelf2"));
+		Assertions.assertEquals(Boolean.FALSE, tree.get("wowza", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertEquals(Boolean.TRUE, tree.get("bookshelf", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertNull(tree.get("bookshelf2", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -296,16 +296,16 @@ public class RegExpRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(1, tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY).intValue());
 
 		Integer r1 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r1);
 		Assertions.assertEquals(1, r1.intValue());
 
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertNull(tree.getPrefixedBy("hello world"));
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertNull(tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -315,16 +315,16 @@ public class RegExpRadixTreeTest{
 		tree.put("hello", 0);
 		tree.put("hello world", 1);
 
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(1, tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY).intValue());
 
 		Integer r0 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
 
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertNull(tree.getPrefixedBy("hello world"));
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertNull(tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -335,18 +335,18 @@ public class RegExpRadixTreeTest{
 		tree.put("hello world", 1);
 		tree.put("hello, clarice", 2);
 
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertEquals(1, tree.getPrefixedBy("hello world").intValue());
-		Assertions.assertEquals(2, tree.getPrefixedBy("hello, clarice").intValue());
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(1, tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(2, tree.get("hello, clarice", RadixTree.PrefixType.PREFIXED_BY).intValue());
 
 		Integer r0 = tree.removePrefixedBy("hello world");
 
 		Assertions.assertNotNull(r0);
 		Assertions.assertEquals(1, r0.intValue());
 
-		Assertions.assertNull(tree.getPrefixedBy("hello world"));
-		Assertions.assertEquals(0, tree.getPrefixedBy("hello").intValue());
-		Assertions.assertEquals(2, tree.getPrefixedBy("hello, clarice").intValue());
+		Assertions.assertNull(tree.get("hello world", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertEquals(0, tree.get("hello", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertEquals(2, tree.get("hello, clarice", RadixTree.PrefixType.PREFIXED_BY).intValue());
 	}
 
 
@@ -430,11 +430,11 @@ public class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("applecrisp", "applecrisp");
 
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 
 		tree.put("apple", "apple");
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -506,8 +506,8 @@ public class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 
 		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKey("applepie", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -519,9 +519,9 @@ public class RegExpRadixTreeTest{
 		tree.put("applecrisp", "applecrisp");
 
 		Assertions.assertNotNull(tree.removePrefixedBy("apple"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("applecrisp"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKey("applepie", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("applecrisp", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -552,10 +552,10 @@ public class RegExpRadixTreeTest{
 
 		tree.removePrefixedBy("apple");
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("appleshack"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("applepie"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("ape"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKey("appleshack", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("applepie", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("ape", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -567,7 +567,7 @@ public class RegExpRadixTreeTest{
 
 		tree.removePrefixedBy("apple");
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("ball"));
+		Assertions.assertTrue(tree.containsKey("ball", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -602,7 +602,7 @@ public class RegExpRadixTreeTest{
 
 		tree.put("apple", "apple");
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertTrue(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -616,7 +616,7 @@ public class RegExpRadixTreeTest{
 
 		Assertions.assertNotNull(tree.find("appletree", RadixTree.PrefixType.PREFIXED_BY));
 		Assertions.assertNotNull(tree.find("appleshackcream", RadixTree.PrefixType.PREFIXED_BY));
-		Assertions.assertNotNull(tree.containsKeyPrefixedBy("ape"));
+		Assertions.assertNotNull(tree.containsKey("ape", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -650,9 +650,9 @@ public class RegExpRadixTreeTest{
 		tree.put("appletree", "appletree");
 		tree.put("appleshackcream", "appleshackcream");
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("appletree"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("appleshackcream"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("ape"));
+		Assertions.assertTrue(tree.containsKey("appletree", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("appleshackcream", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("ape", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -666,7 +666,7 @@ public class RegExpRadixTreeTest{
 	public void testDoesntContainNonexistantNode(){
 		RegExpRadixTree<String> tree = RegExpRadixTree.createTree();
 
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("apple"));
+		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -686,7 +686,7 @@ public class RegExpRadixTreeTest{
 		tree.put("apple", "apple");
 		tree.put("ape", "ape");
 
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("ap"));
+		Assertions.assertFalse(tree.containsKey("ap", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -779,13 +779,13 @@ public class RegExpRadixTreeTest{
 		tree.put("a[^bcd]", 3);
 		tree.put("a", 4);
 
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("a"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("abc"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("adc"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("aec"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("ae"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("ac"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
+		Assertions.assertTrue(tree.containsKey("a", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("abc", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("adc", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("aec", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("ae", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("ac", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("c", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
@@ -795,11 +795,11 @@ public class RegExpRadixTreeTest{
 		tree.put("a[bc]c", 1);
 		tree.put("a[bc]c", 2);
 
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("a"));
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("ab"));
-		Assertions.assertTrue(tree.containsKeyPrefixedBy("abc"));
-		Assertions.assertEquals(2, tree.getPrefixedBy("acc").intValue());
-		Assertions.assertFalse(tree.containsKeyPrefixedBy("c"));
+		Assertions.assertFalse(tree.containsKey("a", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertFalse(tree.containsKey("ab", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertTrue(tree.containsKey("abc", RadixTree.PrefixType.PREFIXED_BY));
+		Assertions.assertEquals(2, tree.get("acc", RadixTree.PrefixType.PREFIXED_BY).intValue());
+		Assertions.assertFalse(tree.containsKey("c", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test

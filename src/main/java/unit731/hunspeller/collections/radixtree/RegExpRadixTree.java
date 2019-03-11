@@ -25,12 +25,12 @@ public class RegExpRadixTree<V extends Serializable> extends RadixTree<String[],
 		super(new RegExpSequencer(), noDuplicatesAllowed);
 	}
 
-	public boolean containsKeyPrefixedBy(String keyToCheck){
-		return containsKeyPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
+	public boolean containsKey(String keyToCheck, PrefixType type){
+		return containsKey(RegExpSequencer.splitSequence(keyToCheck), type);
 	}
 
-	public V getPrefixedBy(String keyToCheck){
-		return getPrefixedBy(RegExpSequencer.splitSequence(keyToCheck));
+	public V get(String keyToCheck, PrefixType type){
+		return get(RegExpSequencer.splitSequence(keyToCheck), type);
 	}
 
 	public RadixTreeNode<String[], V> find(String keyToCheck, PrefixType type){

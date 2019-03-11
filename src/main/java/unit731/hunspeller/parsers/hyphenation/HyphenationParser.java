@@ -290,7 +290,7 @@ public class HyphenationParser{
 
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
-		String foundNodeValue = patterns.get(level).getPrefixedBy(key);
+		String foundNodeValue = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
 		if(foundNodeValue != null){
 			String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
 			String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
@@ -335,7 +335,7 @@ public class HyphenationParser{
 		validateRule(rule, level);
 
 		String key = getKeyFromData(rule);
-		String newRule = patterns.get(level).getPrefixedBy(key);
+		String newRule = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
 		if(newRule == null)
 			patterns.get(level).put(key, rule);
 
@@ -483,7 +483,7 @@ public class HyphenationParser{
 	 */
 	public boolean hasRule(String rule, Level level){
 		String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKeyPrefixedBy(key));
+		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key, RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	public static String getKeyFromData(String rule){

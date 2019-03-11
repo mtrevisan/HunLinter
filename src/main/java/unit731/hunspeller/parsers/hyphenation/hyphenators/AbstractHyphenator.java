@@ -60,7 +60,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		String key = HyphenationParser.getKeyFromData(addedRule);
 		Map<HyphenationParser.Level, RadixTree<String, String>> patterns = hypParser.getPatterns();
 		Hyphenation hyph = null;
-		if(!patterns.get(level).containsKeyPrefixedBy(key)){
+		if(!patterns.get(level).containsKey(key, RadixTree.PrefixType.PREFIXED_BY)){
 			patterns.get(level).put(key, addedRule);
 
 			hyph = hyphenate(word, patterns);
