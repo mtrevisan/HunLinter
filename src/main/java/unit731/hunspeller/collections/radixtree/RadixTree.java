@@ -104,8 +104,7 @@ public class RadixTree<S, V extends Serializable>{
 
 			return (result.get() != null);
 		};
-		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (type == PrefixType.PREFIXED_BY? this::visitPrefixedBy:
-			this::visitPrefixedTo);
+		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (visitorPrefixed, prefixPrefixed) -> visit(visitorPrefixed, prefixPrefixed, type);
 		visitPrefixed.accept(visitor, prefix);
 
 		return result.get();
@@ -168,8 +167,7 @@ public class RadixTree<S, V extends Serializable>{
 			return false;
 		};
 
-		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (type == PrefixType.PREFIXED_BY? this::visitPrefixedBy:
-			this::visitPrefixedTo);
+		BiConsumer<Function<VisitElement<S, V>, Boolean>, S> visitPrefixed = (visitorPrefixed, prefixPrefixed) -> visit(visitorPrefixed, prefixPrefixed, type);
 		visitPrefixed.accept(visitorEntries, prefix);
 
 		return result;
@@ -186,26 +184,26 @@ public class RadixTree<S, V extends Serializable>{
 
 			return false;
 		};
-		visitPrefixedBy(visitor);
+		visit(visitor, RadixTree.PrefixType.PREFIXED_BY);
 
 		return result.get();
 	}
 
-//	public Set<Map.Entry<S, V>> entrySetPrefixedBy(){
-//		List<VisitElement<S, V>> entries = getEntriesPrefixedBy(sequencer.getEmptySequence());
+//	public Set<Map.Entry<S, V>> entrySet(PrefixType type){
+//		List<VisitElement<S, V>> entries = getEntries(sequencer.getEmptySequence(), type);
 //		return entries.stream()
 //			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
 //			.collect(Collectors.toSet());
 //	}
 
-	public Set<S> keySetPrefixedBy(){
-		return getEntries(sequencer.getEmptySequence(), RadixTree.PrefixType.PREFIXED_BY).stream()
+	public Set<S> keySet(PrefixType type){
+		return getEntries(sequencer.getEmptySequence(), type).stream()
 			.map(VisitElement::getPrefix)
 			.collect(Collectors.toSet());
 	}
 
-	public Collection<V> valuesPrefixedBy(){
-		return getEntries(sequencer.getEmptySequence(), RadixTree.PrefixType.PREFIXED_BY).stream()
+	public Collection<V> values(PrefixType type){
+		return getEntries(sequencer.getEmptySequence(), type).stream()
 			.map(VisitElement::getNode)
 			.map(RadixTreeNode::getValue)
 			.collect(Collectors.toSet());
@@ -358,7 +356,7 @@ public class RadixTree<S, V extends Serializable>{
 
 			return (result.get() != null);
 		};
-		visitPrefixedBy(visitor, key);
+		visit(visitor, key, RadixTree.PrefixType.PREFIXED_BY);
 
 		return result.get();
 	}
@@ -423,42 +421,8 @@ public class RadixTree<S, V extends Serializable>{
 	 *
 	 * @param visitor	The visitor
 	 */
-	public void visitPrefixedBy(Function<VisitElement<S, V>, Boolean> visitor){
-		visitPrefixedBy(visitor, sequencer.getEmptySequence());
-	}
-
-	/**
-	 * Traverses this radix tree using the given visitor and starting at the given prefix.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 * @param prefix	The prefix used to restrict visitation
-	 */
-	public void visitPrefixedBy(Function<VisitElement<S, V>, Boolean> visitor, S prefix){
-		BiFunction<S, S, Boolean> condition = (pre, preAllowed) -> sequencer.startsWith(pre, preAllowed);
-		visit(visitor, prefix, condition);
-	}
-
-	/**
-	 * Traverses this radix tree using the given visitor.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 */
-	public void visitPrefixedTo(Function<VisitElement<S, V>, Boolean> visitor){
-		visitPrefixedTo(visitor, sequencer.getEmptySequence());
-	}
-
-	/**
-	 * Traverses this radix tree using the given visitor and starting at the given prefix.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 * @param prefix	The prefix used to restrict visitation
-	 */
-	public void visitPrefixedTo(Function<VisitElement<S, V>, Boolean> visitor, S prefix){
-		BiFunction<S, S, Boolean> condition = (pre, preAllowed) -> sequencer.startsWith(preAllowed, pre);
-		visit(visitor, prefix, condition);
+	public void visit(Function<VisitElement<S, V>, Boolean> visitor, PrefixType type){
+		visit(visitor, sequencer.getEmptySequence(), type);
 	}
 
 	/**
@@ -470,10 +434,13 @@ public class RadixTree<S, V extends Serializable>{
 	 * @param condition	Condition that has to be verified in order to match
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
-	private void visit(Function<VisitElement<S, V>, Boolean> visitor, S prefix, BiFunction<S, S, Boolean> condition){
+	private void visit(Function<VisitElement<S, V>, Boolean> visitor, S prefix, PrefixType type){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefix);
-		Objects.requireNonNull(condition);
+		Objects.requireNonNull(type);
+
+		BiFunction<S, S, Boolean> condition = (type == PrefixType.PREFIXED_BY? (pre, preAllowed) -> sequencer.startsWith(pre, preAllowed):
+			(pre, preAllowed) -> sequencer.startsWith(preAllowed, pre));
 
 		int prefixAllowedLength = sequencer.length(prefix);
 

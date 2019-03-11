@@ -88,7 +88,7 @@ public class StringRadixTreeTest{
 		tree.put("tank", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		assertEqualsWithSort(tree.getValues(StringUtils.EMPTY, RadixTree.PrefixType.PREFIXED_BY), new ArrayList<>(tree.valuesPrefixedBy()));
+		assertEqualsWithSort(tree.getValues(StringUtils.EMPTY, RadixTree.PrefixType.PREFIXED_BY), new ArrayList<>(tree.values(RadixTree.PrefixType.PREFIXED_BY)));
 		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValues("t", RadixTree.PrefixType.PREFIXED_BY).toArray(new Integer[3]));
 		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValues("te", RadixTree.PrefixType.PREFIXED_BY).toArray(new Integer[2]));
 		Assertions.assertArrayEquals(new Object[0], tree.getValues("asd", RadixTree.PrefixType.PREFIXED_BY).toArray());
@@ -102,7 +102,7 @@ public class StringRadixTreeTest{
 		tree.put("spook", 2);
 
 		Assertions.assertEquals(2, tree.size());
-		assertEqualsWithSort(tree.keySetPrefixedBy().toArray(new String[2]), new String[]{
+		assertEqualsWithSort(tree.keySet(RadixTree.PrefixType.PREFIXED_BY).toArray(new String[2]), new String[]{
 			"pook",
 			"spook"
 		});
@@ -144,7 +144,7 @@ public class StringRadixTreeTest{
 
 		Assertions.assertEquals(strings.size(), tree.size());
 		strings.forEach(x -> Assertions.assertTrue(tree.containsKey(x.toString(32), RadixTree.PrefixType.PREFIXED_BY)));
-		assertEqualsWithSort(strings, new ArrayList<>(tree.valuesPrefixedBy()));
+		assertEqualsWithSort(strings, new ArrayList<>(tree.values(RadixTree.PrefixType.PREFIXED_BY)));
 	}
 
 	private List<BigInteger> generateRandomStrings(int n){

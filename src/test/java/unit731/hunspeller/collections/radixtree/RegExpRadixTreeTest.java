@@ -90,7 +90,7 @@ public class RegExpRadixTreeTest{
 		tree.put("tank", 4);
 
 		Assertions.assertEquals(4, tree.size());
-		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.valuesPrefixedBy()));
+		assertEqualsWithSort(tree.getValuesPrefixedBy(StringUtils.EMPTY), new ArrayList<>(tree.values(RadixTree.PrefixType.PREFIXED_BY)));
 		assertEqualsWithSort(new Integer[]{1, 2, 4}, tree.getValuesPrefixedBy("t").toArray(new Integer[3]));
 		assertEqualsWithSort(new Integer[]{1, 2}, tree.getValuesPrefixedBy("te").toArray(new Integer[2]));
 		Assertions.assertArrayEquals(new Object[0], tree.getValuesPrefixedBy("asd").toArray());
@@ -104,7 +104,7 @@ public class RegExpRadixTreeTest{
 		tree.put("spook", 2);
 
 		Assertions.assertEquals(2, tree.size());
-		Assertions.assertEquals(tree.keySetPrefixedBy().stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
+		Assertions.assertEquals(tree.keySet(RadixTree.PrefixType.PREFIXED_BY).stream().map(key -> String.join(StringUtils.EMPTY, key)).collect(Collectors.toSet()),
 			new HashSet<>(Arrays.asList("pook", "spook")));
 	}
 
@@ -144,7 +144,7 @@ public class RegExpRadixTreeTest{
 
 		Assertions.assertEquals(strings.size(), tree.size());
 		strings.forEach(x -> Assertions.assertTrue(tree.containsKey(x.toString(32), RadixTree.PrefixType.PREFIXED_BY)));
-		assertEqualsWithSort(strings, new ArrayList<>(tree.valuesPrefixedBy()));
+		assertEqualsWithSort(strings, new ArrayList<>(tree.values(RadixTree.PrefixType.PREFIXED_BY)));
 	}
 
 	private List<BigInteger> generateRandomStrings(int n){

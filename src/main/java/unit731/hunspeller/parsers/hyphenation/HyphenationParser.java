@@ -451,7 +451,7 @@ public class HyphenationParser{
 
 			return false;
 		};
-		patterns.get(level).visitPrefixedBy(saveVisitor);
+		patterns.get(level).visit(saveVisitor, RadixTree.PrefixType.PREFIXED_BY);
 
 		Collection<List<String>> values = result.values();
 		for(List<String> value : values){
