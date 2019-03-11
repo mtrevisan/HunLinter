@@ -26,6 +26,72 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  */
 public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 
+	private final RadixTreeTraverser<S, V> prepareTraverser = new RadixTreeTraverser<S, V>(){
+		@Override
+		public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+			if(parent == root)
+				return;
+
+			S currentKey = node.getKey();
+			int keySize = sequencer.length(currentKey);
+			for(int i = 0; i < keySize; i ++){
+				S subkey = sequencer.subSequence(currentKey, i);
+
+				RadixTreeNode<S, V> state = findDeepestNode(subkey, parent);
+
+				S stateKey = state.getKey();
+				int lcpLength = longestCommonPrefixLength(subkey, stateKey);
+				if(lcpLength > 0){
+					int nodeKeyLength = sequencer.length(stateKey);
+					if(lcpLength < nodeKeyLength)
+						//split fail
+						state.split(lcpLength, sequencer);
+					if(lcpLength + i < keySize)
+						//split node
+						node.split(lcpLength + i, sequencer);
+
+					//link fail to node
+					node.setFailNode(state);
+
+					//out(u) += out(f(u))
+					node.addAdditionalValues(state);
+
+					break;
+				}
+			}
+
+			if(node.getFailNode() == null)
+				node.setFailNode(root);
+		}
+
+		/** Find the deepest node labeled by a proper suffix of the current child */
+		private RadixTreeNode<S, V> findDeepestNode(S subkey, RadixTreeNode<S, V> parent){
+			RadixTreeNode<S, V> state;
+			RadixTreeNode<S, V> fail = parent.getFailNode();
+			while((state = transit(fail, subkey)) == null)
+				fail = fail.getFailNode();
+			return state;
+		}
+
+		private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
+			RadixTreeNode<S, V> result = root;
+			Collection<RadixTreeNode<S, V>> children = node.getChildren();
+			if(children != null){
+				Iterator<RadixTreeNode<S, V>> itr = children.iterator();
+				while(itr.hasNext()){
+					RadixTreeNode<S, V> child = itr.next();
+					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
+					if(lcpLength > 0){
+						result = child;
+						break;
+					}
+				}
+			}
+			return result;
+		}
+	};
+
+
 	private boolean prepared;
 
 
@@ -47,71 +113,7 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 		//process children of the root
 		root.forEachChildren(child -> child.setFailNode(root));
 
-		RadixTreeTraverser<S, V> traverser = new RadixTreeTraverser<S, V>(){
-			@Override
-			public void traverse(S wholeKey, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
-				if(parent == root)
-					return;
-
-				S currentKey = node.getKey();
-				int keySize = sequencer.length(currentKey);
-				for(int i = 0; i < keySize; i ++){
-					S subkey = sequencer.subSequence(currentKey, i);
-
-					RadixTreeNode<S, V> state = findDeepestNode(subkey, parent);
-
-					S stateKey = state.getKey();
-					int lcpLength = longestCommonPrefixLength(subkey, stateKey);
-					if(lcpLength > 0){
-						int nodeKeyLength = sequencer.length(stateKey);
-						if(lcpLength < nodeKeyLength)
-							//split fail
-							state.split(lcpLength, sequencer);
-						if(lcpLength + i < keySize)
-							//split node
-							node.split(lcpLength + i, sequencer);
-
-						//link fail to node
-						node.setFailNode(state);
-
-						//out(u) += out(f(u))
-						node.addAdditionalValues(state);
-
-						break;
-					}
-				}
-
-				if(node.getFailNode() == null)
-					node.setFailNode(root);
-			}
-
-			/** Find the deepest node labeled by a proper suffix of the current child */
-			private RadixTreeNode<S, V> findDeepestNode(S subkey, RadixTreeNode<S, V> parent){
-				RadixTreeNode<S, V> state;
-				RadixTreeNode<S, V> fail = parent.getFailNode();
-				while((state = transit(fail, subkey)) == null)
-					fail = fail.getFailNode();
-				return state;
-			}
-
-			private RadixTreeNode<S, V> transit(RadixTreeNode<S, V> node, S prefix){
-				RadixTreeNode<S, V> result = root;
-				Collection<RadixTreeNode<S, V>> children = node.getChildren();
-				if(children != null){
-					Iterator<RadixTreeNode<S, V>> itr = children.iterator();
-					while(itr.hasNext()){
-						RadixTreeNode<S, V> child = itr.next();
-						int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
-						if(lcpLength > 0){
-							result = child;
-							break;
-						}
-					}
-				}
-				return result;
-			}
-		};
-		traverseBFS(traverser);
+		traverseBFS(prepareTraverser);
 
 		prepared = true;
 	}

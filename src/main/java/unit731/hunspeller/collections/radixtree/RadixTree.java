@@ -447,20 +447,20 @@ public class RadixTree<S, V extends Serializable>{
 			if(elem.getNode().hasValue() && condition.apply(elem.getPrefix(), prefix) && visitor.apply(elem))
 				break;
 
-			if(elem.getNode().hasChildren()){
-				addNodesToStack(elem, prefixAllowedLength, prefix, stack);
-			}
+			addNodesToStack(elem, prefixAllowedLength, prefix, stack);
 		}
 	}
 
 	private void addNodesToStack(VisitElement<S, V> elem, int prefixAllowedLength, S prefix, Stack<VisitElement<S, V>> stack){
-		int prefixLen = sequencer.length(elem.getPrefix());
 		Collection<RadixTreeNode<S, V>> children = elem.getNode().getChildren();
-		for(RadixTreeNode<S, V> child : children)
-			if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
-				S newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
-				stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
-			}
+		if(children != null){
+			int prefixLen = sequencer.length(elem.getPrefix());
+			for(RadixTreeNode<S, V> child : children)
+				if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
+					S newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
+					stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
+				}
+		}
 	}
 
 }

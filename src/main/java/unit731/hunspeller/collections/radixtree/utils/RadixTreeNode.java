@@ -68,10 +68,6 @@ public class RadixTreeNode<S, V extends Serializable> implements Serializable{
 		return additionalValues;
 	}
 
-	public boolean hasChildren(){
-		return (children != null && !children.isEmpty());
-	}
-	
 	public Collection<RadixTreeNode<S, V>> getChildren(){
 		return children;
 	}
