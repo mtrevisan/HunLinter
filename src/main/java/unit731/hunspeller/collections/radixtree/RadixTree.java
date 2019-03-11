@@ -95,7 +95,13 @@ public class RadixTree<S, V extends Serializable>{
 		throw new UnsupportedOperationException("Cannot perform search in a non-Aho-Corasick tree");
 	}
 
-	/** Find the element with the given prefix */
+	/**
+	 * Find the element with the given prefix
+	 * 
+	 * @param prefix	The prefix to look for
+	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
+	 * @return The node founr, or <code>null</code> if empty
+	 */
 	public RadixTreeNode<S, V> find(S prefix, PrefixType type){
 		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
 		Function<VisitElement<S, V>, Boolean> visitor = elem -> {
@@ -114,6 +120,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * Gets a list of values whose associated keys have the given prefix, or are contained into the prefix.
 	 *
 	 * @param prefix	The prefix to look for
+	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
 	 * @return	The list of values
 	 * @throws NullPointerException	If the prefix is <code>null</code>
 	 */
@@ -154,6 +161,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * Gets a list of entries whose associated keys have the given prefix.
 	 *
 	 * @param prefix	The prefix to look for
+	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
 	 * @return	The list of values
 	 * @throws NullPointerException	If the given prefix is <code>null</code>
 	 */
@@ -420,6 +428,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * Note that the tree will be traversed in lexicographical order.
 	 *
 	 * @param visitor	The visitor
+	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
 	 */
 	public void visit(Function<VisitElement<S, V>, Boolean> visitor, PrefixType type){
 		visit(visitor, sequencer.getEmptySequence(), type);
