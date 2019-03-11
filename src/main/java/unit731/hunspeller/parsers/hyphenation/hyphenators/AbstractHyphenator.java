@@ -178,22 +178,30 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 
 	private void manageNoHyphen(List<String> response){
 		for(String nohyp : hypParser.getOptParser().getNoHyphen()){
-			int nohypLength = nohyp.length();
-			if(isStarting(nohyp)){
-				if(response.get(0).equals(nohyp.substring(1)))
-					response.remove(0);
-			}
-			else if(isEnding(nohyp)){
-				if(response.get(response.size() - 1).equals(nohyp.substring(0, nohypLength - 1)))
-					response.remove(response.size() - 1);
-			}
-			else{
-				Iterator<String> itr = response.iterator();
-				while(itr.hasNext())
-					if(nohyp.equals(itr.next()))
-						itr.remove();
-			}
+			if(isStarting(nohyp))
+				manageNoHyphenAtStart(response, nohyp);
+			else if(isEnding(nohyp))
+				manageNoHyphenAtEnd(response, nohyp);
+			else
+				manageNoHyphenAtMiddle(response, nohyp);
 		}
+	}
+
+	private void manageNoHyphenAtStart(List<String> response, String nohyp){
+		if(response.get(0).equals(nohyp.substring(1)))
+			response.remove(0);
+	}
+
+	private void manageNoHyphenAtEnd(List<String> response, String nohyp){
+		if(response.get(response.size() - 1).equals(nohyp.substring(0, nohyp.length() - 1)))
+			response.remove(response.size() - 1);
+	}
+
+	private void manageNoHyphenAtMiddle(List<String> response, String nohyp){
+		Iterator<String> itr = response.iterator();
+		while(itr.hasNext())
+			if(nohyp.equals(itr.next()))
+				itr.remove();
 	}
 
 	private boolean isStarting(String key){
