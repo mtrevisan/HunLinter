@@ -38,14 +38,18 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 		if(value == null)
 			return false;
 
+		BloomFilterInterface<T> currentFilter = chooseCurrentFilter(value);
+		return currentFilter.add(value);
+	}
+
+	private BloomFilterInterface<T> chooseCurrentFilter(T value){
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
 		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
 			currentFilter = fork(filters.size());
 
 			filters.push(currentFilter);
 		}
-
-		return currentFilter.add(value);
+		return currentFilter;
 	}
 
 	private BloomFilterInterface<T> fork(int count){

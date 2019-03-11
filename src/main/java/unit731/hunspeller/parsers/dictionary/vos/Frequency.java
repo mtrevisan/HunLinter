@@ -50,8 +50,7 @@ public class Frequency<T>{
 	 * @param increment	the amount by which the value should be incremented
 	 */
 	public void incrementValue(T value, long increment){
-		Long count = frequencies.getOrDefault(value, 0l);
-		frequencies.put(value, count + increment);
+		frequencies.put(value, getCount(value) + increment);
 	}
 
 	public void clear(){
