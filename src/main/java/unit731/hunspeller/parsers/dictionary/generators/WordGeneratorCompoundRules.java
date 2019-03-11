@@ -76,10 +76,19 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
 	private void checkCompoundRuleInputCorrectness(Map<String, Set<DictionaryEntry>> inputs, String[] compoundRuleComponents){
 		for(String component : compoundRuleComponents){
-			char chr = (component.length() == 1? component.charAt(0): 0);
-			if(chr != '*' && chr != '?' && inputs.get(component) == null)
+			boolean error = (inputs.get(component) == null);
+			if(component.length() == 1){
+				char chr = component.charAt(0);
+				error &= (chr != '*' && chr != '?');
+			}
+			if(error)
 				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
 					+ StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
+
+//			char chr = (component.length() == 1? component.charAt(0): 0);
+//			if(chr != '*' && chr != '?' && inputs.get(component) == null)
+//				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
+//					+ StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
 		}
 	}
 
