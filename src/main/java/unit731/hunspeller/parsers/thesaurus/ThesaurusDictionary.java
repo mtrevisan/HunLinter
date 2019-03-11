@@ -40,20 +40,14 @@ public class ThesaurusDictionary{
 	public boolean add(String partOfSpeech, List<String> meanings){
 		boolean result = false;
 		for(String meaning : meanings){
-			StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
-			sj.add(partOfSpeech);
-			meanings.stream()
-				.filter(m -> !m.equals(meaning))
-				.forEachOrdered(sj::add);
-			String mm = sj.toString();
+			MeaningEntry entry = extractPartOfSpeechAndMeanings(partOfSpeech, meanings, meaning);
 
 			String mean = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			ThesaurusEntry foundSynonym = findByMeaning(mean);
-
-			MeaningEntry entry = new MeaningEntry(mm);
 			if(foundSynonym != null)
 				//add to meanings if synonym does exists
-				foundSynonym.getMeanings().add(entry);
+				foundSynonym.getMeanings()
+					.add(entry);
 			else
 				//add to list if synonym does not exists
 				result = synonyms.add(new ThesaurusEntry(mean, Arrays.asList(entry)));
@@ -62,6 +56,15 @@ public class ThesaurusDictionary{
 		modified = true;
 
 		return result;
+	}
+
+	private MeaningEntry extractPartOfSpeechAndMeanings(String partOfSpeech, List<String> meanings, String meaning){
+		StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
+		sj.add(partOfSpeech);
+		meanings.stream()
+			.filter(m -> !m.equals(meaning))
+			.forEachOrdered(sj::add);
+		return new MeaningEntry(sj.toString());
 	}
 
 	public boolean add(ThesaurusEntry entry){
@@ -109,8 +112,8 @@ public class ThesaurusDictionary{
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		if(StringUtils.isNotBlank(text)){
-			String[] lines = StringUtils.split(text, StringUtils.LF);
 			meanings.clear();
+			String[] lines = StringUtils.split(text, StringUtils.LF);
 			for(String line : lines)
 				meanings.add(new MeaningEntry(line));
 		}
