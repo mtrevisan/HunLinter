@@ -144,7 +144,6 @@ class WordGeneratorBase{
 
 	protected List<Production> enforceOnlyInCompound(List<Production> productions){
 		String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
-
 		if(onlyInCompoundFlag != null){
 			Iterator<Production> itr = productions.iterator();
 			while(itr.hasNext()){

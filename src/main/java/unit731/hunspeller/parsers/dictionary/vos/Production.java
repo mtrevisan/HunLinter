@@ -158,7 +158,7 @@ public class Production extends DictionaryEntry{
 	}
 
 	public List<String> getMorphologicalFields(String morphologicalTag){
-		return Arrays.stream(morphologicalFields)
+		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
 			.filter(df -> df.startsWith(morphologicalTag))
 			.collect(Collectors.toList());
 	}

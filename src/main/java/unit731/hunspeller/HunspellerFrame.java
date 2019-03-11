@@ -1677,7 +1677,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			filCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
-			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, (compoundRules != null && !compoundRules.isEmpty()));
+			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 			mainTabbedPane.setSelectedIndex(index);
 
 
