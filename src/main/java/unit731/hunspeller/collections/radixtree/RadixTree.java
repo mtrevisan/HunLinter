@@ -1,19 +1,16 @@
 package unit731.hunspeller.collections.radixtree;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -131,31 +128,19 @@ public class RadixTree<S, V extends Serializable>{
 			.collect(Collectors.toList());
 	}
 
-//	/**
-//	 * Gets a list of keys with the given prefix.
-//	 *
-//	 * @param prefix	The prefix to look for
-//	 * @return	The list of prefixes
-//	 * @throws NullPointerException	If prefix is <code>null</code>
-//	 */
-//	public List<S> getKeysPrefixedBy(S prefix){
-//		return getEntriesPrefixedBy(prefix).stream()
-//			.map(VisitElement::getPrefix)
-//			.collect(Collectors.toList());
-//	}
-
-//	/**
-//	 * Gets a list of keys that are a prefix of the given prefix.
-//	 *
-//	 * @param prefix	The prefix to look for
-//	 * @return	The list of prefixes
-//	 * @throws NullPointerException	If prefix is <code>null</code>
-//	 */
-//	public List<S> getKeysPrefixedTo(S prefix){
-//		return getEntriesPrefixedTo(prefix).stream()
-//			.map(VisitElement::getPrefix)
-//			.collect(Collectors.toList());
-//	}
+	/**
+	 * Gets a list of keys with the given prefix.
+	 *
+	 * @param prefix	The prefix to look for
+	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
+	 * @return	The list of prefixes
+	 * @throws NullPointerException	If prefix is <code>null</code>
+	 */
+	public List<S> keys(S prefix, PrefixType type){
+		return getEntries(prefix, type).stream()
+			.map(VisitElement::getPrefix)
+			.collect(Collectors.toList());
+	}
 
 	/**
 	 * Gets a list of entries whose associated keys have the given prefix.
@@ -197,12 +182,10 @@ public class RadixTree<S, V extends Serializable>{
 		return result.get();
 	}
 
-//	public Set<Map.Entry<S, V>> entrySet(PrefixType type){
-//		List<VisitElement<S, V>> entries = getEntries(sequencer.getEmptySequence(), type);
-//		return entries.stream()
-//			.map(entry -> new AbstractMap.SimpleEntry<>(entry.getPrefix(), entry.getNode().getValue()))
-//			.collect(Collectors.toSet());
-//	}
+	public Set<VisitElement<S, V>> entrySet(PrefixType type){
+		List<VisitElement<S, V>> entries = getEntries(sequencer.getEmptySequence(), type);
+		return new HashSet<>(entries);
+	}
 
 	public Set<S> keySet(PrefixType type){
 		return getEntries(sequencer.getEmptySequence(), type).stream()
