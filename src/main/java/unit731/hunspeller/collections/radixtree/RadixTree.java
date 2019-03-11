@@ -356,27 +356,30 @@ public class RadixTree<S, V extends Serializable>{
 		Collection<RadixTreeNode<S, V>> children = node.getChildren();
 
 		//if there is no children of the node we need to delete it from the its parent children list
-		if(children == null){
-			S key = node.getKey();
-			Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
-			if(parentChildren != null){
-				Iterator<RadixTreeNode<S, V>> itr = parentChildren.iterator();
-				while(itr.hasNext())
-					if(sequencer.equals(itr.next().getKey(), key)){
-						itr.remove();
-						break;
-					}
-
-				//if parent is not real node and has only one child then they need to be merged.
-				if(parentChildren.size() == 1 && !parent.hasValue() && parent != root)
-					parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
-			}
-		}
+		if(children == null)
+			removeNodeNoChildren(node, parent);
 		else if(children.size() == 1)
 			//we need to merge the only child of this node with itself
 			children.iterator().next().mergeWithAncestor(node, sequencer);
 		else
 			node.setValue(null);
+	}
+
+	private void removeNodeNoChildren(RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+		S key = node.getKey();
+		Collection<RadixTreeNode<S, V>> parentChildren = parent.getChildren();
+		if(parentChildren != null){
+			Iterator<RadixTreeNode<S, V>> itr = parentChildren.iterator();
+			while(itr.hasNext())
+				if(sequencer.equals(itr.next().getKey(), key)){
+					itr.remove();
+					break;
+				}
+			
+			//if parent is not real node and has only one child then they need to be merged.
+			if(parentChildren.size() == 1 && !parent.hasValue() && parent != root)
+				parentChildren.iterator().next().mergeWithAncestor(parent, sequencer);
+		}
 	}
 
 
@@ -444,16 +447,20 @@ public class RadixTree<S, V extends Serializable>{
 			if(elem.getNode().hasValue() && condition.apply(elem.getPrefix(), prefix) && visitor.apply(elem))
 				break;
 
-			Collection<RadixTreeNode<S, V>> children = elem.getNode().getChildren();
-			if(children != null){
-				int prefixLen = sequencer.length(elem.getPrefix());
-				for(RadixTreeNode<S, V> child : children)
-					if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
-						S newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
-						stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
-					}
+			if(elem.getNode().hasChildren()){
+				addNodesToStack(elem, prefixAllowedLength, prefix, stack);
 			}
 		}
+	}
+
+	private void addNodesToStack(VisitElement<S, V> elem, int prefixAllowedLength, S prefix, Stack<VisitElement<S, V>> stack){
+		int prefixLen = sequencer.length(elem.getPrefix());
+		Collection<RadixTreeNode<S, V>> children = elem.getNode().getChildren();
+		for(RadixTreeNode<S, V> child : children)
+			if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
+				S newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
+				stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
+			}
 	}
 
 }
