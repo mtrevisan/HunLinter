@@ -58,9 +58,18 @@ public class AffixData{
 		return getData(key.getCode());
 	}
 
+	public <T> T getDataOrDefault(AffixTag key, T defaultValue){
+		return getDataOrDefault(key.getCode(), defaultValue);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> T getData(String key){
 		return (T)data.get(key);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getDataOrDefault(String key, T defaultValue){
+		return (T)data.getOrDefault(key, defaultValue);
 	}
 
 	private List<String> getStringData(AffixTag... keys){
@@ -108,19 +117,15 @@ public class AffixData{
 	}
 
 	public Set<String> getCompoundRules(){
-		return getData(AffixTag.COMPOUND_RULE);
+		return getDataOrDefault(AffixTag.COMPOUND_RULE, Collections.<String>emptySet());
 	}
 
 	public boolean isManagedByCompoundRule(String flag){
-		boolean found = false;
 		Set<String> compoundRules = getCompoundRules();
-		if(compoundRules != null)
-			for(String rule : compoundRules)
-				if(isManagedByCompoundRule(rule, flag)){
-					found = true;
-					break;
-				}
-		return found;
+		for(String rule : compoundRules)
+			if(isManagedByCompoundRule(rule, flag))
+				return true;
+		return false;
 	}
 
 	public boolean isManagedByCompoundRule(String compoundRule, String flag){

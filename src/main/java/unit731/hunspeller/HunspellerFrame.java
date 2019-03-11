@@ -1636,7 +1636,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//affix file:
 			AffixData affixData = backbone.getAffixData();
 			Set<String> compoundRules = affixData.getCompoundRules();
-			if(compoundRules != null && !compoundRules.isEmpty()){
+			if(!compoundRules.isEmpty()){
 				cmpInputComboBox.removeAllItems();
 				compoundRules.forEach(cmpInputComboBox::addItem);
 				String compoundFlag = affixData.getCompoundFlag();
