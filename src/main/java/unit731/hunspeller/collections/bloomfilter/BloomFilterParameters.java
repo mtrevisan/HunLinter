@@ -10,23 +10,43 @@ public abstract class BloomFilterParameters{
 	public static final BitArrayBuilder.Type BIT_ARRAY_TYPE_DEFAULT = BitArrayBuilder.Type.JAVA;
 
 
-	/** Expected (maximum) number of elements to be added without to transcend the falsePositiveProbability */
+	/**
+	 * Expected (maximum) number of elements to be added without transcending the <code>falsePositiveProbability</code>
+	 * 
+	 * @return	The expected number of elements
+	 */
 	public abstract int getExpectedNumberOfElements();
 
-	/** The maximum false positive probability rate that the bloom filter can give */
+	/**
+	 * The maximum false positive probability rate that the bloom filter can give
+	 * 
+	 * @return	The false positive probability
+	 */
 	public abstract double getFalsePositiveProbability();
 
-	/** Defaults to 2 */
+	/**
+	 * Defaults to 2
+	 * 
+	 * @return	The grow ratio when the filter is full
+	 */
 	public double getGrowRatioWhenFull(){
 		return GROW_RATIO_WHEN_FULL_DEFAULT;
 	}
 
-	/** Defaults to 0.85 */
+	/**
+	 * Defaults to 0.85
+	 * 
+	 * @return	The tightening ratio
+	 */
 	public double getTighteningRatio(){
 		return TIGHTENING_RATIO_DEFAULT;
 	}
 
-	/** Defaults to {@link BitArrayBuilder.Type#JAVA} */
+	/**
+	 * Defaults to {@link BitArrayBuilder.Type#JAVA}
+	 * 
+	 * @return	The bit array type
+	 */
 	public BitArrayBuilder.Type getBitArrayType(){
 		return BIT_ARRAY_TYPE_DEFAULT;
 	}
