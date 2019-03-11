@@ -80,18 +80,25 @@ public class Frequency<T>{
 	 * @return	a list containing the value(s) which appear most often.
 	 */
 	public List<T> getMode(){
+		long mostPopular = calculateMostPopularFrequency();
+
+		return getMode(mostPopular);
+	}
+
+	private long calculateMostPopularFrequency(){
 		//get the max count first, so we avoid having to recreate the list each time
 		long mostPopular = 0l;
 		for(Long frequency : frequencies.values())
 			if(frequency > mostPopular)
 				mostPopular = frequency;
+		return mostPopular;
+	}
 
+	private List<T> getMode(long mostPopular){
 		List<T> modeList = new ArrayList<>();
-		for(Map.Entry<T, Long> ent : frequencies.entrySet()){
-			long frequency = ent.getValue();
-			if(frequency == mostPopular)
+		for(Map.Entry<T, Long> ent : frequencies.entrySet())
+			if(ent.getValue() == mostPopular)
 				modeList.add(ent.getKey());
-		}
 		return modeList;
 	}
 
