@@ -28,11 +28,12 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 
 	@Override
 	protected HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options){
+		String w = HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY;
+
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		Iterator<SearchResult<String, String>> itr = patterns.search(HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT)
-			+ HyphenationParser.WORD_BOUNDARY);
+		Iterator<SearchResult<String, String>> itr = patterns.search(w);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
 
@@ -42,13 +43,18 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 			int delta = HyphenationParser.getKeyFromData(rule).length() - r.getNode().getKey().length();
 			indexesAndRules = extractSyllabe(rule, i - delta, word, normalizedWordSize, options, indexesAndRules);
 
-			List<String> rules = r.getNode().getAdditionalValues();
-			if(rules != null)
-				for(String rl : rules)
-					indexesAndRules = extractSyllabe(rl, i, word, normalizedWordSize, options, indexesAndRules);
+			indexesAndRules = manageAdditionalValues(r.getNode().getAdditionalValues(), i, word, normalizedWordSize, options, indexesAndRules);
 		}
 
 		return new HyphenationBreak(indexesAndRules, wordSize);
+	}
+
+	private Map<Integer, Pair<Integer, String>> manageAdditionalValues(List<String> rules, int i, String word, int normalizedWordSize, HyphenationOptions options,
+			Map<Integer, Pair<Integer, String>> indexesAndRules){
+		if(rules != null)
+			for(String rl : rules)
+				indexesAndRules = extractSyllabe(rl, i, word, normalizedWordSize, options, indexesAndRules);
+		return indexesAndRules;
 	}
 
 }

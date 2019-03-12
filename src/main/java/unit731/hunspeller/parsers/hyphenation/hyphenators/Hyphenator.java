@@ -23,8 +23,8 @@ class Hyphenator extends AbstractHyphenator{
 
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
-		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
+		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
 			List<String> prefixes = patterns.getValues(w.substring(i).toLowerCase(Locale.ROOT), RadixTree.PrefixType.PREFIXED_TO);
