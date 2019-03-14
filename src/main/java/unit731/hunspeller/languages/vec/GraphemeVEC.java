@@ -65,10 +65,22 @@ class GraphemeVEC{
 	 * @return	The converted word
 	 */
 	public static String handleJHJWIUmlautPhonemes(String word){
-		//correct fh occurrences
+		word = correctFhOccurrences(word);
+
+		word = correctIJGraphemes(word);
+
+		word = phonizeEtherophonicSequences(word);
+
+		return word;
+	}
+
+	private static String correctFhOccurrences(String word){
 		if(word.contains(GRAPHEME_FH))
 			word = StringUtils.replace(word, GRAPHEME_FH, GRAPHEME_F);
+		return word;
+	}
 
+	private static String correctIJGraphemes(String word){
 		//this step is mandatory before eterophonic sequence VjV
 		if(word.contains(GRAPHEME_J))
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
@@ -76,9 +88,10 @@ class GraphemeVEC{
 			for(Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
 //FIXME is there a way to optimize this PatternService.replaceAll?
 				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
+		return word;
+	}
 
-
-		//phonize etherophonic sequences
+	private static String phonizeEtherophonicSequences(String word){
 		if(word.contains(GRAPHEME_U))
 			word = PatternHelper.replaceAll(word, ETEROPHONIC_SEQUENCE_W, "$1w$2");
 		if(word.contains(GRAPHEME_I))
