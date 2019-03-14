@@ -70,13 +70,17 @@ public class DictionaryCorrectnessChecker{
 
 		if(hyphenator != null){
 			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
+			int size = splittedWords.size();
+			int i = 1;
 			for(String subword : splittedWords){
 				try{
-					checkCompoundProduction(subword, production);
+					checkCompoundProduction(subword, i - size, production);
 				}
 				catch(IllegalArgumentException e){
 					manageException(e, production);
 				}
+
+				i ++;
 			}
 		}
 	}
@@ -115,7 +119,7 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	//used by the correctness worker:
-	protected void checkCompoundProduction(String subword, Production production) throws IllegalArgumentException{}
+	protected void checkCompoundProduction(String subword, int subwordIndex, Production production) throws IllegalArgumentException{}
 
 	//used by the minimal pairs worker:
 	public boolean isConsonant(char chr){
