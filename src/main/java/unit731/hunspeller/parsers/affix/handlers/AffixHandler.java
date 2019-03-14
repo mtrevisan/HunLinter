@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.affix.handlers;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -18,11 +17,6 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 
 
 public class AffixHandler implements Handler{
-
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Error reading line \"{0}\" at row {1}: mismatched rule type (expected {2})");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Error reading line \"{0}\" at row {1}: mismatched rule flag (expected {2})");
-	private static final MessageFormat MULTIPLE_RULE_FLAGS = new MessageFormat("Error reading line \"{0}\" at row {1}: multiple rule flags");
-
 
 	@Override
 	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
@@ -56,17 +50,20 @@ public class AffixHandler implements Handler{
 		//List<AffixEntry> suffixEntries = new ArrayList<>();
 		List<String> aliasesFlag = getData.apply(AffixTag.ALIASES_FLAG);
 		List<String> aliasesMorphologicalField = getData.apply(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+		int i = 0;
+		String line = null;
 		List<AffixEntry> entries = new ArrayList<>(numEntries);
-		for(int i = 0; i < numEntries; i ++){
-			String line = extractLine(br);
+		try{
+			while(i < numEntries){
+				line = extractLine(br);
 
-			AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
+				AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
 
-			checkValidity(entry, ruleType, ruleFlag, line, i);
+				checkValidity(entry, ruleType, ruleFlag);
 
-			boolean inserted = entries.add(entry);
-			if(!inserted)
-				throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+				boolean inserted = entries.add(entry);
+				if(!inserted)
+					throw new IllegalArgumentException("duplicated line");
 	
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
@@ -78,6 +75,12 @@ public class AffixHandler implements Handler{
 //}
 //else
 //	prefixEntries.put(arr, lst);
+
+				i ++;
+			}
+		}
+		catch(IllegalArgumentException e){
+			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": " + e.getMessage());
 		}
 		return entries;
 	}
@@ -90,13 +93,13 @@ public class AffixHandler implements Handler{
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private void checkValidity(AffixEntry entry, AffixEntry.Type ruleType, String ruleFlag, String line, int index) throws IllegalArgumentException{
+	private void checkValidity(AffixEntry entry, AffixEntry.Type ruleType, String ruleFlag) throws IllegalArgumentException{
 		if(entry.getType() != ruleType)
-			throw new IllegalArgumentException(MISMATCHED_RULE_TYPE.format(new Object[]{line, index, ruleType}));
+			throw new IllegalArgumentException("mismatched rule type (expected " + ruleType + ")");
 		if(!ruleFlag.equals(entry.getFlag()))
-			throw new IllegalArgumentException(MISMATCHED_RULE_FLAG.format(new Object[]{line, index, ruleFlag}));
+			throw new IllegalArgumentException("mismatched rule flag (expected " + ruleFlag + ")");
 		if(!entry.containsUniqueContinuationFlags())
-			throw new IllegalArgumentException(MULTIPLE_RULE_FLAGS.format(new Object[]{line, index}));
+			throw new IllegalArgumentException("multiple rule flags");
 	}
 	
 }
