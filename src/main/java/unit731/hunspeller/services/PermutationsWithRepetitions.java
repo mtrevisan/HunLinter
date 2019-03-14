@@ -57,11 +57,17 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 			throw new IllegalArgumentException("Output count must be greater than one");
 
 		List<int[]> all = new ArrayList<>();
-		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++){
-			PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplications);
-			while(pr.hasNext() && all.size() < limit)
-				all.add(pr.next());
-		}
+		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++)
+			all.addAll(extractAllKPermutations(kk, all.size(), limit));
+		return all;
+	}
+
+	private List<int[]> extractAllKPermutations(int kk, int currentCount, int limit){
+		PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplications);
+
+		List<int[]> all = new ArrayList<>();
+		while(pr.hasNext() && all.size() + currentCount < limit)
+			all.add(pr.next());
 		return all;
 	}
 
