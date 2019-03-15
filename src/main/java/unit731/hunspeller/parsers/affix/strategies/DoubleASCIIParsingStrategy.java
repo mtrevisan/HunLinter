@@ -30,48 +30,49 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	private DoubleASCIIParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(String textFlags){
-		if(StringUtils.isBlank(textFlags))
+	public String[] parseFlags(String flags){
+		if(StringUtils.isBlank(flags))
 			return null;
 
-		checkValidity(textFlags);
+		checkValidity(flags);
 
-		String[] flags = extractFlags(textFlags);
+		String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(flags, textFlags);
+		checkForDuplication(singleFlags, flags);
 
-		return flags;
+		return singleFlags;
 	}
 
-	private void checkValidity(String textFlags) throws IllegalArgumentException{
-		if(textFlags.length() % 2 != 0)
-			throw new IllegalArgumentException("Flag must be of length multiple of two: " + textFlags);
+	private void checkValidity(String flags) throws IllegalArgumentException{
+		if(flags.length() % 2 != 0)
+			throw new IllegalArgumentException("Flag must be of length multiple of two: " + flags);
 	}
 
-	private String[] extractFlags(String textFlags){
-		return PatternHelper.split(textFlags, PATTERN);
+	private String[] extractFlags(String flags){
+		return PatternHelper.split(flags, PATTERN);
 	}
 
-	private void checkForDuplication(String[] flags, String textFlags) throws IllegalArgumentException{
+	private void checkForDuplication(String[] flags, String originalFlags) throws IllegalArgumentException{
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
-		if((unduplicatedFlags.size() << 1) < textFlags.length())
-			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+		if((unduplicatedFlags.size() << 1) < originalFlags.length())
+			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 
 	@Override
-	public String joinFlags(String[] textFlags){
-		if(textFlags == null || textFlags.length == 0)
+	public String joinFlags(String[] flags){
+		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkJoinValidity(textFlags);
+		String originalFlags = Arrays.toString(flags);
+		checkValidity(flags, originalFlags);
 
-		return String.join(StringUtils.EMPTY, textFlags);
+		return String.join(StringUtils.EMPTY, flags);
 	}
 
-	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
-		for(String flag : textFlags)
+	private void checkValidity(String[] flags, String originalFlags) throws IllegalArgumentException{
+		for(String flag : flags)
 			if(flag == null || flag.length() != 2)
-				throw new IllegalArgumentException("Each flag must be of length two: " + flag + " from " + Arrays.toString(textFlags));
+				throw new IllegalArgumentException("Flag must be of length two: " + flag + " from " + originalFlags);
 	}
 
 	@Override

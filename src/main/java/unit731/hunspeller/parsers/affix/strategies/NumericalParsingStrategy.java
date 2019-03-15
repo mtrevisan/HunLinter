@@ -33,18 +33,21 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	private NumericalParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(String textFlags){
-		if(StringUtils.isBlank(textFlags))
+	public String[] parseFlags(String flags){
+		if(StringUtils.isBlank(flags))
 			return null;
 
-		//extract flags
-		String[] flags = StringUtils.split(textFlags, COMMA);
+		String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(flags, textFlags);
+		checkForDuplication(singleFlags, flags);
 
-		checkForBounds(flags, textFlags);
+		checkValidity(singleFlags, flags);
 
-		return flags;
+		return singleFlags;
+	}
+
+	private String[] extractFlags(String flags){
+		return StringUtils.split(flags, COMMA);
 	}
 
 	private void checkForDuplication(String[] flags, String originalFlags) throws IllegalArgumentException{
@@ -59,14 +62,12 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 			return StringUtils.EMPTY;
 
 		String originalFlags = Arrays.toString(flags);
-		if(originalFlags.contains("("))
-			originalFlags = originalFlags.substring(1, originalFlags.length() - 1);
-		checkForBounds(flags, originalFlags);
+		checkValidity(flags, originalFlags);
 
 		return String.join(COMMA, flags);
 	}
 
-	private void checkForBounds(String[] flags, String originalFlags) throws IllegalArgumentException{
+	private void checkValidity(String[] flags, String originalFlags) throws IllegalArgumentException{
 		for(String flag : flags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);

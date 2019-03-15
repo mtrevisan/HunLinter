@@ -55,7 +55,7 @@ public class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length two: c from [ab, c]", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two: c from [ab, c]", exception.getMessage());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length two:  from [ab, ]", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two:  from [ab, ]", exception.getMessage());
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class DoubleCharParsingStrategyTest{
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be of length two: null from [ab, null]", exception.getMessage());
+		Assertions.assertEquals("Flag must be of length two: null from [ab, null]", exception.getMessage());
 	}
 
 	@Test
