@@ -63,7 +63,7 @@ public class NumericalParsingStrategyTest{
 			String[] flags = new String[]{"1", "c"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be an integer number: c from [1, c]", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number: c from [1, c]", exception.getMessage());
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class NumericalParsingStrategyTest{
 			String[] flags = new String[]{"1", "1.2"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be an integer number: 1.2 from [1, 1.2]", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number: 1.2 from [1, 1.2]", exception.getMessage());
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class NumericalParsingStrategyTest{
 			String[] flags = new String[]{"1", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be an integer number:  from [1, ]", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number:  from [1, ]", exception.getMessage());
 	}
 
 	@Test
@@ -90,7 +90,7 @@ public class NumericalParsingStrategyTest{
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Each flag must be an integer number: ab from [ab, null]", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number: ab from [ab, null]", exception.getMessage());
 	}
 
 	@Test

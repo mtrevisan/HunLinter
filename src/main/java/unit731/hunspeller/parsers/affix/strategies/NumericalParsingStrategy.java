@@ -47,45 +47,34 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		return flags;
 	}
 
-	private void checkForDuplication(String[] flags, String textFlags) throws IllegalArgumentException{
+	private void checkForDuplication(String[] flags, String originalFlags) throws IllegalArgumentException{
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(unduplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 
-	private void checkForBounds(String[] flags, String textFlags) throws IllegalArgumentException{
+	@Override
+	public String joinFlags(String[] flags){
+		if(flags == null || flags.length == 0)
+			return StringUtils.EMPTY;
+
+		String originalFlags = Arrays.toString(flags);
+		if(originalFlags.contains("("))
+			originalFlags = originalFlags.substring(1, originalFlags.length() - 1);
+		checkForBounds(flags, originalFlags);
+
+		return String.join(COMMA, flags);
+	}
+
+	private void checkForBounds(String[] flags, String originalFlags) throws IllegalArgumentException{
 		for(String flag : flags){
 			try{
 				int numericalFlag = Integer.parseInt(flag);
 				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + textFlags);
+					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + originalFlags);
 			}
 			catch(NumberFormatException e){
-				throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + textFlags);
-			}
-		}
-	}
-
-	@Override
-	public String joinFlags(String[] textFlags){
-		if(textFlags == null || textFlags.length == 0)
-			return StringUtils.EMPTY;
-
-		checkJoinValidity(textFlags);
-
-		return String.join(COMMA, textFlags);
-	}
-
-	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
-		for(String flag : textFlags){
-			try{
-				int numericalFlag = Integer.parseInt(flag);
-				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from "
-						+ Arrays.deepToString(textFlags));
-			}
-			catch(NumberFormatException e){
-				throw new IllegalArgumentException("Each flag must be an integer number: " + flag + " from " + Arrays.deepToString(textFlags));
+				throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + originalFlags);
 			}
 		}
 	}
