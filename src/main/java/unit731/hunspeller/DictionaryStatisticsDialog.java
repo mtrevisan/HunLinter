@@ -361,41 +361,16 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void fillStatisticDatas(){
 		long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){
-			int uniqueWords = statistics.getUniqueWords();
-			int compoundWords = statistics.getCompoundWords();
-			int contractedWords = statistics.getContractedWords();
 			Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
 			Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
 			Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
-			List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
-			int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
-			List<String> longestWords = statistics.getLongestWordsByCharacters();
-			int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
-			List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
-				.map(Hyphenation::getSyllabes)
-				.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
-				.collect(Collectors.toList());
-			longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
-			longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 			boolean hasSyllabeStatistics = (totalWords > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 
-			totalWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(totalWords));
-			uniqueWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(uniqueWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")");
-			compoundWordsLabel.setEnabled(hasSyllabeStatistics);
-			compoundWordsOutputLabel.setEnabled(hasSyllabeStatistics);
-			compoundWordsOutputLabel.setText(hasSyllabeStatistics? DictionaryParser.COUNTER_FORMATTER.format(compoundWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")": StringUtils.EMPTY);
-			contractedWordsOutputLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(contractedWords) + " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")");
-			lengthsModeOutputLabel.setText(String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())));
-			syllabeLengthsModeLabel.setEnabled(hasSyllabeStatistics);
-			syllabeLengthsModeOutputLabel.setEnabled(hasSyllabeStatistics);
-			syllabeLengthsModeOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList())): StringUtils.EMPTY);
-			mostCommonSyllabesLabel.setEnabled(hasSyllabeStatistics);
-			mostCommonSyllabesOutputLabel.setEnabled(hasSyllabeStatistics);
-			mostCommonSyllabesOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, mostCommonSyllabes): StringUtils.EMPTY);
-			longestWordCharactersOutputLabel.setText(String.join(LIST_SEPARATOR, longestWords) + " (" + longestWordCharsCount + ")");
-			longestWordSyllabesLabel.setEnabled(hasSyllabeStatistics);
-			longestWordSyllabesOutputLabel.setEnabled(hasSyllabeStatistics);
-			longestWordSyllabesOutputLabel.setText(hasSyllabeStatistics? String.join(LIST_SEPARATOR, longestWordSyllabes) + " (" + longestWordSyllabesCount + ")": StringUtils.EMPTY);
+			fillBaseStatistics();
+			if(hasSyllabeStatistics)
+				fillSyllabeStatistics();
+			else
+				cleanupDueToMissingSyllabeStatistics();
 
 			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
 			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
@@ -418,6 +393,81 @@ public class DictionaryStatisticsDialog extends JDialog{
 				addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
 			}
 		}
+	}
+
+	private void fillBaseStatistics(){
+		long totalWords = statistics.getTotalProductions();
+		int uniqueWords = statistics.getUniqueWords();
+		int contractedWords = statistics.getContractedWords();
+		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
+		int longestWordCharsCount = statistics.getLongestWordCountByCharacters();
+		List<String> longestWords = statistics.getLongestWordsByCharacters();
+		longestWords = DictionaryStatistics.extractRepresentatives(longestWords, 4);
+
+		String formattedTotalWords = DictionaryParser.COUNTER_FORMATTER.format(totalWords);
+		String formattedUniqueWords = DictionaryParser.COUNTER_FORMATTER.format(uniqueWords)
+			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")";
+		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
+			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
+		String formattedLengthsMode = String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedLongestWords = String.join(LIST_SEPARATOR, longestWords)
+			+ " (" + longestWordCharsCount + ")";
+
+		totalWordsOutputLabel.setText(formattedTotalWords);
+		uniqueWordsOutputLabel.setText(formattedUniqueWords);
+		contractedWordsOutputLabel.setText(formattedContractedWords);
+		lengthsModeOutputLabel.setText(formattedLengthsMode);
+		longestWordCharactersOutputLabel.setText(formattedLongestWords);
+	}
+
+	private void fillSyllabeStatistics(){
+		int compoundWords = statistics.getCompoundWords();
+		int uniqueWords = statistics.getUniqueWords();
+		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+		List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
+		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
+			.map(Hyphenation::getSyllabes)
+			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
+			.collect(Collectors.toList());
+		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
+		int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
+
+		String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
+			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
+		String formattedSyllabeLengthsMode = String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedMostCommonSyllabes = String.join(LIST_SEPARATOR, mostCommonSyllabes);
+		String formattedLongestWordSyllabes = String.join(LIST_SEPARATOR, longestWordSyllabes)
+			+ " (" + longestWordSyllabesCount + ")";
+
+		compoundWordsOutputLabel.setText(formattedCompoundWords);
+		syllabeLengthsModeOutputLabel.setText(formattedSyllabeLengthsMode);
+		mostCommonSyllabesOutputLabel.setText(formattedMostCommonSyllabes);
+		longestWordSyllabesOutputLabel.setText(formattedLongestWordSyllabes);
+
+		compoundWordsLabel.setEnabled(true);
+		compoundWordsOutputLabel.setEnabled(true);
+		syllabeLengthsModeLabel.setEnabled(true);
+		syllabeLengthsModeOutputLabel.setEnabled(true);
+		mostCommonSyllabesLabel.setEnabled(true);
+		mostCommonSyllabesOutputLabel.setEnabled(true);
+		longestWordSyllabesLabel.setEnabled(true);
+		longestWordSyllabesOutputLabel.setEnabled(true);
+	}
+
+	private void cleanupDueToMissingSyllabeStatistics(){
+		compoundWordsOutputLabel.setText(StringUtils.EMPTY);
+		syllabeLengthsModeOutputLabel.setText(StringUtils.EMPTY);
+		mostCommonSyllabesOutputLabel.setText(StringUtils.EMPTY);
+		longestWordSyllabesOutputLabel.setText(StringUtils.EMPTY);
+		
+		compoundWordsLabel.setEnabled(false);
+		compoundWordsOutputLabel.setEnabled(false);
+		syllabeLengthsModeLabel.setEnabled(false);
+		syllabeLengthsModeOutputLabel.setEnabled(false);
+		mostCommonSyllabesLabel.setEnabled(false);
+		mostCommonSyllabesOutputLabel.setEnabled(false);
+		longestWordSyllabesLabel.setEnabled(false);
+		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
