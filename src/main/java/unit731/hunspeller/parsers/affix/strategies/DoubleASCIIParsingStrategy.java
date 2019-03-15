@@ -79,15 +79,22 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	public String[] extractCompoundRule(String compoundRule){
 		String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
-		//check compound validity
-		for(String part : parts){
-			int size = part.length();
-			if(size != 2 && (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?'))
-				throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : "
-					+ compoundRule);
-		}
+		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
+	}
+
+	private void checkCompoundValidity(String[] parts, String compoundRule) throws IllegalArgumentException{
+		for(String part : parts)
+			checkCompoundValidity(part, compoundRule);
+	}
+
+	private void checkCompoundValidity(String part, String compoundRule) throws IllegalArgumentException{
+		int size = part.length();
+		boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+		if(size != 2 && isFlag)
+			throw new IllegalArgumentException("Compound rule must be composed by double-characters flags, or the optional operators '*' or '? : "
+				+ compoundRule);
 	}
 
 }
