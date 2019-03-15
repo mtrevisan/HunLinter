@@ -68,20 +68,23 @@ public class DictionaryCorrectnessChecker{
 			manageException(e, production);
 		}
 
-		if(hyphenator != null){
-			List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-			int size = splittedWords.size();
-			int i = 1;
-			for(String subword : splittedWords){
-				try{
-					checkCompoundProduction(subword, i - size, production);
-				}
-				catch(IllegalArgumentException e){
-					manageException(e, production);
-				}
+		if(hyphenator != null)
+			hyphenatorCheck(production);
+	}
 
-				i ++;
+	private void hyphenatorCheck(Production production) throws IllegalArgumentException{
+		List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
+		int size = splittedWords.size();
+		int i = 1;
+		for(String subword : splittedWords){
+			try{
+				checkCompoundProduction(subword, i - size, production);
 			}
+			catch(IllegalArgumentException e){
+				manageException(e, production);
+			}
+			
+			i ++;
 		}
 	}
 
