@@ -98,6 +98,10 @@ public class DictionaryStatistics implements Closeable{
 		return longestWordsBySyllabes;
 	}
 
+	public synchronized boolean hasSyllabeStatistics(){
+		return (totalProductions > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
+	}
+
 	public Orthography getOrthography(){
 		return orthography;
 	}

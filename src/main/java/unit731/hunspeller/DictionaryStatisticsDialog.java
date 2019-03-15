@@ -361,37 +361,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 	private void fillStatisticDatas(){
 		long totalWords = statistics.getTotalProductions();
 		if(totalWords > 0){
-			Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
-			Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
-			Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
-			boolean hasSyllabeStatistics = (totalWords > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
-
 			fillBaseStatistics();
-			if(hasSyllabeStatistics)
+			if(statistics.hasSyllabeStatistics())
 				fillSyllabeStatistics();
 			else
-				cleanupDueToMissingSyllabeStatistics();
+				cleanupSyllabeStatistics();
 
-			boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
-			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
-			if(hasData){
-				CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel<?>)lengthsPanel).getChart();
-				addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalWords);
-			}
+			fillLengthsFrequencies(totalWords);
 
-			hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
-			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
-			if(hasData){
-				CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel<?>)syllabesPanel).getChart();
-				addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalWords);
-			}
+			fillSyllabeLengthsFrequencies(totalWords);
 
-			hasData = stressesFrequencies.entrySetIterator().hasNext();
-			mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
-			if(hasData){
-				CategoryChart wordStressesChart = (CategoryChart)((XChartPanel<?>)stressesPanel).getChart();
-				addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
-			}
+			fillStressedFrequencies(totalWords);
 		}
 	}
 
@@ -454,7 +434,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(true);
 	}
 
-	private void cleanupDueToMissingSyllabeStatistics(){
+	private void cleanupSyllabeStatistics(){
 		compoundWordsOutputLabel.setText(StringUtils.EMPTY);
 		syllabeLengthsModeOutputLabel.setText(StringUtils.EMPTY);
 		mostCommonSyllabesOutputLabel.setText(StringUtils.EMPTY);
@@ -468,6 +448,39 @@ public class DictionaryStatisticsDialog extends JDialog{
 		mostCommonSyllabesOutputLabel.setEnabled(false);
 		longestWordSyllabesLabel.setEnabled(false);
 		longestWordSyllabesOutputLabel.setEnabled(false);
+	}
+
+	private void fillLengthsFrequencies(long totalWords){
+		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
+		boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
+
+		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
+		if(hasData){
+			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel<?>)lengthsPanel).getChart();
+			addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalWords);
+		}
+	}
+
+	private void fillSyllabeLengthsFrequencies(long totalWords){
+		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
+		boolean hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
+
+		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
+		if(hasData){
+			CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel<?>)syllabesPanel).getChart();
+			addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalWords);
+		}
+	}
+
+	private void fillStressedFrequencies(long totalWords){
+		Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
+		boolean hasData = stressesFrequencies.entrySetIterator().hasNext();
+
+		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
+		if(hasData){
+			CategoryChart wordStressesChart = (CategoryChart)((XChartPanel<?>)stressesPanel).getChart();
+			addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
+		}
 	}
 
 	private JPanel createChartPanel(String title, String xAxisTitle, String yAxisTitle){
