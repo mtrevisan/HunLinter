@@ -367,11 +367,11 @@ public class DictionaryStatisticsDialog extends JDialog{
 			else
 				cleanupSyllabeStatistics();
 
-			fillLengthsFrequencies(totalWords);
+			fillLengthsFrequencies(statistics.getLengthsFrequencies(), totalWords, lengthsPanel);
 
-			fillSyllabeLengthsFrequencies(totalWords);
+			fillLengthsFrequencies(statistics.getSyllabeLengthsFrequencies(), totalWords, syllabesPanel);
 
-			fillStressedFrequencies(totalWords);
+			fillLengthsFrequencies(statistics.getStressFromLastFrequencies(), totalWords, stressesPanel);
 		}
 	}
 
@@ -450,36 +450,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesOutputLabel.setEnabled(false);
 	}
 
-	private void fillLengthsFrequencies(long totalWords){
-		Frequency<Integer> lengthsFrequencies = statistics.getLengthsFrequencies();
-		boolean hasData = lengthsFrequencies.entrySetIterator().hasNext();
+	private void fillLengthsFrequencies(Frequency<Integer> frequencies, long totalSamples, JPanel panel){
+		boolean hasData = frequencies.entrySetIterator().hasNext();
 
-		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(lengthsPanel), hasData);
+		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(panel), hasData);
 		if(hasData){
-			CategoryChart wordLengthsChart = (CategoryChart)((XChartPanel<?>)lengthsPanel).getChart();
-			addSeriesToChart(wordLengthsChart, lengthsFrequencies, totalWords);
-		}
-	}
-
-	private void fillSyllabeLengthsFrequencies(long totalWords){
-		Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
-		boolean hasData = syllabeLengthsFrequencies.entrySetIterator().hasNext();
-
-		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(syllabesPanel), hasData);
-		if(hasData){
-			CategoryChart wordSyllabesChart = (CategoryChart)((XChartPanel<?>)syllabesPanel).getChart();
-			addSeriesToChart(wordSyllabesChart, syllabeLengthsFrequencies, totalWords);
-		}
-	}
-
-	private void fillStressedFrequencies(long totalWords){
-		Frequency<Integer> stressesFrequencies = statistics.getStressFromLastFrequencies();
-		boolean hasData = stressesFrequencies.entrySetIterator().hasNext();
-
-		mainTabbedPane.setEnabledAt(mainTabbedPane.indexOfComponent(stressesPanel), hasData);
-		if(hasData){
-			CategoryChart wordStressesChart = (CategoryChart)((XChartPanel<?>)stressesPanel).getChart();
-			addSeriesToChart(wordStressesChart, stressesFrequencies, totalWords);
+			CategoryChart chart = (CategoryChart)((XChartPanel<?>)panel).getChart();
+			addSeriesToChart(chart, frequencies, totalSamples);
 		}
 	}
 
