@@ -22,10 +22,11 @@ public class CompoundRuleHandler implements Handler{
 	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
 			Function<AffixTag, List<String>> getData){
 		try{
-			int numEntries = checkValidity(context);
+			checkValidity(context);
 
 			BufferedReader br = context.getReader();
 
+			int numEntries = Integer.parseInt(context.getFirstParameter());
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				String line = extractLine(br);
@@ -54,13 +55,12 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
-	private int checkValidity(ParsingContext context) throws IllegalArgumentException, NumberFormatException{
+	private void checkValidity(ParsingContext context) throws IllegalArgumentException, NumberFormatException{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
 		int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
 			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
-		return numEntries;
 	}
 
 	private String extractLine(BufferedReader br) throws IOException, EOFException{

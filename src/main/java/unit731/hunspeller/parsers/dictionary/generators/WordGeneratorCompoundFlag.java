@@ -77,21 +77,26 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		List<List<List<Production>>> entries = new ArrayList<>();
 		Map<Integer, List<Production>> dicEntries = new HashMap<>();
 		for(int[] permutation : permutations){
-			//expand permutation
-			List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-			for(int index : permutation){
-				if(!dicEntries.containsKey(index)){
-					DictionaryEntry input = inputs.get(index);
-					dicEntries.put(index, applyAffixRules(input, true));
-				}
-				List<Production> de = dicEntries.get(index);
-				if(!de.isEmpty())
-					expandedPermutationEntries.add(de);
-			}
-			if(!expandedPermutationEntries.isEmpty())
-				entries.add(expandedPermutationEntries);
+			List<List<Production>> compound = generateCompound(permutation, dicEntries, inputs);
+			if(compound != null)
+				entries.add(compound);
 		}
 		return entries;
+	}
+
+	private List<List<Production>> generateCompound(int[] permutation, Map<Integer, List<Production>> dicEntries, List<DictionaryEntry> inputs)
+			throws IllegalArgumentException{
+		List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+		for(int index : permutation){
+			if(!dicEntries.containsKey(index)){
+				DictionaryEntry input = inputs.get(index);
+				dicEntries.put(index, applyAffixRules(input, true));
+			}
+			List<Production> de = dicEntries.get(index);
+			if(!de.isEmpty())
+				expandedPermutationEntries.add(de);
+		}
+		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);
 	}
 
 }
