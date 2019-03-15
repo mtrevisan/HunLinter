@@ -290,7 +290,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	}
 
 
-	//FIXME method firm is awful
+	//FIXME method signature is awful
 	protected Map<Integer, Pair<Integer, String>> extractSyllabe(String rule, int startingIndex, String word, int normalizedWordSize,
 			HyphenationOptions options, Map<Integer, Pair<Integer, String>> indexesAndRules){
 		int leftMin = options.getLeftMin();
