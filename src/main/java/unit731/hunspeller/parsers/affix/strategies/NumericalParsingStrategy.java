@@ -68,15 +68,18 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkValidity(String[] flags, String originalFlags) throws IllegalArgumentException{
-		for(String flag : flags){
-			try{
-				int numericalFlag = Integer.parseInt(flag);
-				if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-					throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + originalFlags);
-			}
-			catch(NumberFormatException e){
-				throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + originalFlags);
-			}
+		for(String flag : flags)
+			checkValidity(flag, originalFlags);
+	}
+
+	private void checkValidity(String flag, String originalFlags) throws IllegalArgumentException{
+		try{
+			int numericalFlag = Integer.parseInt(flag);
+			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
+				throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + originalFlags);
+		}
+		catch(NumberFormatException e){
+			throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + originalFlags);
 		}
 	}
 
