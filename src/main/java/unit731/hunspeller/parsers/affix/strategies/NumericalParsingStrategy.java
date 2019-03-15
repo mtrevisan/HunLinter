@@ -101,9 +101,14 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 
 	private void checkCompoundValidity(String[] parts, String compoundRule) throws IllegalArgumentException{
 		for(String part : parts)
-			if((part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?') && !NumberUtils.isCreatable(part))
-				throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': "
-					+ compoundRule);
+			checkCompoundValidity(part, compoundRule);
+	}
+
+	private void checkCompoundValidity(String part, String compoundRule) throws IllegalArgumentException{
+		boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+		if(isNumber && !NumberUtils.isCreatable(part))
+			throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': "
+				+ compoundRule);
 	}
 
 }
