@@ -47,26 +47,13 @@ public class DictionaryCorrectnessChecker{
 	//used by the correctness worker:
 	public void checkProduction(Production production) throws IllegalArgumentException{
 		String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag)){
-			IllegalArgumentException e = new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
-			manageException(e, production);
-		}
+		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
+			throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
 
-		if(rulesLoader.isMorphologicalFieldsCheck()){
-			try{
-				morphologicalFieldCheck(production);
-			}
-			catch(IllegalArgumentException e){
-				manageException(e, production);
-			}
-		}
+		if(rulesLoader.isMorphologicalFieldsCheck())
+			morphologicalFieldCheck(production);
 
-		try{
-			incompatibilityCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		incompatibilityCheck(production);
 
 		if(hyphenator != null)
 			hyphenatorCheck(production);
@@ -77,22 +64,10 @@ public class DictionaryCorrectnessChecker{
 		int size = splittedWords.size();
 		int i = 1;
 		for(String subword : splittedWords){
-			try{
-				checkCompoundProduction(subword, i - size, production);
-			}
-			catch(IllegalArgumentException e){
-				manageException(e, production);
-			}
+			checkCompoundProduction(subword, i - size, production);
 			
 			i ++;
 		}
-	}
-
-	protected void manageException(IllegalArgumentException e, Production production) throws IllegalArgumentException{
-		StringBuilder sb = new StringBuilder(e.getMessage());
-		if(production.hasProductionRules())
-			sb.append(" (via ").append(production.getRulesSequence()).append(")");
-		throw new IllegalArgumentException(sb.toString());
 	}
 
 	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{

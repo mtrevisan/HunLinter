@@ -157,16 +157,14 @@ public class RulesLoader{
 		return cannotContainAccent.contains(word);
 	}
 
-	public void letterToFlagIncompatibilityCheck(Production production)
-			throws IllegalArgumentException{
+	public void letterToFlagIncompatibilityCheck(Production production) throws IllegalArgumentException{
 		for(Map.Entry<String, Set<LetterMatcherEntry>> check : letterAndRulesNotCombinable.entrySet())
 			if(StringUtils.containsAny(production.getWord(), check.getKey()))
 				for(LetterMatcherEntry entry : check.getValue())
 					entry.match(production);
 	}
 
-	public void flagToFlagIncompatibilityCheck(Production production)
-			throws IllegalArgumentException{
+	public void flagToFlagIncompatibilityCheck(Production production) throws IllegalArgumentException{
 		for(Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
 			if(production.hasContinuationFlag(check.getKey()))
 				for(RuleMatcherEntry entry : check.getValue())

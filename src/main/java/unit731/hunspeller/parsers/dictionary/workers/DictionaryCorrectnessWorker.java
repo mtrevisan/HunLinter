@@ -23,10 +23,25 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
+			for(Production production : productions){
+				try{
+					checker.checkProduction(production);
+				}
+				catch(Exception e){
+					throw wrapException(e, production);
+				}
+			}
 			productions.forEach(production -> checker.checkProduction(production));
 		};
 		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
+	}
+
+	private IllegalArgumentException wrapException(Exception e, Production production){
+		StringBuilder sb = new StringBuilder(e.getMessage());
+		if(production.hasProductionRules())
+			sb.append(" (via ").append(production.getRulesSequence()).append(")");
+		return new IllegalArgumentException(sb.toString());
 	}
 
 }

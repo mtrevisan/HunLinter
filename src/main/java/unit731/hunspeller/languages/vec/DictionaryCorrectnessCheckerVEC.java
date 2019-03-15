@@ -112,57 +112,22 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public void checkProduction(Production production) throws IllegalArgumentException{
 		super.checkProduction(production);
 
-		try{
-			stressCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		stressCheck(production);
 
-		try{
-			vanishingElCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		vanishingElCheck(production);
 
-		try{
-			incompatibilityCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		incompatibilityCheck(production);
 
 		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
 				&& !production.hasPartOfSpeech(POS_ADVERB)){
-			try{
-				metaphonesisCheck(production);
-			}
-			catch(IllegalArgumentException e){
-				manageException(e, production);
-			}
+			metaphonesisCheck(production);
 
-			try{
-				northernPluralCheck(production);
-			}
-			catch(IllegalArgumentException e){
-				manageException(e, production);
-			}
+			northernPluralCheck(production);
 		}
 
-		try{
-			finalSonorizationCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		finalSonorizationCheck(production);
 
-		try{
-			orthographyAndSyllabationCheck(production);
-		}
-		catch(IllegalArgumentException e){
-			manageException(e, production);
-		}
+		orthographyAndSyllabationCheck(production);
 	}
 
 	private void stressCheck(Production production) throws IllegalArgumentException{
