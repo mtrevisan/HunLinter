@@ -22,12 +22,9 @@ public class CompoundRuleHandler implements Handler{
 	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
 			Function<AffixTag, List<String>> getData){
 		try{
+			int numEntries = checkValidity(context);
+
 			BufferedReader br = context.getReader();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
 			Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
@@ -42,7 +39,7 @@ public class CompoundRuleHandler implements Handler{
 
 				String rule = lineParts[1];
 
-				checkValidity(rule, line, i, strategy);
+				checkRuleValidity(rule, line, i, strategy);
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
@@ -57,6 +54,15 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
+	private int checkValidity(ParsingContext context) throws IllegalArgumentException, NumberFormatException{
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
+		int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0)
+			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
+		return numEntries;
+	}
+
 	private String extractLine(BufferedReader br) throws IOException, EOFException{
 		String line = br.readLine();
 		if(line == null)
@@ -65,7 +71,7 @@ public class CompoundRuleHandler implements Handler{
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private void checkValidity(String rule, String line, int i, FlagParsingStrategy strategy) throws IllegalArgumentException{
+	private void checkRuleValidity(String rule, String line, int i, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		if(StringUtils.isBlank(rule))
 			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
 				+ ": compound rule type cannot be empty");
