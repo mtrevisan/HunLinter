@@ -35,55 +35,56 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	}
 
 	@Override
-	public String[] parseFlags(String textFlags){
-		if(StringUtils.isBlank(textFlags))
+	public String[] parseFlags(String flags){
+		if(StringUtils.isBlank(flags))
 			return null;
 
-		checkValidity(textFlags);
+		checkValidity(flags);
 
-		String[] flags = extractFlags(textFlags);
+		String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(flags, textFlags);
+		checkForDuplication(singleFlags, flags);
 
-		return flags;
+		return singleFlags;
 	}
 
-	private void checkValidity(String textFlags) throws IllegalArgumentException{
-		if(!canEncode(textFlags))
-			throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + textFlags);
+	private void checkValidity(String flags) throws IllegalArgumentException{
+		if(!canEncode(flags))
+			throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flags);
 	}
 
-	private String[] extractFlags(String textFlags){
-		int size = textFlags.length();
-		String[] flags = new String[size];
+	private String[] extractFlags(String flags){
+		int size = flags.length();
+		String[] singleFlags = new String[size];
 		for(int i = 0; i < size; i ++)
-			flags[i] = Character.toString(textFlags.charAt(i));
-		return flags;
+			singleFlags[i] = Character.toString(flags.charAt(i));
+		return singleFlags;
 	}
 
-	private void checkForDuplication(String[] flags, String textFlags) throws IllegalArgumentException{
+	private void checkForDuplication(String[] flags, String originalFlags) throws IllegalArgumentException{
 		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
-		if(unduplicatedFlags.size() < textFlags.length())
-			throw new IllegalArgumentException("Flags must not be duplicated: " + textFlags);
+		if(unduplicatedFlags.size() < originalFlags.length())
+			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 
 	@Override
-	public String joinFlags(String[] textFlags){
-		if(textFlags == null || textFlags.length == 0)
+	public String joinFlags(String[] flags){
+		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		checkJoinValidity(textFlags);
+		String originalFlags = Arrays.toString(flags);
+		checkValidity(flags, originalFlags);
 
-		return String.join(StringUtils.EMPTY, textFlags);
+		return String.join(StringUtils.EMPTY, flags);
 	}
 
-	private void checkJoinValidity(String[] textFlags) throws IllegalArgumentException{
-		for(String flag : textFlags){
+	private void checkValidity(String[] flags, String originalFlags) throws IllegalArgumentException{
+		for(String flag : flags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
 			if(!canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag
-					+ (textFlags.length > 1? " in " + String.join(",", textFlags): StringUtils.EMPTY));
+					+ (flags.length > 1? " in " + originalFlags: StringUtils.EMPTY));
 		}
 	}
 
