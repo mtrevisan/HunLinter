@@ -125,42 +125,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 			setProgress(0);
 
-			int totalLines = lines.size();
-			processingIndex.set(0);
-			Consumer<Pair<Integer, String>> processor = rowLine -> {
-				if(isCancelled())
-					throw new RuntimeInterruptedException();
+			processLines(lines);
 
-				try{
-					if(paused.get())
-						Thread.sleep(500l);
-					else{
-						processingIndex.incrementAndGet();
 
-						readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
-
-						setProgress(getProgress(processingIndex.get(), totalLines));
-					}
-				}
-				catch(InterruptedException e){
-					if(!isPreventExceptionRelaunch())
-						throw new RuntimeException(e);
-				}
-				catch(Exception e){
-					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
-
-					if(!isPreventExceptionRelaunch())
-						throw e;
-				}
-			};
-			if(isParallelProcessing())
-				lines.parallelStream()
-					.forEach(processor);
-			else
-				lines.stream()
-					.forEach(processor);
-			
-			
 			watch.stop();
 
 			setProgress(100);
@@ -179,6 +146,44 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			cancel(true);
 		}
+	}
+
+	private void processLines(List<Pair<Integer, String>> lines){
+		int totalLines = lines.size();
+		processingIndex.set(0);
+		Consumer<Pair<Integer, String>> processor = rowLine -> {
+			if(isCancelled())
+				throw new RuntimeInterruptedException();
+
+			try{
+				if(paused.get())
+					Thread.sleep(500l);
+				else{
+					processingIndex.incrementAndGet();
+
+					readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
+
+					setProgress(getProgress(processingIndex.get(), totalLines));
+				}
+			}
+			catch(InterruptedException e){
+				if(!isPreventExceptionRelaunch())
+					throw new RuntimeException(e);
+			}
+			catch(Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+
+				if(!isPreventExceptionRelaunch())
+					throw e;
+			}
+		};
+
+		if(isParallelProcessing())
+			lines.parallelStream()
+				.forEach(processor);
+		else
+			lines.stream()
+				.forEach(processor);
 	}
 
 	private void writeProcess(List<Pair<Integer, String>> lines){
