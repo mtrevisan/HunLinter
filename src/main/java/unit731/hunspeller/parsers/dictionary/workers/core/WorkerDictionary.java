@@ -127,7 +127,6 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			processLines(lines);
 
-
 			watch.stop();
 
 			setProgress(100);

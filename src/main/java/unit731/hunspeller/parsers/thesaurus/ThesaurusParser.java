@@ -264,11 +264,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	public static String prepareTextForThesaurusFilter(String text){
-		text = StringUtils.strip(text);
-		text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
-		text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
-		text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
-		return "(?iu)(" + text + ")";
+		if(text != null){
+			text = StringUtils.strip(text);
+			text = PatternHelper.clear(text, PATTERN_FILTER_EMPTY);
+			text = PatternHelper.replaceAll(text, PATTERN_FILTER_OR, "|");
+			text = PatternHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
+			text = "(?iu)(" + text + ")";
+		}
+		return text;
 	}
 
 	public void save(File theIndexFile, File theDataFile) throws IOException{
