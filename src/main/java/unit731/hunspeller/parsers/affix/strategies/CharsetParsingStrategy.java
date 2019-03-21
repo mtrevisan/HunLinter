@@ -92,7 +92,12 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	public String[] extractCompoundRule(String compoundRule){
 		checkCompoundValidity(compoundRule);
 
-		return compoundRule.split(StringUtils.EMPTY);
+		//NOTE: same as compoundRule.split(StringUtils.EMPTY) but faster
+		int size = compoundRule.length();
+		String[] result = new String[size];
+		for(int i = 0; i < size; i ++)
+			result[i] = String.valueOf(compoundRule.charAt(i));
+		return result;
 	}
 
 	private void checkCompoundValidity(String compoundRule) throws IllegalArgumentException{

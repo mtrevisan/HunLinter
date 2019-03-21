@@ -42,10 +42,10 @@ public class TimeWatch{
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		long mins = time(TimeUnit.MINUTES);
 		if(mins > 0)
-			sj.add(String.format("%d min", mins));
+			sj.add(Long.toString(mins) + " min");
 		long secs = time(TimeUnit.SECONDS) - mins * 60;
 		if(mins == 0 || secs > 0)
-			sj.add(String.format("%d sec", secs));
+			sj.add(Long.toString(secs) + " sec");
 		return sj.toString();
 	}
 
