@@ -118,7 +118,7 @@ public class DictionaryStatistics implements Closeable{
 			if(!stressIndexes.isEmpty())
 				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
 			syllabeLengthsFrequencies.addValue(syllabes.size());
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			for(String syllabe : syllabes){
 				sb.append(syllabe);
 				if(orthography.countGraphemes(syllabe) == syllabe.length())

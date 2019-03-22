@@ -47,7 +47,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 					if(hyphenation.hasErrors()){
 						String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
 							hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), row});
-						StringBuilder sb = new StringBuilder(message);
+						StringBuffer sb = new StringBuffer(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
 						sb.append(", line ").append(row);

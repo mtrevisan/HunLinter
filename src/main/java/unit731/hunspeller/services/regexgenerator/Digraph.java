@@ -107,7 +107,7 @@ public final class Digraph<T>{
 	 */
 	@Override
 	public String toString(){
-		StringBuilder s = new StringBuilder();
+		StringBuffer s = new StringBuffer();
 		s.append(NEWLINE);
 		int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){

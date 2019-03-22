@@ -265,7 +265,7 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		StringBuilder sb = new StringBuilder(word);
+		StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(StringUtils.join(continuationFlags, COMMA));
@@ -278,7 +278,7 @@ public class DictionaryEntry{
 	public String toString(FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy);
 
-		StringBuilder sb = new StringBuilder(word);
+		StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));

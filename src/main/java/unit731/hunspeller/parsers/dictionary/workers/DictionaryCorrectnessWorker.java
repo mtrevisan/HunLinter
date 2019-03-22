@@ -38,7 +38,7 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 	}
 
 	private IllegalArgumentException wrapException(Exception e, Production production){
-		StringBuilder sb = new StringBuilder(e.getMessage());
+		StringBuffer sb = new StringBuffer(e.getMessage());
 		if(production.hasProductionRules())
 			sb.append(" (via ").append(production.getRulesSequence()).append(")");
 		return new IllegalArgumentException(sb.toString());

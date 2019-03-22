@@ -40,7 +40,7 @@ public class GraphVIZRepresentation{
 	 * @param <V>	The type of values stored in the tree
 	 */
 	public <S, V extends Serializable> String generateGraphVIZRepresentation(RadixTree<S, V> tree, boolean displayEdgesToInitialState){
-		StringBuilder sb = new StringBuilder(40);
+		StringBuffer sb = new StringBuffer(40);
 		sb.append("digraph automaton{")
 			.append(GRAPHVIZ_NEW_LINE)
 			.append(GRAPHVIZ_TAB)
@@ -64,7 +64,7 @@ public class GraphVIZRepresentation{
 		return sb.toString();
 	}
 
-	private <S, V extends Serializable> void graphVIZAppendForwardTransition(StringBuilder sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
+	private <S, V extends Serializable> void graphVIZAppendForwardTransition(StringBuffer sb, RadixTreeNode<S, V> node, RadixTreeNode<S, V> parent){
 		sb.append(GRAPHVIZ_TAB)
 			.append(System.identityHashCode(parent))
 			.append(GRAPHVIZ_STYLE_ARROW)
@@ -78,7 +78,7 @@ public class GraphVIZRepresentation{
 			.append(GRAPHVIZ_NEW_LINE);
 	}
 
-	private <S, V extends Serializable> void graphVIZAppendFailureTransitions(RadixTree<S, V> tree, StringBuilder sb, RadixTreeNode<S, V> node,
+	private <S, V extends Serializable> void graphVIZAppendFailureTransitions(RadixTree<S, V> tree, StringBuffer sb, RadixTreeNode<S, V> node,
 			boolean displayEdgesToInitialState){
 		if(displayEdgesToInitialState || node.getFailNode() != tree.root || node == tree.root)
 			sb.append(GRAPHVIZ_TAB)
@@ -89,7 +89,7 @@ public class GraphVIZRepresentation{
 				.append(GRAPHVIZ_NEW_LINE);
 	}
 
-	private <S, V extends Serializable> void graphVIZAppendNode(StringBuilder sb, RadixTreeNode<S, V> node){
+	private <S, V extends Serializable> void graphVIZAppendNode(StringBuffer sb, RadixTreeNode<S, V> node){
 		sb.append(GRAPHVIZ_TAB)
 			.append(System.identityHashCode(node))
 			.append(node.hasValue()? GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_PRE_LABEL + node.getValue() + GRAPHVIZ_STYLE_STATE_WITH_OUTPUT_POST_LABEL:

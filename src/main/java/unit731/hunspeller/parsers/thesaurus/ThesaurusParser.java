@@ -144,7 +144,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
 
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		if(!partOfSpeech.startsWith("("))
 			sb.append('(');
 		sb.append(partOfSpeech);

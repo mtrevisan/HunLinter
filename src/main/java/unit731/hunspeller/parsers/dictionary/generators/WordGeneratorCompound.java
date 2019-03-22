@@ -100,7 +100,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 		compoundAsReplacement.clear();
 
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		Set<Production> productions = new LinkedHashSet<>();
 		//generate compounds:
 		for(List<List<Production>> entry : entries){
@@ -175,7 +175,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		}
 	}
 
-	private List<DictionaryEntry> composeCompound(int[] indexes, List<List<Production>> entry, StringBuilder sb){
+	private List<DictionaryEntry> composeCompound(int[] indexes, List<List<Production>> entry, StringBuffer sb){
 		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
 		boolean forbidTriples = affixData.isForbidTriplesInCompound();
@@ -224,7 +224,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return compoundEntries;
 	}
 
-	private boolean containsTriple(StringBuilder sb, String compound){
+	private boolean containsTriple(StringBuffer sb, String compound){
 		int count = 0;
 		int size = sb.length() - 1;
 		if(size > 1){

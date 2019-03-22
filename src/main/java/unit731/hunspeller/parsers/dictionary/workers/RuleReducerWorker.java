@@ -571,7 +571,7 @@ throw new RuntimeException("to be tested");
 	}
 
 	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		return sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)
@@ -583,7 +583,7 @@ throw new RuntimeException("to be tested");
 	}
 
 	private String composeLine(AffixEntry.Type type, String flag, LineEntry partialLine){
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		sb.append(type.getFlag().getCode())
 			.append(StringUtils.SPACE)
 			.append(flag)

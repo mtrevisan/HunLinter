@@ -179,7 +179,7 @@ public class WordVEC{
 //	}
 //
 //	private static String replaceCharAt(String text, int idx, char chr){
-//		StringBuilder sb = new StringBuilder(text);
+//		StringBuffer sb = new StringBuffer(text);
 //		sb.setCharAt(idx, chr);
 //		return sb.toString();
 //	}

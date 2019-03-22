@@ -127,7 +127,7 @@ public class ConversionTable{
 		if(word.contains(key)){
 			//search every occurence of the pattern in the word
 			int idx = -1;
-			StringBuilder sb = new StringBuilder();
+			StringBuffer sb = new StringBuffer();
 			while((idx = word.indexOf(key, idx + 1)) >= 0){
 				sb.setLength(0);
 				sb.append(word);
@@ -169,7 +169,7 @@ public class ConversionTable{
 
 	@Override
 	public String toString(){
-		StringBuilder sb = new StringBuilder();
+		StringBuffer sb = new StringBuffer();
 		sb.append("[affixTag=").append(affixTag).append(',');
 		sb.append("table=").append(table).append(']');
 		return sb.toString();

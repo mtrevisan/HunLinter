@@ -160,7 +160,7 @@ public class Frequency<T>{
 	 */
 	@Override
 	public String toString(){
-		StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
+		StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
 		Iterator<T> iter = frequencies.keySet().iterator();
 		while(iter.hasNext()){
 			T value = iter.next();
