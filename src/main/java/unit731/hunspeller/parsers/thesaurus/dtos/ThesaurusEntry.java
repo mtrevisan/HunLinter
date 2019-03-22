@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunspeller.services.FileHelper;
 
 
 public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
@@ -49,10 +48,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 			String meaning = br.readLine();
 			if(meaning == null)
 				throw new EOFException("Unexpected EOF while reading Thesaurus file");
-
-			//ignore any BOM marker on first line
-			if(i == 0)
-				meaning = FileHelper.clearBOMMarker(meaning);
 
 			meanings.add(new MeaningEntry(meaning));
 		}

@@ -3,6 +3,8 @@ package unit731.hunspeller.services;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,6 +14,8 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,14 +79,10 @@ public class FileHelper{
 		}
 	}
 
-	/**
-	 * Ignore any BOM marker
-	 * 
-	 * @param line	The line from which to strip the BOM marker
-	 * @return	The stripped line
-	 */
-	public static String clearBOMMarker(String line){
-		return (line.startsWith(BOM_MARKER)? line.substring(1): line);
+	public static LineNumberReader createReader(Path path, Charset charset) throws IOException{
+		final BOMInputStream bomis = new BOMInputStream(Files.newInputStream(path), ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE,
+			ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
+		return new LineNumberReader(new BufferedReader(new InputStreamReader(bomis, charset)));
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file

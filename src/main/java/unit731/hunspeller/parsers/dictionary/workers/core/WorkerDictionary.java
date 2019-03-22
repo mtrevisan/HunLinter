@@ -85,14 +85,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		File dicFile = getDicFile();
 		Charset charset = getCharset();
 		long totalSize = dicFile.length();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), charset))){
+		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = extractLine(br);
 			
 			long readSoFar = line.getBytes(charset).length + NEWLINE_SIZE;
 			
-			//ignore any BOM marker on first line
-			if(br.getLineNumber() == 1)
-				line = FileHelper.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 			

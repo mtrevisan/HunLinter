@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -151,13 +150,9 @@ public class AffixParser{
 
 		boolean encodingRead = false;
 		charset = FileHelper.determineCharset(affFile.toPath());
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(affFile.toPath(), charset))){
+		try(LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
 			String line;
 			while((line = br.readLine()) != null){
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
-
 				line = DictionaryParser.cleanLine(line);
 				if(line.isEmpty())
 					continue;

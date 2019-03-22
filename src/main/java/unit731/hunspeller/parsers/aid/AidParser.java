@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,16 +26,11 @@ public class AidParser{
 
 		Path path = aidFile.toPath();
 		Charset charset = FileHelper.determineCharset(path);
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(path, charset))){
+		try(LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line;
-			while((line = br.readLine()) != null){
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
-
+			while((line = br.readLine()) != null)
 				if(!line.isEmpty())
 					lines.add(line);
-			}
 		}
 	}
 

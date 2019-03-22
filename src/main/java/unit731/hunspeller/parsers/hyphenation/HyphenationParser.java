@@ -195,14 +195,11 @@ public class HyphenationParser{
 
 			Level level = Level.NON_COMPOUND;
 
-			Path hypPath = hypFile.toPath();
-			Charset charset = FileHelper.determineCharset(hypPath);
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(hypPath, charset))){
+			Path path = hypFile.toPath();
+			Charset charset = FileHelper.determineCharset(path);
+			try(LineNumberReader br = FileHelper.createReader(path, charset)){
 				String line = extractLine(br);
 
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
 				if(Charset.forName(line) != charset)
 					throw new IllegalArgumentException("Hyphenation data file malformed, the first line is not '" + charset.name() + "'");
 

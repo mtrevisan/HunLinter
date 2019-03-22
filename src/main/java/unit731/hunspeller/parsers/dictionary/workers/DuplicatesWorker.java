@@ -147,14 +147,11 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		setProgress(0);
 		File dicFile = dicParser.getDicFile();
 		Charset charset = getCharset();
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
+		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset())){
 			String line = extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + 2;
 
-			//ignore any BOM marker on first line
-			if(br.getLineNumber() == 1)
-				line = FileHelper.clearBOMMarker(line);
 			if(!NumberUtils.isCreatable(line))
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 

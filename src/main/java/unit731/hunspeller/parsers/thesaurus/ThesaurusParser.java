@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,13 +89,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public void parse(File theFile) throws IOException{
 		clearInternal();
 
-		Charset charset = FileHelper.determineCharset(theFile.toPath());
-		try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(theFile.toPath(), charset))){
+		Path path = theFile.toPath();
+		Charset charset = FileHelper.determineCharset(path);
+		try(LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
-
-			//ignore any BOM marker on first line
-			if(br.getLineNumber() == 1)
-				line = FileHelper.clearBOMMarker(line);
 
 			//line should be a charset
 			try{ Charsets.toCharset(line); }

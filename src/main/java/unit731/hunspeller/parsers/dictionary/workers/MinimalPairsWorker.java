@@ -78,16 +78,13 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 		try{
 			File dicFile = dicParser.getDicFile();
 			try(
-					LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()));
+					LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset());
 					BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset());
 					){
 				String line = extractLine(br);
 
 				long readSoFar = line.getBytes(charset).length + 2;
 
-				//ignore any BOM marker on first line
-				if(br.getLineNumber() == 1)
-					line = FileHelper.clearBOMMarker(line);
 				if(!NumberUtils.isCreatable(line))
 					throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
