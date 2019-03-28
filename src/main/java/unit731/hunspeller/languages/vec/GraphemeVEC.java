@@ -86,7 +86,6 @@ class GraphemeVEC{
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
 		if(word.contains(GRAPHEME_I))
 			for(Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
-//FIXME is there a way to optimize this PatternService.replaceAll?
 				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
 		return word;
 	}

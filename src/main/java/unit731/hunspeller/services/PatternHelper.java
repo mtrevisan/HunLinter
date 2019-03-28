@@ -59,6 +59,7 @@ public class PatternHelper{
 			.find();
 	}
 
+//FIXME is there a way to optimize this PatternService.replaceAll?
 	public static String replaceAll(String text, Pattern pattern, String replacement){
 		return pattern.matcher(text)
 			.replaceAll(replacement);
