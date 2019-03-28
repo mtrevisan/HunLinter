@@ -137,16 +137,16 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 			//hyphenation is custom, extract break point positions:
 			String[] hyphenations = customHyphenation.split(HyphenationParser.HYPHEN_EQUALS);
 			Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-			int charCount = Normalizer.normalize(hyphenations[0], Normalizer.Form.NFKC).length();
+			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){
 				String customRule = hyphenations[i - 1] + "1" + hyphenations[i];
 				indexesAndRules.put(charCount, Pair.of(1, customRule));
 
-				charCount += Normalizer.normalize(hyphenations[i], Normalizer.Form.NFKC).length();
+				charCount += getNormalizedLength(hyphenations[i]);
 			}
 			hyphBreak = new HyphenationBreak(indexesAndRules, wordSize);
 		}
-		else if(Normalizer.normalize(word, Normalizer.Form.NFKC).length() < options.getMinimumLength())
+		else if(getNormalizedLength(word) < options.getMinimumLength())
 			//ignore short words (early out):
 			hyphBreak = new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), wordSize);
 		else

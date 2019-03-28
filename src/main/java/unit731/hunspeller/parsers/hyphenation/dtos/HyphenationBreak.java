@@ -101,6 +101,7 @@ public class HyphenationBreak{
 				else if(i == syllabesCount - 1){
 					//merge syllabe with previous
 					syllabesCount --;
+
 					String removedSyllabe = syllabes.remove(syllabesCount);
 					syllabes.set(syllabesCount - 1, syllabes.get(syllabesCount - 1) + removedSyllabe);
 				}
