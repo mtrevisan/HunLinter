@@ -197,7 +197,7 @@ public class Backbone implements FileChangeListener{
 		if(hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
-			hypParser = new HyphenationParser(affParser.getAffixData().getLanguage());
+			hypParser = new HyphenationParser(HyphenatorFactory.Type.AHO_CORASICK, affParser.getAffixData().getLanguage());
 			hypParser.parse(hypFile);
 
 			hyphenator = HyphenatorFactory.createHyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);

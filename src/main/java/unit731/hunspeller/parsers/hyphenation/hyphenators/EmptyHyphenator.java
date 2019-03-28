@@ -18,7 +18,7 @@ class EmptyHyphenator extends AbstractHyphenator{
 	}
 
 	private EmptyHyphenator(){
-		super(new HyphenationParser("xx"), HyphenationParser.SOFT_HYPHEN);
+		super(new HyphenationParser(HyphenatorFactory.Type.STANDARD, "xx"), HyphenationParser.SOFT_HYPHEN);
 	}
 
 	private EmptyHyphenator(HyphenationParser hypParser, String breakCharacter){

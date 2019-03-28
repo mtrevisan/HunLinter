@@ -26,11 +26,13 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.radixtree.AhoCorasickTree;
 import unit731.hunspeller.collections.radixtree.RadixTree;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
@@ -108,6 +110,7 @@ public class HyphenationParser{
 			REDUCED_PATTERNS.put(level, new HashSet<>());
 	}
 
+	private final HyphenatorFactory.Type radixTreeType;
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
@@ -118,9 +121,11 @@ public class HyphenationParser{
 	private final HyphenationOptionsParser optParser;
 
 
-	public HyphenationParser(String language){
+	public HyphenationParser(HyphenatorFactory.Type radixTreeType, String language){
+		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
 
+		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -128,17 +133,19 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
-			patterns.put(level, RadixTree.createTree(new StringSequencer()));
+			patterns.put(level, creatTree());
 			customHyphenations.put(level, new HashMap<>());
 		}
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(String language, Map<Level, RadixTree<String, String>> patterns, Map<Level, Map<String, String>> customHyphenations,
-			HyphenationOptionsParser optParser){
+	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, RadixTree<String, String>> patterns,
+			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
+		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
+		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -147,7 +154,7 @@ public class HyphenationParser{
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(Level level : Level.values()){
-			RadixTree<String, String> p = patterns.getOrDefault(level, RadixTree.createTree(new StringSequencer()));
+			RadixTree<String, String> p = patterns.getOrDefault(level, creatTree());
 			this.patterns.put(level, p);
 		}
 		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.<Level, Map<String, String>>emptyMap());
@@ -156,6 +163,15 @@ public class HyphenationParser{
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
+	}
+
+	private RadixTree<String, String> creatTree(){
+		StringSequencer sequencer = new StringSequencer();
+		return (radixTreeType == HyphenatorFactory.Type.AHO_CORASICK? AhoCorasickTree.createTree(sequencer): RadixTree.createTree(sequencer));
+	}
+
+	public HyphenatorFactory.Type getRadixTreeType(){
+		return radixTreeType;
 	}
 
 	public Orthography getOrthography(){

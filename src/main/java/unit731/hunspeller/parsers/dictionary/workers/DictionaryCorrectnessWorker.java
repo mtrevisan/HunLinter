@@ -31,7 +31,6 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 					throw wrapException(e, production);
 				}
 			}
-			productions.forEach(production -> checker.checkProduction(production));
 		};
 		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
