@@ -123,15 +123,20 @@ public class ConversionTable{
 
 	private static void convertInside(String word, Pair<String, String> entry, List<String> conversions){
 		String key = entry.getKey();
+
 		//FIXME also combinations of more than one REP are possible? or mixed REP substitutions?
 		if(word.contains(key)){
+			String value = entry.getValue();
+			int keyLength = key.length();
+			int valueLength = value.length();
+
 			//search every occurence of the pattern in the word
-			int idx = -1;
+			int idx = -valueLength;
 			StringBuffer sb = new StringBuffer();
-			while((idx = word.indexOf(key, idx + 1)) >= 0){
+			while((idx = word.indexOf(key, idx + valueLength)) >= 0){
 				sb.setLength(0);
 				sb.append(word);
-				sb.replace(idx, idx + key.length(), entry.getValue());
+				sb.replace(idx, idx + keyLength, value);
 				conversions.add(sb.toString());
 			}
 		}
