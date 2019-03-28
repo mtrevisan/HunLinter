@@ -22,7 +22,7 @@ public class AhoCorasickStringRadixTreeTest{
 
 
 	@Test
-	public void testEmptyTree(){
+	public void emptyTree(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertTrue(tree.isEmpty());
@@ -30,7 +30,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSingleInsertion(){
+	public void singleInsertion(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -42,7 +42,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testMultipleInsertions(){
+	public void multipleInsertions(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -58,7 +58,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testPrepare(){
+	public void prepare(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -88,7 +88,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testMultipleInsertionOfTheSameKey(){
+	public void multipleInsertionOfTheSameKey(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -112,7 +112,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testPrefixFetch(){
+	public void prefixFetch(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -128,7 +128,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSpook(){
+	public void spook(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("pook", 1);
@@ -142,7 +142,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testRemoval(){
+	public void removal(){
 		RadixTree<String, Integer> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("test", 1);
@@ -166,7 +166,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testManyInsertions(){
+	public void manyInsertions(){
 		RadixTree<String, BigInteger> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		//n in [100, 500]
@@ -397,7 +397,7 @@ public class AhoCorasickStringRadixTreeTest{
 
 
 	@Test
-	public void testSearchForPartialParentAndLeafKeyWhenOverlapExists(){
+	public void searchForPartialParentAndLeafKeyWhenOverlapExists(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
@@ -408,7 +408,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSearchForLeafNodesWhenOverlapExists(){
+	public void searchForLeafNodesWhenOverlapExists(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
@@ -419,7 +419,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSearchForStringSmallerThanSharedParentWhenOverlapExists(){
+	public void searchForStringSmallerThanSharedParentWhenOverlapExists(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
@@ -430,7 +430,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSearchForStringEqualToSharedParentWhenOverlapExists(){
+	public void searchForStringEqualToSharedParentWhenOverlapExists(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("abcd", "abcd");
@@ -440,7 +440,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testInsert(){
+	public void insert(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -457,7 +457,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testInsertExistingUnrealNodeConvertsItToReal(){
+	public void insertExistingUnrealNodeConvertsItToReal(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("applepie", "applepie");
@@ -471,7 +471,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDuplicatesAllowed(){
+	public void duplicatesAllowed(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -487,7 +487,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDuplicatesNotAllowed(){
+	public void duplicatesNotAllowed(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTreeNoDuplicates(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -503,7 +503,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testInsertWithRepeatingPatternsInKey(){
+	public void insertWithRepeatingPatternsInKey(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("xbox 360", "xbox 360");
@@ -523,7 +523,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDeleteNodeWithNoChildren(){
+	public void deleteNodeWithNoChildren(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -532,7 +532,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDeleteNodeWithOneChild(){
+	public void deleteNodeWithOneChild(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -544,7 +544,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDeleteNodeWithMultipleChildren(){
+	public void deleteNodeWithMultipleChildren(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -558,14 +558,14 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testCantDeleteSomethingThatDoesntExist(){
+	public void cantDeleteSomethingThatDoesntExist(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.remove("apple"));
 	}
 
 	@Test
-	public void testCantDeleteSomethingThatWasAlreadyDeleted(){
+	public void cantDeleteSomethingThatWasAlreadyDeleted(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -575,7 +575,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testChildrenNotAffectedWhenOneIsDeleted(){
+	public void childrenNotAffectedWhenOneIsDeleted(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -592,7 +592,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSiblingsNotAffectedWhenOneIsDeleted(){
+	public void siblingsNotAffectedWhenOneIsDeleted(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -604,7 +604,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testCantDeleteUnrealNode(){
+	public void cantDeleteUnrealNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -614,14 +614,14 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testCantFindRootNode(){
+	public void cantFindRootNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.find("", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
-	public void testFindSimpleInsert(){
+	public void findSimpleInsert(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -630,7 +630,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testContainsSimpleInsert(){
+	public void containsSimpleInsert(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -639,7 +639,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testFindChildInsert(){
+	public void findChildInsert(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -653,7 +653,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testGetPrefixes(){
+	public void getPrefixes(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("h", "h");
@@ -675,7 +675,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testContainsChildInsert(){
+	public void containsChildInsert(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -689,21 +689,21 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testCantFindNonexistantNode(){
+	public void cantFindNonexistantNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertNull(tree.find("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
-	public void testDoesntContainNonexistantNode(){
+	public void doesntContainNonexistantNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		Assertions.assertFalse(tree.containsKey("apple", RadixTree.PrefixType.PREFIXED_BY));
 	}
 
 	@Test
-	public void testCantFindUnrealNode(){
+	public void cantFindUnrealNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -713,7 +713,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDoesntContainUnrealNode(){
+	public void doesntContainUnrealNode(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -723,7 +723,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSearchPrefix_LimitGreaterThanPossibleResults(){
+	public void searchPrefix_LimitGreaterThanPossibleResults(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -742,7 +742,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testSearchPrefix_LimitLessThanPossibleResults(){
+	public void searchPrefix_LimitLessThanPossibleResults(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -760,7 +760,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testGetSize(){
+	public void getSize(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
@@ -773,7 +773,7 @@ public class AhoCorasickStringRadixTreeTest{
 	}
 
 	@Test
-	public void testDeleteReducesSize(){
+	public void deleteReducesSize(){
 		RadixTree<String, String> tree = AhoCorasickTree.createTree(new StringSequencer());
 
 		tree.put("apple", "apple");
