@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
+import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
 import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
@@ -74,7 +75,7 @@ public class AhoCorasickStringRadixTreeTest{
 		Assertions.assertEquals(3, tree.get("tank", RadixTree.PrefixType.PREFIXED_BY).intValue());
 		Assertions.assertEquals(4, tree.get("rest", RadixTree.PrefixType.PREFIXED_BY).intValue());
 
-		Iterator<SearchResult<String, Integer>> itr = tree.search("resting in the test");
+		Iterator<SearchResult<String, Integer>> itr = tree.searchPrefixedBy("resting in the test");
 		SearchResult<String, Integer> search = itr.next();
 		Assertions.assertEquals(0, search.getIndex());
 		Assertions.assertEquals(4, search.getNode().getValue().intValue());
@@ -83,7 +84,7 @@ public class AhoCorasickStringRadixTreeTest{
 		Assertions.assertEquals(1, search.getNode().getValue().intValue());
 		Assertions.assertFalse(itr.hasNext());
 
-		itr = tree.search("blah");
+		itr = tree.searchPrefixedBy("blah");
 		Assertions.assertFalse(itr.hasNext());
 	}
 
