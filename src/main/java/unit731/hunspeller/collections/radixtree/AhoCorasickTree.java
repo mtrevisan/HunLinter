@@ -136,7 +136,7 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
 	@Override
-	public Iterator<SearchResult<S, V>> search(S text){
+	public Iterator<SearchResult<S, V>> searchPrefixedBy(S text){
 		Objects.requireNonNull(text);
 
 		if(!prepared)

@@ -88,7 +88,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The iterator of all the entries found inside the given text
 	 * @throws NullPointerException	If the given text is <code>null</code>
 	 */
-	public Iterator<SearchResult<S, V>> search(S text){
+	public Iterator<SearchResult<S, V>> searchPrefixedBy(S text){
 		throw new UnsupportedOperationException("Cannot perform search in a non-Aho-Corasick tree");
 	}
 

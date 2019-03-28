@@ -33,7 +33,7 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		Iterator<SearchResult<String, String>> itr = patterns.search(w);
+		Iterator<SearchResult<String, String>> itr = patterns.searchPrefixedBy(w);
 		while(itr.hasNext()){
 			SearchResult<String, String> r = itr.next();
 
