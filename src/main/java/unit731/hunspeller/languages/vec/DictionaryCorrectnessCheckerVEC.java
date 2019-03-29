@@ -48,7 +48,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static Pattern PATTERN_NORTHERN_PLURAL;
 	private static String PLURAL_NOUN_MASCULINE_RULE;
 	private static String VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL;
-	private static String METAPHONESIS_RULE;
 	private static String NORTHERN_PLURAL_RULE;
 	private static String NORTHERN_PLURAL_STRESSED_RULE;
 	private static String NORTHERN_PLURAL_EXCEPTION;
@@ -59,9 +58,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static final MessageFormat WORD_WITH_VAN_EL_CANNOT_CONTAIN_DH_OR_TH = new MessageFormat("Word with ƚ cannot contain đ or ŧ, {0}");
 	private static final MessageFormat WORD_WITH_VAN_EL_NEAR_CONSONANT = new MessageFormat("Word with ƚ near a consonant, {0}");
 	private static final MessageFormat WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN = new MessageFormat("Word with rule {0} cannot have otehr rules than {1}");
-	private static final MessageFormat METAPHONESIS_NOT_NEEDED_HANDLE = new MessageFormat("Metaphonesis not needed (missing plural flag), handle {0}");
-	private static final MessageFormat METAPHONESIS_MISSING = new MessageFormat("Metaphonesis missing, add {0}");
-	private static final MessageFormat METAPHONESIS_NOT_NEEDED = new MessageFormat("Metaphonesis not needed, remove {0}");
 	private static final MessageFormat NORTHERN_PLURAL_MISSING = new MessageFormat("Northern plural missing, add {0}");
 	private static final MessageFormat NORTHERN_PLURAL_NOT_NEEDED = new MessageFormat("Northern plural not needed, remove {0} or {1}");
 	private static final MessageFormat WORD_IS_MISSPELLED = new MessageFormat("{0} is misspelled, should be {1}");
@@ -99,7 +95,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		
 		PLURAL_NOUN_MASCULINE_RULE = rulesLoader.readProperty("masculinePluralNoun");
 		VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL = rulesLoader.readProperty("variantTransformationAtEndVanishingEl");
-		METAPHONESIS_RULE = rulesLoader.readProperty("metaphonesis");
 		NORTHERN_PLURAL_RULE = rulesLoader.readProperty("northernPlural");
 		NORTHERN_PLURAL_STRESSED_RULE = rulesLoader.readProperty("northernPluralStressed");
 		NORTHERN_PLURAL_EXCEPTION = rulesLoader.readProperty("northernPluralException");
@@ -119,12 +114,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		incompatibilityCheck(production);
 
-		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB)
-				&& !production.hasPartOfSpeech(POS_ADVERB)){
-			metaphonesisCheck(production);
-
+		if(production.hasNonTerminalContinuationFlags(affixData) && !production.hasPartOfSpeech(POS_VERB) && !production.hasPartOfSpeech(POS_ADVERB))
 			northernPluralCheck(production);
-		}
 
 		finalSonorizationCheck(production);
 
@@ -158,21 +149,6 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
 			throw new IllegalArgumentException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
-	}
-
-	private void metaphonesisCheck(Production production) throws IllegalArgumentException{
-		if(!production.hasPartOfSpeech(POS_PROPER_NOUN) && !production.hasPartOfSpeech(POS_ARTICLE)){
-			boolean hasMetaphonesisFlag = production.hasContinuationFlag(METAPHONESIS_RULE);
-			boolean hasPluralFlag = hasPluralFlag(production);
-			if(hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED_HANDLE.format(new Object[]{METAPHONESIS_RULE}));
-
-			boolean canHaveMetaphonesis = affixData.isAffixProductive(production.getWord(), METAPHONESIS_RULE);
-			if(canHaveMetaphonesis && !hasMetaphonesisFlag && hasPluralFlag)
-				throw new IllegalArgumentException(METAPHONESIS_MISSING.format(new Object[]{METAPHONESIS_RULE}));
-			if(!canHaveMetaphonesis && hasMetaphonesisFlag && !hasPluralFlag)
-				throw new IllegalArgumentException(METAPHONESIS_NOT_NEEDED.format(new Object[]{METAPHONESIS_RULE}));
-		}
 	}
 
 	private void northernPluralCheck(Production production) throws IllegalArgumentException{
