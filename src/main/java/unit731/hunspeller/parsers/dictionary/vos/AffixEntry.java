@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -178,7 +180,7 @@ public class AffixEntry{
 	 * 
 	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the suffix fields)
 	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the suffix fields)
-	 * Terminal Suffix: inflectional suffix fields "removed" by additional (not terminal) suffixes, useful for zero morphemes and affixes
+	 * Terminal Suffix: inflectional suffix fields removed by additional (not terminal) suffixes, useful for zero morphemes and affixes
 	 * 	removed by splitting rules
 	 * 
 	 * @param dicEntry	The dictionary entry to combine from
@@ -188,13 +190,14 @@ public class AffixEntry{
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
+		//FIXME
 //		boolean containsNonTerminalSuffixes = amf.stream()
-//			.anyMatch(field -> field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX));
-//		//remove inflectional and terminal suffixes
-//		mf = mf.stream()
-//			.filter(field -> !field.startsWith(WordGenerator.TAG_INFLECTIONAL_SUFFIX))
-//			.filter(field -> !containsNonTerminalSuffixes || !field.startsWith(WordGenerator.TAG_TERMINAL_SUFFIX))
-//			.collect(Collectors.toList());
+//			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX));
+		//remove inflectional and terminal suffixes
+		mf = mf.stream()
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX))
+//			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsNonTerminalSuffixes)
+			.collect(Collectors.toList());
 
 		//find stem
 		boolean stemFound = false;
