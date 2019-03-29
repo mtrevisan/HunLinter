@@ -128,7 +128,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(Exception e){
 			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
@@ -215,7 +215,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			setProgress(100);
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(Exception e){
 			cancelWorker(e);

@@ -218,7 +218,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			setProgress(100);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (in {})", watch.toStringMinuteSeconds());
 
 			try{
 				FileHelper.openFileWithChoosenEditor(outputFile);

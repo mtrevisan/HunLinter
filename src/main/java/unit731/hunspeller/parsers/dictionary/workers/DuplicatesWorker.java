@@ -112,7 +112,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			watch.stop();
 
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (it takes {})", watch.toStringMinuteSeconds());
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicates extracted successfully (in {})", watch.toStringMinuteSeconds());
 
 			if(!duplicates.isEmpty()){
 				try{
