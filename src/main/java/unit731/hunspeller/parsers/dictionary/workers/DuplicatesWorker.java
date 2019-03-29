@@ -166,7 +166,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						List<Production> productions = wordGenerator.applyAffixRules(line);
 
 						productions.stream()
-							.map(production -> production.toStringWithPartOfSpeechFields(comparator))
+							.map(production -> production.toStringWithPartOfSpeechFields())
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
@@ -228,7 +228,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 							List<Production> productions = wordGenerator.applyAffixRules(line);
 							String word = productions.get(0).getWord();
 							for(Production production : productions){
-								String text = production.toStringWithPartOfSpeechFields(comparator);
+								String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, word, lineIndex));
 							}
@@ -270,7 +270,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			setProgress(getProgress(1., totalSize + 1));
 			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
 				for(List<Duplicate> entries : mergedDuplicates){
-					writer.write(entries.get(0).getProduction().getWord());
+					writer.write(entries.get(0).getProduction().toStringWithPartOfSpeechFields());
 					writer.write(": ");
 					writer.write(entries.stream()
 						.map(duplicate -> 
@@ -296,7 +296,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 	private List<List<Duplicate>> mergeDuplicates(List<Duplicate> duplicates){
 		Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().getWord(),
+			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
 				duplicate -> {
 					List<Duplicate> list = new ArrayList<>();
 					list.add(duplicate);

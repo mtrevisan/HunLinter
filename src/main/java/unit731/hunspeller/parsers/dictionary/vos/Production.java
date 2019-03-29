@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -23,6 +22,8 @@ public class Production extends DictionaryEntry{
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
 	private static final String LEADS_TO = " > ";
+	private static final String POS_OPEN_BRACKET = "[";
+	private static final String POS_CLOSE_BRACKET = "]";
 
 
 	private List<AffixEntry> appliedRules;
@@ -158,8 +159,10 @@ public class Production extends DictionaryEntry{
 	}
 
 	public List<String> getMorphologicalFields(String morphologicalTag){
+		int purgeTag = morphologicalTag.length();
 		return Arrays.stream(morphologicalFields != null? morphologicalFields: new String[0])
 			.filter(df -> df.startsWith(morphologicalTag))
+			.map(df -> df.substring(purgeTag))
 			.collect(Collectors.toList());
 	}
 
@@ -168,19 +171,13 @@ public class Production extends DictionaryEntry{
 		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public String toStringWithPartOfSpeechFields(Comparator<String> comparator){
+	public String toStringWithPartOfSpeechFields(){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		String partOfSpeechFields = getPartOfSpeechFields(comparator);
-		if(StringUtils.isNotBlank(partOfSpeechFields))
-			sj.add(partOfSpeechFields);
-		return sj.toString();
-	}
-
-	private String getPartOfSpeechFields(Comparator<String> comparator){
 		List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
-		fields.sort(comparator);
-		return String.join(StringUtils.SPACE, fields);
+		if(!fields.isEmpty())
+			sj.add(POS_OPEN_BRACKET + String.join(StringUtils.SPACE, fields) + POS_CLOSE_BRACKET);
+		return sj.toString();
 	}
 
 	public void applyOutputConversionTable(AffixData affixData){
