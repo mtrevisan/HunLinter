@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -140,7 +141,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void vanishingElCheck(Production production) throws IllegalArgumentException{
 		String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-			if(PatternHelper.find(derivedWord, PATTERN_NON_VANISHING_EL))
+			if(PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY), PATTERN_NON_VANISHING_EL))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
 			if(production.hasContinuationFlag(NORTHERN_PLURAL_RULE))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
