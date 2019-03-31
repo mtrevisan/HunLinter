@@ -18,7 +18,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
-import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -156,15 +155,6 @@ public class AffixEntry{
 		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public boolean containsUniqueContinuationFlags(){
-		if(continuationFlags == null)
-			return true;
-
-		Set<String> set = new HashSet<>();
-		return Arrays.stream(continuationFlags)
-			.allMatch(set::add);
-	}
-
 	public String[] combineContinuationFlags(String[] otherContinuationFlags){
 		Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)
@@ -246,11 +236,15 @@ public class AffixEntry{
 		if(!isFullstrip && word.length() == removingLength)
 			throw new IllegalArgumentException("Cannot strip full words without the FULLSTRIP tag");
 
-		return (isSuffix()? word.substring(0, word.length() - removingLength) + appending: appending + word.substring(removingLength));
+		return (isSuffix()?
+			word.substring(0, word.length() - removingLength) + appending:
+			appending + word.substring(removingLength));
 	}
 
 	public String undoRule(String word) throws IllegalArgumentException{
-		return (isSuffix()? word.substring(0, word.length() - appendingLength) + removing: removing + word.substring(appendingLength));
+		return (isSuffix()?
+			word.substring(0, word.length() - appendingLength) + removing:
+			removing + word.substring(appendingLength));
 	}
 
 	@Override
