@@ -98,8 +98,6 @@ public class AffixHandler implements Handler{
 			throw new IllegalArgumentException("mismatched rule type (expected " + ruleType + ")");
 		if(!ruleFlag.equals(entry.getFlag()))
 			throw new IllegalArgumentException("mismatched rule flag (expected " + ruleFlag + ")");
-		if(!entry.containsUniqueContinuationFlags())
-			throw new IllegalArgumentException("multiple rule flags");
 	}
 	
 }
