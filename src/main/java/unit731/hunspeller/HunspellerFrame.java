@@ -1462,7 +1462,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 //				dicDuplicatesWorker.pause();
 
 				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!",
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary duplicates task?", "Warning!",
 					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				if(answer == JOptionPane.YES_OPTION){
 					dicDuplicatesWorker.cancel(true);
