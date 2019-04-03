@@ -15,7 +15,7 @@ public class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("This line has the condition part that not ends with the removal part: " + line, exception.getMessage());
+		Assertions.assertEquals("Condition part does not ends with removal part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test
@@ -25,7 +25,7 @@ public class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("This line has characters in common between removed and added part: " + line, exception.getMessage());
+		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("This line has the condition part that not starts with the removal part: " + line, exception.getMessage());
+		Assertions.assertEquals("Condition part does not starts with removal part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test
@@ -45,7 +45,7 @@ public class AffixEntryTest{
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			AffixEntry entry = new AffixEntry(line, strategy, null, null);
 		});
-		Assertions.assertEquals("This line has characters in common between removed and added part: " + line, exception.getMessage());
+		Assertions.assertEquals("Characters in common between removed and added part: '" + line + "'", exception.getMessage());
 	}
 
 	@Test

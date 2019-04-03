@@ -240,7 +240,7 @@ public class HyphenationParser{
 						else if(!isAugmentedRule(line) && line.contains(HYPHEN_EQUALS)){
 							String key = PatternHelper.clear(line, PATTERN_EQUALS);
 							if(customHyphenations.get(level).containsKey(key))
-								throw new IllegalArgumentException("Custom hyphenation " + line + " is already present");
+								throw new IllegalArgumentException("Custom hyphenation '" + line + "' is already present");
 
 							customHyphenations.get(level).put(key, line);
 						}
@@ -250,7 +250,7 @@ public class HyphenationParser{
 							String key = getKeyFromData(line);
 							boolean duplicatedRule = isRuleDuplicated(key, line, level);
 							if(duplicatedRule)
-								throw new IllegalArgumentException("Duplication found: " + line);
+								throw new IllegalArgumentException("Duplication found: '" + line + "'");
 							else
 								//insert current pattern into the radix tree (remove all numbers)
 								patterns.get(level).put(key, line);

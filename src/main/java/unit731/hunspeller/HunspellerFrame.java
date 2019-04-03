@@ -1189,7 +1189,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//try adding the meanings
 			String synonyms = theMeaningsTextField.getText();
 			Supplier<Boolean> duplicatesDiscriminator = () -> {
-				int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with the same part of speech.\nForce insertion?",
+				int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
 					"Please select one", JOptionPane.YES_NO_OPTION);
 				return (responseOption == JOptionPane.YES_OPTION);
 			};
@@ -1706,7 +1706,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			LOGGER.info(Backbone.MARKER_APPLICATION, "The file does not exists");
 		}
 		catch(IllegalArgumentException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
+			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
 		catch(Exception e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "A bad error occurred: {}", ExceptionHelper.getMessage(e));

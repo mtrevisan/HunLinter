@@ -35,7 +35,7 @@ public class CompoundRuleHandler implements Handler{
 
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.COMPOUND_RULE)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
 
 				String rule = lineParts[1];
@@ -44,7 +44,7 @@ public class CompoundRuleHandler implements Handler{
 
 				boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 						+ ": duplicated line");
 			}
 
@@ -57,10 +57,10 @@ public class CompoundRuleHandler implements Handler{
 
 	private void checkValidity(ParsingContext context) throws IllegalArgumentException, NumberFormatException{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
+			throw new IllegalArgumentException("Error reading line '" + context + "': The first parameter is not a number");
 		int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
-			throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
+			throw new IllegalArgumentException("Error reading line '" + context + "': Bad number of entries, it must be a positive integer");
 	}
 
 	private String extractLine(BufferedReader br) throws IOException, EOFException{
@@ -73,11 +73,11 @@ public class CompoundRuleHandler implements Handler{
 
 	private void checkRuleValidity(String rule, String line, int i, FlagParsingStrategy strategy) throws IllegalArgumentException{
 		if(StringUtils.isBlank(rule))
-			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 				+ ": compound rule type cannot be empty");
 		String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i
+			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 				+ ": compound rule is bad formatted");
 	}
 	

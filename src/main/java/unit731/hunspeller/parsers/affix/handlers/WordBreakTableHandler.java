@@ -40,7 +40,7 @@ public class WordBreakTableHandler implements Handler{
 				String[] lineParts = StringUtils.split(line);
 				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.WORD_BREAK_CHARACTERS)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": mismatched type (expected "
+					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": mismatched type (expected "
 						+ AffixTag.WORD_BREAK_CHARACTERS + ")");
 
 				String breakCharacter = lineParts[1];
@@ -48,11 +48,11 @@ public class WordBreakTableHandler implements Handler{
 					breakCharacter = HyphenationParser.EN_DASH;
 
 				if(StringUtils.isBlank(breakCharacter))
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": break character cannot be empty");
+					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": break character cannot be empty");
 
 				boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)
-					throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": duplicated line");
+					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": duplicated line");
 			}
 
 			addData.accept(AffixTag.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);

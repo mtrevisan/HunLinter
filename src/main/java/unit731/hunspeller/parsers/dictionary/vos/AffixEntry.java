@@ -88,14 +88,14 @@ public class AffixEntry{
 		String[] lineParts = StringUtils.split(line, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
 			throw new IllegalArgumentException("Expected an affix entry, found something else"
-				+ (lineParts.length > 0? ": " + line: StringUtils.EMPTY));
+				+ (lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY));
 
 		String ruleType = lineParts[0];
 		this.flag = lineParts[1];
 		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		Matcher m = PATTERN_LINE.matcher(lineParts[3]);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse affix line " + line);
+			throw new IllegalArgumentException("Cannot parse affix line '" + line + "'");
 		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
@@ -122,15 +122,15 @@ public class AffixEntry{
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
-					throw new IllegalArgumentException("This line has the condition part that not ends with the removal part: " + line);
+					throw new IllegalArgumentException("Condition part does not ends with removal part: '" + line + "'");
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
+					throw new IllegalArgumentException("Characters in common between removed and added part: '" + line + "'");
 			}
 			else{
 				if(!cond.startsWith(removal))
-					throw new IllegalArgumentException("This line has the condition part that not starts with the removal part: " + line);
+					throw new IllegalArgumentException("Condition part does not starts with removal part: '" + line + "'");
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					throw new IllegalArgumentException("This line has characters in common between removed and added part: " + line);
+					throw new IllegalArgumentException("Characters in common between removed and added part: '" + line + "'");
 			}
 		}
 	}

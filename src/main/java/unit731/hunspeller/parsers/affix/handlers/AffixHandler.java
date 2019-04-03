@@ -80,7 +80,7 @@ public class AffixHandler implements Handler{
 			}
 		}
 		catch(IllegalArgumentException e){
-			throw new IllegalArgumentException("Error reading line \"" + line + "\" at row " + i + ": " + e.getMessage());
+			throw new IllegalArgumentException("Reading error: " + e.getMessage());
 		}
 		return entries;
 	}

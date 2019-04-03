@@ -56,7 +56,7 @@ public class DictionaryEntry{
 
 		Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
+			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
 
 		String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 		String dicFlags = m.group(PARAM_FLAGS);
@@ -110,7 +110,7 @@ public class DictionaryEntry{
 
 		Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
-			throw new IllegalArgumentException("Cannot parse dictionary line " + line);
+			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
 
 		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 	}
