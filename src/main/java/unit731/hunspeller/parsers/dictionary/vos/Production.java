@@ -212,13 +212,7 @@ public class Production extends DictionaryEntry{
 		return sj.toString();
 	}
 
-	public String toDictionaryLine(FlagParsingStrategy strategy){
-		Objects.requireNonNull(strategy);
-
-		StringJoiner sj = new StringJoiner(TAB);
-		sj.add(super.toString(strategy));
-		String line = sj.toString();
-		//remove stem
+	public String removeStemFromMorphologicalFields(String line){
 		return PatternHelper.clear(line, PATTERN_STEM);
 	}
 

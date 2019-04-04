@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -180,31 +181,38 @@ public class AffixEntry{
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
-		//FIXME
-//		boolean containsNonTerminalSuffixes = amf.stream()
-//			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX));
+		boolean containsTerminalSuffixes = amf.stream()
+			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX))
-//			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsNonTerminalSuffixes)
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
 		//find stem
-		boolean stemFound = false;
-		for(String field : mf)
+		String stem = null;
+		Iterator<String> itr = mf.iterator();
+		while(itr.hasNext()){
+			String field = itr.next();
 			if(field.startsWith(MorphologicalTag.TAG_STEM)){
-				stemFound = true;
+				stem = field;
+				itr.remove();
 				break;
 			}
-		if(!stemFound)
-			for(String field : amf)
+		}
+		if(stem != null){
+			itr = amf.iterator();
+			while(itr.hasNext()){
+				String field = itr.next();
 				if(field.startsWith(MorphologicalTag.TAG_STEM)){
-					stemFound = true;
+					stem = field;
+					itr.remove();
 					break;
 				}
-		//add stem only if not present
-		if(!stemFound)
-			mf.add(0, MorphologicalTag.TAG_STEM + dicEntry.getWord());
+			}
+		}
+		//add stem as first element
+		mf.add(0, (stem != null? stem: MorphologicalTag.TAG_STEM + dicEntry.getWord()));
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);

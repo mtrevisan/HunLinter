@@ -194,6 +194,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		});
 		enableComponentFromWorker.put(WordlistWorker.WORKER_NAME, () -> {
 			dicExtractWordlistMenuItem.setEnabled(true);
+			dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(CompoundRulesWorker.WORKER_NAME, () -> {
 			cmpInputComboBox.setEnabled(true);
@@ -280,6 +281,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicStatisticsSeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
+      dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theFindDuplicatesMenuItem = new javax.swing.JMenuItem();
@@ -923,7 +925,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
       dicExtractWordlistMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
-      dicExtractWordlistMenuItem.setMnemonic('l');
       dicExtractWordlistMenuItem.setText("Extract wordlist...");
       dicExtractWordlistMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -931,6 +932,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       dicMenu.add(dicExtractWordlistMenuItem);
+
+      dicExtractWordlistPlainTextMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_wordlist.png"))); // NOI18N
+      dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)...");
+      dicExtractWordlistPlainTextMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicExtractWordlistPlainTextMenuItemActionPerformed(evt);
+         }
+      });
+      dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
       dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs...");
@@ -1159,7 +1169,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void dicExtractWordlistMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		extractDictionaryWordlist();
+		extractDictionaryWordlist(false);
    }//GEN-LAST:event_dicExtractWordlistMenuItemActionPerformed
 
    private void dicExtractMinimalPairsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractMinimalPairsMenuItemActionPerformed
@@ -1432,6 +1442,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		hypAddRuleDebouncer.call(this);
    }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
 
+   private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		extractDictionaryWordlist(true);
+   }//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+
 
 	@Override
 	public void actionPerformed(ActionEvent event){
@@ -1551,6 +1567,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					dicWordlistWorker.cancel();
 
 					dicExtractWordlistMenuItem.setEnabled(true);
+					dicExtractWordlistPlainTextMenuItem.setEnabled(true);
 					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
 
 					dicWordlistWorker = null;
@@ -1886,16 +1903,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void extractDictionaryWordlist(){
+	private void extractDictionaryWordlist(boolean plainWords){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
 			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChoosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
+				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
-				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), outputFile);
+				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), plainWords, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
 				dicWordlistWorker.execute();
 			}
@@ -2131,6 +2149,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JMenuItem dicExtractDuplicatesMenuItem;
    private javax.swing.JMenuItem dicExtractMinimalPairsMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
+   private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
    private javax.swing.JLabel dicInputLabel;
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;

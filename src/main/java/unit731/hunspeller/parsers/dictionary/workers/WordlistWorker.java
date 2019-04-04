@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +26,19 @@ public class WordlistWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, boolean plainWords, File outputFile){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
+		Function<Production, String> toString = (plainWords? Production::getWord: Production::toString);
 		BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line.getValue());
 
 			try{
 				for(Production production : productions){
-					writer.write(production.getWord());
+					writer.write(toString.apply(production));
 					writer.newLine();
 				}
 			}

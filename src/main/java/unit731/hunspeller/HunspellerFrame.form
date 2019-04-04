@@ -156,11 +156,21 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/dictionary_wordlist.png"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="108"/>
                 <Property name="text" type="java.lang.String" value="Extract wordlist..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="dicExtractWordlistPlainTextMenuItem">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/dictionary_wordlist.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Extract wordlist (plain words)..."/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicExtractWordlistPlainTextMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicExtractMinimalPairsMenuItem">
