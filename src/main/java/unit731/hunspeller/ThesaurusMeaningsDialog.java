@@ -1,10 +1,7 @@
 package unit731.hunspeller;
 
 import java.awt.FlowLayout;
-import java.awt.FocusTraversalPolicy;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -14,10 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
+import unit731.hunspeller.services.GUIHelper;
 
 
 public class ThesaurusMeaningsDialog extends JDialog{
@@ -49,7 +44,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
-		addCancelByEscapeKey();
+		GUIHelper.addCancelByEscapeKey(this);
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
@@ -154,20 +149,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
 		dispose();
    }//GEN-LAST:event_btnCancelActionPerformed
-
-	/** Force the escape key to call the same action as pressing the Cancel button. */
-	private void addCancelByEscapeKey(){
-		AbstractAction cancelAction = new AbstractAction(){
-			private static final long serialVersionUID = -5644390861803492172L;
-
-			@Override
-			public void actionPerformed(ActionEvent e){
-				dispose();
-			}
-		};
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
-	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
 		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());

@@ -1,20 +1,16 @@
 package unit731.hunspeller;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.services.GUIHelper;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
@@ -32,7 +28,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		initComponents();
 
-		addCancelByEscapeKey();
+		GUIHelper.addCancelByEscapeKey(this);
 
 		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);
@@ -72,20 +68,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
-
-	/** Force the escape key to call the same action as pressing the Cancel button. */
-	private void addCancelByEscapeKey(){
-		AbstractAction cancelAction = new AbstractAction(){
-			private static final long serialVersionUID = -5644390861803492172L;
-
-			@Override
-			public void actionPerformed(ActionEvent e){
-				dispose();
-			}
-		};
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
-	}
 
 	public static void main(String args[]){
 		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

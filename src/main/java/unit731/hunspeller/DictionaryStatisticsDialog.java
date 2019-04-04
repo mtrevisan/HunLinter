@@ -2,8 +2,6 @@ package unit731.hunspeller;
 
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -22,13 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.swing.AbstractAction;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -47,6 +42,7 @@ import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
+import unit731.hunspeller.services.GUIHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -81,7 +77,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 		catch(IOException e){}
 
-		addCancelByEscapeKey();
+		GUIHelper.addCancelByEscapeKey(this);
 		addListenerOnClose();
 
 		saveTextFileFileChooser = new JFileChooser();
@@ -334,20 +330,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 			exportButton.setEnabled(true);
 		}
    }//GEN-LAST:event_exportButtonActionPerformed
-
-	/** Force the escape key to call the same action as pressing the Cancel button. */
-	private void addCancelByEscapeKey(){
-		AbstractAction cancelAction = new AbstractAction(){
-			private static final long serialVersionUID = -5644390861803492172l;
-
-			@Override
-			public void actionPerformed(ActionEvent e){
-				dispose();
-			}
-		};
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
-	}
 
 	private void addListenerOnClose(){
 		addWindowListener(new WindowAdapter(){

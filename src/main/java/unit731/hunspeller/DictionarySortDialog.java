@@ -1,19 +1,14 @@
 package unit731.hunspeller;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
@@ -23,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.services.GUIHelper;
 
 
 public class DictionarySortDialog extends JDialog{
@@ -53,7 +49,7 @@ public class DictionarySortDialog extends JDialog{
 
 		lblMessage.setText(message);
 
-		addCancelByEscapeKey();
+		GUIHelper.addCancelByEscapeKey(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -148,20 +144,6 @@ public class DictionarySortDialog extends JDialog{
 		}
 		list.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnPreviousUnsortedAreaActionPerformed
-
-	/** Force the escape key to call the same action as pressing the Cancel button. */
-	private void addCancelByEscapeKey(){
-		AbstractAction cancelAction = new AbstractAction(){
-			private static final long serialVersionUID = -5644390861803492172L;
-
-			@Override
-			public void actionPerformed(ActionEvent e){
-				dispose();
-			}
-		};
-		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
-		getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
-	}
 
 	public void setCellRenderer(ListCellRenderer<String> renderer){
 		list.setCellRenderer(renderer);
