@@ -21,17 +21,22 @@ public class ConversionTable{
 		void convert(String word, Pair<String, String> entry, List<String> conversions);
 	}
 
+	private static final String KEY_INSIDE = reduceKey(" ");
+	private static final String KEY_STARTS_WITH = reduceKey("^");
+	private static final String KEY_ENDS_WITH = reduceKey("$");
+	private static final String KEY_WHOLE = reduceKey("^$");
+
 	private static final Map<String, ConversionFunction> CONVERSION_TABLE_ADD_METHODS = new HashMap<>();
 	static{
-		CONVERSION_TABLE_ADD_METHODS.put("  ", ConversionTable::convertInside);
-		CONVERSION_TABLE_ADD_METHODS.put("^ ", ConversionTable::convertStartsWith);
-		CONVERSION_TABLE_ADD_METHODS.put(" $", ConversionTable::convertEndsWith);
-		CONVERSION_TABLE_ADD_METHODS.put("^$", ConversionTable::convertWhole);
+		CONVERSION_TABLE_ADD_METHODS.put(KEY_INSIDE, ConversionTable::convertInside);
+		CONVERSION_TABLE_ADD_METHODS.put(KEY_STARTS_WITH, ConversionTable::convertStartsWith);
+		CONVERSION_TABLE_ADD_METHODS.put(KEY_ENDS_WITH, ConversionTable::convertEndsWith);
+		CONVERSION_TABLE_ADD_METHODS.put(KEY_WHOLE, ConversionTable::convertWhole);
 	}
 
 
 	private final AffixTag affixTag;
-	private List<Pair<String, String>> table;
+	private Map<String, List<Pair<String, String>>> table;
 
 
 	public ConversionTable(AffixTag affixTag){
@@ -53,7 +58,7 @@ public class ConversionTable{
 				throw new IllegalArgumentException("Error reading line \"" + context
 					+ ": Bad number of entries, it must be a positive integer");
 
-			table = new ArrayList<>(numEntries);
+			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
 				String line = extractLine(br);
 
@@ -61,7 +66,9 @@ public class ConversionTable{
 
 				checkValidity(parts, context);
 
-				table.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
+				String key = reduceKey(parts[1]);
+				table.computeIfAbsent(key, k -> new ArrayList<>())
+					.add(Pair.of(parts[1], StringUtils.replaceChars(parts[2], '_', ' ')));
 			}
 		}
 		catch(IOException e){
@@ -108,17 +115,36 @@ public class ConversionTable{
 	 */
 	public List<String> applyConversionTable(String word){
 		List<String> conversions = new ArrayList<>();
-		if(table != null)
-			for(Pair<String, String> entry : table){
-				String reducedKey = reduceKey(entry.getKey());
-				ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(reducedKey);
-				fun.convert(word, entry, conversions);
-			}
+		if(table != null){
+			conversions.addAll(applyConversionTable(word, KEY_WHOLE));
+			conversions.addAll(applyConversionTable(word, KEY_STARTS_WITH));
+			conversions.addAll(applyConversionTable(word, KEY_ENDS_WITH));
+			conversions.addAll(applyConversionTable(word, KEY_INSIDE));
+		}
 		return conversions;
 	}
 
-	private String reduceKey(String key){
+	private List<String> applyConversionTable(String word, String key){
+		List<String> conversions = new ArrayList<>();
+		List<Pair<String, String>> list = table.get(key);
+		if(list != null){
+			ConversionFunction fun = CONVERSION_TABLE_ADD_METHODS.get(key);
+			for(Pair<String, String> entry : list)
+				fun.convert(word, entry, conversions);
+		}
+		return conversions;
+	}
+
+	private static String reduceKey(String key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
+	}
+
+	private static boolean isStarting(String key){
+		return (key.charAt(0) == '^');
+	}
+
+	private static boolean isEnding(String key){
+		return (key.charAt(key.length() - 1) == '$');
 	}
 
 	private static void convertInside(String word, Pair<String, String> entry, List<String> conversions){
@@ -162,14 +188,6 @@ public class ConversionTable{
 		String strippedKey = key.substring(1, key.length() - 1);
 		if(word.equals(strippedKey))
 			conversions.add(entry.getValue());
-	}
-
-	private boolean isStarting(String key){
-		return (key.charAt(0) == '^');
-	}
-
-	private boolean isEnding(String key){
-		return (key.charAt(key.length() - 1) == '$');
 	}
 
 	@Override
