@@ -17,8 +17,8 @@ import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.services.GUIHelper;
 
 
 public class DictionarySortDialog extends JDialog{
@@ -49,7 +49,7 @@ public class DictionarySortDialog extends JDialog{
 
 		lblMessage.setText(message);
 
-		GUIHelper.addCancelByEscapeKey(this);
+		GUIUtils.addCancelByEscapeKey(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

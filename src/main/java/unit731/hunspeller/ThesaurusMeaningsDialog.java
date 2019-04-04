@@ -17,9 +17,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
-import unit731.hunspeller.services.GUIHelper;
 
 
 public class ThesaurusMeaningsDialog extends JDialog{
@@ -44,7 +44,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
-		GUIHelper.addCancelByEscapeKey(this);
+		GUIUtils.addCancelByEscapeKey(this);
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;

@@ -42,7 +42,6 @@ import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
 import unit731.hunspeller.parsers.dictionary.vos.Frequency;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
-import unit731.hunspeller.services.GUIHelper;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -77,7 +76,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 		catch(IOException e){}
 
-		GUIHelper.addCancelByEscapeKey(this);
+		GUIUtils.addCancelByEscapeKey(this);
 		addListenerOnClose();
 
 		saveTextFileFileChooser = new JFileChooser();

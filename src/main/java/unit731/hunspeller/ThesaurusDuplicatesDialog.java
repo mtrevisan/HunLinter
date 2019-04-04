@@ -10,7 +10,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.services.GUIHelper;
+import unit731.hunspeller.gui.GUIUtils;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
@@ -28,7 +28,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
 		initComponents();
 
-		GUIHelper.addCancelByEscapeKey(this);
+		GUIUtils.addCancelByEscapeKey(this);
 
 		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);

@@ -5,17 +5,22 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -26,6 +31,20 @@ public class GUIUtils{
 
 
 	private GUIUtils(){}
+
+	/** Force the escape key to call the same action as pressing the Cancel button. */
+	public static void addCancelByEscapeKey(JDialog dialog){
+		AbstractAction cancelAction = new AbstractAction(){
+			private static final long serialVersionUID = -5644390861803492172L;
+
+			@Override
+			public void actionPerformed(ActionEvent e){
+				dialog.dispose();
+			}
+		};
+		KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
+		dialog.getRootPane().registerKeyboardAction(cancelAction, escapeKey, JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
 
 	public static JPopupMenu createCopyingPopupMenu(int iconSize) throws IOException{
 		JPopupMenu popupMenu = new JPopupMenu();

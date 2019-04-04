@@ -15,8 +15,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.services.GUIHelper;
 
 
 /**
@@ -37,7 +37,7 @@ public class HelpDialog extends JDialog{
 
 		initComponents();
 
-		GUIHelper.addCancelByEscapeKey(this);
+		GUIUtils.addCancelByEscapeKey(this);
 
 
 		try{
