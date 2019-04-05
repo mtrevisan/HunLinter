@@ -181,11 +181,14 @@ public class AffixEntry{
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
+		boolean containsPartOfSpeech = amf.stream()
+			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));
 		boolean containsTerminalSuffixes = amf.stream()
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX))
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH) || !containsPartOfSpeech)
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
