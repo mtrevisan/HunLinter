@@ -181,6 +181,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			bloomFilter.close();
 			duplicatesBloomFilter.close();
 		}
+		bloomFilter.clear();
+
 		setProgress(100);
 
 		int totalProductions = bloomFilter.getAddedElements();
@@ -189,8 +191,6 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
 		LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
-
-		bloomFilter.clear();
 
 		return duplicatesBloomFilter;
 	}
