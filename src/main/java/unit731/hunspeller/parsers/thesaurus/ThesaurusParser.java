@@ -132,14 +132,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	/**
 	 * @param synonymAndMeanings			The line representing all the synonyms of a word along with their part of speech
-	 * @param duplicatesDiscriminator	Function called to ask the user what to do is duplicates are found (return <code>true</code> to force
+	 * @param duplicatesDiscriminator	Function called to ask the user what to do if duplicates are found (return <code>true</code> to force
 	 *												insertion)
 	 * @return The duplication result
 	 */
 	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
 		String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
-			throw new IllegalArgumentException("Wrong format: " + synonymAndMeanings);
+			throw new IllegalArgumentException("Wrong format: '" + synonymAndMeanings + "'");
 
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
 		StringBuffer sb = new StringBuffer();
@@ -157,7 +157,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			.distinct()
 			.collect(Collectors.toList());
 		if(meanings.size() < 2)
-			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + synonymAndMeanings);
+			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
 
 		DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
 
@@ -185,9 +185,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		List<ThesaurusEntry> duplicates = new ArrayList<>();
 		try{
 			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(String meaning : means)
+			for(String meaning : means){
+				String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 				for(ThesaurusEntry synonym : synonyms)
-					if(synonym.getSynonym().equals(meaning)){
+					if(synonym.getSynonym().equals(mean)){
 						List<MeaningEntry> meanings = synonym.getMeanings();
 						long countSamePartOfSpeech = meanings.stream()
 							.map(MeaningEntry::getPartOfSpeech)
@@ -195,8 +196,9 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 							.map(m -> 1)
 							.reduce(0, (accumulator, m) -> accumulator + 1);
 						if(countSamePartOfSpeech > 0l)
-							throw new IllegalArgumentException("Duplicate detected for " + meaning);
+							throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
 					}
+			}
 		}
 		catch(IllegalArgumentException e){
 			if(!duplicatesDiscriminator.get())

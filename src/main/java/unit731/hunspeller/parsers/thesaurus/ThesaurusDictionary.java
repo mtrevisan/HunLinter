@@ -19,7 +19,7 @@ import unit731.hunspeller.services.PatternHelper;
 
 public class ThesaurusDictionary{
 
-	private static final Pattern PATTERN_PART_OF_SPEECH = PatternHelper.pattern("\\([^)]+\\)");
+	public static final Pattern PATTERN_PART_OF_SPEECH = PatternHelper.pattern("\\s*\\([^)]+\\)");
 
 
 	@JsonProperty

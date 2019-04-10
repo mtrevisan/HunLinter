@@ -131,8 +131,8 @@ public class Backbone implements FileChangeListener{
 		File aidFile = getAidFile();
 		openAidFile(aidFile);
 
-		File theFile = getThesaurusDataFile();
-		openThesaurusFile(theFile);
+		File theDataFile = getThesaurusDataFile();
+		openThesaurusFile(theDataFile);
 	}
 
 	/* NOTE: used for testing purposes */
@@ -150,8 +150,8 @@ public class Backbone implements FileChangeListener{
 		File aidFile = getAidFile();
 		openAidFile(aidFile);
 
-		File theFile = getThesaurusDataFile();
-		openThesaurusFile(theFile);
+		File theDataFile = getThesaurusDataFile();
+		openThesaurusFile(theDataFile);
 	}
 
 	public void clear(){
@@ -242,11 +242,11 @@ public class Backbone implements FileChangeListener{
 			aidParser.clear();
 	}
 
-	private void openThesaurusFile(File theFile) throws IOException{
-		if(theFile.exists()){
-			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theFile.getName());
+	private void openThesaurusFile(File theDataFile) throws IOException{
+		if(theDataFile.exists()){
+			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theDataFile.getName());
 
-			theParser.parse(theFile);
+			theParser.parse(theDataFile);
 
 			if(hunspellable != null)
 				hunspellable.clearThesaurusParser();
