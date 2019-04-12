@@ -44,8 +44,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	protected static class Memento{
 
 		@JsonProperty
-		private final ThesaurusDictionary dictionary;
+		private ThesaurusDictionary dictionary;
 
+
+		Memento(){}
 
 		Memento(ThesaurusDictionary dictionary){
 			this.dictionary = dictionary;

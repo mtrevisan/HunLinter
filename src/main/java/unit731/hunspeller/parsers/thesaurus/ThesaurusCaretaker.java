@@ -13,10 +13,14 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import unit731.hunspeller.services.memento.CaretakerInterface;
 
 
 public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Memento>{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusCaretaker.class);
 
 	private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 	private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
@@ -31,6 +35,8 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 		byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
 		Path mementoFile = createFile(bytes);
 
+		LOGGER.info("Created memento file '{}', size is {} B", mementoFile.toString(), bytes.length);
+
 		mementos.push(mementoFile);
 	}
 
@@ -44,6 +50,8 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 	@Override
 	public ThesaurusParser.Memento popMemento() throws IOException{
 		Path mementoFile = mementos.pop();
+
+		LOGGER.info("Retrieve memento file '{}'", mementoFile.toString());
 
 		byte[] bytes = Files.readAllBytes(mementoFile);
 		String json = new String(decompress(bytes), DEFAULT_CHARSET);

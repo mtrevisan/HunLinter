@@ -22,10 +22,12 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 
 	@JsonProperty
-	private final String synonym;
+	private String synonym;
 	@JsonProperty
 	private List<MeaningEntry> meanings;
 
+
+	private ThesaurusEntry(){}
 
 	public ThesaurusEntry(String synonym, List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);

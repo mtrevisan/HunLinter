@@ -15,10 +15,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class MeaningEntry implements Comparable<MeaningEntry>{
 
 	@JsonProperty
-	private final String partOfSpeech;
+	private String partOfSpeech;
 	@JsonProperty
-	private final List<String> meanings;
+	private List<String> meanings;
 
+
+	private MeaningEntry(){}
 
 	public MeaningEntry(String partOfSpeech, List<String> meanings){
 		Objects.requireNonNull(partOfSpeech);
