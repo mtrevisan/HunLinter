@@ -48,35 +48,35 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		private ThesaurusDictionary dictionary;
 
-		private String partOfSpeech;
-		private List<String> meanings;
-
-		private ThesaurusEntry updatedSynonym;
-		private List<MeaningEntry> meaningEntries;
-		private String text;
-
-		private List<ThesaurusEntry> removedSynonyms;
+//		private String partOfSpeech;
+//		private List<String> meanings;
+//
+//		private ThesaurusEntry updatedSynonym;
+//		private List<MeaningEntry> meaningEntries;
+//		private String text;
+//
+//		private List<ThesaurusEntry> removedSynonyms;
 
 
 		Memento(){}
 
 		//create
-		Memento(String partOfSpeech, List<String> meanings){
-			this.partOfSpeech = partOfSpeech;
-			this.meanings = meanings;
-		}
+//		Memento(String partOfSpeech, List<String> meanings){
+//			this.partOfSpeech = partOfSpeech;
+//			this.meanings = meanings;
+//		}
 
 		//update
-		Memento(ThesaurusEntry updatedSynonym, List<MeaningEntry> meaningEntries, String text){
-			this.updatedSynonym = updatedSynonym;
-			this.meaningEntries = meaningEntries;
-			this.text = text;
-		}
+//		Memento(ThesaurusEntry updatedSynonym, List<MeaningEntry> meaningEntries, String text){
+//			this.updatedSynonym = updatedSynonym;
+//			this.meaningEntries = meaningEntries;
+//			this.text = text;
+//		}
 
 		//delete
-		Memento(List<ThesaurusEntry> removedSynonyms){
-			this.removedSynonyms = removedSynonyms;
-		}
+//		Memento(List<ThesaurusEntry> removedSynonyms){
+//			this.removedSynonyms = removedSynonyms;
+//		}
 
 		Memento(ThesaurusDictionary dictionary){
 			this.dictionary = dictionary;
