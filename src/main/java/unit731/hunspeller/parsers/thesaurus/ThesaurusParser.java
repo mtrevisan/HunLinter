@@ -1,9 +1,7 @@
 package unit731.hunspeller.parsers.thesaurus;
 
-import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
-import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
@@ -25,6 +23,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
+import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
+import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.memento.CaretakerInterface;
@@ -41,13 +42,41 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private static final Pattern PATTERN_FILTER_OR = PatternHelper.pattern("\\|{2,}");
 
 	//NOTE: All members are private and accessible only by Originator
+	@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	protected static class Memento{
 
-		@JsonProperty
 		private ThesaurusDictionary dictionary;
+
+		private String partOfSpeech;
+		private List<String> meanings;
+
+		private ThesaurusEntry updatedSynonym;
+		private List<MeaningEntry> meaningEntries;
+		private String text;
+
+		private List<ThesaurusEntry> removedSynonyms;
 
 
 		Memento(){}
+
+		//create
+		Memento(String partOfSpeech, List<String> meanings){
+			this.partOfSpeech = partOfSpeech;
+			this.meanings = meanings;
+		}
+
+		//update
+		Memento(ThesaurusEntry updatedSynonym, List<MeaningEntry> meaningEntries, String text){
+			this.updatedSynonym = updatedSynonym;
+			this.meaningEntries = meaningEntries;
+			this.text = text;
+		}
+
+		//delete
+		Memento(List<ThesaurusEntry> removedSynonyms){
+			this.removedSynonyms = removedSynonyms;
+		}
 
 		Memento(ThesaurusDictionary dictionary){
 			this.dictionary = dictionary;
@@ -165,6 +194,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
 			try{
+//				undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
 				undoCaretaker.pushMemento(createMemento());
 
 				if(undoable != null)
@@ -214,6 +244,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
 		try{
+//			undoCaretaker.pushMemento(createMemento(index, meanings, text));
 			undoCaretaker.pushMemento(createMemento());
 
 			dictionary.setMeanings(index, meanings, text);
@@ -247,6 +278,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		int count = selectedRowIDs.length;
 		if(count > 0){
 			try{
+//				undoCaretaker.pushMemento(createMemento(selectedRowIDs));
 				undoCaretaker.pushMemento(createMemento());
 
 				if(undoable != null)
