@@ -136,7 +136,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private DictionaryCorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
-	private RuleReducerWorker ruleReducerWorker;
 	private WordCountWorker dicWordCountWorker;
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
@@ -179,9 +178,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		});
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
 			dicSortDictionaryMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(RuleReducerWorker.WORKER_NAME, () -> {
-			dicRuleReducerMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
@@ -274,7 +270,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
-      dicRuleReducerMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -881,15 +876,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       dicMenu.add(dicSortDictionaryMenuItem);
-
-      dicRuleReducerMenuItem.setText("Rule reducer");
-      dicRuleReducerMenuItem.setEnabled(false);
-      dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicRuleReducerMenuItemActionPerformed(evt);
-         }
-      });
-      dicMenu.add(dicRuleReducerMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
       dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
@@ -1429,12 +1415,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		filEmptyRecentFilesMenuItem.setEnabled(false);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
-   private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
-		MenuSelectionManager.defaultManager().clearSelectedPath();
-
-		reduceRules();
-   }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
-
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
@@ -1493,26 +1473,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 //					dicDuplicatesWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(ruleReducerWorker != null && ruleReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-				ruleReducerWorker.pause();
-
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					ruleReducerWorker.cancel();
-
-					dicRuleReducerMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Rule reducer aborted");
-
-					ruleReducerWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					ruleReducerWorker.resume();
 
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
@@ -1866,18 +1826,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void reduceRules(){
-		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
-			dicRuleReducerMenuItem.setEnabled(false);
-
-			mainProgressBar.setValue(0);
-
-			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator());
-			ruleReducerWorker.addPropertyChangeListener(this);
-			ruleReducerWorker.execute();
-		}
-	}
-
 	private void extractWordCount(){
 		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
 			dicWordCountMenuItem.setEnabled(false);
@@ -2157,7 +2105,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenu dicMenu;
-   private javax.swing.JMenuItem dicRuleReducerMenuItem;
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
    private javax.swing.JScrollPane dicScrollPane;

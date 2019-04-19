@@ -101,15 +101,6 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicSortDictionaryMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="dicRuleReducerMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Rule reducer"/>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dicRuleReducerMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="dicDuplicatesSeparator">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="dicWordCountMenuItem">
