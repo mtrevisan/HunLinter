@@ -883,7 +883,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu.add(dicSortDictionaryMenuItem);
 
       dicRuleReducerMenuItem.setText("Rule reducer");
-      dicRuleReducerMenuItem.setEnabled(false);
       dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicRuleReducerMenuItemActionPerformed(evt);
