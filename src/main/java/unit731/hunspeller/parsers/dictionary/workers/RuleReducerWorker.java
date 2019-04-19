@@ -17,6 +17,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -63,6 +65,16 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			this.removal = removal;
 			this.addition = addition;
 			this.condition = condition;
+		}
+
+		@Override
+		public String toString(){
+			return new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE)
+				.append("orig", originalWords)
+				.append("rem", removal)
+				.append("add", addition)
+				.append("cond", condition)
+				.toString();
 		}
 
 		@Override
@@ -214,6 +226,9 @@ String flag = "%3";
 
 	private Map<String, List<LineEntry>> bucketByConditionEndsWith(List<LineEntry> entries){
 		entries.sort(shortestConditionComparator);
+System.out.println("entries");
+for(LineEntry le : entries)
+	System.out.println(le);
 
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		while(!entries.isEmpty()){
@@ -259,6 +274,9 @@ String flag = "%3";
 			else
 				bucket.put(condition, list);
 		}
+System.out.println("bucketed entries");
+for(Map.Entry<String, List<LineEntry>> e : bucket.entrySet())
+	System.out.println(e.getKey() + ": " + e.getValue().stream().map(LineEntry::toString).collect(Collectors.joining(",")));
 		return bucket;
 	}
 

@@ -193,29 +193,21 @@ public class AffixEntry{
 			.collect(Collectors.toList());
 
 		//find stem
-		String stem = null;
-		Iterator<String> itr = mf.iterator();
-		while(itr.hasNext()){
-			String field = itr.next();
+		boolean stemFound = false;
+		for(String field : mf)
 			if(field.startsWith(MorphologicalTag.TAG_STEM)){
-				stem = field;
-				itr.remove();
+				stemFound = true;
 				break;
 			}
-		}
-		if(stem != null){
-			itr = amf.iterator();
-			while(itr.hasNext()){
-				String field = itr.next();
+		if(!stemFound)
+			for(String field : amf)
 				if(field.startsWith(MorphologicalTag.TAG_STEM)){
-					stem = field;
-					itr.remove();
+					stemFound = true;
 					break;
 				}
-			}
-		}
 		//add stem as first element
-		mf.add(0, (stem != null? stem: MorphologicalTag.TAG_STEM + dicEntry.getWord()));
+		if(!stemFound)
+			mf.add(0, MorphologicalTag.TAG_STEM + dicEntry.getWord());
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
