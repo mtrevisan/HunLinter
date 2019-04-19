@@ -144,7 +144,8 @@ public class MemoryMappedFileBitArray implements BitArray{
 				final Field f = unsafeClass.getDeclaredField("theUnsafe");
 				f.setAccessible(true);
 				final Object theUnsafe = f.get(null);
-				unmapper.bindTo(theUnsafe).invokeExact(buffer);
+				unmapper.bindTo(theUnsafe)
+					.invokeExact(buffer);
 			}
 			catch(Throwable e){ }
 

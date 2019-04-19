@@ -279,7 +279,7 @@ public class HyphenationParser{
 //103 352 B compact trie
 //106 800 B basic trie
 		}
-		catch(Throwable t){
+		catch(Exception t){
 			String message = ExceptionHelper.getMessage(t);
 			throw new IllegalArgumentException(t.getClass().getSimpleName() + ": " + message);
 		}

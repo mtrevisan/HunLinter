@@ -123,7 +123,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				}
 			}
 		}
-		catch(Throwable t){
+		catch(Exception t){
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{

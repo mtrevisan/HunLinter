@@ -227,7 +227,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		}
-		catch(Throwable t){
+		catch(Exception t){
 			if(t instanceof ClosedChannelException)
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs thread interrupted");
 			else{

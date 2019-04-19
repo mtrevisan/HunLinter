@@ -1234,7 +1234,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		catch(IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
 		}
-		catch(Throwable t){
+		catch(Exception t){
 			String message = ExceptionHelper.getMessage(t);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
 		}
