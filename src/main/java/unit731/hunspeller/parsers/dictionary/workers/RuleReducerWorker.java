@@ -50,7 +50,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	private class LineEntry{
-		private final List<String> originalWords;
+		private final List<String> from;
 		private final String removal;
 		private final String addition;
 		private String condition;
@@ -59,9 +59,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			this(removal, addition, condition, null);
 		}
 
-		LineEntry(String removal, String addition, String condition, String originalWord){
-			originalWords = new ArrayList<>();
-			originalWords.add(originalWord);
+		LineEntry(String removal, String addition, String condition, String word){
+			from = new ArrayList<>();
+			from.add(word);
 			this.removal = removal;
 			this.addition = addition;
 			this.condition = condition;
@@ -70,7 +70,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		@Override
 		public String toString(){
 			return new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE)
-				.append("orig", originalWords)
+				.append("from", from)
 				.append("rem", removal)
 				.append("add", addition)
 				.append("cond", condition)
@@ -189,7 +189,7 @@ String flag = "%3";
 
 				int index = newAffixEntries.indexOf(affixEntry);
 				if(index >= 0)
-					newAffixEntries.get(index).originalWords.add(word);
+					newAffixEntries.get(index).from.add(word);
 				else
 					newAffixEntries.add(affixEntry);
 			}
@@ -397,7 +397,7 @@ throw new RuntimeException("to be tested");
 			LineEntry entry = itr.next();
 
 			Set<Character> addedConditions = new HashSet<>();
-			Iterator<String> words = entry.originalWords.iterator();
+			Iterator<String> words = entry.from.iterator();
 			while(words.hasNext()){
 				String word = words.next();
 				char chr = (word.charAt(word.length() - entry.condition.length() - 1));
@@ -411,7 +411,7 @@ throw new RuntimeException("to be tested");
 			}
 			addNotCondition(entry, addedConditions);
 
-			if(entry.originalWords.isEmpty())
+			if(entry.from.isEmpty())
 				itr.remove();
 		}
 		return commonRules;
@@ -470,7 +470,7 @@ throw new RuntimeException("to be tested");
 		List<Set<Character>> letters = new ArrayList<>();
 		for(LineEntry en : entries){
 			Set<Character> set = new HashSet<>();
-			for(String originalWord : en.originalWords){
+			for(String originalWord : en.from){
 				char newLetterCondition = originalWord.charAt(originalWord.length() - en.condition.length() - 1);
 				set.add(newLetterCondition);
 			}
