@@ -52,27 +52,44 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	private class LineEntry{
+
 		private final Set<String> from;
 		private final String removal;
 		private final String addition;
 		private String condition;
+
 
 		LineEntry(String removal, String addition, String condition){
 			this(removal, addition, condition, null);
 		}
 
 		LineEntry(String removal, String addition, String condition, String word){
-			from = new HashSet<>();
-			from.add(word);
 			this.removal = removal;
 			this.addition = addition;
 			this.condition = condition;
+
+			from = new HashSet<>();
+			from.add(word);
 		}
 
-		public List<LineEntry> split(){
+		public List<LineEntry> split(AffixEntry.Type type){
 			List<LineEntry> split = new ArrayList<>();
-			for(String f : from)
-				split.add(new LineEntry(removal, addition, f.substring(f.length() - condition.length() - 1), f));
+			if(type == AffixEntry.Type.SUFFIX)
+				for(String f : from){
+					int index = f.length() - condition.length() - 1;
+					if(index < 0)
+						throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
+
+					split.add(new LineEntry(removal, addition, f.substring(index), f));
+				}
+			else
+				for(String f : from){
+					int index = condition.length() + 1;
+					if(index == f.length())
+						throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
+
+					split.add(new LineEntry(removal, addition, f.substring(0, index), f));
+				}
 			return split;
 		}
 
@@ -145,13 +162,12 @@ String flag = "%1";
 //System.out.println("entries:");
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
-			reduceEquivalenceClasses(entriesTable);
+			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+			reduceEquivalenceClasses(type, entriesTable);
 System.out.println("cleaned entries:");
 for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-//TODO extract all values from entriesTable
-			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
@@ -212,7 +228,7 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void reduceEquivalenceClasses(Map<String, List<LineEntry>> entriesTable){
+	private void reduceEquivalenceClasses(AffixEntry.Type type, Map<String, List<LineEntry>> entriesTable){
 		while(true){
 			List<List<String>> equivalenceClasses = calculateEquivalenceClasses(entriesTable);
 //System.out.println("eq classes:");
@@ -222,7 +238,7 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 			if(equivalenceClasses.stream().map(List::size).allMatch(size -> size == 1))
 				break;
 			
-			removeCollidingClasses(equivalenceClasses, entriesTable);
+			removeCollidingClasses(equivalenceClasses, type, entriesTable);
 		}
 	}
 
@@ -247,7 +263,7 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 		return equivalenceClasses;
 	}
 
-	private void removeCollidingClasses(List<List<String>> equivalenceClasses, Map<String, List<LineEntry>> entriesTable){
+	private void removeCollidingClasses(List<List<String>> equivalenceClasses, AffixEntry.Type type, Map<String, List<LineEntry>> entriesTable){
 		for(List<String> equivalenceClass : equivalenceClasses){
 			int classes = equivalenceClass.size();
 			if(classes > 1){
@@ -256,18 +272,16 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 					String currentKey = equivalenceClass.get(i);
 					//prepend characters to currentKey until it is no longer contained into baseKey
 					if(baseKey.endsWith(currentKey))
-						expandConditionRemovingCollingClasses(currentKey, entriesTable);
+						expandConditionRemovingCollingClasses(currentKey, type, entriesTable);
 				}
 			}
 		}
 	}
 
-	private void expandConditionRemovingCollingClasses(String collidingKey, Map<String, List<LineEntry>> entriesTable){
+	private void expandConditionRemovingCollingClasses(String collidingKey, AffixEntry.Type type, Map<String, List<LineEntry>> entriesTable){
 		List<LineEntry> currentEntry = entriesTable.remove(collidingKey);
 		for(LineEntry entry : currentEntry){
-			//TODO manage suffix/prefix
-			//TODO manage cannot add char because the word has ended
-			List<LineEntry> splittedEntries = entry.split();
+			List<LineEntry> splittedEntries = entry.split(type);
 			for(LineEntry splittedEntry : splittedEntries)
 				collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
 		}
