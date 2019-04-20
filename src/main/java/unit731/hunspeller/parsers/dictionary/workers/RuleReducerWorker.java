@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 
 	private class LineEntry{
-		private final List<String> from;
+		private final Set<String> from;
 		private final String removal;
 		private final String addition;
 		private String condition;
@@ -60,11 +61,18 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 
 		LineEntry(String removal, String addition, String condition, String word){
-			from = new ArrayList<>();
+			from = new HashSet<>();
 			from.add(word);
 			this.removal = removal;
 			this.addition = addition;
 			this.condition = condition;
+		}
+
+		public List<LineEntry> split(){
+			List<LineEntry> split = new ArrayList<>();
+			for(String f : from)
+				split.add(new LineEntry(removal, addition, f.substring(f.length() - condition.length() - 1), f));
+			return split;
 		}
 
 		@Override
@@ -121,19 +129,87 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal));
 
-String flag = "%3";
+String flag = "%1";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		List<LineEntry> flaggedEntries = new ArrayList<>();
+		Map<String, List<LineEntry>> entriesTable = new HashMap<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			collectFlagProductions(productions, flag, flaggedEntries);
+			collectFlagProductions(productions, flag, entriesTable);
 		};
 		Runnable completed = () -> {
-			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndsWith(flaggedEntries);
+System.out.println("entries:");
+for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
+	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
+
+			List<List<String>> equivalenceClasses = calculateEquivalenceClasses(entriesTable);
+System.out.println("eq classes:");
+for(List<String> e : equivalenceClasses)
+	System.out.println(String.join(",", e));
+
+			for(List<String> equivalenceClass : equivalenceClasses){
+				int classes = equivalenceClass.size();
+				if(classes > 1){
+					//TODO
+					//reduce(entriesTable, equivalenceClass);
+					String baseKey = equivalenceClass.get(0);
+					for(int i = 1; i < classes; i ++){
+						String currentKey = equivalenceClass.get(i);
+						if(baseKey.length() == currentKey.length()){
+							//TODO
+//throw new RuntimeException("to be coded");
+						}
+						else /*if(baseKey.length() > currentKey.length())*/{
+							//prepend characters to currentKey until it is no longer contained into baseKey
+							if(baseKey.endsWith(currentKey)){
+								//add next char to current key
+								//FIXME manage suffix/prefix
+								List<LineEntry> currentEntry = entriesTable.remove(currentKey);
+								for(LineEntry entry : currentEntry){
+									List<LineEntry> splittedEntries = entry.split();
+									for(LineEntry splittedEntry : splittedEntries)
+										collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
+								}
+
+//								List<Set<Character>> chars = collectPreviousLettersOfCondition(currentEntry);
+//System.out.println("add next char(s) to " + currentKey + " until " + baseKey + ", char is from " + StringUtils.join(currentEntry, ",") + " and are one of " + StringUtils.join(chars, ","));
+//
+//								entriesTable.remove(currentKey);
+//								for(int j = 0; j < chars.size(); j ++){
+//									LineEntry entry = currentEntry.get(j);
+//									Set<Character> entryChars = chars.get(j);
+//									if(entryChars.size() > 1){
+//										List<LineEntry> splittedEntries = entry.split();
+//										for(LineEntry splittedEntry : splittedEntries)
+//											collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
+//									}
+//								}
+							}
+							//TODO
+equivalenceClasses = calculateEquivalenceClasses(entriesTable);
+System.out.println("eq classes:");
+for(List<String> e : equivalenceClasses)
+	System.out.println(String.join(",", e));
+						}
+					}
+				}
+			}
+
+//			for(List<LineEntry> entries : entriesTable.values()){
+//				List<String> rules = reduceEntriesToRules(originalRuleEntry, entries);
+//
+//				AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+//				LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
+//				rules.stream()
+//					.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
+//			}
+
+
+
+//			Map<String, List<LineEntry>> bucketedEntries = bucketByConditionEndsWith(flaggedEntries);
 
 //			Map<String, LineEntry> nonOverlappingBucketedEntries = removeOverlappingRules(bucketedEntries);
 
@@ -159,23 +235,23 @@ String flag = "%3";
 #SFX v1 ònia onista ònia
 */
 //			List<LineEntry> nonOverlappingEntries = new ArrayList<>(nonOverlappingBucketedEntries.values());
-			List<LineEntry> nonOverlappingEntries = bucketedEntries.values().stream()
-				.flatMap(List::stream)
-				.collect(Collectors.toList());
-			nonOverlappingEntries = mergeSameRule(nonOverlappingEntries);
-			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
-
-			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
-			rules.stream()
-				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
+//			List<LineEntry> nonOverlappingEntries = bucketedEntries.values().stream()
+//				.flatMap(List::stream)
+//				.collect(Collectors.toList());
+//			nonOverlappingEntries = mergeSameRule(nonOverlappingEntries);
+//			List<String> rules = reduceEntriesToRules(originalRuleEntry, nonOverlappingEntries);
+//
+//			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+//			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
+//			rules.stream()
+//				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
 		};
 		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void collectFlagProductions(List<Production> productions, String flag, List<LineEntry> newAffixEntries){
+	private void collectFlagProductions(List<Production> productions, String flag, Map<String, List<LineEntry>> entries){
 		Iterator<Production> itr = productions.iterator();
 		//skip base production
 		itr.next();
@@ -187,13 +263,18 @@ String flag = "%3";
 				String word = lastAppliedRule.undoRule(production.getWord());
 				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
 
-				int index = newAffixEntries.indexOf(affixEntry);
-				if(index >= 0)
-					newAffixEntries.get(index).from.add(word);
-				else
-					newAffixEntries.add(affixEntry);
+				collectFlagProduction(affixEntry, word, entries);
 			}
 		}
+	}
+
+	private void collectFlagProduction(LineEntry affixEntry, String word, Map<String, List<LineEntry>> entries){
+		List<LineEntry> list = entries.computeIfAbsent(affixEntry.condition, k -> new ArrayList<>());
+		int idx = list.indexOf(affixEntry);
+		if(idx >= 0)
+			list.get(idx).from.add(word);
+		else
+			list.add(affixEntry);
 	}
 
 	private LineEntry createSuffixEntry(Production production, String word){
@@ -222,6 +303,27 @@ String flag = "%3";
 		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
 		String condition = (firstCommonLetter < wordLength? removal: word.substring(wordLength - 1));
 		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private List<List<String>> calculateEquivalenceClasses(Map<String, List<LineEntry>> entriesTable){
+		List<List<String>> equivalenceClasses = new ArrayList<>();
+		for(String cond : entriesTable.keySet()){
+			List<String> foundClass = null;
+			for(int i = 0; i < equivalenceClasses.size(); i ++)
+				if(equivalenceClasses.get(i).stream().anyMatch(eq -> eq.endsWith(cond) || cond.endsWith(eq))){
+					foundClass = equivalenceClasses.get(i);
+					break;
+				}
+			if(foundClass != null)
+				foundClass.add(cond);
+			else
+				equivalenceClasses.add(new ArrayList<>(Arrays.asList(cond)));
+		}
+
+		//order equivalence classes
+		equivalenceClasses.forEach(classes -> classes.sort(Comparator.comparing(String::length).reversed()));
+
+		return equivalenceClasses;
 	}
 
 	private Map<String, List<LineEntry>> bucketByConditionEndsWith(List<LineEntry> entries){
@@ -468,10 +570,10 @@ throw new RuntimeException("to be tested");
 
 	private List<Set<Character>> collectPreviousLettersOfCondition(List<LineEntry> entries){
 		List<Set<Character>> letters = new ArrayList<>();
-		for(LineEntry en : entries){
+		for(LineEntry entry : entries){
 			Set<Character> set = new HashSet<>();
-			for(String originalWord : en.from){
-				char newLetterCondition = originalWord.charAt(originalWord.length() - en.condition.length() - 1);
+			for(String from : entry.from){
+				char newLetterCondition = from.charAt(from.length() - entry.condition.length() - 1);
 				set.add(newLetterCondition);
 			}
 			letters.add(set);
