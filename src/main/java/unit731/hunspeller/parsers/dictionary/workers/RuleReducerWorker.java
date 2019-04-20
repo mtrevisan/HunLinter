@@ -147,7 +147,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparingInt(entry -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition))))
 			.thenComparing(Comparator.comparing(entry -> entry.condition));
 
-String flag = "%1";
+String flag = "%4";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -163,10 +163,17 @@ String flag = "%1";
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-			reduceEquivalenceClasses(type, entriesTable);
-System.out.println("cleaned entries:");
-for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
-	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
+			try{
+				reduceEquivalenceClasses(type, entriesTable);
+			}
+			catch(Exception e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+
+				throw e;
+			}
+//System.out.println("cleaned entries:");
+//for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
+//	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
 			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
