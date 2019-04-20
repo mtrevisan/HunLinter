@@ -5,19 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
-import unit731.hunspeller.services.PatternHelper;
 
 
 public class Production extends DictionaryEntry{
-
-	private static final Pattern PATTERN_STEM = PatternHelper.pattern(MorphologicalTag.TAG_STEM + "[^\\s]+( |$)");
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
@@ -210,10 +206,6 @@ public class Production extends DictionaryEntry{
 				.collect(Collectors.joining(LEADS_TO)));
 		}
 		return sj.toString();
-	}
-
-	public String removeStemFromMorphologicalFields(String line){
-		return PatternHelper.clear(line, PATTERN_STEM);
 	}
 
 }

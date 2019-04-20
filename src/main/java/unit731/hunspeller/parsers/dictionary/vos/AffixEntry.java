@@ -27,6 +27,7 @@ public class AffixEntry{
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
 	private static final Pattern PATTERN_LINE = PatternHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
+	private static final String TAB = "\t";
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
 	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("\t.*$");
@@ -79,7 +80,6 @@ public class AffixEntry{
 	private final String[] morphologicalFields;
 
 	private final String entry;
-	private final String entryContinuationFlags;
 
 
 	public AffixEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
@@ -98,12 +98,12 @@ public class AffixEntry{
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse affix line '" + line + "'");
 		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
-		entryContinuationFlags = m.group(PARAM_CONTINUATION_CLASSES);
+		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
 		type = Type.createFromCode(ruleType);
-		String[] classes = strategy.parseFlags((entryContinuationFlags != null? expandAliases(entryContinuationFlags, aliasesFlag): null));
+		String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -251,13 +251,22 @@ public class AffixEntry{
 			removing + word.substring(appendingLength));
 	}
 
+	public String toStringMorphologicalAndMorphologicalFields(FlagParsingStrategy strategy){
+		Objects.requireNonNull(strategy);
+
+		StringBuffer sb = new StringBuffer();
+		if(continuationFlags != null && continuationFlags.length > 0){
+			sb.append(SLASH);
+			sb.append(strategy.joinFlags(continuationFlags));
+		}
+		if(morphologicalFields != null && morphologicalFields.length > 0)
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+		return sb.toString();
+	}
+
 	@Override
 	public String toString(){
 		return entry;
-	}
-
-	public String toContinuationFlagsString(){
-		return entryContinuationFlags;
 	}
 
 	@Override

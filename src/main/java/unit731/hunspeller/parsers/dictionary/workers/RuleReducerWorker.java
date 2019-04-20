@@ -27,6 +27,7 @@ import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -43,7 +44,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Rule reducer";
 
 	private static final String SLASH = "/";
-
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
@@ -129,6 +129,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 
+	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
 	private Comparator<LineEntry> shortestConditionComparator;
 	private Comparator<LineEntry> lineEntryComparator;
@@ -138,16 +139,17 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
 
+		strategy = affixData.getFlagParsingStrategy();
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition)))
-			.thenComparing(Comparator.comparing(entry -> entry.condition, String.CASE_INSENSITIVE_ORDER))
+/*			.thenComparing(Comparator.comparing(entry -> entry.condition, String.CASE_INSENSITIVE_ORDER))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal, String.CASE_INSENSITIVE_ORDER))
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition, String.CASE_INSENSITIVE_ORDER));
+			.thenComparing(Comparator.comparing(entry -> entry.addition, String.CASE_INSENSITIVE_ORDER))/**/;
 
-String flag = "%1";
+String flag = "%0";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -330,6 +332,8 @@ String flag = "%1";
 
 		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
+		if(production.getContinuationFlagCount() > 0)
+			addition += production.getLastAppliedRule().toStringMorphologicalAndMorphologicalFields(strategy);
 		String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
@@ -352,16 +356,16 @@ String flag = "%1";
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
 			.forEach(entries::addAll);
+		entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
 		entries.sort(lineEntryComparator);
 
 		int size = entries.size();
 		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 		String flag = originalRuleEntry.getEntries().get(0).getFlag();
-		String continuationFlags = originalRuleEntry.getEntries().get(0).toContinuationFlagsString();
 
 		List<String> rules = new ArrayList<>(size);
 		for(LineEntry entry : entries)
-			rules.add(composeLine(type, flag, continuationFlags, entry));
+			rules.add(composeLine(type, flag, entry));
 		return rules;
 	}
 
@@ -740,13 +744,13 @@ throw new RuntimeException("to be tested");
 			.toString();
 	}
 
-	private String composeLine(AffixEntry.Type type, String flag, String continuationFlags, LineEntry partialLine){
+	private String composeLine(AffixEntry.Type type, String flag, LineEntry partialLine){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getFlag().getCode())
 			.add(flag)
 			.add(partialLine.removal)
-			.add(partialLine.addition + (continuationFlags != null? SLASH + continuationFlags: StringUtils.EMPTY))
-			.add(longestCommonSuffix(partialLine.from))
+			.add(partialLine.addition)
+			.add(partialLine.condition)
 			.toString();
 	}
 
