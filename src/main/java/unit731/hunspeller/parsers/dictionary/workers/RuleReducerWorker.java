@@ -141,63 +141,14 @@ String flag = "%1";
 			collectFlagProductions(productions, flag, entriesTable);
 		};
 		Runnable completed = () -> {
+//System.out.println("entries:");
+//for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
+//	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
+			reduceEquivalenceClasses(entriesTable);
 System.out.println("entries:");
 for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
-
-			List<List<String>> equivalenceClasses = calculateEquivalenceClasses(entriesTable);
-System.out.println("eq classes:");
-for(List<String> e : equivalenceClasses)
-	System.out.println(String.join(",", e));
-
-			for(List<String> equivalenceClass : equivalenceClasses){
-				int classes = equivalenceClass.size();
-				if(classes > 1){
-					//TODO
-					//reduce(entriesTable, equivalenceClass);
-					String baseKey = equivalenceClass.get(0);
-					for(int i = 1; i < classes; i ++){
-						String currentKey = equivalenceClass.get(i);
-						if(baseKey.length() == currentKey.length()){
-							//TODO
-//throw new RuntimeException("to be coded");
-						}
-						else /*if(baseKey.length() > currentKey.length())*/{
-							//prepend characters to currentKey until it is no longer contained into baseKey
-							if(baseKey.endsWith(currentKey)){
-								//add next char to current key
-								//FIXME manage suffix/prefix
-								List<LineEntry> currentEntry = entriesTable.remove(currentKey);
-								for(LineEntry entry : currentEntry){
-									List<LineEntry> splittedEntries = entry.split();
-									for(LineEntry splittedEntry : splittedEntries)
-										collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
-								}
-
-//								List<Set<Character>> chars = collectPreviousLettersOfCondition(currentEntry);
-//System.out.println("add next char(s) to " + currentKey + " until " + baseKey + ", char is from " + StringUtils.join(currentEntry, ",") + " and are one of " + StringUtils.join(chars, ","));
-//
-//								entriesTable.remove(currentKey);
-//								for(int j = 0; j < chars.size(); j ++){
-//									LineEntry entry = currentEntry.get(j);
-//									Set<Character> entryChars = chars.get(j);
-//									if(entryChars.size() > 1){
-//										List<LineEntry> splittedEntries = entry.split();
-//										for(LineEntry splittedEntry : splittedEntries)
-//											collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
-//									}
-//								}
-							}
-							//TODO
-equivalenceClasses = calculateEquivalenceClasses(entriesTable);
-System.out.println("eq classes:");
-for(List<String> e : equivalenceClasses)
-	System.out.println(String.join(",", e));
-						}
-					}
-				}
-			}
-
+		
 //			for(List<LineEntry> entries : entriesTable.values()){
 //				List<String> rules = reduceEntriesToRules(originalRuleEntry, entries);
 //
@@ -249,6 +200,67 @@ for(List<String> e : equivalenceClasses)
 		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
+	}
+
+	private void reduceEquivalenceClasses(Map<String, List<LineEntry>> entriesTable){
+		while(true){
+			List<List<String>> equivalenceClasses = calculateEquivalenceClasses(entriesTable);
+//System.out.println("eq classes:");
+//for(List<String> e : equivalenceClasses)
+//	System.out.println(String.join(",", e));
+			
+			if(equivalenceClasses.stream().map(List::size).allMatch(size -> size == 1))
+				break;
+			
+			removeCollidingClasses(equivalenceClasses, entriesTable);
+		}
+	}
+
+	private List<List<String>> calculateEquivalenceClasses(Map<String, List<LineEntry>> entriesTable){
+		List<List<String>> equivalenceClasses = new ArrayList<>();
+		for(String cond : entriesTable.keySet()){
+			List<String> foundClass = null;
+			for(int i = 0; i < equivalenceClasses.size(); i ++)
+				if(equivalenceClasses.get(i).stream().anyMatch(eq -> eq.endsWith(cond) || cond.endsWith(eq))){
+					foundClass = equivalenceClasses.get(i);
+					break;
+				}
+			if(foundClass != null)
+				foundClass.add(cond);
+			else
+				equivalenceClasses.add(new ArrayList<>(Arrays.asList(cond)));
+		}
+
+		//order equivalence classes
+		equivalenceClasses.forEach(classes -> classes.sort(Comparator.comparing(String::length).reversed()));
+
+		return equivalenceClasses;
+	}
+
+	private void removeCollidingClasses(List<List<String>> equivalenceClasses, Map<String, List<LineEntry>> entriesTable){
+		for(List<String> equivalenceClass : equivalenceClasses){
+			int classes = equivalenceClass.size();
+			if(classes > 1){
+				String baseKey = equivalenceClass.get(0);
+				for(int i = 1; i < classes; i ++){
+					String currentKey = equivalenceClass.get(i);
+					//prepend characters to currentKey until it is no longer contained into baseKey
+					if(baseKey.endsWith(currentKey))
+						expandConditionRemovingCollingClasses(currentKey, entriesTable);
+				}
+			}
+		}
+	}
+
+	private void expandConditionRemovingCollingClasses(String collidingKey, Map<String, List<LineEntry>> entriesTable){
+		List<LineEntry> currentEntry = entriesTable.remove(collidingKey);
+		for(LineEntry entry : currentEntry){
+			//TODO manage suffix/prefix
+			//TODO manage cannot add char because the word has ended
+			List<LineEntry> splittedEntries = entry.split();
+			for(LineEntry splittedEntry : splittedEntries)
+				collectFlagProduction(splittedEntry, splittedEntry.from.iterator().next(), entriesTable);
+		}
 	}
 
 	private void collectFlagProductions(List<Production> productions, String flag, Map<String, List<LineEntry>> entries){
@@ -305,26 +317,7 @@ for(List<String> e : equivalenceClasses)
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<List<String>> calculateEquivalenceClasses(Map<String, List<LineEntry>> entriesTable){
-		List<List<String>> equivalenceClasses = new ArrayList<>();
-		for(String cond : entriesTable.keySet()){
-			List<String> foundClass = null;
-			for(int i = 0; i < equivalenceClasses.size(); i ++)
-				if(equivalenceClasses.get(i).stream().anyMatch(eq -> eq.endsWith(cond) || cond.endsWith(eq))){
-					foundClass = equivalenceClasses.get(i);
-					break;
-				}
-			if(foundClass != null)
-				foundClass.add(cond);
-			else
-				equivalenceClasses.add(new ArrayList<>(Arrays.asList(cond)));
-		}
 
-		//order equivalence classes
-		equivalenceClasses.forEach(classes -> classes.sort(Comparator.comparing(String::length).reversed()));
-
-		return equivalenceClasses;
-	}
 
 	private Map<String, List<LineEntry>> bucketByConditionEndsWith(List<LineEntry> entries){
 		entries.sort(shortestConditionComparator);
