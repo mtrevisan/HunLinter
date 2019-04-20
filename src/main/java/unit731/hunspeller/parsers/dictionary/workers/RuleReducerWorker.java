@@ -42,7 +42,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Rule reducer";
 
-	private static final String TAB = "\t";
 	private static final String SLASH = "/";
 
 	private static final String NOT_GROUP_START = "[^";
@@ -124,12 +123,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
-		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> entry.addition.length())
+		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> entry.removal.length())
+			.thenComparing(Comparator.comparing(entry -> entry.removal))
+			.thenComparing(Comparator.comparingInt((LineEntry entry) -> entry.addition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.addition))
 			.thenComparing(Comparator.comparingInt(entry -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition))))
-			.thenComparing(Comparator.comparing(entry -> entry.condition))
-			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.removal));
+			.thenComparing(Comparator.comparing(entry -> entry.condition));
 
 String flag = "%1";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
