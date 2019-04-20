@@ -143,11 +143,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition)))
-/*			.thenComparing(Comparator.comparing(entry -> entry.condition, String.CASE_INSENSITIVE_ORDER))
+			.thenComparing(Comparator.comparing(entry -> entry.condition, String.CASE_INSENSITIVE_ORDER))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal, String.CASE_INSENSITIVE_ORDER))
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition, String.CASE_INSENSITIVE_ORDER))/**/;
+			.thenComparing(Comparator.comparing(entry -> entry.addition, String.CASE_INSENSITIVE_ORDER));
 
 String flag = "%0";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
