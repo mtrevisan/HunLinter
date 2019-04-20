@@ -79,6 +79,7 @@ public class AffixEntry{
 	private final String[] morphologicalFields;
 
 	private final String entry;
+	private final String entryContinuationFlags;
 
 
 	public AffixEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
@@ -97,12 +98,12 @@ public class AffixEntry{
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse affix line '" + line + "'");
 		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
-		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
+		entryContinuationFlags = m.group(PARAM_CONTINUATION_CLASSES);
 		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
 
 		type = Type.createFromCode(ruleType);
-		String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
+		String[] classes = strategy.parseFlags((entryContinuationFlags != null? expandAliases(entryContinuationFlags, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -114,6 +115,7 @@ public class AffixEntry{
 			Arrays.sort(continuationFlags);
 
 		checkValidity(cond, removal, line);
+
 
 		entry = PatternHelper.clear(line, PATTERN_ENTRY);
 	}
@@ -252,6 +254,10 @@ public class AffixEntry{
 	@Override
 	public String toString(){
 		return entry;
+	}
+
+	public String toContinuationFlagsString(){
+		return entryContinuationFlags;
 	}
 
 	@Override

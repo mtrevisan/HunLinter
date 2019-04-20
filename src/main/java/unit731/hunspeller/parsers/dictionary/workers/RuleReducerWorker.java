@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,6 +43,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Rule reducer";
 
 	private static final String TAB = "\t";
+	private static final String SLASH = "/";
 
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
@@ -145,10 +147,19 @@ String flag = "%1";
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 			reduceEquivalenceClasses(entriesTable);
-System.out.println("entries:");
+System.out.println("cleaned entries:");
 for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
-		
+
+//TODO extract all values from entriesTable
+			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
+			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
+			rules.stream()
+				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
+
+
+
 //			for(List<LineEntry> entries : entriesTable.values()){
 //				List<String> rules = reduceEntriesToRules(originalRuleEntry, entries);
 //
@@ -299,7 +310,7 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 
 		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
-		String condition = (lastCommonLetter < wordLength? removal: word.substring(wordLength - 1));
+		String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
@@ -313,8 +324,25 @@ for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 
 		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
 		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
-		String condition = (firstCommonLetter < wordLength? removal: word.substring(wordLength - 1));
+		String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, Map<String, List<LineEntry>> entriesTable){
+		List<LineEntry> entries = new ArrayList<>();
+		entriesTable.values()
+			.forEach(entries::addAll);
+		entries.sort(lineEntryComparator);
+
+		int size = entries.size();
+		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+		String flag = originalRuleEntry.getEntries().get(0).getFlag();
+		String continuationFlags = originalRuleEntry.getEntries().get(0).toContinuationFlagsString();
+
+		List<String> rules = new ArrayList<>(size);
+		for(LineEntry entry : entries)
+			rules.add(composeLine(type, flag, continuationFlags, entry));
+		return rules;
 	}
 
 
@@ -670,51 +698,67 @@ throw new RuntimeException("to be tested");
 //		entry.condition = GROUP_START + addedCondition + GROUP_END + entry.condition;
 //	}
 
-	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
-		int size = nonOverlappingBucketedEntries.size();
-		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
-		String flag = originalRuleEntry.getEntries().get(0).getFlag();
-
-		nonOverlappingBucketedEntries.sort(lineEntryComparator);
-
-		List<String> rules = new ArrayList<>(size);
-		for(LineEntry entry : nonOverlappingBucketedEntries)
-			rules.add(composeLine(type, flag, entry));
-		return rules;
-	}
+//	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
+//		int size = nonOverlappingBucketedEntries.size();
+//		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+//		String flag = originalRuleEntry.getEntries().get(0).getFlag();
+//
+//		nonOverlappingBucketedEntries.sort(lineEntryComparator);
+//
+//		List<String> rules = new ArrayList<>(size);
+//		for(LineEntry entry : nonOverlappingBucketedEntries)
+//			rules.add(composeLine(type, flag, entry));
+//		return rules;
+//	}
 
 	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
-		StringBuffer sb = new StringBuffer();
-		return sb.append(type.getFlag().getCode())
-			.append(StringUtils.SPACE)
-			.append(flag)
-			.append(StringUtils.SPACE)
-			.append(isCombineable? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE)
-			.append(StringUtils.SPACE)
-			.append(size)
+		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		return sj.add(type.getFlag().getCode())
+			.add(flag)
+			.add(Character.toString(isCombineable? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE))
+			.add(Integer.toString(size))
 			.toString();
 	}
 
-	private String composeLine(AffixEntry.Type type, String flag, LineEntry partialLine){
-		StringBuffer sb = new StringBuffer();
-		sb.append(type.getFlag().getCode())
-			.append(StringUtils.SPACE)
-			.append(flag)
-			.append(StringUtils.SPACE)
-			.append(partialLine.removal)
-			.append(StringUtils.SPACE);
-		int idx = partialLine.addition.indexOf(TAB);
-		if(idx >= 0)
-			sb.append(partialLine.addition.substring(0, idx))
-				.append(StringUtils.SPACE)
-				.append(partialLine.condition)
-				.append(TAB)
-				.append(partialLine.addition.substring(idx + 1));
-		else
-			sb.append(partialLine.addition)
-				.append(StringUtils.SPACE)
-				.append(partialLine.condition);
-		return sb.toString();
+	private String composeLine(AffixEntry.Type type, String flag, String continuationFlags, LineEntry partialLine){
+		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		return sj.add(type.getFlag().getCode())
+			.add(flag)
+			.add(partialLine.removal)
+			.add(partialLine.addition + (continuationFlags != null? SLASH + continuationFlags: StringUtils.EMPTY))
+			.add(longestCommonSuffix(partialLine.from))
+			.toString();
+	}
+
+	//FIXME optimize!
+	private String longestCommonSuffix(Set<String> texts){
+		String firstText = null;
+		int lastCommonLetter = 0;
+		List<String> list = new ArrayList<>(texts);
+		list.sort(Comparator.comparing(String::length).reversed());
+		while(true){
+			Iterator<String> itr = list.iterator();
+			String text = itr.next();
+			if(firstText == null){
+				//extract longest word
+				firstText = text;
+			}
+
+			int index = text.length() - lastCommonLetter - 1;
+			if(index < 0)
+				break;
+
+			char commonLetter = text.charAt(index);
+			while(itr.hasNext()){
+				text = itr.next();
+				index = text.length() - lastCommonLetter - 1;
+				if(index < 0 || text.charAt(index) != commonLetter)
+					return text.substring(index + 1);
+			}
+
+			lastCommonLetter ++;
+		}
+		return firstText;
 	}
 
 }
