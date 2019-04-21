@@ -43,7 +43,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Rule reducer";
 
-	private static final String SLASH = "/";
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
@@ -74,6 +73,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		public List<LineEntry> split(AffixEntry.Type type){
 			List<LineEntry> split = new ArrayList<>();
+			//TODO cope with mi[lƚ]e in condition and in from
 			if(type == AffixEntry.Type.SUFFIX)
 				for(String f : from){
 					int index = f.length() - condition.length() - 1;
@@ -143,13 +143,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition)))
-			.thenComparing(Comparator.comparing(entry -> entry.condition, String.CASE_INSENSITIVE_ORDER))
+			.thenComparing(Comparator.comparing(entry -> entry.condition))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.removal, String.CASE_INSENSITIVE_ORDER))
+			.thenComparing(Comparator.comparing(entry -> entry.removal))
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition, String.CASE_INSENSITIVE_ORDER));
+			.thenComparing(Comparator.comparing(entry -> entry.addition));
 
-String flag = "%0";
+//String flag = "%0"; mi[lƚ]e
+String flag = "<2";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -237,6 +238,23 @@ String flag = "%0";
 		createReadWorker(data, lineProcessor);
 	}
 
+	private void collectFlagProductions(List<Production> productions, String flag, Map<String, List<LineEntry>> entries){
+		Iterator<Production> itr = productions.iterator();
+		//skip base production
+		itr.next();
+		while(itr.hasNext()){
+			Production production = itr.next();
+
+			AffixEntry lastAppliedRule = production.getLastAppliedRule();
+			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
+				String word = lastAppliedRule.undoRule(production.getWord());
+				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
+
+				collectFlagProduction(affixEntry, word, entries);
+			}
+		}
+	}
+
 	private void reduceEquivalenceClasses(AffixEntry.Type type, Map<String, List<LineEntry>> entriesTable){
 		while(true){
 			List<List<String>> equivalenceClasses = calculateEquivalenceClasses(entriesTable);
@@ -296,28 +314,21 @@ String flag = "%0";
 		}
 	}
 
-	private void collectFlagProductions(List<Production> productions, String flag, Map<String, List<LineEntry>> entries){
-		Iterator<Production> itr = productions.iterator();
-		//skip base production
-		itr.next();
-		while(itr.hasNext()){
-			Production production = itr.next();
-
-			AffixEntry lastAppliedRule = production.getLastAppliedRule();
-			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
-				String word = lastAppliedRule.undoRule(production.getWord());
-				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
-
-				collectFlagProduction(affixEntry, word, entries);
-			}
-		}
-	}
-
 	private void collectFlagProduction(LineEntry affixEntry, String word, Map<String, List<LineEntry>> entries){
 		List<LineEntry> list = entries.computeIfAbsent(affixEntry.condition, k -> new ArrayList<>());
 		int idx = list.indexOf(affixEntry);
-		if(idx >= 0)
+		if(idx >= 0){
+			//merge similar condition rules
+			//TODO has to manage mi[lƚ]e in split
+//SFX %0 e èr/A1 mile
+//SFX %0 e èr/A1 miƚe
+//SFX %0 e ar/A1 mile
+//SFX %0 e ar/A1 miƚe
+//to
+//SFX %0 e ar/A1 mi[lƚ]e
+//SFX %0 e ar/A1 mi[lƚ]e
 			list.get(idx).from.add(word);
+		}
 		else
 			list.add(affixEntry);
 	}
@@ -353,21 +364,55 @@ String flag = "%0";
 	}
 
 	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, Map<String, List<LineEntry>> entriesTable){
+		//extract raw rules
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
 			.forEach(entries::addAll);
-		entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
+		//if the longest common suffix is wanted, then decomment the next line
+//		entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
 		entries.sort(lineEntryComparator);
 
+		//compose affix rules
 		int size = entries.size();
 		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 		String flag = originalRuleEntry.getEntries().get(0).getFlag();
-
 		List<String> rules = new ArrayList<>(size);
 		for(LineEntry entry : entries)
 			rules.add(composeLine(type, flag, entry));
 		return rules;
 	}
+
+	//FIXME optimize!
+	private String longestCommonSuffix(Set<String> texts){
+		String firstText = null;
+		int lastCommonLetter = 0;
+		List<String> list = new ArrayList<>(texts);
+		list.sort(Comparator.comparing(String::length).reversed());
+		while(true){
+			Iterator<String> itr = list.iterator();
+			String text = itr.next();
+			if(firstText == null){
+				//extract longest word
+				firstText = text;
+			}
+
+			int index = text.length() - lastCommonLetter - 1;
+			if(index < 0)
+				break;
+
+			char commonLetter = text.charAt(index);
+			while(itr.hasNext()){
+				text = itr.next();
+				index = text.length() - lastCommonLetter - 1;
+				if(index < 0 || text.charAt(index) != commonLetter)
+					return text.substring(index + 1);
+			}
+
+			lastCommonLetter ++;
+		}
+		return firstText;
+	}
+
 
 
 
@@ -427,7 +472,7 @@ for(Map.Entry<String, List<LineEntry>> e : bucket.entrySet())
 		return bucket;
 	}
 
-//	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
+	private Map<String, LineEntry> removeOverlappingRules(Map<String, List<LineEntry>> bucketedEntries){
 //		Map<String, LineEntry> nonOverlappingBucketedEntries = new HashMap<>();
 //		for(Map.Entry<String, List<LineEntry>> entry : bucketedEntries.entrySet()){
 //			List<LineEntry> aggregatedRules = entry.getValue();
@@ -441,7 +486,8 @@ for(Map.Entry<String, List<LineEntry>> e : bucket.entrySet())
 //				nonOverlappingBucketedEntries.put(entry.getKey(), aggregatedRules.get(0));
 //		}
 //		return nonOverlappingBucketedEntries;
-//	}
+return null;
+	}
 
 	private List<LineEntry> removeOverlappingConditions(List<LineEntry> aggregatedRules){
 		//extract letters prior to first condition
@@ -574,7 +620,7 @@ throw new RuntimeException("to be tested");
 	}
 
 	//expand conditions by one letter
-//	private List<LineEntry> expandConditions(List<LineEntry> entries){
+	private List<LineEntry> expandConditions(List<LineEntry> entries){
 //		List<LineEntry> expandedEntries = new ArrayList<>();
 //		for(LineEntry en : entries){
 //			Iterator<String> words = en.originalWords.iterator();
@@ -601,7 +647,8 @@ throw new RuntimeException("to be tested");
 //		entries.clear();
 //		entries.addAll(expandedEntries);
 //		return entries;
-//	}
+return null;
+	}
 
 	private List<String> convertSets(List<Set<Character>> letters){
 		return letters.stream()
@@ -715,14 +762,14 @@ throw new RuntimeException("to be tested");
 		return list;
 	}
 
-//	private void addCondition(LineEntry entry, Set<String> conditions){
+	private void addCondition(LineEntry entry, Set<String> conditions){
 //		List<String> sortedConditions = new ArrayList<>(conditions);
 //		Collections.sort(sortedConditions, comparator);
 //		String addedCondition = StringUtils.join(sortedConditions, StringUtils.EMPTY);
 //		entry.condition = GROUP_START + addedCondition + GROUP_END + entry.condition;
-//	}
+	}
 
-//	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
+	private List<String> reduceEntriesToRules(RuleEntry originalRuleEntry, List<LineEntry> nonOverlappingBucketedEntries){
 //		int size = nonOverlappingBucketedEntries.size();
 //		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 //		String flag = originalRuleEntry.getEntries().get(0).getFlag();
@@ -733,7 +780,8 @@ throw new RuntimeException("to be tested");
 //		for(LineEntry entry : nonOverlappingBucketedEntries)
 //			rules.add(composeLine(type, flag, entry));
 //		return rules;
-//	}
+return null;
+	}
 
 	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
@@ -752,37 +800,6 @@ throw new RuntimeException("to be tested");
 			.add(partialLine.addition)
 			.add(partialLine.condition)
 			.toString();
-	}
-
-	//FIXME optimize!
-	private String longestCommonSuffix(Set<String> texts){
-		String firstText = null;
-		int lastCommonLetter = 0;
-		List<String> list = new ArrayList<>(texts);
-		list.sort(Comparator.comparing(String::length).reversed());
-		while(true){
-			Iterator<String> itr = list.iterator();
-			String text = itr.next();
-			if(firstText == null){
-				//extract longest word
-				firstText = text;
-			}
-
-			int index = text.length() - lastCommonLetter - 1;
-			if(index < 0)
-				break;
-
-			char commonLetter = text.charAt(index);
-			while(itr.hasNext()){
-				text = itr.next();
-				index = text.length() - lastCommonLetter - 1;
-				if(index < 0 || text.charAt(index) != commonLetter)
-					return text.substring(index + 1);
-			}
-
-			lastCommonLetter ++;
-		}
-		return firstText;
 	}
 
 }
