@@ -73,7 +73,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		public List<LineEntry> split(AffixEntry.Type type){
 			List<LineEntry> split = new ArrayList<>();
-			//TODO cope with mi[lƚ]e in condition and in from
 			if(type == AffixEntry.Type.SUFFIX)
 				for(String f : from){
 					int index = f.length() - condition.length() - 1;
@@ -149,7 +148,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.addition));
 
-//String flag = "%0"; mi[lƚ]e
+//String flag = "%0"; //mi[lƚ]e
 String flag = "<2";
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
@@ -178,11 +177,7 @@ String flag = "<2";
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-			List<String> rules = convertEntriesToRules(originalRuleEntry, false, entriesTable);
-//			List<String> rules = convertEntriesToRules(originalRuleEntry, true, entriesTable);
-//			List<String> rules2 = convertEntriesToRules(originalRuleEntry, false, entriesTable);
-//			if(rules2.size() < rules.size())
-//				rules = rules2;
+			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
 				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
@@ -321,18 +316,8 @@ String flag = "<2";
 	private void collectFlagProduction(LineEntry affixEntry, String word, Map<String, List<LineEntry>> entries){
 		List<LineEntry> list = entries.computeIfAbsent(affixEntry.condition, k -> new ArrayList<>());
 		int idx = list.indexOf(affixEntry);
-		if(idx >= 0){
-			//merge similar condition rules
-			//TODO has to manage mi[lƚ]e in split
-//SFX %0 e èr/A1 mile
-//SFX %0 e èr/A1 miƚe
-//SFX %0 e ar/A1 mile
-//SFX %0 e ar/A1 miƚe
-//to
-//SFX %0 e ar/A1 mi[lƚ]e
-//SFX %0 e ar/A1 mi[lƚ]e
+		if(idx >= 0)
 			list.get(idx).from.add(word);
-		}
 		else
 			list.add(affixEntry);
 	}
@@ -367,20 +352,79 @@ String flag = "<2";
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean enableLongestCommonAffix,
-			Map<String, List<LineEntry>> entriesTable){
-		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, Map<String, List<LineEntry>> entriesTable){
+		List<LineEntry> entries = extractRawRules(false, entriesTable);
 
-		//extract raw rules
+		entries = compressRules(entries);
+
+		return composeAffixRules(originalRuleEntry, entries);
+	}
+
+	private List<LineEntry> compressRules(List<LineEntry> entries){
+		//bucket by removal and adding parts
+		Map<String, List<LineEntry>> bucket = new HashMap<>();
+		for(LineEntry entry : entries){
+			String key = entry.removal + "\t" + entry.addition + "\t" + entry.condition.length();
+			bucket.computeIfAbsent(key, k -> new ArrayList<>())
+				.add(entry);
+		}
+
+		//compress
+		for(List<LineEntry> value : bucket.values())
+			if(value.size() > 1){
+				//collect conditions
+				List<String> conditions = value.stream()
+					.map(le -> le.condition)
+					.collect(Collectors.toList());
+				String commonCondition = mergeConditions(conditions);
+				if(commonCondition != null){
+					LineEntry onlyEntry = value.remove(0);
+					List<String> froms = value.stream()
+						.flatMap(le -> le.from.stream())
+						.collect(Collectors.toList());
+					onlyEntry.from.addAll(froms);
+					onlyEntry.condition = commonCondition;
+					value.clear();
+					value.add(onlyEntry);
+				}
+				else{
+					//TODO separate into sets of merged rules (aa, ba, cb, db > [ab]a, [cd]b)
+throw new RuntimeException("aahh");
+				}
+			}
+
+		//extract compressed rules
+		return extractRawRules(true, bucket);
+	}
+
+	private String mergeConditions(List<String> conditions){
+		//TODO cope with suffix/affix
+		String lcs = longestCommonSuffix(new HashSet<>(conditions), null);
+		if(lcs.length() + 1 != conditions.get(0).length())
+			return null;
+
+		return conditions.stream()
+			//TODO cope with suffix/affix
+			.map(cond -> cond.charAt(0))
+			.map(String::valueOf)
+			.sorted(comparator)
+			.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END + lcs));
+	}
+
+	private List<LineEntry> extractRawRules(boolean enableLongestCommonAffix, Map<String, List<LineEntry>> entriesTable){
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
 			.forEach(entries::addAll);
 		if(enableLongestCommonAffix)
 			//FIXME cope with suffix/prefix
-			entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
+			entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from, RegExpSequencer.splitSequence(entry.condition)));
 		entries.sort(lineEntryComparator);
+		return entries;
+	}
 
-		//compose affix rules
+	private List<String> composeAffixRules(RuleEntry originalRuleEntry, List<LineEntry> entries){
+		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+
 		int size = entries.size();
 		String flag = originalRuleEntry.getEntries().get(0).getFlag();
 		List<String> rules = new ArrayList<>(size);
@@ -390,9 +434,9 @@ String flag = "<2";
 	}
 
 	//FIXME optimize!
-	private String longestCommonSuffix(Set<String> texts){
+	private String longestCommonSuffix(Set<String> texts, String[] baseCondition){
 		String firstText = null;
-		int lastCommonLetter = 0;
+		int lastCommonLetter = (baseCondition != null? baseCondition.length: 0);
 		List<String> list = new ArrayList<>(texts);
 		list.sort(Comparator.comparing(String::length).reversed());
 		while(true){
@@ -411,12 +455,18 @@ String flag = "<2";
 			while(itr.hasNext()){
 				text = itr.next();
 				index = text.length() - lastCommonLetter - 1;
-				if(index < 0 || text.charAt(index) != commonLetter)
-					return text.substring(index + 1);
+				if(index < 0 || text.charAt(index) != commonLetter){
+					text = text.substring(index + 1);
+					if(baseCondition != null)
+						text = text.substring(0, text.length() - baseCondition.length) + String.join(StringUtils.EMPTY, baseCondition);
+					return text;
+				}
 			}
 
 			lastCommonLetter ++;
 		}
+		if(baseCondition != null)
+			firstText = firstText.substring(0, firstText.length() - baseCondition.length) + String.join(StringUtils.EMPTY, baseCondition);
 		return firstText;
 	}
 
