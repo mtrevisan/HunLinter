@@ -427,7 +427,7 @@ boolean keepLongestCommonAffix = false;
 	}
 
 	private void reduceNotConditions(Map<String, LineEntry> bucket){
-		//stage 0:
+		//stage 0: bucket content
 		//SFX <2 0 aso/M0 [nr]
 		//SFX <2 e aso/M0 e
 		//SFX <2 0 sa/F0 [gnñortu]a
@@ -441,8 +441,8 @@ boolean keepLongestCommonAffix = false;
 		//SFX <2 òjo ojaso/M0 òjo
 		//SFX <2 òɉo oɉaso/M0 òɉo
 
-		//stage 1: collect and order by increasing lengths the remaining parts of the conditions with a character group inside
-		//		(ex. [aiou]la > order by 'la'.length ascending)
+		//stage 1: collect and order by increasing lengths the remaining parts of the conditions (those after a group) with a character
+		//		group inside (ex. [aiou]la > order by 'la'.length ascending)
 		//SFX <2 0 sa/F0 [gnñortu]a
 		//SFX <2 o aso/M0 [giñptv]o
 		//SFX <2 0 sa/F0 [aiou]ƚa
