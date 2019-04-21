@@ -150,6 +150,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 //String flag = "%0"; //mi[lƚ]e
 String flag = "<2";
+boolean keepShortestCondition = false;
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -177,7 +178,7 @@ String flag = "<2";
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
+			List<String> rules = convertEntriesToRules(originalRuleEntry, keepShortestCondition, entriesTable);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
 				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
@@ -352,15 +353,16 @@ String flag = "<2";
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, Map<String, List<LineEntry>> entriesTable){
+	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepShortestCondition,
+			Map<String, List<LineEntry>> entriesTable){
 		List<LineEntry> entries = extractRawRules(false, entriesTable);
 
-		entries = compressRules(entries);
+		entries = compressRules(entries, keepShortestCondition);
 
 		return composeAffixRules(originalRuleEntry, entries);
 	}
 
-	private List<LineEntry> compressRules(List<LineEntry> entries){
+	private List<LineEntry> compressRules(List<LineEntry> entries, boolean keepShortestCondition){
 		//bucket by removal and adding parts
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		for(LineEntry entry : entries){
@@ -394,7 +396,7 @@ throw new RuntimeException("aahh");
 			}
 
 		//extract compressed rules
-		return extractRawRules(true, bucket);
+		return extractRawRules(keepShortestCondition, bucket);
 	}
 
 	private String mergeConditions(List<String> conditions){
