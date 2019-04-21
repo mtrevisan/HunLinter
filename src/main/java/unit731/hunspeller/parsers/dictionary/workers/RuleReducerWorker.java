@@ -150,7 +150,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 //String flag = "%0"; //mi[lƚ]e
 String flag = "<2";
-boolean keepShortestCondition = false;
+//NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
+//flag name for input should be "Optimize for closed group"?
+boolean keepLongestCommonAffix = false;
 		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -178,7 +180,7 @@ boolean keepShortestCondition = false;
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-			List<String> rules = convertEntriesToRules(originalRuleEntry, keepShortestCondition, entriesTable);
+			List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, entriesTable);
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
 				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
@@ -297,7 +299,7 @@ boolean keepShortestCondition = false;
 				String baseKey = equivalenceClass.get(0);
 				for(int i = 1; i < classes; i ++){
 					String currentKey = equivalenceClass.get(i);
-					//prepend characters to currentKey until it is no longer contained into baseKey
+					//prepend/append characters to currentKey until it is no longer contained into baseKey
 					if(baseKey.endsWith(currentKey))
 						expandConditionRemovingCollingClasses(currentKey, type, entriesTable);
 				}
@@ -353,25 +355,113 @@ boolean keepShortestCondition = false;
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepShortestCondition,
+	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepLongestCommonAffix,
 			Map<String, List<LineEntry>> entriesTable){
 		List<LineEntry> entries = extractRawRules(false, entriesTable);
 
-		entries = compressRules(entries, keepShortestCondition);
+		entries = compressRules(entries, keepLongestCommonAffix);
 
 		return composeAffixRules(originalRuleEntry, entries);
 	}
 
-	private List<LineEntry> compressRules(List<LineEntry> entries, boolean keepShortestCondition){
-		//bucket by removal and adding parts
+	private List<LineEntry> compressRules(List<LineEntry> entries, boolean keepLongestCommonAffix){
+		Map<String, List<LineEntry>> bucket = bucketByRemovalAndAddingParts(entries);
+
+		compressBucketedRules(bucket);
+System.out.println("compressed entries:");
+for(Map.Entry<String, List<LineEntry>> e : bucket.entrySet())
+	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
+
+		//stage 0:
+//SFX <2 0 aso/M0 [nr]
+//SFX <2 e aso/M0 e
+//SFX <2 0 sa/F0 [gnñortu]a
+//SFX <2 ía iasa/F0 ía
+//SFX <2 0 sa/F0 [aiou]ƚa
+//SFX <2 èƚa eƚasa/F0 èƚa
+//SFX <2 òƚa oƚasa/F0 òƚa
+//SFX <2 o aso/M0 [giñptv]o
+//SFX <2 o aso/M0 [aiou]ƚo
+//SFX <2 èƚo eƚaso/M0 èƚo
+//SFX <2 òjo ojaso/M0 òjo
+//SFX <2 òɉo oɉaso/M0 òɉo
+
+		//stage 1: collect and order by decreasing lengths the remaining parts of the conditions with a character group inside ([aiou]la > la)
+//SFX <2 0 sa/F0 [aiou]ƚa
+//SFX <2 o aso/M0 [aiou]ƚo
+//SFX <2 0 sa/F0 [gnñortu]a
+//SFX <2 o aso/M0 [giñptv]o
+		Map<String, LineEntry> remainings = new HashMap<>();
+		Iterator<Map.Entry<String, List<LineEntry>>> itr = bucket.entrySet().iterator();
+		while(itr.hasNext()){
+			LineEntry elem = itr.next().getValue().get(0);
+			if(elem.condition.contains("[") && elem.condition.lastIndexOf(']') + 1 < elem.condition.length()){
+				remainings.put(elem.condition.substring(elem.condition.lastIndexOf(']') + 1), elem);
+
+				itr.remove();
+			}
+		}
+		List<String> remainingsSuffixes = new ArrayList<>(remainings.keySet());
+		remainingsSuffixes.sort(Comparator.comparingInt((String elem) -> elem.length() - elem.lastIndexOf(']')).reversed());
+
+		//stage 2: bucket the other rules to the remainings
+//SFX <2 0 sa/F0 [aiou]ƚa:	[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]
+//SFX <2 o aso/M0 [aiou]ƚo:	[SFX <2 èƚo eƚaso/M0 èƚo]
+//SFX <2 0 sa/F0 [gnñortu]a:	[SFX <2 ía iasa/F0 ía]
+//SFX <2 o aso/M0 [giñptv]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo]
+		Map<String, List<LineEntry>> remainingsBucket = new HashMap<>();
+		for(String key : remainingsSuffixes){
+			itr = bucket.entrySet().iterator();
+			while(itr.hasNext()){
+				LineEntry elem = itr.next().getValue().get(0);
+				if(elem.condition.endsWith(key)){
+					remainingsBucket.computeIfAbsent(key, k -> new ArrayList<>())
+						.add(elem);
+
+					itr.remove();
+				}
+			}
+		}
+/*
+step 3: estrazione caratteri in comune al netto della parte rimanente della condition originale,
+	se rimangono caratteri oltre l'estrazione, aggiungere una regola (cosa succede se ho [òw]? splittare diversamente
+	in [^ò]jo e [^w]ɉo > per ogni carattere dell'estrazione tirare fuori gli affissi, bucket per affissi, aggiunta regola per ogni affisso)
+SFX <2 0 sa/F0 [aiou]ƚa:	[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]:	[èò]
+SFX <2 o aso/M0 [aiou]ƚo:	[SFX <2 èƚo eƚaso/M0 èƚo]:										[è]
+SFX <2 0 sa/F0 [gnñortu]a:	[SFX <2 ía iasa/F0 ía]:											[í]
+SFX <2 o aso/M0 [giñptv]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo]:	[jɉ] (rimangono caratteri: [ò])
+SFX <2 o aso/M0 [^ò][jɉ]o
+
+step 4: trasferire nell'estrazione le parti in più nelle rimanenti condition che sono contenute
+	(es. a [gnñortu]a, aggiungere ƚ da [aiou]ƚa perché ƚa contiene a)
+SFX <2 0 sa/F0 [aiou]ƚa:	[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]:	[èò]
+SFX <2 o aso/M0 [aiou]ƚo:	[SFX <2 èƚo eƚaso/M0 èƚo]:										[è]
+SFX <2 0 sa/F0 [gnñortu]a:	[SFX <2 ía iasa/F0 ía]:											[íƚ]
+SFX <2 o aso/M0 [giñptv]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo]:	[jɉƚ]
+SFX <2 o aso/M0 [^ò][jɉ]o
+
+step 5: se caratteri in comune non è contenuto nella parte [] della condizione originale, sostituire con la negazione
+SFX <2 0 sa/F0 [^èò]ƚa:		[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]:	[èò]
+SFX <2 o aso/M0 [^è]ƚo:		[SFX <2 èƚo eƚaso/M0 èƚo]:										[è]
+SFX <2 0 sa/F0 [^íƚ]a:		[SFX <2 ía iasa/F0 ía]:											[íƚ]
+SFX <2 o aso/M0 [^jɉƚ]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo]:	[jɉƚ]
+SFX <2 o aso/M0 [^ò][jɉ]o
+*/
+		//extract compressed rules
+		return extractRawRules(keepLongestCommonAffix, bucket);
+	}
+
+	private Map<String, List<LineEntry>> bucketByRemovalAndAddingParts(List<LineEntry> entries){
 		Map<String, List<LineEntry>> bucket = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + "\t" + entry.addition + "\t" + entry.condition.length();
+			String key = entry.removal + "\t" + entry.addition + "\t" + entry.condition.substring(1);
 			bucket.computeIfAbsent(key, k -> new ArrayList<>())
 				.add(entry);
 		}
+		return bucket;
+	}
 
-		//compress
+	private void compressBucketedRules(Map<String, List<LineEntry>> bucket){
 		for(List<LineEntry> value : bucket.values())
 			if(value.size() > 1){
 				//collect conditions
@@ -379,24 +469,15 @@ boolean keepShortestCondition = false;
 					.map(le -> le.condition)
 					.collect(Collectors.toList());
 				String commonCondition = mergeConditions(conditions);
-				if(commonCondition != null){
-					LineEntry onlyEntry = value.remove(0);
-					List<String> froms = value.stream()
-						.flatMap(le -> le.from.stream())
-						.collect(Collectors.toList());
-					onlyEntry.from.addAll(froms);
-					onlyEntry.condition = commonCondition;
-					value.clear();
-					value.add(onlyEntry);
-				}
-				else{
-					//TODO separate into sets of merged rules (aa, ba, cb, db > [ab]a, [cd]b)
-throw new RuntimeException("aahh");
-				}
+				LineEntry onlyEntry = value.remove(0);
+				List<String> froms = value.stream()
+					.flatMap(le -> le.from.stream())
+					.collect(Collectors.toList());
+				onlyEntry.from.addAll(froms);
+				onlyEntry.condition = commonCondition;
+				value.clear();
+				value.add(onlyEntry);
 			}
-
-		//extract compressed rules
-		return extractRawRules(keepShortestCondition, bucket);
 	}
 
 	private String mergeConditions(List<String> conditions){
@@ -413,12 +494,12 @@ throw new RuntimeException("aahh");
 			.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END + lcs));
 	}
 
-	private List<LineEntry> extractRawRules(boolean enableLongestCommonAffix, Map<String, List<LineEntry>> entriesTable){
+	private List<LineEntry> extractRawRules(boolean keepLongestCommonAffix, Map<String, List<LineEntry>> entriesTable){
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
 			.forEach(entries::addAll);
-		if(enableLongestCommonAffix)
-			//FIXME cope with suffix/prefix
+		if(keepLongestCommonAffix)
+			//TODO cope with suffix/prefix
 			entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from, RegExpSequencer.splitSequence(entry.condition)));
 		entries.sort(lineEntryComparator);
 		return entries;
