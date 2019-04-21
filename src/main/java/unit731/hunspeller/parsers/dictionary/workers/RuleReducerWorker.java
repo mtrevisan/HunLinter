@@ -357,7 +357,10 @@ boolean keepLongestCommonAffix = false;
 
 	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepLongestCommonAffix,
 			Map<String, List<LineEntry>> entriesTable){
-		List<LineEntry> entries = extractRawRules(false, entriesTable);
+		List<LineEntry> entries = new ArrayList<>();
+		entriesTable.values()
+			.forEach(entries::addAll);
+		entries.sort(lineEntryComparator);
 
 		entries = compressRules(entries, keepLongestCommonAffix);
 
@@ -367,12 +370,12 @@ boolean keepLongestCommonAffix = false;
 	private List<LineEntry> compressRules(List<LineEntry> entries, boolean keepLongestCommonAffix){
 		Map<String, List<LineEntry>> bucket = bucketByRemovalAndAddingParts(entries);
 
-		compressBucketedRules(bucket);
+		Map<String, LineEntry> compressedBucket = compressBucketedRules(bucket);
 
-		reduceNotConditions(bucket);
+		reduceNotConditions(compressedBucket);
 
 		//extract compressed rules
-		return extractRawRules(keepLongestCommonAffix, bucket);
+		return extractRawRules(keepLongestCommonAffix, compressedBucket);
 	}
 
 	private Map<String, List<LineEntry>> bucketByRemovalAndAddingParts(List<LineEntry> entries){
@@ -385,23 +388,28 @@ boolean keepLongestCommonAffix = false;
 		return bucket;
 	}
 
-	private void compressBucketedRules(Map<String, List<LineEntry>> bucket){
-		for(List<LineEntry> value : bucket.values())
-			if(value.size() > 1){
+	private Map<String, LineEntry> compressBucketedRules(Map<String, List<LineEntry>> bucket){
+		Map<String, LineEntry> compressedBucket = new HashMap<>();
+		for(Map.Entry<String, List<LineEntry>> elem : bucket.entrySet()){
+			List<LineEntry> list = elem.getValue();
+			if(list.size() == 1)
+				compressedBucket.put(elem.getKey(), list.get(0));
+			else{
 				//collect conditions
-				List<String> conditions = value.stream()
+				List<String> conditions = list.stream()
 					.map(le -> le.condition)
 					.collect(Collectors.toList());
 				String commonCondition = mergeConditions(conditions);
-				LineEntry onlyEntry = value.remove(0);
-				List<String> froms = value.stream()
+				LineEntry onlyEntry = list.remove(0);
+				List<String> froms = list.stream()
 					.flatMap(le -> le.from.stream())
 					.collect(Collectors.toList());
 				onlyEntry.from.addAll(froms);
 				onlyEntry.condition = commonCondition;
-				value.clear();
-				value.add(onlyEntry);
+				compressedBucket.put(elem.getKey(), onlyEntry);
 			}
+		}
+		return compressedBucket;
 	}
 
 	private String mergeConditions(List<String> conditions){
@@ -418,7 +426,7 @@ boolean keepLongestCommonAffix = false;
 			.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END + lcs));
 	}
 
-	private void reduceNotConditions(Map<String, List<LineEntry>> bucket){
+	private void reduceNotConditions(Map<String, LineEntry> bucket){
 		//stage 0:
 		//SFX <2 0 aso/M0 [nr]
 		//SFX <2 e aso/M0 e
@@ -433,28 +441,27 @@ boolean keepLongestCommonAffix = false;
 		//SFX <2 òjo ojaso/M0 òjo
 		//SFX <2 òɉo oɉaso/M0 òɉo
 
-		//stage 1: collect and order by decreasing lengths the remaining parts of the conditions with a character group inside
-		//		(ex. [aiou]la > order by 'la'.length)
-		//SFX <2 0 sa/F0 [aiou]ƚa
-		//SFX <2 o aso/M0 [aiou]ƚo
+		//stage 1: collect and order by increasing lengths the remaining parts of the conditions with a character group inside
+		//		(ex. [aiou]la > order by 'la'.length ascending)
 		//SFX <2 0 sa/F0 [gnñortu]a
 		//SFX <2 o aso/M0 [giñptv]o
-		Map<String, LineEntry> remainings = new HashMap<>();
-		Iterator<Map.Entry<String, List<LineEntry>>> itr = bucket.entrySet().iterator();
+		//SFX <2 0 sa/F0 [aiou]ƚa
+		//SFX <2 o aso/M0 [aiou]ƚo
+		List<LineEntry> conditionsWithGroup = new ArrayList<>();
+		Iterator<Map.Entry<String, LineEntry>> itr = bucket.entrySet().iterator();
 		while(itr.hasNext()){
-			LineEntry elem = itr.next().getValue().get(0);
+			LineEntry elem = itr.next().getValue();
 
 			int closedBraketIndex = elem.condition.indexOf(']') + 1;
 			if(closedBraketIndex > 0 && closedBraketIndex < elem.condition.length()){
-				remainings.put(elem.condition.substring(closedBraketIndex), elem);
+				conditionsWithGroup.add(elem);
 
 				itr.remove();
 			}
 		}
-		List<String> remainingsSuffixes = new ArrayList<>(remainings.keySet());
-		remainingsSuffixes.sort(Comparator.comparingInt((String elem) -> elem.length() - elem.indexOf(']')).reversed());
+		conditionsWithGroup.sort(Comparator.comparingInt((LineEntry entry) -> entry.condition.length() - entry.condition.indexOf(']')));
 
-		//stage 2: bucket the other rules (only the condition part not in common is truly necessary) to the remainings
+/*		//stage 2: bucket the other rules (only the condition part not in common is truly necessary) to the remainings
 		//SFX <2 0 sa/F0 [aiou]ƚa:		[è, ò]
 		//SFX <2 o aso/M0 [aiou]ƚo:	[è]
 		//SFX <2 0 sa/F0 [gnñortu]a:	[í]
@@ -515,14 +522,14 @@ System.out.println("");
 				//TODO
 
 				//for each bucket:
-				LineEntry newEntry = new LineEntry(elem.removal, elem.addition, elem.condition /*"[^ò][jɉ]o"*/);
+				LineEntry newEntry = new LineEntry(elem.removal, elem.addition, elem.condition /*"[^ò][jɉ]o"* /);
 				String newKey = newEntry.removal + "\t" + newEntry.addition + "\t" + newEntry.condition;
 				bucket.computeIfAbsent(newKey, k -> new ArrayList<>())
 					.add(newEntry);
 
 				String strippedCondition = elem.condition.substring(0, elem.condition.length() - key.length());
 				remainingsBucket.computeIfAbsent(key, k -> new ArrayList<>())
-					.add(strippedCondition /*j*/);
+					.add(strippedCondition /*j* /);
 			}
 		}
 
@@ -542,7 +549,7 @@ System.out.println("");
 			}
 //		for(Map.Entry<String, List<String>> entry : remainingsBucket.entrySet()){
 			//TODO
-		}
+		}*/
 
 /*
 step 3: estrazione caratteri in comune al netto della parte rimanente della condition originale,
@@ -572,10 +579,10 @@ SFX <2 o aso/M0 [^ò][jɉ]o
 System.out.println("");
 	}
 
-	private List<LineEntry> extractRawRules(boolean keepLongestCommonAffix, Map<String, List<LineEntry>> entriesTable){
+	private List<LineEntry> extractRawRules(boolean keepLongestCommonAffix, Map<String, LineEntry> entriesTable){
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
-			.forEach(entries::addAll);
+			.forEach(entries::add);
 		if(keepLongestCommonAffix)
 			//TODO cope with suffix/prefix
 			entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from, RegExpSequencer.splitSequence(entry.condition)));
