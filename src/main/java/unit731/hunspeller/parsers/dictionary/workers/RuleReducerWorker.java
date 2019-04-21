@@ -178,7 +178,11 @@ String flag = "<2";
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-			List<String> rules = convertEntriesToRules(originalRuleEntry, entriesTable);
+			List<String> rules = convertEntriesToRules(originalRuleEntry, false, entriesTable);
+//			List<String> rules = convertEntriesToRules(originalRuleEntry, true, entriesTable);
+//			List<String> rules2 = convertEntriesToRules(originalRuleEntry, false, entriesTable);
+//			if(rules2.size() < rules.size())
+//				rules = rules2;
 			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 			rules.stream()
 				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
@@ -363,18 +367,21 @@ String flag = "<2";
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, Map<String, List<LineEntry>> entriesTable){
+	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean enableLongestCommonAffix,
+			Map<String, List<LineEntry>> entriesTable){
+		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+
 		//extract raw rules
 		List<LineEntry> entries = new ArrayList<>();
 		entriesTable.values()
 			.forEach(entries::addAll);
-		//if the longest common suffix is wanted, then decomment the next line
-//		entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
+		if(enableLongestCommonAffix)
+			//FIXME cope with suffix/prefix
+			entries.forEach(entry -> entry.condition = longestCommonSuffix(entry.from));
 		entries.sort(lineEntryComparator);
 
 		//compose affix rules
 		int size = entries.size();
-		AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 		String flag = originalRuleEntry.getEntries().get(0).getFlag();
 		List<String> rules = new ArrayList<>(size);
 		for(LineEntry entry : entries)
