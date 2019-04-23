@@ -51,7 +51,7 @@ public class WordGeneratorAffixTest{
 		loadData(affFile.getAbsolutePath());
 
 		ConversionTable table = backbone.getAffixData().getData(AffixTag.OUTPUT_CONVERSION_TABLE);
-		Assertions.assertEquals("[affixTag=OUTPUT_CONVERSION_TABLE,table=[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]]", table.toString());
+		Assertions.assertEquals("[affixTag=OUTPUT_CONVERSION_TABLE,table={  =[(a,A), (á,Á), (b,B), (c,C), (d,D), (e,E), (é,É)]}]", table.toString());
 	}
 
 

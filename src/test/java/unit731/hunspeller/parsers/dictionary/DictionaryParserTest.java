@@ -30,7 +30,7 @@ public class DictionaryParserTest{
 		affParser.parse(affFile);
 
 		ConversionTable table = affParser.getAffixData().getData(AffixTag.REPLACEMENT_TABLE);
-		Assertions.assertEquals("[affixTag=REPLACEMENT_TABLE,table=[(^b,bb), (e$,ee), (ij,IJ), (alot,a lot)]]", table.toString());
+		Assertions.assertEquals("[affixTag=REPLACEMENT_TABLE,table={  =[(ij,IJ), (alot,a lot)],  $=[(e$,ee)], ^ =[(^b,bb)]}]", table.toString());
 
 		List<String> replaced = affParser.getAffixData().applyReplacementTable("clea");
 		Assertions.assertTrue(replaced.isEmpty());

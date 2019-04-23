@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -116,6 +115,7 @@ public class AffixEntry{
 
 		checkValidity(cond, removal, line);
 
+
 		entry = PatternHelper.clear(line, PATTERN_ENTRY);
 	}
 
@@ -181,19 +181,19 @@ public class AffixEntry{
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
 		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
 
-		boolean containsPartOfSpeech = amf.stream()
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));
+//		boolean containsPartOfSpeech = amf.stream()
+//			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));
 		boolean containsTerminalSuffixes = amf.stream()
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX))
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH) || !containsPartOfSpeech)
+//			.filter(field -> !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH) || !containsPartOfSpeech)
 			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
 		//find stem
-		String stem = null;
+/*		String stem = null;
 		Iterator<String> itr = mf.iterator();
 		while(itr.hasNext()){
 			String field = itr.next();
@@ -215,7 +215,7 @@ public class AffixEntry{
 			}
 		}
 		//add stem as first element
-		mf.add(0, (stem != null? stem: MorphologicalTag.TAG_STEM + dicEntry.getWord()));
+		mf.add(0, (stem != null? stem: MorphologicalTag.TAG_STEM + dicEntry.getWord()));*/
 
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
