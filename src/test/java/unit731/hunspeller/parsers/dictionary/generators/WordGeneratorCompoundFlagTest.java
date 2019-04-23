@@ -197,7 +197,7 @@ public class WordGeneratorCompoundFlagTest{
 		Assertions.assertEquals(createProduction("foosuf", "P", "st:foo po:suf"), words.get(1));
 		//twofold productions
 		Assertions.assertEquals(createProduction("prefoo", "S", "po:pre st:foo"), words.get(2));
-		Assertions.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo"), words.get(3));
+		Assertions.assertEquals(createProduction("prefoosuf", null, "po:pre st:foo po:suf"), words.get(3));
 		//lastfold productions
 
 
@@ -211,19 +211,19 @@ public class WordGeneratorCompoundFlagTest{
 			createProduction("foofoo", "PS", "pa:foo st:foo pa:foo st:foo"),
 			createProduction("foofoosuf", "P", "pa:foo st:foo pa:foo st:foo po:suf"),
 			createProduction("prefoofoo", "S", "po:pre pa:foo st:foo pa:foo st:foo"),
-			createProduction("prefoofoosuf", null, "po:pre pa:foo st:foo pa:foo st:foo"),
+			createProduction("prefoofoosuf", null, "po:pre pa:foo st:foo pa:foo st:foo po:suf"),
 			createProduction("foobar", "PS", "pa:foo st:foo pa:bar st:bar"),
 			createProduction("foobarsuf", "P", "pa:foo st:foo pa:bar st:bar po:suf"),
 			createProduction("prefoobar", "S", "po:pre pa:foo st:foo pa:bar st:bar"),
-			createProduction("prefoobarsuf", null, "po:pre pa:foo st:foo pa:bar st:bar"),
+			createProduction("prefoobarsuf", null, "po:pre pa:foo st:foo pa:bar st:bar po:suf"),
 			createProduction("barfoo", "PS", "pa:bar st:bar pa:foo st:foo"),
 			createProduction("barfoosuf", "P", "pa:bar st:bar pa:foo st:foo po:suf"),
 			createProduction("prebarfoo", "S", "po:pre pa:bar st:bar pa:foo st:foo"),
-			createProduction("prebarfoosuf", null, "po:pre pa:bar st:bar pa:foo st:foo"),
+			createProduction("prebarfoosuf", null, "po:pre pa:bar st:bar pa:foo st:foo po:suf"),
 			createProduction("barbar", "PS", "pa:bar st:bar pa:bar st:bar"),
 			createProduction("barbarsuf", "P", "pa:bar st:bar pa:bar st:bar po:suf"),
 			createProduction("prebarbar", "S", "po:pre pa:bar st:bar pa:bar st:bar"),
-			createProduction("prebarbarsuf", null, "po:pre pa:bar st:bar pa:bar st:bar")
+			createProduction("prebarbarsuf", null, "po:pre pa:bar st:bar pa:bar st:bar po:suf")
 		);
 		Assertions.assertEquals(expected, words);
 	}
