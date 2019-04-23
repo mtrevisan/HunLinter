@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -23,7 +24,10 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
+import unit731.hunspeller.collections.radixtree.RadixTree;
+import unit731.hunspeller.collections.radixtree.StringRadixTree;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
+import unit731.hunspeller.collections.radixtree.utils.RadixTreeTraverser;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
@@ -50,7 +54,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
-	private class LineEntry{
+	private class LineEntry implements Serializable{
 
 		private final Set<String> from;
 
@@ -203,6 +207,34 @@ boolean keepLongestCommonAffix = false;
 					collectIntoEquivalenceClasses(entry, equivalenceTable);
 				}
 			}
+
+			//constuct the suffix tree
+			StringRadixTree<LineEntry> tree = StringRadixTree.createTreeNoDuplicates();
+			for(LineEntry entry : equivalenceTable.values())
+				tree.put(StringUtils.reverse(entry.condition), entry);
+			//all the conditions that are not a leaf must be augmented
+			RadixTreeTraverser<String, LineEntry> traverser = (wholeKey, node, parent) -> {
+				if(node.hasValue() && !node.isEmpty()){
+					//augment the condition
+					List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
+System.out.println("augment the condition for " + node.getValue() + " from set\r\n\t" + StringUtils.join(list, "\r\n\t"));
+					//TODO
+				}
+			};
+			tree.traverseBFS(traverser);
+/*
+#SFX <2 0 aso/M0 n
+#SFX <2 0 aso/M0 r
+#SFX <2 e aso/M0 e
+#SFX <2 o aso/M0 o
+#SFX <2 0 sa/F0 a
+#SFX <2 ía iasa/F0 ía
+#SFX <2 èƚa eƚasa/F0 èƚa
+#SFX <2 èƚo eƚaso/M0 èƚo
+#SFX <2 òjo ojaso/M0 òjo
+#SFX <2 òɉo oɉaso/M0 òɉo
+#SFX <2 òƚa oƚasa/F0 òƚa
+*/
 
 //System.out.println("entries:");
 //for(Map.Entry<String, LineEntry> e : equivalenceTable.entrySet())
