@@ -170,20 +170,21 @@ boolean keepLongestCommonAffix = false;
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 			try{
 				reduceEquivalenceClasses(type, entriesTable);
+//System.out.println("cleaned entries:");
+//for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
+//	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
+
+				List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, entriesTable);
+
+				LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
+				rules.stream()
+					.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 
 				throw e;
 			}
-//System.out.println("cleaned entries:");
-//for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
-//	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
-
-			List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, entriesTable);
-			LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
-			rules.stream()
-				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
 
 
 
@@ -427,7 +428,7 @@ boolean keepLongestCommonAffix = false;
 	}
 
 	private void reduceNotConditions(List<LineEntry> compressedRules){
-		//stage 0: `compressedRules` content
+		//stage 0: original list
 		//SFX <2 0 aso/M0 [nr]
 		//SFX <2 e aso/M0 e
 		//SFX <2 0 sa/F0 [gnñortu]a
@@ -441,58 +442,68 @@ boolean keepLongestCommonAffix = false;
 		//SFX <2 òjo ojaso/M0 òjo
 		//SFX <2 òɉo oɉaso/M0 òɉo
 
-		//stage 1: collect the remaining parts of the conditions after a group (ex. [aiou]la > 'la')
+		//stage 1: collect the rules with a fixed part in the conditions (ex. [aiou]la > 'la')
 		//SFX <2 0 sa/F0 [aiou]ƚa
 		//SFX <2 o aso/M0 [aiou]ƚo
 		//SFX <2 0 sa/F0 [gnñortu]a
 		//SFX <2 o aso/M0 [giñptv]o
-		Map<LineEntry, List<LineEntry>> remainingsBucket = new HashMap<>();
+		Map<LineEntry, List<LineEntry>> fixedPartsBucket = new HashMap<>();
 		for(LineEntry elem : compressedRules){
 			int closedBraketIndex = elem.condition.indexOf(']') + 1;
 			if(closedBraketIndex > 0 && closedBraketIndex < elem.condition.length())
-				remainingsBucket.put(elem, new ArrayList<>());
+				fixedPartsBucket.put(elem, new ArrayList<>());
 		}
 
-		//stage 2: for each grouped rule, collect all the parts from the remaining rules that ends with the `contidionsWithGroup` common part,
-		//		add also from the `contidionsWithGroup`
+		//stage 2: check for collisions between fixed parts
+		Set<String> collisions = new HashSet<>();
+		for(LineEntry key : fixedPartsBucket.keySet()){
+			String fixedCondition = key.condition.substring(key.condition.indexOf(']') + 1);
+			if(!collisions.add(fixedCondition))
+				throw new IllegalArgumentException("Collision occurred between fixed parts of some conditions: " + key.toString());
+		}
+
+		//stage 3: for each fixed-part rule, bucket all the non-fixed parts of the remaining rules that ends with a fixed part,
+		//		bucket also from the bucketed bucket
 		//SFX <2 0 sa/F0 [aiou]ƚa:		[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]
 		//SFX <2 o aso/M0 [aiou]ƚo:	[SFX <2 èƚo eƚaso/M0 èƚo]
 		//SFX <2 0 sa/F0 [gnñortu]a:	[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa, SFX <2 ía iasa/F0 ía, SFX <2 0 sa/F0 [aiou]ƚa]
 		//SFX <2 o aso/M0 [giñptv]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo, SFX <2 èƚo eƚaso/M0 èƚo, SFX <2 o aso/M0 [aiou]ƚo]
-		for(Map.Entry<LineEntry, List<LineEntry>> entry : remainingsBucket.entrySet()){
+		for(Map.Entry<LineEntry, List<LineEntry>> entry : fixedPartsBucket.entrySet()){
 			LineEntry key = entry.getKey();
 			List<LineEntry> value = entry.getValue();
 
-			String fixedCondition = key.condition.substring(key.condition.indexOf("]") + 1);
+			String fixedCondition = key.condition.substring(key.condition.indexOf(']') + 1);
 			for(LineEntry compressedRule : compressedRules)
 				if(key != compressedRule && compressedRule.condition.endsWith(fixedCondition))
 					value.add(compressedRule);
 		}
 
-		//stage 3: collect the letters prior to the common part and use them as the not part
-		for(Map.Entry<LineEntry, List<LineEntry>> entry : remainingsBucket.entrySet()){
+		//stage 4: collect the letters prior to the common part and use them as the not part
+		for(Map.Entry<LineEntry, List<LineEntry>> entry : fixedPartsBucket.entrySet()){
 			LineEntry key = entry.getKey();
 			List<LineEntry> value = entry.getValue();
 
-			int fixedConditionLength = key.condition.length() - key.condition.indexOf(']');
+			int keyConditionLength = key.condition.length();
+			int fixedPartConditionLength = keyConditionLength - key.condition.indexOf(']');
+			int variablePartConditionLength = keyConditionLength - fixedPartConditionLength;
 			Set<String> notSet = value.stream()
-				.map(rule -> String.valueOf(rule.condition.charAt(rule.condition.length() - fixedConditionLength)))
+				.map(rule -> String.valueOf(rule.condition.charAt(rule.condition.length() - fixedPartConditionLength)))
 				.collect(Collectors.toSet());
-			//NOTE: the `notSet` should not be contained into the group of key.condition!! if not raise exception!
-			boolean overlaps = StringUtils.containsAny(key.condition.substring(1, key.condition.length() - fixedConditionLength),
-				notSet.toArray(new String[notSet.size()]));
+			//NOTE: the `notSet` should not be contained into the group of key.condition!! if not, raise exception!
+			String variablePart = key.condition.substring(1, variablePartConditionLength);
+			boolean overlaps = StringUtils.containsAny(variablePart, notSet.toArray(new String[notSet.size()]));
 			if(overlaps)
-				throw new RuntimeException("overlaps!");
+				throw new IllegalArgumentException("Collision occurred between variable parts of a condition and not-set: " + key.toString()
+					+ ", not-set is " + String.join(StringUtils.EMPTY, notSet));
 
-			//if everything's ok, continue
+			//if everything's ok, continue and substitute the variable part with the negated set
 			List<String> notPart = new ArrayList<>(notSet);
 			notPart.sort(comparator);
 			StringJoiner sj = new StringJoiner(StringUtils.EMPTY);
 			sj.add(NOT_GROUP_START);
-			for(String part : notPart)
-				sj.add(part);
+			notPart.forEach(sj::add);
 			sj.add(GROUP_END)
-				.add(key.condition.substring(key.condition.length() - fixedConditionLength + 1));
+				.add(key.condition.substring(variablePartConditionLength + 1));
 			key.condition = sj.toString();
 		}
 
