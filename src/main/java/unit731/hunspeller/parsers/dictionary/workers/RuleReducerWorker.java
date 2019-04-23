@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private class LineEntry{
 
 		private final Set<String> from;
+
 		private final String removal;
 		private final String addition;
 		private String condition;
@@ -67,7 +69,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			this.condition = condition;
 
 			from = new HashSet<>();
-			from.add(word);
+			if(word != null)
+				from.add(word);
 		}
 
 		public List<LineEntry> split(AffixEntry.Type type){
@@ -148,7 +151,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparing(entry -> entry.addition));
 
 //String flag = "%0"; //mi[lƚ]e
-String flag = "<1";
+String flag = "<2";
 //NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
 //flag name for input should be "Optimize for closed group"?
 boolean keepLongestCommonAffix = false;
@@ -156,24 +159,62 @@ boolean keepLongestCommonAffix = false;
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		Map<String, List<LineEntry>> entriesTable = new HashMap<>();
+		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			collectFlagProductions(productions, flag, entriesTable);
+			collectProductionsByFlag(productions, flag, equivalenceTable);
 		};
 		Runnable completed = () -> {
+			//extract rules with missing conditions
+			List<LineEntry> missingConditions = new ArrayList<>();
+			Iterator<Map.Entry<String, LineEntry>> itr = equivalenceTable.entrySet().iterator();
+			while(itr.hasNext()){
+				Map.Entry<String, LineEntry> elem = itr.next();
+				if(elem.getValue().condition.isEmpty()){
+					missingConditions.add(elem.getValue());
+
+					itr.remove();
+				}
+			}
+			//reinsert rules with missing conditions with a condition
+			for(LineEntry entry : missingConditions){
+				String lcs = longestCommonSuffix(entry.from, null);
+				if(lcs.isEmpty()){
+					//no common suffix present:
+					//bucket by last character
+					Map<Character, Set<String>> lastCharacterBucket = new HashMap<>();
+					for(String from : entry.from)
+						lastCharacterBucket.computeIfAbsent(from.charAt(from.length() - 1), k -> new HashSet<>())
+							.add(from);
+					//insert new rules
+					for(Map.Entry<Character, Set<String>> conditions : lastCharacterBucket.entrySet()){
+						lcs = (conditions.getValue().size() == 1?
+							String.valueOf(conditions.getKey()):
+							longestCommonSuffix(conditions.getValue(), null));
+						LineEntry e = new LineEntry(entry.removal, entry.addition, lcs);
+						e.from.addAll(conditions.getValue());
+						collectIntoEquivalenceClasses(e, equivalenceTable);
+					}
+				}
+				else{
+					//common suffix present:
+					entry.condition = lcs;
+					collectIntoEquivalenceClasses(entry, equivalenceTable);
+				}
+			}
+
 //System.out.println("entries:");
-//for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
+//for(Map.Entry<String, LineEntry> e : equivalenceTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 			AffixEntry.Type type = (originalRuleEntry.isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
 			try{
-				reduceEquivalenceClasses(type, entriesTable);
+//				reduceEquivalenceClasses(type, entriesTable);
 //System.out.println("cleaned entries:");
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-				List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, entriesTable);
+				List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, equivalenceTable);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 				rules.stream()
@@ -233,12 +274,13 @@ boolean keepLongestCommonAffix = false;
 //			rules.stream()
 //				.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+//		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void collectFlagProductions(List<Production> productions, String flag, Map<String, List<LineEntry>> entries){
+	private void collectProductionsByFlag(List<Production> productions, String flag, Map<String, LineEntry> equivalenceTable){
 		Iterator<Production> itr = productions.iterator();
 		//skip base production
 		itr.next();
@@ -250,9 +292,31 @@ boolean keepLongestCommonAffix = false;
 				String word = lastAppliedRule.undoRule(production.getWord());
 				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
 
-				collectFlagProduction(affixEntry, new HashSet<>(Arrays.asList(word)), entries);
+				collectIntoEquivalenceClasses(affixEntry, equivalenceTable);
 			}
 		}
+	}
+
+	private void collectIntoEquivalenceClasses(LineEntry affixEntry, Map<String, LineEntry> equivalenceTable){
+		String key = affixEntry.removal + TAB + affixEntry.addition + TAB + affixEntry.condition;
+		LineEntry ruleSet = equivalenceTable.putIfAbsent(key, affixEntry);
+		if(ruleSet != null)
+			ruleSet.from.addAll(affixEntry.from);
+	}
+
+	private void collectIntoEquivalenceClasses(LineEntry affixEntry, Set<LineEntry> equivalenceTable){
+		LineEntry foundClass = null;
+		for(LineEntry eq : equivalenceTable)
+			if(affixEntry.condition.isEmpty() && eq.condition.isEmpty()
+					|| !affixEntry.condition.isEmpty() && !eq.condition.isEmpty()
+						&& (eq.condition.endsWith(affixEntry.condition) || affixEntry.condition.endsWith(eq.condition))){
+				foundClass = eq;
+				break;
+			}
+		if(foundClass != null)
+			foundClass.from.addAll(affixEntry.from);
+		else
+			equivalenceTable.add(affixEntry);
 	}
 
 	private void reduceEquivalenceClasses(AffixEntry.Type type, Map<String, List<LineEntry>> entriesTable){
@@ -315,7 +379,7 @@ boolean keepLongestCommonAffix = false;
 		List<LineEntry> list = entries.computeIfAbsent(affixEntry.condition, k -> new ArrayList<>());
 		int idx = list.indexOf(affixEntry);
 		if(idx >= 0)
-			list.get(idx).from.addAll(from);
+			list.get(idx).from.addAll(from != null? from: affixEntry.from);
 		else
 			list.add(affixEntry);
 	}
@@ -351,9 +415,8 @@ boolean keepLongestCommonAffix = false;
 	}
 
 	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepLongestCommonAffix,
-			Map<String, List<LineEntry>> entriesTable){
-		List<LineEntry> entries = entriesTable.values().stream()
-			.flatMap(e -> e.stream())
+			Map<String, LineEntry> equivalenceTable){
+		List<LineEntry> entries = equivalenceTable.values().stream()
 			.sorted(lineEntryComparator)
 			.collect(Collectors.toList());
 
@@ -363,10 +426,11 @@ boolean keepLongestCommonAffix = false;
 	}
 
 	private List<LineEntry> compressRules(List<LineEntry> entries, boolean keepLongestCommonAffix){
-		Map<String, List<LineEntry>> bucket = bucketByRemovalAndAddingParts(entries);
+		Map<String, Set<LineEntry>> bucket = bucketByRemovalAndAddingAndCondition(entries);
 
 		List<LineEntry> compressedRules = compressBucketedRules(bucket);
 
+		//FIXME
 		if(!keepLongestCommonAffix){
 			List<LineEntry> additionalRules = reduceNotConditions(compressedRules);
 			compressedRules.addAll(additionalRules);
@@ -380,21 +444,22 @@ boolean keepLongestCommonAffix = false;
 		return prepareRules(keepLongestCommonAffix, compressedRules);
 	}
 
-	private Map<String, List<LineEntry>> bucketByRemovalAndAddingParts(List<LineEntry> entries){
-		Map<String, List<LineEntry>> bucket = new HashMap<>();
+	private Map<String, Set<LineEntry>> bucketByRemovalAndAddingAndCondition(Collection<LineEntry> entries){
+		Map<String, Set<LineEntry>> bucket = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.addition + TAB + entry.condition.substring(1);
-			bucket.computeIfAbsent(key, k -> new ArrayList<>())
+			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
+			bucket.computeIfAbsent(key, k -> new HashSet<>())
 				.add(entry);
 		}
 		return bucket;
 	}
 
-	private List<LineEntry> compressBucketedRules(Map<String, List<LineEntry>> bucket){
+	private List<LineEntry> compressBucketedRules(Map<String, Set<LineEntry>> bucket){
 		List<LineEntry> compressedRules = new ArrayList<>();
-		for(List<LineEntry> rules : bucket.values()){
+		for(Set<LineEntry> rules : bucket.values()){
+			Iterator<LineEntry> itr = rules.iterator();
 			if(rules.size() == 1)
-				compressedRules.add(rules.get(0));
+				compressedRules.add(itr.next());
 			else{
 				//collect conditions
 				Set<String> conditions = rules.stream()
@@ -402,7 +467,8 @@ boolean keepLongestCommonAffix = false;
 					.collect(Collectors.toSet());
 				String commonCondition = mergeConditions(conditions);
 
-				LineEntry onlyEntry = rules.remove(0);
+				LineEntry onlyEntry = itr.next();
+				itr.remove();
 				List<String> froms = rules.stream()
 					.flatMap(le -> le.from.stream())
 					.collect(Collectors.toList());
