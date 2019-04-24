@@ -154,7 +154,7 @@ public class DictionaryEntry{
 	}
 
 	public int getContinuationFlagCount(){
-		return continuationFlags.length;
+		return (continuationFlags != null? continuationFlags.length: 0);
 	}
 
 	public boolean hasContinuationFlag(String ... continuationFlags){

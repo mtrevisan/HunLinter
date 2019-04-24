@@ -264,7 +264,7 @@ public class HyphenationParser{
 					if(charset == StandardCharsets.UTF_8)
 						retroCompatibilityNoHyphen.addAll(Arrays.asList(RIGHT_SINGLE_QUOTATION_MARK, EN_DASH));
 
-					patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, StringUtils.EMPTY) + "]");
+					patternNoHyphen = PatternHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen, null) + "]");
 
 					optParser.getNoHyphen().addAll(retroCompatibilityNoHyphen);
 

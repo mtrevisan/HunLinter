@@ -148,14 +148,13 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition)))
-			.thenComparing(Comparator.comparing(entry -> entry.condition))
+			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition)))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal))
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.addition));
 
-//String flag = "%0"; //mi[lƚ]e
-String flag = "<2";
+String flag = "%1";
 //NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
 //flag name for input should be "Optimize for closed group"?
 boolean keepLongestCommonAffix = false;
@@ -209,32 +208,88 @@ boolean keepLongestCommonAffix = false;
 			}
 
 			//constuct the suffix tree
-			StringRadixTree<LineEntry> tree = StringRadixTree.createTreeNoDuplicates();
-			for(LineEntry entry : equivalenceTable.values())
-				tree.put(StringUtils.reverse(entry.condition), entry);
+			StringRadixTree<LineEntry> tree = StringRadixTree.createTree();
+			for(LineEntry entry : equivalenceTable.values()){
+				LineEntry oldEntry = tree.put(StringUtils.reverse(entry.condition), entry);
+
+				if(oldEntry != null){
+					LOGGER.info(Backbone.MARKER_APPLICATION, "case to be managed");
+throw new RuntimeException("case to be managed");
+					//TODO
+				}
+			}
 			//all the conditions that are not a leaf must be augmented
 			RadixTreeTraverser<String, LineEntry> traverser = (wholeKey, node, parent) -> {
-				if(node.hasValue() && !node.isEmpty()){
-					//augment the condition
+				LineEntry nodeEntry = node.getValue();
+				if(nodeEntry != null && !node.isEmpty()){
+					//retrieve all the conditions spanned by the current condition
 					List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
-System.out.println("augment the condition for " + node.getValue() + " from set\r\n\t" + StringUtils.join(list, "\r\n\t"));
-					//TODO
+					//sort by shortes condition
+					list.sort(shortestConditionComparator);
+
+					//extract prior to condition characters
+					String feasibleGroup = extractGroup(nodeEntry.from, nodeEntry.condition.length());
+System.out.println("feasible group: " + feasibleGroup);
+
+					//extract not part
+					int size = list.size();
+					for(int i = 0; i < size; i ++){
+						LineEntry base = list.get(i);
+						Set<String> notSet = new HashSet<>();
+						for(int j = i + 1; j < size; j ++){
+							LineEntry collision = list.get(j);
+							if(collision.condition.endsWith(base.condition)){
+								int index = collision.condition.length() - base.condition.length() - 1;
+								if(index == -1)
+									//same length condition
+									break;
+
+								notSet.add(String.valueOf(collision.condition.charAt(index)));
+
+								while(index > 0){
+									//add additional rules
+									String conditionSuffix = collision.condition.substring(index);
+									Set<String> set = list.stream()
+										.map(entry -> entry.condition)
+										.filter(condition -> condition.endsWith(conditionSuffix))
+										.collect(Collectors.toSet());
+									String conditionSuffixGroup = extractGroup(set, conditionSuffix.length());
+									if(conditionSuffixGroup != null){
+										StringJoiner sj = new StringJoiner(StringUtils.EMPTY)
+											.add(NOT_GROUP_START)
+											.add(conditionSuffixGroup)
+											.add(GROUP_END)
+											.add(conditionSuffix);
+										LineEntry newEntry = new LineEntry(base.removal, base.addition, sj.toString());
+										collectIntoEquivalenceClasses(newEntry, equivalenceTable);
+									}
+
+									index --;
+								}
+							}
+						}
+						if(!notSet.isEmpty()){
+							List<String> notPart = new ArrayList<>(notSet);
+							notPart.sort(comparator);
+							String notGroup = StringUtils.join(notPart, null);
+System.out.println("not group: " + notGroup);
+//							if(StringUtils.containsAny(notGroup, feasibleGroup))
+//								throw new IllegalArgumentException("Invalid not group [^" + notGroup + "] into [" + feasibleGroup + "]");
+
+							StringJoiner sj = new StringJoiner(StringUtils.EMPTY)
+								.add(NOT_GROUP_START)
+								.add(notGroup)
+								.add(GROUP_END)
+								.add(base.condition);
+							base.condition = sj.toString();
+
+							//TODO check feasibility of solution
+						}
+					}
+//System.out.println("augment the condition for " + node.getValue() + " from set\r\n\t" + StringUtils.join(list, "\r\n\t"));
 				}
 			};
 			tree.traverseBFS(traverser);
-/*
-#SFX <2 0 aso/M0 n
-#SFX <2 0 aso/M0 r
-#SFX <2 e aso/M0 e
-#SFX <2 o aso/M0 o
-#SFX <2 0 sa/F0 a
-#SFX <2 ía iasa/F0 ía
-#SFX <2 èƚa eƚasa/F0 èƚa
-#SFX <2 èƚo eƚaso/M0 èƚo
-#SFX <2 òjo ojaso/M0 òjo
-#SFX <2 òɉo oɉaso/M0 òɉo
-#SFX <2 òƚa oƚasa/F0 òƚa
-*/
 
 //System.out.println("entries:");
 //for(Map.Entry<String, LineEntry> e : equivalenceTable.entrySet())
@@ -310,6 +365,24 @@ System.out.println("augment the condition for " + node.getValue() + " from set\r
 		WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
+	}
+
+	private String extractGroup(Collection<String> words, int indexFromLast){
+		Set<String> group = new HashSet<>();
+		for(String word : words){
+			int index = word.length() - indexFromLast - 1;
+			if(index < 0)
+				throw new IllegalArgumentException("Cannot extract group for " + this + " because of the word " + word + " that is too short");
+
+			group.add(String.valueOf(word.charAt(index)));
+		}
+		String result = null;
+		if(!group.isEmpty()){
+			List<String> uniqueGroup = new ArrayList<>(group);
+			uniqueGroup.sort(comparator);
+			result = StringUtils.join(uniqueGroup, null);
+		}
+		return result;
 	}
 
 	private void collectProductionsByFlag(List<Production> productions, String flag, Map<String, LineEntry> equivalenceTable){
@@ -452,7 +525,7 @@ System.out.println("augment the condition for " + node.getValue() + " from set\r
 			.sorted(lineEntryComparator)
 			.collect(Collectors.toList());
 
-		entries = compressRules(entries, keepLongestCommonAffix);
+//		entries = compressRules(entries, keepLongestCommonAffix);
 
 		return composeAffixRules(originalRuleEntry, entries);
 	}

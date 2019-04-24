@@ -78,7 +78,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		for(String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
 				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
-					+ StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
+					+ StringUtils.join(compoundRuleComponents, null));
 	}
 
 	private boolean raiseError(Map<String, Set<DictionaryEntry>> inputs, String component){
