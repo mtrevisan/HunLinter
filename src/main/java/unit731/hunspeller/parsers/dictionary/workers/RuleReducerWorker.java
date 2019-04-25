@@ -154,7 +154,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.addition));
 
-String flag = "%1";
+//String flag = "%1";
+String flag = "<2";
 //NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
 //flag name for input should be "Optimize for closed group"?
 boolean keepLongestCommonAffix = false;
@@ -182,7 +183,7 @@ boolean keepLongestCommonAffix = false;
 			}
 			//reinsert rules with missing conditions with a condition
 			for(LineEntry entry : missingConditions){
-				String lcs = longestCommonSuffix(entry.from, null);
+				String lcs = longestCommonSuffix(entry.from);
 				if(lcs.isEmpty()){
 					//no common suffix present:
 					//bucket by last character
@@ -194,7 +195,7 @@ boolean keepLongestCommonAffix = false;
 					for(Map.Entry<Character, Set<String>> conditions : lastCharacterBucket.entrySet()){
 						lcs = (conditions.getValue().size() == 1?
 							String.valueOf(conditions.getKey()):
-							longestCommonSuffix(conditions.getValue(), null));
+							longestCommonSuffix(conditions.getValue()));
 						LineEntry e = new LineEntry(entry.removal, entry.addition, lcs);
 						e.from.addAll(conditions.getValue());
 						collectIntoEquivalenceClasses(e, equivalenceTable);
@@ -213,8 +214,8 @@ boolean keepLongestCommonAffix = false;
 				LineEntry oldEntry = tree.put(StringUtils.reverse(entry.condition), entry);
 
 				if(oldEntry != null){
-					LOGGER.info(Backbone.MARKER_APPLICATION, "case to be managed");
-throw new RuntimeException("case to be managed");
+					LOGGER.info(Backbone.MARKER_APPLICATION, "case to be managed: duplicated entry");
+throw new RuntimeException("case to be managed: duplicated entry");
 					//TODO
 				}
 			}
@@ -255,12 +256,8 @@ System.out.println("feasible group: " + feasibleGroup);
 										.collect(Collectors.toSet());
 									String conditionSuffixGroup = extractGroup(set, conditionSuffix.length());
 									if(conditionSuffixGroup != null){
-										StringJoiner sj = new StringJoiner(StringUtils.EMPTY)
-											.add(NOT_GROUP_START)
-											.add(conditionSuffixGroup)
-											.add(GROUP_END)
-											.add(conditionSuffix);
-										LineEntry newEntry = new LineEntry(base.removal, base.addition, sj.toString());
+										String condition = NOT_GROUP_START + conditionSuffixGroup + GROUP_END + conditionSuffix;
+										LineEntry newEntry = new LineEntry(base.removal, base.addition, condition);
 										collectIntoEquivalenceClasses(newEntry, equivalenceTable);
 									}
 
@@ -276,12 +273,7 @@ System.out.println("not group: " + notGroup);
 //							if(StringUtils.containsAny(notGroup, feasibleGroup))
 //								throw new IllegalArgumentException("Invalid not group [^" + notGroup + "] into [" + feasibleGroup + "]");
 
-							StringJoiner sj = new StringJoiner(StringUtils.EMPTY)
-								.add(NOT_GROUP_START)
-								.add(notGroup)
-								.add(GROUP_END)
-								.add(base.condition);
-							base.condition = sj.toString();
+							base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
 
 							//TODO check feasibility of solution
 						}
@@ -301,7 +293,51 @@ System.out.println("not group: " + notGroup);
 //for(Map.Entry<String, List<LineEntry>> e : entriesTable.entrySet())
 //	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 
-				List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, equivalenceTable);
+				List<LineEntry> entries = equivalenceTable.values().stream()
+					.collect(Collectors.toList());
+
+				//merge similar rules
+				Map<String, Set<LineEntry>> mergeBucket = new HashMap<>();
+				Iterator<LineEntry> itr2 = entries.iterator();
+				while(itr2.hasNext()){
+					LineEntry entry = itr2.next();
+					if(!entry.condition.contains("]")){
+						String key = entry.removal + TAB + entry.addition + TAB + entry.condition.length();
+						mergeBucket.computeIfAbsent(key, k -> new HashSet<>())
+							.add(entry);
+
+						itr2.remove();
+					}
+				}
+				Iterator<Set<LineEntry>> itr3 = mergeBucket.values()
+					.iterator();
+				while(itr3.hasNext()){
+					Set<LineEntry> set = itr3.next();
+					if(set.size() == 1)
+						entries.add(set.iterator().next());
+					else{
+						Map<String, Set<LineEntry>> similarConditionBucket = new HashMap<>();
+						for(LineEntry e : set){
+							String key = e.condition.substring(1);
+							similarConditionBucket.computeIfAbsent(key, k -> new HashSet<>())
+								.add(e);
+						}
+						//collect initial letters into a group
+						for(Set<LineEntry> v : similarConditionBucket.values()){
+							LineEntry firstEntry = v.iterator().next();
+							Set<String> words = v.stream()
+								.map(vv -> vv.condition)
+								.collect(Collectors.toSet());
+							String commonGroup = extractGroup(words, firstEntry.condition.length() - 1);
+							String condition = GROUP_START + commonGroup + GROUP_END + firstEntry.condition.substring(1);
+							LineEntry newEntry = new LineEntry(firstEntry.removal, firstEntry.addition, condition);
+							newEntry.from.addAll(v.stream().flatMap(vv -> vv.from.stream()).collect(Collectors.toSet()));
+							entries.add(newEntry);
+						}
+					}
+				}
+
+				List<String> rules = convertEntriesToRules(originalRuleEntry, keepLongestCommonAffix, entries);
 
 				LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 				rules.stream()
@@ -520,12 +556,11 @@ System.out.println("not group: " + notGroup);
 	}
 
 	private List<String> convertEntriesToRules(RuleEntry originalRuleEntry, boolean keepLongestCommonAffix,
-			Map<String, LineEntry> equivalenceTable){
-		List<LineEntry> entries = equivalenceTable.values().stream()
-			.sorted(lineEntryComparator)
-			.collect(Collectors.toList());
+			List<LineEntry> entries){
+		entries.sort(lineEntryComparator);
 
 //		entries = compressRules(entries, keepLongestCommonAffix);
+		entries = prepareRules(keepLongestCommonAffix, entries);
 
 		return composeAffixRules(originalRuleEntry, entries);
 	}
@@ -536,14 +571,14 @@ System.out.println("not group: " + notGroup);
 		List<LineEntry> compressedRules = compressBucketedRules(bucket);
 
 		//FIXME
-		if(!keepLongestCommonAffix){
-			List<LineEntry> additionalRules = reduceNotConditions(compressedRules);
-			compressedRules.addAll(additionalRules);
-		}
-		else{
-			//TODO
-			//check for collisions between conditions
-		}
+//		if(!keepLongestCommonAffix){
+//			List<LineEntry> additionalRules = reduceNotConditions(compressedRules);
+//			compressedRules.addAll(additionalRules);
+//		}
+//		else{
+//			//TODO
+//			//check for collisions between conditions
+//		}
 
 		//extract compressed rules
 		return prepareRules(keepLongestCommonAffix, compressedRules);
@@ -552,7 +587,7 @@ System.out.println("not group: " + notGroup);
 	private Map<String, Set<LineEntry>> bucketByRemovalAndAddingAndCondition(Collection<LineEntry> entries){
 		Map<String, Set<LineEntry>> bucket = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
+			String key = entry.removal + TAB + entry.addition + TAB + entry.condition.length();
 			bucket.computeIfAbsent(key, k -> new HashSet<>())
 				.add(entry);
 		}
@@ -587,7 +622,7 @@ System.out.println("not group: " + notGroup);
 
 	private String mergeConditions(Set<String> conditions){
 		//TODO cope with suffix/affix
-		String lcs = longestCommonSuffix(conditions, null);
+		String lcs = longestCommonSuffix(conditions);
 		if(lcs.length() + 1 != conditions.iterator().next().length())
 			return null;
 
@@ -598,162 +633,26 @@ System.out.println("not group: " + notGroup);
 			.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END + lcs));
 	}
 
-	private List<LineEntry> reduceNotConditions(List<LineEntry> compressedRules){
-		//stage 0: original list
-		//SFX <2 0 aso/M0 [nr]
-		//SFX <2 e aso/M0 e
-		//SFX <2 0 sa/F0 [gnñortu]a
-		//SFX <2 ía iasa/F0 ía
-		//SFX <2 0 sa/F0 [aiou]ƚa
-		//SFX <2 èƚa eƚasa/F0 èƚa
-		//SFX <2 òƚa oƚasa/F0 òƚa
-		//SFX <2 o aso/M0 [giñptv]o
-		//SFX <2 o aso/M0 [aiou]ƚo
-		//SFX <2 èƚo eƚaso/M0 èƚo
-		//SFX <2 òjo ojaso/M0 òjo
-		//SFX <2 òɉo oɉaso/M0 òɉo
-
-		//stage 1: collect the rules with a fixed part in the conditions (ex. [aiou]la > 'la')
-		//SFX <2 0 sa/F0 [aiou]ƚa
-		//SFX <2 o aso/M0 [aiou]ƚo
-		//SFX <2 0 sa/F0 [gnñortu]a
-		//SFX <2 o aso/M0 [giñptv]o
-		Map<LineEntry, List<LineEntry>> fixedPartsBucket = new HashMap<>();
-		for(LineEntry elem : compressedRules){
-			int closedBraketIndex = elem.condition.indexOf(']') + 1;
-			if(closedBraketIndex > 0 && closedBraketIndex < elem.condition.length())
-				fixedPartsBucket.put(elem, new ArrayList<>());
-		}
-
-		//stage 2: check for collisions between fixed parts
-		Map<String, List<LineEntry>> conditionBucket = new HashMap<>();
-		for(LineEntry key : fixedPartsBucket.keySet())
-			conditionBucket.computeIfAbsent(key.condition, k -> new ArrayList<>())
-				.add(key);
-		Map<String, List<LineEntry>> collisions = new HashMap<>();
-		for(Map.Entry<String, List<LineEntry>> e : conditionBucket.entrySet()){
-			String fixedCondition = e.getKey().substring(e.getKey().indexOf(']') + 1);
-			if(collisions.containsKey(fixedCondition))
-				throw new IllegalArgumentException("Collision occurred between fixed parts of some conditions: " + e.getValue()
-					+ " and " + collisions.get(fixedCondition));
-
-			collisions.put(fixedCondition, e.getValue());
-		}
-
-		//stage 3: for each fixed-part rule, bucket all the non-fixed parts of the remaining rules that ends with a fixed part,
-		//		bucket also from the bucketed bucket
-		//SFX <2 0 sa/F0 [aiou]ƚa:		[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa]
-		//SFX <2 o aso/M0 [aiou]ƚo:	[SFX <2 èƚo eƚaso/M0 èƚo]
-		//SFX <2 0 sa/F0 [gnñortu]a:	[SFX <2 èƚa eƚasa/F0 èƚa, SFX <2 òƚa oƚasa/F0 òƚa, SFX <2 ía iasa/F0 ía, SFX <2 0 sa/F0 [aiou]ƚa]
-		//SFX <2 o aso/M0 [giñptv]o:	[SFX <2 òjo ojaso/M0 òjo, SFX <2 òɉo oɉaso/M0 òɉo, SFX <2 èƚo eƚaso/M0 èƚo, SFX <2 o aso/M0 [aiou]ƚo]
-		for(Map.Entry<LineEntry, List<LineEntry>> entry : fixedPartsBucket.entrySet()){
-			LineEntry key = entry.getKey();
-			List<LineEntry> value = entry.getValue();
-
-			String fixedCondition = key.condition.substring(key.condition.indexOf(']') + 1);
-			for(LineEntry compressedRule : compressedRules)
-				if(key != compressedRule && compressedRule.condition.endsWith(fixedCondition))
-					value.add(compressedRule);
-		}
-
-		//stage 4: collect the letters prior to the common part and use them as the not part
-		for(Map.Entry<LineEntry, List<LineEntry>> entry : fixedPartsBucket.entrySet()){
-			LineEntry key = entry.getKey();
-			List<LineEntry> value = entry.getValue();
-
-			int keyConditionLength = key.condition.length();
-			int fixedPartConditionLength = keyConditionLength - key.condition.indexOf(']');
-			int variablePartConditionLength = keyConditionLength - fixedPartConditionLength;
-			Set<String> notSet = value.stream()
-				.map(rule -> String.valueOf(rule.condition.charAt(rule.condition.length() - fixedPartConditionLength)))
-				.collect(Collectors.toSet());
-			//NOTE: the `notSet` should not be contained into the group of key.condition!! if not, raise exception!
-			String variablePart = key.condition.substring(1, variablePartConditionLength);
-			boolean overlaps = StringUtils.containsAny(variablePart, notSet.toArray(new String[notSet.size()]));
-			if(overlaps)
-				throw new IllegalArgumentException("Collision occurred between variable parts of a condition and not-set: " + key.toString()
-					+ ", not-set is " + String.join(StringUtils.EMPTY, notSet));
-
-			//if everything's ok, continue and substitute the variable part with the negated set
-			List<String> notPart = new ArrayList<>(notSet);
-			notPart.sort(comparator);
-			StringJoiner sj = new StringJoiner(StringUtils.EMPTY);
-			sj.add(NOT_GROUP_START);
-			notPart.forEach(sj::add);
-			sj.add(GROUP_END)
-				.add(key.condition.substring(variablePartConditionLength + 1));
-			key.condition = sj.toString();
-		}
-
-		//stage 5: expand missing rules
-		Map<LineEntry, List<LineEntry>> missingRules = new HashMap<>();
-		for(Map.Entry<LineEntry, List<LineEntry>> entry : fixedPartsBucket.entrySet()){
-			LineEntry key = entry.getKey();
-			List<LineEntry> value = entry.getValue();
-
-			int fixedPartConditionLength = key.condition.length() - key.condition.indexOf(']');
-			for(LineEntry rule : value){
-				int fixedPartIndex = rule.condition.length() - fixedPartConditionLength;
-				if(rule.condition.indexOf(']') < 0 && fixedPartIndex > 0){
-					//check if fixed part is not already contained into the bucket
-					String fixedPart = rule.condition.substring(fixedPartIndex);
-					if(!collisions.containsKey(fixedPart))
-						missingRules.computeIfAbsent(key, k -> new ArrayList<>())
-							.add(rule);
-				}
-			}
-		}
-		List<LineEntry> additionalRules = new ArrayList<>();
-		//collect all letters from key.condition.length - 2 for each group key.condition.length - fixedPartConditionLength to key.condition.length
-		for(Map.Entry<LineEntry, List<LineEntry>> rule : missingRules.entrySet()){
-			LineEntry key = rule.getKey();
-			List<LineEntry> value = rule.getValue();
-
-			Map<String, LineEntry> rules = new HashMap<>();
-			int fixedPartConditionLength = key.condition.length() - key.condition.indexOf(']');
-			Map<String, List<LineEntry>> expansionBucket = new HashMap<>();
-			for(LineEntry v : value){
-				int index = v.condition.length() - fixedPartConditionLength;
-				if(index < 0)
-					throw new IllegalArgumentException("Cannot create additional rules from " + key);
-
-				while(index > 0){
-					String subkey = v.condition.substring(index);
-					rules.put(subkey, key);
-					expansionBucket.computeIfAbsent(subkey, k -> new ArrayList<>())
-						.add(v);
-
-					index --;
-				}
-			}
-			for(Map.Entry<String, List<LineEntry>> expansionPoint : expansionBucket.entrySet()){
-				String k = expansionPoint.getKey();
-				List<LineEntry> v = expansionPoint.getValue();
-
-				int keyConditionLength = k.length();
-				Set<String> notSet = v.stream()
-					.map(r -> String.valueOf(r.condition.charAt(r.condition.length() - keyConditionLength - 1)))
-					.collect(Collectors.toSet());
-
-				LineEntry r = rules.get(k);
-				List<String> notPart = new ArrayList<>(notSet);
-				notPart.sort(comparator);
-				StringJoiner sj = new StringJoiner(StringUtils.EMPTY);
-				sj.add(NOT_GROUP_START);
-				notPart.forEach(sj::add);
-				sj.add(GROUP_END)
-					.add(k);
-				additionalRules.add(new LineEntry(r.removal, r.addition, sj.toString()));
-			}
-		}
-
-	return additionalRules;
-	}
-
 	private List<LineEntry> prepareRules(boolean keepLongestCommonAffix, List<LineEntry> compressedRules){
 		if(keepLongestCommonAffix)
 			//TODO cope with suffix/prefix
-			compressedRules.forEach(entry -> entry.condition = longestCommonSuffix(entry.from, RegExpSequencer.splitSequence(entry.condition)));
+			compressedRules.forEach(entry -> {
+				String lcs = longestCommonSuffix(entry.from);
+				if(lcs == null)
+					lcs = entry.condition;
+				else if(entry.condition.contains("]")){
+					int tailCharactersToExclude = RegExpSequencer.splitSequence(entry.condition).length;
+					if(tailCharactersToExclude <= lcs.length())
+						lcs = lcs.substring(0, lcs.length() - tailCharactersToExclude) + entry.condition;
+					else
+						lcs = entry.condition;
+				}
+				//NOTE: could it ever be that lcs.length < entry.condition.length?
+				if(lcs.length() < entry.condition.length())
+					throw new IllegalArgumentException("cannot be?");
+
+				entry.condition = lcs;
+			});
 		compressedRules.sort(lineEntryComparator);
 		return compressedRules;
 	}
@@ -769,44 +668,44 @@ System.out.println("not group: " + notGroup);
 		return rules;
 	}
 
-	//FIXME optimize!
-	private String longestCommonSuffix(Set<String> texts, String[] baseCondition){
-		String firstText = null;
-		int lastCommonLetter = (baseCondition != null? baseCondition.length: 0);
-		List<String> list = new ArrayList<>(texts);
-		list.sort(Comparator.comparing(String::length).reversed());
-		while(true){
-			Iterator<String> itr = list.iterator();
-			String text = itr.next();
-			if(firstText == null){
-				//extract longest word
-				firstText = text;
-			}
-
-			int index = text.length() - lastCommonLetter - 1;
-			if(index < 0)
-				break;
-
-			char commonLetter = text.charAt(index);
-			while(itr.hasNext()){
-				text = itr.next();
-				index = text.length() - lastCommonLetter - 1;
-				if(index < 0 || text.charAt(index) != commonLetter){
-					text = text.substring(index + 1);
-					if(baseCondition != null)
-						text = text.substring(0, text.length() - baseCondition.length) + String.join(StringUtils.EMPTY, baseCondition);
-					return text;
-				}
-			}
-
-			lastCommonLetter ++;
+	//TODO longest common prefix
+	private String longestCommonSuffix(Collection<String> texts){
+		String lcs = null;
+		if(!texts.isEmpty()){
+			Iterator<String> itr = texts.iterator();
+			lcs = itr.next();
+			while(!lcs.isEmpty() && itr.hasNext())
+				lcs = longestCommonSuffix(lcs, itr.next());
 		}
-		if(baseCondition != null)
-			firstText = firstText.substring(0, firstText.length() - baseCondition.length) + String.join(StringUtils.EMPTY, baseCondition);
-		return firstText;
+		return lcs;
 	}
 
+	/**
+	 * Returns the longest string {@code suffix} such that {@code a.toString().endsWith(suffix) &&
+	 * b.toString().endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
+	 * {@code b} have no common suffix, returns the empty string.
+	 */
+	private String longestCommonSuffix(String a, String b){
+		int s = 0;
+		int aLength = a.length();
+		int bLength = b.length();
+		int maxSuffixLength = Math.min(aLength, bLength);
+		while(s < maxSuffixLength && a.charAt(aLength - s - 1) == b.charAt(bLength - s - 1))
+			s ++;
+		if(validSurrogatePairAt(a, aLength - s - 1) || validSurrogatePairAt(b, bLength - s - 1))
+			s --;
+		return a.subSequence(aLength - s, aLength).toString();
+	}
 
+	/**
+	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
+	 * Out-of-range indexes return false.
+	 */
+	private boolean validSurrogatePairAt(CharSequence string, int index){
+		return (index >= 0 && index <= (string.length() - 2)
+			&& Character.isHighSurrogate(string.charAt(index))
+			&& Character.isLowSurrogate(string.charAt(index + 1)));
+	}
 
 
 	private Set<Character> calculateIntersection(List<Set<Character>> letters){
