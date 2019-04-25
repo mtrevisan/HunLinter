@@ -148,11 +148,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition)))
-			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition)))
+			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.removal))
+			.thenComparing(Comparator.comparing(entry -> entry.removal, comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition));
+			.thenComparing(Comparator.comparing(entry -> entry.addition, comparator));
 
 //String flag = "%1";
 String flag = "<2";
@@ -237,6 +237,7 @@ System.out.println("feasible group: " + feasibleGroup);
 					for(int i = 0; i < size; i ++){
 						LineEntry base = list.get(i);
 						Set<String> notSet = new HashSet<>();
+						Set<LineEntry> intermediateEntries = new HashSet<>();
 						for(int j = i + 1; j < size; j ++){
 							LineEntry collision = list.get(j);
 							if(collision.condition.endsWith(base.condition)){
@@ -258,13 +259,46 @@ System.out.println("feasible group: " + feasibleGroup);
 									if(conditionSuffixGroup != null){
 										String condition = NOT_GROUP_START + conditionSuffixGroup + GROUP_END + conditionSuffix;
 										LineEntry newEntry = new LineEntry(base.removal, base.addition, condition);
-										collectIntoEquivalenceClasses(newEntry, equivalenceTable);
+										newEntry.from.addAll(list.stream()
+											.filter(entry -> entry.condition.endsWith(conditionSuffix))
+											.flatMap(entry -> entry.from.stream())
+											.collect(Collectors.toSet()));
+										intermediateEntries.add(newEntry);
 									}
 
 									index --;
 								}
 							}
 						}
+						if(intermediateEntries.size() > 1){
+System.out.println("potentially similar rules: " + intermediateEntries);
+							int index = intermediateEntries.iterator().next().condition.indexOf(']');
+							Map<String, Set<LineEntry>> bb = new HashMap<>();
+							for(LineEntry entry : intermediateEntries){
+								String key = entry.condition.substring(0, index + 1) + TAB + entry.condition.substring(index + 2);
+								bb.computeIfAbsent(key, k -> new HashSet<>())
+									.add(entry);
+							}
+							for(Map.Entry<String, Set<LineEntry>> ee : bb.entrySet()){
+								Set<String> set = ee.getValue().stream()
+									.map(entry -> entry.condition)
+									.collect(Collectors.toSet());
+								if(set.size() > 1){
+									String conditionSuffixGroup = extractGroup(set, index - 2);
+									if(conditionSuffixGroup != null){
+										String condition = StringUtils.replace(ee.getKey(), TAB, GROUP_START + conditionSuffixGroup + GROUP_END);
+										LineEntry newEntry = new LineEntry(base.removal, base.addition, condition);
+										newEntry.from.addAll(ee.getValue().stream().flatMap(entry -> entry.from.stream()).collect(Collectors.toSet()));
+										collectIntoEquivalenceClasses(newEntry, equivalenceTable);
+									}
+								}
+								else
+									collectIntoEquivalenceClasses(ee.getValue().iterator().next(), equivalenceTable);
+							}
+						}
+						else
+							for(LineEntry entry : intermediateEntries)
+								collectIntoEquivalenceClasses(entry, equivalenceTable);
 						if(!notSet.isEmpty()){
 							List<String> notPart = new ArrayList<>(notSet);
 							notPart.sort(comparator);
