@@ -225,7 +225,7 @@ public class Backbone implements FileChangeListener{
 		else if(dicParser != null)
 			dicParser.clear();
 
-		wordGenerator = new WordGenerator(affParser, dicParser);
+		wordGenerator = new WordGenerator(affixData, dicParser);
 	}
 
 	private void openAidFile(File aidFile) throws IOException{

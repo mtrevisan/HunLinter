@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -82,6 +80,11 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
       });
 
       optimizeClosedGroupCheckBox.setText("Optimize for closed group");
+      optimizeClosedGroupCheckBox.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            optimizeClosedGroupCheckBoxActionPerformed(evt);
+         }
+      });
 
       reduceButton.setText("Reduce");
       reduceButton.addActionListener(new java.awt.event.ActionListener() {
@@ -93,15 +96,17 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
       ruleScrollPane.setBackground(java.awt.Color.white);
       ruleScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
+      ruleTextArea.setEditable(false);
       ruleTextArea.setColumns(20);
-      ruleTextArea.setRows(5);
+      ruleTextArea.setRows(1);
+      ruleTextArea.setTabSize(3);
       ruleScrollPane.setViewportView(ruleTextArea);
 
       resultLabel.setText("Result:");
 
       resultTextArea.setEditable(false);
       resultTextArea.setColumns(20);
-      resultTextArea.setRows(5);
+      resultTextArea.setRows(1);
       resultTextArea.setTabSize(3);
       resultScrollPane.setViewportView(resultTextArea);
 
@@ -157,10 +162,9 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 		AffixData affixData = backbone.getAffixData();
 		List<RuleEntry> affixes = affixData.getRuleEntries();
-		Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		List<String> affixEntries = affixes.stream()
 			.map(affix -> (affix.isSuffix()? AffixTag.SUFFIX: AffixTag.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
-			.sorted(comparator)
+			.sorted()
 			.collect(Collectors.toList());
 		ruleComboBox.removeAllItems();
 		affixEntries.forEach(ruleComboBox::addItem);
@@ -173,6 +177,8 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 			.map(AffixEntry::toString)
 			.collect(Collectors.joining(StringUtils.LF));
 		ruleTextArea.setText(ruleEntries);
+		ruleTextArea.setCaretPosition(0);
+		resultTextArea.setText(null);
    }//GEN-LAST:event_ruleComboBoxActionPerformed
 
    private void reduceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
@@ -181,6 +187,10 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
+
+   private void optimizeClosedGroupCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optimizeClosedGroupCheckBoxActionPerformed
+		resultTextArea.setText(null);
+   }//GEN-LAST:event_optimizeClosedGroupCheckBoxActionPerformed
 
 	@Override
 	public void actionPerformed(ActionEvent event){

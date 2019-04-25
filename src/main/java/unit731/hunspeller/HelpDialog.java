@@ -115,7 +115,7 @@ public class HelpDialog extends JDialog{
       lblManagedOptionsTextArea.setColumns(20);
       lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
       lblManagedOptionsTextArea.setLineWrap(true);
-      lblManagedOptionsTextArea.setRows(5);
+      lblManagedOptionsTextArea.setRows(1);
       lblManagedOptionsTextArea.setTabSize(3);
       lblManagedOptionsTextArea.setWrapStyleWord(true);
       jScrollPane1.setViewportView(lblManagedOptionsTextArea);

@@ -44,7 +44,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
       duplicatesTextArea.setEditable(false);
       duplicatesTextArea.setColumns(20);
       duplicatesTextArea.setLineWrap(true);
-      duplicatesTextArea.setRows(5);
+      duplicatesTextArea.setRows(1);
       duplicatesTextArea.setWrapStyleWord(true);
       mainScrollPane.setViewportView(duplicatesTextArea);
 

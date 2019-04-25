@@ -60,7 +60,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
       meaningsTextArea.setColumns(20);
       meaningsTextArea.setLineWrap(true);
-      meaningsTextArea.setRows(5);
+      meaningsTextArea.setRows(1);
       meaningsTextArea.setWrapStyleWord(true);
       mainScrollPane.setViewportView(meaningsTextArea);
 

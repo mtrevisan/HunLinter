@@ -334,7 +334,7 @@
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>
-            <Property name="rows" type="int" value="5"/>
+            <Property name="rows" type="int" value="1"/>
             <Property name="tabSize" type="int" value="3"/>
           </Properties>
           <AuxValues>
@@ -660,7 +660,7 @@
                 <Component class="javax.swing.JTextArea" name="cmpInputTextArea">
                   <Properties>
                     <Property name="columns" type="int" value="20"/>
-                    <Property name="rows" type="int" value="5"/>
+                    <Property name="rows" type="int" value="1"/>
                   </Properties>
                 </Component>
               </SubComponents>

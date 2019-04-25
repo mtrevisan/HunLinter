@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
@@ -44,7 +44,6 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 
-	protected final AffixParser affParser;
 	protected final DictionaryParser dicParser;
 	protected final WordGenerator wordGenerator;
 
@@ -52,10 +51,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	protected final Set<String> compoundAsReplacement = new HashSet<>();
 
 
-	WordGeneratorCompound(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
-		super(affParser.getAffixData());
+	WordGeneratorCompound(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+		super(affixData);
 
-		this.affParser = affParser;
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
 	}

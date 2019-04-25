@@ -211,9 +211,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 			removeOverlappingRules(type, equivalenceTable);
 
-//System.out.println("entries:");
-//for(Map.Entry<String, LineEntry> e : equivalenceTable.entrySet())
-//	System.out.println(e.getKey() + ": " + StringUtils.join(e.getValue(), ","));
 			try{
 				List<LineEntry> entries = equivalenceTable.values().stream()
 					.collect(Collectors.toList());
@@ -261,6 +258,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, entries);
 
+//TODO check feasibility of solution?
+
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 				rules.stream()
 					.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
@@ -287,11 +286,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
 				//sort by shortes condition
 				list.sort(shortestConditionComparator);
-				
-				//extract prior to condition characters
-				String feasibleGroup = extractGroup(nodeEntry.from, nodeEntry.condition.length());
-System.out.println("feasible group: " + feasibleGroup);
-				
+
 				//extract not part
 				int size = list.size();
 				for(int i = 0; i < size; i ++){
@@ -305,9 +300,9 @@ System.out.println("feasible group: " + feasibleGroup);
 							if(index == -1)
 								//same length condition
 								break;
-							
+
 							notSet.add(String.valueOf(collision.condition.charAt(index)));
-							
+
 							while(index > 0){
 								//add additional rules
 								String conditionSuffix = collision.condition.substring(index);
@@ -325,13 +320,13 @@ System.out.println("feasible group: " + feasibleGroup);
 										.collect(Collectors.toSet()));
 									intermediateEntries.add(newEntry);
 								}
-								
+
 								index --;
 							}
 						}
 					}
 					if(intermediateEntries.size() > 1){
-System.out.println("potentially similar rules: " + intermediateEntries);
+						//found potentially similar rules
 						int index = intermediateEntries.iterator().next().condition.indexOf(']');
 						Map<String, Set<LineEntry>> bb = new HashMap<>();
 						for(LineEntry entry : intermediateEntries){
@@ -363,13 +358,8 @@ System.out.println("potentially similar rules: " + intermediateEntries);
 						List<String> notPart = new ArrayList<>(notSet);
 						notPart.sort(comparator);
 						String notGroup = StringUtils.join(notPart, null);
-System.out.println("not group: " + notGroup);
-//							if(StringUtils.containsAny(notGroup, feasibleGroup))
-//								throw new IllegalArgumentException("Invalid not group [^" + notGroup + "] into [" + feasibleGroup + "]");
 
-base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
-
-//TODO check feasibility of solution?
+						base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
 					}
 				}
 			}
@@ -381,7 +371,7 @@ base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
 		StringRadixTree<LineEntry> tree = StringRadixTree.createTree();
 		for(LineEntry entry : equivalenceTable.values()){
 			LineEntry oldEntry = tree.put((type == AffixEntry.Type.SUFFIX? StringUtils.reverse(entry.condition): entry.condition), entry);
-			
+
 			if(oldEntry != null){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "case to be managed: duplicated entry");
 throw new RuntimeException("case to be managed: duplicated entry");
@@ -396,7 +386,8 @@ throw new RuntimeException("case to be managed: duplicated entry");
 		for(String word : words){
 			int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group for " + this + " because of the word " + word + " that is too short");
+				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
+					+ "] because of the presence of the word " + word + " that is too short");
 
 			group.add(String.valueOf(word.charAt(index)));
 		}
@@ -482,9 +473,8 @@ throw new RuntimeException("case to be managed: duplicated entry");
 					else
 						lcs = entry.condition;
 				}
-				//NOTE: could it ever be that lcs.length < entry.condition.length?
 				if(lcs.length() < entry.condition.length())
-					throw new IllegalArgumentException("cannot be?");
+					throw new IllegalArgumentException("really bad error, lcs.length < condition.length");
 
 				entry.condition = lcs;
 			});

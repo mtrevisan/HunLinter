@@ -295,7 +295,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setRows(5);
+      parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -417,7 +417,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpScrollPane.setViewportView(cmpTable);
 
       cmpInputTextArea.setColumns(20);
-      cmpInputTextArea.setRows(5);
+      cmpInputTextArea.setRows(1);
       cmpInputScrollPane.setViewportView(cmpInputTextArea);
 
       cmpLoadInputButton.setText("Load input from dictionary");
