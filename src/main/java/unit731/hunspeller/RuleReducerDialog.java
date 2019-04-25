@@ -153,6 +153,8 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
    }// </editor-fold>//GEN-END:initComponents
 
 	private void init(){
+		ruleTextArea.setText(null);
+
 		AffixData affixData = backbone.getAffixData();
 		List<RuleEntry> affixes = affixData.getRuleEntries();
 		Comparator<String> comparator = BaseBuilder.getComparator(affixData.getLanguage());
@@ -214,18 +216,25 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 		}
 	}
 
-	public String getSelectedFlag(){
-		return ruleComboBox.getSelectedItem().toString().split(StringUtils.SPACE)[1];
-	}
-
 	private void reduceRules(){
 		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
-			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator());
+			String flag = getSelectedFlag();
+			boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
+			ruleReducerWorker = new RuleReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
+				backbone.getWordGenerator());
 			ruleReducerWorker.addPropertyChangeListener(this);
 			ruleReducerWorker.execute();
 		}
+	}
+
+	private String getSelectedFlag(){
+		return ruleComboBox.getSelectedItem().toString().split(StringUtils.SPACE)[1];
+	}
+
+	private boolean getKeepLongestCommonAffix(){
+		return optimizeClosedGroupCheckBox.isSelected();
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{

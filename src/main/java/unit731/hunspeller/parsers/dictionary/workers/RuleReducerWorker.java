@@ -141,7 +141,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private Comparator<LineEntry> lineEntryComparator;
 
 
-	public RuleReducerWorker(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+	public RuleReducerWorker(String flag, boolean keepLongestCommonAffix, AffixData affixData, DictionaryParser dicParser,
+			WordGenerator wordGenerator){
+		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
 
@@ -156,11 +158,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.addition, comparator));
 
-//String flag = "%1";
-String flag = "<2";
-//NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
-//flag name for input should be "Optimize for closed group"?
-boolean keepLongestCommonAffix = false;
 		RuleEntry originalRuleEntry = affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -269,7 +266,7 @@ boolean keepLongestCommonAffix = false;
 					.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
 			}
 			catch(Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		};
 		//FIXME
@@ -386,7 +383,7 @@ base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
 			LineEntry oldEntry = tree.put((type == AffixEntry.Type.SUFFIX? StringUtils.reverse(entry.condition): entry.condition), entry);
 			
 			if(oldEntry != null){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "case to be managed: duplicated entry");
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "case to be managed: duplicated entry");
 throw new RuntimeException("case to be managed: duplicated entry");
 				//TODO
 			}
