@@ -220,12 +220,17 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
-			String flag = getSelectedFlag();
-			boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
-			ruleReducerWorker = new RuleReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
-				backbone.getWordGenerator());
-			ruleReducerWorker.addPropertyChangeListener(this);
-			ruleReducerWorker.execute();
+			try{
+				String flag = getSelectedFlag();
+				boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
+				ruleReducerWorker = new RuleReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
+					backbone.getWordGenerator());
+				ruleReducerWorker.addPropertyChangeListener(this);
+				ruleReducerWorker.execute();
+			}
+			catch(Exception e){
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
+			}
 		}
 	}
 
