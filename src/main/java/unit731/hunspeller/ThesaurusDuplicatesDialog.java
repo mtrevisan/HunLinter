@@ -23,12 +23,11 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 	public ThesaurusDuplicatesDialog(List<String> duplicates, Frame parent){
 		super(parent, "Duplicates", true);
 
-		Objects.requireNonNull(parent);
 		Objects.requireNonNull(duplicates);
+		Objects.requireNonNull(parent);
 
 		initComponents();
 
-		GUIUtils.addCancelByEscapeKey(this);
 
 		String content = String.join(StringUtils.LF, duplicates);
 		duplicatesTextArea.setText(content);
@@ -84,6 +83,7 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 			try{
 				javax.swing.JFrame parent = new javax.swing.JFrame();
 				ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(Arrays.asList("a", "b", "c"), parent);
+				GUIUtils.addCancelByEscapeKey(dialog);
 				dialog.setLocationRelativeTo(parent);
 				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
 					@Override

@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent; 
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -76,7 +75,6 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
-import unit731.hunspeller.parsers.dictionary.workers.RuleReducerWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
@@ -122,7 +120,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
-	private DictionarySortDialog dicDialog;
+	private DictionarySortDialog dicSortDialog;
+	private RuleReducerDialog ruleReducerDialog;
 
 	private final Backbone backbone;
 
@@ -136,7 +135,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private DictionaryCorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
-	private RuleReducerWorker ruleReducerWorker;
 	private WordCountWorker dicWordCountWorker;
 	private StatisticsWorker dicStatisticsWorker;
 	private WordlistWorker dicWordlistWorker;
@@ -159,7 +157,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(IOException e){}
 
-		ApplicationLogAppender.setTextArea(parsingResultTextArea);
+		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 
 
 		File currentDir = new File(".");
@@ -179,9 +177,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		});
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
 			dicSortDictionaryMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(RuleReducerWorker.WORKER_NAME, () -> {
-			dicRuleReducerMenuItem.setEnabled(true);
 		});
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
 			dicWordCountMenuItem.setEnabled(true);
@@ -547,6 +542,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
+                  GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
                }
@@ -882,7 +878,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicRuleReducerMenuItem.setText("Rule reducer");
+      dicRuleReducerMenuItem.setText("Rule reducer...");
       dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
             dicRuleReducerMenuItemActionPerformed(evt);
@@ -1093,6 +1089,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		HelpDialog dialog = new HelpDialog(this);
+		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
@@ -1150,9 +1147,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		try{
 			String[] lines = backbone.getDictionaryLines();
-			dicDialog.setListData(lines);
-			dicDialog.setLocationRelativeTo(this);
-			dicDialog.setVisible(true);
+			dicSortDialog.setListData(lines);
+			dicSortDialog.setVisible(true);
 		}
 		catch(IOException e){
 			LOGGER.error("Something very bad happend while sorting the dictionary", e);
@@ -1189,6 +1185,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
+		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
@@ -1431,7 +1428,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		reduceRules();
+		dicRuleReducerMenuItem.setEnabled(false);
+		ruleReducerDialog.setVisible(true);
    }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
 
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
@@ -1492,26 +1490,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
 //					dicDuplicatesWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(ruleReducerWorker != null && ruleReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-				ruleReducerWorker.pause();
-
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					ruleReducerWorker.cancel();
-
-					dicRuleReducerMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Rule reducer aborted");
-
-					ruleReducerWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					ruleReducerWorker.resume();
 
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
@@ -1674,13 +1652,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
-			dicDialog.setLocationRelativeTo(this);
-			dicDialog.addListSelectionListener(e -> {
+			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
+			GUIUtils.addCancelByEscapeKey(dicSortDialog);
+			dicSortDialog.setLocationRelativeTo(this);
+			dicSortDialog.addListSelectionListener(e -> {
 				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					int selectedRow = dicDialog.getSelectedIndex();
+					int selectedRow = dicSortDialog.getSelectedIndex();
 					if(backbone.getDicParser().isInBoundary(selectedRow)){
-						dicDialog.setVisible(false);
+						dicSortDialog.setVisible(false);
 
 						dicSortDictionaryMenuItem.setEnabled(false);
 						mainProgressBar.setValue(0);
@@ -1690,6 +1669,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 						dicSorterWorker.addPropertyChangeListener(this);
 						dicSorterWorker.execute();
 					}
+				}
+			});
+			ruleReducerDialog = new RuleReducerDialog(backbone, this);
+			GUIUtils.addCancelByEscapeKey(ruleReducerDialog);
+			ruleReducerDialog.setLocationRelativeTo(this);
+			ruleReducerDialog.addWindowListener(new WindowAdapter(){
+				@Override
+				public void windowClosed(WindowEvent e){
+					dicRuleReducerMenuItem.setEnabled(true);
 				}
 			});
 
@@ -1862,18 +1850,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				dicDuplicatesWorker.addPropertyChangeListener(this);
 				dicDuplicatesWorker.execute();
 			}
-		}
-	}
-
-	private void reduceRules(){
-		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
-			dicRuleReducerMenuItem.setEnabled(false);
-
-			mainProgressBar.setValue(0);
-
-			ruleReducerWorker = new RuleReducerWorker(backbone.getAffixData(), backbone.getDicParser(), backbone.getWordGenerator());
-			ruleReducerWorker.addPropertyChangeListener(this);
-			ruleReducerWorker.execute();
 		}
 	}
 

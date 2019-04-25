@@ -55,7 +55,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private class LineEntry implements Serializable{
 
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 8374397415767767436L;
 
 		private final Set<String> from;
 
@@ -161,7 +161,7 @@ String flag = "<2";
 //NOTE: if the rules are from a closed group, then `keepLongestCommonAffix` should be true
 //flag name for input should be "Optimize for closed group"?
 boolean keepLongestCommonAffix = false;
-		RuleEntry originalRuleEntry = (RuleEntry)affixData.getData(flag);
+		RuleEntry originalRuleEntry = affixData.getData(flag);
 		if(originalRuleEntry == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
@@ -264,9 +264,9 @@ boolean keepLongestCommonAffix = false;
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, entries);
 
-				LOGGER.info(Backbone.MARKER_APPLICATION, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 				rules.stream()
-					.forEach(rule -> LOGGER.info(Backbone.MARKER_APPLICATION, rule));
+					.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());

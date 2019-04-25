@@ -41,6 +41,7 @@ public class Backbone implements FileChangeListener{
 	private static final Logger LOGGER = LoggerFactory.getLogger(Backbone.class);
 
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
+	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 
 	private static final ZipManager ZIPPER = new ZipManager();
 

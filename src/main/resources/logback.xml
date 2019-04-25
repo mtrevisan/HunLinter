@@ -18,6 +18,19 @@
 			<pattern>%date{HH:mm:ss} %msg%n</pattern>
 		</encoder>
 	</appender>
+	<appender name="rule-reducer" class="unit731.hunspeller.services.ApplicationLogAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+				<marker>rule-reducer</marker>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
 
 	<logger name="unit731.hunspeller" level="info" />
 <!--	<logger name="unit731.hunspeller.parsers" level="info" />-->
@@ -29,5 +42,6 @@
 	<root>
 		<appender-ref ref="console" />
 		<appender-ref ref="application" />
+		<appender-ref ref="rule-reducer" />
 	</root>
 </configuration>

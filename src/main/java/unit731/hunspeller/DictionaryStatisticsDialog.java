@@ -13,8 +13,6 @@ import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +22,6 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.CategoryChart;
@@ -76,7 +72,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 		catch(IOException e){}
 
-		GUIUtils.addCancelByEscapeKey(this);
 		addListenerOnClose();
 
 		saveTextFileFileChooser = new JFileChooser();
@@ -535,47 +530,6 @@ public class DictionaryStatisticsDialog extends JDialog{
 		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
 	}
 
-
-	public static void main(String args[]){
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			LOGGER.error(null, e);
-		}
-		//</editor-fold>
-
-		java.awt.EventQueue.invokeLater(() -> {
-			try{
-				DictionaryStatistics stats = new DictionaryStatistics("vec", StandardCharsets.UTF_8);
-				List<String> rules = Collections.<String>emptyList();
-				boolean[] errors = new boolean[0];
-				stats.addData("aba", new Hyphenation(Arrays.asList("à", "ba"), Arrays.asList("àba"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("ma" + HyphenationParser.EN_DASH + "paba", new Hyphenation(Arrays.asList("ma", "bà", "pa"), Arrays.asList("ma", "bàpa"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("paè", new Hyphenation(Arrays.asList("pa", "è"), Arrays.asList("paè"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("monta", new Hyphenation(Arrays.asList("món", "ta"), Arrays.asList("mónta"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("sko" + HyphenationParser.EN_DASH + "dando", new Hyphenation(Arrays.asList("sko", "dàn", "do"), Arrays.asList("sko", "dàndo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("pérdendolo", new Hyphenation(Arrays.asList("pér", "den", "do", "lo"), Arrays.asList("pérdendolo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("pérdendoto", new Hyphenation(Arrays.asList("pér", "den", "do", "to"), Arrays.asList("pérdendoto"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				stats.addData("sàrminpalo", new Hyphenation(Arrays.asList("sàr", "min", "pa", "lo"), Arrays.asList("sàrminpalo"), rules, errors, HyphenationParser.SOFT_HYPHEN));
-				javax.swing.JFrame parent = new javax.swing.JFrame();
-				DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(stats, parent);
-				dialog.setLocationRelativeTo(parent);
-				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
-					@Override
-					public void windowClosing(java.awt.event.WindowEvent e){
-						System.exit(0);
-					}
-				});
-				dialog.setVisible(true);
-			}
-			catch(IllegalArgumentException e){
-				LOGGER.error(null, e);
-			}
-		});
-	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel compoundWordsLabel;

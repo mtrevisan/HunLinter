@@ -6,18 +6,13 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import javax.swing.JDialog;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
@@ -44,7 +39,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		initComponents();
 
-		GUIUtils.addCancelByEscapeKey(this);
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
@@ -158,41 +152,6 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
 	}
 
-
-	public static void main(String args[]){
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			LOGGER.error(null, e);
-		}
-		//</editor-fold>
-
-		java.awt.EventQueue.invokeLater(() -> {
-			try{
-				List<MeaningEntry> meanings = Collections.unmodifiableList(Arrays.asList(
-					new MeaningEntry("(noun)|bla|bli|blo"),
-					new MeaningEntry("(art)|el|la")
-				));
-				ThesaurusEntry synonym = new ThesaurusEntry("synonym", meanings);
-				javax.swing.JFrame parent = new javax.swing.JFrame();
-				ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, (means, text) -> {}, parent);
-				dialog.setLocationRelativeTo(parent);
-				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
-					@Override
-					public void windowClosing(java.awt.event.WindowEvent e){
-						System.exit(0);
-					}
-				});
-				dialog.setVisible(true);
-			}
-			catch(IllegalArgumentException e){
-				LOGGER.error(null, e);
-			}
-		});
-	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton btnCancel;
