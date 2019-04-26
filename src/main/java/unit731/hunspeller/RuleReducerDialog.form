@@ -39,7 +39,8 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="optimizeClosedGroupCheckBox" min="-2" max="-2" attributes="0"/>
-                          <Component id="resultLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="reducedSetLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="currentSetLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
@@ -60,11 +61,13 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="optimizeClosedGroupCheckBox" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="ruleScrollPane" min="-2" pref="100" max="-2" attributes="0"/>
+              <Component id="currentSetLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="ruleScrollPane" min="-2" pref="100" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="mainProgressBar" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="resultLabel" min="-2" max="-2" attributes="0"/>
+              <Component id="reducedSetLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="resultScrollPane" min="-2" pref="200" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -102,6 +105,11 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="reduceButtonActionPerformed"/>
       </Events>
     </Component>
+    <Component class="javax.swing.JLabel" name="currentSetLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Current set:"/>
+      </Properties>
+    </Component>
     <Container class="javax.swing.JScrollPane" name="ruleScrollPane">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -126,9 +134,9 @@
     </Container>
     <Component class="javax.swing.JProgressBar" name="mainProgressBar">
     </Component>
-    <Component class="javax.swing.JLabel" name="resultLabel">
+    <Component class="javax.swing.JLabel" name="reducedSetLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Result:"/>
+        <Property name="text" type="java.lang.String" value="Reduced set:"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="resultScrollPane">

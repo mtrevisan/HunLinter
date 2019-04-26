@@ -62,10 +62,11 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
       ruleComboBox = new javax.swing.JComboBox<>();
       optimizeClosedGroupCheckBox = new javax.swing.JCheckBox();
       reduceButton = new javax.swing.JButton();
+      currentSetLabel = new javax.swing.JLabel();
       ruleScrollPane = new javax.swing.JScrollPane();
       ruleTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
-      resultLabel = new javax.swing.JLabel();
+      reducedSetLabel = new javax.swing.JLabel();
       resultScrollPane = new javax.swing.JScrollPane();
       resultTextArea = new javax.swing.JTextArea();
 
@@ -93,6 +94,8 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
          }
       });
 
+      currentSetLabel.setText("Current set:");
+
       ruleScrollPane.setBackground(java.awt.Color.white);
       ruleScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
 
@@ -102,7 +105,7 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
       ruleTextArea.setTabSize(3);
       ruleScrollPane.setViewportView(ruleTextArea);
 
-      resultLabel.setText("Result:");
+      reducedSetLabel.setText("Reduced set:");
 
       resultTextArea.setEditable(false);
       resultTextArea.setColumns(20);
@@ -129,7 +132,8 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
                .addGroup(layout.createSequentialGroup()
                   .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                      .addComponent(optimizeClosedGroupCheckBox)
-                     .addComponent(resultLabel))
+                     .addComponent(reducedSetLabel)
+                     .addComponent(currentSetLabel))
                   .addGap(0, 0, Short.MAX_VALUE)))
             .addContainerGap())
       );
@@ -144,11 +148,13 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addComponent(optimizeClosedGroupCheckBox)
             .addGap(18, 18, 18)
-            .addComponent(ruleScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(currentSetLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(ruleScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
             .addComponent(mainProgressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addGap(18, 18, 18)
-            .addComponent(resultLabel)
+            .addComponent(reducedSetLabel)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(resultScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -266,11 +272,12 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
+   private javax.swing.JLabel currentSetLabel;
    private javax.swing.JLabel lblRule;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JCheckBox optimizeClosedGroupCheckBox;
    private javax.swing.JButton reduceButton;
-   private javax.swing.JLabel resultLabel;
+   private javax.swing.JLabel reducedSetLabel;
    private javax.swing.JScrollPane resultScrollPane;
    private javax.swing.JTextArea resultTextArea;
    private javax.swing.JComboBox<String> ruleComboBox;
