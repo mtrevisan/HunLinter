@@ -210,12 +210,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Iterator<Map.Entry<String, Set<LineEntry>>> itr = duplicatedConditions.entrySet().iterator();
 		while(itr.hasNext()){
 			Map.Entry<String, Set<LineEntry>> elem = itr.next();
-			
+			String condition = elem.getKey();
 			Set<LineEntry> entries = elem.getValue();
-			if(entries.size() > 1 || entries.iterator().next().condition.isEmpty()){
+
+			if(entries.size() > 1 || condition.isEmpty())
 				//rewrite rules with the new condition
 				for(LineEntry entry : entries){
 					String lca = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+					lca = findMinimumKeyNotContained(lca, (entry.removal.equals(0)? 0: entry.removal.length()), duplicatedConditions.keySet());
 					if(lca.isEmpty()){
 						//no common suffix present:
 						//bucket by last character
@@ -234,8 +236,26 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						//common suffix present:
 						entry.condition = lca;
 				}
-			}
 		}
+	}
+
+	private String findMinimumKeyNotContained(String maxKey, int minimumLength, Set<String> keys){
+		String minimumKey = maxKey;
+		int index = maxKey.length();
+		while(index >= minimumLength){
+			boolean found = false;
+			minimumKey = maxKey.substring(index);
+			for(String key : keys)
+				if(key.endsWith(minimumKey)){
+					found = true;
+					break;
+				}
+			if(!found)
+				break;
+			
+			index --;
+		}
+		return minimumKey;
 	}
 
 	private void removeAffixOverlappingConditions(AffixEntry.Type type, Map<String, LineEntry> equivalenceTable) throws RuntimeException{
