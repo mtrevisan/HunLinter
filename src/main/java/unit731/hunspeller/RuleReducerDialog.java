@@ -220,9 +220,13 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt){
-		if("progress".equals(evt.getPropertyName())){
+		String propertyName = evt.getPropertyName();
+		if("progress".equals(propertyName)){
 			int progress = (int)evt.getNewValue();
 			mainProgressBar.setValue(progress);
+		}
+		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
+			resultTextArea.setCaretPosition(0);
 		}
 	}
 
