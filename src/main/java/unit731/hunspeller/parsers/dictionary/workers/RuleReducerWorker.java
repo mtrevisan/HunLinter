@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -47,6 +46,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final Logger LOGGER = LoggerFactory.getLogger(RuleReducerWorker.class);
 
 	public static final String WORKER_NAME = "Rule reducer";
+
+	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 	private static final String TAB = "\t";
 	private static final String NOT_GROUP_START = "[^";
@@ -242,68 +243,69 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		//all the conditions that are not a leaf must be augmented
 		RadixTreeTraverser<String, LineEntry> traverser = (wholeKey, node, parent) -> {
-			LineEntry nodeEntry = node.getValue();
-			if(nodeEntry != null && !node.isEmpty()){
-				//retrieve all the conditions spanned by the current condition
-				List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
-				//sort by shortes condition
-				list.sort(shortestConditionComparator);
-				LineEntry basicRule = null;
-				while(!list.isEmpty()){
-					LineEntry base = list.remove(0);
+			try{
+				LineEntry nodeEntry = node.getValue();
+				if(nodeEntry != null && !node.isEmpty()){
+					//retrieve all the conditions spanned by the current condition
+					List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
+					//sort by shortes condition
+					list.sort(shortestConditionComparator);
+					LineEntry basicRule = null;
+					while(!list.isEmpty()){
+						LineEntry base = list.remove(0);
 
-					//base.condition.length < next.condition.length
-					String baseGroup = extractGroup(base.from, base.condition.length());
-					if(!StringUtils.isEmpty(baseGroup)){
-						Set<String> nextFrom = list.stream()
-							.filter(entry -> entry.condition.endsWith(base.condition))
-							.flatMap(entry -> entry.from.stream())
-							.collect(Collectors.toSet());
-						int baseConditionLength = RegExpSequencer.splitSequence(base.condition).length;
-						String nextPreCondition = extractGroup(nextFrom, baseConditionLength);
-						if(StringUtils.containsAny(baseGroup, nextPreCondition)){
-							//augment conditions by one character:
-							String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
-							Map<String, Set<String>> splitConditions = bucket(base.from.iterator(),
-								from -> {
-									char chr = from.charAt(from.length() - 2);
-									return (StringUtils.contains(nextPreCondition, chr)? String.valueOf(chr): nextPreGroup);
-								}
-							);
-							//add augmented rules to the initial set
-							for(Map.Entry<String, Set<String>> elem : splitConditions.entrySet()){
-								String prekey = elem.getKey();
-								if(!prekey.equals(nextPreGroup)){
-									LineEntry newEntry = new LineEntry(base.removal, base.addition, prekey + base.condition, elem.getValue());
-									//add collided rule to the collision handling list
-									list.add(newEntry);
+						//base.condition.length < next.condition.length
+						String baseGroup = extractGroup(base.from, base.condition.length());
+						if(!StringUtils.isEmpty(baseGroup)){
+							Set<String> nextFrom = list.stream()
+								.filter(entry -> entry.condition.endsWith(base.condition))
+								.flatMap(entry -> entry.from.stream())
+								.collect(Collectors.toSet());
+							int baseConditionLength = RegExpSequencer.splitSequence(base.condition).length;
+							String nextPreCondition = extractGroup(nextFrom, baseConditionLength);
+							if(StringUtils.containsAny(baseGroup, nextPreCondition)){
+								//augment conditions by one character:
+								String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
+								Map<String, Set<String>> splitConditions = bucket(base.from.iterator(),
+									from -> {
+										char chr = from.charAt(from.length() - 2);
+										return (StringUtils.contains(nextPreCondition, chr)? String.valueOf(chr): nextPreGroup);
+									}
+								);
+								//add augmented rules to the initial set
+								for(Map.Entry<String, Set<String>> elem : splitConditions.entrySet()){
+									String prekey = elem.getKey();
+									if(!prekey.equals(nextPreGroup)){
+										LineEntry newEntry = new LineEntry(base.removal, base.addition, prekey + base.condition, elem.getValue());
+										//add collided rule to the collision handling list
+										list.add(newEntry);
 
-									collectIntoEquivalenceClasses(newEntry, equivalenceTable);
+										collectIntoEquivalenceClasses(newEntry, equivalenceTable);
+									}
 								}
+								//modify base rule to cope with the splitting
+								base.from.clear();
+								base.from.addAll(splitConditions.get(nextPreGroup));
+								base.condition = nextPreGroup + base.condition;
+
+								//sort by shortes condition
+								list.sort(shortestConditionComparator);
 							}
-							//modify base rule to cope with the splitting
-							base.from.clear();
-							base.from.addAll(splitConditions.get(nextPreGroup));
-							base.condition = nextPreGroup + base.condition;
+							else /*if(StringUtils.isNotEmpty(nextPreCondition))*/{
+								Iterator<LineEntry> itr = list.iterator();
+								while(itr.hasNext()){
+									LineEntry le = itr.next();
+									if(le.condition.endsWith(base.condition)){
+										int index = le.condition.length() - Math.max(baseConditionLength + 1, le.removal.length());
+										if(index > 0)
+											le.condition = le.condition.substring(index);
 
-							//sort by shortes condition
-							list.sort(shortestConditionComparator);
-						}
-						else /*if(StringUtils.isNotEmpty(nextPreCondition))*/{
-							Iterator<LineEntry> itr = list.iterator();
-							while(itr.hasNext()){
-								LineEntry le = itr.next();
-								if(le.condition.endsWith(base.condition)){
-									int index = le.condition.length() - Math.max(baseConditionLength + 1, le.removal.length());
-									if(index > 0)
-										le.condition = le.condition.substring(index);
-
-									itr.remove();
+										itr.remove();
+									}
 								}
+								String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
+								base.condition = nextPreGroup + base.condition;
 							}
-							String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
-							base.condition = nextPreGroup + base.condition;
-						}
 //						else{
 //							//search for base rule, add not group on first character
 //							LineEntry found = null;
@@ -330,8 +332,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //
 //							collectIntoEquivalenceClasses(newEntry, equivalenceTable);
 //						}
+						}
 					}
-				}
 
 //				for(LineEntry base2 : list){
 //					Set<String> notSet = new HashSet<>();
@@ -469,6 +471,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //						base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
 //					}
 //				}
+				}
+			}
+			catch(Exception e){
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
+
+				throw e;
 			}
 		};
 		tree.traverseBFS(traverser);
@@ -606,11 +614,14 @@ throw new RuntimeException("case to be managed: duplicated entry between\r\n" + 
 				if(lcs == null)
 					lcs = entry.condition;
 				else if(entry.condition.contains("]")){
-					int tailCharactersToExclude = RegExpSequencer.splitSequence(entry.condition).length;
-					if(tailCharactersToExclude <= lcs.length())
-						lcs = lcs.substring(0, lcs.length() - tailCharactersToExclude) + entry.condition;
-					else
-						lcs = entry.condition;
+					String[] entryCondition = RegExpSequencer.splitSequence(entry.condition);
+					if(!SEQUENCER.endsWith(RegExpSequencer.splitSequence(lcs), entryCondition)){
+						int tailCharactersToExclude = entryCondition.length;
+						if(tailCharactersToExclude <= lcs.length())
+							lcs = lcs.substring(0, lcs.length() - tailCharactersToExclude) + entry.condition;
+						else
+							lcs = entry.condition;
+					}
 				}
 				if(lcs.length() < entry.condition.length())
 					throw new IllegalArgumentException("really bad error, lcs.length < condition.length");
