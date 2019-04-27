@@ -391,6 +391,8 @@ public class RadixTree<S, V extends Serializable>{
 	public void traverseBFS(RadixTreeTraverser<S, V> traverser){
 		Objects.requireNonNull(traverser);
 
+		traverser.traverse(root.getKey(), root, null);
+
 		Queue<TraverseElement<S, V>> queue = new ArrayDeque<>();
 		queue.add(new TraverseElement<>(root, root.getKey()));
 		while(!queue.isEmpty()){
