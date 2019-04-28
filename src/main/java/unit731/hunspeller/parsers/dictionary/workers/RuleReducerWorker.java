@@ -25,7 +25,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.collections.radixtree.StringRadixTree;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -188,7 +187,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				Set<LineEntry> disjointRules = removeSameConditions(type, plainRules);
-disjointRules.forEach(System.out::println);
+//disjointRules.forEach(System.out::println);
 
 				removeOverlappingConditions(type, disjointRules);
 
@@ -251,6 +250,11 @@ disjointRules.forEach(System.out::println);
 						//manage same condition parent and children:
 						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules);
 						rules.addAll(newParents);
+						if(rules.contains(parent)){
+							//check rules
+							//TODO
+System.out.println("");
+						}
 
 						sortedList.addAll(newParents);
 						sortedList.sort(shortestConditionComparator);
@@ -304,296 +308,16 @@ disjointRules.forEach(System.out::println);
 //NOTE should NOT take the new rule from the parent!!!
 //SFX §0 òvo ovato/FSM0 òvo > SFX §0 òvo ovato/FSM0 [^ò]vo : wrong!!
 				String c = NOT_GROUP_START + parent.condition.charAt(0) + GROUP_END + parent.condition.substring(1);
-				rules.add(LineEntry.createFrom(parent, c));
+System.out.println(parent);
+//[from=[òvo],rem=òvo,add=ovato/FSM0,cond=òvo]
+//[from=[òmo],rem=òmo,add=omato/FSM0,cond=òmo]
+//[from=[gòbo],rem=òbo,add=obato/FSM0,cond=òbo]
+//[from=[ròba, gòba],rem=òba,add=obata/F0,cond=òba]
+//				rules.add(LineEntry.createFrom(parent, c));
 			}
 		}
 
 System.out.println("");
-//		Map<String, Set<LineEntry>> sameConditionsBucket = bucket(rules, entry -> entry.condition);
-//		StringRadixTree<String> tree = constructConditionTree(type, sameConditionsBucket.keySet());
-//
-//		//all the conditions that are not a leaf must be augmented
-//		RadixTreeTraverser<String, String> traverser = (wholeKey, node, parent) -> {
-//			try{
-//				String parentKey = node.getValue();
-//				if(parentKey != null && !node.isEmpty()){
-//					Set<LineEntry> parentRules = sameConditionsBucket.get(parentKey);
-////TODO what if there are more than one parent?
-//					//collect all the letters for the parent's group
-//					Set<String> parentFrom = parentRules.stream()
-//						.map(rule -> rule.from)
-//						.flatMap(Set::stream)
-//						.collect(Collectors.toSet());
-//					int parentConditionLength = wholeKey.length();
-//					String parentGroup = extractGroup(parentFrom, parentConditionLength);
-//					//retrieve all the conditions that are children of the current condition
-//					Set<String> childrenFrom = node.getChildren().stream()
-//						.map(RadixTreeNode::getValue)
-//						.map(sameConditionsBucket::get)
-//						.flatMap(Set::stream)
-//						.map(rule -> rule.from)
-//						.flatMap(Set::stream)
-//						.collect(Collectors.toSet());
-//					//collect all the letters for the childrens' group
-//					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-//					int childrenRuleConditionLength = node.getChildren().stream()
-//						.map(RadixTreeNode::getValue)
-//						.map(sameConditionsBucket::get)
-//						.flatMap(Set::stream)
-//						.map(rule -> rule.condition)
-//						.max(Comparator.comparingInt(String::length))
-//						.map(String::length)
-//						.get();
-//					if(StringUtils.containsAny(parentGroup, childrenGroup)){
-//						//split parents between belonging to children group and not belonging to children group
-//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-//						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
-//							from -> {
-//								char chr = from.charAt(from.length() - parentConditionLength - 1);
-//								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
-//							}
-//						);
-//						//manage same condition parent and children:
-//						splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parentRules, rules);
-//						//TODO
-//System.out.println("");
-//					}
-//					else{
-//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-//						parentRules.forEach(rule -> rule.condition = notChildrenGroup + rule.condition);
-//					}
-////					List<LineEntry> list = tree.getValues(wholeKey, RadixTree.PrefixType.PREFIXED_BY);
-////					//sort by shortes condition
-////					list.sort(shortestConditionComparator);
-////					LineEntry basicRule = null;
-////					while(!list.isEmpty()){
-////						LineEntry base = list.remove(0);
-////
-////						String baseGroup = extractGroup(base.from, base.condition.length());
-////						if(!StringUtils.isEmpty(baseGroup)){
-////							Set<String> nextFrom = list.stream()
-////								.filter(entry -> entry.condition.endsWith(base.condition))
-////								.flatMap(entry -> entry.from.stream())
-////								.collect(Collectors.toSet());
-////							int baseConditionLength = RegExpSequencer.splitSequence(base.condition).length;
-////							String nextPreCondition = extractGroup(nextFrom, baseConditionLength);
-////							if(StringUtils.containsAny(baseGroup, nextPreCondition)){
-////								//augment conditions by one character:
-////								String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
-////								Map<String, Set<String>> splitConditions = bucket(base.from,
-////									from -> {
-////										char chr = from.charAt(from.length() - 2);
-////										return (StringUtils.contains(nextPreCondition, chr)? String.valueOf(chr): nextPreGroup);
-////									}
-////								);
-////								//add augmented rules to the initial set
-////								for(Map.Entry<String, Set<String>> elem : splitConditions.entrySet()){
-////									String prekey = elem.getKey();
-////									if(!prekey.equals(nextPreGroup)){
-////										LineEntry newEntry = new LineEntry(base.removal, base.addition, prekey + base.condition, elem.getValue());
-////										//add collided rule to the collision handling list
-////										list.add(newEntry);
-////
-////										rules.add(newEntry);
-////									}
-////								}
-////								//modify base rule to cope with the splitting
-////								base.from.clear();
-////								base.from.addAll(splitConditions.get(nextPreGroup));
-////								base.condition = nextPreGroup + base.condition;
-////
-////								//sort by shortes condition
-////								list.sort(shortestConditionComparator);
-////							}
-////							else /*if(StringUtils.isNotEmpty(nextPreCondition))*/{
-////								Iterator<LineEntry> itr = list.iterator();
-////								while(itr.hasNext()){
-////									LineEntry le = itr.next();
-////									if(le.condition.endsWith(base.condition)){
-////										int index = le.condition.length() - Math.max(baseConditionLength + 1, le.removal.length());
-////										if(index > 0)
-////											le.condition = le.condition.substring(index);
-////
-////										itr.remove();
-////									}
-////								}
-////								String nextPreGroup = NOT_GROUP_START + nextPreCondition + GROUP_END;
-////								base.condition = nextPreGroup + base.condition;
-////							}
-////						else{
-////							//search for base rule, add not group on first character
-////							LineEntry found = null;
-////							int index = 1;
-////							while(found == null && index < base.condition.length()){
-////								String key = base.condition.substring(index);
-////								for(LineEntry le : equivalenceTable.values())
-////									if(le != base){
-////										String[] cond = RegExpSequencer.splitSequence(le.condition);
-////										String subcond = StringUtils.join(ArrayUtils.subarray(cond, 1, cond.length), null);
-////										if(key.equals(subcond)){
-////											found = le;
-////											break;
-////										}
-////									}
-////
-////								index ++;
-////							}
-////							if(found == null)
-////								throw new IllegalArgumentException("uh-oh");
-////							index = base.condition.length() - index;
-////							String c = NOT_GROUP_START + base.condition.charAt(index) + GROUP_END + base.condition.substring(index + 1);
-////							LineEntry newEntry = new LineEntry(found.removal, found.addition, c);
-////
-////							collectIntoEquivalenceClasses(newEntry, equivalenceTable);
-////						}
-////						}
-////					}
-//
-////				for(LineEntry base2 : list){
-////					Set<String> notSet = new HashSet<>();
-////					Set<LineEntry> intermediateEntries = new HashSet<>();
-////					for(LineEntry collision : list){
-////						int index = collision.condition.length() - base2.condition.length() - 1;
-////
-////						notSet.add(String.valueOf(collision.condition.charAt(index)));
-////
-////						while(index > 0){
-////							//add additional rules
-////							String conditionSuffix = collision.condition.substring(index);
-////							Set<String> set = list.stream()
-////								.map(entry -> entry.condition)
-////								.filter(condition -> condition.endsWith(conditionSuffix))
-////								.collect(Collectors.toSet());
-////							String conditionSuffixGroup = extractGroup(set, conditionSuffix.length());
-////							if(conditionSuffixGroup != null){
-////								String condition = NOT_GROUP_START + conditionSuffixGroup + GROUP_END + conditionSuffix;
-////								LineEntry newEntry = new LineEntry(base2.removal, base2.addition, condition);
-////								newEntry.from.addAll(list.stream()
-////									.filter(entry -> entry.condition.endsWith(conditionSuffix))
-////									.flatMap(entry -> entry.from.stream())
-////									.collect(Collectors.toSet()));
-////								intermediateEntries.add(newEntry);
-////							}
-////
-////							index --;
-////						}
-////					}
-////
-////					if(intermediateEntries.size() > 1){
-////						//found potentially similar rules
-////						int index = intermediateEntries.iterator().next().condition.indexOf(']');
-////						Map<String, Set<LineEntry>> bb = bucket(intermediateEntries.iterator(),
-////							entry -> entry.condition.substring(0, index + 1) + TAB + entry.condition.substring(index + 2));
-////						for(Map.Entry<String, Set<LineEntry>> ee : bb.entrySet()){
-////							Set<String> set = ee.getValue().stream()
-////								.map(entry -> entry.condition)
-////								.collect(Collectors.toSet());
-////							if(set.size() > 1){
-////								String conditionSuffixGroup = extractGroup(set, index - 2);
-////								if(conditionSuffixGroup != null){
-////									String condition = StringUtils.replace(ee.getKey(), TAB, GROUP_START + conditionSuffixGroup + GROUP_END);
-////									LineEntry newEntry = new LineEntry(base2.removal, base2.addition, condition);
-////									newEntry.from.addAll(ee.getValue().stream().flatMap(entry -> entry.from.stream()).collect(Collectors.toSet()));
-////									collectIntoEquivalenceClasses(newEntry, equivalenceTable);
-////								}
-////							}
-////							else
-////								collectIntoEquivalenceClasses(ee.getValue().iterator().next(), equivalenceTable);
-////						}
-////					}
-////					else
-////						for(LineEntry entry : intermediateEntries)
-////							collectIntoEquivalenceClasses(entry, equivalenceTable);
-////					if(!notSet.isEmpty()){
-////						List<String> notPart = new ArrayList<>(notSet);
-////						notPart.sort(comparator);
-////						String notGroup = StringUtils.join(notPart, null);
-////
-////						base2.condition = NOT_GROUP_START + notGroup + GROUP_END + base2.condition;
-////					}
-////				}
-//
-//
-//				//extract not part
-////				int size = list.size();
-////				for(int i = 0; i < size; i ++){
-////					LineEntry base = list.get(i);
-////					Set<String> notSet = new HashSet<>();
-////					Set<LineEntry> intermediateEntries = new HashSet<>();
-////					for(int j = i + 1; j < size; j ++){
-////						LineEntry collision = list.get(j);
-////						if(collision.condition.endsWith(base.condition)){
-////							int index = collision.condition.length() - base.condition.length() - 1;
-////							if(index == -1)
-////								//same length condition
-////								break;
-////
-////							notSet.add(String.valueOf(collision.condition.charAt(index)));
-////
-////							while(index > 0){
-////								//add additional rules
-////								String conditionSuffix = collision.condition.substring(index);
-////								Set<String> set = list.stream()
-////									.map(entry -> entry.condition)
-////									.filter(condition -> condition.endsWith(conditionSuffix))
-////									.collect(Collectors.toSet());
-////								String conditionSuffixGroup = extractGroup(set, conditionSuffix.length());
-////								if(conditionSuffixGroup != null){
-////									String condition = NOT_GROUP_START + conditionSuffixGroup + GROUP_END + conditionSuffix;
-////									LineEntry newEntry = new LineEntry(base.removal, base.addition, condition);
-////									newEntry.from.addAll(list.stream()
-////										.filter(entry -> entry.condition.endsWith(conditionSuffix))
-////										.flatMap(entry -> entry.from.stream())
-////										.collect(Collectors.toSet()));
-////									intermediateEntries.add(newEntry);
-////								}
-////
-////								index --;
-////							}
-////						}
-////					}
-////					if(intermediateEntries.size() > 1){
-////						//found potentially similar rules
-////						int index = intermediateEntries.iterator().next().condition.indexOf(']');
-////						Map<String, Set<LineEntry>> bb = bucket(intermediateEntries.iterator(),
-////							entry -> entry.condition.substring(0, index + 1) + TAB + entry.condition.substring(index + 2));
-////						for(Map.Entry<String, Set<LineEntry>> ee : bb.entrySet()){
-////							Set<String> set = ee.getValue().stream()
-////								.map(entry -> entry.condition)
-////								.collect(Collectors.toSet());
-////							if(set.size() > 1){
-////								String conditionSuffixGroup = extractGroup(set, index - 2);
-////								if(conditionSuffixGroup != null){
-////									String condition = StringUtils.replace(ee.getKey(), TAB, GROUP_START + conditionSuffixGroup + GROUP_END);
-////									LineEntry newEntry = new LineEntry(base.removal, base.addition, condition);
-////									newEntry.from.addAll(ee.getValue().stream().flatMap(entry -> entry.from.stream()).collect(Collectors.toSet()));
-////									collectIntoEquivalenceClasses(newEntry, equivalenceTable);
-////								}
-////							}
-////							else
-////								collectIntoEquivalenceClasses(ee.getValue().iterator().next(), equivalenceTable);
-////						}
-////					}
-////					else
-////						for(LineEntry entry : intermediateEntries)
-////							collectIntoEquivalenceClasses(entry, equivalenceTable);
-////					if(!notSet.isEmpty()){
-////						List<String> notPart = new ArrayList<>(notSet);
-////						notPart.sort(comparator);
-////						String notGroup = StringUtils.join(notPart, null);
-////
-////						base.condition = NOT_GROUP_START + notGroup + GROUP_END + base.condition;
-////					}
-////				}
-//				}
-//			}
-//			catch(Exception e){
-//				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
-//
-//				throw e;
-//			}
-//		};
-//		tree.traverseBFS(traverser);
 	}
 
 	private Set<LineEntry> splitParentAndChildren(Map<String, Set<String>> parentChildrenBucket, String notChildrenGroup, LineEntry parent,
@@ -619,65 +343,6 @@ System.out.println("");
 		return newParents;
 	}
 
-//	private Set<LineEntry> removeSameConditionRules(AffixEntry.Type type, List<LineEntry> plainRules){
-//		//aggregate rules
-//		Map<String, LineEntry> equivalenceTable = collectIntoEquivalenceClasses(plainRules);
-//		plainRules.clear();
-//		plainRules.addAll(equivalenceTable.values());
-//
-//		Map<String, Set<LineEntry>> sameConditionsBucket = bucket(plainRules, entry -> entry.condition);
-//		Set<String> keys = sameConditionsBucket.keySet();
-//		for(Map.Entry<String, Set<LineEntry>> elem : sameConditionsBucket.entrySet()){
-//			String condition = elem.getKey();
-//			Set<LineEntry> entries = elem.getValue();
-//
-//			if(entries.size() > 1 || condition.isEmpty())
-//				//rewrite rules with the new condition
-//				for(LineEntry entry : entries){
-//					String lca = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-//					lca = findMinimumKeyNotContained(lca, (entry.removal.equals(0)? 0: entry.removal.length()), keys);
-//					if(lca.isEmpty()){
-////TODO
-//throw new IllegalArgumentException("");
-////						//no common suffix present:
-////						//bucket by last character
-////						Map<Character, Set<String>> lastCharacterBucket = bucket(entry.from, from -> from.charAt(from.length() - 1));
-////						//insert new rules
-////						for(Set<String> conditions : lastCharacterBucket.values()){
-////							lca = longestCommonAffix(conditions, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-////							LineEntry newEntry = new LineEntry(entry.removal, entry.addition, lca, conditions);
-////							plainRules.add(newEntry);
-////						}
-////						
-////						plainRules.remove(entry);
-//					}
-//					else
-//						//common suffix present:
-//						entry.condition = lca;
-//				}
-//		}
-//		return new HashSet<>(plainRules);
-//	}
-
-	private String findMinimumKeyNotContained(String maxKey, int minimumLength, Set<String> keys){
-		String minimumKey = maxKey;
-		int index = maxKey.length();
-		while(index >= minimumLength){
-			boolean found = false;
-			minimumKey = maxKey.substring(index);
-			for(String key : keys)
-				if(key.endsWith(minimumKey)){
-					found = true;
-					break;
-				}
-			if(!found)
-				break;
-			
-			index --;
-		}
-		return minimumKey;
-	}
-
 	private Map<String, LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
@@ -698,13 +363,6 @@ System.out.println("");
 					.add(entry);
 		}
 		return bucket;
-	}
-
-	private StringRadixTree<String> constructConditionTree(AffixEntry.Type type, Set<String> entries){
-		StringRadixTree<String> tree = StringRadixTree.createTree();
-		for(String entry : entries)
-			tree.put((type == AffixEntry.Type.SUFFIX? StringUtils.reverse(entry): entry), entry);
-		return tree;
 	}
 
 	private String extractGroup(Collection<String> words, int indexFromLast){
