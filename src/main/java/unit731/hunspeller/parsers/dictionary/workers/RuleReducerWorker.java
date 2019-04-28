@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +77,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 
 		LineEntry(String removal, String addition, String condition){
-			this(removal, addition, condition, (String)null);
+			this(removal, addition, condition, Collections.<String>emptyList());
 		}
 
 		LineEntry(String removal, String addition, String condition, String word){
@@ -198,8 +199,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //TODO check feasibility of solution?
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
-				rules.stream()
-					.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
+				rules.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
@@ -320,25 +320,26 @@ System.out.println("ahn? " + parent);
 		//modify parent rule to cope with the splitting
 		Set<String> newParentFrom = parentChildrenBucket.get(notChildrenGroup);
 		if(newParentFrom != null){
-			//check other rules
-			if(StringUtils.isNotEmpty(parent.condition)){
-				Iterator<LineEntry> itr = sortedList.iterator();
-				while(itr.hasNext()){
-					LineEntry le = itr.next();
-					if(le.condition.endsWith(parent.condition)){
-						int index = le.condition.length() - parent.condition.length() - 1;
-						while(index > 0){
-							//add additional rules
-							String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
-							LineEntry newEntry = LineEntry.createFrom(parent, condition);
-							rules.add(newEntry);
-System.out.println("added " + newEntry);
-	
-							index --;
-						}
-					}
-				}
-			}
+			//TODO check other rules :'(
+//			if(StringUtils.isNotEmpty(parent.condition)){
+//				Iterator<LineEntry> itr = sortedList.iterator();
+//				while(itr.hasNext()){
+//					LineEntry le = itr.next();
+//					if(le.condition.endsWith(parent.condition)){
+//						int index = le.condition.length() - parent.condition.length() - 1;
+//						while(index > 0){
+//							//add additional rules
+//							String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
+//							LineEntry newEntry = LineEntry.createFrom(parent, condition);
+//System.out.println("added " + newEntry);
+//
+//							rules.add(newEntry);
+//	
+//							index --;
+//						}
+//					}
+//				}
+//			}
 
 			parent.from.clear();
 			parent.from.addAll(newParentFrom);
