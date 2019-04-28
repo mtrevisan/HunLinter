@@ -248,13 +248,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							}
 						);
 						//manage same condition parent and children:
-						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules);
+						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules,
+							sortedList);
 						rules.addAll(newParents);
-						if(rules.contains(parent)){
-							//check rules
-							//TODO
-System.out.println("");
-						}
 
 						sortedList.addAll(newParents);
 						sortedList.sort(shortestConditionComparator);
@@ -298,30 +294,20 @@ System.out.println("");
 								String c = NOT_GROUP_START + le.condition.charAt(i) + GROUP_END + le.condition.substring(i + 1);
 								rules.add(LineEntry.createFrom(parent, c));
 							}
+
 							itr.remove();
 						}
 					}
 				}
 			}
-			else{
-				//add not group for first character of the condition
-//NOTE should NOT take the new rule from the parent!!!
-//SFX §0 òvo ovato/FSM0 òvo > SFX §0 òvo ovato/FSM0 [^ò]vo : wrong!!
-				String c = NOT_GROUP_START + parent.condition.charAt(0) + GROUP_END + parent.condition.substring(1);
-System.out.println(parent);
-//[from=[òvo],rem=òvo,add=ovato/FSM0,cond=òvo]
-//[from=[òmo],rem=òmo,add=omato/FSM0,cond=òmo]
-//[from=[gòbo],rem=òbo,add=obato/FSM0,cond=òbo]
-//[from=[ròba, gòba],rem=òba,add=obata/F0,cond=òba]
-//				rules.add(LineEntry.createFrom(parent, c));
-			}
+			else
+System.out.println("ahn? " + parent);
 		}
-
-System.out.println("");
 	}
 
 	private Set<LineEntry> splitParentAndChildren(Map<String, Set<String>> parentChildrenBucket, String notChildrenGroup, LineEntry parent,
-			Set<LineEntry> rules){
+			Set<LineEntry> rules,
+			List<LineEntry> sortedList){
 		//add augmented rules to the initial set
 		Set<LineEntry> newParents = new HashSet<>();
 		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
@@ -334,6 +320,26 @@ System.out.println("");
 		//modify parent rule to cope with the splitting
 		Set<String> newParentFrom = parentChildrenBucket.get(notChildrenGroup);
 		if(newParentFrom != null){
+			//check other rules
+			if(StringUtils.isNotEmpty(parent.condition)){
+				Iterator<LineEntry> itr = sortedList.iterator();
+				while(itr.hasNext()){
+					LineEntry le = itr.next();
+					if(le.condition.endsWith(parent.condition)){
+						int index = le.condition.length() - parent.condition.length() - 1;
+						while(index > 0){
+							//add additional rules
+							String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
+							LineEntry newEntry = LineEntry.createFrom(parent, condition);
+							rules.add(newEntry);
+System.out.println("added " + newEntry);
+	
+							index --;
+						}
+					}
+				}
+			}
+
 			parent.from.clear();
 			parent.from.addAll(newParentFrom);
 			parent.condition = notChildrenGroup + parent.condition;
