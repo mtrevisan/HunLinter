@@ -187,10 +187,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		};
 		Runnable completed = () -> {
 			try{
-				Set<LineEntry> disjointRules = removeSameConditions(type, plainRules);
+				Set<LineEntry> disjointRules = removeSameConditions(plainRules);
 //disjointRules.forEach(System.out::println);
 
-				removeOverlappingConditions(type, disjointRules);
+				removeOverlappingConditions(disjointRules);
 
 				mergeSimilarRules(disjointRules);
 
@@ -212,12 +212,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		createReadWorker(data, lineProcessor);
 	}
 
-	private Set<LineEntry> removeSameConditions(AffixEntry.Type type, List<LineEntry> plainRules){
+	private Set<LineEntry> removeSameConditions(List<LineEntry> plainRules){
 		Map<String, LineEntry> equivalenceTable = collectIntoEquivalenceClasses(plainRules);
 		return new HashSet<>(equivalenceTable.values());
 	}
 
-	private void removeOverlappingConditions(AffixEntry.Type type, Set<LineEntry> rules){
+	private void removeOverlappingConditions(Set<LineEntry> rules){
 		//sort by shortes condition
 		List<LineEntry> sortedList = rules.stream()
 			.sorted(shortestConditionComparator)
@@ -248,8 +248,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							}
 						);
 						//manage same condition parent and children:
-						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules,
-							sortedList);
+						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules);
 						rules.addAll(newParents);
 
 						sortedList.addAll(newParents);
@@ -281,7 +280,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								sortedList.sort(shortestConditionComparator);
 							}
 							String nextPreGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-							parent.condition = nextPreGroup + parent.condition;
+							rules.remove(parent);
+							//TODO to check is it's correct!
+							parent = LineEntry.createFrom(parent, nextPreGroup + parent.condition, parent.from);
+							rules.add(parent);
+//							parent.condition = nextPreGroup + parent.condition;
 						}
 					}
 				}
@@ -306,8 +309,7 @@ System.out.println("ahn? " + parent);
 	}
 
 	private Set<LineEntry> splitParentAndChildren(Map<String, Set<String>> parentChildrenBucket, String notChildrenGroup, LineEntry parent,
-			Set<LineEntry> rules,
-			List<LineEntry> sortedList){
+			Set<LineEntry> rules){
 		//add augmented rules to the initial set
 		Set<LineEntry> newParents = new HashSet<>();
 		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
