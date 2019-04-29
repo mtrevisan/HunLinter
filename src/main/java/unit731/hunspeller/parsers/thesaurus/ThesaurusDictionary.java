@@ -48,9 +48,12 @@ public class ThesaurusDictionary{
 				//add to meanings if synonym does exists
 				foundSynonym.getMeanings()
 					.add(entry);
-			else
+			else{
 				//add to list if synonym does not exists
-				result = synonyms.add(new ThesaurusEntry(mean, Arrays.asList(entry)));
+				List<MeaningEntry> entries = new ArrayList<>();
+				entries.add(entry);
+				result = synonyms.add(new ThesaurusEntry(mean, entries));
+			}
 		}
 
 		modified = true;
