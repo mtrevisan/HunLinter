@@ -166,7 +166,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		strategy = affixData.getFlagParsingStrategy();
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegExpSequencer.splitSequence(entry.condition).length)
-			.thenComparing(Comparator.comparingInt(entry -> StringUtils.countMatches(entry.condition, ']')))
+			.thenComparing(Comparator.comparingInt(entry -> StringUtils.countMatches(entry.condition, GROUP_END)))
 			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal, comparator))
@@ -188,7 +188,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				Set<LineEntry> disjointRules = removeSameConditions(plainRules);
-//disjointRules.forEach(System.out::println);
 
 				removeOverlappingConditions(disjointRules);
 
@@ -433,17 +432,17 @@ System.out.println("ahn? " + parent);
 	}
 
 	private void mergeSimilarRules(Set<LineEntry> entries){
-		//merge similar rules
 		Map<String, Set<LineEntry>> mergeBucket = bucket(entries,
-			entry -> (entry.condition.contains("]")?
+			entry -> (entry.condition.contains(GROUP_END)?
 				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition).length: null));
+//TODO improve
 		for(Set<LineEntry> set : mergeBucket.values())
 			if(set.size() > 1){
 				LineEntry firstEntry = set.iterator().next();
 				String[] firstEntryCondition = RegExpSequencer.splitSequence(firstEntry.condition);
 				int index;
 				for(index = 0; index < firstEntryCondition.length; index ++)
-					if(firstEntryCondition[index].contains("]"))
+					if(firstEntryCondition[index].contains(GROUP_END))
 						break;
 				int idx = index + 1;
 				String[] commonPreCondition = SEQUENCER.subSequence(firstEntryCondition, 0, idx);
@@ -473,7 +472,7 @@ System.out.println("ahn? " + parent);
 				String lcs = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
 				if(lcs == null)
 					lcs = entry.condition;
-				else if(entry.condition.contains("]")){
+				else if(entry.condition.contains(GROUP_END)){
 					String[] entryCondition = RegExpSequencer.splitSequence(entry.condition);
 					if(!SEQUENCER.endsWith(RegExpSequencer.splitSequence(lcs), entryCondition)){
 						int tailCharactersToExclude = entryCondition.length;
