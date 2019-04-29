@@ -282,8 +282,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							String nextPreGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
 							rules.remove(parent);
 							//TODO to check is it's correct!
-							parent = LineEntry.createFrom(parent, nextPreGroup + parent.condition, parent.from);
-							rules.add(parent);
+							LineEntry newParent = LineEntry.createFrom(parent, nextPreGroup + parent.condition, parent.from);
+							rules.add(newParent);
 //							parent.condition = nextPreGroup + parent.condition;
 						}
 					}

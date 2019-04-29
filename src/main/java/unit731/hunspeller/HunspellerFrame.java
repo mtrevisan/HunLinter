@@ -1672,7 +1672,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 			});
 			ruleReducerDialog = new RuleReducerDialog(backbone, this);
-			GUIUtils.addCancelByEscapeKey(ruleReducerDialog);
 			ruleReducerDialog.setLocationRelativeTo(this);
 			ruleReducerDialog.addWindowListener(new WindowAdapter(){
 				@Override

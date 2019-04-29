@@ -3,6 +3,7 @@ package unit731.hunspeller;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -13,8 +14,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -164,6 +167,9 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
    }// </editor-fold>//GEN-END:initComponents
 
 	private void init(){
+		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+
 		currentSetTextArea.setText(null);
 
 		AffixData affixData = backbone.getAffixData();
@@ -200,28 +206,27 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		if(ruleReducerWorker != null){
-			SwingWorker.StateValue state = ruleReducerWorker.getState();
-			if(state == SwingWorker.StateValue.STARTED){
-				ruleReducerWorker.pause();
+		if(ruleReducerWorker != null && ruleReducerWorker.getState() == SwingWorker.StateValue.STARTED){
+			ruleReducerWorker.pause();
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					ruleReducerWorker.cancel();
+			Object[] options = {"Abort", "Cancel"};
+			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			if(answer == JOptionPane.YES_OPTION){
+				ruleReducerWorker.cancel();
 
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Rule reducer aborted");
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rule reducer aborted");
 
-					ruleReducerWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					ruleReducerWorker.resume();
+				ruleReducerWorker = null;
+			}
+			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+				ruleReducerWorker.resume();
 
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
+				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
 		}
+		else
+			dispose();
 	}
 
 	@Override
