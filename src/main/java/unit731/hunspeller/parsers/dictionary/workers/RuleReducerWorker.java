@@ -238,6 +238,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						.collect(Collectors.toSet());
 					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 					if(StringUtils.containsAny(parentGroup, childrenGroup)){
+						rules.remove(parent);
+
 						//split parents between belonging to children group and not belonging to children group
 						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
 						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
@@ -246,12 +248,20 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 							}
 						);
-						//manage same condition parent and children:
-						Set<LineEntry> newParents = splitParentAndChildren(parentChildrenBucket, notChildrenGroup, parent, rules,
-							sortedList);
-						rules.addAll(newParents);
+						Set<LineEntry> additionalParents = extractUncommonRules(parentChildrenBucket, parent);
+						Set<String> commonRulesFrom = parentChildrenBucket.get(notChildrenGroup);
+						if(commonRulesFrom != null){
+							LineEntry newEntry = LineEntry.createFrom(parent, notChildrenGroup + parent.condition, commonRulesFrom);
+							rules.add(newEntry);
 
-						sortedList.addAll(newParents);
+							//manage same condition parent and children:
+							splitParentAndChildren(parent, rules,
+								sortedList);
+						}
+						//add augmented rules to the initial set
+						rules.addAll(additionalParents);
+
+						sortedList.addAll(additionalParents);
 						sortedList.sort(shortestConditionComparator);
 					}
 					else{
@@ -263,6 +273,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								int index = le.condition.length() - Math.max(parentConditionLength + 1, le.removal.length());
 								if(index > 0)
 									le.condition = le.condition.substring(index);
+//								else
+//									le.condition = childrenGroup + le.condition;
 
 								if(parentConditionLength + 1 == le.removal.length()){
 									itr.remove();
@@ -305,46 +317,38 @@ System.out.println("ahn? " + parent);
 		}
 	}
 
-	private Set<LineEntry> splitParentAndChildren(Map<String, Set<String>> parentChildrenBucket, String notChildrenGroup, LineEntry parent,
-			Set<LineEntry> rules,
+	private void splitParentAndChildren(LineEntry parent, Set<LineEntry> rules,
 			List<LineEntry> sortedList){
-		//add augmented rules to the initial set
+		//modify parent rule to cope with the splitting
+		if(StringUtils.isNotEmpty(parent.condition)){
+			Iterator<LineEntry> itr = sortedList.iterator();
+			while(itr.hasNext()){
+				LineEntry le = itr.next();
+				if(le.condition.endsWith(parent.condition)){
+					int index = le.condition.length() - parent.condition.length() - 1;
+					while(index > 0){
+						//add additional rules
+						String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
+						LineEntry newEntry = LineEntry.createFrom(parent, condition);
+
+						rules.add(newEntry);
+
+						index --;
+					}
+				}
+			}
+		}
+	}
+
+	private Set<LineEntry> extractUncommonRules(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
 		Set<LineEntry> newParents = new HashSet<>();
 		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
 			String key = elem.getKey();
-			if(!key.equals(notChildrenGroup)){
+			if(!key.startsWith(NOT_GROUP_START)){
 				Set<String> from = elem.getValue();
 				newParents.add(LineEntry.createFrom(parent, key + parent.condition, from));
 			}
 		}
-		//modify parent rule to cope with the splitting
-		Set<String> newParentFrom = parentChildrenBucket.get(notChildrenGroup);
-		if(newParentFrom != null){
-			if(StringUtils.isNotEmpty(parent.condition)){
-				Iterator<LineEntry> itr = sortedList.iterator();
-				while(itr.hasNext()){
-					LineEntry le = itr.next();
-					if(le.condition.endsWith(parent.condition)){
-						int index = le.condition.length() - parent.condition.length() - 1;
-						while(index > 0){
-							//add additional rules
-							String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
-							LineEntry newEntry = LineEntry.createFrom(parent, condition);
-
-							rules.add(newEntry);
-	
-							index --;
-						}
-					}
-				}
-			}
-
-			parent.from.clear();
-			parent.from.addAll(newParentFrom);
-			parent.condition = notChildrenGroup + parent.condition;
-		}
-		else
-			rules.remove(parent);
 		return newParents;
 	}
 
@@ -434,29 +438,23 @@ System.out.println("ahn? " + parent);
 	private void mergeSimilarRules(Set<LineEntry> entries){
 		Map<String, Set<LineEntry>> mergeBucket = bucket(entries,
 			entry -> (entry.condition.contains(GROUP_END)?
-				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition).length: null));
-//TODO improve
+				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0]
+					+ RegExpSequencer.splitSequence(entry.condition).length: null));
 		for(Set<LineEntry> set : mergeBucket.values())
 			if(set.size() > 1){
 				LineEntry firstEntry = set.iterator().next();
 				String[] firstEntryCondition = RegExpSequencer.splitSequence(firstEntry.condition);
-				int index;
-				for(index = 0; index < firstEntryCondition.length; index ++)
-					if(firstEntryCondition[index].contains(GROUP_END))
-						break;
-				int idx = index + 1;
-				String[] commonPreCondition = SEQUENCER.subSequence(firstEntryCondition, 0, idx);
-				String[] commonPostCondition = SEQUENCER.subSequence(firstEntryCondition, idx + 1);
+				String[] commonPreCondition = SEQUENCER.subSequence(firstEntryCondition, 0, 1);
+				String[] commonPostCondition = SEQUENCER.subSequence(firstEntryCondition, 2);
 				//extract all the rules from `set` that has the condition compatible with firstEntry.condition
-				Set<LineEntry> endsWith = set;
-				String condition = endsWith.stream()
-					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[idx])
+				String condition = set.stream()
+					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1])
 					.sorted(comparator)
 					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END));
 				condition = StringUtils.join(commonPreCondition) + condition + StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(firstEntry, condition));
 
-				endsWith.forEach(entries::remove);
+				set.forEach(entries::remove);
 			}
 	}
 
