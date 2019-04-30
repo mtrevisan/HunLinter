@@ -188,7 +188,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		};
 		Runnable completed = () -> {
 			try{
-				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
+				Set<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
 				removeOverlappingConditions(disjointRules);
 
@@ -228,7 +228,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 	}
 
-	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
+	private Set<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
 			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
@@ -236,10 +236,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			if(ruleSet != null)
 				ruleSet.from.addAll(entry.from);
 		}
-		return new ArrayList<>(equivalenceTable.values());
+		return new HashSet<>(equivalenceTable.values());
 	}
 
-	private void removeOverlappingConditions(List<LineEntry> rules){
+	private void removeOverlappingConditions(Set<LineEntry> rules){
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
@@ -277,9 +277,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						if(notInCommonRule != null){
 							rules.add(notInCommonRule);
 
-							//manage same condition parent and children:
-							splitParentAndChildren(parent, rules,
-								sortedList);
+							List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+							rules.addAll(newParents);
 						}
 						//add new parents to the original list
 						rules.addAll(inCommonRules);
@@ -326,8 +325,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						LineEntry le = itr.next();
 						if(le.condition.endsWith(parent.condition)){
 							for(int i = 0; i < le.condition.length() - parent.condition.length(); i ++){
-								String c = NOT_GROUP_START + le.condition.charAt(i) + GROUP_END + le.condition.substring(i + 1);
-								rules.add(LineEntry.createFrom(parent, c));
+								String condition = NOT_GROUP_START + le.condition.charAt(i) + GROUP_END + le.condition.substring(i + 1);
+								rules.add(LineEntry.createFrom(parent, condition));
 							}
 
 							itr.remove();
@@ -373,9 +372,9 @@ System.out.println("ahn? " + parent);
 		return Pair.of(newRule, newRules);
 	}
 
-	private void splitParentAndChildren(LineEntry parent, Collection<LineEntry> rules,
-			List<LineEntry> sortedList){
-		//modify parent rule to cope with the splitting
+	private List<LineEntry> advanceNotGroup(LineEntry parent, List<LineEntry> sortedList){
+		//bubble up the not group
+		List<LineEntry> newParents = new ArrayList<>();
 		if(StringUtils.isNotEmpty(parent.condition)){
 			Iterator<LineEntry> itr = sortedList.iterator();
 			while(itr.hasNext()){
@@ -385,15 +384,14 @@ System.out.println("ahn? " + parent);
 					while(index > 0){
 						//add additional rules
 						String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
-						LineEntry newEntry = LineEntry.createFrom(parent, condition);
-
-						rules.add(newEntry);
+						newParents.add(LineEntry.createFrom(parent, condition));
 
 						index --;
 					}
 				}
 			}
 		}
+		return newParents;
 	}
 
 	private <K, V> Map<K, Set<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
