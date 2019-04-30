@@ -239,27 +239,24 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
-		//sort by shortes condition
+		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
-//		List<LineEntry> sortedList = rules.stream()
-//			.sorted(shortestConditionComparator)
-//			.collect(Collectors.toList());
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
 
-			Set<LineEntry> children = sortedList.stream()
+			List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 			if(!children.isEmpty()){
 				int parentConditionLength = parent.condition.length();
 				Set<String> parentFrom = parent.from;
 				String parentGroup = extractGroup(parentFrom, parentConditionLength);
 				if(!StringUtils.isEmpty(parentGroup)){
-					Set<String> childrenFrom = children.stream()
+					List<String> childrenFrom = children.stream()
 						.flatMap(entry -> entry.from.stream())
-						.collect(Collectors.toSet());
+						.collect(Collectors.toList());
 					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 					if(StringUtils.containsAny(parentGroup, childrenGroup)){
 						rules.remove(parent);
@@ -272,7 +269,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 							}
 						);
-						Set<LineEntry> additionalParents = extractUncommonRules(parentChildrenBucket, parent);
+						Set<LineEntry> additionalParents = extractRulesInCommon(parentChildrenBucket, parent);
 						Set<String> commonRulesFrom = parentChildrenBucket.get(notChildrenGroup);
 						if(commonRulesFrom != null){
 							LineEntry newEntry = LineEntry.createFrom(parent, notChildrenGroup + parent.condition, commonRulesFrom);
@@ -282,7 +279,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							splitParentAndChildren(parent, rules,
 								sortedList);
 						}
-						//add augmented rules to the initial set
+						//add new parents to the original list
 						rules.addAll(additionalParents);
 
 						sortedList.addAll(additionalParents);
@@ -341,6 +338,33 @@ System.out.println("ahn? " + parent);
 		}
 	}
 
+	private String extractGroup(Collection<String> words, int indexFromLast){
+		Set<String> group = new HashSet<>();
+		for(String word : words){
+			int index = word.length() - indexFromLast - 1;
+			if(index < 0)
+				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
+					+ "] at index " + indexFromLast + " from last because of the presence of the word " + word + " that is too short");
+
+			group.add(String.valueOf(word.charAt(index)));
+		}
+		return group.stream()
+			.sorted(comparator)
+			.collect(Collectors.joining(StringUtils.EMPTY));
+	}
+
+	private Set<LineEntry> extractRulesInCommon(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
+		Set<LineEntry> newParents = new HashSet<>();
+		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
+			String key = elem.getKey();
+			if(!key.startsWith(NOT_GROUP_START)){
+				Set<String> from = elem.getValue();
+				newParents.add(LineEntry.createFrom(parent, key + parent.condition, from));
+			}
+		}
+		return newParents;
+	}
+
 	private void splitParentAndChildren(LineEntry parent, Collection<LineEntry> rules,
 			List<LineEntry> sortedList){
 		//modify parent rule to cope with the splitting
@@ -364,18 +388,6 @@ System.out.println("ahn? " + parent);
 		}
 	}
 
-	private Set<LineEntry> extractUncommonRules(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
-		Set<LineEntry> newParents = new HashSet<>();
-		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
-			String key = elem.getKey();
-			if(!key.startsWith(NOT_GROUP_START)){
-				Set<String> from = elem.getValue();
-				newParents.add(LineEntry.createFrom(parent, key + parent.condition, from));
-			}
-		}
-		return newParents;
-	}
-
 	private <K, V> Map<K, Set<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
 		Map<K, Set<V>> bucket = new HashMap<>();
 		for(V entry : entries){
@@ -385,21 +397,6 @@ System.out.println("ahn? " + parent);
 					.add(entry);
 		}
 		return bucket;
-	}
-
-	private String extractGroup(Collection<String> words, int indexFromLast){
-		Set<String> group = new HashSet<>();
-		for(String word : words){
-			int index = word.length() - indexFromLast - 1;
-			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
-					+ "] at index " + indexFromLast + " from last because of the presence of the word " + word + " that is too short");
-
-			group.add(String.valueOf(word.charAt(index)));
-		}
-		return group.stream()
-			.sorted(comparator)
-			.collect(Collectors.joining(StringUtils.EMPTY));
 	}
 
 	private LineEntry createSuffixEntry(Production production, String word){
