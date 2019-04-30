@@ -187,7 +187,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		};
 		Runnable completed = () -> {
 			try{
-				Set<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
+				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
 				removeOverlappingConditions(disjointRules);
 
@@ -227,7 +227,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 	}
 
-	private Set<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
+	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
 			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
@@ -235,14 +235,16 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			if(ruleSet != null)
 				ruleSet.from.addAll(entry.from);
 		}
-		return new HashSet<>(equivalenceTable.values());
+		return new ArrayList<>(equivalenceTable.values());
 	}
 
-	private void removeOverlappingConditions(Set<LineEntry> rules){
+	private void removeOverlappingConditions(List<LineEntry> rules){
 		//sort by shortes condition
-		List<LineEntry> sortedList = rules.stream()
-			.sorted(shortestConditionComparator)
-			.collect(Collectors.toList());
+		List<LineEntry> sortedList = new ArrayList<>(rules);
+		sortedList.sort(shortestConditionComparator);
+//		List<LineEntry> sortedList = rules.stream()
+//			.sorted(shortestConditionComparator)
+//			.collect(Collectors.toList());
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
@@ -339,7 +341,7 @@ System.out.println("ahn? " + parent);
 		}
 	}
 
-	private void splitParentAndChildren(LineEntry parent, Set<LineEntry> rules,
+	private void splitParentAndChildren(LineEntry parent, Collection<LineEntry> rules,
 			List<LineEntry> sortedList){
 		//modify parent rule to cope with the splitting
 		if(StringUtils.isNotEmpty(parent.condition)){
@@ -430,7 +432,7 @@ System.out.println("ahn? " + parent);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private void mergeSimilarRules(Set<LineEntry> entries){
+	private void mergeSimilarRules(Collection<LineEntry> entries){
 		Map<String, Set<LineEntry>> mergeBucket = bucket(entries,
 			entry -> (entry.condition.contains(GROUP_END)?
 				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0]
@@ -453,13 +455,13 @@ System.out.println("ahn? " + parent);
 			}
 	}
 
-	private List<String> convertEntriesToRules(String flag, AffixEntry.Type type, boolean keepLongestCommonAffix, Set<LineEntry> entries){
+	private List<String> convertEntriesToRules(String flag, AffixEntry.Type type, boolean keepLongestCommonAffix, Collection<LineEntry> entries){
 		List<LineEntry> sortedEntries = prepareRules(type, keepLongestCommonAffix, entries);
 
 		return composeAffixRules(flag, type, sortedEntries);
 	}
 
-	private List<LineEntry> prepareRules(AffixEntry.Type type, boolean keepLongestCommonAffix, Set<LineEntry> entries){
+	private List<LineEntry> prepareRules(AffixEntry.Type type, boolean keepLongestCommonAffix, Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
 			entries.forEach(entry -> {
 				String lcs = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
