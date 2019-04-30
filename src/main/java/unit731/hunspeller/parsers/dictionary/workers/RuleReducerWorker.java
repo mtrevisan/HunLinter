@@ -253,8 +253,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			if(!children.isEmpty()){
 				int parentConditionLength = parent.condition.length();
 				Set<String> parentFrom = parent.from;
-				String parentGroup = extractGroup(parentFrom, parentConditionLength);
-				if(!StringUtils.isEmpty(parentGroup)){
+				try{
+					String parentGroup = extractGroup(parentFrom, parentConditionLength);
 					List<String> childrenFrom = children.stream()
 						.flatMap(entry -> entry.from.stream())
 						.collect(Collectors.toList());
@@ -303,19 +303,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						rules.addAll(newParents);
 					}
 				}
-				else{
-					Iterator<LineEntry> itr = sortedList.iterator();
-					while(itr.hasNext()){
-						LineEntry le = itr.next();
-						if(le.condition.endsWith(parent.condition)){
-							for(int i = 0; i < le.condition.length() - parent.condition.length(); i ++){
-								String condition = NOT_GROUP_START + le.condition.charAt(i) + GROUP_END + le.condition.substring(i + 1);
-								rules.add(LineEntry.createFrom(parent, condition));
-							}
-
-							itr.remove();
-						}
-					}
+				catch(IllegalArgumentException e){
+					for(LineEntry le : sortedList)
+						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
+							throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(parent.from, ",")
+								+ "] at index " + parentConditionLength + " from last because of the presence of the rule " + le
+								+ " that has the same condition");
 				}
 			}
 			else
@@ -346,6 +339,9 @@ System.out.println("ahn? " + parent);
 			String key = elem.getKey();
 			if(key.startsWith(NOT_GROUP_START)){
 				Set<String> from = elem.getValue();
+				String key2 = extractGroup(from, parent.condition.length());
+				if(!key2.isEmpty() && key2.length() < key.length() - NOT_GROUP_START.length() - GROUP_END.length())
+					key = GROUP_START + key2 + GROUP_END;
 				newRule = LineEntry.createFrom(parent, key + parent.condition, from);
 			}
 			else{
