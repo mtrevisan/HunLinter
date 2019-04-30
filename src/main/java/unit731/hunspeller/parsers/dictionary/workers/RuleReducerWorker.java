@@ -23,6 +23,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -269,20 +270,21 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 							}
 						);
-						Set<LineEntry> additionalParents = extractRulesInCommon(parentChildrenBucket, parent);
-						Set<String> commonRulesFrom = parentChildrenBucket.get(notChildrenGroup);
-						if(commonRulesFrom != null){
-							LineEntry newEntry = LineEntry.createFrom(parent, notChildrenGroup + parent.condition, commonRulesFrom);
-							rules.add(newEntry);
+						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+						LineEntry notInCommonRule = newRules.getLeft();
+						List<LineEntry> inCommonRules = newRules.getRight();
+
+						if(notInCommonRule != null){
+							rules.add(notInCommonRule);
 
 							//manage same condition parent and children:
 							splitParentAndChildren(parent, rules,
 								sortedList);
 						}
 						//add new parents to the original list
-						rules.addAll(additionalParents);
+						rules.addAll(inCommonRules);
 
-						sortedList.addAll(additionalParents);
+						sortedList.addAll(inCommonRules);
 						sortedList.sort(shortestConditionComparator);
 					}
 					else{
@@ -353,16 +355,22 @@ System.out.println("ahn? " + parent);
 			.collect(Collectors.joining(StringUtils.EMPTY));
 	}
 
-	private Set<LineEntry> extractRulesInCommon(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
-		Set<LineEntry> newParents = new HashSet<>();
+	/** Extract rule in common and not in common between parent and children */
+	private Pair<LineEntry, List<LineEntry>> extractCommunalities(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
+		LineEntry newRule = null;
+		List<LineEntry> newRules = new ArrayList<>();
 		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
 			String key = elem.getKey();
-			if(!key.startsWith(NOT_GROUP_START)){
+			if(key.startsWith(NOT_GROUP_START)){
 				Set<String> from = elem.getValue();
-				newParents.add(LineEntry.createFrom(parent, key + parent.condition, from));
+				newRule = LineEntry.createFrom(parent, key + parent.condition, from);
+			}
+			else{
+				Set<String> from = elem.getValue();
+				newRules.add(LineEntry.createFrom(parent, key + parent.condition, from));
 			}
 		}
-		return newParents;
+		return Pair.of(newRule, newRules);
 	}
 
 	private void splitParentAndChildren(LineEntry parent, Collection<LineEntry> rules,
