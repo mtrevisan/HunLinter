@@ -310,9 +310,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				catch(IllegalArgumentException e){
 					for(LineEntry le : sortedList)
 						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
-							throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(parent.from, ",")
-								+ "] at index " + parentConditionLength + " from last because of the presence of the rule " + le
-								+ " that has the same condition");
+							throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
+								+ le + " that has a common condition part");
 				}
 			}
 			else
