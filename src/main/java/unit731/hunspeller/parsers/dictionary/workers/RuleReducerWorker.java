@@ -189,6 +189,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				Set<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
+disjointRules.forEach(System.out::println);
 
 				removeOverlappingConditions(disjointRules);
 
@@ -289,6 +290,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					else{
 						rules.remove(parent);
 						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+//						String key2 = extractGroup(parent.from, parent.condition.length());
+//						if(!key2.isEmpty() && key2.length() <= notChildrenGroup.length() - NOT_GROUP_START.length() - GROUP_END.length())
+//							notChildrenGroup = GROUP_START + key2 + GROUP_END;
 						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
 
 						for(LineEntry child : children)
@@ -339,9 +343,9 @@ System.out.println("ahn? " + parent);
 			String key = elem.getKey();
 			if(key.startsWith(NOT_GROUP_START)){
 				Set<String> from = elem.getValue();
-				String key2 = extractGroup(from, parent.condition.length());
-				if(!key2.isEmpty() && key2.length() < key.length() - NOT_GROUP_START.length() - GROUP_END.length())
-					key = GROUP_START + key2 + GROUP_END;
+//				String key2 = extractGroup(from, parent.condition.length());
+//				if(!key2.isEmpty() && key2.length() <= key.length() - NOT_GROUP_START.length() - GROUP_END.length())
+//					key = GROUP_START + key2 + GROUP_END;
 				newRule = LineEntry.createFrom(parent, key + parent.condition, from);
 			}
 			else{
