@@ -187,7 +187,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		};
 		Runnable completed = () -> {
 			try{
-				Set<LineEntry> disjointRules = removeSameConditions(plainRules);
+				Set<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
 				removeOverlappingConditions(disjointRules);
 
@@ -211,8 +211,30 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		createReadWorker(data, lineProcessor);
 	}
 
-	private Set<LineEntry> removeSameConditions(List<LineEntry> plainRules){
-		Map<String, LineEntry> equivalenceTable = collectIntoEquivalenceClasses(plainRules);
+	private void collectProductionsByFlag(List<Production> productions, String flag, List<LineEntry> plainRules){
+		Iterator<Production> itr = productions.iterator();
+		//skip base production
+		itr.next();
+		while(itr.hasNext()){
+			Production production = itr.next();
+
+			AffixEntry lastAppliedRule = production.getLastAppliedRule();
+			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
+				String word = lastAppliedRule.undoRule(production.getWord());
+				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
+				plainRules.add(affixEntry);
+			}
+		}
+	}
+
+	private Set<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
+		Map<String, LineEntry> equivalenceTable = new HashMap<>();
+		for(LineEntry entry : entries){
+			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
+			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
+			if(ruleSet != null)
+				ruleSet.from.addAll(entry.from);
+		}
 		return new HashSet<>(equivalenceTable.values());
 	}
 
@@ -352,17 +374,6 @@ System.out.println("ahn? " + parent);
 		return newParents;
 	}
 
-	private Map<String, LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		Map<String, LineEntry> equivalenceTable = new HashMap<>();
-		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
-			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
-			if(ruleSet != null)
-				ruleSet.from.addAll(entry.from);
-		}
-		return equivalenceTable;
-	}
-
 	private <K, V> Map<K, Set<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
 		Map<K, Set<V>> bucket = new HashMap<>();
 		for(V entry : entries){
@@ -387,22 +398,6 @@ System.out.println("ahn? " + parent);
 		return group.stream()
 			.sorted(comparator)
 			.collect(Collectors.joining(StringUtils.EMPTY));
-	}
-
-	private void collectProductionsByFlag(List<Production> productions, String flag, List<LineEntry> plainRules){
-		Iterator<Production> itr = productions.iterator();
-		//skip base production
-		itr.next();
-		while(itr.hasNext()){
-			Production production = itr.next();
-
-			AffixEntry lastAppliedRule = production.getLastAppliedRule();
-			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
-				String word = lastAppliedRule.undoRule(production.getWord());
-				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
-				plainRules.add(affixEntry);
-			}
-		}
 	}
 
 	private LineEntry createSuffixEntry(Production production, String word){
