@@ -287,36 +287,20 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						sortedList.sort(shortestConditionComparator);
 					}
 					else{
-						boolean removed = false;
-						Iterator<LineEntry> itr = sortedList.iterator();
-						while(itr.hasNext()){
-							LineEntry le = itr.next();
-							if(le.condition.endsWith(parent.condition)){
-								int index = le.condition.length() - Math.max(parentConditionLength + 1, le.removal.length());
-								if(index > 0)
-									le.condition = le.condition.substring(index);
-//								else
-//									le.condition = childrenGroup + le.condition;
+						rules.remove(parent);
+						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
 
-								if(parentConditionLength + 1 == le.removal.length()){
-									itr.remove();
-									removed = true;
-								}
+						for(LineEntry child : children)
+							if(child.condition.length() == parentConditionLength){
+								String childGroup = extractGroup(child.from, parentConditionLength);
+								if(childGroup.length() > 1)
+									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+								child.condition = childGroup + child.condition;
 							}
-						}
-						if(StringUtils.isNotEmpty(childrenGroup)){
-							if(!removed){
-								String newParentCondition = childrenGroup + parent.condition;
-								Set<String> newParentFrom = parent.from.stream()
-									.filter(from -> from.endsWith(newParentCondition))
-									.collect(Collectors.toSet());
-								sortedList.add(LineEntry.createFrom(parent, newParentCondition, newParentFrom));
-								sortedList.sort(shortestConditionComparator);
-							}
-							String nextPreGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-							rules.remove(parent);
-							rules.add(LineEntry.createFrom(parent, nextPreGroup + parent.condition, parent.from));
-						}
+
+						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+						rules.addAll(newParents);
 					}
 				}
 				else{
