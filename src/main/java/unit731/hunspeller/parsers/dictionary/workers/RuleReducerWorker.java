@@ -154,8 +154,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
-		.reversed();
+	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -248,6 +247,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
+
+			//extract longes condition that matches the parent
+			LineEntry longest;
+			for(LineEntry le : sortedList)
+				if(le.condition.length() > parent.condition.length() && le.condition.endsWith(parent.condition))
+					longest = le;
 
 			List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
