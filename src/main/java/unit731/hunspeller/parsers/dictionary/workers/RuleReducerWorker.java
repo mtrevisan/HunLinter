@@ -250,30 +250,42 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			int parentConditionLength = parent.condition.length();
 
 			//extract longest conditions that ends with the parent condition
-			int longestConditionLength = sortedList.stream()
+//			int longestConditionLength = sortedList.stream()
+//				.filter(entry -> entry.condition.endsWith(parent.condition))
+//				.mapToInt(entry -> entry.condition.length())
+//				.max()
+//				.orElse(-1);
+//			if(longestConditionLength < 0)
+//				continue;
+
+			List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
-				.mapToInt(entry -> entry.condition.length())
-				.max()
-				.orElse(-1);
-			if(longestConditionLength < 0)
+//				.filter(entry -> entry.condition.length() == longestConditionLength)
+				.collect(Collectors.toList());
+			if(children.isEmpty())
 				continue;
 
-			Set<LineEntry> longestConditions = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parent.condition))
-				.filter(entry -> entry.condition.length() == longestConditionLength)
-				.collect(Collectors.toSet());
+			Map<String, List<LineEntry>> conditionLengthBucket = bucket(children,
+				entry -> entry.removal + TAB + entry.addition + TAB + entry.condition.length());
+			Map<String, List<LineEntry>> conditionBucket = bucket(children, entry -> entry.condition.substring(1));
+			for(List<LineEntry> commonSet : conditionBucket.values()){
+				System.out.println("");
+			}
+			for(List<LineEntry> commonSet : conditionLengthBucket.values()){
+				System.out.println("");
+			}
 
 			//for each longest rule extract a new rule until reaching parent
 			//TODO merge this list (ex -ra and -xa becomes -[^r] and -[^x]a, should be -[^rx]a)
-			for(LineEntry entry : longestConditions){
-				int entryConditionLength = entry.condition.length();
+			for(LineEntry child : children){
+				int entryConditionLength = child.condition.length();
 				int index = entryConditionLength - parentConditionLength;
 				while(index > 0){
 					//split parents between belonging to children group and not belonging to children group
-					char childrenGroup = entry.condition.charAt(entryConditionLength - index - 1);
+					char childrenGroup = child.condition.charAt(entryConditionLength - index - 1);
 					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
 					final int idx = index;
-					Map<String, Set<String>> parentChildrenBucket = bucket(parent.from,
+					Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
 						from -> {
 							int k = from.length() - parentConditionLength - idx;
 							if(k < 0)
@@ -284,7 +296,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							return (childrenGroup == chr? String.valueOf(chr): notChildrenGroup);
 						}
 					);
-					LineEntry shadowParent = LineEntry.createFrom(parent, entry.condition.substring(entryConditionLength - index), parent.from);
+					LineEntry shadowParent = LineEntry.createFrom(parent, child.condition.substring(entryConditionLength - index), parent.from);
 					Pair<LineEntry, List<LineEntry>> bucketRules = extractCommunalities(parentChildrenBucket, shadowParent);
 					LineEntry notInCommonRule = bucketRules.getLeft();
 					List<LineEntry> inCommonRules = bucketRules.getRight();
@@ -306,77 +318,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			}
 
 			rules.remove(parent);
-			longestConditions.forEach(sortedList::remove);
+			children.forEach(sortedList::remove);
 System.out.println("");
-
-//			List<LineEntry> children = sortedList.stream()
-//				.filter(entry -> entry.condition.endsWith(parent.condition))
-//				.collect(Collectors.toList());
-//			if(!children.isEmpty()){
-//				int parentConditionLength = parent.condition.length();
-//				Set<String> parentFrom = parent.from;
-//				try{
-//					String parentGroup = extractGroup(parentFrom, parentConditionLength);
-//					List<String> childrenFrom = children.stream()
-//						.flatMap(entry -> entry.from.stream())
-//						.collect(Collectors.toList());
-//					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-//					if(StringUtils.containsAny(parentGroup, childrenGroup)){
-//						rules.remove(parent);
-//
-//						//split parents between belonging to children group and not belonging to children group
-//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-//						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
-//							from -> {
-//								char chr = from.charAt(from.length() - parentConditionLength - 1);
-//								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
-//							}
-//						);
-//						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
-//						LineEntry notInCommonRule = newRules.getLeft();
-//						List<LineEntry> inCommonRules = newRules.getRight();
-//
-//						if(notInCommonRule != null){
-//							rules.add(notInCommonRule);
-//
-//							List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
-//							rules.addAll(newParents);
-//						}
-//						//add new parents to the original list
-//						rules.addAll(inCommonRules);
-//
-//						sortedList.addAll(inCommonRules);
-//						sortedList.sort(shortestConditionComparator);
-//					}
-//					else{
-//						rules.remove(parent);
-//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-////						String key2 = extractGroup(parent.from, parent.condition.length());
-////						if(!key2.isEmpty() && key2.length() <= notChildrenGroup.length() - NOT_GROUP_START.length() - GROUP_END.length())
-////							notChildrenGroup = GROUP_START + key2 + GROUP_END;
-//						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
-//
-//						for(LineEntry child : children)
-//							if(child.condition.length() == parentConditionLength){
-//								String childGroup = extractGroup(child.from, parentConditionLength);
-//								if(childGroup.length() > 1)
-//									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
-//								child.condition = childGroup + child.condition;
-//							}
-//
-//						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
-//						rules.addAll(newParents);
-//					}
-//				}
-//				catch(IllegalArgumentException e){
-//					for(LineEntry le : sortedList)
-//						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
-//							throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
-//								+ le + " that has a common condition part");
-//				}
-//			}
-//			else
-//System.out.println("ahn? " + parent);
 		}
 	}
 
@@ -472,20 +415,20 @@ System.out.println("");
 	}
 
 	/** Extract rule in common and not in common between parent and children */
-	private Pair<LineEntry, List<LineEntry>> extractCommunalities(Map<String, Set<String>> parentChildrenBucket, LineEntry parent){
+	private Pair<LineEntry, List<LineEntry>> extractCommunalities(Map<String, List<String>> parentChildrenBucket, LineEntry parent){
 		LineEntry newRule = null;
 		List<LineEntry> newRules = new ArrayList<>();
-		for(Map.Entry<String, Set<String>> elem : parentChildrenBucket.entrySet()){
+		for(Map.Entry<String, List<String>> elem : parentChildrenBucket.entrySet()){
 			String key = elem.getKey();
 			if(key.startsWith(NOT_GROUP_START)){
-				Set<String> from = elem.getValue();
+				List<String> from = elem.getValue();
 //				String key2 = extractGroup(from, parent.condition.length());
 //				if(!key2.isEmpty() && key2.length() <= key.length() - NOT_GROUP_START.length() - GROUP_END.length())
 //					key = GROUP_START + key2 + GROUP_END;
 				newRule = LineEntry.createFrom(parent, key + parent.condition, from);
 			}
 			else{
-				Set<String> from = elem.getValue();
+				List<String> from = elem.getValue();
 				newRules.add(LineEntry.createFrom(parent, key + parent.condition, from));
 			}
 		}
@@ -514,12 +457,12 @@ System.out.println("");
 		return newParents;
 	}
 
-	private <K, V> Map<K, Set<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
-		Map<K, Set<V>> bucket = new HashMap<>();
+	private <K, V> Map<K, List<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
+		Map<K, List<V>> bucket = new HashMap<>();
 		for(V entry : entries){
 			K key = keyGenerator.apply(entry);
 			if(key != null)
-				bucket.computeIfAbsent(key, k -> new HashSet<>())
+				bucket.computeIfAbsent(key, k -> new ArrayList<>())
 					.add(entry);
 		}
 		return bucket;
@@ -556,11 +499,11 @@ System.out.println("");
 	}
 
 	private void mergeSimilarRules(Collection<LineEntry> entries){
-		Map<String, Set<LineEntry>> mergeBucket = bucket(entries,
+		Map<String, List<LineEntry>> mergeBucket = bucket(entries,
 			entry -> (entry.condition.contains(GROUP_END)?
 				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0]
 					+ RegExpSequencer.splitSequence(entry.condition).length: null));
-		for(Set<LineEntry> set : mergeBucket.values())
+		for(List<LineEntry> set : mergeBucket.values())
 			if(set.size() > 1){
 				LineEntry firstEntry = set.iterator().next();
 				String[] firstEntryCondition = RegExpSequencer.splitSequence(firstEntry.condition);
