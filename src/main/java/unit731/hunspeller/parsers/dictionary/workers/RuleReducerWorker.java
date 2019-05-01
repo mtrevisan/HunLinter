@@ -247,81 +247,136 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
+			int parentConditionLength = parent.condition.length();
 
-			//extract longes condition that matches the parent
-			LineEntry longest;
-			for(LineEntry le : sortedList)
-				if(le.condition.length() > parent.condition.length() && le.condition.endsWith(parent.condition))
-					longest = le;
-
-			List<LineEntry> children = sortedList.stream()
+			//extract longest conditions that ends with the parent condition
+			int longestConditionLength = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
-				.collect(Collectors.toList());
-			if(!children.isEmpty()){
-				int parentConditionLength = parent.condition.length();
-				Set<String> parentFrom = parent.from;
-				try{
-					String parentGroup = extractGroup(parentFrom, parentConditionLength);
-					List<String> childrenFrom = children.stream()
-						.flatMap(entry -> entry.from.stream())
-						.collect(Collectors.toList());
-					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-					if(StringUtils.containsAny(parentGroup, childrenGroup)){
-						rules.remove(parent);
+				.mapToInt(entry -> entry.condition.length())
+				.max()
+				.orElse(-1);
+			if(longestConditionLength < 0)
+				continue;
 
-						//split parents between belonging to children group and not belonging to children group
-						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
-							from -> {
-								char chr = from.charAt(from.length() - parentConditionLength - 1);
-								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
-							}
-						);
-						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
-						LineEntry notInCommonRule = newRules.getLeft();
-						List<LineEntry> inCommonRules = newRules.getRight();
+			Set<LineEntry> longestConditions = sortedList.stream()
+				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.filter(entry -> entry.condition.length() == longestConditionLength)
+				.collect(Collectors.toSet());
 
-						if(notInCommonRule != null){
-							rules.add(notInCommonRule);
+			//for each longest rule extract a new rule until reaching parent
+			//TODO merge this list (ex -ra and -xa becomes -[^r] and -[^x]a, should be -[^rx]a)
+			for(LineEntry entry : longestConditions){
+				int entryConditionLength = entry.condition.length();
+				int index = entryConditionLength - parentConditionLength;
+				while(index > 0){
+					//split parents between belonging to children group and not belonging to children group
+					char childrenGroup = entry.condition.charAt(entryConditionLength - index - 1);
+					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+					final int idx = index;
+					Map<String, Set<String>> parentChildrenBucket = bucket(parent.from,
+						from -> {
+							int k = from.length() - parentConditionLength - idx;
+							if(k < 0)
+								//remove from if it's too short wrt parent.condition
+								return null;
 
-							List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
-							rules.addAll(newParents);
+							char chr = from.charAt(k);
+							return (childrenGroup == chr? String.valueOf(chr): notChildrenGroup);
 						}
-						//add new parents to the original list
-						rules.addAll(inCommonRules);
+					);
+					LineEntry shadowParent = LineEntry.createFrom(parent, entry.condition.substring(entryConditionLength - index), parent.from);
+					Pair<LineEntry, List<LineEntry>> bucketRules = extractCommunalities(parentChildrenBucket, shadowParent);
+					LineEntry notInCommonRule = bucketRules.getLeft();
+					List<LineEntry> inCommonRules = bucketRules.getRight();
 
-						sortedList.addAll(inCommonRules);
-						sortedList.sort(shortestConditionComparator);
+					if(!inCommonRules.isEmpty()){
+						throw new IllegalArgumentException("?");
 					}
-					else{
-						rules.remove(parent);
-						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-//						String key2 = extractGroup(parent.from, parent.condition.length());
-//						if(!key2.isEmpty() && key2.length() <= notChildrenGroup.length() - NOT_GROUP_START.length() - GROUP_END.length())
-//							notChildrenGroup = GROUP_START + key2 + GROUP_END;
-						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
 
-						for(LineEntry child : children)
-							if(child.condition.length() == parentConditionLength){
-								String childGroup = extractGroup(child.from, parentConditionLength);
-								if(childGroup.length() > 1)
-									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
-								child.condition = childGroup + child.condition;
-							}
-
-						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
-						rules.addAll(newParents);
+					if(notInCommonRule == null){
+						shadowParent.condition = notChildrenGroup + shadowParent.condition;
+						notInCommonRule = shadowParent;
 					}
-				}
-				catch(IllegalArgumentException e){
-					for(LineEntry le : sortedList)
-						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
-							throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
-								+ le + " that has a common condition part");
+
+					//add additional rule
+					rules.add(notInCommonRule);
+
+					index --;
 				}
 			}
-			else
-System.out.println("ahn? " + parent);
+
+			rules.remove(parent);
+			longestConditions.forEach(sortedList::remove);
+System.out.println("");
+
+//			List<LineEntry> children = sortedList.stream()
+//				.filter(entry -> entry.condition.endsWith(parent.condition))
+//				.collect(Collectors.toList());
+//			if(!children.isEmpty()){
+//				int parentConditionLength = parent.condition.length();
+//				Set<String> parentFrom = parent.from;
+//				try{
+//					String parentGroup = extractGroup(parentFrom, parentConditionLength);
+//					List<String> childrenFrom = children.stream()
+//						.flatMap(entry -> entry.from.stream())
+//						.collect(Collectors.toList());
+//					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+//					if(StringUtils.containsAny(parentGroup, childrenGroup)){
+//						rules.remove(parent);
+//
+//						//split parents between belonging to children group and not belonging to children group
+//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+//						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
+//							from -> {
+//								char chr = from.charAt(from.length() - parentConditionLength - 1);
+//								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
+//							}
+//						);
+//						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+//						LineEntry notInCommonRule = newRules.getLeft();
+//						List<LineEntry> inCommonRules = newRules.getRight();
+//
+//						if(notInCommonRule != null){
+//							rules.add(notInCommonRule);
+//
+//							List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+//							rules.addAll(newParents);
+//						}
+//						//add new parents to the original list
+//						rules.addAll(inCommonRules);
+//
+//						sortedList.addAll(inCommonRules);
+//						sortedList.sort(shortestConditionComparator);
+//					}
+//					else{
+//						rules.remove(parent);
+//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+////						String key2 = extractGroup(parent.from, parent.condition.length());
+////						if(!key2.isEmpty() && key2.length() <= notChildrenGroup.length() - NOT_GROUP_START.length() - GROUP_END.length())
+////							notChildrenGroup = GROUP_START + key2 + GROUP_END;
+//						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
+//
+//						for(LineEntry child : children)
+//							if(child.condition.length() == parentConditionLength){
+//								String childGroup = extractGroup(child.from, parentConditionLength);
+//								if(childGroup.length() > 1)
+//									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+//								child.condition = childGroup + child.condition;
+//							}
+//
+//						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+//						rules.addAll(newParents);
+//					}
+//				}
+//				catch(IllegalArgumentException e){
+//					for(LineEntry le : sortedList)
+//						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
+//							throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
+//								+ le + " that has a common condition part");
+//				}
+//			}
+//			else
+//System.out.println("ahn? " + parent);
 		}
 	}
 
