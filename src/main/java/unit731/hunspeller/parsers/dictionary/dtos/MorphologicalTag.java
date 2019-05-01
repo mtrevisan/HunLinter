@@ -9,7 +9,7 @@ public class MorphologicalTag{
 	private static final String TAG_DERIVATIONAL_PREFIX = "dp:";
 	public static final String TAG_INFLECTIONAL_PREFIX = "ip:";
 	private static final String TAG_TERMINAL_PREFIX = "tp:";
-	private static final String TAG_DERIVATIONAL_SUFFIX = "ds:";
+	public static final String TAG_DERIVATIONAL_SUFFIX = "ds:";
 	public static final String TAG_INFLECTIONAL_SUFFIX = "is:";
 	public static final String TAG_TERMINAL_SUFFIX = "ts:";
 	private static final String TAG_SURFACE_PREFIX = "sp:";

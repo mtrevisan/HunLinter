@@ -154,7 +154,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
+	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
+		.reversed();
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -318,6 +319,82 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 System.out.println("ahn? " + parent);
 		}
 	}
+
+//	private void removeOverlappingConditions(Set<LineEntry> rules){
+//		//sort by shortest condition
+//		List<LineEntry> sortedList = new ArrayList<>(rules);
+//		sortedList.sort(shortestConditionComparator);
+//
+//		while(!sortedList.isEmpty()){
+//			LineEntry parent = sortedList.remove(0);
+//
+//			List<LineEntry> children = sortedList.stream()
+//				.filter(entry -> entry.condition.endsWith(parent.condition))
+//				.collect(Collectors.toList());
+//			if(!children.isEmpty()){
+//				int parentConditionLength = parent.condition.length();
+//				Set<String> parentFrom = parent.from;
+//				try{
+//					String parentGroup = extractGroup(parentFrom, parentConditionLength);
+//					List<String> childrenFrom = children.stream()
+//						.flatMap(entry -> entry.from.stream())
+//						.collect(Collectors.toList());
+//					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+//					if(StringUtils.containsAny(parentGroup, childrenGroup)){
+//						rules.remove(parent);
+//
+//						//split parents between belonging to children group and not belonging to children group
+//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+//						Map<String, Set<String>> parentChildrenBucket = bucket(parentFrom,
+//							from -> {
+//								char chr = from.charAt(from.length() - parentConditionLength - 1);
+//								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
+//							}
+//						);
+//						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+//						LineEntry notInCommonRule = newRules.getLeft();
+//						List<LineEntry> inCommonRules = newRules.getRight();
+//
+//						if(notInCommonRule != null){
+//							rules.add(notInCommonRule);
+//
+//							List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+//							rules.addAll(newParents);
+//						}
+//						//add new parents to the original list
+//						rules.addAll(inCommonRules);
+//
+//						sortedList.addAll(inCommonRules);
+//						sortedList.sort(shortestConditionComparator);
+//					}
+//					else{
+//						rules.remove(parent);
+//						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+//						rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
+//
+//						for(LineEntry child : children)
+//							if(child.condition.length() == parentConditionLength){
+//								String childGroup = extractGroup(child.from, parentConditionLength);
+//								if(childGroup.length() > 1)
+//									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+//								child.condition = childGroup + child.condition;
+//							}
+//
+//						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+//						rules.addAll(newParents);
+//					}
+//				}
+//				catch(IllegalArgumentException e){
+//					for(LineEntry le : sortedList)
+//						if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
+//							throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
+//								+ le + " that has a common condition part");
+//				}
+//			}
+//			else
+//System.out.println("ahn? " + parent);
+//		}
+//	}
 
 	private String extractGroup(Collection<String> words, int indexFromLast){
 		Set<String> group = new HashSet<>();
