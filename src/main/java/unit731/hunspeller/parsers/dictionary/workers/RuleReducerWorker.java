@@ -268,6 +268,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			Map<String, List<LineEntry>> conditionLengthBucket = bucket(children,
 				entry -> entry.removal + TAB + entry.addition + TAB + entry.condition.length());
 			Map<String, List<LineEntry>> conditionBucket = bucket(children, entry -> entry.condition.substring(1));
+			for(Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
+				List<String> from = entry.getValue().stream()
+					.flatMap(e -> e.from.stream())
+					.collect(Collectors.toList());
+				String childrenGroup = extractGroup(from, entry.getKey().length());
+System.out.println(childrenGroup);
+			}
+				
 			for(List<LineEntry> commonSet : conditionBucket.values()){
 				System.out.println("");
 			}
