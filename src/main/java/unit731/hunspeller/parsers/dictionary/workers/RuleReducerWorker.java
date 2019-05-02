@@ -254,20 +254,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			if(children.isEmpty())
 				continue;
 
-			Map<String, List<LineEntry>> conditionLengthBucket = bucket(children,
-				entry -> entry.removal + TAB + entry.addition + TAB + entry.condition.length());
 			Map<String, List<LineEntry>> conditionBucket = bucket(children,
 				entry -> (entry.removal.charAt(0) == entry.condition.charAt(0)? entry.removal.substring(1): entry.removal)
 					+ TAB + entry.addition + TAB + entry.condition.substring(1));
-
-//			for(Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
-//				List<String> from = entry.getValue().stream()
-//					.flatMap(e -> e.from.stream())
-//					.collect(Collectors.toList());
-//				String childrenGroup = extractGroup(from, entry.getKey().length());
-//System.out.println(childrenGroup);
-//			}
-				
 			for(List<LineEntry> commonSet : conditionBucket.values()){
 				List<String> words = commonSet.stream()
 					.map(entry -> entry.condition)
@@ -276,52 +265,49 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				String childrenGroup = extractGroup(words, index);
 System.out.println(childrenGroup);
 			}
-			for(List<LineEntry> commonSet : conditionLengthBucket.values()){
-				System.out.println("");
-			}
 
 			//for each longest rule extract a new rule until reaching parent
 			//TODO merge this list (ex -ra and -xa becomes -[^r] and -[^x]a, should be -[^rx]a)
-//			int parentConditionLength = parent.condition.length();
-//			for(LineEntry child : children){
-//				int entryConditionLength = child.condition.length();
-//				int index = entryConditionLength - parentConditionLength;
-//				while(index > 0){
-//					//split parents between belonging to children group and not belonging to children group
-//					char childrenGroup = child.condition.charAt(entryConditionLength - index - 1);
-//					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-//					final int idx = index;
-//					Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
-//						from -> {
-//							int k = from.length() - parentConditionLength - idx;
-//							if(k < 0)
-//								//remove from if it's too short wrt parent.condition
-//								return null;
-//
-//							char chr = from.charAt(k);
-//							return (childrenGroup == chr? String.valueOf(chr): notChildrenGroup);
-//						}
-//					);
-//					LineEntry shadowParent = LineEntry.createFrom(parent, child.condition.substring(entryConditionLength - index), parent.from);
-//					Pair<LineEntry, List<LineEntry>> bucketRules = extractCommunalities(parentChildrenBucket, shadowParent);
-//					LineEntry notInCommonRule = bucketRules.getLeft();
-//					List<LineEntry> inCommonRules = bucketRules.getRight();
-//
-//					if(!inCommonRules.isEmpty()){
-//						throw new IllegalArgumentException("?");
-//					}
-//
-//					if(notInCommonRule == null){
-//						shadowParent.condition = notChildrenGroup + shadowParent.condition;
-//						notInCommonRule = shadowParent;
-//					}
-//
-//					//add additional rule
-//					rules.add(notInCommonRule);
-//
-//					index --;
-//				}
-//			}
+			int parentConditionLength = parent.condition.length();
+			for(LineEntry child : children){
+				int entryConditionLength = child.condition.length();
+				int index = entryConditionLength - parentConditionLength;
+				while(index > 0){
+					//split parents between belonging to children group and not belonging to children group
+					char childrenGroup = child.condition.charAt(entryConditionLength - index - 1);
+					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+					final int idx = index;
+					Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
+						from -> {
+							int k = from.length() - parentConditionLength - idx;
+							if(k < 0)
+								//remove from if it's too short wrt parent.condition
+								return null;
+
+							char chr = from.charAt(k);
+							return (childrenGroup == chr? String.valueOf(chr): notChildrenGroup);
+						}
+					);
+					LineEntry shadowParent = LineEntry.createFrom(parent, child.condition.substring(entryConditionLength - index), parent.from);
+					Pair<LineEntry, List<LineEntry>> bucketRules = extractCommunalities(parentChildrenBucket, shadowParent);
+					LineEntry notInCommonRule = bucketRules.getLeft();
+					List<LineEntry> inCommonRules = bucketRules.getRight();
+
+					if(!inCommonRules.isEmpty()){
+						throw new IllegalArgumentException("?");
+					}
+
+					if(notInCommonRule == null){
+						shadowParent.condition = notChildrenGroup + shadowParent.condition;
+						notInCommonRule = shadowParent;
+					}
+
+					//add additional rule
+					rules.add(notInCommonRule);
+
+					index --;
+				}
+			}
 
 			rules.remove(parent);
 			children.forEach(sortedList::remove);
