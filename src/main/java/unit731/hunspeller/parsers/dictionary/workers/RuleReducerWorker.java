@@ -247,20 +247,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
-			int parentConditionLength = parent.condition.length();
-
-			//extract longest conditions that ends with the parent condition
-//			int longestConditionLength = sortedList.stream()
-//				.filter(entry -> entry.condition.endsWith(parent.condition))
-//				.mapToInt(entry -> entry.condition.length())
-//				.max()
-//				.orElse(-1);
-//			if(longestConditionLength < 0)
-//				continue;
 
 			List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
-//				.filter(entry -> entry.condition.length() == longestConditionLength)
 				.collect(Collectors.toList());
 			if(children.isEmpty())
 				continue;
@@ -268,6 +257,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			Map<String, List<LineEntry>> conditionLengthBucket = bucket(children,
 				entry -> entry.removal + TAB + entry.addition + TAB + entry.condition.length());
 			Map<String, List<LineEntry>> conditionBucket = bucket(children, entry -> entry.condition.substring(1));
+
 			for(Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
 				List<String> from = entry.getValue().stream()
 					.flatMap(e -> e.from.stream())
@@ -285,6 +275,7 @@ System.out.println(childrenGroup);
 
 			//for each longest rule extract a new rule until reaching parent
 			//TODO merge this list (ex -ra and -xa becomes -[^r] and -[^x]a, should be -[^rx]a)
+			int parentConditionLength = parent.condition.length();
 			for(LineEntry child : children){
 				int entryConditionLength = child.condition.length();
 				int index = entryConditionLength - parentConditionLength;

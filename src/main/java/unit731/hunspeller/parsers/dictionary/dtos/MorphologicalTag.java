@@ -6,7 +6,7 @@ public class MorphologicalTag{
 	public static final String TAG_STEM = "st:";
 	public static final String TAG_ALLOMORPH = "al:";
 	public static final String TAG_PART_OF_SPEECH = "po:";
-	private static final String TAG_DERIVATIONAL_PREFIX = "dp:";
+	public static final String TAG_DERIVATIONAL_PREFIX = "dp:";
 	public static final String TAG_INFLECTIONAL_PREFIX = "ip:";
 	private static final String TAG_TERMINAL_PREFIX = "tp:";
 	public static final String TAG_DERIVATIONAL_SUFFIX = "ds:";
