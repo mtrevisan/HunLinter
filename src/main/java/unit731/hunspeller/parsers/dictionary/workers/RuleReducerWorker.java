@@ -294,7 +294,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //							//ex.
 //							//	SFX v1 0 ista/A2 [lnr]
 //							//	SFX v1 0 ista/A2 [^è]r
-//							//the 'r' shoule be removed because of the presence of the other rule, resulting in
+//							//the `r` should be removed because of the presence in the other rule, `[^è]r`, resulting in
 //							//	SFX v1 0 ista/A2 [ln]
 //							notInCommonRule.condition = (parentGroup.length() > 1? GROUP_START + parentGroup + GROUP_END: parentGroup);
 //						}
@@ -326,7 +326,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //							//ex.
 //							//	SFX v1 0 ista/A2 [lnr]
 //							//	SFX v1 0 ista/A2 [^è]r
-//							//the 'r' shoule be removed because of the presence of the other rule, resulting in
+//							//the `r` should be removed because of the presence in the other rule, `[^è]r`, resulting in
 //							//	SFX v1 0 ista/A2 [ln]
 //						condition = (parentGroup.length() > 1? GROUP_START + parentGroup + GROUP_END: parentGroup);
 //					}
