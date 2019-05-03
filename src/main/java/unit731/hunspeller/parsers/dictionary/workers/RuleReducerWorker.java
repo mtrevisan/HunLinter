@@ -191,9 +191,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 //disjointRules.forEach(System.out::println);
 
+//handle rule v0
 				removeOverlappingConditions(disjointRules);
 
-//				mergeSimilarRules(disjointRules);
+				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...
+				mergeSimilarRules(disjointRules);
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
 
