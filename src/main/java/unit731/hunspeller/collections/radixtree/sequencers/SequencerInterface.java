@@ -22,12 +22,12 @@ public interface SequencerInterface<S>{
 	 * Tests if this sequence ends with the specified prefix.
 	 *
 	 * @param sequence	The sequence.
-	 * @param prefix	The prefix.
+	 * @param suffix	The suffix.
 	 * @return	{@code true} if the sequence represented by the argument is a suffix of the sequence represented by this sequence; {@code false} otherwise.
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals} method.
 	 */
-	boolean endsWith(S sequence, S prefix);
+	boolean endsWith(S sequence, S suffix);
 
 	boolean equals(S sequenceA, S sequenceB);
 
