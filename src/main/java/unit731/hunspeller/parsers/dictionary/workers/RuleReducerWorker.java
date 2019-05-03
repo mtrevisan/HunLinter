@@ -337,13 +337,6 @@ parentChildrenNotBucket.size();
 		}
 	}
 
-	private String disjoint(String a, String b){
-		return a.chars()
-			.mapToObj(elem -> String.valueOf((char)elem))
-			.filter(elem -> !StringUtils.contains(b, elem))
-			.collect(Collectors.joining(StringUtils.EMPTY));
-	}
-
 	private String symmetricDifference(String a, String b){
 		Set<Character> aa = new HashSet<>(asCharList(a));
 		Set<Character> bb = new HashSet<>(asCharList(b));
@@ -356,10 +349,12 @@ parentChildrenNotBucket.size();
 
 	private List<Character> asCharList(final String string){
 		return new AbstractList<Character>(){
+			@Override
 			public int size(){
 				return string.length();
 			}
 
+			@Override
 			public Character get(int index){
 				return string.charAt(index);
 			}
@@ -397,9 +392,6 @@ parentChildrenNotBucket.size();
 			String key = elem.getKey();
 			if(key.startsWith(NOT_GROUP_START)){
 				List<String> from = elem.getValue();
-//				String key2 = extractGroup(from, parent.condition.length());
-//				if(!key2.isEmpty() && key2.length() <= key.length() - NOT_GROUP_START.length() - GROUP_END.length())
-//					key = GROUP_START + key2 + GROUP_END;
 				newRule = LineEntry.createFrom(parent, key + parent.condition, from);
 			}
 			else{
