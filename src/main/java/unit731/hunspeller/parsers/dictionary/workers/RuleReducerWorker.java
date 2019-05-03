@@ -19,7 +19,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -275,18 +274,18 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 						}
 					);
-					String groupDifference = symmetricDifference(parentGroup, childrenGroup);
-					String notGroupDifference = NOT_GROUP_START + groupDifference + GROUP_END;
-					Map<String, List<String>> parentChildrenNotBucket = bucket(parentFrom,
-						from -> {
-							char chr = from.charAt(from.length() - parentConditionLength - 1);
-							return (StringUtils.contains(groupDifference, chr)? GROUP_START + groupDifference + GROUP_END: notGroupDifference);
-						}
-					);
+//					String groupDifference = symmetricDifference(parentGroup, childrenGroup);
+//					String notGroupDifference = NOT_GROUP_START + groupDifference + GROUP_END;
+//					Map<String, List<String>> parentChildrenNotBucket = bucket(parentFrom,
+//						from -> {
+//							char chr = from.charAt(from.length() - parentConditionLength - 1);
+//							return (StringUtils.contains(groupDifference, chr)? GROUP_START + groupDifference + GROUP_END: notGroupDifference);
+//						}
+//					);
+//parentChildrenNotBucket.size();
 					Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
 					LineEntry notInCommonRule = newRules.getLeft();
 					List<LineEntry> inCommonRules = newRules.getRight();
-parentChildrenNotBucket.size();
 
 					if(notInCommonRule != null){
 						rules.add(notInCommonRule);
