@@ -265,8 +265,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					 .collect(Collectors.toList());
 				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 				if(StringUtils.containsAny(parentGroup, childrenGroup)){
-					rules.remove(parent);
-
 					//split parents between belonging to children group and not belonging to children group
 					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
 					Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
@@ -299,6 +297,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 								itr.remove();
 						}
 					}
+
 					//add new parents to the original list
 					rules.addAll(inCommonRules);
 
@@ -306,7 +305,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					sortedList.sort(shortestConditionComparator);
 				}
 				else{
-					rules.remove(parent);
 					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
 					rules.add(LineEntry.createFrom(parent, notChildrenGroup + parent.condition, parent.from));
 
@@ -321,6 +319,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 					rules.addAll(newParents);
 				}
+
+				rules.remove(parent);
 			}
 			catch(IllegalArgumentException e){
 				for(LineEntry le : sortedList)
