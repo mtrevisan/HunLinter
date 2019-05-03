@@ -193,7 +193,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 				removeOverlappingConditions(disjointRules);
 
-				mergeSimilarRules(disjointRules);
+//				mergeSimilarRules(disjointRules);
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
 
@@ -357,7 +357,7 @@ System.out.println("");
 					if(notInCommonRule != null){
 						rules.add(notInCommonRule);
 
-						List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+						List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 						rules.addAll(newParents);
 					}
 					//add new parents to the original list
@@ -379,7 +379,7 @@ System.out.println("");
 							child.condition = childGroup + child.condition;
 						}
 
-					List<LineEntry> newParents = advanceNotGroup(parent, sortedList);
+					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 					rules.addAll(newParents);
 				}
 			}
@@ -444,23 +444,24 @@ System.out.println("");
 		return Pair.of(newRule, newRules);
 	}
 
-	private List<LineEntry> advanceNotGroup(LineEntry parent, List<LineEntry> sortedList){
-		//bubble up the not group
+	private List<LineEntry> bubbleUpNotGroup(LineEntry parent, List<LineEntry> sortedList){
 		List<LineEntry> newParents = new ArrayList<>();
 		if(StringUtils.isNotEmpty(parent.condition)){
-			Iterator<LineEntry> itr = sortedList.iterator();
-			while(itr.hasNext()){
-				LineEntry le = itr.next();
-				if(le.condition.endsWith(parent.condition)){
-					int index = le.condition.length() - parent.condition.length() - 1;
-					while(index > 0){
-						//add additional rules
-						String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
-						newParents.add(LineEntry.createFrom(parent, condition));
+			//extract all the children rules
+			List<LineEntry> children = sortedList.stream()
+				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.collect(Collectors.toList());
+			for(LineEntry le : children){
+				int index = le.condition.length() - parent.condition.length() - 1;
+				while(index > 0){
+					//add additional rules
+					String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
+					newParents.add(LineEntry.createFrom(parent, condition));
 
-						index --;
-					}
+					index --;
 				}
+
+				sortedList.remove(le);
 			}
 		}
 		return newParents;
