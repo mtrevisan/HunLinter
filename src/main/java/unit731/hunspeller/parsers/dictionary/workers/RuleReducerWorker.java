@@ -19,7 +19,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -289,15 +288,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					List<LineEntry> inCommonRules = newRules.getRight();
 
 					if(notInCommonRule != null){
-//						if(notInCommonRule.condition.endsWith(GROUP_END)){
-//							//TODO remove final characters that will be present in the final set
-//							//ex.
-//							//	SFX v1 0 ista/A2 [lnr]
-//							//	SFX v1 0 ista/A2 [^è]r
-//							//the `r` should be removed because of the presence in the other rule, `[^è]r`, resulting in
-//							//	SFX v1 0 ista/A2 [ln]
-//							notInCommonRule.condition = (parentGroup.length() > 1? GROUP_START + parentGroup + GROUP_END: parentGroup);
-//						}
 						rules.add(notInCommonRule);
 
 						List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
@@ -320,18 +310,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					sortedList.sort(shortestConditionComparator);
 				}
 				else{
-//					String condition;
-//					if(parent.condition.isEmpty()){
-//							//TODO remove final characters that will be present in the final set
-//							//ex.
-//							//	SFX v1 0 ista/A2 [lnr]
-//							//	SFX v1 0 ista/A2 [^è]r
-//							//the `r` should be removed because of the presence in the other rule, `[^è]r`, resulting in
-//							//	SFX v1 0 ista/A2 [ln]
-//						condition = (parentGroup.length() > 1? GROUP_START + parentGroup + GROUP_END: parentGroup);
-//					}
-//					else
-//						condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
 					String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
 					rules.add(LineEntry.createFrom(parent, condition, parent.from));
 
