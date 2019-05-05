@@ -149,6 +149,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		initComponents();
 
+		rfm.setEnabled(rfm.hasEntries());
 		filEmptyRecentFilesMenuItem.setEnabled(rfm.hasEntries());
 
 		try{
@@ -1051,6 +1052,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
 			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
+
+			rfm.setEnabled(true);
 			filEmptyRecentFilesMenuItem.setEnabled(true);
 
 			File affFile = openAffixFileFileChooser.getSelectedFile();
@@ -1422,6 +1425,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filEmptyRecentFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentFilesMenuItemActionPerformed
 		rfm.clear();
 
+		rfm.setEnabled(false);
 		filEmptyRecentFilesMenuItem.setEnabled(false);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
