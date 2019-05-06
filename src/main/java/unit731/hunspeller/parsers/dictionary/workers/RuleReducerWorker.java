@@ -190,7 +190,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
-//disjointRules.forEach(System.out::println);
 
 //handle rule v0
 				removeOverlappingConditions(disjointRules);
