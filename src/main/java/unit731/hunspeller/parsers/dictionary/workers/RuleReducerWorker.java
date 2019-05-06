@@ -49,6 +49,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 	private static final String TAB = "\t";
+	private static final String DOT = ".";
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
@@ -297,8 +298,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						while(itr.hasNext()){
 							LineEntry icr = itr.next();
 							for(LineEntry np : newParents)
-								if(np.condition.endsWith(icr.condition))
+								if(np.condition.endsWith(icr.condition)){
 									itr.remove();
+									break;
+								}
 						}
 					}
 
@@ -422,12 +425,17 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		int firstCommonLetter;
 		int wordLength = word.length();
 		String producedWord = production.getWord();
-		for(firstCommonLetter = 0; firstCommonLetter < Math.min(wordLength, producedWord.length()); firstCommonLetter ++)
-			if(word.charAt(firstCommonLetter) == producedWord.charAt(firstCommonLetter))
+		int productionLength = producedWord.length();
+		int minLength = Math.min(wordLength, productionLength);
+		for(firstCommonLetter = 1; firstCommonLetter <= minLength; firstCommonLetter ++)
+			if(word.charAt(wordLength - firstCommonLetter) != producedWord.charAt(productionLength - firstCommonLetter))
 				break;
 
-		String removal = (firstCommonLetter < wordLength? word.substring(0, firstCommonLetter): AffixEntry.ZERO);
-		String addition = (firstCommonLetter > 0? producedWord.substring(0, firstCommonLetter): AffixEntry.ZERO);
+		firstCommonLetter --;
+		String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
+		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
+		if(production.getContinuationFlagCount() > 0)
+			addition += production.getLastAppliedRule().toStringMorphologicalAndMorphologicalFields(strategy);
 		String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
@@ -464,7 +472,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				String group = extractGroup(entry.from, 0);
 				String originalNotGroup = entry.condition.substring(notGroupStartLength, entry.condition.length() - notGroupStartLength - groupEndLength);
 				if(!StringUtils.contains(originalNotGroup, group))
-					entry.condition = GROUP_START + group + GROUP_END;
+					entry.condition = (group.length() > 1? GROUP_START + group + GROUP_END: group);
 			}
 	}
 
@@ -576,7 +584,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.add(flag)
 			.add(partialLine.removal)
 			.add(partialLine.addition)
-			.add(partialLine.condition)
+			.add(partialLine.condition.isEmpty()? DOT: partialLine.condition)
 			.toString();
 	}
 
