@@ -191,6 +191,16 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 //disjointRules.forEach(System.out::println);
 
+				//find if there are multiple production for a single word
+				Set<String> froms = disjointRules.stream()
+					.flatMap(entry -> entry.from.stream())
+					.collect(Collectors.toSet());
+				long fromCount = disjointRules.stream()
+					.flatMap(entry -> entry.from.stream())
+					.count();
+				if(froms.size() != fromCount)
+					throw new IllegalArgumentException("Cannot reduce, multiple productions present from a single word");
+
 //handle rule v0
 				removeOverlappingConditions(disjointRules);
 
