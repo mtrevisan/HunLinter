@@ -319,13 +319,21 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 				rules.remove(parent);
 			}
-			//parentFrom = childrenFrom
-			else if(SetHelper.equals(parentFrom, childrenFrom)){
-				throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
-			}
-			//(parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom)
 			else{
-				throw new IllegalArgumentException("to be coded ((parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom))");
+				//separate the children between those who have the same `from` set of the parent and those who doesn't
+				Map<Integer, List<LineEntry>> fromBucket = bucket(children, child -> SetHelper.intersection(parentFrom, child.from).size());
+fromBucket.size();
+				//TODO
+
+				//parentFrom = childrenFrom
+				if(SetHelper.equals(parentFrom, childrenFrom)){
+					//multiple productions for the same word exists
+					throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
+				}
+				//(parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom)
+				else{
+					throw new IllegalArgumentException("to be coded ((parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom))");
+				}
 			}
 		}
 	}
