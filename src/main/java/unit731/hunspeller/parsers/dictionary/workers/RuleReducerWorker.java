@@ -159,8 +159,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private Comparator<LineEntry> lineEntryComparator;
 
 
-	public RuleReducerWorker(String flag, boolean keepLongestCommonAffix, AffixData affixData, DictionaryParser dicParser,
-			WordGenerator wordGenerator){
+	public RuleReducerWorker(String flag, boolean keepLongestCommonAffix, AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
@@ -204,7 +203,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //handle rule v0
 				removeOverlappingConditions(disjointRules);
 
-				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...
+				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
 				mergeSimilarRules(disjointRules);
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
@@ -430,8 +429,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		for(firstCommonLetter = 1; firstCommonLetter <= minLength; firstCommonLetter ++)
 			if(word.charAt(wordLength - firstCommonLetter) != producedWord.charAt(productionLength - firstCommonLetter))
 				break;
-
 		firstCommonLetter --;
+
 		String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
 		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
 		if(production.getContinuationFlagCount() > 0)
