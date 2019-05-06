@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.Serializable;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -274,15 +273,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 						}
 					);
-//					String groupDifference = symmetricDifference(parentGroup, childrenGroup);
-//					String notGroupDifference = NOT_GROUP_START + groupDifference + GROUP_END;
-//					Map<String, List<String>> parentChildrenNotBucket = bucket(parentFrom,
-//						from -> {
-//							char chr = from.charAt(from.length() - parentConditionLength - 1);
-//							return (StringUtils.contains(groupDifference, chr)? GROUP_START + groupDifference + GROUP_END: notGroupDifference);
-//						}
-//					);
-//parentChildrenNotBucket.size();
 					Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
 					LineEntry notInCommonRule = newRules.getLeft();
 					List<LineEntry> inCommonRules = newRules.getRight();
@@ -334,38 +324,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 							+ le + " that has a common condition part");
 			}
 		}
-	}
-
-	private String symmetricDifference(String a, String b){
-		Set<Character> aa = new HashSet<>(asCharList(a));
-		Set<Character> bb = new HashSet<>(asCharList(b));
-		List<String> cc = symmetricDifference(aa, bb).stream()
-			.map(String::valueOf)
-			.sorted(comparator)
-			.collect(Collectors.toList());
-		return StringUtils.join(cc, null);
-	}
-
-	private List<Character> asCharList(final String string){
-		return new AbstractList<Character>(){
-			@Override
-			public int size(){
-				return string.length();
-			}
-
-			@Override
-			public Character get(int index){
-				return string.charAt(index);
-			}
-		};
-	}
-
-	private <T> Set<T> symmetricDifference(Set<T> a, Set<T> b){
-		Set<T> result = new HashSet<>(a);
-		for(T element : b)
-			if(!result.add(element))
-				result.remove(element);
-		return result;
 	}
 
 	private String extractGroup(Collection<String> words, int indexFromLast){
@@ -466,6 +424,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private void mergeSimilarRules(Collection<LineEntry> entries){
+		//merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`)
 		Map<String, List<LineEntry>> mergeBucket = bucket(entries,
 			entry -> (entry.condition.contains(GROUP_END)?
 				entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0]
@@ -486,6 +445,17 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				entries.add(LineEntry.createFrom(firstEntry, condition));
 
 				set.forEach(entries::remove);
+			}
+
+		//transform a condition that is only a not group into a positive group
+		int notGroupStartLength = NOT_GROUP_START.length();
+		int groupEndLength = GROUP_END.length();
+		for(LineEntry entry : entries)
+			if(entry.condition.endsWith(GROUP_END)){
+				String group = extractGroup(entry.from, 0);
+				String originalNotGroup = entry.condition.substring(notGroupStartLength, entry.condition.length() - notGroupStartLength - groupEndLength);
+				if(!StringUtils.contains(originalNotGroup, group))
+					entry.condition = GROUP_START + group + GROUP_END;
 			}
 	}
 
