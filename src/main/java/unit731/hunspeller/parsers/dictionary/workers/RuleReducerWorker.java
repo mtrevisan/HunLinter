@@ -257,85 +257,77 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 			int parentConditionLength = parent.condition.length();
 			Set<String> parentFrom = parent.from;
-//			try{
-				String parentGroup = extractGroup(parentFrom, parentConditionLength);
-				Set<String> childrenFrom = children.stream()
-					 .flatMap(entry -> entry.from.stream())
-					 .collect(Collectors.toSet());
+			String parentGroup = extractGroup(parentFrom, parentConditionLength);
+			Set<String> childrenFrom = children.stream()
+				 .flatMap(entry -> entry.from.stream())
+				 .collect(Collectors.toSet());
 
-				//parentFrom ∩ childrenFrom = ∅
-				if(SetHelper.disjoint(parentFrom, childrenFrom)){
-					String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-					if(StringUtils.containsAny(parentGroup, childrenGroup)){
-						//split parents between belonging to children group and not belonging to children group
-						String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-						Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
-							from -> {
-								char chr = from.charAt(from.length() - parentConditionLength - 1);
-								return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
-							}
-						);
-						Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
-						LineEntry notInCommonRule = newRules.getLeft();
-						List<LineEntry> inCommonRules = newRules.getRight();
-
-						if(notInCommonRule != null){
-							rules.add(notInCommonRule);
-
-							List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
-							rules.addAll(newParents);
-
-							//remove from in-common rules those already presents in new parents
-							Iterator<LineEntry> itr = inCommonRules.iterator();
-							while(itr.hasNext()){
-								LineEntry icr = itr.next();
-								for(LineEntry np : newParents)
-									if(np.condition.endsWith(icr.condition)){
-										itr.remove();
-										break;
-									}
-							}
+			//parentFrom ∩ childrenFrom = ∅
+			if(SetHelper.disjoint(parentFrom, childrenFrom)){
+				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+				if(StringUtils.containsAny(parentGroup, childrenGroup)){
+					//split parents between belonging to children group and not belonging to children group
+					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+					Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
+						from -> {
+							char chr = from.charAt(from.length() - parentConditionLength - 1);
+							return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 						}
+					);
+					Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+					LineEntry notInCommonRule = newRules.getLeft();
+					List<LineEntry> inCommonRules = newRules.getRight();
 
-						//add new parents to the original list
-						rules.addAll(inCommonRules);
-
-						sortedList.addAll(inCommonRules);
-						sortedList.sort(shortestConditionComparator);
-					}
-					else{
-						String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
-						rules.add(LineEntry.createFrom(parent, condition, parent.from));
-
-						for(LineEntry child : children)
-							if(child.condition.length() == parentConditionLength){
-								String childGroup = extractGroup(child.from, parentConditionLength);
-								if(childGroup.length() > 1)
-									childGroup = NOT_GROUP_START + childGroup + GROUP_END;
-								child.condition = childGroup + child.condition;
-							}
+					if(notInCommonRule != null){
+						rules.add(notInCommonRule);
 
 						List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 						rules.addAll(newParents);
+
+						//remove from in-common rules those already presents in new parents
+						Iterator<LineEntry> itr = inCommonRules.iterator();
+						while(itr.hasNext()){
+							LineEntry icr = itr.next();
+							for(LineEntry np : newParents)
+								if(np.condition.endsWith(icr.condition)){
+									itr.remove();
+									break;
+								}
+						}
 					}
 
-					rules.remove(parent);
+					//add new parents to the original list
+					rules.addAll(inCommonRules);
+
+					sortedList.addAll(inCommonRules);
+					sortedList.sort(shortestConditionComparator);
 				}
-				//parentFrom = childrenFrom
-				else if(SetHelper.equals(parentFrom, childrenFrom)){
-					throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
-				}
-				//(parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom)
 				else{
-					throw new IllegalArgumentException("to be coded ((parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom))");
+					String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
+					rules.add(LineEntry.createFrom(parent, condition, parent.from));
+
+					for(LineEntry child : children)
+						if(child.condition.length() == parentConditionLength){
+							String childGroup = extractGroup(child.from, parentConditionLength);
+							if(childGroup.length() > 1)
+								childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+							child.condition = childGroup + child.condition;
+						}
+
+					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
+					rules.addAll(newParents);
 				}
-//			}
-//			catch(IllegalArgumentException e){
-//				for(LineEntry le : sortedList)
-//					if(le.condition.endsWith(parent.condition) && !le.condition.equals(parent.condition))
-//						throw new IllegalArgumentException("Cannot extract group from " + parent + " because of the presence of the rule "
-//							+ le + " that has a common condition part");
-//			}
+
+				rules.remove(parent);
+			}
+			//parentFrom = childrenFrom
+			else if(SetHelper.equals(parentFrom, childrenFrom)){
+				throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
+			}
+			//(parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom)
+			else{
+				throw new IllegalArgumentException("to be coded ((parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom))");
+			}
 		}
 	}
 
