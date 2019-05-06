@@ -38,6 +38,7 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class RuleReducerWorker extends WorkerDictionaryBase{
@@ -192,13 +193,13 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //disjointRules.forEach(System.out::println);
 
 				//find if there are multiple production for a single word
-				Set<String> froms = new HashSet<>();
-				for(LineEntry entry : disjointRules){
-					boolean alreadyPresent = entry.from.stream()
-						.anyMatch(from -> !froms.add(from));
-					if(alreadyPresent)
-						throw new IllegalArgumentException("Cannot reduce, multiple productions present from a single word");
-				}
+//				Set<String> froms = new HashSet<>();
+//				for(LineEntry entry : disjointRules){
+//					boolean alreadyPresent = entry.from.stream()
+//						.anyMatch(from -> !froms.add(from));
+//					if(alreadyPresent)
+//						throw new IllegalArgumentException("Cannot reduce, multiple productions present from a single word");
+//				}
 
 //handle rule v0
 				removeOverlappingConditions(disjointRules);
@@ -270,6 +271,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				Set<String> childrenFrom = children.stream()
 					 .flatMap(entry -> entry.from.stream())
 					 .collect(Collectors.toSet());
+
+				//parentFrom = childrenFrom
+//				if(SetHelper.equals(parentFrom, childrenFrom)){}
+				//parentFrom ∩ childrenFrom = ∅
+//				else if(SetHelper.disjoint(parentFrom, childrenFrom)){}
+				//parentFrom ∩ childrenFrom ≠ ∅
+//				else{}
+
 				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 				if(StringUtils.containsAny(parentGroup, childrenGroup)){
 					//split parents between belonging to children group and not belonging to children group
