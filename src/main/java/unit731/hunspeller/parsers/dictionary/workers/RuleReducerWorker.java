@@ -241,12 +241,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		return sameFrom.values().stream()
 			.map(ee -> {
 				//collect all the addings
-				LineEntry representative = ee.get(0);
-				representative.addition = ee.stream()
+				String addition = ee.stream()
 					.map(entry -> entry.addition)
 					.collect(Collectors.joining(TAB));
-				return representative;
-				})
+				LineEntry representative = ee.get(0);
+				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
+			})
 			.collect(Collectors.toList());
 	}
 
