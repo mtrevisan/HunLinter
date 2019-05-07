@@ -103,18 +103,19 @@ public class SetHelper{
 	 * @return	The disjointness of {@code set1} and {@code set2}
 	 */
 	public static <T> boolean disjoint(Set<T> set1, Set<T> set2){
-		return intersection(set2, set1).isEmpty();
+		return intersection(set2, set1)
+			.isEmpty();
 	}
 
 	/**
-	 * Returns {@code true} if the two specified sets have no elements in common (A ∩ B = ∅).
+	 * Returns {@code true} if {@code set2} is a proper subset of {@code set1} (A ⊂ B).
 	 * 
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set
-	 * @return	The containment of {@code set1} and {@code set2}
+	 * @return	The proper subset of {@code set2} into {@code set1}
 	 */
-	public static <T> boolean contains(Set<T> set1, Set<T> set2){
+	public static <T> boolean properSubset(Set<T> set1, Set<T> set2){
 		return set1.containsAll(set2);
 	}
 
