@@ -51,6 +51,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private static final String TAB = "\t";
 	private static final String DOT = ".";
+	private static final String SLASH = "/";
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
@@ -69,10 +70,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		public static LineEntry createFrom(LineEntry entry, String condition){
 			return new LineEntry(entry.removal, entry.addition, condition);
-		}
-
-		public static LineEntry createFrom(LineEntry entry, String condition, String word){
-			return new LineEntry(entry.removal, entry.addition, condition, word);
 		}
 
 		public static LineEntry createFrom(LineEntry entry, String condition, Collection<String> words){
@@ -156,7 +153,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
+	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
+		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.addition.indexOf(SLASH): entry.addition.length())).reversed());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -192,18 +190,18 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
 				//extract same `from` rules
-//				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
-//				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
-//					.map(entries -> {
-//						//collect all the addings
-//						LineEntry representative = entries.get(0);
-//						representative.addition = entries.stream()
-//							.map(entry -> entry.addition)
-//							.collect(Collectors.joining(TAB));
-//						return representative;
-//						})
-//					.collect(Collectors.toList());
-List<LineEntry> unduplicatedRules = disjointRules;
+				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
+				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
+					.map(entries -> {
+						//collect all the addings
+						LineEntry representative = entries.get(0);
+						representative.addition = entries.stream()
+							.map(entry -> entry.addition)
+							.collect(Collectors.joining(TAB));
+						return representative;
+						})
+					.collect(Collectors.toList());
+//unduplicatedRules = disjointRules;
 
 //handle rule v0
 				removeOverlappingConditions(unduplicatedRules);
@@ -211,15 +209,14 @@ List<LineEntry> unduplicatedRules = disjointRules;
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
 				mergeSimilarRules(unduplicatedRules);
 
-				//TODO restore original rules
-//				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
-//					.flatMap(rule -> {
-//						String[] conditions = rule.addition.split(TAB);
-//						return Arrays.stream(conditions)
-//							.map(condition -> LineEntry.createFrom(rule, condition, rule.from));
-//					})
-//					.collect(Collectors.toList());
-List<LineEntry> duplicatedRules = disjointRules;
+				//restore original rules
+				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
+					.flatMap(rule -> {
+						String[] additions = rule.addition.split(TAB);
+						return Arrays.stream(additions)
+							.map(addition -> new LineEntry(rule.removal, addition, rule.condition, rule.from));
+					})
+					.collect(Collectors.toList());
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, duplicatedRules);
 
