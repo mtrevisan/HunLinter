@@ -63,7 +63,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		private final Set<String> from;
 
 		private final String removal;
-		private final String addition;
+		private String addition;
 		private String condition;
 
 
@@ -191,13 +191,35 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			try{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
+				//extract same `from` rules
+				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
+				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
+					.map(entries -> {
+						//collect all the addings
+						LineEntry representative = entries.get(0);
+						representative.addition = entries.stream()
+							.map(entry -> entry.addition)
+							.collect(Collectors.joining(TAB));
+						return representative;
+						})
+					.collect(Collectors.toList());
+
 //handle rule v0
-				removeOverlappingConditions(disjointRules);
+				removeOverlappingConditions(unduplicatedRules);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
-				mergeSimilarRules(disjointRules);
+				mergeSimilarRules(unduplicatedRules);
 
-				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
+				//TODO restore original rules
+				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
+					.flatMap(rule -> {
+						String[] conditions = rule.addition.split(TAB);
+						return Arrays.stream(conditions)
+							.map(condition -> LineEntry.createFrom(rule, condition, rule.from));
+					})
+					.collect(Collectors.toList());
+
+				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, duplicatedRules);
 
 //TODO check feasibility of solution?
 
@@ -242,11 +264,6 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
-		//extract same `from` rules
-		Map<Integer, List<LineEntry>> collectedFrom = bucket(rules, rule -> rule.from.hashCode());
-collectedFrom.size();
-
-
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
