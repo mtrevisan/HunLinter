@@ -262,7 +262,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				 .collect(Collectors.toSet());
 
 			//parentFrom ∩ childrenFrom = ∅
-			if(SetHelper.disjoint(parentFrom, childrenFrom)){
+			if(SetHelper.isDisjoint(parentFrom, childrenFrom)){
 				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 				if(StringUtils.containsAny(parentGroup, childrenGroup)){
 					//split parents between belonging to children group and not belonging to children group
@@ -326,7 +326,7 @@ fromBucket.size();
 				//TODO
 
 				//parentFrom = childrenFrom
-				if(SetHelper.equals(parentFrom, childrenFrom)){
+				if(SetHelper.isEquals(parentFrom, childrenFrom)){
 					//multiple productions for the same word exists
 					throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
 				}

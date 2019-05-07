@@ -1,13 +1,31 @@
 package unit731.hunspeller.services;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 
 public class SetHelper{
 
 	private SetHelper(){}
 
+
+	public static <T> Set<T> setOf(T... values){
+		return new HashSet<>(Arrays.asList(values));
+	}
+
+	public static <T> Set<T> sortedSetOf(Comparator<? super T> comparator, T... values){
+		Set<T> set = new TreeSet<>(comparator);
+		set.addAll(Arrays.asList(values));
+		return set;
+	}
+
+	public static <T> Set<T> emptySet(){
+		return Collections.<T>emptySet();
+	}
 
 	/**
 	 * Returns {@code true} if the specified set have no elements (A = ∅).
@@ -16,7 +34,7 @@ public class SetHelper{
 	 * @param set	Set
 	 * @return	The emptiness of {@code set}
 	 */
-	public static <T> boolean empty(Set<T> set){
+	public static <T> boolean isEmpty(Set<T> set){
 		return set.isEmpty();
 	}
 
@@ -28,7 +46,7 @@ public class SetHelper{
 	 * @param set2	Second set
 	 * @return	The equality of {@code set1} and {@code set2}
 	 */
-	public static <T> boolean equals(Set<T> set1, Set<T> set2){
+	public static <T> boolean isEquals(Set<T> set1, Set<T> set2){
 		return (set1.size() == set2.size() && set1.containsAll(set2));
 	}
 
@@ -78,7 +96,7 @@ public class SetHelper{
 	}
 
 	/**
-	 * Returns a set with the difference between two sets (A \ B).
+	 * Returns a set with the difference between two sets, aka relative complement (A \ B).
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and not in {@code set2}.
 	 * The iteration order of the returned set is undefined.
@@ -102,7 +120,7 @@ public class SetHelper{
 	 * @param set2	Second set
 	 * @return	The disjointness of {@code set1} and {@code set2}
 	 */
-	public static <T> boolean disjoint(Set<T> set1, Set<T> set2){
+	public static <T> boolean isDisjoint(Set<T> set1, Set<T> set2){
 		return intersection(set2, set1)
 			.isEmpty();
 	}
@@ -115,7 +133,7 @@ public class SetHelper{
 	 * @param set2	Second set
 	 * @return	The proper subset of {@code set2} into {@code set1}
 	 */
-	public static <T> boolean properSubset(Set<T> set1, Set<T> set2){
+	public static <T> boolean isProperSubset(Set<T> set1, Set<T> set2){
 		return set1.containsAll(set2);
 	}
 
