@@ -229,8 +229,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		};
-//		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
-WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
