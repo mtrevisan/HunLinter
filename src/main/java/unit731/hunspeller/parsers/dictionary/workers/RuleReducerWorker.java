@@ -185,7 +185,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			collectProductionsByFlag(productions, flag, plainRules);
+			collectProductionsByFlag(productions, flag, type, plainRules);
 		};
 		Runnable completed = () -> {
 			try{
@@ -208,22 +208,23 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+//		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void collectProductionsByFlag(List<Production> productions, String flag, List<LineEntry> plainRules){
+	private void collectProductionsByFlag(List<Production> productions, String flag, AffixEntry.Type type, List<LineEntry> plainRules){
 		Iterator<Production> itr = productions.iterator();
 		//skip base production
 		itr.next();
 		while(itr.hasNext()){
 			Production production = itr.next();
 
-			AffixEntry lastAppliedRule = production.getLastAppliedRule();
+			AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
 				String word = lastAppliedRule.undoRule(production.getWord());
-				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word): createPrefixEntry(production, word));
+				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word, type): createPrefixEntry(production, word, type));
 				plainRules.add(affixEntry);
 			}
 		}
@@ -241,6 +242,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
+		//extract same `from` rules
+		Map<Integer, List<LineEntry>> collectedFrom = bucket(rules, rule -> rule.from.hashCode());
+collectedFrom.size();
+
+
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
@@ -261,8 +267,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				 .flatMap(entry -> entry.from.stream())
 				 .collect(Collectors.toSet());
 
+			//separate the children between those who have the same `from` set of the parent and those who doesn't
+			Map<Integer, List<LineEntry>> fromBucket = bucket(children, child -> SetHelper.intersectionSize(parentFrom, child.from));
+fromBucket.size();
+
 			//parentFrom ∩ childrenFrom = ∅
-			if(SetHelper.isDisjoint(parentFrom, childrenFrom)){
+			if(fromBucket.size() == 1 && fromBucket.containsKey(0)){
 				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 				if(StringUtils.containsAny(parentGroup, childrenGroup)){
 					//split parents between belonging to children group and not belonging to children group
@@ -320,9 +330,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				rules.remove(parent);
 			}
 			else{
-				//separate the children between those who have the same `from` set of the parent and those who doesn't
-				Map<Integer, List<LineEntry>> fromBucket = bucket(children, child -> SetHelper.intersection(parentFrom, child.from).size());
-fromBucket.size();
 				//TODO
 
 				//parentFrom = childrenFrom
@@ -405,7 +412,7 @@ fromBucket.size();
 		return bucket;
 	}
 
-	private LineEntry createSuffixEntry(Production production, String word){
+	private LineEntry createSuffixEntry(Production production, String word, AffixEntry.Type type){
 		int lastCommonLetter;
 		int wordLength = word.length();
 		String producedWord = production.getWord();
@@ -416,12 +423,12 @@ fromBucket.size();
 		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
 		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule().toStringMorphologicalAndMorphologicalFields(strategy);
+			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
 		String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private LineEntry createPrefixEntry(Production production, String word){
+	private LineEntry createPrefixEntry(Production production, String word, AffixEntry.Type type){
 		int firstCommonLetter;
 		int wordLength = word.length();
 		String producedWord = production.getWord();
@@ -435,7 +442,7 @@ fromBucket.size();
 		String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
 		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
 		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule().toStringMorphologicalAndMorphologicalFields(strategy);
+			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
 		String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}

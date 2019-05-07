@@ -32,7 +32,11 @@ public class GUIUtils{
 
 	private GUIUtils(){}
 
-	/** Force the escape key to call the same action as pressing the Cancel button. */
+	/**
+	 * Force the escape key to call the same action as pressing the Cancel button.
+	 * 
+	 * @param dialog	Dialog to attach the escape key to
+	 */
 	public static void addCancelByEscapeKey(JDialog dialog){
 		AbstractAction cancelAction = new AbstractAction(){
 			private static final long serialVersionUID = -5644390861803492172L;

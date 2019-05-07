@@ -86,8 +86,14 @@ public class Production extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(){
-		return (hasProductionRules()? appliedRules.get(appliedRules.size() - 1): null);
+	public AffixEntry getLastAppliedRule(AffixEntry.Type type){
+		AffixEntry lastAppliedRule = null;
+		if(hasProductionRules())
+			lastAppliedRule = appliedRules.stream()
+				.filter(rule -> rule.getType() == type)
+				.reduce((first, second) -> second)
+				.orElse(null);
+		return lastAppliedRule;
 	}
 
 	public List<DictionaryEntry> getCompoundEntries(){

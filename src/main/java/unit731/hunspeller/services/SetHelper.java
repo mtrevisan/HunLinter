@@ -96,6 +96,32 @@ public class SetHelper{
 	}
 
 	/**
+	 * Returns a set with the intersection between two sets (A ∩ B).
+	 * <p>
+	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
+	 * The iteration order of the returned set is undefined.
+	 * 
+	 * @param <T>	The type of the values contained into the sets
+	 * @param set1	First set
+	 * @param set2	Second set
+	 * @return	The intersection size of {@code set1} and {@code set2}
+	 */
+	public static <T> int intersectionSize(Set<T> set1, Set<T> set2){
+		Set<T> a = set1;
+		Set<T> b = set2;
+		if(set1.size() > set2.size()){
+			a = set2;
+			b = set1;
+		}
+
+		int count = 0;
+		for(T e : a)
+			if(b.contains(e))
+				count ++;
+		return count;
+	}
+
+	/**
 	 * Returns a set with the difference between two sets, aka relative complement (A \ B).
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and not in {@code set2}.
