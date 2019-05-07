@@ -189,36 +189,13 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			try{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
-				//extract same `from` rules
-				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
-				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
-					.map(entries -> {
-						//collect all the addings
-						LineEntry representative = entries.get(0);
-						representative.addition = entries.stream()
-							.map(entry -> entry.addition)
-							.collect(Collectors.joining(TAB));
-						return representative;
-						})
-					.collect(Collectors.toList());
-//unduplicatedRules = disjointRules;
-
 //handle rule v0
-				removeOverlappingConditions(unduplicatedRules);
+				removeOverlappingConditions(disjointRules);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
-				mergeSimilarRules(unduplicatedRules);
+				mergeSimilarRules(disjointRules);
 
-				//restore original rules
-				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
-					.flatMap(rule -> {
-						String[] additions = rule.addition.split(TAB);
-						return Arrays.stream(additions)
-							.map(addition -> new LineEntry(rule.removal, addition, rule.condition, rule.from));
-					})
-					.collect(Collectors.toList());
-
-				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, duplicatedRules);
+				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
 
 //TODO check feasibility of solution?
 
@@ -258,7 +235,19 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			if(ruleSet != null)
 				ruleSet.from.addAll(entry.from);
 		}
-		return new ArrayList<>(equivalenceTable.values());
+
+		//extract same `from` rules
+		Map<Integer, List<LineEntry>> sameFrom = bucket(equivalenceTable.values(), rule -> rule.from.hashCode());
+		return sameFrom.values().stream()
+			.map(ee -> {
+				//collect all the addings
+				LineEntry representative = ee.get(0);
+				representative.addition = ee.stream()
+					.map(entry -> entry.addition)
+					.collect(Collectors.joining(TAB));
+				return representative;
+				})
+			.collect(Collectors.toList());
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
@@ -499,7 +488,16 @@ fromBucket.size();
 	}
 
 	private List<String> convertEntriesToRules(String flag, AffixEntry.Type type, boolean keepLongestCommonAffix, Collection<LineEntry> entries){
-		List<LineEntry> sortedEntries = prepareRules(type, keepLongestCommonAffix, entries);
+		//restore original rules
+		List<LineEntry> restoredRules = entries.stream()
+			.flatMap(rule -> {
+				String[] additions = rule.addition.split(TAB);
+				return Arrays.stream(additions)
+					.map(addition -> new LineEntry(rule.removal, addition, rule.condition, rule.from));
+			})
+			.collect(Collectors.toList());
+
+		List<LineEntry> sortedEntries = prepareRules(type, keepLongestCommonAffix, restoredRules);
 
 		return composeAffixRules(flag, type, sortedEntries);
 	}
