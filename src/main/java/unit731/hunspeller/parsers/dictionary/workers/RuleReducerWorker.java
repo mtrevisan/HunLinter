@@ -192,17 +192,18 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
 				//extract same `from` rules
-				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
-				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
-					.map(entries -> {
-						//collect all the addings
-						LineEntry representative = entries.get(0);
-						representative.addition = entries.stream()
-							.map(entry -> entry.addition)
-							.collect(Collectors.joining(TAB));
-						return representative;
-						})
-					.collect(Collectors.toList());
+//				Map<Integer, List<LineEntry>> sameFrom = bucket(disjointRules, rule -> rule.from.hashCode());
+//				List<LineEntry> unduplicatedRules = sameFrom.values().stream()
+//					.map(entries -> {
+//						//collect all the addings
+//						LineEntry representative = entries.get(0);
+//						representative.addition = entries.stream()
+//							.map(entry -> entry.addition)
+//							.collect(Collectors.joining(TAB));
+//						return representative;
+//						})
+//					.collect(Collectors.toList());
+List<LineEntry> unduplicatedRules = disjointRules;
 
 //handle rule v0
 				removeOverlappingConditions(unduplicatedRules);
@@ -211,13 +212,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				mergeSimilarRules(unduplicatedRules);
 
 				//TODO restore original rules
-				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
-					.flatMap(rule -> {
-						String[] conditions = rule.addition.split(TAB);
-						return Arrays.stream(conditions)
-							.map(condition -> LineEntry.createFrom(rule, condition, rule.from));
-					})
-					.collect(Collectors.toList());
+//				List<LineEntry> duplicatedRules = unduplicatedRules.stream()
+//					.flatMap(rule -> {
+//						String[] conditions = rule.addition.split(TAB);
+//						return Arrays.stream(conditions)
+//							.map(condition -> LineEntry.createFrom(rule, condition, rule.from));
+//					})
+//					.collect(Collectors.toList());
+List<LineEntry> duplicatedRules = disjointRules;
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, duplicatedRules);
 
