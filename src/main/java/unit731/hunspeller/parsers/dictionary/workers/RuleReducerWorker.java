@@ -465,11 +465,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				set.forEach(entries::remove);
 			}
 
-		//transform a condition that is only a not group into a positive group
+		//transform a condition that is only a not-group into a positive group
 		int notGroupStartLength = NOT_GROUP_START.length();
 		int groupEndLength = GROUP_END.length();
 		for(LineEntry entry : entries)
-			if(entry.condition.endsWith(GROUP_END)){
+			if(entry.condition.startsWith(NOT_GROUP_START) && entry.condition.endsWith(GROUP_END)){
 				String group = extractGroup(entry.from, 0);
 				String originalNotGroup = entry.condition.substring(notGroupStartLength, entry.condition.length() - notGroupStartLength - groupEndLength);
 				if(!StringUtils.contains(originalNotGroup, group))
