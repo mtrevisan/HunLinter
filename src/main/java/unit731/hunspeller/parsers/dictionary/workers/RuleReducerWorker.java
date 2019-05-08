@@ -199,11 +199,17 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
+System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
+disjointRules.forEach(System.out::println);
 
 				removeOverlappingConditions(disjointRules);
+System.out.println("\r\nremoveOverlappingConditions (" + disjointRules.size() + "):");
+disjointRules.forEach(System.out::println);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
 				mergeSimilarRules(disjointRules);
+System.out.println("\r\nmergeSimilarRules (" + disjointRules.size() + "):");
+disjointRules.forEach(System.out::println);
 
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
 
@@ -239,10 +245,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		Map<String, LineEntry> equivalenceTable = new HashMap<>();
+		Map<Integer, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
-			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
+			LineEntry ruleSet = equivalenceTable.putIfAbsent(entry.hashCode(), entry);
 			if(ruleSet != null)
 				ruleSet.from.addAll(entry.from);
 		}
