@@ -239,37 +239,37 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-//		Map<String, LineEntry> equivalenceTable = new HashMap<>();
-//		for(LineEntry entry : entries){
-//			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
-//			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
-//			if(ruleSet != null)
-//				ruleSet.from.addAll(entry.from);
-//		}
-//
-//		//extract same `from` rules
-//		Map<Integer, List<LineEntry>> sameFrom = bucket(equivalenceTable.values(), rule -> rule.from.hashCode());
-//		return sameFrom.values().stream()
-//			.map(ee -> {
-//				//collect all the addings
-//				Set<String> addition = ee.stream()
-//					.map(LineEntry::anAddition)
-//					.collect(Collectors.toSet());
-//				LineEntry representative = ee.get(0);
-//				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
-//			})
-//			.collect(Collectors.toList());
-
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.condition;
-			LineEntry rule = equivalenceTable.putIfAbsent(key, entry);
-			if(rule != null){
-				rule.from.addAll(entry.from);
-				rule.addition.addAll(entry.addition);
-			}
+			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
+			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
+			if(ruleSet != null)
+				ruleSet.from.addAll(entry.from);
 		}
-		return new ArrayList<>(equivalenceTable.values());
+
+		//extract same `from` rules
+		Map<Integer, List<LineEntry>> sameFrom = bucket(equivalenceTable.values(), rule -> rule.from.hashCode());
+		return sameFrom.values().stream()
+			.map(ee -> {
+				//collect all the addings
+				Set<String> addition = ee.stream()
+					.map(LineEntry::anAddition)
+					.collect(Collectors.toSet());
+				LineEntry representative = ee.get(0);
+				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
+			})
+			.collect(Collectors.toList());
+
+//		Map<String, LineEntry> equivalenceTable = new HashMap<>();
+//		for(LineEntry entry : entries){
+//			String key = entry.removal + TAB + entry.condition;
+//			LineEntry rule = equivalenceTable.putIfAbsent(key, entry);
+//			if(rule != null){
+//				rule.from.addAll(entry.from);
+//				rule.addition.addAll(entry.addition);
+//			}
+//		}
+//		return new ArrayList<>(equivalenceTable.values());
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
