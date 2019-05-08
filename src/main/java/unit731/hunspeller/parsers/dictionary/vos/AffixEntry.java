@@ -27,6 +27,7 @@ public class AffixEntry{
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
 	private static final Pattern PATTERN_LINE = PatternHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
+	private static final String TAB = "\t";
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
 	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("\t.*$");
@@ -256,6 +257,19 @@ public class AffixEntry{
 		return (isSuffix()?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));
+	}
+
+	public String toStringWithMorphologicalFields(FlagParsingStrategy strategy){
+		Objects.requireNonNull(strategy);
+
+		StringBuffer sb = new StringBuffer();
+		if(continuationFlags != null && continuationFlags.length > 0){
+			sb.append(SLASH);
+			sb.append(strategy.joinFlags(continuationFlags));
+		}
+		if(morphologicalFields != null && morphologicalFields.length > 0)
+			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+		return sb.toString();
 	}
 
 	@Override

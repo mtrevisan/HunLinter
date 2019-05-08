@@ -11,13 +11,10 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.gui.DictionarySortCellRenderer;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -45,11 +42,7 @@ public class DictionarySortDialog extends JDialog{
 
 		initComponents();
 
-		init();
-
-		lblMessage.setText(message);
-
-		GUIUtils.addCancelByEscapeKey(this);
+		init(message);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -117,9 +110,11 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void init(){
+	private void init(String message){
 		ListCellRenderer<String> dicCellRenderer = new DictionarySortCellRenderer(dicParser::getBoundaryIndex);
 		setCellRenderer(dicCellRenderer);
+
+		lblMessage.setText(message);
 	}
 
    private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
@@ -169,33 +164,6 @@ public class DictionarySortDialog extends JDialog{
 		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 
-
-	public static void main(String args[]){
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex){
-			LOGGER.error(null, ex);
-		}
-		//</editor-fold>
-
-		/* Create and display the dialog */
-		java.awt.EventQueue.invokeLater(() -> {
-			javax.swing.JFrame parent = new javax.swing.JFrame();
-			DictionarySortDialog dialog = new DictionarySortDialog(null, "title", "message", parent);
-			dialog.setLocationRelativeTo(parent);
-			dialog.setListData(new String[]{"a", "b", "c"});
-			dialog.addWindowListener(new java.awt.event.WindowAdapter(){
-				@Override
-				public void windowClosing(java.awt.event.WindowEvent e){
-					System.exit(0);
-				}
-			});
-			dialog.setVisible(true);
-		});
-	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton btnNextUnsortedArea;

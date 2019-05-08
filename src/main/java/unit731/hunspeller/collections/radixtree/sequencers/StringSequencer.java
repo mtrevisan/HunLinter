@@ -21,8 +21,8 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
-	public boolean endsWith(String sequence, String prefix){
-		return sequence.endsWith(prefix);
+	public boolean endsWith(String sequence, String suffix){
+		return sequence.endsWith(suffix);
 	}
 
 	@Override

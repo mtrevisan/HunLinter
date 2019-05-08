@@ -48,6 +48,10 @@ public class RuleEntry{
 		return combineable;
 	}
 
+	public AffixEntry.Type getType(){
+		return (isSuffix()? AffixEntry.Type.SUFFIX: AffixEntry.Type.PREFIX);
+	}
+
 	public List<AffixEntry> getEntries(){
 		return entries;
 	}

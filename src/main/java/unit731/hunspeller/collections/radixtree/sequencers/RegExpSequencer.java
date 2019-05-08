@@ -45,13 +45,13 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 	}
 
 	@Override
-	public boolean endsWith(String[] sequence, String[] prefix){
-		int count = prefix.length;
+	public boolean endsWith(String[] sequence, String[] suffix){
+		int count = suffix.length;
 		if(count > sequence.length)
 			return false;
 
 		for(int i = 1; i <= count; i ++)
-			if(!matches(sequence[sequence.length - i], prefix[prefix.length - i]))
+			if(!matches(sequence[sequence.length - i], suffix[suffix.length - i]))
 				return false;
 		return true;
 	}

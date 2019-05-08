@@ -58,7 +58,7 @@ public class WordVEC{
 
 	private static final String NO_STRESS_AVER = "^(r[aei]|ar)?g?(ar)?[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ESER = "^(r[aei]|ar)?((s[ae]r)?[àé]|[sx]é)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^((dex)?d|((dex)?asue|des|kon(tra–?)?|[lƚ]iku[ei]|mal–?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|sora|stra–?|stupe|tore|tume)?f|(kon(tra)?|mal–?|move|o|re|so(ra|to))?st)([ae]rà|[àé])-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
+	private static final String NO_STRESS_DAR_FAR_STAR = "^((dex)?d|((dex)?asue|des|kon(tra–?)?|[lƚ]iku[ei]|mal–?|putre|rare|r[ae]|ar|sastu|sat[iu]s|sodis|sora|stra–?|st[ou]pe|tore|tume)?f|(kon(tra)?|mal–?|move|o|re|so(ra|to))?st)([ae]rà|[àé])-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_SAVER = "^(pre|r[ae]|ar|stra–?)?(sà|sav?arà)-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(r[ae]|ar)?v[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";
 	private static final String NO_STRESS_TRAER = "^(|as?|des?|es|kon|pro|re|so|sub?)?tr[àé]-?([lƚ][oaie]|[gmnstv]e|[mn]i|nt[ei]|s?t[ou])$";

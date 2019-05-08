@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
@@ -16,8 +16,8 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	WordGeneratorAffixRules(AffixParser affParser){
-		super(affParser.getAffixData());
+	WordGeneratorAffixRules(AffixData affixData){
+		super(affixData);
 	}
 
 	List<Production> applySingleAffixRule(String line){

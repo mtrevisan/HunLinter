@@ -154,7 +154,7 @@ public class DictionaryEntry{
 	}
 
 	public int getContinuationFlagCount(){
-		return continuationFlags.length;
+		return (continuationFlags != null? continuationFlags.length: 0);
 	}
 
 	public boolean hasContinuationFlag(String ... continuationFlags){
@@ -169,7 +169,8 @@ public class DictionaryEntry{
 		return Collections.<AffixEntry>emptyList();
 	}
 
-	public AffixEntry getLastAppliedRule(){
+	/** Get last applied rule of type {@code type} */
+	public AffixEntry getLastAppliedRule(AffixEntry.Type type){
 		return null;
 	}
 

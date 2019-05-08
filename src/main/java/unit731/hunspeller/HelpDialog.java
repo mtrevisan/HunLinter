@@ -11,11 +11,8 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -36,8 +33,6 @@ public class HelpDialog extends JDialog{
 		Objects.requireNonNull(parent);
 
 		initComponents();
-
-		GUIUtils.addCancelByEscapeKey(this);
 
 
 		try{
@@ -120,7 +115,7 @@ public class HelpDialog extends JDialog{
       lblManagedOptionsTextArea.setColumns(20);
       lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
       lblManagedOptionsTextArea.setLineWrap(true);
-      lblManagedOptionsTextArea.setRows(5);
+      lblManagedOptionsTextArea.setRows(1);
       lblManagedOptionsTextArea.setTabSize(3);
       lblManagedOptionsTextArea.setWrapStyleWord(true);
       jScrollPane1.setViewportView(lblManagedOptionsTextArea);
@@ -185,36 +180,6 @@ public class HelpDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-
-	public static void main(String args[]){
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			LOGGER.error(null, e);
-		}
-		//</editor-fold>
-
-		java.awt.EventQueue.invokeLater(() -> {
-			try{
-				javax.swing.JFrame parent = new javax.swing.JFrame();
-				HelpDialog dialog = new HelpDialog(parent);
-				dialog.setLocationRelativeTo(parent);
-				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
-					@Override
-					public void windowClosing(java.awt.event.WindowEvent e){
-						System.exit(0);
-					}
-				});
-				dialog.setVisible(true);
-			}
-			catch(IllegalArgumentException e){
-				LOGGER.error(null, e);
-			}
-		});
-	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JScrollPane jScrollPane1;

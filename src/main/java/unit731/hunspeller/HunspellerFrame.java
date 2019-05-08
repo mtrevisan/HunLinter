@@ -13,7 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent; 
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -76,7 +75,6 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
-import unit731.hunspeller.parsers.dictionary.workers.RuleReducerWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
@@ -122,7 +120,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerHyphenationText;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
-	private DictionarySortDialog dicDialog;
+	private DictionarySortDialog dicSortDialog;
+	private RuleReducerDialog ruleReducerDialog;
 
 	private final Backbone backbone;
 
@@ -150,6 +149,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		initComponents();
 
+		rfm.setEnabled(rfm.hasEntries());
 		filEmptyRecentFilesMenuItem.setEnabled(rfm.hasEntries());
 
 		try{
@@ -158,7 +158,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 		catch(IOException e){}
 
-		ApplicationLogAppender.setTextArea(parsingResultTextArea);
+		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 
 
 		File currentDir = new File(".");
@@ -270,6 +270,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
+      dicRuleReducerMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -295,7 +296,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setRows(5);
+      parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
       DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
       caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -417,7 +418,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       cmpScrollPane.setViewportView(cmpTable);
 
       cmpInputTextArea.setColumns(20);
-      cmpInputTextArea.setRows(5);
+      cmpInputTextArea.setRows(1);
       cmpInputScrollPane.setViewportView(cmpInputTextArea);
 
       cmpLoadInputButton.setText("Load input from dictionary");
@@ -542,6 +543,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   };
                   ThesaurusEntry synonym = backbone.getTheParser().getSynonymsDictionary().get(row);
                   ThesaurusMeaningsDialog dialog = new ThesaurusMeaningsDialog(synonym, okButtonAction, parent);
+                  GUIUtils.addCancelByEscapeKey(dialog);
                   dialog.setLocationRelativeTo(parent);
                   dialog.setVisible(true);
                }
@@ -876,6 +878,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
       dicMenu.add(dicSortDictionaryMenuItem);
+
+      dicRuleReducerMenuItem.setText("Rule reducer...");
+      dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dicRuleReducerMenuItemActionPerformed(evt);
+         }
+      });
+      dicMenu.add(dicRuleReducerMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
       dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
@@ -1042,6 +1052,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
 			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
+
+			rfm.setEnabled(true);
 			filEmptyRecentFilesMenuItem.setEnabled(true);
 
 			File affFile = openAffixFileFileChooser.getSelectedFile();
@@ -1080,6 +1092,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		HelpDialog dialog = new HelpDialog(this);
+		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_hlpAboutMenuItemActionPerformed
@@ -1137,9 +1150,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		try{
 			String[] lines = backbone.getDictionaryLines();
-			dicDialog.setListData(lines);
-			dicDialog.setLocationRelativeTo(this);
-			dicDialog.setVisible(true);
+			dicSortDialog.setListData(lines);
+			dicSortDialog.setVisible(true);
 		}
 		catch(IOException e){
 			LOGGER.error("Something very bad happend while sorting the dictionary", e);
@@ -1176,6 +1188,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(backbone.getTheParser().extractDuplicates(), this);
+		GUIUtils.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
@@ -1412,8 +1425,15 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void filEmptyRecentFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentFilesMenuItemActionPerformed
 		rfm.clear();
 
+		rfm.setEnabled(false);
 		filEmptyRecentFilesMenuItem.setEnabled(false);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
+
+   private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
+		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		reduceRules();
+   }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
 
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1635,13 +1655,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//dictionary file:
-			dicDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
-			dicDialog.setLocationRelativeTo(this);
-			dicDialog.addListSelectionListener(e -> {
+			dicSortDialog = new DictionarySortDialog(backbone.getDicParser(), "Sorter", "Please select a section from the list:", this);
+			GUIUtils.addCancelByEscapeKey(dicSortDialog);
+			dicSortDialog.setLocationRelativeTo(this);
+			dicSortDialog.addListSelectionListener(e -> {
 				if(e.getValueIsAdjusting() && (dicSorterWorker == null || dicSorterWorker.isDone())){
-					int selectedRow = dicDialog.getSelectedIndex();
+					int selectedRow = dicSortDialog.getSelectedIndex();
 					if(backbone.getDicParser().isInBoundary(selectedRow)){
-						dicDialog.setVisible(false);
+						dicSortDialog.setVisible(false);
 
 						dicSortDictionaryMenuItem.setEnabled(false);
 						mainProgressBar.setValue(0);
@@ -1651,6 +1672,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 						dicSorterWorker.addPropertyChangeListener(this);
 						dicSorterWorker.execute();
 					}
+				}
+			});
+			ruleReducerDialog = new RuleReducerDialog(backbone, this);
+			ruleReducerDialog.setLocationRelativeTo(this);
+			ruleReducerDialog.addWindowListener(new WindowAdapter(){
+				@Override
+				public void windowClosed(WindowEvent e){
+					dicRuleReducerMenuItem.setEnabled(true);
 				}
 			});
 
@@ -2105,6 +2134,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenu dicMenu;
+   private javax.swing.JMenuItem dicRuleReducerMenuItem;
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
    private javax.swing.JScrollPane dicScrollPane;

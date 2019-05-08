@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
@@ -303,6 +304,13 @@ public class AffixData{
 
 	public String getForceCompoundUppercaseFlag(){
 		return getData(AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG);
+	}
+
+	public List<RuleEntry> getRuleEntries(){
+		return data.values().stream()
+			.filter(entry -> entry instanceof RuleEntry)
+			.map(RuleEntry.class::cast)
+			.collect(Collectors.toList());
 	}
 
 }

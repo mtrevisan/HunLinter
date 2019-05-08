@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.DictionaryStatisticsDialog;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
@@ -67,6 +68,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 			//show statistics window
 			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};

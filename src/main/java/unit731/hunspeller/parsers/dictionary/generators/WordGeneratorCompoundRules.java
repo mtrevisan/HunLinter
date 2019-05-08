@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
@@ -16,8 +16,8 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	WordGeneratorCompoundRules(AffixParser affParser, DictionaryParser dicParser, WordGenerator wordGenerator){
-		super(affParser, dicParser, wordGenerator);
+	WordGeneratorCompoundRules(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+		super(affixData, dicParser, wordGenerator);
 	}
 
 	/**
@@ -78,7 +78,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		for(String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
 				throw new IllegalArgumentException("Missing word(s) for rule " + component + " in compound rule "
-					+ StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
+					+ StringUtils.join(compoundRuleComponents, null));
 	}
 
 	private boolean raiseError(Map<String, Set<DictionaryEntry>> inputs, String component){

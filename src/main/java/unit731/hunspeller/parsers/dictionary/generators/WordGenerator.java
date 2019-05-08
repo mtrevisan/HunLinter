@@ -1,7 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
 import java.util.List;
-import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
@@ -14,11 +14,11 @@ public class WordGenerator{
 	private final WordGeneratorCompoundBeginMiddleEnd wordGeneratorCompoundBeginMiddleEnd;
 
 
-	public WordGenerator(AffixParser affParser, DictionaryParser dicParser){
-		wordGeneratorAffixRules = new WordGeneratorAffixRules(affParser);
-		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affParser, dicParser, this);
-		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affParser, dicParser, this);
-		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affParser, dicParser, this);
+	public WordGenerator(AffixData affixData, DictionaryParser dicParser){
+		wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData);
+		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, this);
+		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, this);
+		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, this);
 	}
 
 	public List<Production> applySingleAffixRule(String line){

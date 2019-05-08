@@ -52,6 +52,7 @@ public class RulesLoader{
 		wordCanHaveMultipleAccents = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleAccents"));
 
 		dataFields.put(MorphologicalTag.TAG_PART_OF_SPEECH, readPropertyAsSet("partOfSpeeches", ','));
+		dataFields.put(MorphologicalTag.TAG_DERIVATIONAL_SUFFIX, readPropertyAsSet("derivationalSuffixes", ','));
 		dataFields.put(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX, readPropertyAsSet("inflectionalSuffixes", ','));
 		dataFields.put(MorphologicalTag.TAG_TERMINAL_SUFFIX, readPropertyAsSet("terminalSuffixes", ','));
 		dataFields.put(MorphologicalTag.TAG_STEM, null);
