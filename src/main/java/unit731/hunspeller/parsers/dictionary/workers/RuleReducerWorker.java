@@ -245,27 +245,29 @@ disjointRules.forEach(System.out::println);
 	}
 
 	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		Map<String, List<LineEntry>> sameFrom1 = bucket(entries, rule -> rule.from.hashCode() + TAB + rule.removal + TAB + rule.condition);
-		List<LineEntry> entries1 = sameFrom1.values().stream()
-			.map(ee -> {
-				//collect all the addings
-				Set<String> addition = ee.stream()
-					.map(LineEntry::anAddition)
-					.collect(Collectors.toSet());
-				LineEntry representative = ee.get(0);
-				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
-			})
-			.collect(Collectors.toList());
+		List<LineEntry> entries1 = compactRules(entries);
 
-		Map<Integer, LineEntry> equivalenceTable = new HashMap<>();
+		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries1){
-			LineEntry ruleSet = equivalenceTable.putIfAbsent(entry.hashCode(), entry);
+			LineEntry ruleSet = equivalenceTable.putIfAbsent(entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition, entry);
 			if(ruleSet != null){
 				ruleSet.from.addAll(entry.from);
 				ruleSet.addition.addAll(entry.addition);
 			}
 		}
 		return new ArrayList<>(equivalenceTable.values());
+	}
+
+	//same originating word, same removal, and same condition parts
+	private List<LineEntry> compactRules(List<LineEntry> entries){
+		Map<String, LineEntry> sameFromRemovalCondition = new HashMap<>();
+		for(LineEntry entry : entries){
+			String key = entry.from.hashCode() + TAB + entry.removal + TAB + entry.condition;
+			LineEntry ruleSet = sameFromRemovalCondition.putIfAbsent(key, entry);
+			if(ruleSet != null)
+				ruleSet.addition.addAll(entry.addition);
+		}
+		return new ArrayList<>(sameFromRemovalCondition.values());
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
