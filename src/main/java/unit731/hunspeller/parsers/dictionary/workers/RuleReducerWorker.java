@@ -63,7 +63,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		private final Set<String> from;
 
 		private final String removal;
-		private String addition;
+		private final Set<String> addition;
 		private String condition;
 
 
@@ -75,15 +75,23 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			return new LineEntry(entry.removal, entry.addition, condition, words);
 		}
 
-		LineEntry(String removal, String addition, String condition){
+		LineEntry(String removal, Set<String> addition, String condition){
 			this(removal, addition, condition, Collections.<String>emptyList());
 		}
 
 		LineEntry(String removal, String addition, String condition, String word){
+			this(removal, new HashSet<>(Arrays.asList(addition)), condition, word);
+		}
+
+		LineEntry(String removal, Set<String> addition, String condition, String word){
 			this(removal, addition, condition, Arrays.asList(word));
 		}
 
 		LineEntry(String removal, String addition, String condition, Collection<String> words){
+			this(removal, new HashSet<>(Arrays.asList(addition)), condition, words);
+		}
+
+		LineEntry(String removal, Set<String> addition, String condition, Collection<String> words){
 			this.removal = removal;
 			this.addition = addition;
 			this.condition = condition;
@@ -112,6 +120,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					split.add(new LineEntry(removal, addition, f.substring(0, index), f));
 				}
 			return split;
+		}
+
+		public String anAddition(){
+			return addition.iterator().next();
 		}
 
 		@Override
@@ -153,7 +165,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
 	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
-		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.addition.indexOf(SLASH): entry.addition.length())).reversed());
+		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.anAddition().indexOf(SLASH): entry.anAddition().length())).reversed());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -169,8 +181,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
 			.thenComparing(Comparator.comparing(entry -> entry.removal, comparator))
-			.thenComparing(Comparator.comparingInt(entry -> entry.addition.length()))
-			.thenComparing(Comparator.comparing(entry -> entry.addition, comparator));
+			.thenComparing(Comparator.comparingInt(entry -> entry.anAddition().length()))
+			.thenComparing(Comparator.comparing(entry -> entry.anAddition(), comparator));
 
 		RuleEntry originalRuleEntry = affixData.getData(flag);
 		if(originalRuleEntry == null)
@@ -198,7 +210,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //TODO check feasibility of solution?
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
-				rules.forEach(rule -> LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule));
+				for(String rule : rules)
+					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
@@ -226,26 +239,37 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	}
 
 	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
+//		Map<String, LineEntry> equivalenceTable = new HashMap<>();
+//		for(LineEntry entry : entries){
+//			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
+//			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
+//			if(ruleSet != null)
+//				ruleSet.from.addAll(entry.from);
+//		}
+//
+//		//extract same `from` rules
+//		Map<Integer, List<LineEntry>> sameFrom = bucket(equivalenceTable.values(), rule -> rule.from.hashCode());
+//		return sameFrom.values().stream()
+//			.map(ee -> {
+//				//collect all the addings
+//				Set<String> addition = ee.stream()
+//					.map(LineEntry::anAddition)
+//					.collect(Collectors.toSet());
+//				LineEntry representative = ee.get(0);
+//				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
+//			})
+//			.collect(Collectors.toList());
+
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
 		for(LineEntry entry : entries){
-			String key = entry.removal + TAB + entry.addition + TAB + entry.condition;
-			LineEntry ruleSet = equivalenceTable.putIfAbsent(key, entry);
-			if(ruleSet != null)
-				ruleSet.from.addAll(entry.from);
+			String key = entry.removal + TAB + entry.condition;
+			LineEntry rule = equivalenceTable.putIfAbsent(key, entry);
+			if(rule != null){
+				rule.from.addAll(entry.from);
+				rule.addition.addAll(entry.addition);
+			}
 		}
-
-		//extract same `from` rules
-		Map<Integer, List<LineEntry>> sameFrom = bucket(equivalenceTable.values(), rule -> rule.from.hashCode());
-		return sameFrom.values().stream()
-			.map(ee -> {
-				//collect all the addings
-				String addition = ee.stream()
-					.map(entry -> entry.addition)
-					.collect(Collectors.joining(TAB));
-				LineEntry representative = ee.get(0);
-				return new LineEntry(representative.removal, addition, representative.condition, representative.from);
-			})
-			.collect(Collectors.toList());
+		return new ArrayList<>(equivalenceTable.values());
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
@@ -493,8 +517,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		//restore original rules
 		List<LineEntry> restoredRules = entries.stream()
 			.flatMap(rule -> {
-				String[] additions = rule.addition.split(TAB);
-				return Arrays.stream(additions)
+				return rule.addition.stream()
 					.map(addition -> new LineEntry(rule.removal, addition, rule.condition, rule.from));
 			})
 			.collect(Collectors.toList());
@@ -605,7 +628,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		return sj.add(type.getTag().getCode())
 			.add(flag)
 			.add(partialLine.removal)
-			.add(partialLine.addition)
+			.add(partialLine.anAddition())
 			.add(partialLine.condition.isEmpty()? DOT: partialLine.condition)
 			.toString();
 	}
