@@ -198,7 +198,11 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		};
 		Runnable completed = () -> {
 			try{
-				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
+				List<LineEntry> compactedRules = compactRules(plainRules);
+System.out.println("\r\ncompactRules (" + compactedRules.size() + "):");
+compactedRules.forEach(System.out::println);
+
+				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(compactedRules);
 System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
 
@@ -244,12 +248,10 @@ disjointRules.forEach(System.out::println);
 		}
 	}
 
+	//same removal, same addition, and same condition parts
 	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		List<LineEntry> entries1 = compactRules(entries);
-
-		//same removal, same addition, and same condition parts
 		Map<String, LineEntry> equivalenceTable = new HashMap<>();
-		for(LineEntry entry : entries1){
+		for(LineEntry entry : entries){
 			LineEntry ruleSet = equivalenceTable.putIfAbsent(entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition, entry);
 			if(ruleSet != null)
 				ruleSet.from.addAll(entry.from);
