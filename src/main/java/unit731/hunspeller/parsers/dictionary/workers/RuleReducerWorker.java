@@ -272,7 +272,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//split parents between belonging to children group and not belonging to children group
-				String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+				String notChildrenGroup = makeNotGroup(childrenGroup);
 				Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
 					from -> {
 						char chr = from.charAt(from.length() - parentConditionLength - 1);
@@ -310,7 +310,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 //							//remove `lettersToRemove` from `childrenGroup`
 //							String cleanedChildrenGroup = StringUtils.replaceEach(childrenGroup, lettersToRemove.split(""), new String[]{StringUtils.EMPTY});
 //							//substitute into notInCommonRule.condition
-//							notInCommonRule.condition = NOT_GROUP_START + cleanedChildrenGroup + GROUP_END + parent.condition;
+//							notInCommonRule.condition = makeNotGroup(cleanedChildrenGroup) + parent.condition;
 //						}
 					}
 				}
@@ -322,14 +322,12 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
+				String condition = makeNotGroup(childrenGroup) + parent.condition;
 				rules.add(LineEntry.createFrom(parent, condition, parent.from));
 
 				for(LineEntry child : children)
 					if(child.condition.length() == parentConditionLength){
-						String childGroup = extractGroup(child.from, parentConditionLength);
-						if(childGroup.length() > 1)
-							childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+						String childGroup = makeGroup(extractGroup(child.from, parentConditionLength));
 						child.condition = childGroup + child.condition;
 					}
 
@@ -385,7 +383,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				int index = le.condition.length() - parent.condition.length() - 1;
 				while(index > 0){
 					//add additional rules
-					String condition = NOT_GROUP_START + le.condition.charAt(index - 1) + GROUP_END + le.condition.substring(index);
+					String condition = makeNotGroup(le.condition.charAt(index - 1)) + le.condition.substring(index);
 					newParents.add(LineEntry.createFrom(parent, condition));
 
 					index --;
@@ -475,8 +473,20 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				String group = extractGroup(entry.from, 0);
 				String originalNotGroup = entry.condition.substring(notGroupStartLength, entry.condition.length() - notGroupStartLength - groupEndLength);
 				if(!StringUtils.contains(originalNotGroup, group))
-					entry.condition = (group.length() > 1? GROUP_START + group + GROUP_END: group);
+					entry.condition = makeGroup(group);
 			}
+	}
+
+	private String makeGroup(String group){
+		return (group.length() > 1? GROUP_START + group + GROUP_END: group);
+	}
+
+	private String makeNotGroup(String group){
+		return NOT_GROUP_START + group + GROUP_END;
+	}
+
+	private String makeNotGroup(char group){
+		return NOT_GROUP_START + group + GROUP_END;
 	}
 
 	private List<String> convertEntriesToRules(String flag, AffixEntry.Type type, boolean keepLongestCommonAffix, Collection<LineEntry> entries){
