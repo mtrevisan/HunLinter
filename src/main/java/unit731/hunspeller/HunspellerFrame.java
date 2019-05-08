@@ -1432,7 +1432,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		reduceRules();
+		dicRuleReducerMenuItem.setEnabled(false);
+		ruleReducerDialog.setVisible(true);
    }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
 
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
