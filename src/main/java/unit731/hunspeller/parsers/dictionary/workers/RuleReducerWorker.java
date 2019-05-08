@@ -248,27 +248,18 @@ disjointRules.forEach(System.out::println);
 		}
 	}
 
-	//same removal, same addition, and same condition parts
-	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		Map<String, LineEntry> equivalenceTable = new HashMap<>();
-		for(LineEntry entry : entries){
-			LineEntry ruleSet = equivalenceTable.putIfAbsent(entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition, entry);
-			if(ruleSet != null)
-				ruleSet.from.addAll(entry.from);
-		}
-		return new ArrayList<>(equivalenceTable.values());
-	}
-
 	//same originating word, same removal, and same condition parts
 	private List<LineEntry> compactRules(List<LineEntry> entries){
-		Map<String, LineEntry> sameFromRemovalCondition = new HashMap<>();
-		for(LineEntry entry : entries){
-			String key = entry.from.hashCode() + TAB + entry.removal + TAB + entry.condition;
-			LineEntry ruleSet = sameFromRemovalCondition.putIfAbsent(key, entry);
-			if(ruleSet != null)
-				ruleSet.addition.addAll(entry.addition);
-		}
-		return new ArrayList<>(sameFromRemovalCondition.values());
+		return collect(entries,
+			entry -> entry.from.hashCode() + TAB + entry.removal + TAB + entry.condition,
+			(rule, entry) -> rule.addition.addAll(entry.addition));
+	}
+
+	//same removal, same addition, and same condition parts
+	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
+		return collect(entries,
+			entry -> entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition,
+			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
 	private void removeOverlappingConditions(List<LineEntry> rules){
@@ -418,15 +409,26 @@ disjointRules.forEach(System.out::println);
 		return newParents;
 	}
 
-	private <K, V> Map<K, List<V>> bucket(Collection<V> entries, Function<V, K> keyGenerator){
+	private <K, V> Map<K, List<V>> bucket(Collection<V> entries, Function<V, K> keyMapper){
 		Map<K, List<V>> bucket = new HashMap<>();
 		for(V entry : entries){
-			K key = keyGenerator.apply(entry);
+			K key = keyMapper.apply(entry);
 			if(key != null)
 				bucket.computeIfAbsent(key, k -> new ArrayList<>())
 					.add(entry);
 		}
 		return bucket;
+	}
+
+	private <K, V> List<V> collect(Collection<V> entries, Function<V, K> keyMapper, BiConsumer<V, V> mergeFunction){
+		Map<K, V> compaction = new HashMap<>();
+		for(V entry : entries){
+			K key = keyMapper.apply(entry);
+			V rule = compaction.putIfAbsent(key, entry);
+			if(rule != null)
+				mergeFunction.accept(rule, entry);
+		}
+		return new ArrayList<>(compaction.values());
 	}
 
 	private LineEntry createSuffixEntry(Production production, String word, AffixEntry.Type type){
