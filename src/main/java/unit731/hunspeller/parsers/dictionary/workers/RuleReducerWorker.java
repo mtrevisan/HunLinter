@@ -72,7 +72,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 
 		public static LineEntry createFrom(LineEntry entry, String condition, Collection<String> words){
-			return new LineEntry(entry.removal, entry.addition, condition, words);
+			List<String> from = words.stream()
+				.filter(f -> f.endsWith(condition))
+				.collect(Collectors.toList());
+			return new LineEntry(entry.removal, entry.addition, condition, from);
 		}
 
 		LineEntry(String removal, Set<String> addition, String condition){
@@ -199,8 +202,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				List<LineEntry> compactedRules = compactRules(plainRules);
-System.out.println("\r\ncompactRules (" + compactedRules.size() + "):");
-compactedRules.forEach(System.out::println);
 
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(compactedRules);
 System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
@@ -341,9 +342,13 @@ disjointRules.forEach(System.out::println);
 
 				for(LineEntry child : children)
 					if(child.condition.length() == parentConditionLength){
-						String childGroup = makeGroup(extractGroup(child.from, parentConditionLength));
-						child.condition = childGroup + child.condition;
+						sortedList.remove(child);
+
+						String childGroup = extractGroup(child.from, parentConditionLength);
+						for(char chr : childGroup.toCharArray())
+							sortedList.add(LineEntry.createFrom(child, chr + child.condition, child.from));
 					}
+				sortedList.sort(shortestConditionComparator);
 
 				List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 				rules.addAll(newParents);
