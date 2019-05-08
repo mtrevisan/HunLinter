@@ -289,15 +289,29 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 					rules.addAll(newParents);
 
-					//remove from in-common rules those already presents in new parents
 					Iterator<LineEntry> itr = inCommonRules.iterator();
 					while(itr.hasNext()){
 						LineEntry icr = itr.next();
+
+						//remove from in-common rules those already presents in new parents
+						boolean removed = false;
 						for(LineEntry np : newParents)
 							if(np.condition.endsWith(icr.condition)){
 								itr.remove();
+								removed = true;
 								break;
 							}
+
+						if(!removed){
+							List<String> conditions = inCommonRules.stream()
+								.map(entry -> entry.condition)
+								.collect(Collectors.toList());
+							String lettersToRemove = extractGroup(conditions, parent.condition.length());
+							//remove `lettersToRemove` from `childrenGroup`
+							String cleanedChildrenGroup = StringUtils.replaceEach(childrenGroup, lettersToRemove.split(""), new String[]{StringUtils.EMPTY});
+							//substitute into notInCommonRule.condition
+							notInCommonRule.condition = NOT_GROUP_START + cleanedChildrenGroup + GROUP_END + parent.condition;
+						}
 					}
 				}
 
