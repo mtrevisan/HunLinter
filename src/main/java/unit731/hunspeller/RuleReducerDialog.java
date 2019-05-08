@@ -183,6 +183,7 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	}
 
    private void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+//TODO refresh this list if the aff file changes
 		String flag = getSelectedFlag();
 		RuleEntry rule = backbone.getAffixData().getData(flag);
 		String ruleEntries = rule.getEntries().stream()
