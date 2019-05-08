@@ -38,7 +38,6 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
-import unit731.hunspeller.services.SetHelper;
 
 
 public class RuleReducerWorker extends WorkerDictionaryBase{
@@ -189,7 +188,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 			try{
 				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(plainRules);
 
-//handle rule v0
 				removeOverlappingConditions(disjointRules);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
@@ -271,81 +269,61 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				 .flatMap(entry -> entry.from.stream())
 				 .collect(Collectors.toSet());
 
-			//separate the children between those who have the same `from` set of the parent and those who doesn't
-			Map<Integer, List<LineEntry>> fromBucket = bucket(children, child -> SetHelper.intersectionSize(parentFrom, child.from));
-fromBucket.size();
-
-			//parentFrom ∩ childrenFrom = ∅
-			if(fromBucket.size() == 1 && fromBucket.containsKey(0)){
-				String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-				if(StringUtils.containsAny(parentGroup, childrenGroup)){
-					//split parents between belonging to children group and not belonging to children group
-					String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
-					Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
-						from -> {
-							char chr = from.charAt(from.length() - parentConditionLength - 1);
-							return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
-						}
-					);
-					Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
-					LineEntry notInCommonRule = newRules.getLeft();
-					List<LineEntry> inCommonRules = newRules.getRight();
-
-					if(notInCommonRule != null){
-						rules.add(notInCommonRule);
-
-						List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
-						rules.addAll(newParents);
-
-						//remove from in-common rules those already presents in new parents
-						Iterator<LineEntry> itr = inCommonRules.iterator();
-						while(itr.hasNext()){
-							LineEntry icr = itr.next();
-							for(LineEntry np : newParents)
-								if(np.condition.endsWith(icr.condition)){
-									itr.remove();
-									break;
-								}
-						}
+			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+			if(StringUtils.containsAny(parentGroup, childrenGroup)){
+				//split parents between belonging to children group and not belonging to children group
+				String notChildrenGroup = NOT_GROUP_START + childrenGroup + GROUP_END;
+				Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
+					from -> {
+						char chr = from.charAt(from.length() - parentConditionLength - 1);
+						return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
 					}
+				);
+				Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+				LineEntry notInCommonRule = newRules.getLeft();
+				List<LineEntry> inCommonRules = newRules.getRight();
 
-					//add new parents to the original list
-					rules.addAll(inCommonRules);
-
-					sortedList.addAll(inCommonRules);
-					sortedList.sort(shortestConditionComparator);
-				}
-				else{
-					String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
-					rules.add(LineEntry.createFrom(parent, condition, parent.from));
-
-					for(LineEntry child : children)
-						if(child.condition.length() == parentConditionLength){
-							String childGroup = extractGroup(child.from, parentConditionLength);
-							if(childGroup.length() > 1)
-								childGroup = NOT_GROUP_START + childGroup + GROUP_END;
-							child.condition = childGroup + child.condition;
-						}
+				if(notInCommonRule != null){
+					rules.add(notInCommonRule);
 
 					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 					rules.addAll(newParents);
+
+					//remove from in-common rules those already presents in new parents
+					Iterator<LineEntry> itr = inCommonRules.iterator();
+					while(itr.hasNext()){
+						LineEntry icr = itr.next();
+						for(LineEntry np : newParents)
+							if(np.condition.endsWith(icr.condition)){
+								itr.remove();
+								break;
+							}
+					}
 				}
 
-				rules.remove(parent);
+				//add new parents to the original list
+				rules.addAll(inCommonRules);
+
+				sortedList.addAll(inCommonRules);
+				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				//TODO
+				String condition = NOT_GROUP_START + childrenGroup + GROUP_END + parent.condition;
+				rules.add(LineEntry.createFrom(parent, condition, parent.from));
 
-				//parentFrom = childrenFrom
-				if(SetHelper.isEquals(parentFrom, childrenFrom)){
-					//multiple productions for the same word exists
-					throw new IllegalArgumentException("to be coded (parentFrom = childrenFrom)");
-				}
-				//(parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom)
-				else{
-					throw new IllegalArgumentException("to be coded ((parentFrom ∩ childrenFrom ≠ ∅) ∧ (parentFrom ≠ childrenFrom))");
-				}
+				for(LineEntry child : children)
+					if(child.condition.length() == parentConditionLength){
+						String childGroup = extractGroup(child.from, parentConditionLength);
+						if(childGroup.length() > 1)
+							childGroup = NOT_GROUP_START + childGroup + GROUP_END;
+						child.condition = childGroup + child.condition;
+					}
+
+				List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
+				rules.addAll(newParents);
 			}
+
+			rules.remove(parent);
 		}
 	}
 
