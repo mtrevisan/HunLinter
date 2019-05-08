@@ -294,24 +294,24 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 						LineEntry icr = itr.next();
 
 						//remove from in-common rules those already presents in new parents
-						boolean removed = false;
+//						boolean removed = false;
 						for(LineEntry np : newParents)
 							if(np.condition.endsWith(icr.condition)){
 								itr.remove();
-								removed = true;
+//								removed = true;
 								break;
 							}
 
-						if(!removed){
-							List<String> conditions = inCommonRules.stream()
-								.map(entry -> entry.condition)
-								.collect(Collectors.toList());
-							String lettersToRemove = extractGroup(conditions, parent.condition.length());
-							//remove `lettersToRemove` from `childrenGroup`
-							String cleanedChildrenGroup = StringUtils.replaceEach(childrenGroup, lettersToRemove.split(""), new String[]{StringUtils.EMPTY});
-							//substitute into notInCommonRule.condition
-							notInCommonRule.condition = NOT_GROUP_START + cleanedChildrenGroup + GROUP_END + parent.condition;
-						}
+//						if(!removed){
+//							List<String> conditions = inCommonRules.stream()
+//								.map(entry -> entry.condition)
+//								.collect(Collectors.toList());
+//							String lettersToRemove = extractGroup(conditions, parent.condition.length());
+//							//remove `lettersToRemove` from `childrenGroup`
+//							String cleanedChildrenGroup = StringUtils.replaceEach(childrenGroup, lettersToRemove.split(""), new String[]{StringUtils.EMPTY});
+//							//substitute into notInCommonRule.condition
+//							notInCommonRule.condition = NOT_GROUP_START + cleanedChildrenGroup + GROUP_END + parent.condition;
+//						}
 					}
 				}
 
@@ -583,7 +583,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private String composeHeader(AffixEntry.Type type, String flag, boolean isCombineable, int size){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		return sj.add(type.getFlag().getCode())
+		return sj.add(type.getTag().getCode())
 			.add(flag)
 			.add(Character.toString(isCombineable? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE))
 			.add(Integer.toString(size))
@@ -592,7 +592,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private String composeLine(AffixEntry.Type type, String flag, LineEntry partialLine){
 		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		return sj.add(type.getFlag().getCode())
+		return sj.add(type.getTag().getCode())
 			.add(flag)
 			.add(partialLine.removal)
 			.add(partialLine.addition)

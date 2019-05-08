@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -185,10 +186,16 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
    private void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		String flag = getSelectedFlag();
 		RuleEntry rule = backbone.getAffixData().getData(flag);
-		String ruleEntries = rule.getEntries().stream()
+		StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		String header = sj.add(rule.getType().getTag().getCode())
+			.add(flag)
+			.add(Character.toString(rule.isCombineable()? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE))
+			.add(Integer.toString(rule.getEntries().size()))
+			.toString();
+		String rules = rule.getEntries().stream()
 			.map(AffixEntry::toString)
 			.collect(Collectors.joining(StringUtils.LF));
-		currentSetTextArea.setText(ruleEntries);
+		currentSetTextArea.setText(header + StringUtils.LF + rules);
 		currentSetTextArea.setCaretPosition(0);
 		reducedSetTextArea.setText(null);
    }//GEN-LAST:event_ruleComboBoxActionPerformed

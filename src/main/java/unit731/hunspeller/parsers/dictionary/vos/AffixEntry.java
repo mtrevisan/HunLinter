@@ -41,25 +41,25 @@ public class AffixEntry{
 		PREFIX(AffixTag.PREFIX);
 
 
-		private final AffixTag flag;
+		private final AffixTag tag;
 
-		Type(AffixTag flag){
-			this.flag = flag;
+		Type(AffixTag tag){
+			this.tag = tag;
 		}
 
 		public static Type createFromCode(String code){
 			return Arrays.stream(values())
-				.filter(tag -> tag.flag.getCode().equals(code))
+				.filter(t -> t.tag.getCode().equals(code))
 				.findFirst()
 				.orElse(null);
 		}
 
 		public boolean is(String flag){
-			return this.flag.getCode().equals(flag);
+			return this.tag.getCode().equals(flag);
 		}
 
-		public AffixTag getFlag(){
-			return flag;
+		public AffixTag getTag(){
+			return tag;
 		}
 
 	}
