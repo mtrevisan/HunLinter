@@ -204,7 +204,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
 
-				removeOverlappingConditions(disjointRules);
+				disjoinConditions(disjointRules);
 System.out.println("\r\nremoveOverlappingConditions (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
 
@@ -261,7 +261,7 @@ disjointRules.forEach(System.out::println);
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private void removeOverlappingConditions(List<LineEntry> rules){
+	private void disjoinConditions(List<LineEntry> rules){
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
