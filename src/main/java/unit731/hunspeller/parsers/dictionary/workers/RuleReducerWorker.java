@@ -72,10 +72,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		}
 
 		public static LineEntry createFrom(LineEntry entry, String condition, Collection<String> words){
-			List<String> from = words.stream()
-				.filter(f -> f.endsWith(condition))
-				.collect(Collectors.toList());
-			return new LineEntry(entry.removal, entry.addition, condition, from);
+			return new LineEntry(entry.removal, entry.addition, condition, words);
 		}
 
 		LineEntry(String removal, Set<String> addition, String condition){
@@ -343,10 +340,18 @@ disjointRules.forEach(System.out::println);
 				for(LineEntry child : children)
 					if(child.condition.length() == parentConditionLength){
 						sortedList.remove(child);
+						rules.remove(child);
 
 						String childGroup = extractGroup(child.from, parentConditionLength);
-						for(char chr : childGroup.toCharArray())
-							sortedList.add(LineEntry.createFrom(child, chr + child.condition, child.from));
+						for(char chr : childGroup.toCharArray()){
+							String cond = chr + child.condition;
+							List<String> from = child.from.stream()
+								.filter(f -> f.endsWith(cond))
+								.collect(Collectors.toList());
+							LineEntry newEntry = LineEntry.createFrom(child, cond, from);
+							sortedList.add(newEntry);
+							rules.add(newEntry);
+						}
 					}
 				sortedList.sort(shortestConditionComparator);
 
