@@ -210,6 +210,7 @@ disjointRules.forEach(System.out::println);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
 				mergeSimilarRules(disjointRules);
+				transformSingleNotGroup(disjointRules);
 System.out.println("\r\nmergeSimilarRules (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
 
@@ -499,8 +500,10 @@ disjointRules.forEach(System.out::println);
 
 				set.forEach(entries::remove);
 			}
+	}
 
-		//transform a condition that is only a not-group into a positive group
+	/** Transforms a condition that is only a not-group into a positive group */
+	private void transformSingleNotGroup(Collection<LineEntry> entries){
 		int notGroupStartLength = NOT_GROUP_START.length();
 		int groupEndLength = GROUP_END.length();
 		for(LineEntry entry : entries)
