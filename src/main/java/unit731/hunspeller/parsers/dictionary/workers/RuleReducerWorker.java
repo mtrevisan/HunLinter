@@ -206,32 +206,6 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
 
-//remove same condition rules?
-//				boolean sameConditions = true;
-//				while(sameConditions){
-//					sameConditions = false;
-//
-//					Map<String, List<LineEntry>> sameConditionBucket = bucket(disjointRules, rule -> rule.condition);
-//					for(List<LineEntry> multiConditionList : sameConditionBucket.values())
-//						if(multiConditionList.size() > 1){
-//							sameConditions = true;
-//
-//							for(LineEntry entry : multiConditionList){
-//								String group = extractGroup(entry.from, entry.condition.length());
-//								for(char chr : group.toCharArray()){
-//									String cond = chr + entry.condition;
-//									List<String> from = entry.from.stream()
-//										.filter(f -> f.endsWith(cond))
-//										.collect(Collectors.toList());
-//									LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
-//									disjointRules.add(newEntry);
-//								}
-//								disjointRules.remove(entry);
-//							}
-//						}
-//				}
-//TODO
-
 				disjoinConditions(disjointRules);
 System.out.println("\r\nremoveOverlappingConditions (" + disjointRules.size() + "):");
 disjointRules.forEach(System.out::println);
@@ -297,15 +271,35 @@ disjointRules.forEach(System.out::println);
 		sortedList.sort(shortestConditionComparator);
 
 		while(!sortedList.isEmpty()){
-			LineEntry parent = sortedList.remove(0);
+			LineEntry parent = sortedList.get(0);
 
 			List<LineEntry> children = sortedList.stream()
+				//FIXME has to be excluded those that have entry.condition.equals(parent.condition)?
 				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 			//FIXME what if there are more parents with the same condition? one cannot just skip!
 			if(children.isEmpty()){
-				//TODO
-//				continue;
+//				List<LineEntry> parents = sortedList.stream()
+//					.filter(entry -> entry.condition.equals(parent.condition))
+//					.collect(Collectors.toList());
+//				if(parents.size() == 1)
+//					continue;
+
+//remove same condition rules?
+//				for(LineEntry entry : parents){
+//					String group = extractGroup(entry.from, entry.condition.length());
+//					for(char chr : group.toCharArray()){
+//						String cond = chr + entry.condition;
+//						List<String> from = entry.from.stream()
+//							.filter(f -> f.endsWith(cond))
+//							.collect(Collectors.toList());
+//						LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
+//						sortedList.add(newEntry);
+//						rules.add(newEntry);
+//					}
+//					sortedList.remove(entry);
+//					rules.remove(entry);
+//				}
 throw new IllegalArgumentException("yet to be coded!");
 			}
 
@@ -381,6 +375,7 @@ throw new IllegalArgumentException("yet to be coded!");
 				rules.addAll(newParents);
 			}
 
+			sortedList.remove(parent);
 			rules.remove(parent);
 		}
 	}
