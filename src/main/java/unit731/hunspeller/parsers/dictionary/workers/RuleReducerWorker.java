@@ -271,36 +271,40 @@ disjointRules.forEach(System.out::println);
 		sortedList.sort(shortestConditionComparator);
 
 		while(!sortedList.isEmpty()){
-			LineEntry parent = sortedList.get(0);
+			LineEntry parent = sortedList.remove(0);
 
 			List<LineEntry> children = sortedList.stream()
 				//FIXME has to be excluded those that have entry.condition.equals(parent.condition)?
-				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.filter(entry -> !entry.condition.equals(parent.condition) && entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
-			//FIXME what if there are more parents with the same condition? one cannot just skip!
 			if(children.isEmpty()){
-//				List<LineEntry> parents = sortedList.stream()
-//					.filter(entry -> entry.condition.equals(parent.condition))
-//					.collect(Collectors.toList());
-//				if(parents.size() == 1)
-//					continue;
-
+				List<LineEntry> parents = sortedList.stream()
+					.filter(entry -> entry.condition.equals(parent.condition))
+					.collect(Collectors.toList());
+				if(!parents.isEmpty()){
+					//FIXME what if there are more parents with the same condition? one cannot just skip!
 //remove same condition rules?
-//				for(LineEntry entry : parents){
-//					String group = extractGroup(entry.from, entry.condition.length());
-//					for(char chr : group.toCharArray()){
-//						String cond = chr + entry.condition;
-//						List<String> from = entry.from.stream()
-//							.filter(f -> f.endsWith(cond))
-//							.collect(Collectors.toList());
-//						LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
-//						sortedList.add(newEntry);
-//						rules.add(newEntry);
-//					}
-//					sortedList.remove(entry);
-//					rules.remove(entry);
-//				}
-throw new IllegalArgumentException("yet to be coded!");
+					parents.add(parent);
+					for(LineEntry entry : parents){
+						String group = extractGroup(entry.from, entry.condition.length());
+						for(char chr : group.toCharArray()){
+							String cond = chr + entry.condition;
+							List<String> from = entry.from.stream()
+								.filter(f -> f.endsWith(cond))
+								.collect(Collectors.toList());
+							LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
+							sortedList.add(newEntry);
+							rules.add(newEntry);
+						}
+						sortedList.remove(entry);
+						rules.remove(entry);
+					}
+
+					sortedList.sort(shortestConditionComparator);
+				}
+
+				continue;
+//throw new IllegalArgumentException("yet to be coded!");
 			}
 
 			int parentConditionLength = parent.condition.length();
@@ -346,6 +350,8 @@ throw new IllegalArgumentException("yet to be coded!");
 				//add new parents to the original list
 				rules.addAll(inCommonRules);
 
+				rules.remove(parent);
+
 				sortedList.addAll(inCommonRules);
 				sortedList.sort(shortestConditionComparator);
 			}
@@ -373,10 +379,9 @@ throw new IllegalArgumentException("yet to be coded!");
 
 				List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 				rules.addAll(newParents);
-			}
 
-			sortedList.remove(parent);
-			rules.remove(parent);
+				rules.remove(parent);
+			}
 		}
 	}
 
