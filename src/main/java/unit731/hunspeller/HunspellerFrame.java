@@ -3,6 +3,7 @@ package unit731.hunspeller;
 import java.awt.Component;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1112,6 +1113,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
+
+				//show first row
+				Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
+				frame.dicTable.scrollRectToVisible(cellRect);
 
 				frame.totalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
