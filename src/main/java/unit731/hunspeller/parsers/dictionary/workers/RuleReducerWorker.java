@@ -164,7 +164,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length());
+//	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length());
+	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
+		//FIXME resolve that `anAddition` call: it hasn't to be there
+		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.anAddition().indexOf(SLASH): entry.anAddition().length())).reversed());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -204,29 +207,29 @@ System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() 
 disjointRules.forEach(System.out::println);
 
 //remove same condition rules?
-				boolean sameConditions = true;
-				while(sameConditions){
-					sameConditions = false;
-
-					Map<String, List<LineEntry>> sameConditionBucket = bucket(disjointRules, rule -> rule.condition);
-					for(List<LineEntry> multiConditionList : sameConditionBucket.values())
-						if(multiConditionList.size() > 1){
-							sameConditions = true;
-
-							for(LineEntry entry : multiConditionList){
-								String group = extractGroup(entry.from, entry.condition.length());
-								for(char chr : group.toCharArray()){
-									String cond = chr + entry.condition;
-									List<String> from = entry.from.stream()
-										.filter(f -> f.endsWith(cond))
-										.collect(Collectors.toList());
-									LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
-									disjointRules.add(newEntry);
-								}
-								disjointRules.remove(entry);
-							}
-						}
-				}
+//				boolean sameConditions = true;
+//				while(sameConditions){
+//					sameConditions = false;
+//
+//					Map<String, List<LineEntry>> sameConditionBucket = bucket(disjointRules, rule -> rule.condition);
+//					for(List<LineEntry> multiConditionList : sameConditionBucket.values())
+//						if(multiConditionList.size() > 1){
+//							sameConditions = true;
+//
+//							for(LineEntry entry : multiConditionList){
+//								String group = extractGroup(entry.from, entry.condition.length());
+//								for(char chr : group.toCharArray()){
+//									String cond = chr + entry.condition;
+//									List<String> from = entry.from.stream()
+//										.filter(f -> f.endsWith(cond))
+//										.collect(Collectors.toList());
+//									LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
+//									disjointRules.add(newEntry);
+//								}
+//								disjointRules.remove(entry);
+//							}
+//						}
+//				}
 //TODO
 
 				disjoinConditions(disjointRules);
