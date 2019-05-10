@@ -298,26 +298,29 @@ disjointRules.forEach(System.out::println);
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
-			String parentCondition = parent.condition;
-			int parentConditionLength = parentCondition.length();
 
 			List<LineEntry> children = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parentCondition))
+				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
-			if(children.isEmpty())
-				continue;
+			//FIXME what if there are more parents with the same condition? one cannot just skip!
+			if(children.isEmpty()){
+				//TODO
+//				continue;
+throw new IllegalArgumentException("yet to be coded!");
+			}
 
-			Set<String> parentFrom = parent.from;
-			String parentGroup = extractGroup(parentFrom, parentConditionLength);
+			int parentConditionLength = parent.condition.length();
+			String parentGroup = extractGroup(parent.from, parentConditionLength);
+
 			Set<String> childrenFrom = children.stream()
 				 .flatMap(entry -> entry.from.stream())
 				 .collect(Collectors.toSet());
-
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//split parents between belonging to children group and not belonging to children group
 				String notChildrenGroup = makeNotGroup(childrenGroup);
-				Map<String, List<String>> parentChildrenBucket = bucket(parentFrom,
+				Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
 					from -> {
 						char chr = from.charAt(from.length() - parentConditionLength - 1);
 						return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
@@ -353,7 +356,7 @@ disjointRules.forEach(System.out::println);
 				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				String newCondition = makeNotGroup(childrenGroup) + parentCondition;
+				String newCondition = makeNotGroup(childrenGroup) + parent.condition;
 				rules.add(LineEntry.createFrom(parent, newCondition, parent.from));
 
 				for(LineEntry child : children)
