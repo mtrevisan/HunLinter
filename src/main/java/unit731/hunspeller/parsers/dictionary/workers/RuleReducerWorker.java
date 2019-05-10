@@ -164,14 +164,14 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-//	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length());
 	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
 		//FIXME resolve that `anAddition` call: it hasn't to be there
 		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.anAddition().indexOf(SLASH): entry.anAddition().length())).reversed());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
-	public RuleReducerWorker(String flag, boolean keepLongestCommonAffix, AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+	public RuleReducerWorker(String flag, boolean keepLongestCommonAffix, AffixData affixData, DictionaryParser dicParser,
+			WordGenerator wordGenerator){
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);
 		Objects.requireNonNull(wordGenerator);
@@ -269,7 +269,9 @@ disjointRules.forEach(System.out::println);
 			AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
 				String word = lastAppliedRule.undoRule(production.getWord());
-				LineEntry affixEntry = (lastAppliedRule.isSuffix()? createSuffixEntry(production, word, type): createPrefixEntry(production, word, type));
+				LineEntry affixEntry = (lastAppliedRule.isSuffix()?
+					createSuffixEntry(production, word, type):
+					createPrefixEntry(production, word, type));
 				plainRules.add(affixEntry);
 			}
 		}
@@ -296,14 +298,15 @@ disjointRules.forEach(System.out::println);
 
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
+			String parentCondition = parent.condition;
+			int parentConditionLength = parentCondition.length();
 
 			List<LineEntry> children = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.filter(entry -> entry.condition.endsWith(parentCondition))
 				.collect(Collectors.toList());
 			if(children.isEmpty())
 				continue;
 
-			int parentConditionLength = parent.condition.length();
 			Set<String> parentFrom = parent.from;
 			String parentGroup = extractGroup(parentFrom, parentConditionLength);
 			Set<String> childrenFrom = children.stream()
@@ -335,24 +338,11 @@ disjointRules.forEach(System.out::println);
 						LineEntry icr = itr.next();
 
 						//remove from in-common rules those already presents in new parents
-//						boolean removed = false;
 						for(LineEntry np : newParents)
 							if(np.condition.endsWith(icr.condition)){
 								itr.remove();
-//								removed = true;
 								break;
 							}
-
-//						if(!removed){
-//							List<String> conditions = inCommonRules.stream()
-//								.map(entry -> entry.condition)
-//								.collect(Collectors.toList());
-//							String lettersToRemove = extractGroup(conditions, parent.condition.length());
-//							//remove `lettersToRemove` from `childrenGroup`
-//							String cleanedChildrenGroup = StringUtils.replaceEach(childrenGroup, lettersToRemove.split(""), new String[]{StringUtils.EMPTY});
-//							//substitute into notInCommonRule.condition
-//							notInCommonRule.condition = makeNotGroup(cleanedChildrenGroup) + parent.condition;
-//						}
 					}
 				}
 
@@ -363,8 +353,8 @@ disjointRules.forEach(System.out::println);
 				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				String condition = makeNotGroup(childrenGroup) + parent.condition;
-				rules.add(LineEntry.createFrom(parent, condition, parent.from));
+				String newCondition = makeNotGroup(childrenGroup) + parentCondition;
+				rules.add(LineEntry.createFrom(parent, newCondition, parent.from));
 
 				for(LineEntry child : children)
 					if(child.condition.length() == parentConditionLength){
