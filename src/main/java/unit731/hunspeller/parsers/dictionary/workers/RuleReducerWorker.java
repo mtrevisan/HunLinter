@@ -269,49 +269,18 @@ compactedRules.forEach(System.out::println);
 
 	private void disjoinSameConditions(List<LineEntry> rules) throws IllegalArgumentException{
 		Map<String, List<LineEntry>> sameConditionBucket = bucket(rules, rule -> rule.condition);
-		for(List<LineEntry> entry : sameConditionBucket.values()){
-			int size = entry.size();
-			if(size == 1)
-				continue;
+		for(List<LineEntry> entry : sameConditionBucket.values())
+			if(entry.size() > 1){
+				//extract parent's group
+				Map<LineEntry, String> parentsGroups = entry.stream()
+					.collect(Collectors.toMap(Function.identity(), e -> extractGroup(e.from, e.condition.length())));
+				//check if parents' groups are disjoint
+				Set<String> parentsGroupsIntersection = parentsGroups.values().stream()
+					.map(group -> (Set<String>)new HashSet<>(Arrays.asList(group.split(""))))
+					.reduce(new HashSet<>(), (group1, group2) -> SetHelper.intersection(group1, group2));
+				if(!parentsGroupsIntersection.isEmpty())
+					throw new IllegalArgumentException("yet to be coded!");
 
-			//extract parent's group
-			Map<LineEntry, String> parentsGroups = entry.stream()
-				.collect(Collectors.toMap(Function.identity(), e -> extractGroup(e.from, e.condition.length())));
-			//check if parents' groups are disjoint
-			Set<String> parentsGroupsIntersection = parentsGroups.values().stream()
-				.map(group -> (Set<String>)new HashSet<>(Arrays.asList(group.split(""))))
-				.reduce(new HashSet<>(), (group1, group2) -> SetHelper.intersection(group1, group2));
-			if(!parentsGroupsIntersection.isEmpty())
-				throw new IllegalArgumentException("yet to be coded!");
-
-//			if(size == 2){
-//				//sort groups
-//				List<Map.Entry<LineEntry, String>> sortedGroups = parentsGroups.entrySet().stream()
-//					.sorted(Comparator.comparingInt(e -> e.getValue().length()))
-//					.collect(Collectors.toList());
-//				Map.Entry<LineEntry, String> shortestEntry = sortedGroups.get(0);
-//				Map.Entry<LineEntry, String> longestEntry = sortedGroups.get(1);
-//				//modify conditions
-//				for(char chr : longestEntry.getValue().toCharArray()){
-//					LineEntry newEntry = longestEntry.getKey();
-//					String cond = chr + newEntry.condition;
-//					List<String> from = newEntry.from.stream()
-//						.filter(f -> f.endsWith(cond))
-//						.collect(Collectors.toList());
-//					rules.add(LineEntry.createFrom(newEntry, cond, from));
-//				}
-//				rules.remove(longestEntry.getKey());
-//				for(char chr : shortestEntry.getValue().toCharArray()){
-//					LineEntry newEntry = shortestEntry.getKey();
-//					String cond = chr + newEntry.condition;
-//					List<String> from = newEntry.from.stream()
-//						.filter(f -> f.endsWith(cond))
-//						.collect(Collectors.toList());
-//					rules.add(LineEntry.createFrom(newEntry, cond, from));
-//				}
-//				rules.remove(shortestEntry.getKey());
-//			}
-//			else{
 				for(Map.Entry<LineEntry, String> e : parentsGroups.entrySet()){
 					LineEntry newEntry = e.getKey();
 					for(char chr : e.getValue().toCharArray()){
@@ -323,9 +292,7 @@ compactedRules.forEach(System.out::println);
 					}
 				}
 				entry.forEach(rules::remove);
-//throw new IllegalArgumentException("yet to be coded!");
-//			}
-		}
+			}
 	}
 
 	private void disjoinSameEndingConditions(List<LineEntry> rules){
