@@ -38,6 +38,7 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class RuleReducerWorker extends WorkerDictionaryBase{
@@ -164,9 +165,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private FlagParsingStrategy strategy;
 	private Comparator<String> comparator;
-	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
+	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
+//	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt((LineEntry entry) -> entry.condition.length())
 		//FIXME resolve that `anAddition` call: it hasn't to be there
-		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.anAddition().indexOf(SLASH): entry.anAddition().length())).reversed());
+//		.thenComparing(Comparator.comparingInt((LineEntry entry) -> (entry.addition.contains(SLASH)? entry.anAddition().indexOf(SLASH): entry.anAddition().length())).reversed());
 	private Comparator<LineEntry> lineEntryComparator;
 
 
@@ -201,22 +203,22 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				List<LineEntry> compactedRules = compactRules(plainRules);
+System.out.println("\r\ncollectIntoEquivalenceClasses (" + compactedRules.size() + "):");
+compactedRules.forEach(System.out::println);
 
-				List<LineEntry> disjointRules = collectIntoEquivalenceClasses(compactedRules);
-System.out.println("\r\ncollectIntoEquivalenceClasses (" + disjointRules.size() + "):");
-disjointRules.forEach(System.out::println);
+				disjoinSameConditions(compactedRules);
 
-				disjoinConditions(disjointRules);
-System.out.println("\r\nremoveOverlappingConditions (" + disjointRules.size() + "):");
-disjointRules.forEach(System.out::println);
+				disjoinSameEndingConditions(compactedRules);
+System.out.println("\r\nremoveOverlappingConditions (" + compactedRules.size() + "):");
+compactedRules.forEach(System.out::println);
 
 				//FIXME remove this useless call, manage duplications in removeOverlappingConditions...?
-				mergeSimilarRules(disjointRules);
-				transformSingleNotGroup(disjointRules);
-System.out.println("\r\nmergeSimilarRules (" + disjointRules.size() + "):");
-disjointRules.forEach(System.out::println);
+//				mergeSimilarRules(compactedRules);
+//				transformSingleNotGroup(compactedRules);
+System.out.println("\r\nmergeSimilarRules (" + compactedRules.size() + "):");
+compactedRules.forEach(System.out::println);
 
-				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, disjointRules);
+				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
 //TODO check feasibility of solution?
 
@@ -226,6 +228,8 @@ disjointRules.forEach(System.out::println);
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
+
+				e.printStackTrace();
 			}
 		};
 		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
@@ -251,21 +255,80 @@ disjointRules.forEach(System.out::println);
 		}
 	}
 
-	//same originating word, same removal, and same condition parts
 	private List<LineEntry> compactRules(List<LineEntry> entries){
-		return collect(entries,
+		//same originating word, same removal, and same condition parts
+		List<LineEntry> intermediate = collect(entries,
 			entry -> entry.from.hashCode() + TAB + entry.removal + TAB + entry.condition,
 			(rule, entry) -> rule.addition.addAll(entry.addition));
-	}
 
-	//same removal, same addition, and same condition parts
-	private List<LineEntry> collectIntoEquivalenceClasses(List<LineEntry> entries){
-		return collect(entries,
+		//same removal, same addition, and same condition parts
+		return collect(intermediate,
 			entry -> entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private void disjoinConditions(List<LineEntry> rules){
+	private void disjoinSameConditions(List<LineEntry> rules) throws IllegalArgumentException{
+		Map<String, List<LineEntry>> sameConditionBucket = bucket(rules, rule -> rule.condition);
+		for(List<LineEntry> entry : sameConditionBucket.values()){
+			int size = entry.size();
+			if(size == 1)
+				continue;
+
+			//extract parent's group
+			Map<LineEntry, String> parentsGroups = entry.stream()
+				.collect(Collectors.toMap(Function.identity(), e -> extractGroup(e.from, e.condition.length())));
+			//check if parents' groups are disjoint
+			Set<String> parentsGroupsIntersection = parentsGroups.values().stream()
+				.map(group -> (Set<String>)new HashSet<>(Arrays.asList(group.split(""))))
+				.reduce(new HashSet<>(), (group1, group2) -> SetHelper.intersection(group1, group2));
+			if(!parentsGroupsIntersection.isEmpty())
+				throw new IllegalArgumentException("yet to be coded!");
+
+//			if(size == 2){
+//				//sort groups
+//				List<Map.Entry<LineEntry, String>> sortedGroups = parentsGroups.entrySet().stream()
+//					.sorted(Comparator.comparingInt(e -> e.getValue().length()))
+//					.collect(Collectors.toList());
+//				Map.Entry<LineEntry, String> shortestEntry = sortedGroups.get(0);
+//				Map.Entry<LineEntry, String> longestEntry = sortedGroups.get(1);
+//				//modify conditions
+//				for(char chr : longestEntry.getValue().toCharArray()){
+//					LineEntry newEntry = longestEntry.getKey();
+//					String cond = chr + newEntry.condition;
+//					List<String> from = newEntry.from.stream()
+//						.filter(f -> f.endsWith(cond))
+//						.collect(Collectors.toList());
+//					rules.add(LineEntry.createFrom(newEntry, cond, from));
+//				}
+//				rules.remove(longestEntry.getKey());
+//				for(char chr : shortestEntry.getValue().toCharArray()){
+//					LineEntry newEntry = shortestEntry.getKey();
+//					String cond = chr + newEntry.condition;
+//					List<String> from = newEntry.from.stream()
+//						.filter(f -> f.endsWith(cond))
+//						.collect(Collectors.toList());
+//					rules.add(LineEntry.createFrom(newEntry, cond, from));
+//				}
+//				rules.remove(shortestEntry.getKey());
+//			}
+//			else{
+				for(Map.Entry<LineEntry, String> e : parentsGroups.entrySet()){
+					LineEntry newEntry = e.getKey();
+					for(char chr : e.getValue().toCharArray()){
+						String cond = chr + newEntry.condition;
+						List<String> from = newEntry.from.stream()
+							.filter(f -> f.endsWith(cond))
+							.collect(Collectors.toList());
+						rules.add(LineEntry.createFrom(newEntry, cond, from));
+					}
+				}
+				entry.forEach(rules::remove);
+//throw new IllegalArgumentException("yet to be coded!");
+//			}
+		}
+	}
+
+	private void disjoinSameEndingConditions(List<LineEntry> rules){
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
@@ -274,38 +337,10 @@ disjointRules.forEach(System.out::println);
 			LineEntry parent = sortedList.remove(0);
 
 			List<LineEntry> children = sortedList.stream()
-				//FIXME has to be excluded those that have entry.condition.equals(parent.condition)?
-				.filter(entry -> !entry.condition.equals(parent.condition) && entry.condition.endsWith(parent.condition))
+				.filter(entry -> SEQUENCER.endsWith(RegExpSequencer.splitSequence(entry.condition), RegExpSequencer.splitSequence(parent.condition)))
 				.collect(Collectors.toList());
-			if(children.isEmpty()){
-				List<LineEntry> parents = sortedList.stream()
-					.filter(entry -> entry.condition.equals(parent.condition))
-					.collect(Collectors.toList());
-				if(!parents.isEmpty()){
-					//FIXME what if there are more parents with the same condition? one cannot just skip!
-//remove same condition rules?
-					parents.add(parent);
-					for(LineEntry entry : parents){
-						String group = extractGroup(entry.from, entry.condition.length());
-						for(char chr : group.toCharArray()){
-							String cond = chr + entry.condition;
-							List<String> from = entry.from.stream()
-								.filter(f -> f.endsWith(cond))
-								.collect(Collectors.toList());
-							LineEntry newEntry = LineEntry.createFrom(entry, cond, from);
-							sortedList.add(newEntry);
-							rules.add(newEntry);
-						}
-						sortedList.remove(entry);
-						rules.remove(entry);
-					}
-
-					sortedList.sort(shortestConditionComparator);
-				}
-
+			if(children.isEmpty())
 				continue;
-//throw new IllegalArgumentException("yet to be coded!");
-			}
 
 			int parentConditionLength = parent.condition.length();
 			String parentGroup = extractGroup(parent.from, parentConditionLength);
@@ -498,7 +533,45 @@ disjointRules.forEach(System.out::println);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private void mergeSimilarRules(Collection<LineEntry> entries){
+	private void mergeSimilarRules(List<LineEntry> entries){
+//		List<LineEntry> mergedEntries = new ArrayList<>();
+//
+//		//sort entries by condition length
+//		entries.sort(Comparator.comparingInt(entry -> RegExpSequencer.splitSequence(entry.condition).length));
+//		Iterator<LineEntry> itr = entries.iterator();
+//		while(itr.hasNext()){
+//			LineEntry entry = itr.next();
+//			itr.remove();
+//
+//			int index = 0;
+//			if(!entry.condition.endsWith(GROUP_END) && !entry.condition.substring(entry.condition.length() - index - 2, 1).equals(GROUP_END)){
+//				String ending = String.valueOf(entry.condition.charAt(entry.condition.length() - index - 1));
+//				List<LineEntry> children = entries.stream()
+//					.filter(e -> e.condition.endsWith(ending))
+//					.collect(Collectors.toList());
+//				children.forEach(entries::remove);
+//
+//				//collect
+//				String[] entryCondition = RegExpSequencer.splitSequence(entry.condition);
+//				String[] commonPreCondition = SEQUENCER.subSequence(entryCondition, 0, entryCondition.length - index - 1);
+//				String[] commonPostCondition = SEQUENCER.subSequence(entryCondition, entryCondition.length - index);
+//				String condition = children.stream()
+//					.map(e -> {
+//						String[] cond = RegExpSequencer.splitSequence(e.condition);
+//						return cond[cond.length - index - 1];
+//					})
+//					.sorted(comparator)
+//					.distinct()
+//					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END));
+//				condition = StringUtils.join(commonPreCondition) + condition + StringUtils.join(commonPostCondition);
+//				mergedEntries.add(LineEntry.createFrom(entry, condition));
+//			}
+//			else
+//				mergedEntries.add(entry);
+//		}
+//
+//		return mergedEntries;
+
 		//merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`)
 		Map<String, List<LineEntry>> mergeBucket = bucket(entries,
 			entry -> (entry.condition.contains(GROUP_END)?
