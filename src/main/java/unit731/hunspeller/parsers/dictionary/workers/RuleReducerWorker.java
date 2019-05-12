@@ -203,12 +203,13 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		Runnable completed = () -> {
 			try{
 				List<LineEntry> compactedRules = compactRules(plainRules);
-System.out.println("\r\ncollectIntoEquivalenceClasses (" + compactedRules.size() + "):");
+
+//				while(disjoinSameConditions(compactedRules)){}
+System.out.println("\r\ndisjoinSameConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
-				disjoinSameConditions(compactedRules);
-
-				disjoinSameEndingConditions(compactedRules);
+//				disjoinSameEndingConditions(compactedRules);
+bla(compactedRules);
 System.out.println("\r\nremoveOverlappingConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
@@ -267,16 +268,76 @@ compactedRules.forEach(System.out::println);
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private void disjoinSameConditions(List<LineEntry> rules) throws IllegalArgumentException{
+	private void bla(List<LineEntry> rules){
+		//sort by shortest condition
+		List<LineEntry> sortedList = new ArrayList<>(rules);
+		sortedList.sort(shortestConditionComparator);
+
+		while(!sortedList.isEmpty()){
+			LineEntry parent = sortedList.remove(0);
+
+			List<LineEntry> children = sortedList.stream()
+				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.collect(Collectors.toList());
+			if(children.isEmpty())
+				continue;
+
+			int parentConditionLength = parent.condition.length();
+			String parentGroup = extractGroup(parent.from, parentConditionLength);
+
+			Set<String> childrenFrom = children.stream()
+				 .flatMap(entry -> entry.from.stream())
+				 .collect(Collectors.toSet());
+			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+
+			if(!StringUtils.containsAny(parentGroup, childrenGroup)){
+				String parentCondition = parent.condition;
+				parent.condition = makeNotGroup(childrenGroup) + parentCondition;
+				if(!rules.contains(parent))
+					//insert back into the final set of rules if the parent was originated from a bubble-up
+					rules.add(parent);
+
+
+				//prepare to bubbling up the not groups
+				children = children.stream()
+					.filter(entry -> entry.condition.length() > parentConditionLength + 1)
+					.collect(Collectors.toList());
+				if(!children.isEmpty()){
+					childrenFrom = children.stream()
+						.flatMap(entry -> entry.from.stream())
+						.collect(Collectors.toSet());
+					childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+					for(Character chr : childrenGroup.toCharArray()){
+						String cond = chr + parentCondition;
+						List<String> from = childrenFrom.stream()
+							.filter(f -> f.endsWith(cond))
+							.collect(Collectors.toList());
+						if(!from.isEmpty())
+							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+							sortedList.add(LineEntry.createFrom(parent, cond));
+					}
+
+					sortedList.sort(shortestConditionComparator);
+				}
+			}
+			else
+				throw new IllegalArgumentException("yet to be coded!");
+
+System.out.println("");
+		}
+	}
+
+	private boolean disjoinSameConditions(List<LineEntry> rules) throws IllegalArgumentException{
+		boolean expanded = false;
 		Map<String, List<LineEntry>> sameConditionBucket = bucket(rules, rule -> rule.condition);
 		for(List<LineEntry> entry : sameConditionBucket.values())
 			if(entry.size() > 1){
-				//extract parent's group
+				//extract parent's groups
 				Map<LineEntry, String> parentsGroups = entry.stream()
 					.collect(Collectors.toMap(Function.identity(), e -> extractGroup(e.from, e.condition.length())));
 				//check if parents' groups are disjoint
-				Set<String> parentsGroupsIntersection = parentsGroups.values().stream()
-					.map(group -> (Set<String>)new HashSet<>(Arrays.asList(group.split(""))))
+				Set<Character> parentsGroupsIntersection = parentsGroups.values().stream()
+					.map(group -> group.codePoints().mapToObj(chr -> (char)chr).collect(Collectors.toSet()))
 					.reduce(new HashSet<>(), (group1, group2) -> SetHelper.intersection(group1, group2));
 				if(!parentsGroupsIntersection.isEmpty())
 					throw new IllegalArgumentException("yet to be coded!");
@@ -292,7 +353,10 @@ compactedRules.forEach(System.out::println);
 					}
 				}
 				entry.forEach(rules::remove);
+
+				expanded = true;
 			}
+		return expanded;
 	}
 
 	private void disjoinSameEndingConditions(List<LineEntry> rules){
@@ -303,8 +367,14 @@ compactedRules.forEach(System.out::println);
 		while(!sortedList.isEmpty()){
 			LineEntry parent = sortedList.remove(0);
 
+			List<LineEntry> parents = sortedList.stream()
+				.filter(entry -> !entry.removal.equals(parent.removal) && entry.condition.equals(parent.condition))
+				.collect(Collectors.toList());
+			parents.forEach(sortedList::remove);
+
+
 			List<LineEntry> children = sortedList.stream()
-				.filter(entry -> SEQUENCER.endsWith(RegExpSequencer.splitSequence(entry.condition), RegExpSequencer.splitSequence(parent.condition)))
+				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 			if(children.isEmpty())
 				continue;
