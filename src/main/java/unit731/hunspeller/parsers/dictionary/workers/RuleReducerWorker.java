@@ -290,7 +290,12 @@ compactedRules.forEach(System.out::println);
 				 .collect(Collectors.toSet());
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
-			if(!StringUtils.containsAny(parentGroup, childrenGroup)){
+			if(StringUtils.containsAny(parentGroup, childrenGroup)){
+System.out.println("");
+
+throw new IllegalArgumentException("yet to be coded!");
+			}
+			else{
 				String parentCondition = parent.condition;
 				parent.condition = makeNotGroup(childrenGroup) + parentCondition;
 				if(!rules.contains(parent))
@@ -309,10 +314,7 @@ compactedRules.forEach(System.out::println);
 					childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 					for(Character chr : childrenGroup.toCharArray()){
 						String cond = chr + parentCondition;
-						List<String> from = childrenFrom.stream()
-							.filter(f -> f.endsWith(cond))
-							.collect(Collectors.toList());
-						if(!from.isEmpty())
+						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)))
 							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
 							sortedList.add(LineEntry.createFrom(parent, cond));
 					}
@@ -320,10 +322,6 @@ compactedRules.forEach(System.out::println);
 					sortedList.sort(shortestConditionComparator);
 				}
 			}
-			else
-				throw new IllegalArgumentException("yet to be coded!");
-
-System.out.println("");
 		}
 	}
 
