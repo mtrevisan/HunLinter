@@ -291,7 +291,8 @@ compactedRules.forEach(System.out::println);
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
-				//split parent between belonging to children group and not belonging to children group
+				//intersection exists between parent group and children group, split parent between belonging to children group
+				//and not belonging to children group
 				String notChildrenGroup = makeNotGroup(childrenGroup);
 				Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
 					from -> {
@@ -346,8 +347,8 @@ compactedRules.forEach(System.out::println);
 				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				String parentCondition = parent.condition;
-				parent.condition = makeNotGroup(childrenGroup) + parentCondition;
+				//no intersection exists between parent group and children group, modify the parent condition
+				parent.condition = makeNotGroup(childrenGroup) + parent.condition;
 				if(!rules.contains(parent))
 					//insert back into the final set of rules if the parent was originated from a bubble-up
 					rules.add(parent);
@@ -363,7 +364,7 @@ compactedRules.forEach(System.out::println);
 						.collect(Collectors.toSet());
 					String bubbleChildrenGroup = extractGroup(childrenFrom, parentConditionLength);
 					for(Character chr : bubbleChildrenGroup.toCharArray()){
-						String cond = chr + parentCondition;
+						String cond = chr + parent.condition;
 						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)))
 							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
 							sortedList.add(LineEntry.createFrom(parent, cond));
