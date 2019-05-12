@@ -290,6 +290,27 @@ compactedRules.forEach(System.out::println);
 				 .collect(Collectors.toSet());
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
+/*
+#SFX §0 Y 13
+#SFX §0 0 ta/F0 . ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la)
+#SFX §0 òba obata/F0 òba
+#SFX §0 òka okata/F0 òka
+#SFX §0 òna onata/F0 òna
+#SFX §0 òsa osata/F0 òsa
+#SFX §0 èla elata/F0 èla
+#SFX §0 o ato/M0FS o (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
+#SFX §0 òbo obato/M0FS òbo
+#SFX §0 òko okato/M0FS òko
+#SFX §0 òmo omato/M0FS òmo
+#SFX §0 òvo ovato/M0FS òvo
+#SFX §0 0 ato/M0FS . ({l}nr/a{l}o > [^è]l)
+#SFX §0 èl elato/M0FS èl
+
+#SFX §0 0 ta/F0 a (cdi{kln}r{s}x/b{klns} > [^bklns]a + [^ò][bkns]a + [^è]la)
+#SFX §0 0 ta/F0 [^lnor] ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la) > NO!, because all ends in 'a's
+#SFX §0 o ato/M0FS ko (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
+#SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
+*/
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
 				//and not belonging to children group
