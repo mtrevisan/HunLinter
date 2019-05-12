@@ -307,17 +307,18 @@ compactedRules.forEach(System.out::println);
 				if(notInCommonRule != null){
 					rules.add(notInCommonRule);
 
-//					for(Character chr : childrenGroup.toCharArray()){
-//						String cond = chr + parent.condition;
-//						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) && !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))){
-//							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
-//							List<String> from = parent.from.stream()
-//								.filter(f -> f.endsWith(cond))
-//								.collect(Collectors.toList());
+					for(Character chr : childrenGroup.toCharArray()){
+						String cond = chr + parent.condition;
+//						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) /*&& !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))*/){
+							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+							List<String> from = parent.from.stream()
+								.filter(f -> f.endsWith(cond))
+								.collect(Collectors.toList());
 //							if(!sortedList.stream().anyMatch(e -> e.removal.equals(parent.removal) && e.condition.equals(cond)))
-//								sortedList.add(LineEntry.createFrom(parent, cond, from));
+								sortedList.add(LineEntry.createFrom(parent, cond, from));
 //						}
-//					}
+					}
+					inCommonRules.clear();
 
 //					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 //					if(!newParents.isEmpty()){
@@ -347,12 +348,7 @@ compactedRules.forEach(System.out::println);
 				sortedList.sort(shortestConditionComparator);
 			}
 			else{
-				//no intersection exists between parent group and children group, modify the parent condition
-				parent.condition = makeNotGroup(childrenGroup) + parent.condition;
-				if(!rules.contains(parent))
-					//insert back into the final set of rules if the parent was originated from a bubble-up
-					rules.add(parent);
-
+				//no intersection exists between parent group and children group
 
 				//prepare to bubbling up the not groups
 				children = children.stream()
@@ -372,6 +368,12 @@ compactedRules.forEach(System.out::println);
 
 					sortedList.sort(shortestConditionComparator);
 				}
+
+				//modify the parent condition
+				parent.condition = makeNotGroup(childrenGroup) + parent.condition;
+				if(!rules.contains(parent))
+					//insert back into the final set of rules if the parent was originated from a previous bubble-up
+					rules.add(parent);
 			}
 		}
 	}
