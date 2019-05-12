@@ -291,9 +291,59 @@ compactedRules.forEach(System.out::println);
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
-System.out.println("");
+				//split parent between belonging to children group and not belonging to children group
+				String notChildrenGroup = makeNotGroup(childrenGroup);
+				Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
+					from -> {
+						char chr = from.charAt(from.length() - parentConditionLength - 1);
+						return (StringUtils.contains(childrenGroup, chr)? String.valueOf(chr): notChildrenGroup);
+					}
+				);
+				Pair<LineEntry, List<LineEntry>> newRules = extractCommunalities(parentChildrenBucket, parent);
+				LineEntry notInCommonRule = newRules.getLeft();
+				List<LineEntry> inCommonRules = newRules.getRight();
 
-throw new IllegalArgumentException("yet to be coded!");
+				if(notInCommonRule != null){
+					rules.add(notInCommonRule);
+
+//					for(Character chr : childrenGroup.toCharArray()){
+//						String cond = chr + parent.condition;
+//						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) && !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))){
+//							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+//							List<String> from = parent.from.stream()
+//								.filter(f -> f.endsWith(cond))
+//								.collect(Collectors.toList());
+//							if(!sortedList.stream().anyMatch(e -> e.removal.equals(parent.removal) && e.condition.equals(cond)))
+//								sortedList.add(LineEntry.createFrom(parent, cond, from));
+//						}
+//					}
+
+//					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
+//					if(!newParents.isEmpty()){
+//						rules.addAll(newParents);
+//
+//						Iterator<LineEntry> itr = inCommonRules.iterator();
+//						while(itr.hasNext()){
+//							LineEntry icr = itr.next();
+//
+//							//remove from in-common rules those already presents in new parents
+//							for(LineEntry np : newParents)
+//								if(np.condition.endsWith(icr.condition)){
+//									itr.remove();
+//									break;
+//								}
+//						}
+//					}
+				}
+
+				//add new parents to the original list
+//				rules.addAll(inCommonRules);
+
+				rules.remove(parent);
+
+				//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+				sortedList.addAll(inCommonRules);
+				sortedList.sort(shortestConditionComparator);
 			}
 			else{
 				String parentCondition = parent.condition;
@@ -311,8 +361,8 @@ throw new IllegalArgumentException("yet to be coded!");
 					childrenFrom = children.stream()
 						.flatMap(entry -> entry.from.stream())
 						.collect(Collectors.toSet());
-					childrenGroup = extractGroup(childrenFrom, parentConditionLength);
-					for(Character chr : childrenGroup.toCharArray()){
+					String bubbleChildrenGroup = extractGroup(childrenFrom, parentConditionLength);
+					for(Character chr : bubbleChildrenGroup.toCharArray()){
 						String cond = chr + parentCondition;
 						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)))
 							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
