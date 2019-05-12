@@ -293,6 +293,14 @@ compactedRules.forEach(System.out::println);
 			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
 				//and not belonging to children group
+//				for(Character chr : parentGroup.toCharArray()){
+//					String cond = chr + parent.condition;
+//					List<String> from = parent.from.stream()
+//						.filter(f -> f.endsWith(cond))
+//						.collect(Collectors.toList());
+//					//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+//					sortedList.add(LineEntry.createFrom(parent, cond, from));
+//				}
 				String notChildrenGroup = makeNotGroup(childrenGroup);
 				Map<String, List<String>> parentChildrenBucket = bucket(parent.from,
 					from -> {
@@ -307,18 +315,18 @@ compactedRules.forEach(System.out::println);
 				if(notInCommonRule != null){
 					rules.add(notInCommonRule);
 
-					for(Character chr : childrenGroup.toCharArray()){
-						String cond = chr + parent.condition;
-//						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) /*&& !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))*/){
-							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
-							List<String> from = parent.from.stream()
-								.filter(f -> f.endsWith(cond))
-								.collect(Collectors.toList());
-//							if(!sortedList.stream().anyMatch(e -> e.removal.equals(parent.removal) && e.condition.equals(cond)))
-								sortedList.add(LineEntry.createFrom(parent, cond, from));
-//						}
-					}
-					inCommonRules.clear();
+//					for(Character chr : childrenGroup.toCharArray()){
+//						String cond = chr + parent.condition;
+////						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) /*&& !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))*/){
+//							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+//							List<String> from = parent.from.stream()
+//								.filter(f -> f.endsWith(cond))
+//								.collect(Collectors.toList());
+////							if(!sortedList.stream().anyMatch(e -> e.removal.equals(parent.removal) && e.condition.equals(cond)))
+//								sortedList.add(LineEntry.createFrom(parent, cond, from));
+////						}
+//					}
+//					inCommonRules.clear();
 
 //					List<LineEntry> newParents = bubbleUpNotGroup(parent, sortedList);
 //					if(!newParents.isEmpty()){
