@@ -290,6 +290,10 @@ compactedRules.forEach(System.out::println);
 				 .collect(Collectors.toSet());
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
+			parent.condition = makeNotGroup(childrenGroup) + parent.condition;
+			Map<Character, List<String>> as = bucket(childrenFrom, from -> from.charAt(from.length() - parentConditionLength - 1));
+as.size();
+
 /*
 #SFX §0 Y 13
 #SFX §0 0 ta/F0 . ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la)
@@ -311,7 +315,7 @@ compactedRules.forEach(System.out::println);
 #SFX §0 o ato/M0FS ko (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
 #SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
 */
-			if(StringUtils.containsAny(parentGroup, childrenGroup)){
+/*			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
 				//and not belonging to children group
 //				for(Character chr : parentGroup.toCharArray()){
@@ -338,7 +342,7 @@ compactedRules.forEach(System.out::println);
 
 //					for(Character chr : childrenGroup.toCharArray()){
 //						String cond = chr + parent.condition;
-////						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) /*&& !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))*/){
+////						if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)) / *&& !inCommonRules.stream().anyMatch(e -> e.condition.equals(cond))* /){
 //							//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
 //							List<String> from = parent.from.stream()
 //								.filter(f -> f.endsWith(cond))
@@ -403,7 +407,7 @@ compactedRules.forEach(System.out::println);
 				if(!rules.contains(parent))
 					//insert back into the final set of rules if the parent was originated from a previous bubble-up
 					rules.add(parent);
-			}
+			}*/
 		}
 	}
 
