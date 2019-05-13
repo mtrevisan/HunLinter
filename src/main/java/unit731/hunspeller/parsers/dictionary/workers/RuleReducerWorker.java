@@ -281,74 +281,61 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			//if intersection(parent-group, children-group) is not empty
 			Set<Character> parenGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
 			Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
-			Set<Character> intersect = SetHelper.intersection(parenGroupSet, childrenGroupSet);
-			if(!intersect.isEmpty()){
+			Set<Character> intersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
+			if(!intersection.isEmpty()){
 				//if parent.condition is empty
 				if(parent.condition.isEmpty()){
 					//add new rule from parent with condition the intersection
-					String condition = intersect.stream()
-						.map(String::valueOf)
-						.sorted(comparator)
-						.collect(Collectors.joining());
+					String condition = mergeSet(intersection);
 					List<String> from = parent.from.stream()
 						.filter(f -> StringUtils.endsWithAny(f, condition))
 						.collect(Collectors.toList());
 					LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(condition), from);
-
 					sortedList.add(newEntry);
-
-					rules.remove(parent);
 					rules.add(newEntry);
 
-					parenGroupSet.removeAll(intersect);
+					parenGroupSet.removeAll(intersection);
 					if(!parenGroupSet.isEmpty()){
-						String cond = parenGroupSet.stream()
-							.map(String::valueOf)
-							.sorted(comparator)
-							.collect(Collectors.joining());
-						rules.add(LineEntry.createFrom(parent, makeGroup(cond)));
+						String cond = mergeSet(parenGroupSet);
+						newEntry = LineEntry.createFrom(parent, makeGroup(cond));
+						rules.add(newEntry);
 					}
 				}
 				else{
-					List<LineEntry> bubbles = sortedList.stream()
-						.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength + 1)
-						.collect(Collectors.toList());
+					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
 					//if !can-bubble-up
 					if(bubbles.isEmpty())
 						throw new IllegalArgumentException("cannot bubble-up not-group!");
 
 					//add new rule from parent with condition NOT(children-group)
 					String condition = makeNotGroup(childrenGroup) + parent.condition;
-					rules.add(LineEntry.createFrom(parent, condition));
+					LineEntry newEntry = LineEntry.createFrom(parent, condition);
+					rules.add(newEntry);
 
 					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 					rules.addAll(bubbledRules);
 
 					//remove children from list
 					bubbles.forEach(sortedList::remove);
-					rules.remove(parent);
 				}
 			}
 			else{
-				List<LineEntry> bubbles = sortedList.stream()
-					.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength + 1)
-					.collect(Collectors.toList());
+				List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
 				//if can-bubble-up
 				if(!bubbles.isEmpty()){
 					//add new rule from parent with condition NOT(children-group)
 					String condition = makeNotGroup(childrenGroup) + parent.condition;
-					rules.add(LineEntry.createFrom(parent, condition));
+					LineEntry newEntry = LineEntry.createFrom(parent, condition);
+					rules.add(newEntry);
 
 					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 					rules.addAll(bubbledRules);
 
 					//remove children from list
 					bubbles.forEach(sortedList::remove);
-					rules.remove(parent);
 				}
 
-				//add new rule from parent with condition NOT(children-group-1)
-				parent.condition = makeNotGroup(childrenGroup) + parent.condition;
+				rules.remove(parent);
 			}
 
 /*
@@ -429,6 +416,20 @@ else
 	add new rule from parent with condition NOT(children-group-1)
 */
 		}
+	}
+
+	private List<LineEntry> extractRuleBubbles(LineEntry parent, List<LineEntry> sortedList){
+		int parentConditionLength = parent.condition.length();
+		return sortedList.stream()
+			.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength + 1)
+			.collect(Collectors.toList());
+	}
+
+	private String mergeSet(Set<Character> set){
+		return set.stream()
+			.map(String::valueOf)
+			.sorted(comparator)
+			.collect(Collectors.joining());
 	}
 
 	private String extractGroup(Collection<String> words, int indexFromLast){
