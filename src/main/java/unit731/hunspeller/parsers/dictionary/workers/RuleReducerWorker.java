@@ -295,12 +295,8 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
 			//if intersection(parent-group, children-group) is not empty
-			Set<Character> parenGroupSet = parentGroup.codePoints()
-				.mapToObj(chr -> (char)chr)
-				.collect(Collectors.toSet());
-			Set<Character> childrenGroupSet = childrenGroup.codePoints()
-				.mapToObj(chr -> (char)chr)
-				.collect(Collectors.toSet());
+			Set<Character> parenGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
+			Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
 			Set<Character> intersect = SetHelper.intersection(parenGroupSet, childrenGroupSet);
 			if(!intersect.isEmpty()){
 				//if parent.condition is empty
@@ -313,22 +309,37 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					List<String> from = parent.from.stream()
 						.filter(f -> StringUtils.endsWithAny(f, condition))
 						.collect(Collectors.toList());
-					sortedList.add(LineEntry.createFrom(parent, condition, from));
+					LineEntry newEntry = LineEntry.createFrom(parent, condition, from);
+
+					sortedList.add(newEntry);
+
+					rules.remove(parent);
+					rules.add(newEntry);
 				}
 				else{
+					List<LineEntry> bubbles = sortedList.stream()
+						.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength + 1)
+						.collect(Collectors.toList());
 					//if !can-bubble-up
-//TODO
-boolean canBubbleUp = true;
-					if(!canBubbleUp)
+					if(bubbles.isEmpty())
 						throw new IllegalArgumentException("cannot bubble-up not-group!");
 
 					//add new rule from parent with condition NOT(children-group)
-					String condition = makeNotGroup(childrenGroup);
-					sortedList.add(LineEntry.createFrom(parent, condition + parent.condition));
+					String condition = makeNotGroup(childrenGroup) + parent.condition;
+					rules.add(LineEntry.createFrom(parent, condition));
 
 					//bubble up by bucketing children for group-2
+					List<String> bubblesCondition = bubbles.stream()
+						.map(entry -> entry.condition)
+						.collect(Collectors.toList());
+					Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, parentConditionLength));
 					//for each children-group-2
-					//	add new rule from parent with condition NOT(children-group-2)
+					for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
+						//add new rule from parent with condition starting with NOT(children-group-2)
+						String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
+						condition = makeNotGroup(conds.getKey()) + makeGroup(bubbleGroup) + parent.condition;
+						rules.add(LineEntry.createFrom(parent, condition));
+					}
 
 					//remove children from list
 					children.forEach(sortedList::remove);
@@ -415,7 +426,7 @@ if intersection(parent-group, children-group) is not empty{
 		add new rule from parent with condition NOT(children-group)
 		bubble up by bucketing children for group-2
 		for each children-group-2
-			add new rule from parent with condition NOT(children-group-2)
+			add new rule from parent with condition starting with NOT(children-group-2)
 		remove children from list
 	}
 }
@@ -528,7 +539,7 @@ else
 					.collect(Collectors.toMap(Function.identity(), e -> extractGroup(e.from, e.condition.length())));
 				//check if parents' groups are disjoint
 				Set<Character> parentsGroupsIntersection = parentsGroups.values().stream()
-					.map(group -> group.codePoints().mapToObj(chr -> (char)chr).collect(Collectors.toSet()))
+					.map(SetHelper::makeCharacterSetFrom)
 					.reduce(new HashSet<>(), (group1, group2) -> SetHelper.intersection(group1, group2));
 				if(!parentsGroupsIntersection.isEmpty())
 					throw new IllegalArgumentException("yet to be coded!");
@@ -683,13 +694,15 @@ else
 
 	private List<LineEntry> bubbleUpNotGroup(LineEntry parent, List<LineEntry> sortedList){
 		List<LineEntry> newParents = new ArrayList<>();
-		if(StringUtils.isNotEmpty(parent.condition)){
+		int parentConditionLength = parent.condition.length();
+		if(parentConditionLength > 0){
 			//extract all the children rules
 			List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
+//				.filter(entry -> entry.condition.length() > parentConditionLength + 1)
 				.collect(Collectors.toList());
 			for(LineEntry le : children){
-				int index = le.condition.length() - parent.condition.length() - 1;
+				int index = le.condition.length() - parentConditionLength - 1;
 				while(index > 0){
 					//add additional rules
 					String condition = makeNotGroup(le.condition.charAt(index - 1)) + le.condition.substring(index);
@@ -700,6 +713,17 @@ else
 
 				sortedList.remove(le);
 			}
+//---
+//			Set<String> childrenFrom = children.stream()
+//				.flatMap(entry -> entry.from.stream())
+//				.collect(Collectors.toSet());
+//			String bubbleChildrenGroup = extractGroup(childrenFrom, parentConditionLength);
+//			for(Character chr : bubbleChildrenGroup.toCharArray()){
+//				String cond = chr + parent.condition;
+//				if(childrenFrom.stream().anyMatch(f -> f.endsWith(cond)))
+//					//add rule for bubble-up to the processing list, to be added to the final set of rules once not-ed
+//					newParents.add(LineEntry.createFrom(parent, cond));
+//			}
 		}
 		return newParents;
 	}

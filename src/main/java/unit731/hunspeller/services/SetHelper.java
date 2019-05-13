@@ -6,12 +6,19 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 
 public class SetHelper{
 
 	private SetHelper(){}
 
+
+	public static Set<Character> makeCharacterSetFrom(String text){
+		return text.codePoints()
+			.mapToObj(chr -> (char)chr)
+			.collect(Collectors.toSet());
+	}
 
 	public static <T> Set<T> setOf(T... values){
 		return new HashSet<>(Arrays.asList(values));
