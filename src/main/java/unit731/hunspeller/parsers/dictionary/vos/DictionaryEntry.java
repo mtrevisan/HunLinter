@@ -169,7 +169,12 @@ public class DictionaryEntry{
 		return Collections.<AffixEntry>emptyList();
 	}
 
-	/** Get last applied rule of type {@code type} */
+	/**
+	 * Get last applied rule of type {@code type}
+	 * 
+	 * @param type	The type used to filter the last applied rule
+	 * @return	The last applied rule of the specified type
+	 */
 	public AffixEntry getLastAppliedRule(AffixEntry.Type type){
 		return null;
 	}
