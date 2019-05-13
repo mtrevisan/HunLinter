@@ -316,23 +316,29 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					sortedList.add(LineEntry.createFrom(parent, condition, from));
 				}
 				else{
+					//if !can-bubble-up
+//TODO
+boolean canBubbleUp = true;
+					if(!canBubbleUp)
+						throw new IllegalArgumentException("cannot bubble-up not-group!");
+
 					//add new rule from parent with condition NOT(children-group)
-					//if exists-an-intersection ^ can-bubble-up
-					//	exit with error
-					//if exists-an-intersection{
-					//	bubble up by bucketing children for group-2
-					//	for each children-group-2
-					//		add new rule from parent with condition NOT(children-group-2)
-					//}
-					//else
-					//	add new rule from parent with condition NOT(children-group-1)
+					String condition = makeNotGroup(childrenGroup);
+					sortedList.add(LineEntry.createFrom(parent, condition));
+
+					//bubble up by bucketing children for group-2
+					//for each children-group-2
+					//	add new rule from parent with condition NOT(children-group-2)
 				}
 
 				//remove children from list
 				children.forEach(sortedList::remove);
 			}
-			else
-				throw new IllegalArgumentException("yet to be coded!");
+			else{
+				//add new rule from parent with condition NOT(children-group-1)
+				String condition = makeNotGroup(childrenGroup);
+				sortedList.add(LineEntry.createFrom(parent, condition));
+			}
 
 
 //			parent.condition = makeNotGroup(childrenGroup) + parent.condition;
@@ -401,21 +407,18 @@ if intersection(parent-group, children-group) is not empty{
 	if parent.condition is empty
 		add new parent with condition the intersection
 	else{
-		add new rule from parent with condition NOT(children-group)
-		if exists-an-intersection ^ can-bubble-up
+		if !can-bubble-up
 			exit with error
-		if exists-an-intersection{
-			bubble up by bucketing children for group-2
-			for each children-group-2
-				add new rule from parent with condition NOT(children-group-2)
-		}
-		else
-			add new rule from parent with condition NOT(children-group-1)
+
+		add new rule from parent with condition NOT(children-group)
+		bubble up by bucketing children for group-2
+		for each children-group-2
+			add new rule from parent with condition NOT(children-group-2)
 		remove children from list
 	}
 }
 else
-	?
+	add new rule from parent with condition NOT(children-group-1)
 */
 /*			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
