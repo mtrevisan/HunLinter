@@ -208,8 +208,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 System.out.println("\r\ndisjoinSameConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
-				disjoinSameEndingConditions(compactedRules);
-//bla(compactedRules);
+//				disjoinSameEndingConditions(compactedRules);
+bla(compactedRules);
 System.out.println("\r\nremoveOverlappingConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
@@ -275,6 +275,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		sortedList.sort(shortestConditionComparator);
 
 		while(!sortedList.isEmpty()){
+			//extract rule
 			LineEntry parent = sortedList.remove(0);
 
 			List<LineEntry> children = sortedList.stream()
@@ -284,16 +285,59 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				continue;
 
 			int parentConditionLength = parent.condition.length();
+			//find parent-group
 			String parentGroup = extractGroup(parent.from, parentConditionLength);
 
 			Set<String> childrenFrom = children.stream()
 				 .flatMap(entry -> entry.from.stream())
 				 .collect(Collectors.toSet());
+			//find children-group
 			String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
-			parent.condition = makeNotGroup(childrenGroup) + parent.condition;
-			Map<Character, List<String>> as = bucket(childrenFrom, from -> from.charAt(from.length() - parentConditionLength - 1));
-as.size();
+			//if intersection(parent-group, children-group) is not empty
+			Set<Character> parenGroupSet = parentGroup.codePoints()
+				.mapToObj(chr -> (char)chr)
+				.collect(Collectors.toSet());
+			Set<Character> childrenGroupSet = childrenGroup.codePoints()
+				.mapToObj(chr -> (char)chr)
+				.collect(Collectors.toSet());
+			Set<Character> intersect = SetHelper.intersection(parenGroupSet, childrenGroupSet);
+			if(!intersect.isEmpty()){
+				//if parent.condition is empty
+				if(parent.condition.isEmpty()){
+					//add new rule from parent with condition the intersection
+					String condition = intersect.stream()
+						.map(String::valueOf)
+						.sorted(comparator)
+						.collect(Collectors.joining());
+					List<String> from = parent.from.stream()
+						.filter(f -> StringUtils.endsWithAny(f, condition))
+						.collect(Collectors.toList());
+					sortedList.add(LineEntry.createFrom(parent, condition, from));
+				}
+				else{
+					//add new rule from parent with condition NOT(children-group)
+					//if exists-an-intersection ^ can-bubble-up
+					//	exit with error
+					//if exists-an-intersection{
+					//	bubble up by bucketing children for group-2
+					//	for each children-group-2
+					//		add new rule from parent with condition NOT(children-group-2)
+					//}
+					//else
+					//	add new rule from parent with condition NOT(children-group-1)
+				}
+
+				//remove children from list
+				children.forEach(sortedList::remove);
+			}
+			else
+				throw new IllegalArgumentException("yet to be coded!");
+
+
+//			parent.condition = makeNotGroup(childrenGroup) + parent.condition;
+//			Map<Character, List<String>> as = bucket(childrenFrom, from -> from.charAt(from.length() - parentConditionLength - 1));
+//as.size();
 
 /*
 SFX §0 Y 13
@@ -353,27 +397,25 @@ SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
 extract rule
 find parent-group
 find children-group
-find common-group
-if common-group is not empty{
-	add new parent with condition the intersection
-}
-
-extract rule
-find parent-group
-find children-group
-find common-group
-if common-group is not empty (subset of the parent-group){
-	add NOT(children-group) to parent
-	if exists-an-intersection ^ can-bubble-up
-		exit with error
-	if exists-an-intersection{
-		bubble up by bucketing children for group-2
-		for each children-group-2
-			add NOT(children-group-2) to parent
+if intersection(parent-group, children-group) is not empty{
+	if parent.condition is empty
+		add new parent with condition the intersection
+	else{
+		add new rule from parent with condition NOT(children-group)
+		if exists-an-intersection ^ can-bubble-up
+			exit with error
+		if exists-an-intersection{
+			bubble up by bucketing children for group-2
+			for each children-group-2
+				add new rule from parent with condition NOT(children-group-2)
+		}
+		else
+			add new rule from parent with condition NOT(children-group-1)
+		remove children from list
 	}
-	else
-		add NOT(children group-1) to parent
 }
+else
+	?
 */
 /*			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
