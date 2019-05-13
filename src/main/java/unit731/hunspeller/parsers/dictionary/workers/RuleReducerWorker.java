@@ -272,9 +272,9 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 	private void bla(List<LineEntry> rules){
 		//sort by shortest condition
 		List<LineEntry> sortedList = new ArrayList<>(rules);
-		sortedList.sort(shortestConditionComparator);
-
 		while(!sortedList.isEmpty()){
+			sortedList.sort(shortestConditionComparator);
+
 			//extract rule
 			LineEntry parent = sortedList.remove(0);
 
@@ -324,15 +324,15 @@ boolean canBubbleUp = true;
 
 					//add new rule from parent with condition NOT(children-group)
 					String condition = makeNotGroup(childrenGroup);
-					sortedList.add(LineEntry.createFrom(parent, condition));
+					sortedList.add(LineEntry.createFrom(parent, condition + parent.condition));
 
 					//bubble up by bucketing children for group-2
 					//for each children-group-2
 					//	add new rule from parent with condition NOT(children-group-2)
-				}
 
-				//remove children from list
-				children.forEach(sortedList::remove);
+					//remove children from list
+					children.forEach(sortedList::remove);
+				}
 			}
 			else{
 				//add new rule from parent with condition NOT(children-group-1)
@@ -379,6 +379,7 @@ SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
 2.2) if cannot bubble up, then exit with error since there exist an intersection
 2.3) bubble up by bucketing for group-2 (ò[bkns]a, èla)
 2.4) add NOT(children group-2 'ò', 'è') to parent '[bkns]a', 'la', SFX §0 0 ta/F0 [^ò][bkns]a, SFX §0 0 ta/F0 [^è]la
+2.5) remove all children
 
 0) extract SFX §0 o ato/M0FS o
 1) find parent group, 'dđfgikrstx', find children group 'bkmv'
@@ -387,6 +388,7 @@ SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
 2.2) if cannot bubble up, then exit with error since there exist an intersection
 2.3) bubble up by bucketing for group-2 (ò[bkmv]o)
 2.4) add NOT(children group-2 'ò') to parent '[bkmv]o', SFX §0 o ato/M0FS [^ò][bkmv]o
+2.5) remove all children
 
 0) extract SFX §0 0 ato/M0FS .
 1) find parent group, 'lnr', find children group 'alo'
