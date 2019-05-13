@@ -208,8 +208,8 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 System.out.println("\r\ndisjoinSameConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
-//				disjoinSameEndingConditions(compactedRules);
-bla(compactedRules);
+				disjoinSameEndingConditions(compactedRules);
+//bla(compactedRules);
 System.out.println("\r\nremoveOverlappingConditions (" + compactedRules.size() + "):");
 compactedRules.forEach(System.out::println);
 
@@ -233,7 +233,8 @@ compactedRules.forEach(System.out::println);
 				e.printStackTrace();
 			}
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+//		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
@@ -295,25 +296,84 @@ compactedRules.forEach(System.out::println);
 as.size();
 
 /*
-#SFX §0 Y 13
-#SFX §0 0 ta/F0 . ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la)
-#SFX §0 òba obata/F0 òba
-#SFX §0 òka okata/F0 òka
-#SFX §0 òna onata/F0 òna
-#SFX §0 òsa osata/F0 òsa
-#SFX §0 èla elata/F0 èla
-#SFX §0 o ato/M0FS o (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
-#SFX §0 òbo obato/M0FS òbo
-#SFX §0 òko okato/M0FS òko
-#SFX §0 òmo omato/M0FS òmo
-#SFX §0 òvo ovato/M0FS òvo
-#SFX §0 0 ato/M0FS . ({l}nr/a{l}o > [^è]l)
-#SFX §0 èl elato/M0FS èl
+SFX §0 Y 13
+SFX §0 0 ta/F0 . ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la)
+SFX §0 òba obata/F0 òba
+SFX §0 òka okata/F0 òka
+SFX §0 èla elata/F0 èla
+SFX §0 òna onata/F0 òna
+SFX §0 òsa osata/F0 òsa
+SFX §0 o ato/M0FS o (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
+SFX §0 òbo obato/M0FS òbo
+SFX §0 òko okato/M0FS òko
+SFX §0 òmo omato/M0FS òmo
+SFX §0 òvo ovato/M0FS òvo
+SFX §0 0 ato/M0FS . ({l}nr/a{l}o > [^è]l)
+SFX §0 èl elato/M0FS èl
 
-#SFX §0 0 ta/F0 a (cdi{kln}r{s}x/b{klns} > [^bklns]a + [^ò][bkns]a + [^è]la)
-#SFX §0 0 ta/F0 [^lnor] ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la) > NO!, because all ends in 'a's
-#SFX §0 o ato/M0FS ko (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
-#SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
+SFX §0 0 ta/F0 a (cdi{kln}r{s}x/b{klns} > [^bklns]a + [^ò][bkns]a + [^è]la)
+SFX §0 0 ta/F0 [^lnor] ({a}/{a}lnor > [^bklns]a + [^ò][bkns]a + [^è]la) > NO!, because all ends in 'a's
+SFX §0 o ato/M0FS ko (dđfgi{k}rstx/b{k}mv > [^bkmv]o + [^ò][bkmv]o)
+SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
+
+
+0) extract SFX §0 0 ta/F0 .
+1) find parent group, 'a', find children group 'alnor'
+2) there is a common group 'a' (the entire parent)
+2.1) insert new parent with condition 'a', SFX §0 0 ta/F0 a
+
+0) extract SFX §0 0 ta/F0 a
+1) find parent group 'cdiklnrsx', find children group 'bklns'
+2) there is a common group 'klns' (subset of the parent)
+2.1) add NOT(children group-1 'bklns') to parent 'a', SFX §0 0 ta/F0 [^bklns]a
+2.2) if cannot bubble up, then exit with error since there exist an intersection
+2.3) bubble up by bucketing for group-2 (ò[bkns]a, èla)
+2.4) add NOT(children group-2 'ò', 'è') to parent '[bkns]a', 'la', SFX §0 0 ta/F0 [^ò][bkns]a, SFX §0 0 ta/F0 [^è]la
+
+0) extract SFX §0 o ato/M0FS o
+1) find parent group, 'dđfgikrstx', find children group 'bkmv'
+2) there is a common group 'k' (subset of the parent)
+2.1) add NOT(children group-1 'bkmv') to parent 'o', SFX §0 o ato/M0FS [^bkmv]o
+2.2) if cannot bubble up, then exit with error since there exist an intersection
+2.3) bubble up by bucketing for group-2 (ò[bkmv]o)
+2.4) add NOT(children group-2 'ò') to parent '[bkmv]o', SFX §0 o ato/M0FS [^ò][bkmv]o
+
+0) extract SFX §0 0 ato/M0FS .
+1) find parent group, 'lnr', find children group 'alo'
+2) there is a common group 'l' (subset of the parent)
+2.1) insert new parent with condition 'l', SFX §0 0 ato/M0FS l
+
+0) extract SFX §0 0 ato/M0FS l
+1) find parent group, 'aeo', find children group 'è'
+2) there is no common group
+2.1) add NOT(children group-1 'è') to parent 'l', SFX §0 0 ato/M0FS [^è]l
+2.2) cannot bubble up, ok since there exist no intersection
+
+
+extract rule
+find parent-group
+find children-group
+find common-group
+if common-group is not empty{
+	add new parent with condition the intersection
+}
+
+extract rule
+find parent-group
+find children-group
+find common-group
+if common-group is not empty (subset of the parent-group){
+	add NOT(children-group) to parent
+	if exists-an-intersection ^ can-bubble-up
+		exit with error
+	if exists-an-intersection{
+		bubble up by bucketing children for group-2
+		for each children-group-2
+			add NOT(children-group-2) to parent
+	}
+	else
+		add NOT(children group-1) to parent
+}
 */
 /*			if(StringUtils.containsAny(parentGroup, childrenGroup)){
 				//intersection exists between parent group and children group, split parent between belonging to children group
