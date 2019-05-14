@@ -293,10 +293,6 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(condition), from);
 					sortedList.add(newEntry);
 
-					//remove parent from final list
-					rules.remove(parent);
-//					rules.add(newEntry);
-
 					//if intersection-proper-subset-of-parent-group
 					parenGroupSet.removeAll(intersection);
 					if(!parenGroupSet.isEmpty()){
@@ -307,23 +303,21 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					}
 				}
 				else{
-					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
-					//if !can-bubble-up
-					if(bubbles.isEmpty())
-						throw new IllegalArgumentException("cannot bubble-up not-group!");
-
 					//add new rule from parent with condition starting with NOT(children-group) to final list
 					String condition = makeNotGroup(childrenGroup) + parent.condition;
 					LineEntry newEntry = LineEntry.createFrom(parent, condition);
 					rules.add(newEntry);
+
+					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+					//if !can-bubble-up
+					if(bubbles.isEmpty())
+						throw new IllegalArgumentException("cannot bubble-up not-group!");
 
 					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 					rules.addAll(bubbledRules);
 
 					//remove bubbles from current list
 					bubbles.forEach(sortedList::remove);
-					//remove parent from final list
-					rules.remove(parent);
 				}
 			}
 			else{
@@ -332,25 +326,19 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				LineEntry newEntry = LineEntry.createFrom(parent, condition);
 				rules.add(newEntry);
 
-//				List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
-//				List<LineEntry> bubbles = sortedList.stream()
-//					.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength)
-//					.collect(Collectors.toList());
-//				//if can-bubble-up
-//				if(!bubbles.isEmpty()){
-//					//add new rule from parent with condition NOT(children-group)
-//					String condition = makeNotGroup(childrenGroup) + parent.condition;
-//					LineEntry newEntry = LineEntry.createFrom(parent, condition);
-//					rules.add(newEntry);
-//
-//					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-//					rules.addAll(bubbledRules);
-//
-//					//remove children from list
-//					bubbles.forEach(sortedList::remove);
-//					rules.remove(parent);
-//				}
+				List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+				//if can-bubble-up
+				if(!bubbles.isEmpty()){
+					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+					rules.addAll(bubbledRules);
+
+					//remove bubbles from current list
+					bubbles.forEach(sortedList::remove);
+				}
 			}
+
+			//remove parent from final list
+			rules.remove(parent);
 
 /*
 SFX §0 Y 13
@@ -415,26 +403,34 @@ find children-group
 if intersection(parent-group, children-group) is not empty{
 	if parent.condition is empty{
 		add new rule from parent with condition the intersection to current list
-		remove parent from final list
 
 		if intersection-proper-subset-of-parent-group
 			add new rule from parent with condition the difference between parent-grop and intersection to final list
 	}
 	else{
+		add new rule from parent with condition starting with NOT(children-group) to final list
+
 		if !can-bubble-up
 			exit with error
-
-		add new rule from parent with condition starting with NOT(children-group) to final list
 
 		bubble up by bucketing children for group-2
 		for each children-group-2
 			add new rule from parent with condition starting with NOT(children-group-2) to final list
 		remove bubbles from current list
-		remove parent from final list
 	}
 }
-else
+else{
 	add new rule from parent with condition starting with NOT(children-group-1) to final list
+
+	if can-bubble-up{
+		bubble up by bucketing children for group-2
+		for each children-group-2
+			add new rule from parent with condition starting with NOT(children-group-2) to final list
+		remove bubbles from current list
+	}
+}
+
+remove parent from final list
 */
 		}
 	}
