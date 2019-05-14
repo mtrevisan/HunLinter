@@ -284,7 +284,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
 			Set<Character> groupIntersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
 			if(groupIntersection.isEmpty()){
-				ahn(parent, parentGroup, childrenGroup, rules, children, sortedList);
+				ahn(parent, parentGroup, children, childrenGroup, sortedList, rules);
 
 				//for each children-same-condition
 				List<LineEntry> sameConditionChildren = children.stream()
@@ -330,7 +330,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
 				//if intersection is empty
 				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE))
-					ahn(parent, parentGroup, childrenGroup, rules, children, sortedList);
+					ahn(parent, parentGroup, children, childrenGroup, sortedList, rules);
 				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
 //do nothing (?)
 				}
@@ -414,7 +414,7 @@ remove parent from final list
 		}
 	}
 
-	private void ahn(LineEntry parent, String parentGroup, String childrenGroup, List<LineEntry> rules, List<LineEntry> children, List<LineEntry> sortedList){
+	private void ahn(LineEntry parent, String parentGroup, List<LineEntry> children, String childrenGroup, List<LineEntry> sortedList, List<LineEntry> rules){
 		//add new rule from parent with condition starting with NOT(children-group) to final list
 		String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
 		LineEntry newEntry = LineEntry.createFrom(parent, condition);
@@ -440,6 +440,44 @@ remove parent from final list
 			.collect(Collectors.toList());
 	}
 
+	private List<LineEntry> bubbleUpNotGroup(LineEntry parent, List<LineEntry> children){
+		int parentConditionLength = parent.condition.length();
+		//bubble up by bucketing children for group-2
+		List<String> bubblesCondition = children.stream()
+			.map(entry -> entry.condition)
+			.collect(Collectors.toList());
+
+		//extract communalities
+		//TODO
+/*
+[0] = (HashMap$Node) "ò => [òdo, òco, òko]"
+[1] = (HashMap$Node) "è => [èdo, èđo, èxo]"
+
+into
+
+[0] = (HashMap$Node) "ò => [òco, òko]"
+[1] = (HashMap$Node) "è => [èđo, èxo]"
+[0] = (HashMap$Node) "òè => [òdo, èdo]"
+
+add 'SFX v0 o ería|erieta|aría|arieta/F0 [^èò]do'
+
+		Map<String, List<String>> commonConditionBucket = bucket(bubblesCondition, cond -> cond.substring(cond.length() - parentConditionLength));
+*/
+		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
+		//for each children-group-2
+		List<LineEntry> newParents = new ArrayList<>();
+		for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
+			//add new rule from parent with condition starting with NOT(children-group-2) to final list
+			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
+			//do the bubble trick
+			for(int i = conds.getKey().length(); i > 0; i --){
+				String condition = makeNotGroup(conds.getKey().substring(i - 1, i)) + conds.getKey().substring(i) + makeGroup(bubbleGroup) + parent.condition;
+				newParents.add(LineEntry.createFrom(parent, condition));
+			}
+		}
+		return newParents;
+	}
+
 	private String mergeSet(Set<Character> set){
 		return set.stream()
 			.map(String::valueOf)
@@ -460,27 +498,6 @@ remove parent from final list
 		return group.stream()
 			.sorted(comparator)
 			.collect(Collectors.joining(StringUtils.EMPTY));
-	}
-
-	private List<LineEntry> bubbleUpNotGroup(LineEntry parent, List<LineEntry> children){
-		List<LineEntry> newParents = new ArrayList<>();
-		int parentConditionLength = parent.condition.length();
-		//bubble up by bucketing children for group-2
-		List<String> bubblesCondition = children.stream()
-			.map(entry -> entry.condition)
-			.collect(Collectors.toList());
-		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
-		//for each children-group-2
-		for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
-			//add new rule from parent with condition starting with NOT(children-group-2) to final list
-			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
-			//do the bubble trick
-			for(int i = conds.getKey().length(); i > 0; i --){
-				String condition = makeNotGroup(conds.getKey().substring(i - 1, i)) + conds.getKey().substring(i) + makeGroup(bubbleGroup) + parent.condition;
-				newParents.add(LineEntry.createFrom(parent, condition));
-			}
-		}
-		return newParents;
 	}
 
 	private <K, V> Map<K, List<V>> bucket(Collection<V> entries, Function<V, K> keyMapper){
