@@ -289,14 +289,16 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				LineEntry newEntry = LineEntry.createFrom(parent, condition);
 				rules.add(newEntry);
 
-				List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
-				//if can-bubble-up
-				if(!bubbles.isEmpty()){
-					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-					rules.addAll(bubbledRules);
+				if(!parent.condition.isEmpty()){
+					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+					//if can-bubble-up
+					if(!bubbles.isEmpty()){
+						List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+						rules.addAll(bubbledRules);
 
-					//remove bubbles from current list
-					bubbles.forEach(sortedList::remove);
+						//remove bubbles from current list
+						bubbles.forEach(sortedList::remove);
+					}
 				}
 
 				//for each children-same-condition
@@ -339,13 +341,9 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			}
 			else{
 				//calculate intersection between parent and children conditions
-				Set<String> parenConditionSet = new HashSet<>(Arrays.asList(parent.condition));
-				Set<String> childrenConditionSet = children.stream()
-					.map(rule -> rule.condition)
-					.collect(Collectors.toSet());
-				Set<String> conditionIntersection = SetHelper.intersection(parenConditionSet, childrenConditionSet);
+				Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
 				//if intersection is empty
-				if(conditionIntersection.isEmpty()){
+				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE)){
 					//add new rule from parent with condition starting with NOT(children-group) to final list
 					String condition = makeNotGroup(childrenGroup) + parent.condition;
 					LineEntry newEntry = LineEntry.createFrom(parent, condition);
@@ -362,8 +360,15 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					//remove bubbles from current list
 					bubbles.forEach(sortedList::remove);
 				}
-				else
+				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
+//do nothing
+				}
+				else if(conditionBucket.isEmpty()){
 					throw new IllegalArgumentException("yet to be coded!");
+				}
+				else{
+					throw new IllegalArgumentException("yet to be coded!");
+				}
 			}
 
 			//remove parent from final list
