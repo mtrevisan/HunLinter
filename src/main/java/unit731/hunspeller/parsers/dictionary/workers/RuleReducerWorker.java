@@ -284,32 +284,17 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
 			Set<Character> groupIntersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
 			if(groupIntersection.isEmpty()){
-				//add new rule from parent with condition starting with NOT(children-group-1) to final list
-				String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
-				LineEntry newEntry = LineEntry.createFrom(parent, condition);
-				rules.add(newEntry);
-
-				if(!parent.condition.isEmpty()){
-					List<LineEntry> bubbles = extractRuleBubbles(parent, children);
-					//if can-bubble-up
-					if(!bubbles.isEmpty()){
-						List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-						rules.addAll(bubbledRules);
-
-						//remove bubbles from current list
-						bubbles.forEach(sortedList::remove);
-					}
-				}
+				ahn(parent, parentGroup, childrenGroup, rules, children, sortedList);
 
 				//for each children-same-condition
 				List<LineEntry> sameConditionChildren = children.stream()
 					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
 					.collect(Collectors.toList());
 				for(LineEntry child : sameConditionChildren){
-					//add new rule from child with condition starting with (child-group-1) to final list
+					//add new rule from child with condition starting with (child-group) to final list
 					String childGroup = extractGroup(child.from, parentConditionLength);
-					condition = makeGroup(childGroup) + child.condition;
-					newEntry = LineEntry.createFrom(child, condition, child.from);
+					String condition = makeGroup(childGroup) + child.condition;
+					LineEntry newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}
 
@@ -344,23 +329,8 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				//calculate intersection between parent and children conditions
 				Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
 				//if intersection is empty
-				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE)){
-					//add new rule from parent with condition starting with NOT(children-group) to final list
-					String condition = makeNotGroup(childrenGroup) + parent.condition;
-					LineEntry newEntry = LineEntry.createFrom(parent, condition);
-					rules.add(newEntry);
-
-					List<LineEntry> bubbles = extractRuleBubbles(parent, children);
-					//if !can-bubble-up
-					if(bubbles.isEmpty())
-						throw new IllegalArgumentException("cannot bubble-up not-group!");
-
-					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-					rules.addAll(bubbledRules);
-
-					//remove bubbles from current list
-					bubbles.forEach(sortedList::remove);
-				}
+				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE))
+					ahn(parent, parentGroup, childrenGroup, rules, children, sortedList);
 				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
 //do nothing (?)
 				}
@@ -381,7 +351,10 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 #SFX v0 0 ría|rieta/F0 .	: {ae}/{ae}or	> add 'SFX v0 0 ría|rieta/F0 a', 'SFX v0 0 ría|rieta/F0 e' to current
 #SFX v0 e aría|arieta/F0 e	: {ƚt}/{ƚt}	> do nothing since conditions are both equals (0 ría|rieta/F0 e)
 #SFX v0 a ería|erieta/F0 a	: {dđgijɉkñorstŧvx}/{dđgi}í{jɉk}lƚ{ñorstŧvx}	> (clash with 'SFX v0 0 ría|rieta/F0 a') ?
-#SFX v0 o ería|erieta|aría|arieta/F0 o	: b{d}gi{k}ƚnrtv{x}/c{d}đ{kx} > add 'SFX v0 o ería|erieta|aría|arieta/F0 [^cdđkx]o', 'SFX v0 o ería|erieta|aría|arieta/F0 [^ò][cdk]o', 'SFX v0 o ería|erieta|aría|arieta/F0 [^è][dđx]o' to final
+#SFX v0 o ería|erieta|aría|arieta/F0 o	: b{d}gi{k}ƚnrtv{x}/c{d}đ{kx} > add 'SFX v0 o ería|erieta|aría|arieta/F0 [^cdđkx]o' to final, bubble 'SFX v0 o ería|erieta|aría|arieta/F0 [^ò][cdk]o', 'SFX v0 o ería|erieta|aría|arieta/F0 [^è][dđx]o' to final
+#*SFX v0 0 ía|ieta/F0 r	: {a}o/{a}è > 'SFX v0 o ería|erieta|aría|arieta/F0 [^aè]r' to final
+#*SFX v0 0 ría|rieta/F0 a	: dđgijɉkñorstŧvx/ílƚ > add 'SFX v0 0 ría|rieta/F0 [^ílƚ]a' to final, bubble 'SFX v0 0 ría|rieta/F0 [^è][lƚ]a', 'SFX v0 0 ría|rieta/F0 [^r]ía', 'SFX v0 0 ría|rieta/F0 [^e]ría' to final
+#*SFX v0 0 ría|rieta/F0 e	: no children
 #SFX v0 èr aría|arieta|ería|erieta/F0 èr
 #SFX v0 ar ería|erieta/F0 ar
 #SFX v0 ía ieta/F0 ía
@@ -438,6 +411,25 @@ else{
 
 remove parent from final list
 */
+		}
+	}
+
+	private void ahn(LineEntry parent, String parentGroup, String childrenGroup, List<LineEntry> rules, List<LineEntry> children, List<LineEntry> sortedList){
+		//add new rule from parent with condition starting with NOT(children-group) to final list
+		String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
+		LineEntry newEntry = LineEntry.createFrom(parent, condition);
+		rules.add(newEntry);
+		
+		if(!parent.condition.isEmpty()){
+			List<LineEntry> bubbles = extractRuleBubbles(parent, children);
+			//if can-bubble-up
+			if(!bubbles.isEmpty()){
+				List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+				rules.addAll(bubbledRules);
+				
+				//remove bubbles from current list
+				bubbles.forEach(sortedList::remove);
+			}
 		}
 	}
 
