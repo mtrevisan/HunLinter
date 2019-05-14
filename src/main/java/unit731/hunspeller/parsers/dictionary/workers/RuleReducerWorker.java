@@ -489,13 +489,16 @@ remove parent from final list
 		List<String> bubblesCondition = children.stream()
 			.map(entry -> entry.condition)
 			.collect(Collectors.toList());
-		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength));
+		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
 		//for each children-group-2
 		for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
 			//add new rule from parent with condition starting with NOT(children-group-2) to final list
 			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
-			String condition = makeNotGroup(conds.getKey().substring(0, conds.getKey().length() - 1)) + makeGroup(bubbleGroup) + parent.condition;
-			newParents.add(LineEntry.createFrom(parent, condition));
+			//do the bubble trick
+			for(int i = conds.getKey().length(); i > 0; i --){
+				String condition = makeNotGroup(conds.getKey().substring(i - 1, i)) + conds.getKey().substring(i) + makeGroup(bubbleGroup) + parent.condition;
+				newParents.add(LineEntry.createFrom(parent, condition));
+			}
 		}
 		return newParents;
 	}
