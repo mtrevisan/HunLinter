@@ -290,7 +290,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				rules.add(newEntry);
 
 				if(!parent.condition.isEmpty()){
-					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+					List<LineEntry> bubbles = extractRuleBubbles(parent, children);
 					//if can-bubble-up
 					if(!bubbles.isEmpty()){
 						List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
@@ -350,7 +350,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					LineEntry newEntry = LineEntry.createFrom(parent, condition);
 					rules.add(newEntry);
 
-					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+					List<LineEntry> bubbles = extractRuleBubbles(parent, children);
 					//if !can-bubble-up
 					if(bubbles.isEmpty())
 						throw new IllegalArgumentException("cannot bubble-up not-group!");
@@ -368,7 +368,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					throw new IllegalArgumentException("yet to be coded!");
 				}
 				else{
-					throw new IllegalArgumentException("yet to be coded!");
+//do nothing (?)
 				}
 			}
 
@@ -380,8 +380,8 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 #SFX v0 0 aría|arieta|ería|erieta/F0 .	: ln/aeor	> add 'SFX v0 0 aría|arieta|ería|erieta/F0 [ln]' to final
 #SFX v0 0 ría|rieta/F0 .	: {ae}/{ae}or	> add 'SFX v0 0 ría|rieta/F0 a', 'SFX v0 0 ría|rieta/F0 e' to current
 #SFX v0 e aría|arieta/F0 e	: {ƚt}/{ƚt}	> do nothing since conditions are both equals (0 ría|rieta/F0 e)
-#SFX v0 a ería|erieta/F0 a	: {dđgijɉkñorstŧvx}/{dđgi}í{jɉk}lƚ{ñorstŧvx}	> ?
-#SFX v0 o ería|erieta|aría|arieta/F0 o
+#SFX v0 a ería|erieta/F0 a	: {dđgijɉkñorstŧvx}/{dđgi}í{jɉk}lƚ{ñorstŧvx}	> (clash with 'SFX v0 0 ría|rieta/F0 a') ?
+#SFX v0 o ería|erieta|aría|arieta/F0 o	: b{d}gi{k}ƚnrtv{x}/c{d}đ{kx} > add 'SFX v0 o ería|erieta|aría|arieta/F0 [^cdđkx]o', 'SFX v0 o ería|erieta|aría|arieta/F0 [^ò][cdk]o', 'SFX v0 o ería|erieta|aría|arieta/F0 [^è][dđx]o' to final
 #SFX v0 èr aría|arieta|ería|erieta/F0 èr
 #SFX v0 ar ería|erieta/F0 ar
 #SFX v0 ía ieta/F0 ía
@@ -444,7 +444,7 @@ remove parent from final list
 	private List<LineEntry> extractRuleBubbles(LineEntry parent, List<LineEntry> sortedList){
 		int parentConditionLength = parent.condition.length();
 		return sortedList.stream()
-			.filter(entry -> entry.condition.endsWith(parent.condition) && entry.condition.length() > parentConditionLength + 1)
+			.filter(entry -> entry.condition.length() > parentConditionLength + 1)
 			.collect(Collectors.toList());
 	}
 
