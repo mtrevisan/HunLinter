@@ -321,12 +321,13 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			//if parent.condition is empty
 			else if(parent.condition.isEmpty()){
 				//add new rule from parent with condition the intersection
-				for(Character chr : groupIntersection){
-					List<String> from = parent.from.stream()
-						.filter(f -> f.charAt(f.length() - 1) == chr)
-						.collect(Collectors.toList());
-					LineEntry newEntry = LineEntry.createFrom(parent, String.valueOf(chr), from);
-					sortedList.add(newEntry);
+				Map<Character, List<String>> fromBucket = bucket(parent.from, from -> from.charAt(from.length() - 1));
+				for(Map.Entry<Character, List<String>> entry : fromBucket.entrySet()){
+					Character key = entry.getKey();
+					if(groupIntersection.contains(key)){
+						LineEntry newEntry = LineEntry.createFrom(parent, String.valueOf(key), entry.getValue());
+						sortedList.add(newEntry);
+					}
 				}
 				sortedList.sort(shortestConditionComparator);
 
@@ -375,6 +376,25 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			rules.remove(parent);
 
 /*
+#SFX v0 0 ía|ieta/F0 .	: {r}/aelno{r}	> add 'SFX v0 0 ía|ieta/F0 r' to current
+#SFX v0 0 aría|arieta|ería|erieta/F0 .	: ln/aeor	> add 'SFX v0 0 aría|arieta|ería|erieta/F0 [ln]' to final
+#SFX v0 0 ría|rieta/F0 .	: {ae}/{ae}or	> add 'SFX v0 0 ría|rieta/F0 a', 'SFX v0 0 ría|rieta/F0 e' to current
+#SFX v0 e aría|arieta/F0 e	: {ƚt}/{ƚt}	> do nothing since conditions are both equals (0 ría|rieta/F0 e)
+#SFX v0 a ería|erieta/F0 a	: {dđgijɉkñorstŧvx}/{dđgi}í{jɉk}lƚ{ñorstŧvx}	> ?
+#SFX v0 o ería|erieta|aría|arieta/F0 o
+#SFX v0 èr aría|arieta|ería|erieta/F0 èr
+#SFX v0 ar ería|erieta/F0 ar
+#SFX v0 ía ieta/F0 ía
+#SFX v0 èdo edaría|edarieta|edería|ederieta/F0 èdo
+#SFX v0 èđo eđaría|eđarieta|eđería|eđerieta/F0 èđo
+#SFX v0 òdo odaría|odarieta|odería|oderieta/F0 òdo
+#SFX v0 èxo exaría|exarieta|exería|exerieta/F0 èxo
+#SFX v0 òco ocaría|ocarieta|ocería|ocerieta/F0 òco
+#SFX v0 òko okaría|okarieta|okería|okerieta/F0 òko
+#SFX v0 èla elería|elerieta|elaría|elarieta/F0 èla
+#SFX v0 èƚa eƚería|eƚerieta|eƚaría|eƚarieta/F0 èƚa
+#SFX v0 ería aría|arieta/F0 ería
+
 extract rule from current list
 find parent-group
 find children-group
