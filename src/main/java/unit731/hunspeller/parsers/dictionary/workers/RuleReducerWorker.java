@@ -297,6 +297,23 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					//remove bubbles from current list
 					bubbles.forEach(sortedList::remove);
 				}
+
+				//for each children-same-condition
+				List<LineEntry> sameConditionChildren = children.stream()
+					.filter(entry -> entry.condition.equals(parent.condition))
+					.collect(Collectors.toList());
+				for(LineEntry child : sameConditionChildren){
+					//add new rule from child with condition starting with (child-group-1) to final list
+					String childGroup = extractGroup(child.from, parentConditionLength);
+					condition = makeGroup(childGroup) + child.condition;
+					newEntry = LineEntry.createFrom(child, condition, child.from);
+					rules.add(newEntry);
+				}
+
+				//remove same-condition-children from current list
+				sameConditionChildren.forEach(sortedList::remove);
+				//remove same-condition-children from final list
+				sameConditionChildren.forEach(rules::remove);
 			}
 			//if parent.condition is empty
 			else if(parent.condition.isEmpty()){
@@ -407,6 +424,11 @@ if intersection(parent-group, children-group) is empty{
 			add new rule from parent with condition starting with NOT(children-group-2) to final list
 		remove bubbles from current list
 	}
+
+	for each children-same-condition
+		add new rule from child with condition starting with (child-group-1) to final list
+	remove same-condition-children from current list
+	remove same-condition-children from final list
 }
 else if parent.condition is empty{
 	add new rule from parent with condition the intersection to current list
@@ -467,12 +489,12 @@ remove parent from final list
 		List<String> bubblesCondition = children.stream()
 			.map(entry -> entry.condition)
 			.collect(Collectors.toList());
-		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, parentConditionLength));
+		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength));
 		//for each children-group-2
 		for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
 			//add new rule from parent with condition starting with NOT(children-group-2) to final list
 			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
-			String condition = makeNotGroup(conds.getKey()) + makeGroup(bubbleGroup) + parent.condition;
+			String condition = makeNotGroup(conds.getKey().substring(0, conds.getKey().length() - 1)) + makeGroup(bubbleGroup) + parent.condition;
 			newParents.add(LineEntry.createFrom(parent, condition));
 		}
 		return newParents;
