@@ -361,7 +361,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					bubbles.forEach(sortedList::remove);
 				}
 				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
-//do nothing
+//do nothing (?)
 				}
 				else if(conditionBucket.isEmpty()){
 					throw new IllegalArgumentException("yet to be coded!");
