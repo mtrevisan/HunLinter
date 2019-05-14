@@ -282,45 +282,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			Set<Character> parenGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
 			Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
 			Set<Character> intersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
-			if(!intersection.isEmpty()){
-				//if parent.condition is empty
-				if(parent.condition.isEmpty()){
-					//add new rule from parent with condition the intersection
-					String condition = mergeSet(intersection);
-					List<String> from = parent.from.stream()
-						.filter(f -> StringUtils.endsWithAny(f, condition))
-						.collect(Collectors.toList());
-					LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(condition), from);
-					sortedList.add(newEntry);
-
-					//if intersection-proper-subset-of-parent-group
-					parenGroupSet.removeAll(intersection);
-					if(!parenGroupSet.isEmpty()){
-						//add new rule from parent with condition the difference between parent-grop and intersection to final list
-						String cond = mergeSet(parenGroupSet);
-						newEntry = LineEntry.createFrom(parent, makeGroup(cond));
-						rules.add(newEntry);
-					}
-				}
-				else{
-					//add new rule from parent with condition starting with NOT(children-group) to final list
-					String condition = makeNotGroup(childrenGroup) + parent.condition;
-					LineEntry newEntry = LineEntry.createFrom(parent, condition);
-					rules.add(newEntry);
-
-					List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
-					//if !can-bubble-up
-					if(bubbles.isEmpty())
-						throw new IllegalArgumentException("cannot bubble-up not-group!");
-
-					List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-					rules.addAll(bubbledRules);
-
-					//remove bubbles from current list
-					bubbles.forEach(sortedList::remove);
-				}
-			}
-			else{
+			if(intersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group-1) to final list
 				String condition = makeNotGroup(childrenGroup) + parent.condition;
 				LineEntry newEntry = LineEntry.createFrom(parent, condition);
@@ -335,6 +297,42 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					//remove bubbles from current list
 					bubbles.forEach(sortedList::remove);
 				}
+			}
+			//if parent.condition is empty
+			else if(parent.condition.isEmpty()){
+				//add new rule from parent with condition the intersection
+				String condition = mergeSet(intersection);
+				List<String> from = parent.from.stream()
+					.filter(f -> StringUtils.endsWithAny(f, condition))
+					.collect(Collectors.toList());
+				LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(condition), from);
+				sortedList.add(newEntry);
+
+				//if intersection-proper-subset-of-parent-group
+				parenGroupSet.removeAll(intersection);
+				if(!parenGroupSet.isEmpty()){
+					//add new rule from parent with condition the difference between parent-grop and intersection to final list
+					String cond = mergeSet(parenGroupSet);
+					newEntry = LineEntry.createFrom(parent, makeGroup(cond));
+					rules.add(newEntry);
+				}
+			}
+			else{
+				//add new rule from parent with condition starting with NOT(children-group) to final list
+				String condition = makeNotGroup(childrenGroup) + parent.condition;
+				LineEntry newEntry = LineEntry.createFrom(parent, condition);
+				rules.add(newEntry);
+
+				List<LineEntry> bubbles = extractRuleBubbles(parent, sortedList);
+				//if !can-bubble-up
+				if(bubbles.isEmpty())
+					throw new IllegalArgumentException("cannot bubble-up not-group!");
+
+				List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+				rules.addAll(bubbledRules);
+
+				//remove bubbles from current list
+				bubbles.forEach(sortedList::remove);
 			}
 
 			//remove parent from final list
@@ -400,26 +398,7 @@ SFX §0 o ato/M0FS [^bkmv]o (?/? > [^bkmv]o + [^ò][bkmv]o)
 extract rule from current list
 find parent-group
 find children-group
-if intersection(parent-group, children-group) is not empty{
-	if parent.condition is empty{
-		add new rule from parent with condition the intersection to current list
-
-		if intersection-proper-subset-of-parent-group
-			add new rule from parent with condition the difference between parent-grop and intersection to final list
-	}
-	else{
-		add new rule from parent with condition starting with NOT(children-group) to final list
-
-		if !can-bubble-up
-			exit with error
-
-		bubble up by bucketing children for group-2
-		for each children-group-2
-			add new rule from parent with condition starting with NOT(children-group-2) to final list
-		remove bubbles from current list
-	}
-}
-else{
+if intersection(parent-group, children-group) is empty{
 	add new rule from parent with condition starting with NOT(children-group-1) to final list
 
 	if can-bubble-up{
@@ -428,6 +407,23 @@ else{
 			add new rule from parent with condition starting with NOT(children-group-2) to final list
 		remove bubbles from current list
 	}
+}
+else if parent.condition is empty{
+	add new rule from parent with condition the intersection to current list
+
+	if intersection-proper-subset-of-parent-group
+		add new rule from parent with condition the difference between parent-grop and intersection to final list
+}
+else{
+	add new rule from parent with condition starting with NOT(children-group) to final list
+
+	if !can-bubble-up
+		exit with error
+
+	bubble up by bucketing children for group-2
+	for each children-group-2
+		add new rule from parent with condition starting with NOT(children-group-2) to final list
+	remove bubbles from current list
 }
 
 remove parent from final list
