@@ -397,13 +397,12 @@ else{
 	if intersection is empty{
 		add new rule from parent with condition starting with NOT(children-group) to final list
 
-		if !can-bubble-up
-			exit with error
-
-		bubble up by bucketing children for group-2
-		for each children-group-2
-			add new rule from parent with condition starting with NOT(children-group-2) to final list
-		remove bubbles from current list
+		if can-bubble-up{
+			bubble up by bucketing children for group-2
+			for each children-group-2
+				add new rule from parent with condition starting with NOT(children-group-2) to final list
+			remove bubbles from current list
+		}
 	}
 	else
 		exit with error
