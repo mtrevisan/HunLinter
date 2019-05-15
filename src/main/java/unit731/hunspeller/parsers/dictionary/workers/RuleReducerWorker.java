@@ -242,6 +242,41 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		}
 	}
 
+	private LineEntry createSuffixEntry(Production production, String word, AffixEntry.Type type){
+		int lastCommonLetter;
+		int wordLength = word.length();
+		String producedWord = production.getWord();
+		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
+			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
+				break;
+
+		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
+		if(production.getContinuationFlagCount() > 0)
+			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
+		String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
+		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private LineEntry createPrefixEntry(Production production, String word, AffixEntry.Type type){
+		int firstCommonLetter;
+		int wordLength = word.length();
+		String producedWord = production.getWord();
+		int productionLength = producedWord.length();
+		int minLength = Math.min(wordLength, productionLength);
+		for(firstCommonLetter = 1; firstCommonLetter <= minLength; firstCommonLetter ++)
+			if(word.charAt(wordLength - firstCommonLetter) != producedWord.charAt(productionLength - firstCommonLetter))
+				break;
+		firstCommonLetter --;
+
+		String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
+		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
+		if(production.getContinuationFlagCount() > 0)
+			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
+		String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
+		return new LineEntry(removal, addition, condition, word);
+	}
+
 	private List<LineEntry> compactRules(List<LineEntry> entries){
 		//same originating word, same removal, and same condition parts
 		List<LineEntry> intermediate = collect(entries,
@@ -252,6 +287,17 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		return collect(intermediate,
 			entry -> entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
+	}
+
+	private <K, V> List<V> collect(Collection<V> entries, Function<V, K> keyMapper, BiConsumer<V, V> mergeFunction){
+		Map<K, V> compaction = new HashMap<>();
+		for(V entry : entries){
+			K key = keyMapper.apply(entry);
+			V rule = compaction.putIfAbsent(key, entry);
+			if(rule != null)
+				mergeFunction.accept(rule, entry);
+		}
+		return new ArrayList<>(compaction.values());
 	}
 
 	//FIXME tested bottom-up until v0
@@ -545,52 +591,6 @@ while current-list is not empty{
 					.add(entry);
 		}
 		return bucket;
-	}
-
-	private <K, V> List<V> collect(Collection<V> entries, Function<V, K> keyMapper, BiConsumer<V, V> mergeFunction){
-		Map<K, V> compaction = new HashMap<>();
-		for(V entry : entries){
-			K key = keyMapper.apply(entry);
-			V rule = compaction.putIfAbsent(key, entry);
-			if(rule != null)
-				mergeFunction.accept(rule, entry);
-		}
-		return new ArrayList<>(compaction.values());
-	}
-
-	private LineEntry createSuffixEntry(Production production, String word, AffixEntry.Type type){
-		int lastCommonLetter;
-		int wordLength = word.length();
-		String producedWord = production.getWord();
-		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
-			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-				break;
-
-		String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
-		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
-		String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
-		return new LineEntry(removal, addition, condition, word);
-	}
-
-	private LineEntry createPrefixEntry(Production production, String word, AffixEntry.Type type){
-		int firstCommonLetter;
-		int wordLength = word.length();
-		String producedWord = production.getWord();
-		int productionLength = producedWord.length();
-		int minLength = Math.min(wordLength, productionLength);
-		for(firstCommonLetter = 1; firstCommonLetter <= minLength; firstCommonLetter ++)
-			if(word.charAt(wordLength - firstCommonLetter) != producedWord.charAt(productionLength - firstCommonLetter))
-				break;
-		firstCommonLetter --;
-
-		String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
-		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
-		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
-		String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
-		return new LineEntry(removal, addition, condition, word);
 	}
 
 	private String makeGroup(String group){
