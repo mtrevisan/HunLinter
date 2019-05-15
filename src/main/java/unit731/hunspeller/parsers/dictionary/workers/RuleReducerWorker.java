@@ -206,6 +206,7 @@ compactedRules.forEach(System.out::println);
 				List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
 //TODO check feasibility of solution?
+//TODO keep only rules that matches
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, originalRuleEntry.isCombineable(), rules.size()));
 				for(String rule : rules)
@@ -329,6 +330,8 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				}
 			}
 			else{
+				//FIXME really ugly!!
+
 				//calculate intersection between parent and children conditions
 				Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
 				//if intersection is empty
