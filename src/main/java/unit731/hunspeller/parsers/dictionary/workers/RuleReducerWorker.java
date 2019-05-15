@@ -446,25 +446,38 @@ remove parent from final list
 			.map(entry -> entry.condition)
 			.collect(Collectors.toList());
 
-		//extract communalities
-		//TODO
-/*
-[0] = (HashMap$Node) "ò => [òdo, òco, òko]"
-[1] = (HashMap$Node) "è => [èdo, èđo, èxo]"
+		/*
+		extract communalities:
+		from
+		"ò => [òdo, òco, òko]"
+		"è => [èdo, èđo, èxo]"
+		transform into
+		"ò => [òco, òko]"
+		"è => [èđo, èxo]"
+		"òè => [òdo, èdo]"
+		so add condition
+		'[^èò]do'
+		*/
+		List<LineEntry> newParents = new ArrayList<>();
+		Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition, cond -> cond.substring(cond.length() - parentConditionLength - 1));
+		for(Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
+			List<String> comm = e.getValue();
+			if(comm.size() > 1){
+				//FIXME?
+				if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
+					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey() + "', comm '"
+						+ comm.toString());
 
-into
+				String commonGroup = extractGroup(comm, e.getKey().length());
+				String condition = makeNotGroup(commonGroup) + e.getKey();
+				newParents.add(LineEntry.createFrom(parent, condition));
 
-[0] = (HashMap$Node) "ò => [òco, òko]"
-[1] = (HashMap$Node) "è => [èđo, èxo]"
-[0] = (HashMap$Node) "òè => [òdo, èdo]"
+				comm.forEach(bubblesCondition::remove);
+			}
+		}
 
-add 'SFX v0 o ería|erieta|aría|arieta/F0 [^èò]do'
-
-		Map<String, List<String>> commonConditionBucket = bucket(bubblesCondition, cond -> cond.substring(cond.length() - parentConditionLength));
-*/
 		Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
 		//for each children-group-2
-		List<LineEntry> newParents = new ArrayList<>();
 		for(Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
 			//add new rule from parent with condition starting with NOT(children-group-2) to final list
 			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
