@@ -347,8 +347,9 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 						if(as.size() == 1 && as.get(0).from.equals(te.from)){
 							as.get(0).addition.addAll(te.addition.stream().map(add -> te.condition + add).collect(Collectors.toList()));
 
+							rules.add(as.get(0));
 							sortedList.remove(te);
-							sortedList.add(as.get(0));
+							sortedList.add(parent);
 							sortedList.sort(shortestConditionComparator);
 						}
 						else
