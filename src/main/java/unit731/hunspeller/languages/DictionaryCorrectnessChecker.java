@@ -2,7 +2,6 @@ package unit731.hunspeller.languages;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -54,20 +53,6 @@ public class DictionaryCorrectnessChecker{
 			morphologicalFieldCheck(production);
 
 		incompatibilityCheck(production);
-
-		if(hyphenator != null)
-			hyphenatorCheck(production);
-	}
-
-	private void hyphenatorCheck(Production production) throws IllegalArgumentException{
-		List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-		int size = splittedWords.size();
-		int i = 1;
-		for(String subword : splittedWords){
-			checkCompoundProduction(subword, i - size, production);
-			
-			i ++;
-		}
 	}
 
 	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{
