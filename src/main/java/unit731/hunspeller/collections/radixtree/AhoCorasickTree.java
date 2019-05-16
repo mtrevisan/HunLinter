@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
+import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeTraverser;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
@@ -20,6 +21,8 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho-Corasick algorithm</a>
  * @see <a href="http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf">Biosequence Algorithms, Spring 2005 - Lecture 4: Set Matching and Aho-Corasick Algorithm</a>
  * @see <a href="http://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2014-2015/Makalah2015/Makalah_IF221_Strategi_Algoritma_2015_032.pdf">Aho-Corasick Algorithm in Pattern Matching</a>
+ * @see <a href="https://github.com/hankcs/AhoCorasickDoubleArrayTrie">Aho-Corasick double-array trie</a>
+ * @see <a href="https://github.com/robert-bor/aho-corasick">Aho-Corasick</a>
  *
  * @param <S>	The sequence/key type
  * @param <V>	The type of values stored in the tree

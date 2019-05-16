@@ -49,8 +49,8 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 		return new HyphenationBreak(indexesAndRules, wordSize);
 	}
 
-	private Map<Integer, Pair<Integer, String>> manageAdditionalValues(List<String> rules, int i, String word, int normalizedWordSize, HyphenationOptions options,
-			Map<Integer, Pair<Integer, String>> indexesAndRules){
+	private Map<Integer, Pair<Integer, String>> manageAdditionalValues(List<String> rules, int i, String word, int normalizedWordSize,
+			HyphenationOptions options, Map<Integer, Pair<Integer, String>> indexesAndRules){
 		if(rules != null)
 			for(String rl : rules){
 				String key = HyphenationParser.getKeyFromData(rl);
