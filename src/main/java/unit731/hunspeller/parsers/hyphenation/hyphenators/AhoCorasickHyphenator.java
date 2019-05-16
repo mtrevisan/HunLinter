@@ -52,8 +52,14 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 	private Map<Integer, Pair<Integer, String>> manageAdditionalValues(List<String> rules, int i, String word, int normalizedWordSize, HyphenationOptions options,
 			Map<Integer, Pair<Integer, String>> indexesAndRules){
 		if(rules != null)
-			for(String rl : rules)
-				indexesAndRules = extractSyllabe(rl, i, word, normalizedWordSize, options, indexesAndRules);
+			for(String rl : rules){
+				String key = HyphenationParser.getKeyFromData(rl);
+				int ruleLastIndex = key.length() - 1;
+				boolean endingKey = (rl.charAt(ruleLastIndex) == '.');
+				if(!endingKey && word.substring(i - HyphenationParser.WORD_BOUNDARY.length()).startsWith(key)
+						|| endingKey && word.endsWith(key.substring(0, ruleLastIndex)))
+					indexesAndRules = extractSyllabe(rl, i, word, normalizedWordSize, options, indexesAndRules);
+			}
 		return indexesAndRules;
 	}
 
