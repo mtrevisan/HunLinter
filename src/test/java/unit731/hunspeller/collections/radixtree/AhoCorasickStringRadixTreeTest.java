@@ -79,7 +79,7 @@ public class AhoCorasickStringRadixTreeTest{
 		Assertions.assertEquals(0, search.getIndex());
 		Assertions.assertEquals(4, search.getNode().getValue().intValue());
 		search = itr.next();
-		Assertions.assertEquals(17, search.getIndex());
+		Assertions.assertEquals(15, search.getIndex());
 		Assertions.assertEquals(1, search.getNode().getValue().intValue());
 		Assertions.assertFalse(itr.hasNext());
 

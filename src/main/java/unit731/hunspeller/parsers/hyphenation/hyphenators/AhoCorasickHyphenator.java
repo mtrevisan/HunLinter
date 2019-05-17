@@ -23,7 +23,8 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 
 	private void preparePatterns(){
 		for(HyphenationParser.Level level : HyphenationParser.Level.values())
-			hypParser.getPatterns().get(level).prepare();
+			hypParser.getPatterns().get(level)
+				.prepare();
 	}
 
 	@Override

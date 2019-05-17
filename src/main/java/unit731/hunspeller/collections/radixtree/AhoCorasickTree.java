@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.radixtree.dtos.SearchResult;
-import unit731.hunspeller.collections.radixtree.exceptions.DuplicateKeyException;
 import unit731.hunspeller.collections.radixtree.sequencers.SequencerInterface;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeTraverser;
 import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
@@ -43,15 +43,16 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 				RadixTreeNode<S, V> state = findDeepestNode(subkey, parent);
 
 				S stateKey = state.getKey();
-				int lcpLength = longestCommonPrefixLength(subkey, stateKey);
-				if(lcpLength > 0){
-					int nodeKeyLength = sequencer.length(stateKey);
-					if(lcpLength < nodeKeyLength)
-						//split fail
-						state.split(lcpLength, sequencer);
-					if(lcpLength + i < keySize)
-						//split node
-						node.split(lcpLength + i, sequencer);
+				Pair<Integer, Integer> lcs = longestCommonSubstring(subkey, stateKey);
+				int lcsIndexA = lcs.getLeft();
+				if(lcsIndexA >= 0){
+					if(lcsIndexA > 0)
+						//split current node
+						node.split(lcsIndexA, sequencer);
+					int lcsIndexB = lcs.getRight();
+					if(lcsIndexB > 0)
+						//split targeted fail node
+						state = state.split(lcsIndexB + i, sequencer);
 
 					//link fail to node
 					node.setFailNode(state);
@@ -84,14 +85,63 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 				while(itr.hasNext()){
 					RadixTreeNode<S, V> child = itr.next();
 
-					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
-					if(lcpLength > 0){
+					Pair<Integer, Integer> lcs = longestCommonSubstring(child.getKey(), prefix);
+					int lcsIndexA = lcs.getLeft();
+					if(lcsIndexA >= 0){
 						result = child;
 						break;
 					}
 				}
 			}
 			return result;
+		}
+
+		/**
+		 * Finds the length and the index at which starts the Longest Common Substring
+		 *
+		 * @param keyA	Character sequence A
+		 * @param keyB	Character sequence B
+		 * @return	The indexes of keyA and keyB of the start of the longest common substring between <code>A</code> and <code>B</code>
+		 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
+		 */
+		private Pair<Integer, Integer> longestCommonSubstring(S keyA, S keyB){
+			int m = sequencer.length(keyA);
+			int n = sequencer.length(keyB);
+
+			if(m < n){
+				Pair<Integer, Integer> indexes = longestCommonSubstring(keyB, keyA);
+				return Pair.of(indexes.getRight(), indexes.getLeft());
+			}
+
+			//matrix to store result of two consecutive rows at a time
+			int[][] len = new int[2][n];
+			int currRow = 0;
+
+			//for a particular value of i and j, len[currRow][j] stores length of LCS in string X[0..i] and Y[0..j]
+			int lcsLength = 0;
+			int lcsIndexA = 0;
+			int lcsIndexB = 0;
+			for(int i = 0; i < m; i ++){
+				for(int j = 0; j < n; j ++){
+					if(i == 0 || j == 0)
+						len[currRow][j] = 0;
+					else if(sequencer.equalsAtIndex(keyA, keyB, i - 1, j - 1)){
+						len[currRow][j] = len[1 - currRow][j - 1] + 1;
+						if(len[currRow][j] > lcsLength){
+							lcsLength = len[currRow][j];
+
+							lcsIndexA = i;
+							lcsIndexB = j;
+						}
+					}
+					else
+						len[currRow][j] = 0;
+				}
+
+				//make current row as previous row and previous row as new current row
+				currRow = 1 - currRow;
+			}
+			return Pair.of(lcsIndexA - 1, lcsIndexB - 1);
 		}
 	};
 
@@ -172,16 +222,24 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 
 			@Override
 			public SearchResult<S, V> next(){
+				int idx = -1;
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					lastMatchedNode = lastMatchedNode.getNextNode(text, i, sequencer);
-					if(lastMatchedNode == null)
+					if(lastMatchedNode == null){
 						lastMatchedNode = root;
-					else if(lastMatchedNode.hasValue()){
-						currentIndex = i + 1;
-						return new SearchResult<>(lastMatchedNode, i);
+
+						idx = -1;
 					}
-					else
-						i += sequencer.length(lastMatchedNode.getKey()) - 1;
+					else{
+						if(idx < 0)
+							idx = i;
+						if(lastMatchedNode.hasValue()){
+							currentIndex = i + 1;
+							return new SearchResult<>(lastMatchedNode, idx);
+						}
+						else
+							i += sequencer.length(lastMatchedNode.getKey()) - 1;
+					}
 				}
 
 				throw new NoSuchElementException();

@@ -288,7 +288,7 @@ public class RadixTree<S, V extends Serializable>{
 		//key and node.getPrefix() share a prefix, so split node
 		node.split(lcpLength, sequencer);
 		if(lcpLength == keyLength){
-			//the largest prefix is equal to the key, so set this node's value
+			//the longest prefix is equal to the key, so set this node's value
 			ret = node.getValue();
 			node.setValue(value);
 		}
@@ -312,7 +312,7 @@ public class RadixTree<S, V extends Serializable>{
 	 *
 	 * @param keyA	Character sequence A
 	 * @param keyB	Character sequence B
-	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
+	 * @return	The length of longest common prefix between <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
 	protected int longestCommonPrefixLength(S keyA, S keyB){
