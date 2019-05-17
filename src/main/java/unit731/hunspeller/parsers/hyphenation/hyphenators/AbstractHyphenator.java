@@ -221,7 +221,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		int size = word.length();
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
-				String subword = word.substring(startIndex, endIndex + 1);
+				String subword = word.substring(startIndex, endIndex);
 
 				if(StringUtils.isNotBlank(addAfter)){
 					//append first characters to next subword
@@ -260,7 +260,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				}
 
 				result.add(subword);
-				startIndex = endIndex + 1;
+				startIndex = endIndex;
 			}
 
 		String subword = word.substring(startIndex);
