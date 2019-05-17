@@ -22,21 +22,21 @@ import java.util.Set;
 public class AhoCorasickTrie<V> implements Serializable{
 
 	/** check array of the Double-Array Trie structure */
-	protected int check[];
+	private int check[];
 	/** base array of the Double-Array Trie structure */
-	protected int base[];
+	private int base[];
 	/** fail table of the Aho-Corasick automata */
-	protected int fail[];
+	private int fail[];
 	/** output table of the Aho-Corasick automata */
-	protected int[][] output;
+	private int[][] output;
 	/** outer value array */
-	protected V[] v;
+	private V[] v;
 
 	/** the length of every key */
-	protected int[] l;
+	private int[] l;
 
 	/** the size of base and check array */
-	protected int size;
+	private int size;
 
 
 	/**
@@ -135,19 +135,64 @@ public class AhoCorasickTrie<V> implements Serializable{
 		return newCurrentState;
 	}
 
-	/** Transition of a state */
-	protected int transition(int current, char c){
-		int idx = current + c + 1;
-		return (current == check[idx]? base[idx]: -1);
-	}
-
 	/** Transition of a state, if the state is root and it failed, then returns the root */
-	protected int transitionWithRoot(int nodePos, char c){
+	private int transitionWithRoot(int nodePos, char c){
 		int b = base[nodePos];
 		int idx = b + c + 1;
 		if(b != check[idx])
 			return (nodePos == 0? 0: -1);
 		return idx;
+	}
+
+	/**
+	 * Match exactly by a key
+	 *
+	 * @param key	The key
+	 * @return	The index of the key (you can use it as a perfect hash function)
+	 */
+	private int exactMatchSearch(String key){
+		return exactMatchSearch(key, 0, 0, 0);
+	}
+
+	/**
+	 * Match exactly by a key
+	 *
+	 * @param key	The key
+	 * @param pos	The begin index of char array
+	 * @param len	The length of the key
+	 * @param nodePos	The starting position of the node for searching
+	 * @return	The index of the key (you can use it as a perfect hash function)
+	 */
+	private int exactMatchSearch(String key, int pos, int len, int nodePos){
+		if(len <= 0)
+			len = key.length();
+		if(nodePos <= 0)
+			nodePos = 0;
+
+		int result = -1;
+
+		char[] keyChars = key.toCharArray();
+
+		int b = base[nodePos];
+		int p;
+		for(int i = pos; i < len; i ++){
+			p = b + (int)(keyChars[i]) + 1;
+			if(b == check[p])
+				b = base[p];
+			else
+				return result;
+		}
+
+		p = b;
+		int n = base[p];
+		if(b == check[p] && n < 0)
+			result =  - n - 1;
+		return result;
+	}
+
+	/** Get the size of the keywords */
+	public int size(){
+		return v.length;
 	}
 
 
@@ -159,205 +204,6 @@ public class AhoCorasickTrie<V> implements Serializable{
 	public void build(Map<String, V> map){
 		new Builder()
 			.build(map);
-	}
-
-	/**
-	 * match exactly by a key
-	 *
-	 * @param key the key
-	 * @return the index of the key, you can use it as a perfect hash function
-	 */
-	public int exactMatchSearch(String key){
-		return exactMatchSearch(key, 0, 0, 0);
-	}
-
-	/**
-	 * match exactly by a key
-	 *
-	 * @param key
-	 * @param pos
-	 * @param len
-	 * @param nodePos
-	 * @return
-	 */
-	private int exactMatchSearch(String key, int pos, int len, int nodePos){
-		if(len <= 0){
-			len = key.length();
-		}
-		if(nodePos <= 0){
-			nodePos = 0;
-		}
-
-		int result = -1;
-
-		char[] keyChars = key.toCharArray();
-
-		int b = base[nodePos];
-		int p;
-
-		for(int i = pos; i < len; i ++){
-			p = b + (int)(keyChars[i]) + 1;
-			if(b == check[p]){
-				b = base[p];
-			}
-			else{
-				return result;
-			}
-		}
-
-		p = b;
-		int n = base[p];
-		if(b == check[p] && n < 0){
-			result =  - n - 1;
-		}
-		return result;
-	}
-
-	/**
-	 * match exactly by a key
-	 *
-	 * @param keyChars the char array of the key
-	 * @param pos the begin index of char array
-	 * @param len the length of the key
-	 * @param nodePos the starting position of the node for searching
-	 * @return the value index of the key, minus indicates null
-	 */
-	private int exactMatchSearch(char[] keyChars, int pos, int len, int nodePos){
-		int result = -1;
-
-		int b = base[nodePos];
-		int p;
-
-		for(int i = pos; i < len; i ++){
-			p = b + (int)(keyChars[i]) + 1;
-			if(b == check[p]){
-				b = base[p];
-			}
-			else{
-				return result;
-			}
-		}
-
-		p = b;
-		int n = base[p];
-		if(b == check[p] && n < 0){
-			result =  - n - 1;
-		}
-		return result;
-	}
-
-//    /**
-//     * Just for debug when I wrote it
-//     */
-//    public void debug()
-//    {
-//        System.out.println("base:");
-//        for (int i = 0; i < base.length; i++)
-//        {
-//            if (base[i] < 0)
-//            {
-//                System.out.println(i + " : " + -base[i]);
-//            }
-//        }
-//
-//        System.out.println("output:");
-//        for (int i = 0; i < output.length; i++)
-//        {
-//            if (output[i] != null)
-//            {
-//                System.out.println(i + " : " + Arrays.toString(output[i]));
-//            }
-//        }
-//
-//        System.out.println("fail:");
-//        for (int i = 0; i < fail.length; i++)
-//        {
-//            if (fail[i] != 0)
-//            {
-//                System.out.println(i + " : " + fail[i]);
-//            }
-//        }
-//
-//        System.out.println(this);
-//    }
-//
-//    @Override
-//    public String toString()
-//    {
-//        String infoIndex = "i    = ";
-//        String infoChar = "char = ";
-//        String infoBase = "base = ";
-//        String infoCheck = "check= ";
-//        for (int i = 0; i < Math.min(base.length, 200); ++i)
-//        {
-//            if (base[i] != 0 || check[i] != 0)
-//            {
-//                infoChar += "    " + (i == check[i] ? " ×" : (char) (i - check[i] - 1));
-//                infoIndex += " " + String.format("%5d", i);
-//                infoBase += " " + String.format("%5d", base[i]);
-//                infoCheck += " " + String.format("%5d", check[i]);
-//            }
-//        }
-//        return "DoubleArrayTrie：" +
-//                "\n" + infoChar +
-//                "\n" + infoIndex +
-//                "\n" + infoBase +
-//                "\n" + infoCheck + "\n" +
-////                "check=" + Arrays.toString(check) +
-////                ", base=" + Arrays.toString(base) +
-////                ", used=" + Arrays.toString(used) +
-//                "size=" + size
-////                ", length=" + Arrays.toString(length) +
-////                ", value=" + Arrays.toString(value) +
-//                ;
-//    }
-//
-//    /**
-//     * 一个顺序输出变量名与变量值的调试类
-//     */
-//    private static class DebugArray
-//    {
-//        Map<String, String> nameValueMap = new LinkedHashMap<String, String>();
-//
-//        public void add(String name, int value)
-//        {
-//            String valueInMap = nameValueMap.get(name);
-//            if (valueInMap == null)
-//            {
-//                valueInMap = "";
-//            }
-//
-//            valueInMap += " " + String.format("%5d", value);
-//
-//            nameValueMap.put(name, valueInMap);
-//        }
-//
-//        @Override
-//        public String toString()
-//        {
-//            String text = "";
-//            for (Map.Entry<String, String> entry : nameValueMap.entrySet())
-//            {
-//                String name = entry.getKey();
-//                String value = entry.getValue();
-//                text += String.format("%-5s", name) + "= " + value + '\n';
-//            }
-//
-//            return text;
-//        }
-//
-//        public void println()
-//        {
-//            System.out.print(this);
-//        }
-//    }
-	/**
-	 * Get the size of the keywords
-	 *
-	 * @return
-	 */
-	public int size(){
-		return v.length;
 	}
 
 	/**
