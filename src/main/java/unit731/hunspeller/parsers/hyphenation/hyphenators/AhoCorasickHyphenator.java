@@ -41,6 +41,7 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 			String rule = r.getNode().getValue();
 			int i = r.getIndex();
 
+			//number of non-letter characters
 			int delta = HyphenationParser.getKeyFromData(rule).length() - r.getNode().getKey().length();
 			indexesAndRules = extractSyllabe(rule, i - delta, word, normalizedWordSize, options, indexesAndRules);
 
