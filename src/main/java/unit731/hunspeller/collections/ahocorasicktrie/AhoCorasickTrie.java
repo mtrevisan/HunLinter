@@ -21,7 +21,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	int base[];
 	int fail[];
 	int[][] output;
-	V[] outerValue;
+	List<V> outerValue;
 
 	int[] keyLength;
 
@@ -47,7 +47,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		int[] hitArray = output[currentState];
 		if(hitArray != null)
 			for(int hit : hitArray)
-				collectedEmits.add(new SearchResult<>(position - keyLength[hit], position, outerValue[hit]));
+				collectedEmits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			int[] hitArray = output[currentState];
 			if(hitArray != null)
 				for(int hit : hitArray){
-					boolean proceed = processor.hit(position - keyLength[hit], position, outerValue[hit]);
+					boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 					if(!proceed)
 						break exit;
 				}
@@ -95,7 +95,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	public V get(String key){
 		int index = exactMatchSearch(key);
-		return (outerValue != null && index >= 0? outerValue[index]: null);
+		return (outerValue != null && index >= 0? outerValue.get(index): null);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	public boolean set(String key, V value){
 		int index = exactMatchSearch(key);
 		if(index >= 0){
-			outerValue[index] = value;
+			outerValue.set(index, value);
 			return true;
 		}
 		return false;
@@ -156,39 +156,44 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	The index of the key (you can use it as a perfect hash function)
 	 */
 	private int exactMatchSearch(String key, int posistion, int length, int nodePosition){
-		if(length <= 0)
-			length = key.length();
-		if(nodePosition < 0)
-			nodePosition = 0;
-
-		char[] keyChars = key.toCharArray();
-
 		int result = -1;
+		if(isInitialized()){
+			if(length <= 0)
+				length = key.length();
+			if(nodePosition < 0)
+				nodePosition = 0;
 
-		int b = base[nodePosition];
-		int p;
-		for(int i = posistion; i < length; i ++){
-			p = b + (keyChars[i]) + 1;
-			if(b == check[p])
-				b = base[p];
-			else
-				return result;
+			char[] keyChars = key.toCharArray();
+
+			int b = base[nodePosition];
+			int p;
+			for(int i = posistion; i < length; i ++){
+				p = b + (keyChars[i]) + 1;
+				if(b == check[p])
+					b = base[p];
+				else
+					return result;
+			}
+
+			p = b;
+			int n = base[p];
+			if(b == check[p] && n < 0)
+				result =  - n - 1;
 		}
-
-		p = b;
-		int n = base[p];
-		if(b == check[p] && n < 0)
-			result =  - n - 1;
 		return result;
 	}
 
 	/** Get the size of the keywords */
 	public int size(){
-		return outerValue.length;
+		return (outerValue != null? outerValue.size(): 0);
 	}
 
 	public boolean isEmpty(){
-		return (size() == 0);
+		return (outerValue == null || outerValue.isEmpty());
+	}
+
+	public boolean isInitialized(){
+		return (base != null);
 	}
 
 }

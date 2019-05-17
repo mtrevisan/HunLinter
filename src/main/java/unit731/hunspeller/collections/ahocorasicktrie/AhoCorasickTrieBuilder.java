@@ -23,6 +23,8 @@ import unit731.hunspeller.collections.ahocorasicktrie.exceptions.DuplicateKeyExc
 class AhoCorasickTrieBuilder<V extends Serializable>{
 
 	private final RadixTrieNode rootNode = new RadixTrieNode();
+	private AhoCorasickTrie<V> trie;
+	private boolean noDuplicatesAllowed;
 
 	/** Whether the position has been used */
 	private boolean used[];
@@ -36,6 +38,21 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	private int keySize;
 
 
+	AhoCorasickTrieBuilder(){
+		this(new AhoCorasickTrie<>());
+	}
+
+	AhoCorasickTrieBuilder(AhoCorasickTrie<V> trie){
+		Objects.requireNonNull(trie);
+
+		this.trie = trie;
+	}
+
+	public AhoCorasickTrieBuilder<V> noDuplicatesAllowed(){
+		noDuplicatesAllowed = true;
+		return this;
+	}
+
 	/**
 	 * Build a AhoCorasickTrie from a map
 	 *
@@ -45,12 +62,9 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	public AhoCorasickTrie<V> build(Map<String, V> map){
 		Objects.requireNonNull(map);
 
-		AhoCorasickTrie<V> trie = new AhoCorasickTrie<>();
-
 		//save the outer values
-		trie.outerValue = (V[])map.values()
-			.toArray();
-		trie.keyLength = new int[trie.outerValue.length];
+		trie.outerValue = new ArrayList<>(map.values());
+		trie.keyLength = new int[trie.outerValue.size()];
 
 		//construct a two-point trie tree
 		Set<String> keySet = map.keySet();
@@ -62,6 +76,60 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		//build the failure table and merge the output table
 		constructFailureStates(trie);
 
+		return trie;
+	}
+
+	/**
+	 * NOTE: Calling this method will un-{@link #prepare() prepare} the tree, that is, it will not be an Aho-Corasick tree anymore.
+	 * 
+	 * @param key	The key to add to the tree
+	 * @param value	The value associated to the key
+	 * @return	The previous value (if any) associated to the key
+	 * @throws NullPointerException	If the given key or value is <code>null</code>
+	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
+	 */
+	public V put(String key, V value) throws DuplicateKeyException{
+		Objects.requireNonNull(key);
+		Objects.requireNonNull(value);
+
+		V previousValue = trie.get(key);
+		if(previousValue != null){
+			if(noDuplicatesAllowed)
+				throw new DuplicateKeyException("Duplicate key inserted: '" + key + "'");
+
+			trie.set(key, value);
+		}
+		else{
+			if(trie.isInitialized()){
+				//realloc memory
+				allocSize = trie.outerValue.size();
+				trie.keyLength = Arrays.copyOf(trie.keyLength, allocSize + 1);
+			}
+			else{
+				allocSize = 0;
+				trie.outerValue = new ArrayList<>(1);
+				trie.keyLength = new int[1];
+			}
+
+			//save the outer value
+			trie.outerValue.add(value);
+			trie.keyLength[allocSize] = key.length();
+
+			//construct a two-point trie tree
+			addKeyword(trie, key, allocSize);
+
+			allocSize ++;
+
+			//vuilding a double array trie tree based on a two-point trie tree
+			buildTrie(trie, allocSize);
+
+			//build the failure table and merge the output table
+			constructFailureStates(trie);
+		}
+		return previousValue;
+	}
+
+	public AhoCorasickTrie<V> getTrie(){
 		return trie;
 	}
 
