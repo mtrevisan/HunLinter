@@ -3,7 +3,6 @@ package unit731.hunspeller.collections.ahocorasicktrie;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -16,7 +15,7 @@ import java.util.Map;
 public class AhoCorasickTrie<V> implements Serializable{
 
 	/** check array of the Double-Array Trie structure */
-	private int check[];
+	int check[];
 	/** base array of the Double-Array Trie structure */
 	int base[];
 	/** fail table of the Aho-Corasick automata */

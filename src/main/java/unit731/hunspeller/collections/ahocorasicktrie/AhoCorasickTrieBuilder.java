@@ -18,24 +18,6 @@ import java.util.Set;
  */
 class AhoCorasickTrieBuilder<V>{
 
-	/** check array of the Double-Array Trie structure */
-//	private int check[];
-//	/** base array of the Double-Array Trie structure */
-//	private int base[];
-//	/** fail table of the Aho-Corasick automata */
-//	private int fail[];
-//	/** output table of the Aho-Corasick automata */
-//	private int[][] output;
-//	/** outer value array */
-//	private V[] v;
-//
-//	/** the length of every key */
-//	private int[] l;
-//
-//	/** the size of base and check array */
-//	private int size;
-
-
 	/** The root state of trie */
 	private RadixTrieNode rootState = new RadixTrieNode();
 	/** Whether the position has been used */
@@ -180,7 +162,7 @@ class AhoCorasickTrieBuilder<V>{
 
 		RadixTrieNode root_node = this.rootState;
 
-		List<Map.Entry<Integer, RadixTrieNode>> siblings = new ArrayList<Map.Entry<Integer, RadixTrieNode>>(root_node.getSuccess().entrySet().size());
+		List<Map.Entry<Integer, RadixTrieNode>> siblings = new ArrayList<>(root_node.getSuccess().entrySet().size());
 		fetch(root_node, siblings);
 		insert(trie, siblings);
 	}
@@ -273,14 +255,14 @@ class AhoCorasickTrieBuilder<V>{
 		}
 		used[begin] = true;
 
-		trie.size = (trie.size > begin + siblings.get(siblings.size() - 1).getKey() + 1) ? size : begin + siblings.get(siblings.size() - 1).getKey() + 1;
+		trie.size = (trie.size > begin + siblings.get(siblings.size() - 1).getKey() + 1) ? trie.size : begin + siblings.get(siblings.size() - 1).getKey() + 1;
 
 		for(Map.Entry<Integer, RadixTrieNode> sibling : siblings){
 			trie.check[begin + sibling.getKey()] = begin;
 		}
 
 		for(Map.Entry<Integer, RadixTrieNode> sibling : siblings){
-			List<Map.Entry<Integer, RadixTrieNode>> new_siblings = new ArrayList<Map.Entry<Integer, RadixTrieNode>>(sibling.getValue().getSuccess().entrySet().size() + 1);
+			List<Map.Entry<Integer, RadixTrieNode>> new_siblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
 
 			if(fetch(sibling.getValue(), new_siblings) == 0) // 一个词的终止且不为其他词的前缀，其实就是叶子节点
 			{
