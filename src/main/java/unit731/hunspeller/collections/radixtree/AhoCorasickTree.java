@@ -80,6 +80,7 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 				Iterator<RadixTreeNode<S, V>> itr = children.iterator();
 				while(itr.hasNext()){
 					RadixTreeNode<S, V> child = itr.next();
+
 					int lcpLength = longestCommonPrefixLength(child.getKey(), prefix);
 					if(lcpLength > 0){
 						result = child;
