@@ -209,7 +209,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the given key or value is <code>null</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	public V put(S key, V value){
+	public V put(S key, V value) throws DuplicateKeyException{
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
@@ -232,7 +232,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	private V put(S key, V value, RadixTreeNode<S, V> node){
+	private V put(S key, V value, RadixTreeNode<S, V> node) throws DuplicateKeyException{
 		V ret = null;
 
 		S nodeKey = node.getKey();
