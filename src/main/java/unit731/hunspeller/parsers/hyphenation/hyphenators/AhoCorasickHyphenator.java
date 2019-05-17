@@ -1,12 +1,12 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
-import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
@@ -18,14 +18,14 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, AhoCorasickDoubleArrayTrie<String> patterns, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, AhoCorasickTrie<String> patterns, HyphenationOptions options){
 		String w = HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY;
 
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		List<AhoCorasickDoubleArrayTrie.Hit<String>> itr = patterns.parseText(w);
-		for(AhoCorasickDoubleArrayTrie.Hit<String> r : itr){
+		List<AhoCorasickTrie.Hit<String>> itr = patterns.parseText(w);
+		for(AhoCorasickTrie.Hit<String> r : itr){
 			String rule = r.value;
 			int i = r.begin;
 

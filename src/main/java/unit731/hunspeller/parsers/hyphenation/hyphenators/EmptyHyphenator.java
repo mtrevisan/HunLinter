@@ -1,6 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
-import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
@@ -26,7 +26,7 @@ class EmptyHyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, AhoCorasickDoubleArrayTrie<String> patterns, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, AhoCorasickTrie<String> patterns, HyphenationOptions options){
 		return HyphenationBreak.getEmptyInstance();
 	}
 	

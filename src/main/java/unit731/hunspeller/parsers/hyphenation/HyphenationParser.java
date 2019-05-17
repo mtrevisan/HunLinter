@@ -1,6 +1,5 @@
 package unit731.hunspeller.parsers.hyphenation;
 
-import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
@@ -27,6 +26,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
@@ -113,7 +113,7 @@ public class HyphenationParser{
 
 	private boolean secondLevelPresent;
 	public Pattern patternNoHyphen;
-	private final Map<Level, AhoCorasickDoubleArrayTrie<String>> patterns = new EnumMap<>(Level.class);
+	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private final HyphenationOptionsParser optParser;
 
@@ -130,13 +130,13 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
-			patterns.put(level, new AhoCorasickDoubleArrayTrie<>());
+			patterns.put(level, new AhoCorasickTrie<>());
 			customHyphenations.put(level, new HashMap<>());
 		}
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, AhoCorasickDoubleArrayTrie<String>> patterns,
+	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, AhoCorasickTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
 		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
@@ -176,7 +176,7 @@ public class HyphenationParser{
 		return patternNoHyphen;
 	}
 
-	public Map<Level, AhoCorasickDoubleArrayTrie<String>> getPatterns(){
+	public Map<Level, AhoCorasickTrie<String>> getPatterns(){
 		return patterns;
 	}
 
