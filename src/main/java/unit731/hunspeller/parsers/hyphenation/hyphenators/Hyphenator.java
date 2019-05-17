@@ -1,12 +1,12 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import java.util.HashMap;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.collections.radixtree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
@@ -18,7 +18,7 @@ class Hyphenator extends AbstractHyphenator{
 	}
 
 	@Override
-	protected HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options){
+	protected HyphenationBreak calculateBreakpoints(String word, AhoCorasickDoubleArrayTrie<String> patterns, HyphenationOptions options){
 		String w = HyphenationParser.WORD_BOUNDARY + word + HyphenationParser.WORD_BOUNDARY;
 
 		int wordSize = word.length();
@@ -27,10 +27,10 @@ class Hyphenator extends AbstractHyphenator{
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<String> prefixes = patterns.getValues(w.substring(i).toLowerCase(Locale.ROOT), RadixTree.PrefixType.PREFIXED_TO);
+			List<AhoCorasickDoubleArrayTrie.Hit<String>> prefixes = patterns.parseText(w.substring(i).toLowerCase(Locale.ROOT));
 
-			for(String rule : prefixes)
-				indexesAndRules = extractSyllabe(rule, i, word, normalizedWordSize, options, indexesAndRules);
+			for(AhoCorasickDoubleArrayTrie.Hit<String> rule : prefixes)
+				indexesAndRules = extractSyllabe(rule.value, i, word, normalizedWordSize, options, indexesAndRules);
 		}
 
 		return new HyphenationBreak(indexesAndRules, wordSize);

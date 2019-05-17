@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation;
 
+import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
@@ -26,10 +27,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.radixtree.AhoCorasickTree;
-import unit731.hunspeller.collections.radixtree.RadixTree;
-import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
@@ -116,7 +113,7 @@ public class HyphenationParser{
 
 	private boolean secondLevelPresent;
 	public Pattern patternNoHyphen;
-	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
+	private final Map<Level, AhoCorasickDoubleArrayTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private final HyphenationOptionsParser optParser;
 
@@ -133,13 +130,13 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
-			patterns.put(level, creatTree());
+			patterns.put(level, new AhoCorasickDoubleArrayTrie<>());
 			customHyphenations.put(level, new HashMap<>());
 		}
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, RadixTree<String, String>> patterns,
+	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, AhoCorasickDoubleArrayTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
 		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
@@ -153,21 +150,14 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		for(Level level : Level.values()){
-			RadixTree<String, String> p = patterns.getOrDefault(level, creatTree());
-			this.patterns.put(level, p);
-		}
+		for(Level level : Level.values())
+			this.patterns.put(level, patterns.get(level));
 		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.<Level, Map<String, String>>emptyMap());
 		for(Level level : Level.values()){
 			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
-	}
-
-	private RadixTree<String, String> creatTree(){
-		StringSequencer sequencer = new StringSequencer();
-		return (radixTreeType == HyphenatorFactory.Type.AHO_CORASICK? AhoCorasickTree.createTree(sequencer): RadixTree.createTree(sequencer));
 	}
 
 	public HyphenatorFactory.Type getRadixTreeType(){
@@ -186,7 +176,7 @@ public class HyphenationParser{
 		return patternNoHyphen;
 	}
 
-	public Map<Level, RadixTree<String, String>> getPatterns(){
+	public Map<Level, AhoCorasickDoubleArrayTrie<String>> getPatterns(){
 		return patterns;
 	}
 
@@ -221,6 +211,7 @@ public class HyphenationParser{
 
 				REDUCED_PATTERNS.get(level).clear();
 
+				Map<String, String> hyphenations = new HashMap<>();
 				while((line = br.readLine()) != null){
 					line = removeComment(line);
 					if(line.isEmpty())
@@ -231,6 +222,10 @@ public class HyphenationParser{
 						if(line.startsWith(NEXT_LEVEL)){
 							if(level == Level.COMPOUND)
 								throw new IllegalArgumentException("Cannot have more than two levels");
+
+							patterns.get(level)
+								.build(hyphenations);
+							hyphenations.clear();
 
 							//start with non–compound level
 							level = Level.COMPOUND;
@@ -253,7 +248,7 @@ public class HyphenationParser{
 								throw new IllegalArgumentException("Duplication found: '" + line + "'");
 							else
 								//insert current pattern into the radix tree (remove all numbers)
-								patterns.get(level).put(key, line);
+								hyphenations.put(key, line);
 						}
 					}
 				}
@@ -271,9 +266,12 @@ public class HyphenationParser{
 					for(String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
 						if(!isRuleDuplicated(noHyphen, line, level))
-							patterns.get(level).put(noHyphen, line);
+							hyphenations.put(noHyphen, line);
 					}
 				}
+
+				patterns.get(level)
+					.build(hyphenations);
 			}
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
@@ -303,7 +301,8 @@ public class HyphenationParser{
 
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
-		String foundNodeValue = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
+		String foundNodeValue = patterns.get(level)
+			.get(key);
 		if(foundNodeValue != null){
 			String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
 			String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
@@ -330,8 +329,6 @@ public class HyphenationParser{
 	}
 
 	private void clearInternal(){
-		patterns.values()
-			.forEach(RadixTree::clear);
 		customHyphenations.values()
 			.forEach(Map::clear);
 		optParser.clear();
@@ -348,9 +345,10 @@ public class HyphenationParser{
 		validateRule(rule, level);
 
 		String key = getKeyFromData(rule);
-		String newRule = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
+		String newRule = patterns.get(level).get(key);
 		if(newRule == null)
-			patterns.get(level).put(key, rule);
+			patterns.get(level)
+				.put(key, rule);
 
 		return newRule;
 	}
@@ -464,7 +462,8 @@ public class HyphenationParser{
 
 			return false;
 		};
-		patterns.get(level).visit(saveVisitor, RadixTree.PrefixType.PREFIXED_BY);
+		patterns.get(level)
+			.visit(saveVisitor);
 
 		Collection<List<String>> values = result.values();
 		for(List<String> value : values){
@@ -496,7 +495,7 @@ public class HyphenationParser{
 	 */
 	public boolean hasRule(String rule, Level level){
 		String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key, RadixTree.PrefixType.PREFIXED_BY));
+		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).get(key) != null);
 	}
 
 	public static String getKeyFromData(String rule){

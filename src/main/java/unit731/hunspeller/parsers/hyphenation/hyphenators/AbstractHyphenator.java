@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.hyphenation.hyphenators;
 
+import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import unit731.hunspeller.collections.radixtree.RadixTree;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.dtos.HyphenationBreak;
@@ -58,14 +58,16 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	@Override
 	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
 		String key = HyphenationParser.getKeyFromData(addedRule);
-		Map<HyphenationParser.Level, RadixTree<String, String>> patterns = hypParser.getPatterns();
+		Map<HyphenationParser.Level, AhoCorasickDoubleArrayTrie<String>> patterns = hypParser.getPatterns();
 		Hyphenation hyph = null;
-		if(!patterns.get(level).containsKey(key, RadixTree.PrefixType.PREFIXED_BY)){
-			patterns.get(level).put(key, addedRule);
+		if(patterns.get(level).get(key) == null){
+			patterns.get(level)
+				.put(key, addedRule);
 
 			hyph = hyphenate(word, patterns);
 
-			patterns.get(level).remove(key);
+			patterns.get(level)
+				.remove(key);
 		}
 		return hyph;
 	}
@@ -77,7 +79,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns){
+	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, AhoCorasickDoubleArrayTrie<String>> patterns){
 		//apply first level hyphenation
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND,
 			hypParser.getOptParser().getNonCompoundOptions());
@@ -125,7 +127,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	 * @param options	The hyphenation options
 	 * @return the hyphenation breakpoints object
 	 */
-	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, RadixTree<String, String>> patterns,
+	private HyphenationBreak hyphenate(String word, Map<HyphenationParser.Level, AhoCorasickDoubleArrayTrie<String>> patterns,
 			HyphenationParser.Level level, HyphenationOptions options){
 		//clear already present word boundaries' characters
 		word = PatternHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
@@ -155,7 +157,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		return hyphBreak;
 	}
 
-	protected abstract HyphenationBreak calculateBreakpoints(String word, RadixTree<String, String> patterns, HyphenationOptions options);
+	protected abstract HyphenationBreak calculateBreakpoints(String word, AhoCorasickDoubleArrayTrie<String> patterns, HyphenationOptions options);
 
 	@Override
 	public List<String> splitIntoCompounds(String word){
