@@ -115,33 +115,35 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 
 			//matrix to store result of two consecutive rows at a time
 			int[][] len = new int[2][n];
-			int currRow = 0;
+			int currentRow = 0;
 
 			//for a particular value of i and j, len[currRow][j] stores length of LCS in string X[0..i] and Y[0..j]
-			int lcsLength = 0;
-			int lcsIndexA = 0;
-			int lcsIndexB = 0;
+			int lcsMaxLength = 0;
+			int lcsIndexA = -1;
+			int lcsIndexB = -1;
 			for(int i = 0; i < m; i ++){
 				for(int j = 0; j < n; j ++){
-					if(i == 0 || j == 0)
-						len[currRow][j] = 0;
-					else if(sequencer.equalsAtIndex(keyA, keyB, i - 1, j - 1)){
-						len[currRow][j] = len[1 - currRow][j - 1] + 1;
-						if(len[currRow][j] > lcsLength){
-							lcsLength = len[currRow][j];
-
-							lcsIndexA = i;
-							lcsIndexB = j;
-						}
-					}
+					int cost;
+					if(!sequencer.equalsAtIndex(keyA, keyB, i, j))
+						cost = 0;
+					else if(i == 0 || j == 0)
+						cost = 1;
 					else
-						len[currRow][j] = 0;
+						cost = len[currentRow][j - 1] + 1;
+					len[1 - currentRow][j] = cost;
+
+					if(cost > lcsMaxLength){
+						lcsMaxLength = cost;
+
+						lcsIndexA = i;
+						lcsIndexB = j;
+					}
 				}
 
 				//make current row as previous row and previous row as new current row
-				currRow = 1 - currRow;
+				currentRow = 1 - currentRow;
 			}
-			return Pair.of(lcsIndexA - 1, lcsIndexB - 1);
+			return Pair.of(lcsIndexA, lcsIndexB);
 		}
 	};
 
@@ -225,11 +227,10 @@ public class AhoCorasickTree<S, V extends Serializable> extends RadixTree<S, V>{
 				int idx = -1;
 				for(int i = currentIndex; i < sequencer.length(text); i ++){
 					lastMatchedNode = lastMatchedNode.getNextNode(text, i, sequencer);
-					if(lastMatchedNode == null){
-						lastMatchedNode = root;
-
+					if(lastMatchedNode == root || lastMatchedNode == null)
 						idx = -1;
-					}
+					if(lastMatchedNode == null)
+						lastMatchedNode = root;
 					else{
 						if(idx < 0)
 							idx = i;

@@ -58,7 +58,7 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 				String key = HyphenationParser.getKeyFromData(rl);
 				int ruleLastIndex = key.length() - 1;
 				boolean endingKey = (rl.charAt(ruleLastIndex) == '.');
-				if(!endingKey && word.substring(i - HyphenationParser.WORD_BOUNDARY.length()).startsWith(key)
+				if(!endingKey && word.substring(i).startsWith(key)
 						|| endingKey && word.endsWith(key.substring(0, ruleLastIndex)))
 					indexesAndRules = extractSyllabe(rl, i, word, normalizedWordSize, options, indexesAndRules);
 			}

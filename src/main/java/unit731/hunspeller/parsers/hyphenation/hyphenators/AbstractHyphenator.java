@@ -216,12 +216,12 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		List<String> result = new ArrayList<>();
 
 		int startIndex = 0;
-		int size = word.length();
 		int after = 0;
 		String addAfter = null;
+		int size = word.length();
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
-				String subword = word.substring(startIndex, endIndex);
+				String subword = word.substring(startIndex, endIndex + 1);
 
 				if(StringUtils.isNotBlank(addAfter)){
 					//append first characters to next subword
@@ -260,7 +260,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 				}
 
 				result.add(subword);
-				startIndex = endIndex;
+				startIndex = endIndex + 1;
 			}
 
 		String subword = word.substring(startIndex);
@@ -300,6 +300,7 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 		String reducedRule = removeNonStandardPart(rule);
 
 		//cycle the pattern's characters searching for numbers
+		//start from -1 since the innitial dot has to be skipped
 		int j = -1;
 		for(char chr : reducedRule.toCharArray()){
 			if(!Character.isDigit(chr))
