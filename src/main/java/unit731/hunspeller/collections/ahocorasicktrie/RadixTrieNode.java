@@ -2,6 +2,7 @@ package unit731.hunspeller.collections.ahocorasicktrie;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -59,7 +60,7 @@ public class RadixTrieNode{
 	/** Add a matching pattern string (this state corresponds to this pattern string) */
 	public void addEmit(int keyword){
 		if(emits == null)
-			emits = new TreeSet<>(Collections.reverseOrder());
+			emits = new HashSet<>();
 
 		emits.add(keyword);
 	}

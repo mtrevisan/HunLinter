@@ -24,7 +24,7 @@ class AhoCorasickHyphenator extends AbstractHyphenator{
 		int wordSize = word.length();
 		int normalizedWordSize = getNormalizedLength(word);
 		Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
-		List<AhoCorasickTrie.Hit<String>> itr = patterns.parseText(w);
+		List<AhoCorasickTrie.Hit<String>> itr = patterns.searchInText(w);
 		for(AhoCorasickTrie.Hit<String> r : itr){
 			String rule = r.value;
 			int i = r.begin;

@@ -27,7 +27,7 @@ class Hyphenator extends AbstractHyphenator{
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<AhoCorasickTrie.Hit<String>> prefixes = patterns.parseText(w.substring(i).toLowerCase(Locale.ROOT));
+			List<AhoCorasickTrie.Hit<String>> prefixes = patterns.searchInText(w.substring(i).toLowerCase(Locale.ROOT));
 
 			for(AhoCorasickTrie.Hit<String> rule : prefixes)
 				indexesAndRules = extractSyllabe(rule.value, i, word, normalizedWordSize, options, indexesAndRules);
