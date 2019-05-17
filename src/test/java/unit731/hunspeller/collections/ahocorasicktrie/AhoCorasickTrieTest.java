@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunspeller.collections.ahocorasicktrie.exceptions.DuplicateKeyException;
 
 
 public class AhoCorasickTrieTest{
@@ -55,23 +54,6 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void multiplePutInsertions(){
-		AhoCorasickTrieBuilder<Integer> builder = new AhoCorasickTrieBuilder<>();
-		builder.put("test", 1);
-		builder.put("tent", 2);
-		builder.put("tentest", 21);
-		builder.put("tank", 3);
-		builder.put("rest", 4);
-		AhoCorasickTrie<Integer> trie = builder.getTrie();
-
-		Assertions.assertEquals(5, trie.size());
-		Assertions.assertEquals(1, trie.get("test").intValue());
-		Assertions.assertEquals(2, trie.get("tent").intValue());
-		Assertions.assertEquals(3, trie.get("tank").intValue());
-		Assertions.assertEquals(4, trie.get("rest").intValue());
-	}
-
-	@Test
 	public void prepare(){
 		Map<String, Integer> map = new HashMap<>();
 		map.put("test", 1);
@@ -110,24 +92,6 @@ public class AhoCorasickTrieTest{
 		Assertions.assertEquals(2, trie.get("tent").intValue());
 		Assertions.assertEquals(3, trie.get("tank").intValue());
 		Assertions.assertEquals(4, trie.get("rest").intValue());
-	}
-
-	@Test
-	public void multipleInsertionOfTheSameKeyNoDuplicate(){
-		Map<String, Integer> map = new HashMap<>();
-		map.put("test", 1);
-		map.put("tent", 2);
-		map.put("tank", 3);
-		map.put("rest", 4);
-		AhoCorasickTrie<Integer> trie = new AhoCorasickTrieBuilder<Integer>()
-			.build(map);
-
-		Throwable exception = Assertions.assertThrows(DuplicateKeyException.class, () -> {
-			AhoCorasickTrieBuilder<Integer> builder = new AhoCorasickTrieBuilder<>(trie)
-				.noDuplicatesAllowed();
-			builder.put("test", 9);
-		});
-		Assertions.assertEquals("Duplicate key inserted: 'test'", exception.getMessage());
 	}
 
 	/*@Test
