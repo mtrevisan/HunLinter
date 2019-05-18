@@ -10,7 +10,7 @@ public class DuplicateKeyException extends RuntimeException{
 		super();
 	}
 
-	public DuplicateKeyException(String msg){
+	public DuplicateKeyException(final String msg){
 		super(msg);
 	}
 

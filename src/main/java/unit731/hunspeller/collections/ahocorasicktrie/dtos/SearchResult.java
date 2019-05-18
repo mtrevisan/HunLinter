@@ -16,7 +16,7 @@ public class SearchResult<V>{
 	private final V value;
 
 
-	public SearchResult(int begin, int end, V value){
+	public SearchResult(final int begin, final int end, final V value){
 		this.start = begin;
 		this.end = end;
 		this.value = value;

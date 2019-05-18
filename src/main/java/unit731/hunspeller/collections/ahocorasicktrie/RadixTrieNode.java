@@ -51,7 +51,7 @@ public class RadixTrieNode{
 	 *
 	 * @param depth	The depth of this node
 	 */
-	public RadixTrieNode(int depth){
+	public RadixTrieNode(final int depth){
 		this.depth = depth;
 	}
 
@@ -60,7 +60,7 @@ public class RadixTrieNode{
 	}
 
 	/** Add a matching pattern string (this node corresponds to this pattern string) */
-	public void addChildrenId(int keyword){
+	public void addChildrenId(final int keyword){
 		if(childrenIds == null)
 			childrenIds = new HashSet<>();
 
@@ -72,7 +72,7 @@ public class RadixTrieNode{
 	}
 
 	/** Add some matching pattern strings */
-	public void addChildrenIds(Collection<Integer> childrenIds){
+	public void addChildrenIds(final Collection<Integer> childrenIds){
 		childrenIds.forEach(this::addChildrenId);
 	}
 
@@ -91,7 +91,7 @@ public class RadixTrieNode{
 		return failure;
 	}
 
-	public void setFailure(RadixTrieNode failure, int[] fail){
+	public void setFailure(final RadixTrieNode failure, final int[] fail){
 		this.failure = failure;
 		fail[id] = failure.id;
 	}
@@ -103,7 +103,7 @@ public class RadixTrieNode{
 	 * @param ignoreRootNode	Whether to ignore the root node, it should be true if the root node calls itself, otherwise it is false
 	 * @return	Transfer result
 	 */
-	private RadixTrieNode nextNode(Character character, boolean ignoreRootNode){
+	private RadixTrieNode nextNode(final Character character, final boolean ignoreRootNode){
 		RadixTrieNode nextNode = success.get(character);
 		if(!ignoreRootNode && nextNode == null && depth == 0)
 			nextNode = this;
@@ -111,16 +111,16 @@ public class RadixTrieNode{
 	}
 
 	/** According to the character transfer, the root node transfer failure will return itself (never return null) */
-	public RadixTrieNode nextNode(Character character){
+	public RadixTrieNode nextNode(final Character character){
 		return nextNode(character, false);
 	}
 
 	/** According to character transfer, any node transfer failure will return null */
-	public RadixTrieNode nextNodeIgnoreRoot(Character character){
+	public RadixTrieNode nextNodeIgnoreRoot(final Character character){
 		return nextNode(character, true);
 	}
 
-	public RadixTrieNode addNode(Character character){
+	public RadixTrieNode addNode(final Character character){
 		RadixTrieNode nextNode = nextNodeIgnoreRoot(character);
 		if(nextNode == null){
 			nextNode = new RadixTrieNode(depth + 1);
@@ -138,7 +138,7 @@ public class RadixTrieNode{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
@@ -185,7 +185,7 @@ public class RadixTrieNode{
 		return id;
 	}
 
-	public void setId(int id){
+	public void setId(final int id){
 		this.id = id;
 	}
 

@@ -49,23 +49,21 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @return	A list of outputs
 	 */
-	public List<SearchResult<V>> searchInText(CharSequence text){
+	public List<SearchResult<V>> searchInText(final String text){
 		int currentNodeId = ROOT_NODE_ID;
 		List<SearchResult<V>> collectedHits = new ArrayList<>();
 		for(int i = 0; i < text.length(); i ++){
 			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
 
-			storeHit(i + 1, currentNodeId, collectedHits);
+			//store hit
+			final int[] hits = output[currentNodeId];
+			if(hits != null){
+				final int position = i + 1;
+				for(int hit : hits)
+					collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
+			}
 		}
 		return collectedHits;
-	}
-
-	/** Store output */
-	private void storeHit(int position, int currentNodeId, List<SearchResult<V>> collectedHits){
-		int[] hits = output[currentNodeId];
-		if(hits != null)
-			for(int hit : hits)
-				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
 	}
 
 	/**
@@ -74,13 +72,13 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @param processor	A processor which handles the output
 	 */
-	public void searchInText(CharSequence text, HitProcessor<V> processor){
+	public void searchInText(final String text, final HitProcessor<V> processor){
 		int currentNodeId = ROOT_NODE_ID;
 		exit:
 		for(int i = 0; i < text.length(); i ++){
 			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
 
-			int[] hitArray = output[currentNodeId];
+			final int[] hitArray = output[currentNodeId];
 			if(hitArray != null){
 				final int position = i + 1;
 				for(int hit : hitArray){
@@ -98,7 +96,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	Source text to check
 	 * @return	<code>true</code> if string contains at least one substring
 	 */
-	public boolean containsKey(CharSequence text){
+	public boolean containsKey(final String text){
 		if(isInitialized()){
 			int currentNodeId = ROOT_NODE_ID;
 			for(int i = 0; i < text.length(); i ++){
@@ -111,19 +109,19 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return false;
 	}
 
-	private int retrieveNextNodeId(int currentNodeId, char character){
+	private int retrieveNextNodeId(int currentNodeId, final char character){
 		int nextNodeId;
 		while((nextNodeId = transitionWithRoot(currentNodeId, character)) == -1)
 			currentNodeId = next[currentNodeId];
 		return nextNodeId;
 	}
 
-	public boolean hasKey(CharSequence key){
+	public boolean hasKey(final String key){
 		final int id = exactMatchSearch(key);
 		return (id >= 0);
 	}
 
-	public V get(CharSequence key){
+	public V get(final String key){
 		final int id = exactMatchSearch(key);
 		return (outerValue != null && id >= 0? outerValue.get(id): null);
 	}
@@ -135,7 +133,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param value	The value
 	 * @return	successful or not（failure if there is no key）
 	 */
-	public boolean set(CharSequence key, V value){
+	public boolean set(final String key, final V value){
 		final int id = exactMatchSearch(key);
 		if(id >= 0){
 			outerValue.set(id, value);
@@ -145,7 +143,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/** Transition of a node, if the node is root and it failed, then returns the root */
-	private int transitionWithRoot(int nodeId, char character){
+	private int transitionWithRoot(final int nodeId, final char character){
 		final int b = base[nodeId];
 		final int idx = b + character + 1;
 		if(b != check[idx])
@@ -159,7 +157,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param key	The key
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
-	private int exactMatchSearch(CharSequence key){
+	private int exactMatchSearch(final String key){
 		return exactMatchSearch(key, 0, 0, ROOT_NODE_ID);
 	}
 
@@ -172,7 +170,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param nodeId	The starting position of the node for searching
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
-	private int exactMatchSearch(CharSequence key, int position, int length, int nodeId){
+	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
 		int result = -1;
 		if(isInitialized()){
 			if(length <= 0)
@@ -205,7 +203,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 *
 	 * @param visitor	The visitor
 	 */
-	public void visit(Function<VisitElement<V>, Boolean> visitor){
+	public void visit(final Function<VisitElement<V>, Boolean> visitor){
 		visit(visitor, StringUtils.EMPTY);
 	}
 
@@ -217,14 +215,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param prefix	The prefix used to restrict visitation
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
-	public void visit(Function<VisitElement<V>, Boolean> visitor, CharSequence prefix){
+	public void visit(final Function<VisitElement<V>, Boolean> visitor, final String prefix){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefix);
 
-		final int prefixAllowedLength = sequencer.length(prefix);
+		final int prefixAllowedLength = prefix.length();
 
 		Stack<VisitElement<V>> stack = new Stack<>();
-		stack.push(new VisitElement<>(root, null, root.getKey()));
+		stack.push(new VisitElement<>(ROOT_NODE_ID, null, null));
 		while(!stack.isEmpty()){
 			VisitElement<V> elem = stack.pop();
 
@@ -233,11 +231,11 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 			//add nodes to stack
 			Collection<Integer> childrenIds = elem.getNode().getChildrenIds();
-			final int prefixLen = sequencer.length(elem.getKey());
+			final int prefixLen = elem.getKey().length();
 			for(Integer childId : childrenIds){
 				V childValue = outerValue.get(childId);
-				if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
-					String newPrefix = sequencer.concat(elem.getKey(), child.getKey());
+				if(prefixLen >= prefixAllowedLength || child.getKey().charAt(0) == prefix.charAt(prefixLen)){
+					String newPrefix = elem.getKey() + child.getKey();
 					stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
 				}
 			}

@@ -3,24 +3,23 @@ package unit731.hunspeller.collections.ahocorasicktrie.dtos;
 import java.io.Serializable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import unit731.hunspeller.collections.ahocorasicktrie.RadixTrieNode;
 
 
 public class VisitElement<V extends Serializable>{
 
-	private RadixTrieNode node;
+	private final int nodeId;
 	private final String key;
 	private final V value;
 
 
-	public VisitElement(RadixTrieNode node, String key, V value){
-		this.node = node;
+	public VisitElement(final int nodeId, final String key, final V value){
+		this.nodeId = nodeId;
 		this.value = value;
 		this.key = key;
 	}
 
-	public RadixTrieNode getNode(){
-		return node;
+	public int getNodeId(){
+		return nodeId;
 	}
 
 	public String getKey(){
@@ -32,7 +31,7 @@ public class VisitElement<V extends Serializable>{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
@@ -40,7 +39,7 @@ public class VisitElement<V extends Serializable>{
 
 		VisitElement<?> rhs = (VisitElement<?>)obj;
 		return new EqualsBuilder()
-			.append(node, rhs.node)
+			.append(nodeId, rhs.nodeId)
 			.append(key, rhs.key)
 			.append(value, rhs.value)
 			.isEquals();
@@ -49,7 +48,7 @@ public class VisitElement<V extends Serializable>{
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(node)
+			.append(nodeId)
 			.append(key)
 			.append(value)
 			.toHashCode();
