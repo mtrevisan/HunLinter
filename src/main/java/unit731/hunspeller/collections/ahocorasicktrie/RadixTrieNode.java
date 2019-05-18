@@ -83,7 +83,7 @@ public class RadixTrieNode{
 
 	/** Whether it is a terminal node */
 	public boolean isAcceptable(){
-		return (childrenIds != null);
+		return (depth > 0 && childrenIds != null);
 	}
 
 	/** Get the failure node */
