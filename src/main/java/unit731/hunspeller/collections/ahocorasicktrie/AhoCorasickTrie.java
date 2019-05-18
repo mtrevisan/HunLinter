@@ -50,12 +50,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	A list of outputs
 	 */
 	public List<SearchResult<V>> searchInText(final String text){
+		Objects.requireNonNull(text);
+
 		int currentNodeId = ROOT_NODE_ID;
 		List<SearchResult<V>> collectedHits = new ArrayList<>();
 		for(int i = 0; i < text.length(); i ++){
 			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
 
-			//store hit
+			//store hits
 			final int[] hits = output[currentNodeId];
 			if(hits != null){
 				final int position = i + 1;
@@ -73,8 +75,10 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param processor	A processor which handles the output
 	 */
 	public void searchInText(final String text, final HitProcessor<V> processor){
+		Objects.requireNonNull(text);
+		Objects.requireNonNull(processor);
+
 		int currentNodeId = ROOT_NODE_ID;
-		exit:
 		for(int i = 0; i < text.length(); i ++){
 			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
 
@@ -84,7 +88,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 				for(int hit : hitArray){
 					final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 					if(!proceed)
-						break exit;
+						return;
 				}
 			}
 		}
@@ -97,6 +101,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	<code>true</code> if string contains at least one substring
 	 */
 	public boolean containsKey(final String text){
+		Objects.requireNonNull(text);
+
 		if(isInitialized()){
 			int currentNodeId = ROOT_NODE_ID;
 			for(int i = 0; i < text.length(); i ++){
@@ -171,6 +177,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
 	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
+		Objects.requireNonNull(key);
+
 		int result = -1;
 		if(isInitialized()){
 			if(length <= 0)
@@ -217,26 +225,40 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 */
 	public void visit(final Function<VisitElement<V>, Boolean> visitor, final String prefix){
 		Objects.requireNonNull(visitor);
-		Objects.requireNonNull(prefix);
 
-		final int prefixAllowedLength = prefix.length();
+		boolean prefixFound = true;
+		int currentNodeId = ROOT_NODE_ID;
+		if(prefix != null){
+			//find node corresponding to the given prefix
+			prefixFound = false;
+			for(int i = 0; !prefixFound && i < prefix.length(); i ++){
+				currentNodeId = retrieveNextNodeId(currentNodeId, prefix.charAt(i));
 
-		Stack<VisitElement<V>> stack = new Stack<>();
-		stack.push(new VisitElement<>(ROOT_NODE_ID, null, null));
-		while(!stack.isEmpty()){
-			VisitElement<V> elem = stack.pop();
+				if(output[currentNodeId] != null)
+					prefixFound = true;
+//					collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
+			}
+		}
+		if(prefixFound){
+			final int prefixAllowedLength = prefix.length();
 
-			if(elem.getValue() != null && elem.getKey().startsWith(prefix) && visitor.apply(elem))
-				break;
+			Stack<VisitElement<V>> stack = new Stack<>();
+			stack.push(new VisitElement<>(ROOT_NODE_ID, null, null));
+			while(!stack.isEmpty()){
+				VisitElement<V> elem = stack.pop();
 
-			//add nodes to stack
-			Collection<Integer> childrenIds = elem.getNode().getChildrenIds();
-			final int prefixLen = elem.getKey().length();
-			for(Integer childId : childrenIds){
-				V childValue = outerValue.get(childId);
-				if(prefixLen >= prefixAllowedLength || child.getKey().charAt(0) == prefix.charAt(prefixLen)){
-					String newPrefix = elem.getKey() + child.getKey();
-					stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
+				if(elem.getValue() != null && elem.getKey().startsWith(prefix) && visitor.apply(elem))
+					break;
+
+				//add nodes to stack
+				Collection<Integer> childrenIds = elem.getNode().getChildrenIds();
+				final int prefixLen = elem.getKey().length();
+				for(Integer childId : childrenIds){
+					V childValue = outerValue.get(childId);
+					if(prefixLen >= prefixAllowedLength || child.getKey().charAt(0) == prefix.charAt(prefixLen)){
+						String newPrefix = elem.getKey() + child.getKey();
+						stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
+					}
 				}
 			}
 		}
