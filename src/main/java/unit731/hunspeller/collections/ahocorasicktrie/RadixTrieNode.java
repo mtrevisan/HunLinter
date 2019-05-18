@@ -14,27 +14,27 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 /**
  * A node has the following functions
  * <ul>
- *		<li><b>success</b>: successfully transferred to another state</li>
+ *		<li><b>success</b>: successfully transferred to another node</li>
  *		<li><b>failure</b>: if you cannot jump along the string, jump to a shallow node</li>
  *		<li><b>emits</b>: hit a pattern string</li>
  * </ul>
  * <p>
  * The root node is slightly different.
- * The root node has no failure function. Its "failure" refers to moving to the next state according to the string path.
+ * The root node has no failure function. Its "failure" refers to moving to the next node according to the string path.
  * Other nodes have a failure status.
  */
 public class RadixTrieNode{
 
-	/** The length of the pattern string is also the depth of this state */
+	/** The length of the pattern string is also the depth of this node */
 	protected final int depth;
 
-	/** The fail function, if there is no match, jumps to this state. */
-	private RadixTrieNode failureId;
+	/** The fail function, if there is no match, jumps to this node. */
+	private RadixTrieNode failure;
 
-	/** Record mode string as long as this state is reachable */
+	/** Record mode string as long as this node is reachable */
 	private Set<Integer> childrenIds;
 
-	/** The goto table, also known as the transfer function. Move to the next state according to the next character of the string */
+	/** The goto table, also known as the transfer function. Move to the next node according to the next character of the string */
 	private final Map<Character, RadixTrieNode> success = new TreeMap<>();
 
 	/** Corresponding subscript in double array */
@@ -59,7 +59,7 @@ public class RadixTrieNode{
 		return depth;
 	}
 
-	/** Add a matching pattern string (this state corresponds to this pattern string) */
+	/** Add a matching pattern string (this node corresponds to this pattern string) */
 	public void addChildrenId(int keyword){
 		if(childrenIds == null)
 			childrenIds = new HashSet<>();
@@ -88,48 +88,48 @@ public class RadixTrieNode{
 
 	/** Get the failure node */
 	public RadixTrieNode failure(){
-		return failureId;
+		return failure;
 	}
 
 	public void setFailure(RadixTrieNode failure, int[] fail){
-		this.failureId = failure;
+		this.failure = failure;
 		fail[id] = failure.id;
 	}
 
 	/**
-	 * Move to the next state
+	 * Move to the next node
 	 *
 	 * @param character 希望按此字符转移
-	 * @param ignoreRootState	Whether to ignore the root node, it should be true if the root node calls itself, otherwise it is false
+	 * @param ignoreRootNode	Whether to ignore the root node, it should be true if the root node calls itself, otherwise it is false
 	 * @return	Transfer result
 	 */
-	private RadixTrieNode nextState(Character character, boolean ignoreRootState){
-		RadixTrieNode nextState = success.get(character);
-		if(!ignoreRootState && nextState == null && depth == 0)
-			nextState = this;
-		return nextState;
+	private RadixTrieNode nextNode(Character character, boolean ignoreRootNode){
+		RadixTrieNode nextNode = success.get(character);
+		if(!ignoreRootNode && nextNode == null && depth == 0)
+			nextNode = this;
+		return nextNode;
 	}
 
 	/** According to the character transfer, the root node transfer failure will return itself (never return null) */
-	public RadixTrieNode nextState(Character character){
-		return nextState(character, false);
+	public RadixTrieNode nextNode(Character character){
+		return nextNode(character, false);
 	}
 
 	/** According to character transfer, any node transfer failure will return null */
-	public RadixTrieNode nextStateIgnoreRootState(Character character){
-		return nextState(character, true);
+	public RadixTrieNode nextNodeIgnoreRoot(Character character){
+		return nextNode(character, true);
 	}
 
-	public RadixTrieNode addState(Character character){
-		RadixTrieNode nextState = nextStateIgnoreRootState(character);
-		if(nextState == null){
-			nextState = new RadixTrieNode(depth + 1);
-			success.put(character, nextState);
+	public RadixTrieNode addNode(Character character){
+		RadixTrieNode nextNode = nextNodeIgnoreRoot(character);
+		if(nextNode == null){
+			nextNode = new RadixTrieNode(depth + 1);
+			success.put(character, nextNode);
 		}
-		return nextState;
+		return nextNode;
 	}
 
-	public Collection<RadixTrieNode> getStates(){
+	public Collection<RadixTrieNode> getNodes(){
 		return success.values();
 	}
 
@@ -150,7 +150,7 @@ public class RadixTrieNode{
 			.append(id, rhs.id)
 			.append(childrenIds, rhs.childrenIds)
 			.append(success, rhs.success)
-			.append(failureId, rhs.failureId)
+			.append(failure, rhs.failure)
 			.isEquals();
 	}
 
@@ -161,7 +161,7 @@ public class RadixTrieNode{
 			.append(id)
 			.append(childrenIds)
 			.append(success)
-			.append(failureId)
+			.append(failure)
 			.toHashCode();
 	}
 
@@ -172,8 +172,8 @@ public class RadixTrieNode{
 			.append("id", id)
 			.append("childrenIds", childrenIds)
 			.append("success", success.keySet())
-			.append("failureId", (failureId == null? "-1": failureId.id))
-			.append("failure", failureId)
+			.append("failureId", (failure == null? "-1": failure.id))
+			.append("failure", failure)
 			.toString();
 	}
 

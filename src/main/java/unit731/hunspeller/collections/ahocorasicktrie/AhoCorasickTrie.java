@@ -144,7 +144,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return false;
 	}
 
-	/** Transition of a state, if the state is root and it failed, then returns the root */
+	/** Transition of a node, if the node is root and it failed, then returns the root */
 	private int transitionWithRoot(int nodeId, char character){
 		final int b = base[nodeId];
 		final int idx = b + character + 1;

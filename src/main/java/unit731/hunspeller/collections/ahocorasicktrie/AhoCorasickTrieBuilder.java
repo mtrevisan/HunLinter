@@ -47,7 +47,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		AhoCorasickTrie<V> trie = new AhoCorasickTrie<>();
 
 		//save the outer values
-		int size = map.size();
+		final int size = map.size();
 		trie.outerValue = new ArrayList<>(size);
 		trie.outerValue.addAll(map.values());
 		trie.keyLength = new int[size];
@@ -60,7 +60,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		buildTrie(trie, keySet.size());
 
 		//build the failure table and merge the output table
-		constructFailureStates(trie);
+		constructFailureNodes(trie);
 
 		return trie;
 	}
@@ -101,58 +101,58 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param id	The index of the keyword
 	 */
 	private void addKeyword(AhoCorasickTrie<V> trie, String keyword, int id){
-		RadixTrieNode currentState = rootNode;
+		RadixTrieNode currentNode = rootNode;
 		for(Character character : keyword.toCharArray())
-			currentState = currentState.addState(character);
-		currentState.addChildrenId(id);
+			currentNode = currentNode.addNode(character);
+		currentNode.addChildrenId(id);
 		trie.keyLength[id] = keyword.length();
 	}
 
-	private void constructFailureStates(AhoCorasickTrie<V> trie){
+	private void constructFailureNodes(AhoCorasickTrie<V> trie){
 		if(!trie.isEmpty()){
-			int size = trie.check.length + 1;
+			final int size = trie.check.length + 1;
 			trie.next = new int[size];
 			trie.next[1] = trie.base[0];
 			trie.output = new int[size][];
 			Queue<RadixTrieNode> queue = new ArrayDeque<>();
 
 			//the first step is to set the failure of the node with depth 1 to the root node
-			for(RadixTrieNode depthOneState : rootNode.getStates()){
-				depthOneState.setFailure(rootNode, trie.next);
-				queue.add(depthOneState);
-				constructOutput(trie, depthOneState);
+			for(RadixTrieNode depthOneNode : rootNode.getNodes()){
+				depthOneNode.setFailure(rootNode, trie.next);
+				queue.add(depthOneNode);
+				constructOutput(trie, depthOneNode);
 			}
 
 			//the second step is to create a failure table for the node with depth > 1, which is a BFS
 			while(!queue.isEmpty()){
-				RadixTrieNode currentState = queue.remove();
+				RadixTrieNode currentNode = queue.remove();
 
-				for(Character transition : currentState.getTransitions()){
-					RadixTrieNode targetState = currentState.nextState(transition);
-					queue.add(targetState);
+				for(Character transition : currentNode.getTransitions()){
+					RadixTrieNode targetNode = currentNode.nextNode(transition);
+					queue.add(targetNode);
 
-					RadixTrieNode traceFailureState = currentState.failure();
-					while(traceFailureState.nextState(transition) == null)
-						traceFailureState = traceFailureState.failure();
-					RadixTrieNode newFailureState = traceFailureState.nextState(transition);
-					targetState.setFailure(newFailureState, trie.next);
-					targetState.addChildrenIds(newFailureState.getChildrenIds());
-					constructOutput(trie, targetState);
+					RadixTrieNode traceFailureNode = currentNode.failure();
+					while(traceFailureNode.nextNode(transition) == null)
+						traceFailureNode = traceFailureNode.failure();
+					RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
+					targetNode.setFailure(newFailureNode, trie.next);
+					targetNode.addChildrenIds(newFailureNode.getChildrenIds());
+					constructOutput(trie, targetNode);
 				}
 			}
 		}
 	}
 
-	private void constructOutput(AhoCorasickTrie<V> trie, RadixTrieNode targetState){
-		Collection<Integer> childrenIds = targetState.getChildrenIds();
+	private void constructOutput(AhoCorasickTrie<V> trie, RadixTrieNode targetNode){
+		Collection<Integer> childrenIds = targetNode.getChildrenIds();
 		if(childrenIds == null || childrenIds.isEmpty())
 			return;
 
-		int output[] = new int[childrenIds.size()];
+		final int output[] = new int[childrenIds.size()];
 		Iterator<Integer> it = childrenIds.iterator();
 		for(int i = 0; i < output.length; i ++)
 			output[i] = it.next();
-		trie.output[targetState.getId()] = output;
+		trie.output[targetNode.getId()] = output;
 	}
 
 	private void buildTrie(AhoCorasickTrie<V> trie, int keySize){
@@ -162,7 +162,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		int totalKeysLen = 0;
 		for(int i = 0; i < trie.keyLength.length; i ++)
 			totalKeysLen += trie.keyLength[i];
-		int newSize = 65_536 + totalKeysLen * 2 + 1;
+		final int newSize = 65_536 + totalKeysLen * 2 + 1;
 		trie.check = new int[newSize];
 		trie.base = new int[newSize];
 		used = new boolean[newSize];
@@ -257,7 +257,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 				}
 				else{
 					//DFS
-					int h = insert(trie, newSiblings);
+					final int h = insert(trie, newSiblings);
 					trie.base[begin + sibling.getKey()] = h;
 				}
 				sibling.getValue().setId(begin + sibling.getKey());
