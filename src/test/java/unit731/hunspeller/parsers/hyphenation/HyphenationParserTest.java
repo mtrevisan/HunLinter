@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.PatternHelper;
@@ -22,10 +23,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToLeftMin(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "a1bc");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -38,10 +39,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphenationDueToRightMin(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -54,10 +55,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkLeftMin(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "a1bc");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -70,10 +71,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void hyphenationOkRightMin(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -86,10 +87,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithRemovalBeforeHyphen(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje/=,2,1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -102,10 +103,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithIndexes(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1–/–=,1,1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -118,10 +119,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWithoutIndexes(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1–/–=");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -134,10 +135,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "–1/–=–");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -150,11 +151,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreakWithRuleOverlap(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "–3/–=–");
 		addRule(hyphenations, "1c");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -167,11 +168,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedAfterBreak2(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1k");
 		addRule(hyphenations, "–1/–=–");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -184,10 +185,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedNonWordInitial(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "eigh1teen/ht=t,4,2");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -200,10 +201,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedWordInitial(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, ".schif1fahrt/ff=f,5,2");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -216,10 +217,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void augmentedBase(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "c1k/k=k");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -247,11 +248,11 @@ public class HyphenationParserTest{
 
 	@Test
 	public void competingRules(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
 		addRule(hyphenations, "2c");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -265,12 +266,12 @@ public class HyphenationParserTest{
 	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
 	@Test
 	public void germanPreReform(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "f1f");
 		addRule(hyphenations, "if3fa/ff=f,2,2");
 		addRule(hyphenations, "tenerif5fa");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -284,11 +285,11 @@ public class HyphenationParserTest{
 	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
 	@Test
 	public void hungarianSimplifiedDoubleConsonants(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "s1sz/sz=sz,1,3");
 		addRule(hyphenations, "n1ny/ny=ny,1,3");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -300,10 +301,10 @@ public class HyphenationParserTest{
 	/** Dutch: omaatje -> oma-tje */
 	@Test
 	public void dutch1(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje./=,2,1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -315,10 +316,10 @@ public class HyphenationParserTest{
 	/** Dutch: omaatje -> oma-tje */
 	@Test
 	public void dutch2(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje./a=tje,1,5");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -329,10 +330,10 @@ public class HyphenationParserTest{
 
 	@Test
 	public void french(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "xé1ém/á=a,2,2");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -344,7 +345,6 @@ public class HyphenationParserTest{
 
 	@Test
 	public void baseAlt(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "l·1l/l=l,1,3");
 		addRule(hyphenations, "a1atje./a=t,1,3");
@@ -355,7 +355,8 @@ public class HyphenationParserTest{
 		addRule(hyphenations, ".as3szon/sz=sz,2,3");
 		addRule(hyphenations, "n1nyal./ny=ny,1,3");
 		addRule(hyphenations, ".til1lata./ll=l,3,2");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -373,17 +374,17 @@ public class HyphenationParserTest{
 
 	@Test
 	public void englishCompound1(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "motor1cycle");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, ".mo1tor.");
 		addRule(hyphenations2ndLevel, ".cy1cle.");
 		//check independency of the 1st and 2nd hyphenation levels
 		addRule(hyphenations2ndLevel, ".motor2cycle.");
-		patterns2ndLevel.build(hyphenations2ndLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -397,17 +398,17 @@ public class HyphenationParserTest{
 
 	@Test
 	public void englishCompound2(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "motor1cycle");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, ".mo1tor.");
 		addRule(hyphenations2ndLevel, ".cy1cle.");
 		//check independency of the 1st and 2nd hyphenation levels
 		addRule(hyphenations2ndLevel, ".motor2cycle.");
-		patterns2ndLevel.build(hyphenations2ndLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -421,16 +422,16 @@ public class HyphenationParserTest{
 
 	@Test
 	public void compound2(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "szony1fő");
 		addRule(hyphenations1stLevel, "ök1assz");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, ".as1szony./sz=,2,1");
 		addRule(hyphenations2ndLevel, ".fő1nök.");
-		patterns2ndLevel.build(hyphenations2ndLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -447,16 +448,16 @@ public class HyphenationParserTest{
 	 */
 	@Test
 	public void compound3(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "wat1time/tt=t,3,2");
 		addRule(hyphenations1stLevel, ".kilo1watt");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, ".ki1lo.");
 		addRule(hyphenations2ndLevel, ".ti1me.");
-		patterns2ndLevel.build(hyphenations1stLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -468,15 +469,15 @@ public class HyphenationParserTest{
 
 	@Test
 	public void compound5(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, ".post1");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, "e1");
 		addRule(hyphenations2ndLevel, "a1");
-		patterns2ndLevel.build(hyphenations2ndLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -492,14 +493,14 @@ public class HyphenationParserTest{
 
 	@Test
 	public void compound6(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "1que.");
-		patterns1stLevel.build(hyphenations1stLevel);
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations1stLevel);
 		Map<String, String> hyphenations2ndLevel = new HashMap<>();
 		addRule(hyphenations2ndLevel, "e1");
-		patterns2ndLevel.build(hyphenations2ndLevel);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations2ndLevel);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -515,13 +516,13 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphen1(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
 		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK + "1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
@@ -539,13 +540,13 @@ public class HyphenationParserTest{
 
 	@Test
 	public void noHyphen2(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
 		addRule(hyphenations, "1" + HyphenationParser.APOSTROPHE + "1");
 		addRule(hyphenations, "1" + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK + "1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
@@ -564,10 +565,10 @@ public class HyphenationParserTest{
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
 	@Test
 	public void ligature(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ﬃ1/f=ﬁ,1,1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -579,10 +580,10 @@ public class HyphenationParserTest{
 
 		@Test
 	public void settings(){
-		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ő1");
-		patterns1stLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
@@ -593,7 +594,6 @@ public class HyphenationParserTest{
 
 	@Test
 	public void unicode(){
-		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrie<>();
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "l·1l/l=l,1,3");
 		addRule(hyphenations, "e1ë/e=e,1,2");
@@ -609,7 +609,8 @@ public class HyphenationParserTest{
 		addRule(hyphenations, "bus1s/ss=s,3,2");
 		addRule(hyphenations, "7-/=-,1,1");
 		addRule(hyphenations, ".til1låta./ll=l,3,2");
-		patterns2ndLevel.build(hyphenations);
+		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
+			.build(hyphenations);
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();

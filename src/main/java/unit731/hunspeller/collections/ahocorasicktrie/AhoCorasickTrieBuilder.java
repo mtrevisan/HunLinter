@@ -19,7 +19,7 @@ import java.util.Set;
  * 
  * @param <V>	The type of values stored in the tree
  */
-class AhoCorasickTrieBuilder<V extends Serializable>{
+public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 	private final RadixTrieNode rootNode = new RadixTrieNode();
 	private final AhoCorasickTrie<V> trie = new AhoCorasickTrie<>();

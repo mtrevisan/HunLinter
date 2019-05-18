@@ -457,7 +457,7 @@ public class HyphenationParser{
 		/** Extract (compound) data from the radix tree */
 		Map<Integer, List<String>> result = new HashMap<>();
 		Function<VisitElement<String>, Boolean> saveVisitor = elem -> {
-			String value = elem.getNode().getValue();
+			String value = elem.getValue();
 			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
 				.add(value);
 
