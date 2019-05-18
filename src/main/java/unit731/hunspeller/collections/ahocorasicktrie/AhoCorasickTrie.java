@@ -16,7 +16,7 @@ import unit731.hunspeller.collections.ahocorasicktrie.dtos.VisitElement;
 
 
 /**
- * An implementation of the Aho-Corasick Radix Trie algorithm based on Double-Array
+ * An implementation of the Aho-Corasick Radix Trie algorithm based on a triple-array data structure
  * 
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho–Corasick algorithm</a>
  * @see <a href="https://github.com/hankcs/AhoCorasickDoubleArrayTrie">Aho-Corasick double-array trie</a>
@@ -29,10 +29,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	private static final long serialVersionUID = 5044611770728521000L;
 
+	private static final int ROOT_NODE_ID = 0;
+
 
 	int[] base;
+	//failure function
 	int[] next;
 	int[] check;
+	//output function
 	int[][] output;
 	List<V> outerValue;
 
@@ -46,21 +50,22 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	A list of outputs
 	 */
 	public List<SearchResult<V>> searchInText(CharSequence text){
-		int currentState = 0;
-		List<SearchResult<V>> collectedChildren = new ArrayList<>();
+		int currentNodeId = ROOT_NODE_ID;
+		List<SearchResult<V>> collectedHits = new ArrayList<>();
 		for(int i = 0; i < text.length(); i ++){
-			currentState = getState(currentState, text.charAt(i));
-			storeChildren(i + 1, currentState, collectedChildren);
+			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
+
+			storeHit(i + 1, currentNodeId, collectedHits);
 		}
-		return collectedChildren;
+		return collectedHits;
 	}
 
 	/** Store output */
-	private void storeChildren(int position, int currentState, List<SearchResult<V>> collectedChildren){
-		int[] hits = output[currentState];
+	private void storeHit(int position, int currentNodeId, List<SearchResult<V>> collectedHits){
+		int[] hits = output[currentNodeId];
 		if(hits != null)
 			for(int hit : hits)
-				collectedChildren.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
+				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
 	}
 
 	/**
@@ -70,18 +75,20 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param processor	A processor which handles the output
 	 */
 	public void searchInText(CharSequence text, HitProcessor<V> processor){
-		int currentState = 0;
+		int currentNodeId = ROOT_NODE_ID;
 		exit:
 		for(int i = 0; i < text.length(); i ++){
-			final int position = i + 1;
-			currentState = getState(currentState, text.charAt(i));
-			int[] hitArray = output[currentState];
-			if(hitArray != null)
+			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
+
+			int[] hitArray = output[currentNodeId];
+			if(hitArray != null){
+				final int position = i + 1;
 				for(int hit : hitArray){
-					boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
+					final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 					if(!proceed)
 						break exit;
 				}
+			}
 		}
 	}
 
@@ -91,25 +98,33 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	Source text to check
 	 * @return	<code>true</code> if string contains at least one substring
 	 */
-	public boolean containsKey(String text){
+	public boolean containsKey(CharSequence text){
 		if(isInitialized()){
-			int currentState = 0;
+			int currentNodeId = ROOT_NODE_ID;
 			for(int i = 0; i < text.length(); i ++){
-				currentState = getState(currentState, text.charAt(i));
-				if(output[currentState] != null)
+				currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
+
+				if(output[currentNodeId] != null)
 					return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean hasKey(String key){
-		int id = exactMatchSearch(key);
+	private int retrieveNextNodeId(int currentNodeId, char character){
+		int nextNodeId;
+		while((nextNodeId = transitionWithRoot(currentNodeId, character)) == -1)
+			currentNodeId = next[currentNodeId];
+		return nextNodeId;
+	}
+
+	public boolean hasKey(CharSequence key){
+		final int id = exactMatchSearch(key);
 		return (id >= 0);
 	}
 
-	public V get(String key){
-		int id = exactMatchSearch(key);
+	public V get(CharSequence key){
+		final int id = exactMatchSearch(key);
 		return (outerValue != null && id >= 0? outerValue.get(id): null);
 	}
 
@@ -120,8 +135,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param value	The value
 	 * @return	successful or not（failure if there is no key）
 	 */
-	public boolean set(String key, V value){
-		int id = exactMatchSearch(key);
+	public boolean set(CharSequence key, V value){
+		final int id = exactMatchSearch(key);
 		if(id >= 0){
 			outerValue.set(id, value);
 			return true;
@@ -129,25 +144,12 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return false;
 	}
 
-	/**
-	 * NOTE: Supports failure function
-	 */
-	private int getState(int currentState, char character){
-		int newCurrentState = transitionWithRoot(currentState, character);
-		//backup to failure nodes
-		while(newCurrentState == -1){
-			currentState = next[currentState];
-			newCurrentState = transitionWithRoot(currentState, character);
-		}
-		return newCurrentState;
-	}
-
 	/** Transition of a state, if the state is root and it failed, then returns the root */
-	private int transitionWithRoot(int nodePosition, char character){
-		int b = base[nodePosition];
-		int idx = b + character + 1;
+	private int transitionWithRoot(int nodeId, char character){
+		final int b = base[nodeId];
+		final int idx = b + character + 1;
 		if(b != check[idx])
-			return (nodePosition == 0? 0: -1);
+			return (nodeId == ROOT_NODE_ID? nodeId: -1);
 		return idx;
 	}
 
@@ -157,33 +159,31 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param key	The key
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
-	private int exactMatchSearch(String key){
-		return exactMatchSearch(key, 0, 0, 0);
+	private int exactMatchSearch(CharSequence key){
+		return exactMatchSearch(key, 0, 0, ROOT_NODE_ID);
 	}
 
 	/**
 	 * Match exactly by a key
 	 *
 	 * @param key	The key
-	 * @param posistion	The begin index of char array
+	 * @param position	The begin index of char array
 	 * @param length	The length of the key
-	 * @param nodePosition	The starting position of the node for searching
+	 * @param nodeId	The starting position of the node for searching
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
-	private int exactMatchSearch(String key, int posistion, int length, int nodePosition){
+	private int exactMatchSearch(CharSequence key, int position, int length, int nodeId){
 		int result = -1;
 		if(isInitialized()){
 			if(length <= 0)
 				length = key.length();
-			if(nodePosition < 0)
-				nodePosition = 0;
+			if(nodeId < 0)
+				nodeId = ROOT_NODE_ID;
 
-			char[] keyChars = key.toCharArray();
-
-			int b = base[nodePosition];
+			int b = base[nodeId];
 			int p;
-			for(int i = posistion; i < length; i ++){
-				p = b + (keyChars[i]) + 1;
+			for(int i = position; i < length; i ++){
+				p = b + key.charAt(i) + 1;
 				if(b == check[p])
 					b = base[p];
 				else
@@ -191,7 +191,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			}
 
 			p = b;
-			int n = base[p];
+			final int n = base[p];
 			if(b == check[p] && n < 0)
 				result = -n - 1;
 		}
@@ -217,11 +217,11 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param prefix	The prefix used to restrict visitation
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
-	private void visit(Function<VisitElement<V>, Boolean> visitor, String prefix){
+	public void visit(Function<VisitElement<V>, Boolean> visitor, CharSequence prefix){
 		Objects.requireNonNull(visitor);
 		Objects.requireNonNull(prefix);
 
-		int prefixAllowedLength = sequencer.length(prefix);
+		final int prefixAllowedLength = sequencer.length(prefix);
 
 		Stack<VisitElement<V>> stack = new Stack<>();
 		stack.push(new VisitElement<>(root, null, root.getKey()));
@@ -233,7 +233,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 			//add nodes to stack
 			Collection<Integer> childrenIds = elem.getNode().getChildrenIds();
-			int prefixLen = sequencer.length(elem.getKey());
+			final int prefixLen = sequencer.length(elem.getKey());
 			for(Integer childId : childrenIds){
 				V childValue = outerValue.get(childId);
 				if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
@@ -244,9 +244,11 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		}
 	}
 
-	public Set<V> values(){
-		return new HashSet<>(outerValue);
-	}
+	//FIXME
+//	public Set<VisitElement<V>> entrySet(){
+//		final List<VisitElement<V>> entries = getEntries(sequencer.getEmptySequence(), type);
+//		return new HashSet<>(entries);
+//	}
 
 	public int size(){
 		return (outerValue != null? outerValue.size(): 0);
