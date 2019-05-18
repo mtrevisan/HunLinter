@@ -184,7 +184,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	}
 
 	/**
-	 * Insert the siblings into the double-array trie
+	 * Insert the siblings into the triple-array trie
 	 *
 	 * @param siblings	The siblings being inserted
 	 * @return	The position to insert them
