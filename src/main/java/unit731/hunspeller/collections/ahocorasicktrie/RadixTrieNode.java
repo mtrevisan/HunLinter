@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
@@ -27,16 +29,16 @@ public class RadixTrieNode{
 	protected final int depth;
 
 	/** The fail function, if there is no match, jumps to this state. */
-	private RadixTrieNode failure;
+	private RadixTrieNode failureId;
 
 	/** Record mode string as long as this state is reachable */
-	private Set<Integer> emits;
+	private Set<Integer> childrenIds;
 
 	/** The goto table, also known as the transfer function. Move to the next state according to the next character of the string */
 	private final Map<Character, RadixTrieNode> success = new TreeMap<>();
 
 	/** Corresponding subscript in double array */
-	private int index;
+	private int id;
 
 
 	/** Construct a node with a depth of 0 */
@@ -58,40 +60,40 @@ public class RadixTrieNode{
 	}
 
 	/** Add a matching pattern string (this state corresponds to this pattern string) */
-	public void addEmit(int keyword){
-		if(emits == null)
-			emits = new HashSet<>();
+	public void addChildrenId(int keyword){
+		if(childrenIds == null)
+			childrenIds = new HashSet<>();
 
-		emits.add(keyword);
+		childrenIds.add(keyword);
 	}
 
-	public Integer getLargestValueId(){
-		return (emits != null && !emits.isEmpty()? emits.iterator().next(): null);
+	public Integer getLargestChildrenId(){
+		return (childrenIds != null && !childrenIds.isEmpty()? childrenIds.iterator().next(): null);
 	}
 
 	/** Add some matching pattern strings */
-	public void addEmit(Collection<Integer> emits){
-		emits.forEach(this::addEmit);
+	public void addChildrenIds(Collection<Integer> childrenIds){
+		childrenIds.forEach(this::addChildrenId);
 	}
 
 	/** Get the pattern string represented by this node */
-	public Collection<Integer> emit(){
-		return (emits == null? Collections.<Integer>emptyList(): emits);
+	public Collection<Integer> getChildrenIds(){
+		return (childrenIds == null? Collections.<Integer>emptyList(): childrenIds);
 	}
 
-	/** Whether it is the termination status */
+	/** Whether it is a terminal node */
 	public boolean isAcceptable(){
-		return (depth > 0 && emits != null);
+		return (childrenIds != null);
 	}
 
 	/** Get the failure node */
 	public RadixTrieNode failure(){
-		return failure;
+		return failureId;
 	}
 
 	public void setFailure(RadixTrieNode failure, int[] fail){
-		this.failure = failure;
-		fail[index] = failure.index;
+		this.failureId = failure;
+		fail[id] = failure.id;
 	}
 
 	/**
@@ -136,14 +138,42 @@ public class RadixTrieNode{
 	}
 
 	@Override
+	public boolean equals(Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		RadixTrieNode rhs = (RadixTrieNode)obj;
+		return new EqualsBuilder()
+			.append(depth, rhs.depth)
+			.append(id, rhs.id)
+			.append(childrenIds, rhs.childrenIds)
+			.append(success, rhs.success)
+			.append(failureId, rhs.failureId)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(depth)
+			.append(id)
+			.append(childrenIds)
+			.append(success)
+			.append(failureId)
+			.toHashCode();
+	}
+
+	@Override
 	public String toString(){
 		return new ToStringBuilder(this)
 			.append("depth", depth)
-			.append("ID", index)
-			.append("emits", emits)
+			.append("id", id)
+			.append("childrenIds", childrenIds)
 			.append("success", success.keySet())
-			.append("failureID", (failure == null? "-1": failure.index))
-			.append("failure", failure)
+			.append("failureId", (failureId == null? "-1": failureId.id))
+			.append("failure", failureId)
 			.toString();
 	}
 
@@ -151,12 +181,12 @@ public class RadixTrieNode{
 		return success;
 	}
 
-	public int getIndex(){
-		return index;
+	public int getId(){
+		return id;
 	}
 
-	public void setIndex(int index){
-		this.index = index;
+	public void setId(int id){
+		this.id = id;
 	}
 
 }

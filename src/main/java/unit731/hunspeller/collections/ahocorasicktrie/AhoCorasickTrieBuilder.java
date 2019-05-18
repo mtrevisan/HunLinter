@@ -25,11 +25,11 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 
 	/** Whether the position has been used */
 	private boolean used[];
-	/** The allocSize of the dynamic array */
+	/** The allocation size of the dynamic array */
 	private int allocSize;
-	/** A parameter controls the memory growth speed of the dynamic array */
-	private int progress;
-	/** The next position to check unused memory */
+	/** A parameter that controls the memory growth speed of the dynamic array */
+	private int memoryGrowthSpeed;
+	/** The next position to check for unused memory */
 	private int nextCheckPos;
 	/** The size of the key-pair sets */
 	private int keySize;
@@ -49,13 +49,12 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		//save the outer values
 		int size = map.size();
 		trie.outerValue = new ArrayList<>(size);
-		map.values()
-			.forEach(trie.outerValue::add);
+		trie.outerValue.addAll(map.values());
 		trie.keyLength = new int[size];
 
 		//construct a two-point trie tree
 		Set<String> keySet = map.keySet();
-		addAllKeyword(trie, keySet);
+		addAllKeywords(trie, keySet);
 
 		//vuilding a double array trie tree based on a two-point trie tree
 		buildTrie(trie, keySet.size());
@@ -75,9 +74,8 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	 */
 	private int fetch(RadixTrieNode parent, List<Map.Entry<Integer, RadixTrieNode>> siblings){
 		if(parent.isAcceptable()){
-			//this node is a child of the parent and has the output of the parent
-			RadixTrieNode fakeNode = new RadixTrieNode( - (parent.getDepth() + 1));
-			fakeNode.addEmit(parent.getLargestValueId());
+			RadixTrieNode fakeNode = new RadixTrieNode(-parent.getDepth() - 1);
+			fakeNode.addChildrenId(parent.getLargestChildrenId());
 			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 		}
 		for(Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
@@ -90,7 +88,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	 *
 	 * @param keywordSet the collection holding keywords
 	 */
-	private void addAllKeyword(AhoCorasickTrie<V> trie, Collection<String> keywordSet){
+	private void addAllKeywords(AhoCorasickTrie<V> trie, Collection<String> keywordSet){
 		int i = 0;
 		for(String keyword : keywordSet)
 			addKeyword(trie, keyword, i ++);
@@ -100,27 +98,27 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * Add a keyword
 	 *
 	 * @param keyword	A keyword
-	 * @param index	The index of the keyword
+	 * @param id	The index of the keyword
 	 */
-	private void addKeyword(AhoCorasickTrie<V> trie, String keyword, int index){
+	private void addKeyword(AhoCorasickTrie<V> trie, String keyword, int id){
 		RadixTrieNode currentState = rootNode;
 		for(Character character : keyword.toCharArray())
 			currentState = currentState.addState(character);
-		currentState.addEmit(index);
-		trie.keyLength[index] = keyword.length();
+		currentState.addChildrenId(id);
+		trie.keyLength[id] = keyword.length();
 	}
 
 	private void constructFailureStates(AhoCorasickTrie<V> trie){
 		if(!trie.isEmpty()){
 			int size = trie.check.length + 1;
-			trie.fail = new int[size];
-			trie.fail[1] = trie.base[0];
+			trie.next = new int[size];
+			trie.next[1] = trie.base[0];
 			trie.output = new int[size][];
 			Queue<RadixTrieNode> queue = new ArrayDeque<>();
 
 			//the first step is to set the failure of the node with depth 1 to the root node
 			for(RadixTrieNode depthOneState : rootNode.getStates()){
-				depthOneState.setFailure(rootNode, trie.fail);
+				depthOneState.setFailure(rootNode, trie.next);
 				queue.add(depthOneState);
 				constructOutput(trie, depthOneState);
 			}
@@ -137,8 +135,8 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 					while(traceFailureState.nextState(transition) == null)
 						traceFailureState = traceFailureState.failure();
 					RadixTrieNode newFailureState = traceFailureState.nextState(transition);
-					targetState.setFailure(newFailureState, trie.fail);
-					targetState.addEmit(newFailureState.emit());
+					targetState.setFailure(newFailureState, trie.next);
+					targetState.addChildrenIds(newFailureState.getChildrenIds());
 					constructOutput(trie, targetState);
 				}
 			}
@@ -146,23 +144,25 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	}
 
 	private void constructOutput(AhoCorasickTrie<V> trie, RadixTrieNode targetState){
-		Collection<Integer> emit = targetState.emit();
-		if(emit == null || emit.isEmpty()){
+		Collection<Integer> childrenIds = targetState.getChildrenIds();
+		if(childrenIds == null || childrenIds.isEmpty())
 			return;
-		}
-		int output[] = new int[emit.size()];
-		Iterator<Integer> it = emit.iterator();
-		for(int i = 0; i < output.length;  ++ i){
+
+		int output[] = new int[childrenIds.size()];
+		Iterator<Integer> it = childrenIds.iterator();
+		for(int i = 0; i < output.length; i ++)
 			output[i] = it.next();
-		}
-		trie.output[targetState.getIndex()] = output;
+		trie.output[targetState.getId()] = output;
 	}
 
 	private void buildTrie(AhoCorasickTrie<V> trie, int keySize){
-		progress = 0;
+		memoryGrowthSpeed = 0;
 		this.keySize = keySize;
-		//32 double bytes
-		int newSize = 65_536 * 32;
+
+		int totalKeysLen = 0;
+		for(int i = 0; i < trie.keyLength.length; i ++)
+			totalKeysLen += trie.keyLength[i];
+		int newSize = 65_536 + totalKeysLen * 2 + 1;
 		trie.check = new int[newSize];
 		trie.base = new int[newSize];
 		used = new boolean[newSize];
@@ -221,7 +221,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 				begin = pos - siblings.get(0).getKey();
 				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
 					//prevent progress from generating zero divide errors
-					double l = (1.05 > (double)keySize / (progress + 1)? 1.05: (double)keySize / (progress + 1));
+					double l = (1.05 > (double)keySize / (memoryGrowthSpeed + 1)? 1.05: (double)keySize / (memoryGrowthSpeed + 1));
 					resize(trie, (int)(allocSize * l));
 				}
 
@@ -236,7 +236,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 			}
 
 			// -- Simple heuristics --
-			//if the percentage of non-empty contents in check between the index `next_check_pos` and `check` is greater than
+			//if the percentage of non-empty contents in check between the index `nextCheckPos` and `check` is greater than
 			//some constant value (e.g. 0.9), new `next_check_pos` index is written by `check`
 			if((double)nonZeroNum / (pos - nextCheckPos + 1) >= 0.95)
 				//from the position `next_check_pos` to `pos`, if the occupied space is above 95%, the next time you insert the node,
@@ -252,15 +252,15 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){
-					trie.base[begin + sibling.getKey()] = (-sibling.getValue().getLargestValueId() - 1);
-					progress ++;
+					trie.base[begin + sibling.getKey()] = (-sibling.getValue().getLargestChildrenId() - 1);
+					memoryGrowthSpeed ++;
 				}
 				else{
 					//DFS
 					int h = insert(trie, newSiblings);
 					trie.base[begin + sibling.getKey()] = h;
 				}
-				sibling.getValue().setIndex(begin + sibling.getKey());
+				sibling.getValue().setId(begin + sibling.getKey());
 			}
 		}
 		return begin;
