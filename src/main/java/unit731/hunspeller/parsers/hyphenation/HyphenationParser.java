@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunspeller.collections.ahocorasicktrie.dtos.VisitElement;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
@@ -455,7 +456,7 @@ public class HyphenationParser{
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
 		/** Extract (compound) data from the radix tree */
 		Map<Integer, List<String>> result = new HashMap<>();
-		Function<VisitElement<String, String>, Boolean> saveVisitor = elem -> {
+		Function<VisitElement<String>, Boolean> saveVisitor = elem -> {
 			String value = elem.getNode().getValue();
 			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
 				.add(value);

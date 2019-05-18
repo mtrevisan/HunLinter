@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptions;
 
@@ -27,10 +28,10 @@ class Hyphenator extends AbstractHyphenator{
 		int size = wordSize + HyphenationParser.WORD_BOUNDARY.length() * 2;
 		for(int i = 0; i < size; i ++){
 			//find all the prefixes of w.substring(i)
-			List<AhoCorasickTrie.Hit<String>> prefixes = patterns.searchInText(w.substring(i).toLowerCase(Locale.ROOT));
+			List<SearchResult<String>> prefixes = patterns.searchInText(w.substring(i).toLowerCase(Locale.ROOT));
 
-			for(AhoCorasickTrie.Hit<String> rule : prefixes)
-				indexesAndRules = extractSyllabe(rule.value, i, word, normalizedWordSize, options, indexesAndRules);
+			for(SearchResult<String> rule : prefixes)
+				indexesAndRules = extractSyllabe(rule.getValue(), i, word, normalizedWordSize, options, indexesAndRules);
 		}
 
 		return new HyphenationBreak(indexesAndRules, wordSize);

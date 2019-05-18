@@ -1,4 +1,4 @@
-package unit731.hunspeller.collections.ahocorasicktrie;
+package unit731.hunspeller.collections.ahocorasicktrie.dtos;
 
 
 /**

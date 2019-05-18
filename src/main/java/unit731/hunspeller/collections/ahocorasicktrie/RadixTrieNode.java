@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
@@ -137,15 +137,14 @@ public class RadixTrieNode{
 
 	@Override
 	public String toString(){
-		StringBuilder sb = new StringBuilder("RadixTrieNode{");
-		sb.append("depth=").append(depth);
-		sb.append(", ID=").append(index);
-		sb.append(", emits=").append(emits);
-		sb.append(", success=").append(success.keySet());
-		sb.append(", failureID=").append(failure == null? "-1": failure.index);
-		sb.append(", failure=").append(failure);
-		sb.append('}');
-		return sb.toString();
+		return new ToStringBuilder(this)
+			.append("depth", depth)
+			.append("ID", index)
+			.append("emits", emits)
+			.append("success", success.keySet())
+			.append("failureID", (failure == null? "-1": failure.index))
+			.append("failure", failure)
+			.toString();
 	}
 
 	public Map<Character, RadixTrieNode> getSuccess(){

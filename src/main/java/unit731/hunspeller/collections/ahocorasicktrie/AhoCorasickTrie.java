@@ -1,12 +1,22 @@
 package unit731.hunspeller.collections.ahocorasicktrie;
 
+import unit731.hunspeller.collections.ahocorasicktrie.dtos.HitProcessor;
+import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Stack;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.collections.ahocorasicktrie.dtos.VisitElement;
 
 
 /**
- * An implementation of Aho Corasick algorithm based on Double Array Trie
+ * An implementation of the Aho-Corasick Radix Trie algorithm based on Double-Array
  * 
  * @see <a href="https://github.com/hankcs/AhoCorasickDoubleArrayTrie">Aho-Corasick double-array trie</a>
  * 
@@ -79,11 +89,13 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	<code>true</code> if string contains at least one substring
 	 */
 	public boolean containsKey(String text){
-		int currentState = 0;
-		for(int i = 0; i < text.length(); i ++){
-			currentState = getState(currentState, text.charAt(i));
-			if(output[currentState] != null)
-				return true;
+		if(isInitialized()){
+			int currentState = 0;
+			for(int i = 0; i < text.length(); i ++){
+				currentState = getState(currentState, text.charAt(i));
+				if(output[currentState] != null)
+					return true;
+			}
 		}
 		return false;
 	}
@@ -178,22 +190,76 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			p = b;
 			int n = base[p];
 			if(b == check[p] && n < 0)
-				result =  - n - 1;
+				result = -n - 1;
 		}
 		return result;
 	}
 
-	/** Get the size of the keywords */
+
+	/**
+	 * Traverses this radix tree using the given visitor.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 */
+	public void visit(Function<VisitElement<V>, Boolean> visitor){
+		visit(visitor, StringUtils.EMPTY);
+	}
+
+	/**
+	 * Traverses this radix tree using the given visitor and starting at the given prefix.
+	 * Note that the tree will be traversed in lexicographical order.
+	 *
+	 * @param visitor	The visitor
+	 * @param prefix	The prefix used to restrict visitation
+	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
+	 */
+	private void visit(Function<VisitElement<V>, Boolean> visitor, String prefix){
+		Objects.requireNonNull(visitor);
+		Objects.requireNonNull(prefix);
+
+		BiFunction<String, String, Boolean> condition = (pre, preAllowed) -> sequencer.startsWith(pre, preAllowed);
+
+		int prefixAllowedLength = sequencer.length(prefix);
+
+		Stack<VisitElement<V>> stack = new Stack<>();
+		stack.push(new VisitElement<>(root, null, root.getKey()));
+		while(!stack.isEmpty()){
+			VisitElement<V> elem = stack.pop();
+
+			if(elem.getNode().hasValue() && condition.apply(elem.getPrefix(), prefix) && visitor.apply(elem))
+				break;
+
+			addNodesToStack(elem, prefixAllowedLength, prefix, stack);
+		}
+	}
+
+	private void addNodesToStack(VisitElement<V> elem, int prefixAllowedLength, String prefix, Stack<VisitElement< V>> stack){
+		Collection<RadixTrieNode> children = elem.getNode().getChildren();
+		if(children != null){
+			int prefixLen = sequencer.length(elem.getPrefix());
+			for(RadixTrieNode child : children)
+				if(prefixLen >= prefixAllowedLength || sequencer.equalsAtIndex(child.getKey(), prefix, 0, prefixLen)){
+					String newPrefix = sequencer.concat(elem.getPrefix(), child.getKey());
+					stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
+				}
+		}
+	}
+
+	public Set<V> values(){
+		return new HashSet<>(outerValue);
+	}
+
 	public int size(){
 		return (outerValue != null? outerValue.size(): 0);
 	}
 
 	public boolean isEmpty(){
-		return (outerValue == null || outerValue.isEmpty());
+		return (size() == 0);
 	}
 
 	public boolean isInitialized(){
-		return (base != null);
+		return (output != null);
 	}
 
 }

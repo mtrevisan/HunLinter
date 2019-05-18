@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-import unit731.hunspeller.collections.ahocorasicktrie.exceptions.DuplicateKeyException;
 
 
 /**
@@ -48,8 +47,11 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 		AhoCorasickTrie<V> trie = new AhoCorasickTrie<>();
 
 		//save the outer values
-		trie.outerValue = new ArrayList<>(map.values());
-		trie.keyLength = new int[trie.outerValue.size()];
+		int size = map.size();
+		trie.outerValue = new ArrayList<>(size);
+		map.values()
+			.forEach(trie.outerValue::add);
+		trie.keyLength = new int[size];
 
 		//construct a two-point trie tree
 		Set<String> keySet = map.keySet();
@@ -100,7 +102,7 @@ class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param keyword	A keyword
 	 * @param index	The index of the keyword
 	 */
-	private void addKeyword(AhoCorasickTrie<V> trie, String keyword, int index) throws DuplicateKeyException{
+	private void addKeyword(AhoCorasickTrie<V> trie, String keyword, int index){
 		RadixTrieNode currentState = rootNode;
 		for(Character character : keyword.toCharArray())
 			currentState = currentState.addState(character);
