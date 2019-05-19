@@ -362,6 +362,7 @@ public class HyphenationParser{
 
 	private void buildTrie(Level level, Map<String, String> rulesByLevel){
 		AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
+			.caseInsensitive()
 			.build(rulesByLevel);
 		patterns.put(level, trie);
 	}

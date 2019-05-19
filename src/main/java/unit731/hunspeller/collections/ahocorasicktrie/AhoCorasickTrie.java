@@ -5,6 +5,7 @@ import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
@@ -25,6 +26,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	private static final int ROOT_NODE_ID = 0;
 
+	//options:
+	private boolean caseInsensitive;
 
 	int[] base;
 	//failure function
@@ -36,6 +39,12 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	int[] keyLength;
 
+
+	AhoCorasickTrie(){}
+
+	AhoCorasickTrie(boolean caseInsensitive){
+		this.caseInsensitive = caseInsensitive;
+	}
 
 	/**
 	 * Search text
@@ -92,11 +101,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @param consumer	The consumer called in case of a hit
 	 */
-	private boolean searchInText(final String text, BiFunction<int[], Integer, Boolean> consumer){
+	private boolean searchInText(String text, BiFunction<int[], Integer, Boolean> consumer){
 		Objects.requireNonNull(text);
 
 		boolean found = false;
 		if(isInitialized()){
+			if(caseInsensitive)
+				text = text.toLowerCase(Locale.ROOT);
+
 			int currentNodeId = ROOT_NODE_ID;
 			for(int i = 0; i < text.length(); i ++){
 				currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
@@ -176,11 +188,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param nodeId	The starting position of the node for searching
 	 * @return	The id of the key (you can use it as a perfect hash function)
 	 */
-	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
+	private int exactMatchSearch(String key, final int position, int length, int nodeId){
 		Objects.requireNonNull(key);
 
 		int result = -1;
 		if(isInitialized()){
+			if(caseInsensitive)
+				key = key.toLowerCase(Locale.ROOT);
+
 			if(length <= 0)
 				length = key.length();
 			if(nodeId < 0)

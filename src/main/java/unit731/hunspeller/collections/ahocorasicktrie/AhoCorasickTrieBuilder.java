@@ -8,10 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -22,7 +24,10 @@ import java.util.Set;
 public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 	private final RadixTrieNode rootNode = new RadixTrieNode();
-	private final AhoCorasickTrie<V> trie = new AhoCorasickTrie<>();
+	private AhoCorasickTrie<V> trie;
+
+	//options:
+	private boolean caseInsensitive;
 
 	/** Whether the position has been used */
 	private boolean used[];
@@ -36,14 +41,22 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	private int keySize;
 
 
+	public AhoCorasickTrieBuilder<V> caseInsensitive(){
+		caseInsensitive = true;
+		return this;
+	}
+
 	/**
 	 * Build a AhoCorasickTrie from a map
 	 *
 	 * @param map	A map containing key-value pairs
+	 * @return	The trie
 	 */
 	@SuppressWarnings("unchecked")
 	public AhoCorasickTrie<V> build(final Map<String, V> map){
 		Objects.requireNonNull(map);
+
+		trie = new AhoCorasickTrie<>(caseInsensitive);
 
 		//save the outer values
 		final int size = map.size();
@@ -53,6 +66,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 		//construct a two-point trie tree
 		Set<String> keySet = map.keySet();
+		if(caseInsensitive)
+			keySet = keySet.stream()
+				.map(key -> key.toLowerCase(Locale.ROOT))
+				.collect(Collectors.toSet());
 		addAllKeywords(keySet);
 
 		//vuilding a double array trie tree based on a two-point trie tree
