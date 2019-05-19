@@ -59,34 +59,54 @@ public class RadixTrieNode{
 		return depth;
 	}
 
-	/** Add a matching pattern string (this node corresponds to this pattern string) */
-	public void addChildrenId(final int keyword){
+	/**
+	 * Add a matching pattern string (this node corresponds to this pattern string)
+	 * 
+	 * @param key	Key of this node
+	 */
+	public void addChildrenId(final int key){
 		if(childrenIds == null)
 			childrenIds = new HashSet<>();
 
-		childrenIds.add(keyword);
+		childrenIds.add(key);
 	}
 
 	public Integer getLargestChildrenId(){
 		return (childrenIds != null && !childrenIds.isEmpty()? childrenIds.iterator().next(): null);
 	}
 
-	/** Add some matching pattern strings */
+	/**
+	 * Add some matching pattern strings
+	 * 
+	 * @param childrenIds	Id of the children to add
+	 */
 	public void addChildrenIds(final Collection<Integer> childrenIds){
 		childrenIds.forEach(this::addChildrenId);
 	}
 
-	/** Get the pattern string represented by this node */
+	/**
+	 * Get the pattern string represented by this node
+	 * 
+	 * @return	The children ids
+	 */
 	public Collection<Integer> getChildrenIds(){
 		return (childrenIds == null? Collections.<Integer>emptyList(): childrenIds);
 	}
 
-	/** Whether it is a terminal node */
+	/**
+	 * Whether it is a terminal node
+	 * 
+	 * @return	Whether this is a leaf node
+	 */
 	public boolean isAcceptable(){
 		return (depth > 0 && childrenIds != null);
 	}
 
-	/** Get the failure node */
+	/**
+	 * Get the failure node
+	 * 
+	 * @return	The fail node
+	 */
 	public RadixTrieNode failure(){
 		return failure;
 	}
@@ -99,7 +119,7 @@ public class RadixTrieNode{
 	/**
 	 * Move to the next node
 	 *
-	 * @param character 希望按此字符转移
+	 * @param character	Character to get the next node from
 	 * @param ignoreRootNode	Whether to ignore the root node, it should be true if the root node calls itself, otherwise it is false
 	 * @return	Transfer result
 	 */
@@ -110,12 +130,22 @@ public class RadixTrieNode{
 		return nextNode;
 	}
 
-	/** According to the character transfer, the root node transfer failure will return itself (never return null) */
+	/**
+	 * According to the character transfer, the root node transfer failure will return itself (never return null)
+	 * 
+	 * @param character	Character to get the next node from
+	 * @return	The next node
+	 */
 	public RadixTrieNode nextNode(final Character character){
 		return nextNode(character, false);
 	}
 
-	/** According to character transfer, any node transfer failure will return null */
+	/**
+	 * According to character transfer, any node transfer failure will return null
+	 * 
+	 * @param character	Character to get the next node from
+	 * @return	The next node (ignoring root node)
+	 */
 	public RadixTrieNode nextNodeIgnoreRoot(final Character character){
 		return nextNode(character, true);
 	}

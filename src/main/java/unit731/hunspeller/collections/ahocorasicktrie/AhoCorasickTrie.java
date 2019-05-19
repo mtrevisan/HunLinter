@@ -53,8 +53,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	A list of outputs
 	 */
 	public List<SearchResult<V>> searchInText(final String text){
-		List<SearchResult<V>> collectedHits = new ArrayList<>();
-		BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final List<SearchResult<V>> collectedHits = new ArrayList<>();
+		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			final int position = index + 1;
 			for(int hit : hits)
 				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
@@ -73,7 +73,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	public void searchInText(final String text, final HitProcessor<V> processor){
 		Objects.requireNonNull(processor);
 
-		BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			final int position = index + 1;
 			for(int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
