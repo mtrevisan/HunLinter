@@ -28,7 +28,6 @@ import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
@@ -106,7 +105,6 @@ public class HyphenationParser{
 			REDUCED_PATTERNS.put(level, new HashSet<>());
 	}
 
-	private final HyphenatorFactory.Type radixTreeType;
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
@@ -118,11 +116,9 @@ public class HyphenationParser{
 	private final HyphenationOptionsParser optParser;
 
 
-	public HyphenationParser(HyphenatorFactory.Type radixTreeType, String language){
-		Objects.requireNonNull(radixTreeType);
+	public HyphenationParser(String language){
 		Objects.requireNonNull(language);
 
-		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -136,13 +132,11 @@ public class HyphenationParser{
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, AhoCorasickTrie<String>> patterns,
+	HyphenationParser(String language, Map<Level, AhoCorasickTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
-		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
-		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -158,10 +152,6 @@ public class HyphenationParser{
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
-	}
-
-	public HyphenatorFactory.Type getRadixTreeType(){
-		return radixTreeType;
 	}
 
 	public Orthography getOrthography(){
