@@ -289,7 +289,7 @@ public class HyphenationParser{
 
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
-		String foundNodeValue = patterns.get(level)
+		String foundNodeValue = rules.get(level)
 			.get(key);
 		if(foundNodeValue != null){
 			String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
