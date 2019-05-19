@@ -482,7 +482,8 @@ while current-list is not empty{
 		}
 	}
 
-	private void ahn(LineEntry parent, String parentGroup, List<LineEntry> children, String childrenGroup, List<LineEntry> sortedList, List<LineEntry> rules){
+	private void ahn(LineEntry parent, String parentGroup, List<LineEntry> children, String childrenGroup, List<LineEntry> sortedList,
+			List<LineEntry> rules){
 		//add new rule from parent with condition starting with NOT(children-group) to final-list
 		String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
 		LineEntry newEntry = LineEntry.createFrom(parent, condition);
@@ -535,8 +536,8 @@ while current-list is not empty{
 			if(comm.size() > 1){
 				//FIXME
 				if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
-					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey() + "', comm '"
-						+ comm.toString());
+					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
+						+ "', comm '" + comm.toString());
 
 				String commonGroup = extractGroup(comm, e.getKey().length());
 				String condition = makeNotGroup(commonGroup) + e.getKey();
@@ -553,7 +554,8 @@ while current-list is not empty{
 			String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
 			//do the bubble trick
 			for(int i = conds.getKey().length(); i > 0; i --){
-				String condition = makeNotGroup(conds.getKey().substring(i - 1, i)) + conds.getKey().substring(i) + makeGroup(bubbleGroup) + parent.condition;
+				String condition = makeNotGroup(conds.getKey().substring(i - 1, i)) + conds.getKey().substring(i) + makeGroup(bubbleGroup)
+					+ parent.condition;
 				newParents.add(LineEntry.createFrom(parent, condition));
 			}
 		}
