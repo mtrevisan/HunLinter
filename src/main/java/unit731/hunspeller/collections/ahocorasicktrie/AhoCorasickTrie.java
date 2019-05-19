@@ -14,9 +14,12 @@ import java.util.function.BiFunction;
  * An implementation of the Aho-Corasick Radix Trie algorithm based on a triple-array data structure
  * 
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho–Corasick algorithm</a>
- * @see <a href="https://github.com/hankcs/AhoCorasickDoubleArrayTrie">Aho-Corasick double-array trie</a>
  * @see <a href="https://pdfs.semanticscholar.org/18b9/da082ef35aea8bf9853ae6b35242539ff7da.pdf">Efficient implementation of Unicode string pattern matching automaton in Java</a>
  * @see <a href="https://www.db.ics.keio.ac.jp/seminar/2011/20111007_ishizaki/20111007_ishizaki_CIAA.pdf">A table compression method for Extended Aho-Corasick Automaton</a>
+ * @see <a href="http://www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf">Biosequence Algorithms, Spring 2005 - Lecture 4: Set Matching and Aho-Corasick Algorithm</a>
+ * @see <a href="http://informatika.stei.itb.ac.id/~rinaldi.munir/Stmik/2014-2015/Makalah2015/Makalah_IF221_Strategi_Algoritma_2015_032.pdf">Aho-Corasick Algorithm in Pattern Matching</a>
+ * @see <a href="https://github.com/hankcs/AhoCorasickDoubleArrayTrie">Aho-Corasick double-array trie</a>
+ * @see <a href="https://github.com/robert-bor/aho-corasick">Aho-Corasick</a>
  * 
  * @param <V>	The type of values stored in the tree
  */
@@ -47,7 +50,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Search text
+	 * Perform a search and return all the entries that are contained into the given text.
 	 *
 	 * @param text	The text
 	 * @return	A list of outputs
@@ -65,7 +68,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Search text
+	 * Perform a search and call the processor for each entry that are contained into the given text.
 	 *
 	 * @param text	The text
 	 * @param processor	A processor which handles the output
