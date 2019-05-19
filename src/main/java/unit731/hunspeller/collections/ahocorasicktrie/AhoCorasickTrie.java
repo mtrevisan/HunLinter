@@ -4,15 +4,9 @@ import unit731.hunspeller.collections.ahocorasicktrie.dtos.HitProcessor;
 import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.Stack;
-import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.ahocorasicktrie.dtos.VisitElement;
+import java.util.function.BiFunction;
 
 
 /**
@@ -50,21 +44,14 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	A list of outputs
 	 */
 	public List<SearchResult<V>> searchInText(final String text){
-		Objects.requireNonNull(text);
-
-		int currentNodeId = ROOT_NODE_ID;
 		List<SearchResult<V>> collectedHits = new ArrayList<>();
-		for(int i = 0; i < text.length(); i ++){
-			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
-
-			//store hits
-			final int[] hits = output[currentNodeId];
-			if(hits != null){
-				final int position = i + 1;
-				for(int hit : hits)
-					collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
-			}
-		}
+		BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+			final int position = index + 1;
+			for(int hit : hits)
+				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
+			return true;
+		};
+		searchInText(text, consumer);
 		return collectedHits;
 	}
 
@@ -75,23 +62,18 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param processor	A processor which handles the output
 	 */
 	public void searchInText(final String text, final HitProcessor<V> processor){
-		Objects.requireNonNull(text);
 		Objects.requireNonNull(processor);
 
-		int currentNodeId = ROOT_NODE_ID;
-		for(int i = 0; i < text.length(); i ++){
-			currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
-
-			final int[] hitArray = output[currentNodeId];
-			if(hitArray != null){
-				final int position = i + 1;
-				for(int hit : hitArray){
-					final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
-					if(!proceed)
-						return;
-				}
+		BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+			final int position = index + 1;
+			for(int hit : hits){
+				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
+				if(!proceed)
+					return false;
 			}
-		}
+			return true;
+		};
+		searchInText(text, consumer);
 	}
 
 	/**
@@ -101,18 +83,36 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	<code>true</code> if string contains at least one substring
 	 */
 	public boolean containsKey(final String text){
+		return searchInText(text, (hits, index) -> false);
+	}
+
+	/**
+	 * Search text
+	 *
+	 * @param text	The text
+	 * @param consumer	The consumer called in case of a hit
+	 */
+	private boolean searchInText(final String text, BiFunction<int[], Integer, Boolean> consumer){
 		Objects.requireNonNull(text);
 
+		boolean found = false;
 		if(isInitialized()){
 			int currentNodeId = ROOT_NODE_ID;
 			for(int i = 0; i < text.length(); i ++){
 				currentNodeId = retrieveNextNodeId(currentNodeId, text.charAt(i));
 
-				if(output[currentNodeId] != null)
-					return true;
+				//store hits
+				final int[] hits = output[currentNodeId];
+				if(hits != null){
+					found = true;
+
+					final boolean proceed = consumer.apply(hits, i);
+					if(!proceed)
+						break;
+				}
 			}
 		}
-		return false;
+		return found;
 	}
 
 	private int retrieveNextNodeId(int currentNodeId, final char character){
@@ -203,72 +203,6 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		}
 		return result;
 	}
-
-
-	/**
-	 * Traverses this radix tree using the given visitor.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 */
-	public void visit(final Function<VisitElement<V>, Boolean> visitor){
-		visit(visitor, StringUtils.EMPTY);
-	}
-
-	/**
-	 * Traverses this radix tree using the given visitor and starting at the given prefix.
-	 * Note that the tree will be traversed in lexicographical order.
-	 *
-	 * @param visitor	The visitor
-	 * @param prefix	The prefix used to restrict visitation
-	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
-	 */
-	public void visit(final Function<VisitElement<V>, Boolean> visitor, final String prefix){
-		Objects.requireNonNull(visitor);
-
-		boolean prefixFound = true;
-		int currentNodeId = ROOT_NODE_ID;
-		if(prefix != null){
-			//find node corresponding to the given prefix
-			prefixFound = false;
-			for(int i = 0; !prefixFound && i < prefix.length(); i ++){
-				currentNodeId = retrieveNextNodeId(currentNodeId, prefix.charAt(i));
-
-				if(output[currentNodeId] != null)
-					prefixFound = true;
-//					collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
-			}
-		}
-		if(prefixFound){
-			final int prefixAllowedLength = prefix.length();
-
-			Stack<VisitElement<V>> stack = new Stack<>();
-			stack.push(new VisitElement<>(ROOT_NODE_ID, null, null));
-			while(!stack.isEmpty()){
-				VisitElement<V> elem = stack.pop();
-
-				if(elem.getValue() != null && elem.getKey().startsWith(prefix) && visitor.apply(elem))
-					break;
-
-				//add nodes to stack
-				Collection<Integer> childrenIds = elem.getNode().getChildrenIds();
-				final int prefixLen = elem.getKey().length();
-				for(Integer childId : childrenIds){
-					V childValue = outerValue.get(childId);
-					if(prefixLen >= prefixAllowedLength || child.getKey().charAt(0) == prefix.charAt(prefixLen)){
-						String newPrefix = elem.getKey() + child.getKey();
-						stack.push(new VisitElement<>(child, elem.getNode(), newPrefix));
-					}
-				}
-			}
-		}
-	}
-
-	//FIXME
-//	public Set<VisitElement<V>> entrySet(){
-//		final List<VisitElement<V>> entries = getEntries(sequencer.getEmptySequence(), type);
-//		return new HashSet<>(entries);
-//	}
 
 	public int size(){
 		return (outerValue != null? outerValue.size(): 0);

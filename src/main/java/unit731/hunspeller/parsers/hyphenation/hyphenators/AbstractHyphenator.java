@@ -35,52 +35,33 @@ public abstract class AbstractHyphenator implements HyphenatorInterface{
 	}
 
 	/**
-	 * Performs hyphenation
-	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
-	 *
-	 * @param word	String to hyphenate
-	 * @return the hyphenation object(s)
-	 */
-	@Override
-	public Hyphenation hyphenate(String word){
-		return hyphenate(word, hypParser.getPatterns());
-	}
-
-	/**
 	 * Performs hyphenation including an additional rule
 	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
-	 * @param addedRule	Rule to add to the set of rules that will generate the hyphenation
+	 * @param additionalRule	Rule to add to the set of rules that will generate the hyphenation
 	 * @param level	The level to add the rule to
 	 * @return the hyphenation object
 	 */
 	@Override
-	public Hyphenation hyphenate(String word, String addedRule, HyphenationParser.Level level){
-		String key = HyphenationParser.getKeyFromData(addedRule);
-		Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns = hypParser.getPatterns();
-		Hyphenation hyph = null;
-		if(patterns.get(level).get(key) == null){
-			patterns.get(level)
-				.put(key, addedRule);
-
-			hyph = hyphenate(word, patterns);
-
-			patterns.get(level)
-				.remove(key);
-		}
+	public Hyphenation hyphenate(String word, String additionalRule, HyphenationParser.Level level){
+		hypParser.addRule(additionalRule, level);
+		Hyphenation hyph = hyphenate(word);
+		hypParser.removeRule(additionalRule, level);
 		return hyph;
 	}
 
 	/**
 	 * Performs hyphenation
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
 	 *
 	 * @param word	String to hyphenate
-	 * @param patterns	The radix tree containing the patterns
 	 * @return the hyphenation object
 	 */
-	private Hyphenation hyphenate(String word, Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns){
+	@Override
+	public Hyphenation hyphenate(String word){
 		//apply first level hyphenation
+		Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns = hypParser.getPatterns();
 		HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND,
 			hypParser.getOptParser().getNonCompoundOptions());
 

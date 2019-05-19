@@ -1,18 +1,13 @@
 package unit731.hunspeller.collections.ahocorasicktrie;
 
-import java.util.Arrays;
 import unit731.hunspeller.collections.ahocorasicktrie.dtos.SearchResult;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import unit731.hunspeller.collections.ahocorasicktrie.dtos.VisitElement;
 
 
 public class AhoCorasickTrieTest{
@@ -188,26 +183,6 @@ public class AhoCorasickTrieTest{
 			.build(map);
 
 		Assertions.assertEquals(5, trie.size());
-	}
-
-	@Test
-	public void visit(){
-		Map<String, String> map = new HashMap<>();
-		map.put("apple", "apple");
-		map.put("appleshack", "appleshack");
-		map.put("appleshackcream", "appleshackcream");
-		map.put("applepie", "applepie");
-		map.put("ape", "ape");
-		AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
-			.build(map);
-
-		Set<String> keys = new HashSet<>();
-		Function<VisitElement<String>, Boolean> visitor = elem -> {
-			keys.add(elem.getKey());
-			return true;
-		};
-		trie.visit(visitor);
-		Assertions.assertEquals(new HashSet<>(Arrays.asList("apple", "appleshack", "appleshackcream", "applepie", "ape")), keys);
 	}
 
 }
