@@ -174,7 +174,7 @@ public class RadixTrieNode{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		RadixTrieNode rhs = (RadixTrieNode)obj;
+		final RadixTrieNode rhs = (RadixTrieNode)obj;
 		return new EqualsBuilder()
 			.append(depth, rhs.depth)
 			.append(id, rhs.id)

@@ -56,7 +56,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		final List<SearchResult<V>> collectedHits = new ArrayList<>();
 		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			final int position = index + 1;
-			for(int hit : hits)
+			for(final int hit : hits)
 				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
 			return true;
 		};
@@ -75,7 +75,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			final int position = index + 1;
-			for(int hit : hits){
+			for(final int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 				if(!proceed)
 					return false;

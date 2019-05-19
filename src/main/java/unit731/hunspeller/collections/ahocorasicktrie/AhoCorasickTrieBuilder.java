@@ -90,11 +90,11 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 */
 	private int fetch(final RadixTrieNode parent, final List<Map.Entry<Integer, RadixTrieNode>> siblings){
 		if(parent.isAcceptable()){
-			RadixTrieNode fakeNode = new RadixTrieNode(-parent.getDepth() - 1);
+			final RadixTrieNode fakeNode = new RadixTrieNode(-parent.getDepth() - 1);
 			fakeNode.addChildrenId(parent.getLargestChildrenId());
 			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
 		}
-		for(Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
+		for(final Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
 			siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
 		return siblings.size();
 	}
@@ -106,7 +106,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 */
 	private void addAllKeywords(final Collection<String> keywordSet){
 		int i = 0;
-		for(String keyword : keywordSet)
+		for(final String keyword : keywordSet)
 			addKeyword(keyword, i ++);
 	}
 
@@ -118,7 +118,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 */
 	private void addKeyword(final String keyword, final int id){
 		RadixTrieNode currentNode = rootNode;
-		for(Character character : keyword.toCharArray())
+		for(final Character character : keyword.toCharArray())
 			currentNode = currentNode.addNode(character);
 		currentNode.addChildrenId(id);
 		trie.keyLength[id] = keyword.length();
@@ -130,10 +130,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			trie.next = new int[size];
 			trie.next[1] = trie.base[0];
 			trie.output = new int[size][];
-			Queue<RadixTrieNode> queue = new ArrayDeque<>();
+			final Queue<RadixTrieNode> queue = new ArrayDeque<>();
 
 			//the first step is to set the failure of the node with depth 1 to the root node
-			for(RadixTrieNode depthOneNode : rootNode.getNodes()){
+			for(final RadixTrieNode depthOneNode : rootNode.getNodes()){
 				depthOneNode.setFailure(rootNode, trie.next);
 				queue.add(depthOneNode);
 				constructOutput(depthOneNode);
@@ -141,16 +141,16 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 			//the second step is to create a failure table for the node with depth > 1, which is a BFS
 			while(!queue.isEmpty()){
-				RadixTrieNode currentNode = queue.remove();
+				final RadixTrieNode currentNode = queue.remove();
 
-				for(Character transition : currentNode.getTransitions()){
-					RadixTrieNode targetNode = currentNode.nextNode(transition);
+				for(final Character transition : currentNode.getTransitions()){
+					final RadixTrieNode targetNode = currentNode.nextNode(transition);
 					queue.add(targetNode);
 
 					RadixTrieNode traceFailureNode = currentNode.failure();
 					while(traceFailureNode.nextNode(transition) == null)
 						traceFailureNode = traceFailureNode.failure();
-					RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
+					final RadixTrieNode newFailureNode = traceFailureNode.nextNode(transition);
 					targetNode.setFailure(newFailureNode, trie.next);
 					targetNode.addChildrenIds(newFailureNode.getChildrenIds());
 					constructOutput(targetNode);
@@ -160,12 +160,12 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	}
 
 	private void constructOutput(final RadixTrieNode targetNode){
-		Collection<Integer> childrenIds = targetNode.getChildrenIds();
+		final Collection<Integer> childrenIds = targetNode.getChildrenIds();
 		if(childrenIds == null || childrenIds.isEmpty())
 			return;
 
 		final int output[] = new int[childrenIds.size()];
-		Iterator<Integer> it = childrenIds.iterator();
+		final Iterator<Integer> it = childrenIds.iterator();
 		for(int i = 0; i < output.length; i ++)
 			output[i] = it.next();
 		trie.output[targetNode.getId()] = output;
@@ -187,7 +187,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		trie.base[0] = 1;
 		nextCheckPos = 0;
 
-		List<Map.Entry<Integer, RadixTrieNode>> siblings = new ArrayList<>(rootNode.getSuccess().entrySet().size());
+		final List<Map.Entry<Integer, RadixTrieNode>> siblings = new ArrayList<>(rootNode.getSuccess().entrySet().size());
 		fetch(rootNode, siblings);
 		insert(siblings);
 	}
@@ -260,11 +260,11 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				nextCheckPos = pos;
 			used[begin] = true;
 
-			for(Map.Entry<Integer, RadixTrieNode> sibling : siblings)
+			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings)
 				trie.check[begin + sibling.getKey()] = begin;
 
-			for(Map.Entry<Integer, RadixTrieNode> sibling : siblings){
-				List<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
+			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings){
+				final List<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(sibling.getValue().getSuccess().entrySet().size() + 1);
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){

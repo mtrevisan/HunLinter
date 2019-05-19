@@ -37,7 +37,7 @@ public class VisitElement<V extends Serializable>{
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		VisitElement<?> rhs = (VisitElement<?>)obj;
+		final VisitElement<?> rhs = (VisitElement<?>)obj;
 		return new EqualsBuilder()
 			.append(nodeId, rhs.nodeId)
 			.append(key, rhs.key)
