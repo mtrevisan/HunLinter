@@ -390,7 +390,8 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 					if(!words.isEmpty())
 						rules.add(newEntry);
 					else
-						LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition), (newEntry.condition.isEmpty()? DOT: newEntry.condition));
+						LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+							(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 				}
 			}
 			else{
@@ -404,12 +405,14 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
 					final List<LineEntry> t = conditionBucket.get(Boolean.TRUE);
 					if(t.size() == 1){
-						//check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and another-rule.condition == condition
+						//check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and
+						//another-rule.condition == condition
 						final LineEntry te = t.get(0);
 						final List<LineEntry> list = new ArrayList<>(children);
 						list.add(parent);
 						final List<LineEntry> as = list.stream()
-							.filter(rule -> rule.removal.equals((te.removal.equals(ZERO)? te.condition: te.removal + te.condition)) && rule.condition.equals(te.condition))
+							.filter(rule -> rule.removal.equals((te.removal.equals(ZERO)? te.condition: te.removal + te.condition))
+								&& rule.condition.equals(te.condition))
 							.collect(Collectors.toList());
 						if(as.size() == 1 && as.get(0).from.equals(te.from)){
 							as.get(0).addition.addAll(te.addition.stream().map(add -> te.condition + add).collect(Collectors.toList()));
@@ -500,8 +503,8 @@ while current-list is not empty{
 		}
 	}
 
-	private void ahn(final LineEntry parent, final String parentGroup, final List<LineEntry> children, final String childrenGroup, final List<LineEntry> sortedList,
-			final List<LineEntry> rules){
+	private void ahn(final LineEntry parent, final String parentGroup, final List<LineEntry> children, final String childrenGroup,
+			final List<LineEntry> sortedList, final List<LineEntry> rules){
 		//add new rule from parent with condition starting with NOT(children-group) to final-list
 		final String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
 		final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
@@ -548,7 +551,8 @@ while current-list is not empty{
 		'[^èò]do'
 		*/
 		final List<LineEntry> newParents = new ArrayList<>();
-		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition, cond -> cond.substring(cond.length() - parentConditionLength - 1));
+		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
+			cond -> cond.substring(cond.length() - parentConditionLength - 1));
 		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
 			final List<String> comm = e.getValue();
 			if(comm.size() > 1){
@@ -569,13 +573,15 @@ while current-list is not empty{
 				if(!words.isEmpty())
 					newParents.add(newEntry);
 				else
-					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition), (newEntry.condition.isEmpty()? DOT: newEntry.condition));
+					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
 				comm.forEach(bubblesCondition::remove);
 			}
 		}
 
-		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition, cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
+		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
+			cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
 		//for each children-group-2
 		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
 			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
@@ -595,7 +601,8 @@ while current-list is not empty{
 				if(!words.isEmpty())
 					newParents.add(newEntry);
 				else
-					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition), (newEntry.condition.isEmpty()? DOT: newEntry.condition));
+					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 			}
 		}
 		return newParents;
@@ -642,7 +649,8 @@ while current-list is not empty{
 		return NOT_GROUP_START + group + GROUP_END;
 	}
 
-	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
+	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,
+			final Collection<LineEntry> entries){
 		//restore original rules
 		final List<LineEntry> restoredRules = entries.stream()
 			.flatMap(rule -> {
@@ -662,7 +670,7 @@ while current-list is not empty{
 
 	private List<LineEntry> prepareRules(final AffixEntry.Type type, final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			entries.forEach(entry -> {
+			for(final LineEntry entry : entries){
 				String lcs = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
 				if(lcs == null)
 					lcs = entry.condition;
@@ -680,7 +688,7 @@ while current-list is not empty{
 					throw new IllegalArgumentException("really bad error, lcs.length < condition.length");
 
 				entry.condition = lcs;
-			});
+			}
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);
 		return sortedEntries;
