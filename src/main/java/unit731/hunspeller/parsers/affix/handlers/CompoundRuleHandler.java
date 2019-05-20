@@ -19,30 +19,30 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 public class CompoundRuleHandler implements Handler{
 
 	@Override
-	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
-			Function<AffixTag, List<String>> getData){
+	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+			final Function<AffixTag, List<String>> getData){
 		try{
 			checkValidity(context);
 
-			BufferedReader br = context.getReader();
+			final BufferedReader br = context.getReader();
 
-			int numEntries = Integer.parseInt(context.getFirstParameter());
-			Set<String> compoundRules = new HashSet<>(numEntries);
+			final int numEntries = Integer.parseInt(context.getFirstParameter());
+			final Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = extractLine(br);
+				final String line = extractLine(br);
 
-				String[] lineParts = StringUtils.split(line);
+				final String[] lineParts = StringUtils.split(line);
 
-				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
+				final AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.COMPOUND_RULE)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 						+ ": mismatched compound rule type (expected " + AffixTag.COMPOUND_RULE + ")");
 
-				String rule = lineParts[1];
+				final String rule = lineParts[1];
 
 				checkRuleValidity(rule, line, i, strategy);
 
-				boolean inserted = compoundRules.add(rule);
+				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 						+ ": duplicated line");
@@ -50,32 +50,33 @@ public class CompoundRuleHandler implements Handler{
 
 			addData.accept(AffixTag.COMPOUND_RULE.getCode(), compoundRules);
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	private void checkValidity(ParsingContext context) throws IllegalArgumentException, NumberFormatException{
+	private void checkValidity(final ParsingContext context) throws IllegalArgumentException, NumberFormatException{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new IllegalArgumentException("Error reading line '" + context + "': The first parameter is not a number");
-		int numEntries = Integer.parseInt(context.getFirstParameter());
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0)
 			throw new IllegalArgumentException("Error reading line '" + context + "': Bad number of entries, it must be a positive integer");
 	}
 
-	private String extractLine(BufferedReader br) throws IOException, EOFException{
-		String line = br.readLine();
+	private String extractLine(final BufferedReader br) throws IOException, EOFException{
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
 	
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private void checkRuleValidity(String rule, String line, int i, FlagParsingStrategy strategy) throws IllegalArgumentException{
+	private void checkRuleValidity(final String rule, final String line, final int i, final FlagParsingStrategy strategy)
+			throws IllegalArgumentException{
 		if(StringUtils.isBlank(rule))
 			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 				+ ": compound rule type cannot be empty");
-		String[] compounds = strategy.extractCompoundRule(rule);
+		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
 			throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i
 				+ ": compound rule is bad formatted");

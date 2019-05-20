@@ -30,18 +30,18 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 
 
 	@Override
-	public void pushMemento(ThesaurusParser.Memento memento) throws IOException{
-		String json = JSON_MAPPER.writeValueAsString(memento);
-		byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
-		Path mementoFile = createFile(bytes);
+	public void pushMemento(final ThesaurusParser.Memento memento) throws IOException{
+		final String json = JSON_MAPPER.writeValueAsString(memento);
+		final byte[] bytes = compress(json.getBytes(DEFAULT_CHARSET));
+		final Path mementoFile = createFile(bytes);
 
 		LOGGER.info("Created memento file '{}', size is {} B", mementoFile.toString(), bytes.length);
 
 		mementos.push(mementoFile);
 	}
 
-	private Path createFile(byte[] bytes) throws IOException{
-		Path mementoFile = Files.createTempFile("memento", ".zip");
+	private Path createFile(final byte[] bytes) throws IOException{
+		final Path mementoFile = Files.createTempFile("memento", ".zip");
 		mementoFile.toFile().deleteOnExit();
 		Files.write(mementoFile, bytes);
 		return mementoFile;
@@ -49,12 +49,12 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 
 	@Override
 	public ThesaurusParser.Memento popMemento() throws IOException{
-		Path mementoFile = mementos.pop();
+		final Path mementoFile = mementos.pop();
 
 		LOGGER.info("Retrieve memento file '{}'", mementoFile.toString());
 
-		byte[] bytes = Files.readAllBytes(mementoFile);
-		String json = new String(decompress(bytes), DEFAULT_CHARSET);
+		final byte[] bytes = Files.readAllBytes(mementoFile);
+		final String json = new String(decompress(bytes), DEFAULT_CHARSET);
 		return JSON_MAPPER.readValue(json, ThesaurusParser.Memento.class);
 	}
 
@@ -63,12 +63,12 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 		return !mementos.empty();
 	}
 
-	private byte[] compress(byte[] bytes) throws IOException{
+	private byte[] compress(final byte[] bytes) throws IOException{
 		if(bytes == null || bytes.length== 0)
 			return new byte[0];
 
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		try(GZIPOutputStream gzip = new GZIPOutputStream(os, 2048){
+		final ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try(final GZIPOutputStream gzip = new GZIPOutputStream(os, 2048){
 			{
 				def.setLevel(Deflater.BEST_COMPRESSION);
 			}
@@ -78,11 +78,11 @@ public class ThesaurusCaretaker implements CaretakerInterface<ThesaurusParser.Me
 		return os.toByteArray();
 	}
 
-	private byte[] decompress(byte[] bytes) throws IOException{
+	private byte[] decompress(final byte[] bytes) throws IOException{
 		if(bytes == null || bytes.length == 0)
 			return new byte[0];
 
-		try(GZIPInputStream is = new GZIPInputStream(new ByteArrayInputStream(bytes))){
+		try(final GZIPInputStream is = new GZIPInputStream(new ByteArrayInputStream(bytes))){
 			return IOUtils.toByteArray(is);
 		}
 	}

@@ -29,7 +29,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	private ThesaurusEntry(){}
 
-	public ThesaurusEntry(String synonym, List<MeaningEntry> meanings){
+	public ThesaurusEntry(final String synonym, final List<MeaningEntry> meanings){
 		Objects.requireNonNull(synonym);
 		Objects.requireNonNull(meanings);
 
@@ -37,17 +37,17 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		this.meanings = meanings;
 	}
 
-	public ThesaurusEntry(String line, LineNumberReader br) throws IOException{
+	public ThesaurusEntry(final String line, final LineNumberReader br) throws IOException{
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 
-		String[] data = StringUtils.split(line, POS_AND_MEANS);
+		final String[] data = StringUtils.split(line, POS_AND_MEANS);
 
 		synonym = data[0];
-		int numEntries = Integer.parseInt(data[1]);
+		final int numEntries = Integer.parseInt(data[1]);
 		meanings = new ArrayList<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
-			String meaning = br.readLine();
+			final String meaning = br.readLine();
 			if(meaning == null)
 				throw new EOFException("Unexpected EOF while reading Thesaurus file");
 
@@ -63,33 +63,33 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return meanings;
 	}
 
-	public void setMeanings(List<MeaningEntry> meanings){
+	public void setMeanings(final List<MeaningEntry> meanings){
 		this.meanings = meanings;
 	}
 
 	@Override
 	public String toString(){
-		StringJoiner sj = new StringJoiner(": ");
+		final StringJoiner sj = new StringJoiner(": ");
 		sj.add(synonym);
 		meanings.forEach(meaning -> sj.add(StringUtils.join(meaning, ", ")));
 		return sj.toString();
 	}
 
 	@Override
-	public int compareTo(ThesaurusEntry other){
+	public int compareTo(final ThesaurusEntry other){
 		return new CompareToBuilder()
 			.append(synonym, other.getSynonym())
 			.toComparison();
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		ThesaurusEntry rhs = (ThesaurusEntry)obj;
+		final ThesaurusEntry rhs = (ThesaurusEntry)obj;
 		return new EqualsBuilder()
 			.append(synonym, rhs.synonym)
 			.isEquals();

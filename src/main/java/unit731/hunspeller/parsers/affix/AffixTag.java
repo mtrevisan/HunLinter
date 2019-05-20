@@ -151,11 +151,11 @@ public enum AffixTag{
 	private final String code;
 
 
-	AffixTag(String code){
+	AffixTag(final String code){
 		this.code = code;
 	}
 
-	public static AffixTag createFromCode(String code){
+	public static AffixTag createFromCode(final String code){
 		return Arrays.stream(values())
 			.filter(tag -> tag.code.equals(code))
 			.findFirst()

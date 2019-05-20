@@ -23,22 +23,22 @@ public class WordBreakTableHandler implements Handler{
 
 
 	@Override
-	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
-			Function<AffixTag, List<String>> getData){
+	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+			final Function<AffixTag, List<String>> getData){
 		try{
-			BufferedReader br = context.getReader();
+			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
+			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
-			Set<String> wordBreakCharacters = new HashSet<>(numEntries);
+			final Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = extractLine(br);
+				final String line = extractLine(br);
 
-				String[] lineParts = StringUtils.split(line);
-				AffixTag tag = AffixTag.createFromCode(lineParts[0]);
+				final String[] lineParts = StringUtils.split(line);
+				final AffixTag tag = AffixTag.createFromCode(lineParts[0]);
 				if(tag != AffixTag.WORD_BREAK_CHARACTERS)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": mismatched type (expected "
 						+ AffixTag.WORD_BREAK_CHARACTERS + ")");
@@ -50,20 +50,20 @@ public class WordBreakTableHandler implements Handler{
 				if(StringUtils.isBlank(breakCharacter))
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": break character cannot be empty");
 
-				boolean inserted = wordBreakCharacters.add(breakCharacter);
+				final boolean inserted = wordBreakCharacters.add(breakCharacter);
 				if(!inserted)
 					throw new IllegalArgumentException("Error reading line '" + line + "' at row " + i + ": duplicated line");
 			}
 
 			addData.accept(AffixTag.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	private String extractLine(BufferedReader br) throws EOFException, IOException{
-		String line = br.readLine();
+	private String extractLine(final BufferedReader br) throws EOFException, IOException{
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
 

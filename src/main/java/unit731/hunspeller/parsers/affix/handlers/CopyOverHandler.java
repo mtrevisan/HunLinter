@@ -11,8 +11,8 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 public class CopyOverHandler implements Handler{
 
 	@Override
-	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
-			Function<AffixTag, List<String>> getData){
+	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+			final Function<AffixTag, List<String>> getData){
 		addData.accept(context.getRuleType(), context.getAllButFirstParameter());
 	}
 	

@@ -47,49 +47,49 @@ public class AffixData{
 		closed = false;
 	}
 
-	boolean containsData(AffixTag key){
+	boolean containsData(final AffixTag key){
 		return containsData(key.getCode());
 	}
 
-	private boolean containsData(String key){
+	private boolean containsData(final String key){
 		return data.containsKey(key);
 	}
 
-	public <T> T getData(AffixTag key){
+	public <T> T getData(final AffixTag key){
 		return getData(key.getCode());
 	}
 
-	public <T> T getDataOrDefault(AffixTag key, T defaultValue){
+	public <T> T getDataOrDefault(final AffixTag key, final T defaultValue){
 		return getDataOrDefault(key.getCode(), defaultValue);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T getData(String key){
+	public <T> T getData(final String key){
 		return (T)data.get(key);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> T getDataOrDefault(String key, T defaultValue){
+	public <T> T getDataOrDefault(final String key, final T defaultValue){
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(AffixTag... keys){
-		List<String> result = new ArrayList<>(keys.length);
-		for(AffixTag key : keys)
+	private List<String> getStringData(final AffixTag... keys){
+		final List<String> result = new ArrayList<>(keys.length);
+		for(final AffixTag key : keys)
 			result.add(getData(key));
 		return result;
 	}
 
-	<T> void addData(AffixTag key, T value){
+	<T> void addData(final AffixTag key, final T value){
 		addData(key.getCode(), value);
 	}
 
 	@SuppressWarnings("unchecked")
-	<T> void addData(String key, T value){
+	<T> void addData(final String key, final T value){
 		if(closed)
 			throw new IllegalArgumentException("Cannot add data, container is closed");
 
-		T prevValue = (T)data.put(key, value);
+		final T prevValue = (T)data.put(key, value);
 
 		if(prevValue != null)
 			throw new IllegalArgumentException("Duplicated flag: " + key);
@@ -101,7 +101,7 @@ public class AffixData{
 	}
 
 	public FlagParsingStrategy getFlagParsingStrategy(){
-		String flag = getFlag();
+		final String flag = getFlag();
 		return (flag != null? FLAG_PARSING_STRATEGY.apply(flag): ParsingStrategyFactory.createASCIIParsingStrategy());
 	}
 
@@ -113,7 +113,7 @@ public class AffixData{
 		return getData(AffixTag.NEED_AFFIX_FLAG);
 	}
 
-	public boolean isTerminalAffix(String flag){
+	public boolean isTerminalAffix(final String flag){
 		return terminalAffixes.contains(flag);
 	}
 
@@ -121,17 +121,17 @@ public class AffixData{
 		return getDataOrDefault(AffixTag.COMPOUND_RULE, Collections.<String>emptySet());
 	}
 
-	public boolean isManagedByCompoundRule(String flag){
-		Set<String> compoundRules = getCompoundRules();
-		for(String rule : compoundRules)
+	public boolean isManagedByCompoundRule(final String flag){
+		final Set<String> compoundRules = getCompoundRules();
+		for(final String rule : compoundRules)
 			if(isManagedByCompoundRule(rule, flag))
 				return true;
 		return false;
 	}
 
-	public boolean isManagedByCompoundRule(String compoundRule, String flag){
-		FlagParsingStrategy strategy = getFlagParsingStrategy();
-		String[] flags = strategy.extractCompoundRule(compoundRule);
+	public boolean isManagedByCompoundRule(final String compoundRule, final String flag){
+		final FlagParsingStrategy strategy = getFlagParsingStrategy();
+		final String[] flags = strategy.extractCompoundRule(compoundRule);
 		return ArrayUtils.contains(flags, flag);
 	}
 
@@ -152,9 +152,9 @@ public class AffixData{
 		return containsData(AffixTag.COMPLEX_PREFIXES);
 	}
 
-	public Boolean isSuffix(String affixCode){
+	public Boolean isSuffix(final String affixCode){
 		Boolean isSuffix = null;
-		Object affix = getData(affixCode);
+		final Object affix = getData(affixCode);
 		if(affix != null && RuleEntry.class.isAssignableFrom(affix.getClass()))
 			isSuffix = ((RuleEntry)affix).isSuffix();
 		return isSuffix;
@@ -174,10 +174,10 @@ public class AffixData{
 
 	public Set<String> getProductiveAffixes(){
 		//keeps only items with RuleEntry as value
-		Set<String> affixes = new HashSet<>();
-		Set<String> keys = data.keySet();
-		for(String key : keys){
-			Object affix = getData(key);
+		final Set<String> affixes = new HashSet<>();
+		final Set<String> keys = data.keySet();
+		for(final String key : keys){
+			final Object affix = getData(key);
 			if(RuleEntry.class.isAssignableFrom(affix.getClass()))
 				affixes.add(key);
 		}
@@ -188,13 +188,13 @@ public class AffixData{
 		return getData(AffixTag.FLAG);
 	}
 
-	public boolean isAffixProductive(String word, String affix){
+	public boolean isAffixProductive(String word, final String affix){
 		word = applyInputConversionTable(word);
 
 		boolean productive;
-		RuleEntry rule = getData(affix);
+		final RuleEntry rule = getData(affix);
 		if(rule != null){
-			List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
+			final List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
 			productive = !applicableAffixes.isEmpty();
 		}
 		else
@@ -202,10 +202,10 @@ public class AffixData{
 		return productive;
 	}
 
-	public static List<AffixEntry> extractListOfApplicableAffixes(String word, List<AffixEntry> entries){
+	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
 		//extract the list of applicable affixes...
-		List<AffixEntry> applicableAffixes = new ArrayList<>();
-		for(AffixEntry entry : entries)
+		final List<AffixEntry> applicableAffixes = new ArrayList<>();
+		for(final AffixEntry entry : entries)
 			if(entry.match(word))
 				applicableAffixes.add(entry);
 		return applicableAffixes;
@@ -215,27 +215,27 @@ public class AffixData{
 		return getData(AffixTag.NO_SUGGEST_FLAG);
 	}
 
-	public List<String> applyReplacementTable(String word){
-		ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
+	public List<String> applyReplacementTable(final String word){
+		final ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
 		return (table != null? table.applyConversionTable(word): Collections.<String>emptyList());
 	}
 
-	public String applyInputConversionTable(String word){
-		ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
+	public String applyInputConversionTable(final String word){
+		final ConversionTable table = getData(AffixTag.INPUT_CONVERSION_TABLE);
 		return applyConversionTable(word, table, "input");
 	}
 
-	public String applyOutputConversionTable(String word){
-		ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
+	public String applyOutputConversionTable(final String word){
+		final ConversionTable table = getData(AffixTag.OUTPUT_CONVERSION_TABLE);
 		return applyConversionTable(word, table, "output");
 	}
 
-	private String applyConversionTable(String word, ConversionTable table, String type){
+	private String applyConversionTable(String word, final ConversionTable table, final String type){
 		if(table != null){
 			try{
 				word = table.applySingleConversionTable(word);
 			}
-			catch(IllegalArgumentException e){
+			catch(final IllegalArgumentException e){
 				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too much appliable rules");
 			}
 		}
