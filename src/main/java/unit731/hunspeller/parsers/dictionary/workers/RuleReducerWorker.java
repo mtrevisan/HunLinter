@@ -193,7 +193,9 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			collectProductionsByFlag(productions, flag, type, plainRules);
+			LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
+			if(compactedFilteredRule != null)
+				plainRules.add(compactedFilteredRule);
 		};
 		Runnable completed = () -> {
 			try{
@@ -224,22 +226,44 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void collectProductionsByFlag(List<Production> productions, String flag, AffixEntry.Type type, List<LineEntry> plainRules){
-		Iterator<Production> itr = productions.iterator();
-		//skip base production
-		itr.next();
-		while(itr.hasNext()){
-			Production production = itr.next();
-
+	private LineEntry collectProductionsByFlag(List<Production> productions, String flag, AffixEntry.Type type){
+		//remove base production
+		productions.remove(0);
+		List<LineEntry> filteredRules = new ArrayList<>();
+		for(Production production : productions){
 			AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
 				String word = lastAppliedRule.undoRule(production.getWord());
 				LineEntry affixEntry = (lastAppliedRule.isSuffix()?
 					createSuffixEntry(production, word, type):
 					createPrefixEntry(production, word, type));
-				plainRules.add(affixEntry);
+				filteredRules.add(affixEntry);
 			}
 		}
+
+		LineEntry compactedFilteredRule = null;
+		if(!filteredRules.isEmpty()){
+			//same same removal and same condition parts
+			List<LineEntry> compactedFilteredRules = collect(filteredRules,
+				entry -> entry.removal + TAB + entry.condition,
+				(rule, entry) -> rule.addition.addAll(entry.addition));
+
+			compactedFilteredRule = compactedFilteredRules.stream()
+				.max(Comparator.comparingInt(rule -> rule.condition.length()))
+				.get();
+			if(compactedFilteredRules.size() > 1){
+				int longestConditionLength = compactedFilteredRule.condition.length();
+				for(LineEntry rule : compactedFilteredRules){
+					int delta = longestConditionLength - rule.condition.length();
+					String from = rule.from.iterator().next();
+					int startIndex = from.length() - longestConditionLength;
+					String deltaAddition = from.substring(startIndex, startIndex + delta);
+					for(String addition : rule.addition)
+						compactedFilteredRule.addition.add(deltaAddition + addition);
+				}
+			}
+		}
+		return compactedFilteredRule;
 	}
 
 	private LineEntry createSuffixEntry(Production production, String word, AffixEntry.Type type){
@@ -277,16 +301,9 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<LineEntry> compactRules(List<LineEntry> entries){
-		//same originating word, same removal, and same condition parts
-		List<LineEntry> intermediate = collect(entries,
-			entry -> entry.from.hashCode() + TAB + entry.removal + TAB + entry.condition,
-			(rule, entry) -> rule.addition.addAll(entry.addition));
-
-		//same removal, same addition, and same condition parts
-		return collect(intermediate,
-			entry -> entry.removal + TAB + entry.addition.hashCode() + TAB + entry.condition,
-			(rule, entry) -> rule.from.addAll(entry.from));
+	private List<LineEntry> compactRules(List<LineEntry> rules){
+		//same removal, addition, and condition parts
+		return collect(rules, entry -> entry.hashCode(), (rule, entry) -> rule.from.addAll(entry.from));
 	}
 
 	private <K, V> List<V> collect(Collection<V> entries, Function<V, K> keyMapper, BiConsumer<V, V> mergeFunction){
