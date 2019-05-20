@@ -312,11 +312,8 @@ public class Backbone implements FileChangeListener{
 		if(hasAFFExtension(absolutePath)){
 			affParser.clear();
 
-			if(hunspellable != null){
+			if(hunspellable != null)
 				hunspellable.clearAffixParser();
-
-				//TODO update rule reduced dialog
-			}
 		}
 		else if(hasAIDExtension(absolutePath)){
 			aidParser.clear();
@@ -330,11 +327,8 @@ public class Backbone implements FileChangeListener{
 	public void fileModified(Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.toString());
 
-		if(hunspellable != null){
+		if(hunspellable != null)
 			hunspellable.loadFileInternal(affFile.getAbsolutePath());
-
-			//TODO update rule reduced dialog
-		}
 	}
 
 	private boolean hasAFFExtension(String path){

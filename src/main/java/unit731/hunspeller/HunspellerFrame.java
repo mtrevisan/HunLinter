@@ -1696,6 +1696,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			mainTabbedPane.setSelectedIndex(index);
 
 
+			//update rule reduced dialog:
+			ruleReducerDialog.reload();
+
+
 			//aid file:
 			List<String> lines = backbone.getAidParser().getLines();
 			boolean aidLinesPresent = !lines.isEmpty();
@@ -1984,6 +1988,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void clearAffixParser(){
 		clearDictionaryParser();
+
+
+		//update rule reduced dialog:
+		ruleReducerDialog.reload();
 	}
 
 	@Override

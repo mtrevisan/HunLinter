@@ -15,11 +15,15 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +174,9 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	private void init(){
 		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
 
+	public void reload(){
 		currentSetTextArea.setText(null);
 
 		AffixData affixData = backbone.getAffixData();
@@ -179,8 +185,27 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 			.map(affix -> (affix.isSuffix()? AffixTag.SUFFIX: AffixTag.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
 			.sorted()
 			.collect(Collectors.toList());
-		ruleComboBox.removeAllItems();
-		affixEntries.forEach(ruleComboBox::addItem);
+
+		javax.swing.SwingUtilities.invokeLater(() -> {
+			//TODO
+//			ruleComboBox.removeAllItems();
+//			affixEntries.forEach(ruleComboBox::addItem);
+//			ruleComboBox.revalidate();
+//			ruleComboBox.repaint();
+
+			DefaultComboBoxModel ruleModel = (DefaultComboBoxModel)ruleComboBox.getModel();
+			ruleModel.removeAllElements();
+			affixEntries.forEach(ruleModel::addElement);
+			ruleComboBox.setModel(ruleModel);
+			ruleComboBox.revalidate();
+			ruleComboBox.repaint();
+
+//			DefaultComboBoxModel ruleModel = new DefaultComboBoxModel(affixEntries.toArray(new String[affixEntries.size()]));
+//			affixEntries.forEach(ruleModel::addElement);
+//			ruleComboBox.setModel(ruleModel);
+//			ruleComboBox.revalidate();
+//			ruleComboBox.repaint();
+		});
 	}
 
    private void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
@@ -296,4 +321,5 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
    private javax.swing.JTextArea reducedSetTextArea;
    private javax.swing.JComboBox<String> ruleComboBox;
    // End of variables declaration//GEN-END:variables
+
 }
