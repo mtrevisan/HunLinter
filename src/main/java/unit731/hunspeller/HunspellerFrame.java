@@ -1680,14 +1680,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					}
 				}
 			});
-			ruleReducerDialog = new RuleReducerDialog(backbone, this);
-			ruleReducerDialog.setLocationRelativeTo(this);
-			ruleReducerDialog.addWindowListener(new WindowAdapter(){
-				@Override
-				public void windowClosed(WindowEvent e){
-					dicRuleReducerMenuItem.setEnabled(true);
-				}
-			});
 
 			filCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
@@ -1697,7 +1689,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//update rule reduced dialog:
-			ruleReducerDialog.reload();
+			if(ruleReducerDialog == null){
+				ruleReducerDialog = new RuleReducerDialog(backbone, this);
+				ruleReducerDialog.setLocationRelativeTo(this);
+				ruleReducerDialog.addWindowListener(new WindowAdapter(){
+					@Override
+					public void windowClosed(WindowEvent e){
+						dicRuleReducerMenuItem.setEnabled(true);
+					}
+				});
+			}
+			else
+				ruleReducerDialog.reload();
 
 
 			//aid file:
