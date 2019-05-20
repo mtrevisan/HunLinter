@@ -48,6 +48,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
+	private static final String ZERO = "0";
 	private static final String TAB = "\t";
 	private static final String DOT = ".";
 	private static final String NOT_GROUP_START = "[^";
@@ -408,7 +409,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 						List<LineEntry> list = new ArrayList<>(children);
 						list.add(parent);
 						List<LineEntry> as = list.stream()
-							.filter(rule -> rule.removal.equals((te.removal.equals("0")? te.condition: te.removal + te.condition)) && rule.condition.equals(te.condition))
+							.filter(rule -> rule.removal.equals((te.removal.equals(ZERO)? te.condition: te.removal + te.condition)) && rule.condition.equals(te.condition))
 							.collect(Collectors.toList());
 						if(as.size() == 1 && as.get(0).from.equals(te.from)){
 							as.get(0).addition.addAll(te.addition.stream().map(add -> te.condition + add).collect(Collectors.toList()));
@@ -625,7 +626,11 @@ while current-list is not empty{
 		List<LineEntry> restoredRules = entries.stream()
 			.flatMap(rule -> {
 				return rule.addition.stream()
-					.map(addition -> new LineEntry(rule.removal, addition, rule.condition, rule.from));
+					.map(addition -> {
+						int lcp = commonPrefix(rule.removal, addition).length();
+						String removal = rule.removal.substring(lcp);
+						return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
+					});
 			})
 			.collect(Collectors.toList());
 
