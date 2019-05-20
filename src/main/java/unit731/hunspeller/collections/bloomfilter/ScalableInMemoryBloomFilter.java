@@ -23,7 +23,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Stack<BloomFilterInterface<T>> filters = new Stack<>();
 
 
-	public ScalableInMemoryBloomFilter(Charset charset, BloomFilterParameters parameters){
+	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
 		Objects.nonNull(charset);
 		Objects.nonNull(parameters);
 
@@ -34,15 +34,15 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public synchronized boolean add(T value){
+	public synchronized boolean add(final T value){
 		if(value == null)
 			return false;
 
-		BloomFilterInterface<T> currentFilter = chooseCurrentFilter(value);
+		final BloomFilterInterface<T> currentFilter = chooseCurrentFilter(value);
 		return currentFilter.add(value);
 	}
 
-	private BloomFilterInterface<T> chooseCurrentFilter(T value){
+	private BloomFilterInterface<T> chooseCurrentFilter(final T value){
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
 		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
 			currentFilter = fork(filters.size());
@@ -52,13 +52,13 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 		return currentFilter;
 	}
 
-	private BloomFilterInterface<T> fork(int count){
+	private BloomFilterInterface<T> fork(final int count){
 		return new BloomFilter<>(charset, (int)Math.ceil(parameters.getExpectedNumberOfElements() * Math.pow(parameters.getGrowRatioWhenFull(), count)),
 			parameters.getFalsePositiveProbability() * Math.pow(parameters.getTighteningRatio(), count), parameters.getBitArrayType(), null, null);
 	}
 
 	@Override
-	public synchronized boolean contains(T value){
+	public synchronized boolean contains(final T value){
 		return (value != null && filters.stream().anyMatch(filter -> filter.contains(value)));
 	}
 
@@ -71,7 +71,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public synchronized boolean isFull(){
-		int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
+		final int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
 		return (addedElements >= parameters.getExpectedNumberOfElements() / 2);
 	}
 
@@ -86,20 +86,20 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(int insertedElements){
+	public double getTrueFalsePositiveProbability(final int insertedElements){
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	//P = 1 - Prod(i = 0 to n - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
 	@Override
 	public synchronized double getTrueFalsePositiveProbability(){
-		int size = filters.size();
-		double p0 = filters.lastElement().getFalsePositiveProbability();
+		final int size = filters.size();
+		final double p0 = filters.lastElement().getFalsePositiveProbability();
 		double probability = 1.;
 		for(int i = 0; i < size; i ++)
 			probability *= 1 - p0 * Math.pow(parameters.getTighteningRatio(), i);
 		return 1. - probability;
-//		double p0 = filters.get(filters.size() - 1).getFalsePositiveProbability();
+//		final double p0 = filters.get(filters.size() - 1).getFalsePositiveProbability();
 //		return p0 / (1. - parameters.getTighteningRatio());
 	}
 

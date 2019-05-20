@@ -23,7 +23,8 @@ public class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = PatternHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
 
-	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéí" + GraphemeVEC.PHONEME_I_UMLAUT + "òóúh])");
+	private static final Pattern PATTERN_J_INTO_I = PatternHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéí"
+		+ GraphemeVEC.PHONEME_I_UMLAUT + "òóúh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = PatternHelper.pattern("^i(?=[aeiouàèéíòóú])");
 	private static final Pattern PATTERN_I_INSIDE_INTO_J = PatternHelper.pattern("([aeiouàèéíòóú])i(?=[aeiouàèéíòóú])");
 	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
@@ -34,7 +35,8 @@ public class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = PatternHelper.pattern("^ƚ(?=[^ʼ'aeiouàèéíòóújw])");
 	private static final Pattern PATTERN_LH_INSIDE_INTO_L = PatternHelper.pattern("([^ʼ'aeiouàèéíòóú–-])ƚ(?=[aeiouàèéíòóújw])|([aeiouàèéíòóú])ƚ(?=[^aeiouàèéíòóújw])");
 	private static final Pattern PATTERN_X_INTO_S = PatternHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
-	private static final Pattern PATTERN_S_INTO_X = PatternHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH + "ɉsvrlŧ]))");
+	private static final Pattern PATTERN_S_INTO_X = PatternHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
+		+ "ɉsvrlŧ]))");
 
 	private static final Pattern PATTERN_MORPHOLOGICAL = PatternHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
 
@@ -96,7 +98,7 @@ public class OrthographyVEC extends Orthography{
 		word = PatternHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
 		word = PatternHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.PHONEME_JJH);
 		boolean iInsideIntoJFalsePositive = false;
-		for(Pattern p : PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES)
+		for(final Pattern p : PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES)
 			if(PatternHelper.find(word, p)){
 				iInsideIntoJFalsePositive = true;
 				break;
@@ -107,11 +109,11 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public boolean[] getSyllabationErrors(List<String> syllabes){
-		int size = syllabes.size();
-		boolean[] errors = new boolean[size];
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
+		final int size = syllabes.size();
+		final boolean[] errors = new boolean[size];
 		for(int i = 0; i < size; i ++){
-			String syllabe = syllabes.get(i);
+			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE) && !syllabe.contains(HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK)
 				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
 		}
@@ -119,9 +121,9 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public List<Integer> getStressIndexFromLast(List<String> syllabes){
-		List<Integer> indexes = new ArrayList<>();
-		int size = syllabes.size() - 1;
+	public List<Integer> getStressIndexFromLast(final List<String> syllabes){
+		final List<Integer> indexes = new ArrayList<>();
+		final int size = syllabes.size() - 1;
 		for(int i = 0; i <= size; i ++)
 			if(hasStressedGrapheme(syllabes.get(size - i)))
 				indexes.add(i);
@@ -129,17 +131,17 @@ public class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public int countGraphemes(String word){
+	public int countGraphemes(final String word){
 		return WordVEC.countGraphemes(word);
 	}
 
 	@Override
-	public String markDefaultStress(String word){
+	public String markDefaultStress(final String word){
 		return WordVEC.markDefaultStress(word);
 	}
 
 	@Override
-	public boolean hasStressedGrapheme(String word){
+	public boolean hasStressedGrapheme(final String word){
 		return WordVEC.hasStressedGrapheme(word);
 	}
 

@@ -14,7 +14,7 @@ public class AffixCondition{
 	private final String[] condition;
 
 
-	public AffixCondition(String condition, AffixEntry.Type affixType){
+	public AffixCondition(final String condition, final AffixEntry.Type affixType){
 		this.condition = PatternHelper.split(condition, PATTERN_CONDITION_SPLITTER);
 
 		if(affixType == AffixEntry.Type.SUFFIX)
@@ -22,10 +22,10 @@ public class AffixCondition{
 			Collections.reverse(Arrays.asList(this.condition));
 	}
 
-	public boolean match(String word, AffixEntry.Type type){
+	public boolean match(final String word, final AffixEntry.Type type){
 		boolean match = false;
 
-		int size = word.length();
+		final int size = word.length();
 		//if the length of the condition is greater than the length of the word then the rule cannot be applied
 		if(condition.length <= size){
 			match = true;
@@ -37,10 +37,10 @@ public class AffixCondition{
 					break;
 				}
 
-				char firstChar = conditionPart.charAt(0);
+				final char firstChar = conditionPart.charAt(0);
 				if(firstChar != '.'){
 					if(firstChar == '['){
-						boolean negatedGroup = (conditionPart.charAt(1) == '^');
+						final boolean negatedGroup = (conditionPart.charAt(1) == '^');
 						//extract inside of group
 						conditionPart = conditionPart.substring(1 + (negatedGroup? 1: 0), conditionPart.length() - 1);
 						match = (negatedGroup ^ conditionPart.indexOf(word.charAt(idxWord)) >= 0);

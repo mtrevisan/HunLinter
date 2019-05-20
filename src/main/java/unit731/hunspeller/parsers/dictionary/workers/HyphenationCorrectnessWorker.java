@@ -29,25 +29,25 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
 
 
-	public HyphenationCorrectnessWorker(String language, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator)
-			throws IOException{
+	public HyphenationCorrectnessWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
+			final WordGenerator wordGenerator) throws IOException{
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(hyphenator);
 
-		RulesLoader rulesLoader = new RulesLoader(language, null);
+		final RulesLoader rulesLoader = new RulesLoader(language, null);
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			productions.forEach(production -> {
-				String word = production.getWord();
+				final String word = production.getWord();
 				if(word.length() > 1 && !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
-					Hyphenation hyphenation = hyphenator.hyphenate(word);
+					final Hyphenation hyphenation = hyphenator.hyphenate(word);
 					if(hyphenation.hasErrors()){
-						String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
+						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
 							hyphenation.formatHyphenation(new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), row});
-						StringBuffer sb = new StringBuffer(message);
+						final StringBuffer sb = new StringBuffer(message);
 						if(production.hasProductionRules())
 							sb.append(" (via ").append(production.getRulesSequence()).append(")");
 						sb.append(", line ").append(row);
@@ -56,7 +56,7 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 				}
 			});
 		};
-		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 

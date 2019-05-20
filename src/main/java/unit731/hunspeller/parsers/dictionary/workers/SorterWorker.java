@@ -35,7 +35,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	private final Comparator<String> comparator;
 
 
-	public SorterWorker(Backbone backbone, int lineIndex){
+	public SorterWorker(final Backbone backbone, final int lineIndex){
 		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(backbone.getDicParser());
 
@@ -58,12 +58,12 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 			setProgress(20);
 
-			Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
+			final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 			if(boundary != null){
 				backbone.stopFileListener();
 
 				//split dictionary isolating the sorted section
-				List<File> chunks = splitDictionary(boundary);
+				final List<File> chunks = splitDictionary(boundary);
 
 				setProgress(40);
 
@@ -90,13 +90,13 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 
 			setProgress(100);
 		}
-		catch(ClosedChannelException e){
+		catch(final ClosedChannelException e){
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			cancel(true);
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			String message = ExceptionHelper.getMessage(e);
 			LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
@@ -107,11 +107,11 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		return null;
 	}
 
-	private List<File> splitDictionary(Map.Entry<Integer, Integer> boundary) throws IOException{
+	private List<File> splitDictionary(final Map.Entry<Integer, Integer> boundary) throws IOException{
 		int index = 0;
-		List<File> files = new ArrayList<>();
+		final List<File> files = new ArrayList<>();
 		File file = File.createTempFile("split", ".out");
-		try(BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
+		try(final BufferedReader br = Files.newBufferedReader(dicParser.getDicFile().toPath(), dicParser.getCharset())){
 			BufferedWriter writer = Files.newBufferedWriter(file.toPath(), dicParser.getCharset());
 			String line;
 			while((line = br.readLine()) != null){
@@ -137,10 +137,10 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 		return files;
 	}
 
-	private void sortSection(List<File> chunks) throws IOException{
+	private void sortSection(final List<File> chunks) throws IOException{
 		//sort the chosen section
-		File sortSection = chunks.get(1);
-		ExternalSorterOptions options = ExternalSorterOptions.builder()
+		final File sortSection = chunks.get(1);
+		final ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(dicParser.getCharset())
 			.comparator(comparator)
 			.useZip(true)

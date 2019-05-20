@@ -18,6 +18,6 @@ public interface Decomposer<T>{
 	 * @param sink	The sink to which the object is decomposed
 	 * @param charset	The charset to be used
 	 */
-	void decompose(T object, ByteSink sink, Charset charset);
+	void decompose(final T object, final ByteSink sink, final Charset charset);
 
 }

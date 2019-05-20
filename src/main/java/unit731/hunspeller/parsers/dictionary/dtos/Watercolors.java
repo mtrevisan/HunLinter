@@ -23,7 +23,7 @@ public enum Watercolors{
 	private final Color color;
 
 
-	Watercolors(String hexColor){
+	Watercolors(final String hexColor){
 		color = Color.decode(hexColor);
 	}
 

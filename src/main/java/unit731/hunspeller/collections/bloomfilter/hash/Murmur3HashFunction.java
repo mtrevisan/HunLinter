@@ -28,12 +28,12 @@ public class Murmur3HashFunction implements HashFunction{
 	}
 
 	@Override
-	public long hash(byte[] bytes){
+	public long hash(final byte[] bytes){
 		return hash_x86_32(bytes, 0, SEED);
 	}
 
 	@Override
-	public long[] hashMultiple(byte[] bytes){
+	public long[] hashMultiple(final byte[] bytes){
 		return hash_x64_128(bytes, 0, SEED);
 	}
 
@@ -46,7 +46,7 @@ public class Murmur3HashFunction implements HashFunction{
 	 * @return	The computed hash value
 	 */
 	@SuppressWarnings("fallthrough")
-	private static long hash_x86_32(final byte[] data, int length, long seed){
+	private static long hash_x86_32(final byte[] data, final int length, final long seed){
 		final int nblocks = length >> 2;
 		long hash = seed;
 
@@ -73,7 +73,7 @@ public class Murmur3HashFunction implements HashFunction{
 		//----------
 		// tail
 		//advance offset to the unprocessed tail of the data
-		int offset = (nblocks << 2);
+		final int offset = (nblocks << 2);
 		long k1 = 0;
 		switch(length & 3){
 			case 3:
@@ -99,7 +99,7 @@ public class Murmur3HashFunction implements HashFunction{
 	}
 
 	/** Rotate left (for 32 bits) */
-	private static long rotl32(long original, int shift){
+	private static long rotl32(final long original, final int shift){
 		return ((original << shift) & UINT_MASK) | ((original >>> (32 - shift)) & UINT_MASK);
 	}
 	
@@ -125,7 +125,7 @@ public class Murmur3HashFunction implements HashFunction{
 		long h1 = seed;
 		long h2 = seed;
 
-		ByteBuffer buffer = ByteBuffer.wrap(data);
+		final ByteBuffer buffer = ByteBuffer.wrap(data);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 		while(buffer.remaining() >= 16){
 			long k1 = buffer.getLong();

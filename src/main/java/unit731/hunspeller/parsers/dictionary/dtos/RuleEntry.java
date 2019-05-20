@@ -19,7 +19,7 @@ public class RuleEntry{
 //private final List<AffixEntry> suffixEntries;
 
 
-	public RuleEntry(boolean suffix, char combineable, List<AffixEntry> entries){
+	public RuleEntry(final boolean suffix, final char combineable, final List<AffixEntry> entries){
 		Objects.requireNonNull(combineable);
 		Objects.requireNonNull(entries);
 

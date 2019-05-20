@@ -36,7 +36,7 @@ public class Frequency<T>{
 	 *
 	 * @param value	the value to add.
 	 */
-	public void addValue(T value){
+	public void addValue(final T value){
 		incrementValue(value, 1);
 	}
 
@@ -49,7 +49,7 @@ public class Frequency<T>{
 	 * @param value	the value to add.
 	 * @param increment	the amount by which the value should be incremented
 	 */
-	public void incrementValue(T value, long increment){
+	public void incrementValue(final T value, final long increment){
 		frequencies.put(value, getCount(value) + increment);
 	}
 
@@ -79,7 +79,7 @@ public class Frequency<T>{
 	 * @return	a list containing the value(s) which appear most often.
 	 */
 	public List<T> getMode(){
-		long mostPopular = calculateMostPopularFrequency();
+		final long mostPopular = calculateMostPopularFrequency();
 
 		return getMode(mostPopular);
 	}
@@ -87,22 +87,22 @@ public class Frequency<T>{
 	private long calculateMostPopularFrequency(){
 		//get the max count first, so we avoid having to recreate the list each time
 		long mostPopular = 0l;
-		for(Long frequency : frequencies.values())
+		for(final Long frequency : frequencies.values())
 			if(frequency > mostPopular)
 				mostPopular = frequency;
 		return mostPopular;
 	}
 
-	private List<T> getMode(long mostPopular){
-		List<T> modeList = new ArrayList<>();
-		for(Map.Entry<T, Long> ent : frequencies.entrySet())
+	private List<T> getMode(final long mostPopular){
+		final List<T> modeList = new ArrayList<>();
+		for(final Map.Entry<T, Long> ent : frequencies.entrySet())
 			if(ent.getValue() == mostPopular)
 				modeList.add(ent.getKey());
 		return modeList;
 	}
 
-	public List<T> getMostCommonValues(int limit){
-		List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
+	public List<T> getMostCommonValues(final int limit){
+		final List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
 		Collections.sort(sortedEntries, (e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
 		return sortedEntries.stream()
@@ -118,7 +118,7 @@ public class Frequency<T>{
 	 * @param value	the value to lookup.
 	 * @return	the frequency of the given value.
 	 */
-	public long getCount(T value){
+	public long getCount(final T value){
 		return frequencies.getOrDefault(value, 0l);
 	}
 
@@ -131,8 +131,8 @@ public class Frequency<T>{
 	 * @param value	the value to lookup
 	 * @return	the proportion of values equal to the given value
 	 */
-	public double getPercentOf(T value){
-		long sumFreq = getSumOfFrequencies();
+	public double getPercentOf(final T value){
+		final long sumFreq = getSumOfFrequencies();
 		return (sumFreq > 0? (double)getCount(value) / sumFreq: Double.NaN);
 	}
 
@@ -145,9 +145,9 @@ public class Frequency<T>{
 		return SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
 	}
 
-	private long sumOfFrequencies(int hashCode){
+	private long sumOfFrequencies(final int hashCode){
 		long result = 0l;
-		Iterator<Long> iterator = frequencies.values().iterator();
+		final Iterator<Long> iterator = frequencies.values().iterator();
 		while(iterator.hasNext())
 			result += iterator.next();
 		return result;
@@ -160,10 +160,10 @@ public class Frequency<T>{
 	 */
 	@Override
 	public String toString(){
-		StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
-		Iterator<T> iter = frequencies.keySet().iterator();
+		final StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
+		final Iterator<T> iter = frequencies.keySet().iterator();
 		while(iter.hasNext()){
-			T value = iter.next();
+			final T value = iter.next();
 			sb.append(value)
 				.append('\t')
 				.append(getCount(value))

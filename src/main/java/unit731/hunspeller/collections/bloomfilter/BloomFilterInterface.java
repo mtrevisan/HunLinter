@@ -45,7 +45,7 @@ public interface BloomFilterInterface<T>{
 	 * @param value	The object to be added to the bloom filter
 	 * @return <code>true</code> if the value was added to the bloom filter, <code>false</code> otherwise
 	 */
-	boolean add(T value);
+	boolean add(final T value);
 
 	/**
 	 * Check if the value object is present in the bloom filter or not by decomposing it using the given/default decomposer
@@ -53,7 +53,7 @@ public interface BloomFilterInterface<T>{
 	 * @param value	The object to be tested for existence in bloom filter
 	 * @return <code>false</code> if the value is definitely (100% surety) not contained in the bloom filter, <code>true</code> otherwise.
 	 */
-	boolean contains(T value);
+	boolean contains(final T value);
 
 	/**
 	 * Get the number of added elements.
@@ -95,7 +95,7 @@ public interface BloomFilterInterface<T>{
 	 * @param insertedElements	The number of elements inserted into the filter
 	 * @return the approximated false positive rate
 	 */
-	double getTrueFalsePositiveProbability(int insertedElements);
+	double getTrueFalsePositiveProbability(final int insertedElements);
 
 	/** Clear the Bloom filter. */
 	void clear();

@@ -82,7 +82,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	private final BloomFilterParameters dictionaryBaseData;
 
 
-	public DuplicatesWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator, File outputFile){
+	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator, final File outputFile){
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
@@ -104,9 +104,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			watch = TimeWatch.start();
 
-			BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
+			final BloomFilterInterface<String> duplicatesBloomFilter = collectDuplicates();
 
-			List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
+			final List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
 
 			writeDuplicates(duplicates);
 
@@ -118,16 +118,16 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				try{
 					FileHelper.openFileWithChoosenEditor(outputFile);
 				}
-				catch(IOException | InterruptedException e){
+				catch(final IOException | InterruptedException e){
 					LOGGER.warn("Exception while opening the resulting file", e);
 				}
 			}
 		}
-		catch(Exception t){
+		catch(final Exception t){
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{
-				String message = ExceptionHelper.getMessage(t);
+				final String message = ExceptionHelper.getMessage(t);
 				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
 			}
 
@@ -140,14 +140,14 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private BloomFilterInterface<String> collectDuplicates() throws IOException{
-		BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
-		BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
+		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
+		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(),
 			DuplicatesDictionaryBaseData.getInstance());
 
 		setProgress(0);
-		File dicFile = dicParser.getDicFile();
-		Charset charset = getCharset();
-		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset())){
+		final File dicFile = dicParser.getDicFile();
+		final Charset charset = getCharset();
+		try(final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset())){
 			String line = extractLine(br);
 
 			long readSoFar = line.getBytes(charset).length + 2;
@@ -156,21 +156,21 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 				throw new IllegalArgumentException("Dictionary file malformed, the first line is not a number");
 
 			int lineIndex = 1;
-			long totalSize = dicFile.length();
+			final long totalSize = dicFile.length();
 			while((line = br.readLine()) != null){
 				lineIndex ++;
 				readSoFar += line.getBytes(charset).length + 2;
 				line = DictionaryParser.cleanLine(line);
 				if(!line.isEmpty()){
 					try{
-						List<Production> productions = wordGenerator.applyAffixRules(line);
+						final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 						productions.stream()
 							.map(production -> production.toStringWithPartOfSpeechFields())
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
-					catch(IllegalArgumentException e){
+					catch(final IllegalArgumentException e){
 						LOGGER.error(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 					}
 				}
@@ -185,9 +185,9 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 		setProgress(100);
 
-		int totalProductions = bloomFilter.getAddedElements();
-		double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
-		int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
+		final int totalProductions = bloomFilter.getAddedElements();
+		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
+		final int falsePositiveCount = (int)Math.ceil(totalProductions * falsePositiveProbability);
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
 		LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
@@ -196,44 +196,44 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	private String extractLine(final LineNumberReader br) throws EOFException, IOException{
-		String line = br.readLine();
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
 
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private List<Duplicate> extractDuplicates(BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
-		List<Duplicate> result = new ArrayList<>();
+	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter) throws IOException{
+		final List<Duplicate> result = new ArrayList<>();
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Extracting duplicates (pass 2/3)");
 			setProgress(0);
 
-			File dicFile = dicParser.getDicFile();
-			Charset charset = getCharset();
-			try(LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
+			final File dicFile = dicParser.getDicFile();
+			final Charset charset = getCharset();
+			try(final LineNumberReader br = new LineNumberReader(Files.newBufferedReader(dicFile.toPath(), dicParser.getCharset()))){
 				String line = br.readLine();
 
 				long readSoFar = line.getBytes(charset).length + 2;
 
 				int lineIndex = 1;
-				long totalSize = dicFile.length();
+				final long totalSize = dicFile.length();
 				while((line = br.readLine()) != null){
 					lineIndex ++;
 					readSoFar += line.getBytes(charset).length + 2;
 					line = DictionaryParser.cleanLine(line);
 					if(!line.isEmpty()){
 						try{
-							List<Production> productions = wordGenerator.applyAffixRules(line);
-							String word = productions.get(0).getWord();
-							for(Production production : productions){
-								String text = production.toStringWithPartOfSpeechFields();
+							final List<Production> productions = wordGenerator.applyAffixRules(line);
+							final String word = productions.get(0).getWord();
+							for(final Production production : productions){
+								final String text = production.toStringWithPartOfSpeechFields();
 								if(duplicatesBloomFilter.contains(text))
 									result.add(new Duplicate(production, word, lineIndex));
 							}
 						}
-						catch(IllegalArgumentException e){
+						catch(final IllegalArgumentException e){
 							LOGGER.warn(Backbone.MARKER_APPLICATION, e.getMessage());
 						}
 					}
@@ -243,8 +243,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 			setProgress(100);
 
-			int totalDuplicates = duplicatesBloomFilter.getAddedElements();
-			double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
+			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
+			final double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
 			LOGGER.info(Backbone.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
@@ -259,17 +259,17 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		return result;
 	}
 
-	private void writeDuplicates(List<Duplicate> duplicates) throws IOException{
-		int totalSize = duplicates.size();
+	private void writeDuplicates(final List<Duplicate> duplicates) throws IOException{
+		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Write results to file (pass 3/3)");
 			setProgress(0);
 
 			int writtenSoFar = 0;
-			List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
+			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			setProgress(getProgress(1., totalSize + 1));
-			try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
-				for(List<Duplicate> entries : mergedDuplicates){
+			try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), dicParser.getCharset())){
+				for(final List<Duplicate> entries : mergedDuplicates){
 					writer.write(entries.get(0).getProduction().toStringWithPartOfSpeechFields());
 					writer.write(": ");
 					writer.write(entries.stream()
@@ -290,15 +290,15 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		}
 	}
 
-	private int getProgress(double index, double total){
+	private int getProgress(final double index, final double total){
 		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 
-	private List<List<Duplicate>> mergeDuplicates(List<Duplicate> duplicates){
-		Map<String, List<Duplicate>> dupls = duplicates.stream()
+	private List<List<Duplicate>> mergeDuplicates(final List<Duplicate> duplicates){
+		final Map<String, List<Duplicate>> dupls = duplicates.stream()
 			.collect(Collectors.toMap(duplicate -> duplicate.getProduction().toStringWithPartOfSpeechFields(),
 				duplicate -> {
-					List<Duplicate> list = new ArrayList<>();
+					final List<Duplicate> list = new ArrayList<>();
 					list.add(duplicate);
 					return list;
 				},
@@ -307,7 +307,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 					return oldValue;
 				}));
 
-		List<List<Duplicate>> result = new ArrayList<>(dupls.values());
+		final List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
 			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
 		return result;

@@ -15,7 +15,7 @@ public class JavaBitArray implements BitArray{
 	 *
 	 * @param bits the number of bits this instance can hold
 	 */
-	public JavaBitArray(long bits){
+	public JavaBitArray(final long bits){
 		if(bits <= 0)
 			throw new IllegalArgumentException("Number of bits must be strictly positive");
 
@@ -23,13 +23,13 @@ public class JavaBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean get(int index){
+	public boolean get(final int index){
 		return ((data[index >> 6] & (1l << index)) != 0l);
 	}
 
 	/** Returns true if the bit changed value. */
 	@Override
-	public boolean set(int index){
+	public boolean set(final int index){
 		if(!get(index)){
 			data[index >> 6] |= (1l << index);
 			return true;
@@ -38,7 +38,7 @@ public class JavaBitArray implements BitArray{
 	}
 
 	@Override
-	public void clear(int index){
+	public void clear(final int index){
 		if(get(index))
 			data[index >> 6] &= ~(1l << index);
 	}

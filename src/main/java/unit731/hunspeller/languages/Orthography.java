@@ -22,16 +22,16 @@ public class Orthography{
 		return SingletonHelper.INSTANCE;
 	}
 
-	public String correctOrthography(String word){
+	public String correctOrthography(final String word){
 		//apply stress
 		return correctApostrophes(word);
 	}
 
-	protected String correctApostrophes(String word){
+	protected String correctApostrophes(final String word){
 		return PatternHelper.replaceAll(word, PATTERN_APOSTROPHE, HyphenationParser.APOSTROPHE);
 	}
 
-	public boolean[] getSyllabationErrors(List<String> syllabes){
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
 		return new boolean[syllabes.size()];
 	}
 
@@ -39,19 +39,19 @@ public class Orthography{
 	 * @param syllabes	The list of syllabes
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
-	public List<Integer> getStressIndexFromLast(List<String> syllabes){
+	public List<Integer> getStressIndexFromLast(final List<String> syllabes){
 		return Collections.<Integer>emptyList();
 	}
 
-	public int countGraphemes(String word){
+	public int countGraphemes(final String word){
 		return word.length();
 	}
 
-	public String markDefaultStress(String word){
+	public String markDefaultStress(final String word){
 		return word;
 	}
 
-	public boolean hasStressedGrapheme(String word){
+	public boolean hasStressedGrapheme(final String word){
 		return false;
 	}
 

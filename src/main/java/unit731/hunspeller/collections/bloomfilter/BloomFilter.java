@@ -68,7 +68,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param charset							The {@link Charset} to be used
 	 * @param parameters						The parameters object
 	 */
-	public BloomFilter(Charset charset, BloomFilterParameters parameters){
+	public BloomFilter(final Charset charset, final BloomFilterParameters parameters){
 		this(charset, parameters, null, null);
 	}
 
@@ -79,7 +79,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param parameters						The parameters object
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 */
-	public BloomFilter(Charset charset, BloomFilterParameters parameters, Decomposer<T> decomposer){
+	public BloomFilter(final Charset charset, final BloomFilterParameters parameters, final Decomposer<T> decomposer){
 		this(charset, parameters, decomposer, null);
 	}
 
@@ -91,7 +91,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link HASHER_DEFAULT} will be used
 	 */
-	public BloomFilter(Charset charset, BloomFilterParameters parameters, Decomposer<T> decomposer, HashFunction hasher){
+	public BloomFilter(final Charset charset, final BloomFilterParameters parameters, final Decomposer<T> decomposer, final HashFunction hasher){
 		this(charset, parameters.getExpectedNumberOfElements(), parameters.getFalsePositiveProbability(), parameters.getBitArrayType(),
 			decomposer, hasher);
 	}
@@ -106,8 +106,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
 	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link HASHER_DEFAULT} will be used
 	 */
-	protected BloomFilter(Charset charset, int expectedNumberOfElements, double falsePositiveProbability, BitArrayBuilder.Type bitArrayType,
-			Decomposer<T> decomposer, HashFunction hasher){
+	protected BloomFilter(final Charset charset, final int expectedNumberOfElements, final double falsePositiveProbability,
+			final BitArrayBuilder.Type bitArrayType, final Decomposer<T> decomposer, final HashFunction hasher){
 		Objects.nonNull(charset);
 		Objects.nonNull(bitArrayType);
 		if(expectedNumberOfElements <= 0)
@@ -147,7 +147,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param falsePositiveProbability	The maximum false positive rate expected, or <code>p</code>
 	 * @return the optimal size in bits for the filter, or <code>m</code>
 	 */
-	public static int optimalBitSize(double expectedNumberOfElements, double falsePositiveProbability){
+	public static int optimalBitSize(final double expectedNumberOfElements, final double falsePositiveProbability){
 		return (int)Math.round(-expectedNumberOfElements * Math.log(falsePositiveProbability) / LN2_SQUARE);
 	}
 
@@ -157,7 +157,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @return the optimal number of hash functions to be used also known as <code>k</code>
 	 */
-	public static int optimalNumberOfHashFunctions(double falsePositiveProbability){
+	public static int optimalNumberOfHashFunctions(final double falsePositiveProbability){
 		return Math.max(1, (int)Math.round(-Math.log(falsePositiveProbability) / LN2));
 	}
 
@@ -168,8 +168,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter
 	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
-	public synchronized boolean add(byte[] bytes){
-		boolean bitsChanged = calculateIndexes(bytes);
+	public synchronized boolean add(final byte[] bytes){
+		final boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;
 		return bitsChanged;
@@ -181,19 +181,19 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private synchronized boolean calculateIndexes(byte[] bytes){
+	private synchronized boolean calculateIndexes(final byte[] bytes){
 		boolean bitsChanged = false;
-		long hash = getLongHash64(bytes);
-		int lowHash = (int)hash;
-		int highHash = (int)(hash >>> 32);
-		int size = bitArray.size();
+		final long hash = getLongHash64(bytes);
+		final int lowHash = (int)hash;
+		final int highHash = (int)(hash >>> 32);
+		final int size = bitArray.size();
 		for(int i = 1; i <= hashFunctions; i ++){
 			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 
-			int index = nextHash % size;
+			final int index = nextHash % size;
 			bitsChanged |= bitArray.set(index);
 		}
 		return bitsChanged;
@@ -205,18 +205,18 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public synchronized boolean contains(byte[] bytes){
-		long hash = getLongHash64(bytes);
-		int lowHash = (int)hash;
-		int highHash = (int)(hash >>> 32);
-		int size = bitArray.size();
+	public synchronized boolean contains(final byte[] bytes){
+		final long hash = getLongHash64(bytes);
+		final int lowHash = (int)hash;
+		final int highHash = (int)(hash >>> 32);
+		final int size = bitArray.size();
 		for(int i = 1; i <= hashFunctions; i ++){
 			int nextHash = lowHash + i * highHash;
 			//hashcode should be positive, flip all the bits if it's negative
 			if(nextHash < 0)
 				nextHash = ~nextHash;
 
-			int index = nextHash % size;
+			final int index = nextHash % size;
 			if(!bitArray.get(index))
 				return false;
 		}
@@ -231,7 +231,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @return the 64-bit hash
 	 * @throws NullPointerException	if the byte array is <code>null</code>
 	 */
-	private long getLongHash64(byte[] bytes){
+	private long getLongHash64(final byte[] bytes){
 		Objects.requireNonNull(bytes, "Bytes to add to bloom filter cannot be null");
 
 		return (hasher.isSingleValued()? hasher.hash(bytes): hasher.hashMultiple(bytes)[0]);
@@ -246,8 +246,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param value	The value to be decomposed
 	 * @return the decomposed byte array
 	 */
-	private byte[] decomposeValue(T value){
-		ByteSink sink = new ByteSink();
+	private byte[] decomposeValue(final T value){
+		final ByteSink sink = new ByteSink();
 		if(decomposer != null)
 			decomposer.decompose(value, sink, charset);
 		else
@@ -257,12 +257,12 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	//Overridden helper functions follow
 	@Override
-	public boolean add(T value){
+	public boolean add(final T value){
 		return (value != null && add(decomposeValue(value)));
 	}
 
 	@Override
-	public boolean contains(T value){
+	public boolean contains(final T value){
 		return (value != null && contains(value.toString().getBytes(charset)));
 	}
 
@@ -282,7 +282,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(int insertedElements){
+	public double getTrueFalsePositiveProbability(final int insertedElements){
 		//(1 - e^(-k * n / m)) ^ k
 		return Math.pow((1 - Math.exp(-hashFunctions * (double)insertedElements / bitsRequired)), hashFunctions);
 	}
@@ -299,7 +299,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		try{
 			bitArray.close();
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			LOGGER.error("Error closing the Bloom filter", e);
 		}
 	}

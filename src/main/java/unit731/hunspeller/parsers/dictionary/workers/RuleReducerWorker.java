@@ -205,7 +205,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				for(final String rule : rules)
 					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
 			}
-			catch(Exception e){
+			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 
 				e.printStackTrace();

@@ -16,28 +16,29 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Dictionary correctness checking";
 
 
-	public DictionaryCorrectnessWorker(DictionaryParser dicParser, DictionaryCorrectnessChecker checker, WordGenerator wordGenerator){
+	public DictionaryCorrectnessWorker(final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
+			final WordGenerator wordGenerator){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(checker);
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			for(Production production : productions){
+			for(final Production production : productions){
 				try{
 					checker.checkProduction(production);
 				}
-				catch(Exception e){
+				catch(final Exception e){
 					throw wrapException(e, production);
 				}
 			}
 		};
-		WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private IllegalArgumentException wrapException(Exception e, Production production){
-		StringBuffer sb = new StringBuffer(e.getMessage());
+	private IllegalArgumentException wrapException(final Exception e, final Production production){
+		final StringBuffer sb = new StringBuffer(e.getMessage());
 		if(production.hasProductionRules())
 			sb.append(" (via ").append(production.getRulesSequence()).append(")");
 		return new IllegalArgumentException(sb.toString());

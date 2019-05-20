@@ -18,7 +18,7 @@ public class BitArrayBuilder{
 	private BitArrayBuilder(){}
 
 	@SuppressWarnings("fallthrough")
-	public static BitArray getBitArray(Type type, int bits){
+	public static BitArray getBitArray(final Type type, final int bits){
 		Objects.requireNonNull(type);
 
 		BitArray ba = null;
@@ -29,11 +29,11 @@ public class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					File file = File.createTempFile("hunspeller-duplications-bitarray", ".bits");
+					final File file = File.createTempFile("hunspeller-duplications-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}
-				catch(IOException e){
+				catch(final IOException e){
 					ba = new JavaBitArray(bits);
 
 					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);

@@ -26,37 +26,37 @@ public class WordlistWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Wordlist";
 
 
-	public WordlistWorker(DictionaryParser dicParser, WordGenerator wordGenerator, boolean plainWords, File outputFile){
+	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final boolean plainWords, final File outputFile){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(outputFile);
 
 
-		Function<Production, String> toString = (plainWords? Production::getWord: Production::toString);
-		BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line.getValue());
+		final Function<Production, String> toString = (plainWords? Production::getWord: Production::toString);
+		final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor = (writer, line) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line.getValue());
 
 			try{
-				for(Production production : productions){
+				for(final Production production : productions){
 					writer.write(toString.apply(production));
 					writer.newLine();
 				}
 			}
-			catch(IOException e){
+			catch(final IOException e){
 				throw new IllegalArgumentException(e);
 			}
 		};
-		Runnable completed = () -> {
+		final Runnable completed = () -> {
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
 			try{
 				FileHelper.openFileWithChoosenEditor(outputFile);
 			}
-			catch(IOException | InterruptedException e){
+			catch(final IOException | InterruptedException e){
 				LOGGER.warn("Exception while opening the resulting file", e);
 			}
 		};
-		WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createWriteWorker(data, lineProcessor, outputFile);
 	}

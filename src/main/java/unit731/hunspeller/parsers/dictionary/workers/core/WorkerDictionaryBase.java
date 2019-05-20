@@ -14,15 +14,16 @@ public class WorkerDictionaryBase{
 	private WorkerDictionary worker;
 
 
-	public final void createReadWorker(WorkerData workerData, BiConsumer<String, Integer> lineProcessor){
+	public final void createReadWorker(final WorkerData workerData, final BiConsumer<String, Integer> lineProcessor){
 		worker = WorkerDictionary.createReadWorker(workerData, lineProcessor);
 	}
 
-	public final void createWriteWorker(WorkerData workerData, BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor, File outputFile){
+	public final void createWriteWorker(final WorkerData workerData, final BiConsumer<BufferedWriter, Pair<Integer, String>> lineProcessor,
+			final File outputFile){
 		worker = WorkerDictionary.createWriteWorker(workerData, lineProcessor, outputFile);
 	}
 
-	public void addPropertyChangeListener(PropertyChangeListener listener){
+	public void addPropertyChangeListener(final PropertyChangeListener listener){
 		worker.addPropertyChangeListener(listener);
 	}
 

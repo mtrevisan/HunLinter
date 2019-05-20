@@ -88,29 +88,29 @@ public class WordVEC{
 
 	private WordVEC(){}
 
-	public static int countGraphemes(String word){
+	public static int countGraphemes(final String word){
 		int count = 0;
-		int size = word.length();
+		final int size = word.length();
 		for(int i = 0; i < size; i ++)
 			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, word.charAt(i)) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, word.charAt(i)) >= 0)
 				count ++;
 		return count;
 	}
 
-	public static boolean isApostrophe(char chr){
+	public static boolean isApostrophe(final char chr){
 		return (chr == 'ʼ' || chr == '\'');
 	}
 
-	public static boolean isVowel(char chr){
+	public static boolean isVowel(final char chr){
 		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
 	}
 
-	public static boolean isConsonant(char chr){
+	public static boolean isConsonant(final char chr){
 		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
 	}
 
 	//^[ʼ']?[aeiouàèéíòóú]
-	public static boolean startsWithVowel(String word){
+	public static boolean startsWithVowel(final String word){
 		char chr = word.charAt(0);
 		if(isApostrophe(chr))
 			chr = word.charAt(1);
@@ -118,31 +118,31 @@ public class WordVEC{
 	}
 
 	//[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$
-	public static boolean endsWithVowel(String word){
+	public static boolean endsWithVowel(final String word){
 		int i = word.length();
 		while((-- i) >= 0){
-			char chr = word.charAt(i);
+			final char chr = word.charAt(i);
 			if(!isApostrophe(chr))
 				return isVowel(chr);
 		}
 		return false;
 	}
 
-	public static int getFirstVowelIndex(String word, int index){
-		Matcher m = FIRST_STRESSED_VOWEL.matcher(word.substring(index));
+	public static int getFirstVowelIndex(final String word, final int index){
+		final Matcher m = FIRST_STRESSED_VOWEL.matcher(word.substring(index));
 		return (m.find()? m.start() + index: -1);
 	}
 
-	public static int getLastVowelIndex(String word){
-		Matcher m = LAST_VOWEL.matcher(word);
+	public static int getLastVowelIndex(final String word){
+		final Matcher m = LAST_VOWEL.matcher(word);
 		return (m.find()? m.start(): -1);
 	}
 
 	//[aeiou][^aeiou]*$
-	private static int getLastUnstressedVowelIndex(String word, int idx){
+	private static int getLastUnstressedVowelIndex(final String word, final int idx){
 		int i = (idx >= 0? idx: word.length());
 		while((-- i) >= 0){
-			char chr = word.charAt(i);
+			final char chr = word.charAt(i);
 			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
 				return i;
 		}
@@ -151,11 +151,11 @@ public class WordVEC{
 
 
 	//[àèéíòóú]
-	public static boolean hasStressedGrapheme(String word){
+	public static boolean hasStressedGrapheme(final String word){
 		return (countAccents(word) == 1);
 	}
 
-	public static int countAccents(String word){
+	public static int countAccents(final String word){
 		int count = 0;
 		for(int i = 0; i < word.length(); i ++)
 			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
@@ -163,36 +163,36 @@ public class WordVEC{
 		return count;
 	}
 
-	private static String suppressStress(String word){
+	private static String suppressStress(final String word){
 		return StringUtils.replaceChars(word, VOWELS_STRESSED, VOWELS_UNSTRESSED);
 	}
 
 
-	private static String setAcuteStressAtIndex(String word, int idx){
+	private static String setAcuteStressAtIndex(final String word, final int idx){
 		return word.substring(0, idx) + addStressAcute(word.charAt(idx)) + word.substring(idx + 1);
 	}
 
 	//NOTE: is seems faster the current method (above)
-//	private static String setAcuteStressAtIndex(String word, int idx){
+//	private static String setAcuteStressAtIndex(final String word, final int idx){
 //		return replaceCharAt(word, idx, addStressAcute(word.charAt(idx)));
 //	}
 //
-//	private static String replaceCharAt(String text, int idx, char chr){
-//		StringBuffer sb = new StringBuffer(text);
+//	private static String replaceCharAt(final String text, final int idx, final char chr){
+//		final StringBuffer sb = new StringBuffer(text);
 //		sb.setCharAt(idx, chr);
 //		return sb.toString();
 //	}
 
-	private static char addStressAcute(char chr){
-		String c = String.valueOf(chr);
+	private static char addStressAcute(final char chr){
+		final String c = String.valueOf(chr);
 		return ACUTE_STRESSES.getOrDefault(c, c).charAt(0);
 	}
 
 	public static String markDefaultStress(String word){
 		int idx = getIndexOfStress(word);
 		if(idx < 0){
-			String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
-			int lastChar = getLastUnstressedVowelIndex(phones, -1);
+			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
+			final int lastChar = getLastUnstressedVowelIndex(phones, -1);
 
 			//last vowel if the word ends with consonant, penultimate otherwise, default to the second vowel of a group of two (first one on a monosyllabe)
 			if(endsWithVowel(phones))
@@ -209,14 +209,14 @@ public class WordVEC{
 	}
 
 	public static String unmarkDefaultStress(String word){
-		int idx = getIndexOfStress(word);
+		final int idx = getIndexOfStress(word);
 		//check if the word have a stress and this is not on the last letter (and not followed by a minus sign)
-		int wordSize = word.length();
+		final int wordSize = word.length();
 		if(idx >= 0 && idx < wordSize - 1 && idx + 1 < wordSize && word.charAt(idx + 1) != '-'){
-			String subword = word.substring(idx, idx + 2);
+			final String subword = word.substring(idx, idx + 2);
 //FIXME is there a way to optimize this PatternService.find?
 			if(!GraphemeVEC.isDiphtong(subword) && !GraphemeVEC.isHyatus(subword) && !PatternHelper.find(word, PREVENT_UNMARK_STRESS)){
-				String tmp = suppressStress(word);
+				final String tmp = suppressStress(word);
 				if(!tmp.equals(word) && markDefaultStress(tmp).equals(word))
 					word = tmp;
 			}
@@ -224,7 +224,7 @@ public class WordVEC{
 		return word;
 	}
 
-	private static int getIndexOfStress(String word){
+	private static int getIndexOfStress(final String word){
 		for(int i = 0; i < word.length(); i ++)
 			if(ArrayUtils.contains(VOWELS_STRESSED_ARRAY, word.charAt(i)))
 				return i;

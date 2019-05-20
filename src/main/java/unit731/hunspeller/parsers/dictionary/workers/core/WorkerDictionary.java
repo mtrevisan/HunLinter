@@ -39,21 +39,22 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private final File outputFile;
 
 
-	public static final WorkerDictionary createReadWorker(WorkerData workerData, BiConsumer<String, Integer> readLineProcessor){
+	public static final WorkerDictionary createReadWorker(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor){
 		Objects.requireNonNull(readLineProcessor);
 
 		return new WorkerDictionary(workerData, readLineProcessor, null, null);
 	}
 
-	public static final WorkerDictionary createWriteWorker(WorkerData workerData, BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, File outputFile){
+	public static final WorkerDictionary createWriteWorker(final WorkerData workerData,
+			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
 		Objects.requireNonNull(writeLineProcessor);
 		Objects.requireNonNull(outputFile);
 
 		return new WorkerDictionary(workerData, null, writeLineProcessor, outputFile);
 	}
 
-	private WorkerDictionary(WorkerData workerData, BiConsumer<String, Integer> readLineProcessor,
-			BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, File outputFile){
+	private WorkerDictionary(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor,
+			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
 		Objects.requireNonNull(workerData);
 		workerData.validate();
 
@@ -70,7 +71,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 		watch.reset();
 
-		List<Pair<Integer, String>> lines = readLines();
+		final List<Pair<Integer, String>> lines = readLines();
 
 		if(outputFile == null)
 			readProcess(lines);
@@ -81,10 +82,10 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	private List<Pair<Integer, String>> readLines(){
-		List<Pair<Integer, String>> lines = new ArrayList<>();
-		File dicFile = getDicFile();
-		Charset charset = getCharset();
-		long totalSize = dicFile.length();
+		final List<Pair<Integer, String>> lines = new ArrayList<>();
+		final File dicFile = getDicFile();
+		final Charset charset = getCharset();
+		final long totalSize = dicFile.length();
 		try(LineNumberReader br = FileHelper.createReader(dicFile.toPath(), charset)){
 			String line = extractLine(br);
 			
@@ -103,7 +104,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				setProgress(getProgress(readSoFar, totalSize));
 			}
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			cancelWorker(e);
 		}
 		return lines;
@@ -117,7 +118,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		return DictionaryParser.cleanLine(line);
 	}
 
-	private void readProcess(List<Pair<Integer, String>> lines){
+	private void readProcess(final List<Pair<Integer, String>> lines){
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 			setProgress(0);
@@ -130,11 +131,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
 				LOGGER.warn("Thread interrupted");
 			else{
-				String message = ExceptionHelper.getMessage(e);
+				final String message = ExceptionHelper.getMessage(e);
 				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 			}
 
@@ -144,10 +145,10 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		}
 	}
 
-	private void processLines(List<Pair<Integer, String>> lines){
-		int totalLines = lines.size();
+	private void processLines(final List<Pair<Integer, String>> lines){
+		final int totalLines = lines.size();
 		processingIndex.set(0);
-		Consumer<Pair<Integer, String>> processor = rowLine -> {
+		final Consumer<Pair<Integer, String>> processor = rowLine -> {
 			if(isCancelled())
 				throw new RuntimeInterruptedException();
 
@@ -162,11 +163,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 					setProgress(getProgress(processingIndex.get(), totalLines));
 				}
 			}
-			catch(InterruptedException e){
+			catch(final InterruptedException e){
 				if(!isPreventExceptionRelaunch())
 					throw new RuntimeException(e);
 			}
-			catch(Exception e){
+			catch(final Exception e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 				if(!isPreventExceptionRelaunch())
@@ -182,16 +183,16 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				.forEach(processor);
 	}
 
-	private void writeProcess(List<Pair<Integer, String>> lines){
+	private void writeProcess(final List<Pair<Integer, String>> lines){
 		LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 
 		setProgress(0);
 
 		int writtenSoFar = 0;
-		int totalLines = lines.size();
-		Charset charset = getCharset();
-		try(BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			for(Pair<Integer, String> rowLine : lines){
+		final int totalLines = lines.size();
+		final Charset charset = getCharset();
+		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+			for(final Pair<Integer, String> rowLine : lines){
 				if(isCancelled())
 					throw new RuntimeInterruptedException();
 
@@ -202,7 +203,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 					setProgress(getProgress(writtenSoFar, totalLines));
 				}
-				catch(Exception e){
+				catch(final Exception e){
 					LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 					if(!isPreventExceptionRelaunch())
@@ -217,16 +218,16 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			cancelWorker(e);
 		}
 	}
 
-	private void cancelWorker(Exception e){
+	private void cancelWorker(final Exception e){
 		if(e instanceof ClosedChannelException)
 			LOGGER.warn("Thread interrupted");
 		else if(e != null){
-			String message = ExceptionHelper.getMessage(e);
+			final String message = ExceptionHelper.getMessage(e);
 			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
 		}
 		
@@ -235,7 +236,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		cancel(true);
 	}
 
-	private int getProgress(double index, double total){
+	private int getProgress(final double index, final double total){
 		return Math.min((int)Math.floor((index * 100.) / total), 100);
 	}
 

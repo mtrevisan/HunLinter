@@ -28,36 +28,36 @@ public class WordCountWorker extends WorkerDictionaryBase{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(String language, DictionaryParser dicParser, WordGenerator wordGenerator){
+	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		Objects.requireNonNull(dicParser);
 		Objects.requireNonNull(wordGenerator);
 
-		BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			totalProductions.addAndGet(productions.size());
 			for(Production production : productions)
 				dictionary.add(production.getWord());
 		};
-		Runnable completed = () -> {
+		final Runnable completed = () -> {
 			dictionary.close();
 
-			int totalUniqueProductions = dictionary.getAddedElements();
-			double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-			int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
+			final int totalUniqueProductions = dictionary.getAddedElements();
+			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
+			final int falsePositiveCount = (int)Math.ceil(totalUniqueProductions * falsePositiveProbability);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Total productions: {}", DictionaryParser.COUNTER_FORMATTER.format(totalProductions));
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Total unique productions: {} ± {} ({})",
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueProductions),
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		Runnable cancelled = () -> {
+		final Runnable cancelled = () -> {
 			dictionary.close();
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);
 		createReadWorker(data, lineProcessor);

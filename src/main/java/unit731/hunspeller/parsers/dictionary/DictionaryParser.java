@@ -55,7 +55,7 @@ public class DictionaryParser{
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
-	public DictionaryParser(File dicFile, String language, Charset charset){
+	public DictionaryParser(final File dicFile, final String language, final Charset charset){
 		Objects.requireNonNull(dicFile);
 		Objects.requireNonNull(charset);
 
@@ -82,13 +82,13 @@ public class DictionaryParser{
 	}
 
 	//sorter worker
-	public final Map.Entry<Integer, Integer> getBoundary(int lineIndex){
+	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
 			.filter(e -> lineIndex <= e.getValue())
 			.orElse(null);
 	}
 
-	public final int getBoundaryIndex(int lineIndex){
+	public final int getBoundaryIndex(final int lineIndex){
 		calculateDictionaryBoundaries();
 
 		return searchBoundary(lineIndex)
@@ -96,24 +96,24 @@ public class DictionaryParser{
 			.orElse(-1);
 	}
 
-	public final int getNextBoundaryIndex(int lineIndex){
+	public final int getNextBoundaryIndex(final int lineIndex){
 		return Optional.ofNullable(boundaries.higherEntry(lineIndex))
 			.map(Map.Entry::getKey)
 			.orElse(-1);
 	}
 
-	public final int getPreviousBoundaryIndex(int lineIndex){
+	public final int getPreviousBoundaryIndex(final int lineIndex){
 		return Optional.ofNullable(boundaries.lowerEntry(lineIndex))
 			.map(Map.Entry::getKey)
 			.orElse(-1);
 	}
 
-	public final boolean isInBoundary(int lineIndex){
+	public final boolean isInBoundary(final int lineIndex){
 		return searchBoundary(lineIndex)
 			.isPresent();
 	}
 
-	private Optional<Map.Entry<Integer, Integer>> searchBoundary(int lineIndex){
+	private Optional<Map.Entry<Integer, Integer>> searchBoundary(final int lineIndex){
 		return Optional.ofNullable(boundaries.floorEntry(lineIndex))
 			.filter(e -> lineIndex <= e.getValue());
 	}
@@ -152,14 +152,14 @@ public class DictionaryParser{
 				if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
 					boundaries.put(startSection, lineIndex - 1);
 			}
-			catch(IOException e){
+			catch(final IOException e){
 				LOGGER.error(null, e);
 			}
 		}
 	}
 
 
-	private boolean isComment(String line){
+	private boolean isComment(final String line){
 		return PatternHelper.find(line, PATTERN_COMMENT);
 	}
 

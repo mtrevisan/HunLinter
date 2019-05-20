@@ -104,7 +104,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @param consumer	The consumer called in case of a hit
 	 */
-	private boolean searchInText(String text, BiFunction<int[], Integer, Boolean> consumer){
+	private boolean searchInText(String text, final BiFunction<int[], Integer, Boolean> consumer){
 		Objects.requireNonNull(text);
 
 		boolean found = false;

@@ -16,7 +16,7 @@ import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	WordGeneratorCompoundFlag(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		super(affixData, dicParser, wordGenerator);
 	}
 
@@ -29,7 +29,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundFlag(String[] inputCompounds, int limit, int maxCompounds) throws IllegalArgumentException,
+	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
@@ -37,33 +37,33 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
 			throw new IllegalArgumentException("Max compounds cannot be non-positive");
 
-		boolean forbidDuplications = affixData.isForbidDuplicationsInCompound();
+		final boolean forbidDuplications = affixData.isForbidDuplicationsInCompound();
 
 		loadDictionaryForInclusionTest();
 
 		//extract list of dictionary entries
-		List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
+		final List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 
 		//check if it's possible to compound some words
 		if(inputs.isEmpty())
 			return Collections.<Production>emptyList();
 
-		PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
-		List<int[]> permutations = perm.permutations(limit);
+		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
+		final List<int[]> permutations = perm.permutations(limit);
 
-		List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
 
-	private List<DictionaryEntry> extractCompoundFlags(String[] inputCompounds){
-		int compoundMinimumLength = affixData.getCompoundMinimumLength();
-		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+	private List<DictionaryEntry> extractCompoundFlags(final String[] inputCompounds){
+		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
+		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		List<DictionaryEntry> result = new ArrayList<>();
-		for(String inputCompound : inputCompounds){
-			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final List<DictionaryEntry> result = new ArrayList<>();
+		for(final String inputCompound : inputCompounds){
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyInputConversionTable(affixData);
 
 			//filter input set by minimum length and forbidden flag
@@ -73,26 +73,26 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result;
 	}
 
-	private List<List<List<Production>>> generateCompounds(List<int[]> permutations, List<DictionaryEntry> inputs){
-		List<List<List<Production>>> entries = new ArrayList<>();
-		Map<Integer, List<Production>> dicEntries = new HashMap<>();
-		for(int[] permutation : permutations){
-			List<List<Production>> compound = generateCompound(permutation, dicEntries, inputs);
+	private List<List<List<Production>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+		final List<List<List<Production>>> entries = new ArrayList<>();
+		final Map<Integer, List<Production>> dicEntries = new HashMap<>();
+		for(final int[] permutation : permutations){
+			final List<List<Production>> compound = generateCompound(permutation, dicEntries, inputs);
 			if(compound != null)
 				entries.add(compound);
 		}
 		return entries;
 	}
 
-	private List<List<Production>> generateCompound(int[] permutation, Map<Integer, List<Production>> dicEntries, List<DictionaryEntry> inputs)
-			throws IllegalArgumentException{
-		List<List<Production>> expandedPermutationEntries = new ArrayList<>();
-		for(int index : permutation){
+	private List<List<Production>> generateCompound(final int[] permutation, final Map<Integer, List<Production>> dicEntries,
+			final List<DictionaryEntry> inputs) throws IllegalArgumentException{
+		final List<List<Production>> expandedPermutationEntries = new ArrayList<>();
+		for(final int index : permutation){
 			if(!dicEntries.containsKey(index)){
-				DictionaryEntry input = inputs.get(index);
+				final DictionaryEntry input = inputs.get(index);
 				dicEntries.put(index, applyAffixRules(input, true));
 			}
-			List<Production> de = dicEntries.get(index);
+			final List<Production> de = dicEntries.get(index);
 			if(!de.isEmpty())
 				expandedPermutationEntries.add(de);
 		}

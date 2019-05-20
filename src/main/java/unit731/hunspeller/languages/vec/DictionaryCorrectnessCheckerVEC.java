@@ -5,7 +5,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
@@ -14,7 +13,6 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.services.PatternHelper;
 
@@ -70,7 +68,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String[] pluralFlags;
 
 
-	public DictionaryCorrectnessCheckerVEC(AffixData affixData, HyphenatorInterface hyphenator){
+	public DictionaryCorrectnessCheckerVEC(final AffixData affixData, final HyphenatorInterface hyphenator){
 		super(affixData, hyphenator);
 
 		Objects.requireNonNull(hyphenator);
@@ -82,8 +80,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public void loadRules() throws IOException{
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 
-		String pluralFlagsValue = rulesLoader.readProperty("pluralFlags");
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final String pluralFlagsValue = rulesLoader.readProperty("pluralFlags");
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		pluralFlags = (pluralFlagsValue != null? strategy.parseFlags(pluralFlagsValue): null);
 
 		PATTERN_NON_VANISHING_EL = PatternHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"), Pattern.CASE_INSENSITIVE);
@@ -99,12 +97,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		NORTHERN_PLURAL_EXCEPTION = rulesLoader.readProperty("northernPluralException");
 	}
 
-	private boolean hasPluralFlag(Production production){
+	private boolean hasPluralFlag(final Production production){
 		return (pluralFlags != null && production.hasContinuationFlag(pluralFlags));
 	}
 
 	@Override
-	public void checkProduction(Production production) throws IllegalArgumentException{
+	public void checkProduction(final Production production) throws IllegalArgumentException{
 		super.checkProduction(production);
 
 		stressCheck(production);
@@ -121,15 +119,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		orthographyCheck(production);
 	}
 
-	private void stressCheck(Production production) throws IllegalArgumentException{
-		String derivedWord = production.getWord();
-		String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
+	private void stressCheck(final Production production) throws IllegalArgumentException{
+		final String derivedWord = production.getWord();
+		final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(derivedWord);
 		if(!derivedWord.equals(unmarkedDefaultStressWord))
 			throw new IllegalArgumentException(WORD_WITH_UNNECESSARY_STRESS.format(new Object[]{derivedWord}));
 	}
 
-	private void vanishingElCheck(Production production) throws IllegalArgumentException{
-		String derivedWord = production.getWord();
+	private void vanishingElCheck(final Production production) throws IllegalArgumentException{
+		final String derivedWord = production.getWord();
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 			if(PatternHelper.find(StringUtils.replace(derivedWord, "–", StringUtils.EMPTY), PATTERN_NON_VANISHING_EL))
 				throw new IllegalArgumentException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
@@ -143,19 +141,19 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new IllegalArgumentException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 	}
 
-	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
+	private void incompatibilityCheck(final Production production) throws IllegalArgumentException{
 		if(production.hasContinuationFlag(VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL)
 				&& (production.getContinuationFlagCount() != 2 || !production.hasContinuationFlag(PLURAL_NOUN_MASCULINE_RULE)))
 			throw new IllegalArgumentException(WORD_WITH_RULE_CANNOT_HAVE_RULES_OTHER_THAN.format(new Object[]{
 				VARIANT_TRANSFORMATIONS_END_RULE_VANISHING_EL, PLURAL_NOUN_MASCULINE_RULE}));
 	}
 
-	private void northernPluralCheck(Production production) throws IllegalArgumentException{
+	private void northernPluralCheck(final Production production) throws IllegalArgumentException{
 		if(hasToCheckForNorthernPlural(production)){
-			String word = production.getWord();
-			String rule = getRuleToCheckNorthernPlural(word);
-			boolean canHaveNorthernPlural = canHaveNorthernPlural(production, rule);
-			boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
+			final String word = production.getWord();
+			final String rule = getRuleToCheckNorthernPlural(word);
+			final boolean canHaveNorthernPlural = canHaveNorthernPlural(production, rule);
+			final boolean hasNorthernPluralFlag = production.hasContinuationFlag(rule);
 			if(canHaveNorthernPlural && !hasNorthernPluralFlag)
 				throw new IllegalArgumentException(NORTHERN_PLURAL_MISSING.format(new Object[]{rule}));
 			if(!canHaveNorthernPlural && hasNorthernPluralFlag)
@@ -164,25 +162,25 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
-	private boolean hasToCheckForNorthernPlural(Production production){
+	private boolean hasToCheckForNorthernPlural(final Production production){
 		return (!production.hasPartOfSpeech(POS_ARTICLE) && !production.hasPartOfSpeech(POS_PRONOUN) && !production.hasPartOfSpeech(POS_PROPER_NOUN)
 			&& hyphenator.hyphenate(production.getWord()).countSyllabes() > 1);
 	}
 
-	private String getRuleToCheckNorthernPlural(String word){
-		List<String> subwords = hyphenator.splitIntoCompounds(word);
+	private String getRuleToCheckNorthernPlural(final String word){
+		final List<String> subwords = hyphenator.splitIntoCompounds(word);
 		return (!WordVEC.hasStressedGrapheme(subwords.get(subwords.size() - 1)) || PatternHelper.find(word, PATTERN_NORTHERN_PLURAL)?
 			NORTHERN_PLURAL_RULE: NORTHERN_PLURAL_STRESSED_RULE);
 	}
 
-	private boolean canHaveNorthernPlural(Production production, String rule){
-		String word = production.getWord();
-		boolean hasPluralFlag = hasPluralFlag(production);
+	private boolean canHaveNorthernPlural(final Production production, final String rule){
+		final String word = production.getWord();
+		final boolean hasPluralFlag = hasPluralFlag(production);
 		return (hasPluralFlag && !word.contains(GraphemeVEC.GRAPHEME_L_STROKE)
 			&& !word.endsWith(NORTHERN_PLURAL_EXCEPTION) && affixData.isAffixProductive(word, rule));
 	}
 
-	private void orthographyCheck(Production production) throws IllegalArgumentException{
+	private void orthographyCheck(final Production production) throws IllegalArgumentException{
 		if(hasToCheckForOrthographyAndSyllabation(production)){
 			String word = production.getWord();
 			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleAccentedWords(word)){
@@ -192,32 +190,33 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
-	private boolean hasToCheckForOrthographyAndSyllabation(Production production){
+	private boolean hasToCheckForOrthographyAndSyllabation(final Production production){
 		return ((rulesLoader.isEnableVerbSyllabationCheck() || !production.hasPartOfSpeech(POS_VERB))
 			&& !production.hasPartOfSpeech(POS_NUMERAL_LATIN) && !production.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
 
-	private void orthographyCheck(String word) throws IllegalArgumentException{
-		String correctedDerivedWord = orthography.correctOrthography(word);
+	private void orthographyCheck(final String word) throws IllegalArgumentException{
+		final String correctedDerivedWord = orthography.correctOrthography(word);
 		if(!correctedDerivedWord.equals(word))
 			throw new IllegalArgumentException(WORD_IS_MISSPELLED.format(new Object[]{word, correctedDerivedWord}));
 	}
 
 	@Override
-	protected void checkCompoundProduction(String subword, int subwordIndex, Production production) throws IllegalArgumentException{
+	protected void checkCompoundProduction(final String subword, final int subwordIndex, final Production production)
+			throws IllegalArgumentException{
 		if(subwordIndex == 0)
 			accentCheck(subword, production);
 
 		ciuiCheck(subword, production);
 	}
 
-	private void accentCheck(String subword, Production production) throws IllegalArgumentException{
+	private void accentCheck(final String subword, final Production production) throws IllegalArgumentException{
 		if(!rulesLoader.containsMultipleAccentedWords(subword)){
-			int accents = WordVEC.countAccents(subword);
+			final int accents = WordVEC.countAccents(subword);
 			if(!rulesLoader.isWordCanHaveMultipleAccents() && accents > 1)
 				throw new IllegalArgumentException(WORD_HAS_MULTIPLE_ACCENTS.format(new Object[]{production.getWord()}));
 
-			String appliedRuleFlag = getLastAppliedRule(production);
+			final String appliedRuleFlag = getLastAppliedRule(production);
 			if(appliedRuleFlag != null){
 				//retrieve last applied rule
 				if(accents == 0 && rulesLoader.containsHasToContainAccent(appliedRuleFlag))
@@ -228,38 +227,38 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
-	private String getLastAppliedRule(Production production){
+	private String getLastAppliedRule(final Production production){
 		String appliedRuleFlag = null;
-		List<AffixEntry> appliedRules = production.getAppliedRules();
+		final List<AffixEntry> appliedRules = production.getAppliedRules();
 		if(appliedRules != null)
 			appliedRuleFlag = appliedRules.get(appliedRules.size() - 1)
 				.getFlag();
 		return appliedRuleFlag;
 	}
 
-	private void ciuiCheck(String subword, Production production) throws IllegalArgumentException{
+	private void ciuiCheck(final String subword, final Production production) throws IllegalArgumentException{
 		if(!production.hasPartOfSpeech(POS_NUMERAL_LATIN)){
-			String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
+			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(PatternHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
 				throw new IllegalArgumentException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{production.getWord()}));
 		}
 	}
 
-//	private void variantIncompatibilityCheck(RuleProductionEntry production, Set<MatcherEntry> checks)
+//	private void variantIncompatibilityCheck(final RuleProductionEntry production, final Set<MatcherEntry> checks)
 //			throws IllegalArgumentException{
 //		if(canContainsVanishingEl(production.getWord()))
-//			for(MatcherEntry entry : checks)
+//			for(final MatcherEntry entry : checks)
 //				entry.match(production);
 //	}
 //
 //	//(^[ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
-//	private static boolean canContainsVanishingEl(String word){
+//	private static boolean canContainsVanishingEl(final String word){
 //		boolean result = false;
-//		int size = word.length();
+//		final int size = word.length();
 //		if(size > 1){
 //			int index = (WordVEC.isApostrophe(word.charAt(0))? 1: 0);
 //			if(index + 1 < size){
-//				char chr = word.charAt(index);
+//				final char chr = word.charAt(index);
 //				result = (chr == 'l' && WordVEC.isVowel(word.charAt(index + 1)));
 //				while(!result){
 //					index = WordVEC.getFirstVowelIndex(word, index);
@@ -276,10 +275,10 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //		return result;
 //	}
 
-	private void finalSonorizationCheck(Production production) throws IllegalArgumentException{
+	private void finalSonorizationCheck(final Production production) throws IllegalArgumentException{
 //		if(!production.hasProductionRules()&& !production.isPartOfSpeech(POS_VERB) && !production.isPartOfSpeech(POS_PROPER_NOUN)){
-//			boolean hasFinalSonorizationFlag = production.hasContinuationFlag(FINAL_SONORIZATION_RULE);
-//			boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
+//			final boolean hasFinalSonorizationFlag = production.hasContinuationFlag(FINAL_SONORIZATION_RULE);
+//			final boolean canHaveFinalSonorization = (!production.getWord().toLowerCase(Locale.ROOT).contains(GraphemeVEC.L_STROKE_GRAPHEME) && wordGenerator.isAffixProductive(production.getWord(), FINAL_SONORIZATION_RULE));
 //			if(canHaveFinalSonorization ^ hasFinalSonorizationFlag){
 //				if(canHaveFinalSonorization)
 //					throw new IllegalArgumentException("Final sonorization missing for " + production.getWord() + ", add " + FINAL_SONORIZATION_RULE);
@@ -291,13 +290,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 
 	@Override
-	public boolean isConsonant(char chr){
+	public boolean isConsonant(final char chr){
 		return WordVEC.isConsonant(chr);
 	}
 
 	@Override
-	public boolean shouldBeProcessedForMinimalPair(Production production){
-		String word = production.getWord();
+	public boolean shouldBeProcessedForMinimalPair(final Production production){
+		final String word = production.getWord();
 		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 			&& word.indexOf('ƚ') < 0
 			&& word.indexOf('ɉ') < 0

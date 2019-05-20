@@ -27,8 +27,8 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 	private final DictionaryStatistics dicStatistics;
 
 
-	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
-			boolean performHyphenationStatistics, Frame parent){
+	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
+			final WordGenerator wordGenerator, final boolean performHyphenationStatistics, final Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
@@ -36,23 +36,23 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 
-		AffixData affixData = affParser.getAffixData();
+		final AffixData affixData = affParser.getAffixData();
 		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset());
 
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			for(Production production : productions){
+			for(final Production production : productions){
 				//collect statistics
-				String word = production.getWord();
+				final String word = production.getWord();
 				if(performHyphenationStatistics){
-					List<String> subwords = hyphenator.splitIntoCompounds(word);
+					final List<String> subwords = hyphenator.splitIntoCompounds(word);
 					if(subwords.isEmpty())
 						dicStatistics.addData(word);
 					else
-						for(String subword : subwords){
-							Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+						for(final String subword : subwords){
+							final Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
 							dicStatistics.addData(word, hyph);
 						}
 				}
@@ -60,25 +60,25 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 					dicStatistics.addData(word);
 			}
 		};
-		Runnable completed = () -> {
+		final Runnable completed = () -> {
 			try{
 				dicStatistics.close();
 			}
-			catch(IOException e){}
+			catch(final IOException e){}
 
 			//show statistics window
-			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		Runnable cancelled = () -> {
+		final Runnable cancelled = () -> {
 			try{
 				dicStatistics.close();
 			}
-			catch(IOException e){}
+			catch(final IOException e){}
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);
 		createReadWorker(data, lineProcessor);

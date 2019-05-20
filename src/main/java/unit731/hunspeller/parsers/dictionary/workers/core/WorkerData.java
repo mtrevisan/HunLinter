@@ -15,23 +15,24 @@ public class WorkerData{
 	final boolean preventExceptionRelaunch;
 
 
-	public static final WorkerData create(String workerName, DictionaryParser dicParser){
+	public static final WorkerData create(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, false, false);
 	}
 
-	public static final WorkerData createPreventExceptionRelaunch(String workerName, DictionaryParser dicParser){
+	public static final WorkerData createPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, false, true);
 	}
 
-	public static final WorkerData createParallel(String workerName, DictionaryParser dicParser){
+	public static final WorkerData createParallel(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, false);
 	}
 
-	public static final WorkerData createParallelPreventExceptionRelaunch(String workerName, DictionaryParser dicParser){
+	public static final WorkerData createParallelPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, true);
 	}
 
-	private WorkerData(String workerName, DictionaryParser dicParser, boolean parallelProcessing, boolean preventExceptionRelaunch){
+	private WorkerData(final String workerName, final DictionaryParser dicParser, final boolean parallelProcessing,
+			final boolean preventExceptionRelaunch){
 		Objects.requireNonNull(workerName);
 		Objects.requireNonNull(dicParser);
 
@@ -41,13 +42,13 @@ public class WorkerData{
 		this.preventExceptionRelaunch = preventExceptionRelaunch;
 	}
 
-	public void setCompletedCallback(Runnable completed){
+	public void setCompletedCallback(final Runnable completed){
 		Objects.requireNonNull(completed);
 
 		this.completed = completed;
 	}
 
-	public void setCancelledCallback(Runnable cancelled){
+	public void setCancelledCallback(final Runnable cancelled){
 		Objects.requireNonNull(cancelled);
 
 		this.cancelled = cancelled;

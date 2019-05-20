@@ -12,15 +12,15 @@ public class LetterMatcherEntry{
 	private final String correctRule;
 
 
-	public LetterMatcherEntry(MessageFormat messagePattern, String masterLetter, String[] wrongFlags, String correctRule){
+	public LetterMatcherEntry(final MessageFormat messagePattern, final String masterLetter, final String[] wrongFlags, final String correctRule){
 		this.messagePattern = messagePattern;
 		this.masterLetter = masterLetter;
 		this.wrongFlags = wrongFlags;
 		this.correctRule = correctRule;
 	}
 
-	public void match(Production production) throws IllegalArgumentException{
-		for(String flag : wrongFlags)
+	public void match(final Production production) throws IllegalArgumentException{
+		for(final String flag : wrongFlags)
 			if(production.hasContinuationFlag(flag))
 				throw new IllegalArgumentException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}

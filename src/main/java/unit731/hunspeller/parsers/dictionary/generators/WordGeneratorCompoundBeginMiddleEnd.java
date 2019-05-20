@@ -15,7 +15,7 @@ import unit731.hunspeller.services.regexgenerator.HunspellRegexWordGenerator;
 
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
-	WordGeneratorCompoundBeginMiddleEnd(AffixData affixData, DictionaryParser dicParser, WordGenerator wordGenerator){
+	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
 		super(affixData, dicParser, wordGenerator);
 	}
 
@@ -28,51 +28,51 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundBeginMiddleEnd(String[] inputCompounds, int limit) throws IllegalArgumentException,
+	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException,
 			NoApplicableRuleException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");
 
-		String compoundBeginFlag = affixData.getCompoundBeginFlag();
-		String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
-		String compoundEndFlag = affixData.getCompoundEndFlag();
+		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
+		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
+		final String compoundEndFlag = affixData.getCompoundEndFlag();
 
 		loadDictionaryForInclusionTest();
 
 		//extract map flag -> dictionary entries
-		Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag,
+		final Map<String, Set<DictionaryEntry>> inputs = extractCompoundBeginMiddleEnd(inputCompounds, compoundBeginFlag, compoundMiddleFlag,
 			compoundEndFlag);
 
 		checkCompoundBeginMiddleEndInputCorrectness(inputs);
 
-		String[] compoundRule = new String[]{compoundBeginFlag, "*",
+		final String[] compoundRule = new String[]{compoundBeginFlag, "*",
 			compoundMiddleFlag, "*",
 			compoundEndFlag, "*"};
-		HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
+		final HunspellRegexWordGenerator regexWordGenerator = new HunspellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
+		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Production>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
 
-	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(String[] inputCompounds, String compoundBeginFlag,
-			String compoundMiddleFlag, String compoundEndFlag){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		int compoundMinimumLength = affixData.getCompoundMinimumLength();
-		String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+	private Map<String, Set<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
+			final String compoundMiddleFlag, final String compoundEndFlag){
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
+		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
-		for(String inputCompound : inputCompounds){
-			DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
+		for(final String inputCompound : inputCompounds){
+			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyInputConversionTable(affixData);
 
-			List<Production> productions = applyAffixRules(dicEntry, false);
-			for(Production production : productions){
-				Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
+			final List<Production> productions = applyAffixRules(dicEntry, false);
+			for(final Production production : productions){
+				final Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
 				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 			}
@@ -80,8 +80,8 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		return compoundRules;
 	}
 
-	private void checkCompoundBeginMiddleEndInputCorrectness(Map<String, Set<DictionaryEntry>> inputs){
-		for(Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
+	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, Set<DictionaryEntry>> inputs){
+		for(final Map.Entry<String, Set<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
 				throw new IllegalArgumentException("Missing word(s) for rule " + entry.getKey() + " in compound begin-middle-end");
 	}

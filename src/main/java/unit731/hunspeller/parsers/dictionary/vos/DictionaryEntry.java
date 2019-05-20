@@ -45,34 +45,34 @@ public class DictionaryEntry{
 	private final boolean combineable;
 
 
-	public static DictionaryEntry createFromDictionaryLine(String line, FlagParsingStrategy strategy){
+	public static DictionaryEntry createFromDictionaryLine(final String line, final FlagParsingStrategy strategy){
 		return createFromDictionaryLineWithAliases(line, strategy, null, null);
 	}
 
-	public static DictionaryEntry createFromDictionaryLineWithAliases(String line, FlagParsingStrategy strategy, List<String> aliasesFlag,
-			List<String> aliasesMorphologicaField){
+	public static DictionaryEntry createFromDictionaryLineWithAliases(final String line, final FlagParsingStrategy strategy,
+			final List<String> aliasesFlag, final List<String> aliasesMorphologicaField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		Matcher m = PATTERN_ENTRY.matcher(line);
+		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
 
-		String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
-		String dicFlags = m.group(PARAM_FLAGS);
-		String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
-		String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
-		String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
-		boolean combineable = true;
+		final String word = StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+		final String dicFlags = m.group(PARAM_FLAGS);
+		final String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
+		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
+		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
+		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
+		final boolean combineable = true;
 		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combineable);
 	}
 
-	public static DictionaryEntry clone(DictionaryEntry dicEntry){
+	public static DictionaryEntry clone(final DictionaryEntry dicEntry){
 		return new DictionaryEntry(dicEntry);
 	}
 
-	protected DictionaryEntry(DictionaryEntry dicEntry){
+	protected DictionaryEntry(final DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry);
 
 		word = dicEntry.word;
@@ -81,7 +81,7 @@ public class DictionaryEntry{
 		combineable = dicEntry.combineable;
 	}
 
-	protected DictionaryEntry(String word, String[] continuationFlags, String[] morphologicalFields, boolean combineable){
+	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combineable){
 		Objects.requireNonNull(word);
 
 		this.word = word;
@@ -90,14 +90,14 @@ public class DictionaryEntry{
 		this.combineable = combineable;
 	}
 
-	private static String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+	private static String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	private static boolean containsStem(String[] mfs){
+	private static boolean containsStem(final String[] mfs){
 		boolean containsStem = false;
 		if(mfs != null)
-			for(String mf : mfs)
+			for(final String mf : mfs)
 				if(mf.startsWith(MorphologicalTag.TAG_STEM)){
 					containsStem = true;
 					break;
@@ -105,10 +105,10 @@ public class DictionaryEntry{
 		return containsStem;
 	}
 
-	public static String extractWord(String line){
+	public static String extractWord(final String line){
 		Objects.requireNonNull(line);
 
-		Matcher m = PATTERN_ENTRY.matcher(line);
+		final Matcher m = PATTERN_ENTRY.matcher(line);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse dictionary line '" + line + "'");
 
@@ -123,14 +123,14 @@ public class DictionaryEntry{
 		return combineable;
 	}
 
-	public void applyInputConversionTable(AffixData affixData){
+	public void applyInputConversionTable(final AffixData affixData){
 		word = affixData.applyInputConversionTable(word);
 	}
 
-	public boolean removeContinuationFlag(String continuationFlagToRemove){
+	public boolean removeContinuationFlag(final String continuationFlagToRemove){
 		boolean removed = false;
 		if(continuationFlagToRemove != null && continuationFlags != null){
-			int previousSize = continuationFlags.length;
+			final int previousSize = continuationFlags.length;
 			continuationFlags = ArrayUtils.removeElement(ArrayUtils.clone(continuationFlags), continuationFlagToRemove);
 
 			removed = (continuationFlags.length != previousSize);
@@ -145,9 +145,9 @@ public class DictionaryEntry{
 	 * @param affixData	The Affix Data used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasNonTerminalContinuationFlags(AffixData affixData){
+	public boolean hasNonTerminalContinuationFlags(final AffixData affixData){
 		if(continuationFlags != null)
-			for(String flag : continuationFlags)
+			for(final String flag : continuationFlags)
 				if(!affixData.isTerminalAffix(flag))
 					return true;
 		return false;
@@ -157,9 +157,9 @@ public class DictionaryEntry{
 		return (continuationFlags != null? continuationFlags.length: 0);
 	}
 
-	public boolean hasContinuationFlag(String ... continuationFlags){
+	public boolean hasContinuationFlag(final String ... continuationFlags){
 		if(this.continuationFlags != null && continuationFlags != null)
-			for(String flag : this.continuationFlags)
+			for(final String flag : this.continuationFlags)
 				if(ArrayUtils.contains(continuationFlags, flag))
 					return true;
 		return false;
@@ -175,52 +175,52 @@ public class DictionaryEntry{
 	 * @param type	The type used to filter the last applied rule
 	 * @return	The last applied rule of the specified type
 	 */
-	public AffixEntry getLastAppliedRule(AffixEntry.Type type){
+	public AffixEntry getLastAppliedRule(final AffixEntry.Type type){
 		return null;
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(AffixData affixData){
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		return Arrays.stream(continuationFlags != null? continuationFlags: new String[0])
 			.filter(affixData::isManagedByCompoundRule)
 			.collect(Collectors.groupingBy(flag -> flag, Collectors.mapping(x -> this, Collectors.toSet())));
 	}
 
-	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(String compoundBeginFlag, String compoundMiddleFlag,
-			String compoundEndFlag){
-		Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
+	public Map<String, Set<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag, final String compoundMiddleFlag,
+			final String compoundEndFlag){
+		final Map<String, Set<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new HashSet<>());
 		distribution.put(compoundMiddleFlag, new HashSet<>());
 		distribution.put(compoundEndFlag, new HashSet<>());
 		if(continuationFlags != null)
-			for(String flag : continuationFlags){
-				Set<DictionaryEntry> value = distribution.get(flag);
+			for(final String flag : continuationFlags){
+				final Set<DictionaryEntry> value = distribution.get(flag);
 				if(value != null)
 					value.add(this);
 			}
 		return distribution;
 	}
 
-	public boolean hasPartOfSpeech(String partOfSpeech){
+	public boolean hasPartOfSpeech(final String partOfSpeech){
 		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH + partOfSpeech);
 	}
 
-	private boolean hasMorphologicalField(String morphologicalField){
+	private boolean hasMorphologicalField(final String morphologicalField){
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
-	public void forEachMorphologicalField(Consumer<String> fun){
+	public void forEachMorphologicalField(final Consumer<String> fun){
 		if(morphologicalFields != null)
-			for(String morphologicalField : morphologicalFields)
+			for(final String morphologicalField : morphologicalFields)
 				fun.accept(morphologicalField);
 	}
 
-	public void removeAffixes(AffixData affixData){
-		Affixes affixes = separateAffixes(affixData);
+	public void removeAffixes(final AffixData affixData){
+		final Affixes affixes = separateAffixes(affixData);
 		continuationFlags = affixes.getTerminalAffixes();
 	}
 
-	public List<String[]> extractAllAffixes(AffixData affixData, boolean reverse){
-		Affixes affixes = separateAffixes(affixData);
+	public List<String[]> extractAllAffixes(final AffixData affixData, final boolean reverse){
+		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
 
@@ -230,24 +230,24 @@ public class DictionaryEntry{
 	 * @param affixData	The {@link AffixData}
 	 * @return	An object with separated flags, one for each group (prefixes, suffixes, terminals)
 	 */
-	private Affixes separateAffixes(AffixData affixData) throws IllegalArgumentException{
-		List<String> terminalAffixes = new ArrayList<>();
-		List<String> prefixes = new ArrayList<>();
-		List<String> suffixes = new ArrayList<>();
+	private Affixes separateAffixes(final AffixData affixData) throws IllegalArgumentException{
+		final List<String> terminalAffixes = new ArrayList<>();
+		final List<String> prefixes = new ArrayList<>();
+		final List<String> suffixes = new ArrayList<>();
 		if(continuationFlags != null)
-			for(String affix : continuationFlags){
+			for(final String affix : continuationFlags){
 				if(affixData.isTerminalAffix(affix)){
 					terminalAffixes.add(affix);
 					continue;
 				}
 
-				Object rule = affixData.getData(affix);
+				final Object rule = affixData.getData(affix);
 				if(rule == null){
 					if(affixData.isManagedByCompoundRule(affix))
 						continue;
 
-					List<AffixEntry> appliedRules = getAppliedRules();
-					String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
+					final List<AffixEntry> appliedRules = getAppliedRules();
+					final String parentFlag = (appliedRules != null && !appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 					throw new IllegalArgumentException("Non–existent rule " + affix + " found" + (parentFlag != null? " via " + parentFlag:
 						StringUtils.EMPTY));
 				}
@@ -271,7 +271,7 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		StringBuffer sb = new StringBuffer(word);
+		final StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(StringUtils.join(continuationFlags, COMMA));
@@ -281,10 +281,10 @@ public class DictionaryEntry{
 		return sb.toString();
 	}
 
-	public String toString(FlagParsingStrategy strategy){
+	public String toString(final FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy);
 
-		StringBuffer sb = new StringBuffer(word);
+		final StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));
@@ -295,13 +295,13 @@ public class DictionaryEntry{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		DictionaryEntry rhs = (DictionaryEntry)obj;
+		final DictionaryEntry rhs = (DictionaryEntry)obj;
 		return new EqualsBuilder()
 			.append(word, rhs.word)
 			.append(continuationFlags, rhs.continuationFlags)
