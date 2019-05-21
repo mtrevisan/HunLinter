@@ -334,6 +334,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		return new ArrayList<>(compaction.values());
 	}
 
+	//FIXME tested bottom-up until r3
 	private void removeOverlappingConditions(final List<LineEntry> rules){
 		//sort current-list by shortest condition
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
