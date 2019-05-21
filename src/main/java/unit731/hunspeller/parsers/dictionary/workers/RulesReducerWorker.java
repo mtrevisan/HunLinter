@@ -413,8 +413,8 @@ for(final String rule : rules)
 				List<LineEntry> childrenIntersectionEntries = new ArrayList<>();
 
 				//create new (parent) rule with condition as parent.condition \ intersection
-				boolean groupChanged = parentGroupSet.removeAll(groupIntersection);
-				if(groupChanged && !parentGroupSet.isEmpty()){
+				parentGroupSet.removeAll(groupIntersection);
+				if(!parentGroupSet.isEmpty()){
 					String condition = makeGroup(mergeSet(parentGroupSet)) + parent.condition;
 					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 					final List<String> words = parent.from.stream()
@@ -428,7 +428,7 @@ for(final String rule : rules)
 					condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
 					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
 				}
-				else if(parent.condition.isEmpty()){
+				else /*if(parent.condition.isEmpty())*/{
 					final String condition = extractGroup(parent.from, parentConditionLength) + parent.condition;
 					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
 				}
@@ -437,7 +437,7 @@ for(final String rule : rules)
 				for(LineEntry child : children){
 					final String childGroup = extractGroup(child.from, parentConditionLength);
 					final Set<Character> childGroupSet = SetHelper.makeCharacterSetFrom(childGroup);
-					groupChanged = childGroupSet.removeAll(groupIntersection);
+					final boolean groupChanged = childGroupSet.removeAll(groupIntersection);
 					if(groupChanged && !childGroupSet.isEmpty()){
 						String condition = makeGroup(mergeSet(childGroupSet)) + parent.condition;
 						final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
