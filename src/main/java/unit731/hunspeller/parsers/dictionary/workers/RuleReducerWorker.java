@@ -186,7 +186,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		final List<String> originalLines = new ArrayList<>();
 		final List<LineEntry> plainRules = new ArrayList<>();
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
@@ -195,7 +195,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				plainRules.add(compactedFilteredRule);
 			}
 		};
-		Runnable completed = () -> {
+		final Runnable completed = () -> {
 			try{
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} lines", plainRules.size(), originalLines.size());
 
@@ -219,8 +219,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-//		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
-WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}

@@ -232,7 +232,7 @@ public class ExternalSorter{
 	 *
 	 */
 	private int mergeSortedFiles(BufferedWriter writer, ExternalSorterOptions options, List<BinaryFileBuffer> buffers) throws IOException{
-		PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
+		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
 		buffers.stream()
 			.filter(Predicate.not(BinaryFileBuffer::empty))
 			.forEachOrdered(queue::add);
@@ -245,7 +245,7 @@ public class ExternalSorter{
 		}
 		finally{
 			writer.close();
-			for(BinaryFileBuffer buffer : queue)
+			for(final BinaryFileBuffer buffer : queue)
 				buffer.close();
 		}
 		return rowCounter;
