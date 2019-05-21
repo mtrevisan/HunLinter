@@ -239,8 +239,11 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
 			checkRules.add(compactedFilteredRule);
 		}
-		if(!checkRules.equals(new HashSet<>(plainRules)))
+		if(!checkRules.equals(new HashSet<>(plainRules))){
+for(final String rule : rules)
+	LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
 			throw new IllegalArgumentException("Something very bad occurs while reducing");
+		}
 	}
 
 	private LineEntry collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
@@ -348,8 +351,12 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
-			if(children.isEmpty())
+			if(children.isEmpty()){
+				if(!rules.contains(parent))
+					rules.add(parent);
+
 				continue;
+			}
 
 			final int parentConditionLength = parent.condition.length();
 			//find parent-group
@@ -362,9 +369,9 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
 			//if intersection(parent-group, children-group) is empty
-			final Set<Character> parenGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
+			final Set<Character> parentGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
 			final Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
-			final Set<Character> groupIntersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
+			final Set<Character> groupIntersection = SetHelper.intersection(parentGroupSet, childrenGroupSet);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
 				String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
@@ -401,81 +408,134 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				//remove same-condition-children from final-list
 				sameConditionChildren.forEach(rules::remove);
 			}
-			//if parent.condition is empty
-			else if(parent.condition.isEmpty()){
-				//for each last-char of parent.from
-				final Map<Character, List<String>> fromBucket = bucket(parent.from, from -> from.charAt(from.length() - 1));
-				for(final Map.Entry<Character, List<String>> entry : fromBucket.entrySet()){
-					final Character key = entry.getKey();
-					//if last-char is contained into intersection
-					if(groupIntersection.contains(key)){
-						//add new rule from parent with condition the last-char
-						final LineEntry newEntry = LineEntry.createFrom(parent, String.valueOf(key), entry.getValue());
-						sortedList.add(newEntry);
-					}
-				}
-				sortedList.sort(shortestConditionComparator);
-
-				//if intersection is proper subset of parent-group
-				parenGroupSet.removeAll(groupIntersection);
-				if(!parenGroupSet.isEmpty()){
-					//add new rule from parent with condition the difference between parent-grop and intersection to final-list
-					final String condition = makeGroup(mergeSet(parenGroupSet));
+			else{
+				//create new (parent) rule with condition as parent.condition \ intersection
+				boolean groupChanged = parentGroupSet.removeAll(groupIntersection);
+				if(groupChanged && !parentGroupSet.isEmpty()){
+					String condition = makeGroup(mergeSet(parentGroupSet)) + parent.condition;
 					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 					final List<String> words = parent.from.stream()
 						.filter(from -> PatternHelper.find(from, conditionPattern))
 						.collect(Collectors.toList());
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-					//keep only rules that matches some existent words
-					if(!words.isEmpty())
-						rules.add(newEntry);
-					else
-						LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-							(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-				}
-			}
-			else{
-				//FIXME really ugly!!
+					LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+					sortedList.add(newEntry);
 
-				//calculate intersection between parent and children conditions
-				final Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
-				//if intersection is empty
-				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE))
-					ahn(parent, parentGroup, children, childrenGroup, sortedList, rules);
-				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
-					final List<LineEntry> t = conditionBucket.get(Boolean.TRUE);
-					if(t.size() == 1){
-						//check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and
-						//another-rule.condition == condition
-						final LineEntry te = t.get(0);
-						final List<LineEntry> list = new ArrayList<>(children);
-						list.add(parent);
-						final List<LineEntry> as = list.stream()
-							.filter(rule -> rule.removal.equals((te.removal.equals(ZERO)? te.condition: te.removal + te.condition))
-								&& rule.condition.equals(te.condition))
+					//calculate intersection of the parent
+					parent.from.removeAll(words);
+					condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
+					newEntry = LineEntry.createFrom(parent, condition, parent.from);
+					sortedList.add(newEntry);
+					rules.add(newEntry);
+				}
+				else if(parent.condition.isEmpty()){
+					final String condition = extractGroup(parent.from, parentConditionLength) + parent.condition;
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+					sortedList.add(newEntry);
+					rules.add(newEntry);
+				}
+
+				//create new (child) rule with condition as child.condition \ intersection
+				for(LineEntry child : children){
+					final String childGroup = extractGroup(child.from, parentConditionLength);
+					final Set<Character> childGroupSet = SetHelper.makeCharacterSetFrom(childGroup);
+					groupChanged = childGroupSet.removeAll(groupIntersection);
+					if(groupChanged && !childGroupSet.isEmpty()){
+						String condition = makeGroup(mergeSet(childGroupSet)) + parent.condition;
+						final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
+						final List<String> words = child.from.stream()
+							.filter(from -> PatternHelper.find(from, conditionPattern))
 							.collect(Collectors.toList());
-						if(as.size() == 1 && as.get(0).from.equals(te.from)){
-							as.get(0).addition.addAll(te.addition.stream().map(add -> te.condition + add).collect(Collectors.toList()));
+						LineEntry newEntry = LineEntry.createFrom(child, condition, words);
+						sortedList.add(newEntry);
 
-							rules.add(as.get(0));
-							sortedList.remove(te);
-							sortedList.add(parent);
-							sortedList.sort(shortestConditionComparator);
-						}
-						else
-							throw new IllegalArgumentException("yet to be coded! (1)");
+						//calculate intersection of the child
+						child.from.removeAll(words);
+						condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
+						newEntry = LineEntry.createFrom(child, condition, child.from);
+						sortedList.add(newEntry);
+						sortedList.remove(child);
 					}
-					else
-						throw new IllegalArgumentException("yet to be coded! (2)");
 				}
-				else if(conditionBucket.isEmpty()){
-					throw new IllegalArgumentException("yet to be coded! (3)");
-				}
-				else{
-//do nothing (?)
-					throw new IllegalArgumentException("do nothing?");
-				}
+				sortedList.sort(shortestConditionComparator);
+
+				//what to do with the intersection?
+System.out.println("");
 			}
+//			//if parent.condition is empty
+//			else if(parent.condition.isEmpty()){
+//				//for each last-char of parent.from
+//				final Map<Character, List<String>> fromBucket = bucket(parent.from, from -> from.charAt(from.length() - 1));
+//				for(final Map.Entry<Character, List<String>> entry : fromBucket.entrySet()){
+//					final Character key = entry.getKey();
+//					//if last-char is contained into intersection
+//					if(groupIntersection.contains(key)){
+//						//add new rule from parent with condition the last-char
+//						final LineEntry newEntry = LineEntry.createFrom(parent, String.valueOf(key), entry.getValue());
+//						sortedList.add(newEntry);
+//					}
+//				}
+//				sortedList.sort(shortestConditionComparator);
+//
+//				//if intersection is proper subset of parent-group
+//				parenGroupSet.removeAll(groupIntersection);
+//				if(!parenGroupSet.isEmpty()){
+//					//add new rule from parent with condition the difference between parent-grop and intersection to final-list
+//					final String condition = makeGroup(mergeSet(parenGroupSet));
+//					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
+//					final List<String> words = parent.from.stream()
+//						.filter(from -> PatternHelper.find(from, conditionPattern))
+//						.collect(Collectors.toList());
+//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+//					//keep only rules that matches some existent words
+//					if(!words.isEmpty())
+//						rules.add(newEntry);
+//					else
+//						LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+//							(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+//				}
+//			}
+//			else{
+//				//FIXME really ugly!!
+//
+//				//calculate intersection between parent and children conditions
+//				final Map<Boolean, List<LineEntry>> conditionBucket = bucket(children, rule -> rule.condition.equals(parent.condition));
+//				//if intersection is empty
+//				if(!conditionBucket.containsKey(Boolean.TRUE) && conditionBucket.containsKey(Boolean.FALSE))
+//					ahn(parent, parentGroup, children, childrenGroup, sortedList, rules);
+//				else if(conditionBucket.containsKey(Boolean.TRUE) && !conditionBucket.containsKey(Boolean.FALSE)){
+//					final List<LineEntry> t = conditionBucket.get(Boolean.TRUE);
+//					if(t.size() == 1){
+//						//check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and
+//						//another-rule.condition == condition
+//						final LineEntry te = t.get(0);
+//						final List<LineEntry> list = new ArrayList<>(children);
+//						list.add(parent);
+//						final List<LineEntry> as = list.stream()
+//							.filter(rule -> rule.removal.equals((te.removal.equals(ZERO)? te.condition: te.removal + te.condition))
+//								&& rule.condition.equals(te.condition))
+//							.collect(Collectors.toList());
+//						if(as.size() == 1 && as.get(0).from.equals(te.from)){
+//							as.get(0).addition.addAll(te.addition.stream().map(add -> te.condition + add).collect(Collectors.toList()));
+//
+//							rules.add(as.get(0));
+//							sortedList.remove(te);
+//							sortedList.add(parent);
+//							sortedList.sort(shortestConditionComparator);
+//						}
+//						else
+//							throw new IllegalArgumentException("yet to be coded! (1)");
+//					}
+//					else
+//						throw new IllegalArgumentException("yet to be coded! (2)");
+//				}
+//				else if(conditionBucket.isEmpty()){
+//					throw new IllegalArgumentException("yet to be coded! (3)");
+//				}
+//				else{
+////do nothing (?)
+//					throw new IllegalArgumentException("do nothing?");
+//				}
+//			}
 
 			//remove parent from final list
 			rules.remove(parent);
