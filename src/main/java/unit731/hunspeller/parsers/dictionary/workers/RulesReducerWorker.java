@@ -41,11 +41,11 @@ import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 
 
-public class RuleReducerWorker extends WorkerDictionaryBase{
+public class RulesReducerWorker extends WorkerDictionaryBase{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RuleReducerWorker.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
-	public static final String WORKER_NAME = "Rule reducer";
+	public static final String WORKER_NAME = "Rules reducer";
 
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
@@ -162,7 +162,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private Comparator<LineEntry> lineEntryComparator;
 
 
-	public RuleReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData, final DictionaryParser dicParser,
+	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData, final DictionaryParser dicParser,
 			final WordGenerator wordGenerator){
 		Objects.requireNonNull(flag);
 		Objects.requireNonNull(affixData);

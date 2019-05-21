@@ -27,24 +27,24 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.workers.RuleReducerWorker;
+import unit731.hunspeller.parsers.dictionary.workers.RulesReducerWorker;
 import unit731.hunspeller.services.ApplicationLogAppender;
 
 
-public class RuleReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
+public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RuleReducerDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
 
 	private static final long serialVersionUID = -5660512112885632106L;
 
 
 	private final Backbone backbone;
 
-	private RuleReducerWorker ruleReducerWorker;
+	private RulesReducerWorker rulesReducerWorker;
 
 
-	public RuleReducerDialog(Backbone backbone, Frame parent){
-		super(parent, "Rule reducer", true);
+	public RulesReducerDialog(Backbone backbone, Frame parent){
+		super(parent, "Rules reducer", true);
 
 		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(parent);
@@ -222,21 +222,21 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		if(ruleReducerWorker != null && ruleReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-			ruleReducerWorker.pause();
+		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
+			rulesReducerWorker.pause();
 
 			Object[] options = {"Abort", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
+			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rules reducer task?", "Warning!",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if(answer == JOptionPane.YES_OPTION){
-				ruleReducerWorker.cancel();
+				rulesReducerWorker.cancel();
 
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rule reducer aborted");
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rules reducer aborted");
 
-				ruleReducerWorker = null;
+				rulesReducerWorker = null;
 			}
 			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				ruleReducerWorker.resume();
+				rulesReducerWorker.resume();
 
 				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
@@ -258,16 +258,16 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	}
 
 	private void reduceRules(){
-		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
+		if(rulesReducerWorker == null || rulesReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
 			try{
 				String flag = getSelectedFlag();
 				boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
-				ruleReducerWorker = new RuleReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
+				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
 					backbone.getWordGenerator());
-				ruleReducerWorker.addPropertyChangeListener(this);
-				ruleReducerWorker.execute();
+				rulesReducerWorker.addPropertyChangeListener(this);
+				rulesReducerWorker.execute();
 			}
 			catch(Exception e){
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
@@ -285,11 +285,11 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(RuleReducerDialog.class.getName());
+		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
-		throw new NotSerializableException(RuleReducerDialog.class.getName());
+		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 
 

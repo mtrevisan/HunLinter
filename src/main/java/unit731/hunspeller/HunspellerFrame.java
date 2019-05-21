@@ -122,7 +122,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private DictionarySortDialog dicSortDialog;
-	private RuleReducerDialog ruleReducerDialog;
+	private RulesReducerDialog rulesReducerDialog;
 
 	private final Backbone backbone;
 
@@ -271,7 +271,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
-      dicRuleReducerMenuItem = new javax.swing.JMenuItem();
+      dicRulesReducerMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -880,13 +880,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicRuleReducerMenuItem.setText("Rule reducer...");
-      dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      dicRulesReducerMenuItem.setText("Rules reducer...");
+      dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicRuleReducerMenuItemActionPerformed(evt);
+            dicRulesReducerMenuItemActionPerformed(evt);
          }
       });
-      dicMenu.add(dicRuleReducerMenuItem);
+      dicMenu.add(dicRulesReducerMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
       dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
@@ -1434,12 +1434,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		filEmptyRecentFilesMenuItem.setEnabled(false);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
-   private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
+   private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		dicRuleReducerMenuItem.setEnabled(false);
-		ruleReducerDialog.setVisible(true);
-   }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
+		dicRulesReducerMenuItem.setEnabled(false);
+		rulesReducerDialog.setVisible(true);
+   }//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1689,18 +1689,18 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 			//update rule reduced dialog:
-			if(ruleReducerDialog == null){
-				ruleReducerDialog = new RuleReducerDialog(backbone, this);
-				ruleReducerDialog.setLocationRelativeTo(this);
-				ruleReducerDialog.addWindowListener(new WindowAdapter(){
+			if(rulesReducerDialog == null){
+				rulesReducerDialog = new RulesReducerDialog(backbone, this);
+				rulesReducerDialog.setLocationRelativeTo(this);
+				rulesReducerDialog.addWindowListener(new WindowAdapter(){
 					@Override
 					public void windowClosed(WindowEvent e){
-						dicRuleReducerMenuItem.setEnabled(true);
+						dicRulesReducerMenuItem.setEnabled(true);
 					}
 				});
 			}
 			else
-				ruleReducerDialog.reload();
+				rulesReducerDialog.reload();
 
 
 			//aid file:
@@ -1994,7 +1994,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		//update rule reduced dialog:
-		ruleReducerDialog.reload();
+		rulesReducerDialog.reload();
 	}
 
 	@Override
@@ -2151,9 +2151,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenu dicMenu;
-   private javax.swing.JMenuItem dicRuleReducerMenuItem;
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
+   private javax.swing.JMenuItem dicRulesReducerMenuItem;
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
