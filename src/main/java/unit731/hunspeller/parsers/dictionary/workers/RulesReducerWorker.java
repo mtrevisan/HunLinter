@@ -197,7 +197,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		};
 		final Runnable completed = () -> {
 			try{
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} lines", plainRules.size(), originalLines.size());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules", plainRules.size());
 
 				final List<LineEntry> compactedRules = compactRules(plainRules);
 
@@ -235,10 +235,9 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combineableChar(), entries);
 		for(String line : originalLines){
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
-			
+
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
-			if(compactedFilteredRule != null)
-				checkRules.add(compactedFilteredRule);
+			checkRules.add(compactedFilteredRule);
 		}
 		if(!checkRules.equals(new HashSet<>(plainRules)))
 			throw new IllegalArgumentException("Something very bad occurs while reducing");
