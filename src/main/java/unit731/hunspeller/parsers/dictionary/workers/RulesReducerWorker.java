@@ -508,11 +508,16 @@ while current-list is not empty{
 			if last-char is contained into intersection
 				add new rule from parent with condition the last-char
 
-		if intersection is proper subset of parent-group
+		if intersection is proper subset of parent-group{
 			add new rule from parent with condition the difference between parent-grop and intersection to final-list
+			keep only rules that matches some existent words
+		}
 	}
 	else{
 		?
+//		calculate intersection between parent and children conditions
+//		if intersection is empty
+//			check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and another-rule.condition == condition
 	}
 
 	remove parent from final-list
