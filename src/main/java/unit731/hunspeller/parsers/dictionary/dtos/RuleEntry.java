@@ -7,8 +7,8 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 
 public class RuleEntry{
 
-	public static final char COMBINEABLE = 'Y';
-	public static final char NOT_COMBINEABLE = 'N';
+	private static final char COMBINEABLE = 'Y';
+	private static final char NOT_COMBINEABLE = 'N';
 
 
 	private final boolean suffix;
@@ -46,6 +46,10 @@ public class RuleEntry{
 
 	public boolean isCombineable(){
 		return combineable;
+	}
+
+	public char combineableChar(){
+		return (isCombineable()? COMBINEABLE: NOT_COMBINEABLE);
 	}
 
 	public AffixEntry.Type getType(){

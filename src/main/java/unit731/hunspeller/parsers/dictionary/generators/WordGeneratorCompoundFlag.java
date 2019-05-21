@@ -90,7 +90,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		for(final int index : permutation){
 			if(!dicEntries.containsKey(index)){
 				final DictionaryEntry input = inputs.get(index);
-				dicEntries.put(index, applyAffixRules(input, true));
+				dicEntries.put(index, applyAffixRules(input, true, null));
 			}
 			final List<Production> de = dicEntries.get(index);
 			if(!de.isEmpty())

@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import java.util.List;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
 
@@ -27,6 +28,10 @@ public class WordGenerator{
 
 	public List<Production> applyAffixRules(final String line){
 		return wordGeneratorAffixRules.applyAffixRules(line);
+	}
+
+	public List<Production> applyAffixRules(final String line, final RuleEntry overriddenRule){
+		return wordGeneratorAffixRules.applyAffixRules(line, overriddenRule);
 	}
 
 	public List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit)

@@ -32,11 +32,13 @@ class WordGeneratorBase{
 	 * 
 	 * @param dicEntry	{@link DictionaryEntry dictionary entry} used to generate the productions for
 	 * @param isCompound	Whether the word is-a or belongs-to a compound word
+	 * @param overriddenRule	Overridden set of rule entries, optional
 	 * @return	The list of productions for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound) throws IllegalArgumentException,
-			NoApplicableRuleException{
+	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule)
+			throws IllegalArgumentException, NoApplicableRuleException{
+//TODO manage overriddenRule
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.<Production>emptyList();

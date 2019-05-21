@@ -34,6 +34,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -205,21 +206,10 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				final List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
 
-				//check feasibility of solution
-				final Set<LineEntry> checkRules = new HashSet<>();
-				for(String line : originalLines){
-					//FIXME
-					final List<Production> productions = wordGenerator.applyAffixRules(line);
-
-					final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
-					if(compactedFilteredRule != null)
-						checkRules.add(compactedFilteredRule);
-				}
-				if(!plainRules.equals(checkRules))
-					throw new IllegalArgumentException("Something very bad occurs while reducing");
+				checkReductionFeasibility(rules, originalLines, wordGenerator, flag, ruleToBeReduced, plainRules);
 
 
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, ruleToBeReduced.isCombineable(), rules.size()));
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, ruleToBeReduced.combineableChar(), rules.size()));
 				for(final String rule : rules)
 					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
 			}
@@ -233,6 +223,25 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
+	}
+
+	private void checkReductionFeasibility(final List<String> rules, final List<String> originalLines, final WordGenerator wordGenerator,
+			final String flag, final RuleEntry ruleToBeReduced, final Set<LineEntry> plainRules) throws IllegalArgumentException{
+		final Set<LineEntry> checkRules = new HashSet<>();
+		final List<AffixEntry> entries = rules.stream()
+			.map(line -> new AffixEntry(line, strategy, null, null))
+			.collect(Collectors.toList());
+		final AffixEntry.Type type = ruleToBeReduced.getType();
+		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combineableChar(), entries);
+		for(String line : originalLines){
+			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
+			
+			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
+			if(compactedFilteredRule != null)
+				checkRules.add(compactedFilteredRule);
+		}
+		if(!plainRules.equals(checkRules))
+			throw new IllegalArgumentException("Something very bad occurs while reducing");
 	}
 
 	private LineEntry collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
@@ -748,11 +757,11 @@ while current-list is not empty{
 			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
-	private String composeHeader(final AffixEntry.Type type, final String flag, final boolean isCombineable, final int size){
+	private String composeHeader(final AffixEntry.Type type, final String flag, final char combineableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getTag().getCode())
 			.add(flag)
-			.add(Character.toString(isCombineable? RuleEntry.COMBINEABLE: RuleEntry.NOT_COMBINEABLE))
+			.add(Character.toString(combineableChar))
 			.add(Integer.toString(size))
 			.toString();
 	}

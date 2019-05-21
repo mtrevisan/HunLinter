@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
@@ -62,6 +63,10 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	}
 
 	List<Production> applyAffixRules(final String line){
+		return applyAffixRules(line, null);
+	}
+
+	List<Production> applyAffixRules(final String line, final RuleEntry overriddenRule){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
@@ -69,7 +74,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData);
 
-		final List<Production> productions = applyAffixRules(dicEntry, false);
+		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 
 		//convert using output table
 		for(final Production production : productions)

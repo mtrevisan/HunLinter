@@ -70,7 +70,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
 			dicEntry.applyInputConversionTable(affixData);
 
-			final List<Production> productions = applyAffixRules(dicEntry, false);
+			final List<Production> productions = applyAffixRules(dicEntry, false, null);
 			for(final Production production : productions){
 				final Map<String, Set<DictionaryEntry>> distribution = production.distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);

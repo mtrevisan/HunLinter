@@ -69,7 +69,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(!dicEntries.containsKey(flag)){
 					final Set<DictionaryEntry> input = inputs.get(flag);
 					dicEntries.put(flag, input.stream()
-						.map(entry -> applyAffixRules(entry, true))
+						.map(entry -> applyAffixRules(entry, true, null))
 						.map(entry -> entry.stream().filter(prod -> prod.hasContinuationFlag(flag)).collect(Collectors.toList()))
 						.flatMap(List::stream)
 						.collect(Collectors.toList()));
@@ -163,7 +163,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			productions.add(p);
 		else{
 			//add boundary affixes
-			final List<Production> prods = applyAffixRules(p, false);
+			final List<Production> prods = applyAffixRules(p, false, null);
 			
 			//remove twofold because they're not allowed in compounds
 			if(!allowTwofoldAffixesInCompound)
