@@ -409,6 +409,9 @@ for(final String rule : rules)
 				sameConditionChildren.forEach(rules::remove);
 			}
 			else{
+				LineEntry parentIntersectionEntry = null;
+				List<LineEntry> childrenIntersectionEntries = new ArrayList<>();
+
 				//create new (parent) rule with condition as parent.condition \ intersection
 				boolean groupChanged = parentGroupSet.removeAll(groupIntersection);
 				if(groupChanged && !parentGroupSet.isEmpty()){
@@ -417,21 +420,17 @@ for(final String rule : rules)
 					final List<String> words = parent.from.stream()
 						.filter(from -> PatternHelper.find(from, conditionPattern))
 						.collect(Collectors.toList());
-					LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
 					sortedList.add(newEntry);
 
 					//calculate intersection of the parent
 					parent.from.removeAll(words);
 					condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
-					newEntry = LineEntry.createFrom(parent, condition, parent.from);
-					sortedList.add(newEntry);
-					rules.add(newEntry);
+					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
 				}
 				else if(parent.condition.isEmpty()){
 					final String condition = extractGroup(parent.from, parentConditionLength) + parent.condition;
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-					sortedList.add(newEntry);
-					rules.add(newEntry);
+					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
 				}
 
 				//create new (child) rule with condition as child.condition \ intersection
@@ -452,13 +451,16 @@ for(final String rule : rules)
 						child.from.removeAll(words);
 						condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
 						newEntry = LineEntry.createFrom(child, condition, child.from);
-						sortedList.add(newEntry);
+						childrenIntersectionEntries.add(newEntry);
+
 						sortedList.remove(child);
 					}
 				}
 				sortedList.sort(shortestConditionComparator);
 
-				//what to do with the intersection?
+				//what to do with the intersections?
+				sortedList.add(parentIntersectionEntry);
+				childrenIntersectionEntries.forEach(sortedList::add);
 System.out.println("");
 			}
 //			//if parent.condition is empty
