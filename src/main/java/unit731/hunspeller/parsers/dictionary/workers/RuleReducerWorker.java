@@ -183,7 +183,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 
-		final Set<String> originalLines = new HashSet<>();
+		final List<String> originalLines = new ArrayList<>();
 		final Set<LineEntry> plainRules = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
@@ -310,7 +310,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<LineEntry> compactRules(final Set<LineEntry> rules){
+	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return collect(rules, entry -> entry.hashCode(), (rule, entry) -> rule.from.addAll(entry.from));
 	}
