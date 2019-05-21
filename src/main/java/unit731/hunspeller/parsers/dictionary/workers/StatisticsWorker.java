@@ -23,21 +23,20 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Collecting statistics";
 
-	private final boolean performHyphenationStatistics;
 	private final DictionaryStatistics dicStatistics;
+	private final HyphenatorInterface hyphenator;
 
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator, final boolean performHyphenationStatistics, final Frame parent){
+			final WordGenerator wordGenerator, final Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(parent);
 
-		this.performHyphenationStatistics = performHyphenationStatistics;
-
 		final AffixData affixData = affParser.getAffixData();
 		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset());
+		this.hyphenator = hyphenator;
 
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
@@ -46,7 +45,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			for(final Production production : productions){
 				//collect statistics
 				final String word = production.getWord();
-				if(performHyphenationStatistics){
+				if(hyphenator != null){
 					final List<String> subwords = hyphenator.splitIntoCompounds(word);
 					if(subwords.isEmpty())
 						dicStatistics.addData(word);
@@ -85,7 +84,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 	}
 
 	public boolean isPerformHyphenationStatistics(){
-		return performHyphenationStatistics;
+		return (hyphenator != null);
 	}
 
 	@Override

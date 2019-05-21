@@ -1889,8 +1889,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
-				backbone.getWordGenerator(), performHyphenationStatistics, this);
+			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), (performHyphenationStatistics? backbone.getHyphenator(): null),
+				backbone.getWordGenerator(), this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
