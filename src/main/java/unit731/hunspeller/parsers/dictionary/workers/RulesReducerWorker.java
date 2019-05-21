@@ -366,7 +366,23 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
 			final Set<Character> groupIntersection = SetHelper.intersection(parenGroupSet, childrenGroupSet);
 			if(groupIntersection.isEmpty()){
-				ahn(parent, parentGroup, children, childrenGroup, sortedList, rules);
+				//add new rule from parent with condition starting with NOT(children-group) to final-list
+				String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
+				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+				rules.add(newEntry);
+
+				//if parent.condition is not empty
+				if(!parent.condition.isEmpty()){
+					final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
+					//if can-bubble-up
+					if(!bubbles.isEmpty()){
+						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+						rules.addAll(bubbledRules);
+
+						//remove bubbles from current-list
+						bubbles.forEach(sortedList::remove);
+					}
+				}
 
 				final List<LineEntry> sameConditionChildren = children.stream()
 					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
@@ -375,8 +391,8 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
 					final String childGroup = extractGroup(child.from, parentConditionLength);
-					final String condition = makeGroup(childGroup) + child.condition;
-					final LineEntry newEntry = LineEntry.createFrom(child, condition, child.from);
+					condition = makeGroup(childGroup) + child.condition;
+					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}
 
