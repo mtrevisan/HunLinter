@@ -183,23 +183,41 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 
-		final List<LineEntry> plainRules = new ArrayList<>();
+		final Set<String> originalLines = new HashSet<>();
+		final Set<LineEntry> plainRules = new HashSet<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
-			if(compactedFilteredRule != null)
+			if(compactedFilteredRule != null){
+				originalLines.add(line);
 				plainRules.add(compactedFilteredRule);
+			}
 		};
 		Runnable completed = () -> {
 			try{
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} lines", plainRules.size(), originalLines.size());
+
 				final List<LineEntry> compactedRules = compactRules(plainRules);
 
 				removeOverlappingConditions(compactedRules);
 
 				final List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
-//TODO check feasibility of solution?
+
+				//check feasibility of solution
+				final Set<LineEntry> checkRules = new HashSet<>();
+				for(String line : originalLines){
+					//FIXME
+					final List<Production> productions = wordGenerator.applyAffixRules(line);
+
+					final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
+					if(compactedFilteredRule != null)
+						checkRules.add(compactedFilteredRule);
+				}
+				if(!plainRules.equals(checkRules))
+					throw new IllegalArgumentException("Something very bad occurs while reducing");
+
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, ruleToBeReduced.isCombineable(), rules.size()));
 				for(final String rule : rules)
@@ -292,7 +310,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<LineEntry> compactRules(final List<LineEntry> rules){
+	private List<LineEntry> compactRules(final Set<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return collect(rules, entry -> entry.hashCode(), (rule, entry) -> rule.from.addAll(entry.from));
 	}
@@ -308,7 +326,6 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		return new ArrayList<>(compaction.values());
 	}
 
-	//FIXME tested bottom-up until v0
 	private void removeOverlappingConditions(final List<LineEntry> rules){
 		//sort current-list by shortest condition
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
@@ -432,7 +449,6 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				else{
 //do nothing (?)
 					throw new IllegalArgumentException("do nothing?");
-//System.out.println("2");
 				}
 			}
 
