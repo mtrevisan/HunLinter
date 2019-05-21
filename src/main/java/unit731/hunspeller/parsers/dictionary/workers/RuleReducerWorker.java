@@ -34,7 +34,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
@@ -56,6 +55,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
+	private static final String PATTERN_END_OF_WORD = "$";
 
 
 	private static class LineEntry implements Serializable{
@@ -405,7 +405,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 				if(!parenGroupSet.isEmpty()){
 					//add new rule from parent with condition the difference between parent-grop and intersection to final-list
 					final String condition = makeGroup(mergeSet(parenGroupSet));
-					final Pattern conditionPattern = PatternHelper.pattern(condition);
+					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 					final List<String> words = parent.from.stream()
 						.filter(from -> PatternHelper.find(from, conditionPattern))
 						.collect(Collectors.toList());
@@ -447,13 +447,13 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 							sortedList.sort(shortestConditionComparator);
 						}
 						else
-							throw new IllegalArgumentException("yet to be coded!");
+							throw new IllegalArgumentException("yet to be coded! (1)");
 					}
 					else
-						throw new IllegalArgumentException("yet to be coded!");
+						throw new IllegalArgumentException("yet to be coded! (2)");
 				}
 				else if(conditionBucket.isEmpty()){
-					throw new IllegalArgumentException("yet to be coded!");
+					throw new IllegalArgumentException("yet to be coded! (3)");
 				}
 				else{
 //do nothing (?)
@@ -566,7 +566,7 @@ while current-list is not empty{
 				final String commonGroup = extractGroup(comm, e.getKey().length());
 				final String condition = makeNotGroup(commonGroup)
 					+ e.getKey();
-				final Pattern conditionPattern = PatternHelper.pattern(condition);
+				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 				final List<String> words = parent.from.stream()
 					.filter(from -> PatternHelper.find(from, conditionPattern))
 					.collect(Collectors.toList());
@@ -594,7 +594,7 @@ while current-list is not empty{
 					+ conds.getKey().substring(i)
 					+ makeGroup(bubbleGroup)
 					+ parent.condition;
-				final Pattern conditionPattern = PatternHelper.pattern(condition);
+				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 				final List<String> words = parent.from.stream()
 					.filter(from -> PatternHelper.find(from, conditionPattern))
 					.collect(Collectors.toList());
