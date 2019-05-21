@@ -185,7 +185,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 
 		final List<String> originalLines = new ArrayList<>();
-		final Set<LineEntry> plainRules = new HashSet<>();
+		final List<LineEntry> plainRules = new ArrayList<>();
 		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
@@ -226,7 +226,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 	}
 
 	private void checkReductionCorrectness(final List<String> rules, final List<String> originalLines, final WordGenerator wordGenerator,
-			final String flag, final RuleEntry ruleToBeReduced, final Set<LineEntry> plainRules) throws IllegalArgumentException{
+			final String flag, final RuleEntry ruleToBeReduced, final List<LineEntry> plainRules) throws IllegalArgumentException{
 		final Set<LineEntry> checkRules = new HashSet<>();
 		final List<AffixEntry> entries = rules.stream()
 			.map(line -> new AffixEntry(line, strategy, null, null))
@@ -240,7 +240,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			if(compactedFilteredRule != null)
 				checkRules.add(compactedFilteredRule);
 		}
-		if(!plainRules.equals(checkRules))
+		if(!checkRules.equals(new HashSet<>(plainRules)))
 			throw new IllegalArgumentException("Something very bad occurs while reducing");
 	}
 
