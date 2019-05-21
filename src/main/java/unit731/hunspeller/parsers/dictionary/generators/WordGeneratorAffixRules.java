@@ -21,7 +21,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData);
 	}
 
-	List<Production> applySingleAffixRule(final String line){
+	List<Production> applySingleAffixRule(final String line, final RuleEntry overriddenRule){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
@@ -38,7 +38,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 			//extract suffixed productions
 			boolean isCompound = false;
-			productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes());
+			productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
 			if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
 				LOGGER.debug("Suffix productions:");
 				productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),

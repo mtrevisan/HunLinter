@@ -206,7 +206,7 @@ public class RuleReducerWorker extends WorkerDictionaryBase{
 				final List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
 
-				checkReductionFeasibility(rules, originalLines, wordGenerator, flag, ruleToBeReduced, plainRules);
+				checkReductionCorrectness(rules, originalLines, wordGenerator, flag, ruleToBeReduced, plainRules);
 
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, composeHeader(type, flag, ruleToBeReduced.combineableChar(), rules.size()));
@@ -225,7 +225,7 @@ WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		createReadWorker(data, lineProcessor);
 	}
 
-	private void checkReductionFeasibility(final List<String> rules, final List<String> originalLines, final WordGenerator wordGenerator,
+	private void checkReductionCorrectness(final List<String> rules, final List<String> originalLines, final WordGenerator wordGenerator,
 			final String flag, final RuleEntry ruleToBeReduced, final Set<LineEntry> plainRules) throws IllegalArgumentException{
 		final Set<LineEntry> checkRules = new HashSet<>();
 		final List<AffixEntry> entries = rules.stream()
