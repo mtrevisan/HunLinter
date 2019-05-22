@@ -220,8 +220,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-//		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
-final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
@@ -240,11 +239,8 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
 			checkRules.add(compactedFilteredRule);
 		}
-		if(!checkRules.equals(new HashSet<>(plainRules))){
-for(final String rule : rules)
-	LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
+		if(!checkRules.equals(new HashSet<>(plainRules)))
 			throw new IllegalArgumentException("Something very bad occurs while reducing");
-		}
 	}
 
 	private LineEntry collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
