@@ -243,7 +243,8 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		if(!checkRules.equals(new HashSet<>(plainRules))){
 for(final String rule : rules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
-			throw new IllegalArgumentException("Something very bad occurs while reducing");
+			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + plainRules.size() + " productions, obtained "
+				+ checkRules.size());
 		}
 	}
 
@@ -417,7 +418,7 @@ for(final String rule : rules)
 			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
-				String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
+				String condition = (parentGroup.size() < childrenGroup.size()? makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
 
@@ -441,7 +442,8 @@ for(final String rule : rules)
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
 					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-					condition = makeGroup(childGroup) + child.condition;
+					condition = (sameConditionChildren.size() == 1 && !sameConditionChildren.containsAll(childGroup)?
+						makeNotGroup(parentGroup): makeGroup(childGroup)) + child.condition;
 					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}
@@ -452,6 +454,13 @@ for(final String rule : rules)
 				sameConditionChildren.forEach(rules::remove);
 			}
 			else{
+				if(parentGroup.equals(groupIntersection)){
+					final String notGroupIntersection = makeNotGroup(groupIntersection);
+					final String condition = notGroupIntersection + parent.condition;
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+					rules.add(newEntry);
+				}
+
 				final String notGroupIntersection = makeNotGroup(groupIntersection);
 				final Map<String, List<String>> fromBucket = bucket(parent.from,
 					from -> {
@@ -466,7 +475,8 @@ for(final String rule : rules)
 					rules.add(newEntry);
 				}
 				for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
-					final LineEntry newEntry = LineEntry.createFrom(parent, entry.getKey() + parent.condition, entry.getValue());
+					final String condition = entry.getKey() + parent.condition;
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
 					sortedList.add(newEntry);
 				}
 
@@ -565,7 +575,8 @@ for(final String rule : rules)
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(List<LineEntry> entries){
 		Map<String, List<LineEntry>> similarityBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
-			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB + RegExpSequencer.splitSequence(entry.condition).length:
+			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB
+				+ RegExpSequencer.splitSequence(entry.condition).length:
 			null));
 		for(List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
