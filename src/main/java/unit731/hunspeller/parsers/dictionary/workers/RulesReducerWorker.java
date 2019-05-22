@@ -203,8 +203,9 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 
 				removeOverlappingConditions(compactedRules);
 
-				final List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
+				mergeSimilarRules(compactedRules);
 
+				final List<String> rules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
 
 				checkReductionCorrectness(rules, originalLines, wordGenerator, flag, ruleToBeReduced, plainRules);
 
@@ -667,6 +668,34 @@ while current-list is not empty{
 			}
 		}
 		return newParents;
+	}
+
+	private void mergeSimilarRules(List<LineEntry> entries){
+		//merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`)
+		Map<String, List<LineEntry>> mergeBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
+			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + RegExpSequencer.splitSequence(entry.condition).length:
+			null));
+		for(List<LineEntry> set : mergeBucket.values())
+			if(set.size() > 1){
+				LineEntry firstEntry = set.iterator().next();
+				String[] firstEntryCondition = RegExpSequencer.splitSequence(firstEntry.condition);
+				String[] commonPreCondition = SEQUENCER.subSequence(firstEntryCondition, 0, 1);
+				String[] commonPostCondition = SEQUENCER.subSequence(firstEntryCondition, 2);
+				//extract all the rules from `set` that has the condition compatible with firstEntry.condition
+				String condition = set.stream()
+					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1])
+					.sorted(comparator)
+					.distinct()
+					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END));
+				condition = StringUtils.join(commonPreCondition) + condition + StringUtils.join(commonPostCondition);
+				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
+				final List<String> words = firstEntry.from.stream()
+					.filter(from -> PatternHelper.find(from, conditionPattern))
+					.collect(Collectors.toList());
+				entries.add(LineEntry.createFrom(firstEntry, condition, words));
+
+				set.forEach(entries::remove);
+			}
 	}
 
 	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
