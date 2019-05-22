@@ -407,33 +407,60 @@ for(final String rule : rules)
 				sameConditionChildren.forEach(rules::remove);
 			}
 			else{
-				LineEntry parentIntersectionEntry = null;
-
-				//create new (parent) rule with condition the difference between parent.condition and intersection
 				parentGroup.removeAll(groupIntersection);
-				if(!parentGroup.isEmpty()){
-					String condition = makeNotGroup(groupIntersection) + parent.condition;
-					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
-					final List<String> words = parent.from.stream()
-						.filter(from -> PatternHelper.find(from, conditionPattern))
-						.collect(Collectors.toList());
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-					sortedList.add(newEntry);
+				childrenGroup.removeAll(groupIntersection);
 
-					//calculate intersection of the parent
-					parent.from.removeAll(words);
-					condition = makeGroup(groupIntersection) + parent.condition;
-					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
+//				LineEntry parentIntersectionEntry = null;
+
+				//if parent-group is empty and children-group not
+				if(parentGroup.isEmpty() && !childrenGroup.isEmpty()){
+					//expand parent: for each last-char of parent.from
+					final Map<Character, List<String>> fromBucket = bucket(parent.from, from -> from.charAt(from.length() - parentConditionLength - 1));
+					for(final Map.Entry<Character, List<String>> entry : fromBucket.entrySet()){
+						final Character key = entry.getKey();
+						//if last-char is contained into intersection
+						if(groupIntersection.contains(key)){
+							//add new rule from parent with condition starting with the last-char
+							final LineEntry newEntry = LineEntry.createFrom(parent, key + parent.condition, entry.getValue());
+							sortedList.add(newEntry);
+						}
+					}
 				}
-				else /*if(parent.condition.isEmpty())*/{
-					final Set<Character> parentGroup2 = extractGroup(parent.from, parentConditionLength);
-					final String condition = makeGroup(parentGroup2) + parent.condition;
-					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
+				//if children-group is empty and parent-group not
+				else if(!parentGroup.isEmpty() && childrenGroup.isEmpty()){
+					//TODO
+					System.out.println("");
 				}
-				sortedList.sort(shortestConditionComparator);
+				//if either parent-group and children-group are not empty
+				else{
+					//TODO
+					System.out.println("");
+				}
+				//create new (parent) rule with condition the difference between parent.condition and intersection
+//				if(!parentGroup.isEmpty()){
+//					String condition = makeNotGroup(childrenGroup) + parent.condition;
+//					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
+//					final List<String> words = parent.from.stream()
+//						.filter(from -> PatternHelper.find(from, conditionPattern))
+//						.collect(Collectors.toList());
+//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+//					sortedList.add(newEntry);
+//
+//					//calculate intersection of the parent
+//					parent.from.removeAll(words);
+//					condition = makeGroup(groupIntersection) + parent.condition;
+//					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
+//				}
+//				else /*if(parent.condition.isEmpty())*/{
+//					final Set<Character> parentGroup2 = extractGroup(parent.from, parentConditionLength);
+//					final String condition = makeGroup(parentGroup2) + parent.condition;
+//					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
+//				}
 
 				//what to do with the intersections?
-				sortedList.add(parentIntersectionEntry);
+//				sortedList.add(parentIntersectionEntry);
+
+				sortedList.sort(shortestConditionComparator);
 System.out.println("");
 			}
 //			//if parent.condition is empty
