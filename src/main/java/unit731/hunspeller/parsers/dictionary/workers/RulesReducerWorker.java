@@ -360,18 +360,16 @@ for(final String rule : rules)
 
 			final int parentConditionLength = parent.condition.length();
 			//find parent-group
-			final String parentGroup = extractGroup(parent.from, parentConditionLength);
+			final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
 
 			final Set<String> childrenFrom = children.stream()
 				 .flatMap(entry -> entry.from.stream())
 				 .collect(Collectors.toSet());
 			//find children-group
-			final String childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+			final Set<Character> childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 
 			//if intersection(parent-group, children-group) is empty
-			final Set<Character> parentGroupSet = SetHelper.makeCharacterSetFrom(parentGroup);
-			final Set<Character> childrenGroupSet = SetHelper.makeCharacterSetFrom(childrenGroup);
-			final Set<Character> groupIntersection = SetHelper.intersection(parentGroupSet, childrenGroupSet);
+			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
 				String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
@@ -397,7 +395,7 @@ for(final String rule : rules)
 				//for each children-same-condition
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
-					final String childGroup = extractGroup(child.from, parentConditionLength);
+					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
 					condition = makeGroup(childGroup) + child.condition;
 					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
@@ -410,12 +408,11 @@ for(final String rule : rules)
 			}
 			else{
 				LineEntry parentIntersectionEntry = null;
-				List<LineEntry> childrenIntersectionEntries = new ArrayList<>();
 
-				//create new (parent) rule with condition as parent.condition \ intersection
-				parentGroupSet.removeAll(groupIntersection);
-				if(!parentGroupSet.isEmpty()){
-					String condition = makeGroup(mergeSet(parentGroupSet)) + parent.condition;
+				//create new (parent) rule with condition the difference between parent.condition and intersection
+				parentGroup.removeAll(groupIntersection);
+				if(!parentGroup.isEmpty()){
+					String condition = makeNotGroup(groupIntersection) + parent.condition;
 					final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
 					final List<String> words = parent.from.stream()
 						.filter(from -> PatternHelper.find(from, conditionPattern))
@@ -425,42 +422,18 @@ for(final String rule : rules)
 
 					//calculate intersection of the parent
 					parent.from.removeAll(words);
-					condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
+					condition = makeGroup(groupIntersection) + parent.condition;
 					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
 				}
 				else /*if(parent.condition.isEmpty())*/{
-					final String condition = extractGroup(parent.from, parentConditionLength) + parent.condition;
+					final Set<Character> parentGroup2 = extractGroup(parent.from, parentConditionLength);
+					final String condition = makeGroup(parentGroup2) + parent.condition;
 					parentIntersectionEntry = LineEntry.createFrom(parent, condition, parent.from);
-				}
-
-				//create new (child) rule with condition as child.condition \ intersection
-				for(LineEntry child : children){
-					final String childGroup = extractGroup(child.from, parentConditionLength);
-					final Set<Character> childGroupSet = SetHelper.makeCharacterSetFrom(childGroup);
-					final boolean groupChanged = childGroupSet.removeAll(groupIntersection);
-					if(groupChanged && !childGroupSet.isEmpty()){
-						String condition = makeGroup(mergeSet(childGroupSet)) + parent.condition;
-						final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
-						final List<String> words = child.from.stream()
-							.filter(from -> PatternHelper.find(from, conditionPattern))
-							.collect(Collectors.toList());
-						LineEntry newEntry = LineEntry.createFrom(child, condition, words);
-						sortedList.add(newEntry);
-
-						//calculate intersection of the child
-						child.from.removeAll(words);
-						condition = makeGroup(mergeSet(groupIntersection)) + parent.condition;
-						newEntry = LineEntry.createFrom(child, condition, child.from);
-						childrenIntersectionEntries.add(newEntry);
-
-						sortedList.remove(child);
-					}
 				}
 				sortedList.sort(shortestConditionComparator);
 
 				//what to do with the intersections?
 				sortedList.add(parentIntersectionEntry);
-				childrenIntersectionEntries.forEach(sortedList::add);
 System.out.println("");
 			}
 //			//if parent.condition is empty
@@ -588,7 +561,7 @@ while current-list is not empty{
 		}
 	}
 
-	private void ahn(final LineEntry parent, final String parentGroup, final List<LineEntry> children, final String childrenGroup,
+	private void ahn(final LineEntry parent, final Set<Character> parentGroup, final List<LineEntry> children, final Set<Character> childrenGroup,
 			final List<LineEntry> sortedList, final List<LineEntry> rules){
 		//add new rule from parent with condition starting with NOT(children-group) to final-list
 		final String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
@@ -646,7 +619,7 @@ while current-list is not empty{
 					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
 						+ "', comm '" + comm.toString());
 
-				final String commonGroup = extractGroup(comm, e.getKey().length());
+				final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
 				final String condition = makeNotGroup(commonGroup)
 					+ e.getKey();
 				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
@@ -670,10 +643,10 @@ while current-list is not empty{
 		//for each children-group-2
 		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
 			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
-			final String bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
+			final Set<Character> bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
 			//do the bubble trick
 			for(int i = conds.getKey().length(); i > 0; i --){
-				final String condition = makeNotGroup(conds.getKey().substring(i - 1, i))
+				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
 					+ conds.getKey().substring(i)
 					+ makeGroup(bubbleGroup)
 					+ parent.condition;
@@ -693,26 +666,17 @@ while current-list is not empty{
 		return newParents;
 	}
 
-	private String mergeSet(final Set<Character> set){
-		return set.stream()
-			.map(String::valueOf)
-			.sorted(comparator)
-			.collect(Collectors.joining());
-	}
-
-	private String extractGroup(final Collection<String> words, final int indexFromLast){
-		final Set<String> group = new HashSet<>();
+	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
+		final Set<Character> group = new HashSet<>();
 		for(String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
 				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
 					+ "] at index " + indexFromLast + " from last because of the presence of the word " + word + " that is too short");
 
-			group.add(String.valueOf(word.charAt(index)));
+			group.add(word.charAt(index));
 		}
-		return group.stream()
-			.sorted(comparator)
-			.collect(Collectors.joining(StringUtils.EMPTY));
+		return group;
 	}
 
 	private <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
@@ -726,12 +690,25 @@ while current-list is not empty{
 		return bucket;
 	}
 
-	private String makeGroup(final String group){
-		return (group.length() > 1? GROUP_START + group + GROUP_END: group);
+	private String makeGroup(final Set<Character> group){
+		String merge = mergeSet(group);
+		return (merge.length() > 1? GROUP_START + merge + GROUP_END: merge);
 	}
 
-	private String makeNotGroup(final String group){
+	private String makeNotGroup(final char group){
 		return NOT_GROUP_START + group + GROUP_END;
+	}
+
+	private String makeNotGroup(final Set<Character> group){
+		String merge = mergeSet(group);
+		return NOT_GROUP_START + merge + GROUP_END;
+	}
+
+	private String mergeSet(final Set<Character> set){
+		return set.stream()
+			.map(String::valueOf)
+			.sorted(comparator)
+			.collect(Collectors.joining());
 	}
 
 	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,

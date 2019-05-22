@@ -194,6 +194,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
 			try{
+				//FIXME
 //				undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
 				undoCaretaker.pushMemento(createMemento());
 
@@ -244,6 +245,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 
 	public void setMeanings(final int index, final List<MeaningEntry> meanings, final String text){
 		try{
+			//FIXME
 //			undoCaretaker.pushMemento(createMemento(index, meanings, text));
 			undoCaretaker.pushMemento(createMemento());
 
@@ -377,6 +379,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public boolean restorePreviousSnapshot() throws IOException{
 		boolean restored = false;
 		if(canUndo()){
+			//FIXME
 			redoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = undoCaretaker.popMemento();
@@ -395,6 +398,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public boolean restoreNextSnapshot() throws IOException{
 		boolean restored = false;
 		if(canRedo()){
+			//FIXME
 			undoCaretaker.pushMemento(createMemento());
 
 			final Memento memento = redoCaretaker.popMemento();
