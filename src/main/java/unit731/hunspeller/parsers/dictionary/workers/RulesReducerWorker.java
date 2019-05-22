@@ -416,7 +416,7 @@ for(final String rule : rules)
 				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
 				if(notGroupList != null){
 					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-					final String condition = (preCondition.size() < childrenGroup.size()? makeGroup(preCondition): makeNotGroup(childrenGroup)) + parent.condition;
+					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition): makeNotGroup(childrenGroup)) + parent.condition;
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 					rules.add(newEntry);
 				}
