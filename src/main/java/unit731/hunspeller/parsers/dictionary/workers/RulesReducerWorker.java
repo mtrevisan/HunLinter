@@ -338,6 +338,50 @@ for(final String rule : rules)
 		return new ArrayList<>(compaction.values());
 	}
 
+	/**<pre>
+	 * sort current-list by shortest condition
+	 * while current-list is not empty{
+	 * 	extract rule from current-list
+	 * 	find parent-group
+	 * 	find children-group
+	 * 	if intersection(parent-group, children-group) is empty{
+	 * 		add new rule from parent with condition starting with NOT(children-group) to final-list
+	 *
+	 * 		if parent.condition is not empty and can-bubble-up{
+	 * 			bubble up by bucketing children for group-2
+	 * 			for each children-group-2
+	 * 				add new rule from parent with condition starting with NOT(children-group-1) to final-list
+	 *
+	 * 			remove bubbles from current-list
+	 * 		}
+	 *
+	 * 		for each children-same-condition
+	 * 			add new rule from child with condition starting with (child-group) to final-list
+	 *
+	 * 		remove same-condition-children from current-list
+	 * 		remove same-condition-children from final-list
+	 * 	}
+	 * 	else if parent.condition is empty{
+	 * 		for each last-char of parent.from
+	 * 			if last-char is contained into intersection
+	 * 				add new rule from parent with condition the last-char
+	 *
+	 * 		if intersection is proper subset of parent-group{
+	 * 			add new rule from parent with condition the difference between parent-grop and intersection to final-list
+	 * 			keep only rules that matches some existent words
+	 * 		}
+	 * 	}
+	 * 	else{
+	 * 		?
+	 * //		calculate intersection between parent and children conditions
+	 * //		if intersection is empty
+	 * //			check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and another-rule.condition == condition
+	 * 	}
+	 *
+	 * 	remove parent from final-list
+	 * }
+	 * </pre>
+	 */
 	//FIXME tested bottom-up until r3
 	private void removeOverlappingConditions(final List<LineEntry> rules){
 		//sort current-list by shortest condition
@@ -518,73 +562,29 @@ System.out.println("");
 
 			//remove parent from final list
 			rules.remove(parent);
-
-/*
-sort current-list by shortest condition
-while current-list is not empty{
-	extract rule from current-list
-	find parent-group
-	find children-group
-	if intersection(parent-group, children-group) is empty{
-		add new rule from parent with condition starting with NOT(children-group) to final-list
-
-		if parent.condition is not empty and can-bubble-up{
-			bubble up by bucketing children for group-2
-			for each children-group-2
-				add new rule from parent with condition starting with NOT(children-group-1) to final-list
-
-			remove bubbles from current-list
-		}
-
-		for each children-same-condition
-			add new rule from child with condition starting with (child-group) to final-list
-
-		remove same-condition-children from current-list
-		remove same-condition-children from final-list
-	}
-	else if parent.condition is empty{
-		for each last-char of parent.from
-			if last-char is contained into intersection
-				add new rule from parent with condition the last-char
-
-		if intersection is proper subset of parent-group{
-			add new rule from parent with condition the difference between parent-grop and intersection to final-list
-			keep only rules that matches some existent words
-		}
-	}
-	else{
-		?
-//		calculate intersection between parent and children conditions
-//		if intersection is empty
-//			check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and another-rule.condition == condition
-	}
-
-	remove parent from final-list
-}
-*/
 		}
 	}
 
-	private void ahn(final LineEntry parent, final Set<Character> parentGroup, final List<LineEntry> children, final Set<Character> childrenGroup,
-			final List<LineEntry> sortedList, final List<LineEntry> rules){
-		//add new rule from parent with condition starting with NOT(children-group) to final-list
-		final String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
-		final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-		rules.add(newEntry);
-
-		//if parent.condition is not empty
-		if(!parent.condition.isEmpty()){
-			final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
-			//if can-bubble-up
-			if(!bubbles.isEmpty()){
-				final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-				rules.addAll(bubbledRules);
-
-				//remove bubbles from current-list
-				bubbles.forEach(sortedList::remove);
-			}
-		}
-	}
+//	private void ahn(final LineEntry parent, final Set<Character> parentGroup, final List<LineEntry> children, final Set<Character> childrenGroup,
+//			final List<LineEntry> sortedList, final List<LineEntry> rules){
+//		//add new rule from parent with condition starting with NOT(children-group) to final-list
+//		final String condition = (parent.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(childrenGroup) + parent.condition);
+//		final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+//		rules.add(newEntry);
+//
+//		//if parent.condition is not empty
+//		if(!parent.condition.isEmpty()){
+//			final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
+//			//if can-bubble-up
+//			if(!bubbles.isEmpty()){
+//				final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+//				rules.addAll(bubbledRules);
+//
+//				//remove bubbles from current-list
+//				bubbles.forEach(sortedList::remove);
+//			}
+//		}
+//	}
 
 	private List<LineEntry> extractRuleBubbles(final LineEntry parent, final List<LineEntry> sortedList){
 		final int parentConditionLength = parent.condition.length();
@@ -670,19 +670,19 @@ while current-list is not empty{
 		return newParents;
 	}
 
+	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(List<LineEntry> entries){
-		//merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`)
-		Map<String, List<LineEntry>> mergeBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
-			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + RegExpSequencer.splitSequence(entry.condition).length:
+		Map<String, List<LineEntry>> similarityBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
+			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB + RegExpSequencer.splitSequence(entry.condition).length:
 			null));
-		for(List<LineEntry> set : mergeBucket.values())
-			if(set.size() > 1){
-				LineEntry firstEntry = set.iterator().next();
-				String[] firstEntryCondition = RegExpSequencer.splitSequence(firstEntry.condition);
-				String[] commonPreCondition = SEQUENCER.subSequence(firstEntryCondition, 0, 1);
-				String[] commonPostCondition = SEQUENCER.subSequence(firstEntryCondition, 2);
-				//extract all the rules from `set` that has the condition compatible with firstEntry.condition
-				String condition = set.stream()
+		for(List<LineEntry> similarities : similarityBucket.values())
+			if(similarities.size() > 1){
+				LineEntry firstEntry = similarities.iterator().next();
+				String[] firstCondition = RegExpSequencer.splitSequence(firstEntry.condition);
+				String[] commonPreCondition = SEQUENCER.subSequence(firstCondition, 0, 1);
+				String[] commonPostCondition = SEQUENCER.subSequence(firstCondition, 2);
+				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
+				String condition = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1])
 					.sorted(comparator)
 					.distinct()
@@ -694,7 +694,7 @@ while current-list is not empty{
 					.collect(Collectors.toList());
 				entries.add(LineEntry.createFrom(firstEntry, condition, words));
 
-				set.forEach(entries::remove);
+				similarities.forEach(entries::remove);
 			}
 	}
 
