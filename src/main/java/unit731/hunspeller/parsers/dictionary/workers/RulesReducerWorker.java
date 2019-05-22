@@ -491,7 +491,7 @@ for(final String rule : rules)
 	private List<LineEntry> extractRuleBubbles(final LineEntry parent, final List<LineEntry> sortedList){
 		final int parentConditionLength = parent.condition.length();
 		return sortedList.stream()
-			.filter(entry -> entry.condition.length() > parentConditionLength + 1)
+			.filter(entry -> entry.condition.length() > parentConditionLength)
 			.collect(Collectors.toList());
 	}
 
