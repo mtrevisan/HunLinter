@@ -247,10 +247,18 @@ final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
 			checkRules.add(compactedFilteredRule);
 		}
-		if(!checkRules.equals(new HashSet<>(plainRules))){
-for(final String rule : rules)
-	LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
-			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + plainRules.size() + " productions, obtained "
+		Set<LineEntry> uniquePlainRules = new HashSet<>(plainRules);
+		if(!checkRules.equals(uniquePlainRules)){
+Set<LineEntry> intersection = SetHelper.intersection(checkRules, uniquePlainRules);
+checkRules.removeAll(intersection);
+uniquePlainRules.removeAll(intersection);
+LOGGER.info(Backbone.MARKER_RULE_REDUCER, "overproduced rules");
+for(final LineEntry entry : checkRules)
+	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
+LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules");
+for(final LineEntry entry : uniquePlainRules)
+	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
+			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + uniquePlainRules.size() + " productions, obtained "
 				+ checkRules.size());
 		}
 	}
@@ -436,7 +444,7 @@ for(final String rule : rules)
 					if(!bubbles.isEmpty()){
 						//FIXME
 						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-//						rules.addAll(bubbledRules);
+						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
 						bubbles.forEach(sortedList::remove);
