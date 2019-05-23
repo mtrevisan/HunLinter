@@ -456,7 +456,7 @@ for(final String rule : rules)
 			else{
 				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
 
-				//here...
+				//should be here...
 				if(parentGroup.equals(groupIntersection)){
 					final String condition = notGroupIntersection + parent.condition;
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
@@ -506,9 +506,9 @@ for(final String rule : rules)
 	private List<LineEntry> bubbleUpNotGroup(final LineEntry parent, final List<LineEntry> children){
 		final int parentConditionLength = parent.condition.length();
 		//bubble up by bucketing children for group-2
-		final List<String> bubblesCondition = children.stream()
+		final Set<String> bubblesCondition = children.stream()
 			.map(entry -> entry.condition)
-			.collect(Collectors.toList());
+			.collect(Collectors.toSet());
 
 		/*
 		extract communalities:
