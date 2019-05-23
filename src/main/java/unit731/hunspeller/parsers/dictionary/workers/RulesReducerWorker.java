@@ -116,6 +116,13 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 			return split;
 		}
 
+		public List<String> extractFromEndingWith(String suffix){
+			final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
+			return from.stream()
+				.filter(from -> PatternHelper.find(from, conditionPattern))
+				.collect(Collectors.toList());
+		}
+
 		public String anAddition(){
 			return addition.iterator().next();
 		}
@@ -427,11 +434,14 @@ for(final String rule : rules)
 					final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
 					//if can-bubble-up
 					if(!bubbles.isEmpty()){
+						//FIXME
 						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-						rules.addAll(bubbledRules);
+//						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
 						bubbles.forEach(sortedList::remove);
+bubbledRules.size();
+System.out.println("fix me");
 					}
 				}
 
@@ -535,10 +545,7 @@ for(final String rule : rules)
 
 				final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
 				final String condition = makeNotGroup(commonGroup, e.getKey());
-				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
-				final List<String> words = parent.from.stream()
-					.filter(from -> PatternHelper.find(from, conditionPattern))
-					.collect(Collectors.toList());
+				final List<String> words = parent.extractFromEndingWith(condition);
 				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
 				//keep only rules that matches some existent words
 				if(!words.isEmpty())
@@ -562,10 +569,7 @@ for(final String rule : rules)
 				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
 					+ conds.getKey().substring(i)
 					+ makeGroup(bubbleGroup, parent.condition);
-				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
-				final List<String> words = parent.from.stream()
-					.filter(from -> PatternHelper.find(from, conditionPattern))
-					.collect(Collectors.toList());
+				final List<String> words = parent.extractFromEndingWith(condition);
 				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
 				//keep only rules that matches some existent words
 				if(!words.isEmpty())
@@ -597,10 +601,7 @@ for(final String rule : rules)
 					.distinct()
 					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END));
 				condition = StringUtils.join(commonPreCondition) + condition + StringUtils.join(commonPostCondition);
-				final Pattern conditionPattern = PatternHelper.pattern(condition + PATTERN_END_OF_WORD);
-				final List<String> words = firstEntry.from.stream()
-					.filter(from -> PatternHelper.find(from, conditionPattern))
-					.collect(Collectors.toList());
+				final List<String> words = firstEntry.extractFromEndingWith(condition);
 				entries.add(LineEntry.createFrom(firstEntry, condition, words));
 
 				similarities.forEach(entries::remove);
