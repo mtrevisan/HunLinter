@@ -536,14 +536,14 @@ System.out.println("fix me");
 		/*
 		extract communalities:
 		from
-		"ò => [òdo, òco, òko]"
-		"è => [èdo, èđo, èxo]"
+			"è => [èdo, èđo, èxo]"
+			"ò => [òdo, òco, òko]"
 		transform into
-		"ò => [òco, òko]"
-		"è => [èđo, èxo]"
-		"òè => [òdo, èdo]"
-		so add condition
-		'[^èò]do'
+			"è => [èđo, èxo]"
+			"ò => [òco, òko]"
+			"èò => [òdo, èdo]"
+		and add condition
+			'[^èò]do'
 		*/
 		final List<LineEntry> newParents = new ArrayList<>();
 		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
