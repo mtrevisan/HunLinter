@@ -549,34 +549,37 @@ System.out.println("fix me");
 		final List<LineEntry> newParents = new ArrayList<>();
 		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
 			cond -> cond.substring(cond.length() - parentConditionLength - 1));
+		//remove single conditions
+		Iterator<Map.Entry<String, List<String>>> itr = communalitiesBucket.entrySet().iterator();
+		while(itr.hasNext())
+			if(itr.next().getValue().size() == 1)
+				itr.remove();
 		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
 			final List<String> comm = e.getValue();
-			if(comm.size() > 1){
-				//FIXME
-//				if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
-//					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
-//						+ "', comm '" + comm.toString());
+			//FIXME
+//			if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
+//				throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
+//					+ "', comm '" + comm.toString());
 
-				for(String c : comm){
-					final List<String> gg = children.stream()
-						.filter(entry -> entry.condition.equals(c))
-						.flatMap(entry -> entry.from.stream())
-						.collect(Collectors.toList());
-					bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
-				}
-				final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
-				final String condition = makeNotGroup(commonGroup, e.getKey());
-				final List<String> words = parent.extractFromEndingWith(condition);
-				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-				//keep only rules that matches some existent words
-				if(!words.isEmpty())
-					newParents.add(newEntry);
-				else
-					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-
-				comm.forEach(bubblesCondition::remove);
+			for(String c : comm){
+				final List<String> gg = children.stream()
+					.filter(entry -> entry.condition.equals(c))
+					.flatMap(entry -> entry.from.stream())
+					.collect(Collectors.toList());
+				bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
 			}
+			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
+			final String condition = makeNotGroup(commonGroup, e.getKey());
+			final List<String> words = parent.extractFromEndingWith(condition);
+			final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+			//keep only rules that matches some existent words
+			if(!words.isEmpty())
+				newParents.add(newEntry);
+			else
+				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+
+			comm.forEach(bubblesCondition::remove);
 		}
 
 		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
