@@ -204,9 +204,9 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		};
 		final Runnable completed = () -> {
 			try{
-				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules", plainRules.size());
-
 				final List<LineEntry> compactedRules = compactRules(plainRules);
+
+				LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules", compactedRules.size());
 
 				removeOverlappingConditions(compactedRules);
 
@@ -477,8 +477,11 @@ System.out.println("fix me");
 				//should be here...
 				if(parentGroup.equals(groupIntersection)){
 					final String condition = notGroupIntersection + parent.condition;
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-					rules.add(newEntry);
+					final List<String> words = parent.extractFromEndingWith(condition);
+					if(!words.isEmpty()){
+						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+						rules.add(newEntry);
+					}
 				}
 
 				final Map<String, List<String>> fromBucket = bucket(parent.from,
