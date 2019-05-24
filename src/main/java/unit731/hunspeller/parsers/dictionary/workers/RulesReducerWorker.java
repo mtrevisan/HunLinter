@@ -498,10 +498,12 @@ System.out.println("fix me");
 				}
 				//... or here?
 //				else{
-//					final String notGroupIntersection = makeNotGroup(groupIntersection);
 //					final String condition = notGroupIntersection + parent.condition;
-//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-//					rules.add(newEntry);
+//					final List<String> words = parent.extractFromEndingWith(condition);
+//					if(!words.isEmpty()){
+//						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+//						rules.add(newEntry);
+//					}
 //				}
 				for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
 					final String condition = entry.getKey() + parent.condition;
