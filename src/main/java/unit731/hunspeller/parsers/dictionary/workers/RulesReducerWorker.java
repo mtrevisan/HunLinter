@@ -542,7 +542,8 @@ System.out.println("fix me");
 			"è => [èđo, èxo]"
 			"ò => [òco, òko]"
 			"èò => [òdo, èdo]"
-		and add condition
+		extract common-group (key.length > 1)
+		add new rule from parent with condition starting with NOT(common-group) to final-list
 			'[^èò]do'
 		*/
 		final List<LineEntry> newParents = new ArrayList<>();
@@ -552,10 +553,17 @@ System.out.println("fix me");
 			final List<String> comm = e.getValue();
 			if(comm.size() > 1){
 				//FIXME
-				if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
-					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
-						+ "', comm '" + comm.toString());
+//				if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
+//					throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
+//						+ "', comm '" + comm.toString());
 
+				for(String c : comm){
+					final List<String> gg = children.stream()
+						.filter(entry -> entry.condition.equals(c))
+						.flatMap(entry -> entry.from.stream())
+						.collect(Collectors.toList());
+					bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
+				}
 				final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
 				final String condition = makeNotGroup(commonGroup, e.getKey());
 				final List<String> words = parent.extractFromEndingWith(condition);
