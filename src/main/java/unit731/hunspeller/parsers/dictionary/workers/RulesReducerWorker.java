@@ -445,12 +445,12 @@ for(final LineEntry entry : uniquePlainRules)
 					//if can-bubble-up
 					if(!bubbles.isEmpty()){
 						//FIXME
-						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+//						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 //						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
 //						bubbles.forEach(sortedList::remove);
-bubbledRules.size();
+//bubbledRules.size();
 System.out.println("fix me");
 					}
 				}
