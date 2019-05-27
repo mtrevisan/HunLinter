@@ -90,6 +90,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 			this.addition = addition;
 			this.condition = condition;
 
+if("[^aeor]".equals(condition))
+	System.out.println("");
 			from = new HashSet<>();
 			if(words != null)
 				from.addAll(words);
@@ -433,8 +435,7 @@ for(final LineEntry entry : uniquePlainRules)
 			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
-//				String condition = (parentGroup.size() < childrenGroup.size()? makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
-				String condition = makeNotGroup(childrenGroup, parent.condition);
+				String condition = (parentGroup.size() < childrenGroup.size()? makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
 
@@ -445,10 +446,10 @@ for(final LineEntry entry : uniquePlainRules)
 					if(!bubbles.isEmpty()){
 						//FIXME
 						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-						rules.addAll(bubbledRules);
+//						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
-						bubbles.forEach(sortedList::remove);
+//						bubbles.forEach(sortedList::remove);
 bubbledRules.size();
 System.out.println("fix me");
 					}
@@ -461,8 +462,9 @@ System.out.println("fix me");
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
 					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-					condition = (sameConditionChildren.size() == 1 && !sameConditionChildren.containsAll(childGroup)?
-						makeNotGroup(parentGroup, child.condition): makeGroup(childGroup, child.condition));
+//					condition = (sameConditionChildren.size() == 1 && !sameConditionChildren.containsAll(childGroup)?
+//						makeNotGroup(parentGroup, child.condition): makeGroup(childGroup, child.condition));
+					condition = makeGroup(childGroup, child.condition);
 					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}

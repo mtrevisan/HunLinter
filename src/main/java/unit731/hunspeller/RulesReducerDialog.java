@@ -175,6 +175,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	public final void reload(){
+		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
 
 		AffixData affixData = backbone.getAffixData();
