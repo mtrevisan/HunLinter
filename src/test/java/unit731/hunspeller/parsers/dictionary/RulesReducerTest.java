@@ -49,7 +49,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
@@ -111,7 +111,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
@@ -180,7 +180,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("òbo", "obato", "òbo", "gòbo"),
@@ -262,7 +262,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("òda", "odista", "òda", "mòda"),
@@ -416,7 +416,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("èla", new HashSet<>(Arrays.asList("elaría", "elería", "elarieta", "elerieta")), "èla", Arrays.asList("kasèla", "kaxèla")),
@@ -575,7 +575,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("ía", "ixmo", "ía", "maƚinkonía"),
@@ -623,7 +623,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("òko", "okixmo", "òko", "pitòko"),
@@ -685,7 +685,7 @@ public class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("r", new HashSet<>(Arrays.asList("oreto", "toreto", "dora", "doreta", "ora", "doreto", "tor", "toreta", "oreta", "or",
@@ -711,6 +711,178 @@ public class RulesReducerTest{
 			"SFX r8 r doreto r",
 			"SFX r8 r toreta r",
 			"SFX r8 r toreto r"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
+	@Test
+	public void simple9() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX r7 Y 34",
+			"SFX r7 rò ora rò",
+			"SFX r7 rò dora rò",
+			"SFX r7 rò or rò",
+			"SFX r7 rò tora rò",
+			"SFX r7 rò dor rò",
+			"SFX r7 rò oreta rò",
+			"SFX r7 rò tor rò",
+			"SFX r7 rò doreta rò",
+			"SFX r7 rò toreta rò",
+			"SFX r7 rò oreto rò",
+			"SFX r7 rò doreto rò",
+			"SFX r7 rò toreto rò",
+			"SFX r7 r ora [^o]r",
+			"SFX r7 r dora [^o]r",
+			"SFX r7 r or [^o]r",
+			"SFX r7 r tora [^o]r",
+			"SFX r7 r dor [^o]r",
+			"SFX r7 r oreta [^o]r",
+			"SFX r7 r tor [^o]r",
+			"SFX r7 r doreta [^o]r",
+			"SFX r7 r toreta [^o]r",
+			"SFX r7 r oreto [^o]r",
+			"SFX r7 r doreto [^o]r",
+			"SFX r7 r toreto [^o]r",
+			"SFX r7 0 eto dor",
+			"SFX r7 dor or dor",
+			"SFX r7 dor tor dor",
+			"SFX r7 dor oreto dor",
+			"SFX r7 dor toreto dor",
+			"SFX r7 a eta dora",
+			"SFX r7 dora ora dora",
+			"SFX r7 dora tora dora",
+			"SFX r7 dora oreta dora",
+			"SFX r7 dora toreta dora"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "r7";
+		List<String> words = Arrays.asList("reŧevidor", "reŧeidor", "stridor", "resevidor", "reseidor", "fondarò", "batarò", "duxarò", "vendarò",
+			"kredarò", "provedarò", "bevarò", "resevidora", "reseidora", "bratadora", "feridora", "reŧevidora", "reŧeidora", "dopiar", "kavar",
+			"armar", "soleŧitar", "sadar", "trionfar", "kojonbarar", "pasar", "strologar", "dorar", "salar", "arar", "barar", "rengar", "ligar",
+			"partegar", "bevarar", "destramedar", "kolorir", "spekular", "tajar", "guidar", "paŧifegar", "ventilar", "komandar", "noledar",
+			"inpaɉar", "tubiar", "barkar", "spolar", "sopresar", "sagurar", "suxerir", "filar", "karexar", "stokar", "taɉar", "xjonfar", "mendar",
+			"remar", "sostentar", "mexar", "sperdurar", "faitar", "versar", "sprexurar", "alienar", "trebiar", "kronpar", "suɉerir", "xogar",
+			"kuantifegar", "inbiankar", "garbelar", "audir", "palar", "studiar", "renkurar", "renfreskar", "vixitar", "fiokar", "međar", "mexurar",
+			"befar", "kaređar", "kalŧar", "desturbar", "botiđar", "kurar", "falsifegar", "spigolar", "kalkar", "stronđar", "bitar", "brunir",
+			"xugar", "kartar", "kalsar", "raxar", "trufar", "sujarir", "koniar", "vanpar", "garđar", "bufar", "salidar", "semenar", "danexar",
+			"sekurar", "minconar", "piantar", "kuadrar", "nolixar", "krivelar", "tarixar", "stuŧegar", "infrandar", "krear", "inbotir", "strondar",
+			"setar", "travaxar", "buratar", "akuxar", "sparxurar", "menar", "kopar", "kuniar", "mediar", "dupiar", "skansar", "botonar", "suɉarir",
+			"oxelar", "goernar", "pasifegar", "solesitar", "ingraviar", "saltar", "mentir", "servar", "kastrar", "parar", "segurar", "konfortar",
+			"mokar", "sekar", "kalibrar", "sorar", "medar", "pionar", "kaŧar", "bufonar", "xɉonfar", "karedar", "mormolar", "đontar", "kasar",
+			"takar", "predegar", "mañar", "sesolar", "luminar", "konŧar", "koñar", "stimar", "xbrufar", "paisar", "kantar", "ŧarlar", "fondar",
+			"sarlar", "defamar", "fornir", "gardar", "botidar", "ŧetar", "kondurar", "banpar", "partir", "redar", "menestrar", "xontar", "konsar",
+			"inpajar", "portar", "rekamar", "inpinir", "infranđar", "governar", "koɉonbarar", "sitar", "sarvar", "aldir", "sperxurar", "dugar",
+			"pagar", "pisar", "sapar", "nolexar", "tokar", "saxar", "tirar", "likar", "peskar", "kalkolar", "gabar", "tornir", "ŧernir", "kuñar",
+			"rascar", "xgrafiñar", "istuar", "sfroxar", "spaŧar", "dimandar", "stivar", "apaltar", "borar", "lavorar", "levar", "konđurar",
+			"destramexar", "saldar", "varar", "mirar", "stusegar", "koɉonar", "noliđar", "sagomar", "operar", "kontar", "kaveŧar", "mormorar",
+			"konsumar", "vantar", "cacarar", "sperđurar", "papar", "montar", "tamixar", "murar", "tariđar", "urtar", "kavesar", "argomentar",
+			"libar", "spasar", "fiabar", "sikurar", "strisar", "kargar", "misiar", "pilar", "piŧar", "prokurar", "skarpelar", "salixar", "ŧerkar",
+			"lustrar", "forar", "balar", "purgar", "sađar", "radar", "spedir", "dontar", "rafinar", "ŧapar", "ŧitar", "kojonar", "stanpar",
+			"spredurar", "estimar", "serkar", "bruskar", "noar", "pianar", "subarendar", "fiorir", "stronxar", "lavar", "sajar", "spređurar",
+			"rear", "braŧar", "pontar", "kapar", "springar", "beverar", "fregar", "ordir", "brasar", "petenar", "siegar", "garxar", "pekar",
+			"xbuxar", "kaminar", "laorar", "cetar", "đogar", "sigurar", "saɉar", "gomiar", "bolar", "maxenar", "formar", "trivelar", "suxarir",
+			"balotar", "biastemar", "nolidar", "ŧanŧar", "kolar", "supiar", "sialakuar", "infiar", "noleđar", "sernir", "varsar", "granir",
+			"pertegar", "trovar", "rinfreskar", "matar", "sugar", "andar", "segar", "sansar", "konxurar", "iluminar", "sujerir", "botixar",
+			"mankar", "ŧimar", "petar", "sonar", "examinar", "largar", "señalar", "guarnir", "simar", "saliđar", "guastar", "kagar", "refreskar",
+			"lexixlar", "señar", "dogar", "minusar", "konprar", "inpastar", "trasinar", "regolar", "rostir", "dexeñar", "taridar", "skardar",
+			"folar", "kalmar", "raspar", "butar", "đugar", "minuŧar", "strupiar", "infranxar", "destrameđar", "bosar", "frapar", "stuar", "mixurar",
+			"ŧoetar", "manestrar", "testar", "kortegar", "maŧar", "soetar", "strolegar", "boŧar", "parlar", "sublokar", "guantar", "fortifegar",
+			"fumar", "inganar", "negar", "masar", "stukar");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("rò", new HashSet<>(Arrays.asList("oreto", "dora", "doreta", "ora", "toreto", "doreto", "tor", "toreta", "oreta", "or",
+				"tora", "dor")), "rò", Arrays.asList("fondarò", "batarò", "duxarò", "vendarò", "kredarò", "provedarò", "bevarò")),
+			new LineEntry("dora", new HashSet<>(Arrays.asList("doreta", "ora", "toreta", "oreta", "tora")), "dora", Arrays.asList("resevidora",
+				"reseidora", "bratadora", "feridora", "reŧevidora", "reŧeidora")),
+			new LineEntry("dor", new HashSet<>(Arrays.asList("oreto", "toreto", "doreto", "tor", "or")), "dor", Arrays.asList("reŧevidor",
+				"reŧeidor", "stridor", "resevidor", "reseidor")),
+			new LineEntry("r", new HashSet<>(Arrays.asList("oreto", "dora", "doreta", "ora", "toreto", "doreto", "tor", "toreta", "oreta", "or",
+				"tora", "dor")), "[^o]r", Arrays.asList("dopiar", "kavar", "armar", "soleŧitar", "sadar", "trionfar", "kojonbarar", "pasar",
+				"strologar", "dorar", "salar", "arar", "barar", "rengar", "ligar", "partegar", "bevarar", "destramedar", "kolorir", "spekular",
+				"tajar", "guidar", "paŧifegar", "ventilar", "komandar", "noledar", "inpaɉar", "tubiar", "barkar", "spolar", "sopresar", "sagurar",
+				"suxerir", "filar", "karexar", "stokar", "taɉar", "xjonfar", "mendar", "remar", "sostentar", "mexar", "sperdurar", "faitar",
+				"versar", "sprexurar", "alienar", "trebiar", "kronpar", "suɉerir", "xogar", "kuantifegar", "inbiankar", "garbelar", "audir", "palar",
+				"studiar", "renkurar", "renfreskar", "vixitar", "fiokar", "međar", "mexurar", "befar", "kaređar", "kalŧar", "desturbar", "botiđar",
+				"kurar", "falsifegar", "spigolar", "kalkar", "stronđar", "bitar", "brunir", "xugar", "kartar", "kalsar", "raxar", "trufar", "sujarir",
+				"koniar", "vanpar", "garđar", "bufar", "salidar", "semenar", "danexar", "sekurar", "minconar", "piantar", "kuadrar", "nolixar",
+				"krivelar", "tarixar", "stuŧegar", "infrandar", "krear", "inbotir", "strondar", "setar", "travaxar", "buratar", "akuxar", "sparxurar",
+				"menar", "kopar", "kuniar", "mediar", "dupiar", "skansar", "botonar", "suɉarir", "oxelar", "goernar", "pasifegar", "solesitar",
+				"ingraviar", "saltar", "mentir", "servar", "kastrar", "parar", "segurar", "konfortar", "mokar", "sekar", "kalibrar", "sorar", "medar",
+				"pionar", "kaŧar", "bufonar", "xɉonfar", "karedar", "mormolar", "đontar", "kasar", "takar", "predegar", "mañar", "sesolar", "luminar",
+				"konŧar", "koñar", "stimar", "xbrufar", "paisar", "kantar", "ŧarlar", "fondar", "sarlar", "defamar", "fornir", "gardar", "botidar",
+				"ŧetar", "kondurar", "banpar", "partir", "redar", "menestrar", "xontar", "konsar", "inpajar", "portar", "rekamar", "inpinir",
+				"infranđar", "governar", "koɉonbarar", "sitar", "sarvar", "aldir", "sperxurar", "dugar", "pagar", "pisar", "sapar", "nolexar",
+				"tokar", "saxar", "tirar", "likar", "peskar", "kalkolar", "gabar", "tornir", "ŧernir", "kuñar", "rascar", "xgrafiñar", "istuar",
+				"sfroxar", "spaŧar", "dimandar", "stivar", "apaltar", "borar", "lavorar", "levar", "konđurar", "destramexar", "saldar", "varar",
+				"mirar", "stusegar", "koɉonar", "noliđar", "sagomar", "operar", "kontar", "kaveŧar", "mormorar", "konsumar", "vantar", "cacarar",
+				"sperđurar", "papar", "montar", "tamixar", "murar", "tariđar", "urtar", "kavesar", "argomentar", "libar", "spasar", "fiabar",
+				"sikurar", "strisar", "kargar", "misiar", "pilar", "piŧar", "prokurar", "skarpelar", "salixar", "ŧerkar", "lustrar", "forar",
+				"balar", "purgar", "sađar", "radar", "spedir", "dontar", "rafinar", "ŧapar", "ŧitar", "kojonar", "stanpar", "spredurar", "estimar",
+				"serkar", "bruskar", "noar", "pianar", "subarendar", "fiorir", "stronxar", "lavar", "sajar", "spređurar", "rear", "braŧar", "pontar",
+				"kapar", "springar", "beverar", "fregar", "ordir", "brasar", "petenar", "siegar", "garxar", "pekar", "xbuxar", "kaminar", "laorar",
+				"cetar", "đogar", "sigurar", "saɉar", "gomiar", "bolar", "maxenar", "formar", "trivelar", "suxarir", "balotar", "biastemar",
+				"nolidar", "ŧanŧar", "kolar", "supiar", "sialakuar", "infiar", "noleđar", "sernir", "varsar", "granir", "pertegar", "trovar",
+				"rinfreskar", "matar", "sugar", "andar", "segar", "sansar", "konxurar", "iluminar", "sujerir", "botixar", "mankar", "ŧimar", "petar",
+				"sonar", "examinar", "largar", "señalar", "guarnir", "simar", "saliđar", "guastar", "kagar", "refreskar", "lexixlar", "señar",
+				"dogar", "minusar", "konprar", "inpastar", "trasinar", "regolar", "rostir", "dexeñar", "taridar", "skardar", "folar", "kalmar",
+				"raspar", "butar", "đugar", "minuŧar", "strupiar", "infranxar", "destrameđar", "bosar", "frapar", "stuar", "mixurar", "ŧoetar",
+				"manestrar", "testar", "kortegar", "maŧar", "soetar", "strolegar", "boŧar", "parlar", "sublokar", "guantar", "fortifegar", "fumar",
+				"inganar", "negar", "masar", "stukar"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX r7 Y 34",
+			"SFX r7 rò or rò",
+			"SFX r7 rò dor rò",
+			"SFX r7 rò ora rò",
+			"SFX r7 rò tor rò",
+			"SFX r7 rò dora rò",
+			"SFX r7 rò tora rò",
+			"SFX r7 rò oreta rò",
+			"SFX r7 rò oreto rò",
+			"SFX r7 rò doreta rò",
+			"SFX r7 rò doreto rò",
+			"SFX r7 rò toreta rò",
+			"SFX r7 rò toreto rò",
+			"SFX r7 r or [^o]r",
+			"SFX r7 r dor [^o]r",
+			"SFX r7 r ora [^o]r",
+			"SFX r7 r tor [^o]r",
+			"SFX r7 r dora [^o]r",
+			"SFX r7 r tora [^o]r",
+			"SFX r7 r oreta [^o]r",
+			"SFX r7 r oreto [^o]r",
+			"SFX r7 r doreta [^o]r",
+			"SFX r7 r doreto [^o]r",
+			"SFX r7 r toreta [^o]r",
+			"SFX r7 r toreto [^o]r",
+			"SFX r7 0 eto dor",
+			"SFX r7 dor or dor",
+			"SFX r7 dor tor dor",
+			"SFX r7 dor oreto dor",
+			"SFX r7 dor toreto dor",
+			"SFX r7 a eta dora",
+			"SFX r7 dora ora dora",
+			"SFX r7 dora tora dora",
+			"SFX r7 dora oreta dora",
+			"SFX r7 dora toreta dora"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 

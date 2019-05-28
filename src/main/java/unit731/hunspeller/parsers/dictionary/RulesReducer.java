@@ -146,7 +146,7 @@ public class RulesReducer{
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	public List<LineEntry> reduceProductions(final List<LineEntry> plainRules){
+	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
 		final List<LineEntry> compactedRules = compactRules(plainRules);
 
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules", compactedRules.size());
