@@ -552,6 +552,104 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	public void simple6() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX s1 Y 3",
+			"SFX s1 0 ixmo r",
+			"SFX s1 ía ixmo ía",
+			"SFX s1 òmo omixmo òmo"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "s1";
+		List<String> words = Arrays.asList("ƚuminar", "gaƚantòmo", "maƚinkonía");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("ía", "ixmo", "ía", "maƚinkonía"),
+			new LineEntry("òmo", "omixmo", "òmo", "gaƚantòmo"),
+			new LineEntry("0", "ixmo", "r", "ƚuminar")
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX s1 Y 3",
+			"SFX s1 0 ixmo r",
+			"SFX s1 ía ixmo ía",
+			"SFX s1 òmo omixmo òmo"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
+	@Test
+	public void simple7() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX s0 Y 6",
+			"SFX s0 0 ixmo [nr]",
+			"SFX s0 ía ixmo ía",
+			"SFX s0 a ixmo [^í]a",
+			"SFX s0 òko okixmo òko",
+			"SFX s0 òmo omixmo òmo",
+			"SFX s0 òto otixmo òto"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "s0";
+		List<String> words = Arrays.asList("malinkonía", "bigòto", "galantòmo", "pitòko", "bigòto", "baron", "kokon", "konpar", "luminar",
+			"franŧexa", "fransexa");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("òko", "okixmo", "òko", "pitòko"),
+			new LineEntry("ía", "ixmo", "ía", "malinkonía"),
+			new LineEntry("òmo", "omixmo", "òmo", "galantòmo"),
+			new LineEntry("òto", "otixmo", "òto", "bigòto"),
+			new LineEntry("0", "ixmo", "[nr]", Arrays.asList("baron", "kokon", "konpar", "luminar")),
+			new LineEntry("a", "ixmo", "[^í]a", Arrays.asList("franŧexa", "fransexa"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX s0 Y 6",
+			"SFX s0 0 ixmo [nr]",
+			"SFX s0 ía ixmo ía",
+			"SFX s0 a ixmo [^í]a",
+			"SFX s0 òko okixmo òko",
+			"SFX s0 òmo omixmo òmo",
+			"SFX s0 òto otixmo òto"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();

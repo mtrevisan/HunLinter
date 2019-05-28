@@ -158,7 +158,8 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules) throws IllegalArgumentException{
+	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules)
+			throws IllegalArgumentException{
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -171,8 +172,8 @@ public class RulesReducer{
 		return rules;
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules, final List<String> originalLines)
-			throws IllegalArgumentException{
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules,
+			final List<String> originalLines) throws IllegalArgumentException{
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
@@ -202,8 +203,8 @@ for(final LineEntry entry : checkRules)
 LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules");
 for(final LineEntry entry : uniquePlainRules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + uniquePlainRules.size() + " productions, obtained "
-				+ checkRules.size());
+			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + uniquePlainRules.size()
+				+ " productions, obtained " + checkRules.size());
 		}
 	}
 
@@ -302,7 +303,8 @@ for(final LineEntry entry : uniquePlainRules)
 			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
-				String condition = (parentGroup.size() < childrenGroup.size()? makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
+				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
+					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
 
@@ -363,7 +365,8 @@ System.out.println("fix me");
 				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
 				if(notGroupList != null){
 					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition, parent.condition): makeNotGroup(childrenGroup, parent.condition));
+					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition, parent.condition):
+						makeNotGroup(childrenGroup, parent.condition));
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 					rules.add(newEntry);
 				}
