@@ -94,6 +94,8 @@ public class RulesReducer{
 			this.addition = addition;
 			this.condition = condition;
 
+if(condition.contains("cdirx"))
+				System.out.println("");
 			from = new HashSet<>();
 			if(words != null)
 				from.addAll(words);
@@ -415,7 +417,7 @@ for(final LineEntry entry : uniquePlainRules)
 			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
-				String condition = (parentGroup.size() <= childrenGroup.size()? makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
+				String condition = (parentGroup.size() < childrenGroup.size()? makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
 
