@@ -52,8 +52,6 @@ public class LineEntry implements Serializable{
 		this.addition = addition;
 		this.condition = condition;
 
-if(condition.equals("[^ao]"))
-	System.out.println("");
 		from = new HashSet<>();
 		if(words != null)
 			from.addAll(words);
