@@ -193,19 +193,19 @@ public class RulesReducerTest{
 			new RulesReducer.LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
 			new RulesReducer.LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
 			new RulesReducer.LineEntry("òvo", "ovato", "òvo", "òvo"),
-			new RulesReducer.LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
-				"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),
-			new RulesReducer.LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
-				"ŧedro", "konto", "manđo", "granfo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "solfro")),
-			new RulesReducer.LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
-			new RulesReducer.LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "maca", "kora", "savia", "inkuixitora", "aria", "marenda", "kuadra",
-				"inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
-			new RulesReducer.LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko")),
-			new RulesReducer.LineEntry("0", "ta", "esa", "spesa"),
-			new RulesReducer.LineEntry("0", "ta", "rka", Arrays.asList("porka", "sporka")),
-			new RulesReducer.LineEntry("0", "ta", "ala", "đenerala"),
-			new RulesReducer.LineEntry("0", "ta", "[^ò]na", Arrays.asList("viŧina", "koɉona", "visina", "barona", "parona", "patrona", "veŧina", "pesenina",
-				"pecenina", "bona", "vexina", "padrona", "peŧenina", "vesina", "kojona", "fakina"))
+new RulesReducer.LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
+	"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),
+new RulesReducer.LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
+	"ŧedro", "konto", "manđo", "granfo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "solfro")),
+new RulesReducer.LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
+new RulesReducer.LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "maca", "kora", "savia", "inkuixitora", "aria", "marenda", "kuadra",
+	"inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
+new RulesReducer.LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko")),
+new RulesReducer.LineEntry("0", "ta", "esa", "spesa"),
+new RulesReducer.LineEntry("0", "ta", "rka", Arrays.asList("porka", "sporka")),
+new RulesReducer.LineEntry("0", "ta", "ala", "đenerala"),
+new RulesReducer.LineEntry("0", "ta", "[^ò]na", Arrays.asList("viŧina", "koɉona", "visina", "barona", "parona", "patrona", "veŧina", "pesenina",
+	"pecenina", "bona", "vexina", "padrona", "peŧenina", "vesina", "kojona", "fakina"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
