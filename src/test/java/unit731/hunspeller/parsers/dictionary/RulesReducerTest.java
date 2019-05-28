@@ -15,7 +15,7 @@ import unit731.hunspeller.services.FileHelper;
 public class RulesReducerTest{
 
 	@Test
-	public void replacementTable() throws IOException{
+	public void simple1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -95,6 +95,59 @@ public class RulesReducerTest{
 			"SFX ʼ0 e ʼ [dg]e",
 			"SFX ʼ0 o ʼ [^d]o",
 			"SFX ʼ0 ove óʼ ove"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+	}
+
+	@Test
+	public void simple2() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX §1 Y 5",
+			"SFX §1 0 ta/F0 [^ƚ]a",
+			"SFX §1 o ato/M0 [^ƚ]o",
+			"SFX §1 èƚa eƚata/F0 èƚa",
+			"SFX §1 èƚo eƚato/M0 èƚo",
+			"SFX §1 o ato/M0 [^è]ƚo");
+		RulesReducer reducer = createReducer(affFile);
+		List<RulesReducer.LineEntry> plainRules = Arrays.asList(
+			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "kanèƚo"),
+			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", "kapèƚa"),
+			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "kapèƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "ƚibro"),
+			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", "vedèƚa"),
+			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "vedèƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "moƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "rosiñoƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "roxiñoƚo"),
+			new RulesReducer.LineEntry("0", "ta", "", "kaƚandra"),
+			new RulesReducer.LineEntry("o", "ato", "o", "kaƚandro"),
+			new RulesReducer.LineEntry("o", "ato", "o", "xeƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "rusiñoƚo"),
+			new RulesReducer.LineEntry("o", "ato", "o", "ruxiñoƚo")
+		);
+		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(plainRules);
+
+		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
+			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
+			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
+			new RulesReducer.LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
+			new RulesReducer.LineEntry("0", "ta", "ra", "kaƚandra"),
+			new RulesReducer.LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		String flag = "§1";
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX §1 Y 5",
+			"SFX §1 0 ta ra",
+			"SFX §1 o ato [^ƚ]o",
+			"SFX §1 èƚa eƚata èƚa",
+			"SFX §1 èƚo eƚato èƚo",
+			"SFX §1 o ato [^è]ƚo"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 	}
