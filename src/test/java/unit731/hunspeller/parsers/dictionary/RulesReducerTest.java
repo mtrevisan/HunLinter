@@ -474,6 +474,8 @@ public class RulesReducerTest{
 			"SFX v0 0 erieta [ln]",
 			"SFX v0 0 ía ar",
 			"SFX v0 0 ieta ar",
+			"SFX v0 0 ía or",
+			"SFX v0 0 ieta or",
 			"SFX v0 ar ería ar",
 			"SFX v0 ar erieta ar",
 			"SFX v0 èr aría èr",
@@ -488,8 +490,6 @@ public class RulesReducerTest{
 			"SFX v0 o ería [^cdđkx]o",
 			"SFX v0 o arieta [^cdđkx]o",
 			"SFX v0 o erieta [^cdđkx]o",
-			"SFX v0 0 ía [^aè]r",
-			"SFX v0 0 ieta [^aè]r",
 			"SFX v0 èla elaría èla",
 			"SFX v0 èla elería èla",
 			"SFX v0 èla elarieta èla",
@@ -538,9 +538,9 @@ public class RulesReducerTest{
 			"SFX v0 ería aría ería",
 			"SFX v0 ería arieta ería"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
-//		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
 
