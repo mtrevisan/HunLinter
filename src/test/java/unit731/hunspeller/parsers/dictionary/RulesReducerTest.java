@@ -226,6 +226,97 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	public void simple4() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"FULLSTRIP",
+			"SFX §0 Y 17",
+			"SFX §0 0 ato [nr]",
+			"SFX §0 èl elato èl",
+			"SFX §0 0 ta [^bklns]a",
+			"SFX §0 0 ato [^è]l",
+			"SFX §0 o ato [^bkmv]o",
+			"SFX §0 òba obata òba",
+			"SFX §0 òka okata òka",
+			"SFX §0 èla elata èla",
+			"SFX §0 òna onata òna",
+			"SFX §0 òsa osata òsa",
+			"SFX §0 òbo obato òbo",
+			"SFX §0 òko okato òko",
+			"SFX §0 òmo omato òmo",
+			"SFX §0 òvo ovato òvo",
+			"SFX §0 0 ta [^è]la",
+			"SFX §0 o ato [^ò]ko",
+			"SFX §0 0 ta [^ò][kns]a"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "§0";
+		List<String> words = Arrays.asList("aria", "bar", "baron", "bon", "borso", "bosko", "dixnar", "dòna", "fakin", "far", "fator", "fatora", "grada", "granfo",
+			"gòba", "gòbo", "inkuixitor", "inkuixitora", "inspetor", "inspetora", "kalandra", "kalandro", "kanèl", "kapèl", "kapèla", "kara", "kojon", "konto",
+			"kora", "koɉon", "kuadra", "kuadro", "kòsa", "libro", "maca", "mando", "manxo", "manđo", "marenda", "merenda", "mol", "muso", "padron", "paron",
+			"patron", "pecenin", "pesenin", "peŧenin", "porko", "pòka", "pòko", "rexon", "rosiñol", "roxiñol", "rusiñol", "ruxiñol", "ròba", "savia", "savio", "sen",
+			"sinsin", "soko", "solfro", "sorgo", "speso", "sporko", "tabar", "toxa", "vedèl", "vedèla", "verdo", "vesin", "vexin", "vexo", "veŧin", "visio", "viŧio",
+			"xbir", "xel", "òka", "òko", "òmo", "òvo", "đeneral", "đilio", "ŧedro", "ŧinŧin", "ŧoko");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+
+		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
+			new RulesReducer.LineEntry("òbo", "obato", "òbo", "gòbo"),
+			new RulesReducer.LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
+			new RulesReducer.LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
+			new RulesReducer.LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
+			new RulesReducer.LineEntry("òna", "onata", "òna", "dòna"),
+			new RulesReducer.LineEntry("òmo", "omato", "òmo", "òmo"),
+			new RulesReducer.LineEntry("òsa", "osata", "òsa", "kòsa"),
+			new RulesReducer.LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
+			new RulesReducer.LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
+			new RulesReducer.LineEntry("òvo", "ovato", "òvo", "òvo"),
+			new RulesReducer.LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
+				"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),
+			new RulesReducer.LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
+				"ŧedro", "konto", "manđo", "granfo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "solfro")),
+			new RulesReducer.LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
+			new RulesReducer.LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra",
+				"inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
+			new RulesReducer.LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX §0 Y 15",
+			"SFX §0 0 ato [nr]",
+			"SFX §0 èl elato èl",
+			"SFX §0 0 ta [^bklns]a",
+			"SFX §0 0 ato [^è]l",
+			"SFX §0 o ato [^bkmv]o",
+			"SFX §0 òba obata òba",
+			"SFX §0 òka okata òka",
+			"SFX §0 èla elata èla",
+			"SFX §0 òna onata òna",
+			"SFX §0 òsa osata òsa",
+			"SFX §0 òbo obato òbo",
+			"SFX §0 òko okato òko",
+			"SFX §0 òmo omato òmo",
+			"SFX §0 òvo ovato òvo",
+			"SFX §0 o ato [^ò]ko"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);

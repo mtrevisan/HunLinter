@@ -94,8 +94,6 @@ public class RulesReducer{
 			this.addition = addition;
 			this.condition = condition;
 
-if(condition.contains("cdirx"))
-				System.out.println("");
 			from = new HashSet<>();
 			if(words != null)
 				from.addAll(words);
