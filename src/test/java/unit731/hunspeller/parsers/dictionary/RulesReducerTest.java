@@ -211,10 +211,10 @@ public class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX §0 Y 19",
+			"SFX §0 Y 17",
 			"SFX §0 0 ato [nr]",
 			"SFX §0 èl elato èl",
-			"SFX §0 0 ta [^bn]a",
+			"SFX §0 0 ta [^bklns]a",
 			"SFX §0 0 ato [^è]l",
 			"SFX §0 o ato [^bkmv]o",
 			"SFX §0 òba obata òba",
