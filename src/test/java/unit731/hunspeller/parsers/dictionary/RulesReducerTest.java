@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.services.FileHelper;
 
 
@@ -32,37 +35,16 @@ public class RulesReducerTest{
 			"SFX ʼ0 e ʼ [^mtv]e",
 			"SFX ʼ0 o ʼ [^d]o",
 			"SFX ʼ0 ove óʼ ove");
-		RulesReducer reducer = createReducer(affFile);
-		List<RulesReducer.LineEntry> plainRules = Arrays.asList(
-			new RulesReducer.LineEntry("e", "ʼ", "e", "ge"),
-			new RulesReducer.LineEntry("a", "ʼ", "a", "la"),
-			new RulesReducer.LineEntry("a", "ʼ", "a", "na"),
-			new RulesReducer.LineEntry("u", "ʼ", "u", "nu"),
-			new RulesReducer.LineEntry("u", "ʼ", "u", "vu"),
-			new RulesReducer.LineEntry("e", "ʼ", "e", "ge"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "sto"),
-			new RulesReducer.LineEntry("ove", "óʼ", "ove", "adove"),
-			new RulesReducer.LineEntry("ove", "óʼ", "ove", "indove"),
-			new RulesReducer.LineEntry("me", "ʼ", "me", "kome"),
-			new RulesReducer.LineEntry("do", "ʼ", "do", "kuando"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "tuto"),
-			new RulesReducer.LineEntry("e", "ʼ", "e", "de"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "so"),
-			new RulesReducer.LineEntry("ra", "ʼ", "ra", "sora"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "tèrŧo"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "tèrso"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "kuarto"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "koarto"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "kuinto"),
-			new RulesReducer.LineEntry("o", "ʼ", "o", "sèsto"),
-			new RulesReducer.LineEntry("r", "ʼ", "r", "par"),
-			new RulesReducer.LineEntry("xa", "ʼ", "xa", "kaxa"),
-			new RulesReducer.LineEntry("a", "ʼ", "a", "sensa"),
-			new RulesReducer.LineEntry("a", "ʼ", "a", "senŧa"),
-			new RulesReducer.LineEntry("do", "ʼ", "do", "komòdo"),
-			new RulesReducer.LineEntry("te", "ʼ", "te", "frate"),
-			new RulesReducer.LineEntry("do", "ʼ", "do", "nudo")
-		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "ʼ0";
+		List<String> words = Arrays.asList("ge", "la", "na", "nu", "vu", "ge", "sto", "adove", "indove", "kome", "kuando", "tuto", "de", "so", "sora", "tèrŧo",
+			"tèrso", "kuarto", "koarto", "kuinto", "sèsto", "par", "kaxa", "sensa", "senŧa", "komòdo", "frate", "nudo");
+		List<RulesReducer.LineEntry> plainRules = words.stream()
+			.map(word -> wordGenerator.applyAffixRules(word + "/" + flag))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
 		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(plainRules);
 
 		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
@@ -80,7 +62,6 @@ public class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
-		String flag = "ʼ0";
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX ʼ0 Y 11",
@@ -106,28 +87,21 @@ public class RulesReducerTest{
 			"LANG vec",
 			"FLAG long",
 			"SFX §1 Y 5",
-			"SFX §1 0 ta/F0 [^ƚ]a",
-			"SFX §1 o ato/M0 [^ƚ]o",
-			"SFX §1 èƚa eƚata/F0 èƚa",
-			"SFX §1 èƚo eƚato/M0 èƚo",
-			"SFX §1 o ato/M0 [^è]ƚo");
-		RulesReducer reducer = createReducer(affFile);
-		List<RulesReducer.LineEntry> plainRules = Arrays.asList(
-			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "kanèƚo"),
-			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", "kapèƚa"),
-			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "kapèƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "ƚibro"),
-			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", "vedèƚa"),
-			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", "vedèƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "moƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "rosiñoƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "roxiñoƚo"),
-			new RulesReducer.LineEntry("0", "ta", "", "kaƚandra"),
-			new RulesReducer.LineEntry("o", "ato", "o", "kaƚandro"),
-			new RulesReducer.LineEntry("o", "ato", "o", "xeƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "rusiñoƚo"),
-			new RulesReducer.LineEntry("o", "ato", "o", "ruxiñoƚo")
-		);
+			"SFX §1 0 ta [^ƚ]a",
+			"SFX §1 o ato [^ƚ]o",
+			"SFX §1 èƚa eƚata èƚa",
+			"SFX §1 èƚo eƚato èƚo",
+			"SFX §1 o ato [^è]ƚo");
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "§1";
+		List<String> words = Arrays.asList("kanèƚo", "kapèƚa", "kapèƚo", "ƚibro", "vedèƚa", "vedèƚo", "moƚo", "rosiñoƚo", "roxiñoƚo", "kaƚandra", "kaƚandro",
+			"xeƚo", "rusiñoƚo", "ruxiñoƚo");
+		List<RulesReducer.LineEntry> plainRules = words.stream()
+			.map(word -> wordGenerator.applyAffixRules(word + "/" + flag))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
 		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(plainRules);
 
 		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
@@ -139,7 +113,6 @@ public class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
-		String flag = "§1";
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX §1 Y 5",
@@ -152,7 +125,7 @@ public class RulesReducerTest{
 		Assertions.assertEquals(expectedRules, rules);
 	}
 
-	private RulesReducer createReducer(File affFile) throws IOException{
+	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile);
 		AffixData affixData = affParser.getAffixData();
@@ -160,7 +133,8 @@ public class RulesReducerTest{
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser);
-		return new RulesReducer(affixData, wordGenerator);
+		RulesReducer reducer = new RulesReducer(affixData, wordGenerator);
+		return Pair.of(reducer, wordGenerator);
 	}
 
 }
