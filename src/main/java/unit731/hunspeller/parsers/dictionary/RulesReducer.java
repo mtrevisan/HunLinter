@@ -279,8 +279,9 @@ public class RulesReducer{
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 		final List<String> rules = new ArrayList<>();
-		rules.add(composeHeader(type, flag, ruleToBeReduced.combineableChar(), compactedRules.size()));
-		rules.addAll(convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules));
+		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
+		rules.add(composeHeader(type, flag, ruleToBeReduced.combineableChar(), prettyPrintRules.size()));
+		rules.addAll(prettyPrintRules);
 		return rules;
 	}
 
