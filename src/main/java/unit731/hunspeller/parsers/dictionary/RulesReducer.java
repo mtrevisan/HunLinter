@@ -421,18 +421,18 @@ for(final LineEntry entry : uniquePlainRules)
 
 				//if parent.condition is not empty
 				if(!parent.condition.isEmpty()){
-//					final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
+					final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
 					//if can-bubble-up
-//					if(!bubbles.isEmpty()){
+					if(!bubbles.isEmpty()){
 						//FIXME
-//						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 //						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
 //						bubbles.forEach(sortedList::remove);
-//bubbledRules.size();
-//System.out.println("fix me");
-//					}
+bubbledRules.size();
+System.out.println("fix me");
+					}
 				}
 
 				final List<LineEntry> sameConditionChildren = children.stream()
@@ -697,95 +697,95 @@ for(final LineEntry entry : uniquePlainRules)
 
 
 
-//	private List<RulesReducer.LineEntry> extractRuleBubbles(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> sortedList){
-//		final int parentConditionLength = parent.condition.length();
-//		return sortedList.stream()
-//			.filter(entry -> entry.condition.length() > parentConditionLength)
-//			.collect(Collectors.toList());
-//	}
+	private List<RulesReducer.LineEntry> extractRuleBubbles(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> sortedList){
+		final int parentConditionLength = parent.condition.length();
+		return sortedList.stream()
+			.filter(entry -> entry.condition.length() > parentConditionLength)
+			.collect(Collectors.toList());
+	}
 
-//	private List<RulesReducer.LineEntry> bubbleUpNotGroup(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> children){
-//		final int parentConditionLength = parent.condition.length();
-//		//bubble up by bucketing children for group-2
-//		final Set<String> bubblesCondition = children.stream()
-//			.map(entry -> entry.condition)
-//			.collect(Collectors.toSet());
-//
-//		/*
-//		extract communalities:
-//		from
-//			"è => [èdo, èđo, èxo]"
-//			"ò => [òdo, òco, òko]"
-//		transform into
-//			"è => [èđo, èxo]"
-//			"ò => [òco, òko]"
-//			"èò => [òdo, èdo]"
-//		extract common-group (key.length > 1)
-//		add new rule from parent with condition starting with NOT(common-group) to final-list
-//			'[^èò]do'
-//		*/
-//		final List<RulesReducer.LineEntry> newParents = new ArrayList<>();
-//		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
-//			cond -> cond.substring(cond.length() - parentConditionLength - 1));
-//		//remove single conditions
-//		Iterator<Map.Entry<String, List<String>>> itr = communalitiesBucket.entrySet().iterator();
-//		while(itr.hasNext())
-//			if(itr.next().getValue().size() == 1)
-//				itr.remove();
-//		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
-//			final List<String> comm = e.getValue();
-//			//FIXME
-////			if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
-////				throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
-////					+ "', comm '" + comm.toString());
-//
-//			for(String c : comm){
-//				final List<String> gg = children.stream()
-//					.filter(entry -> entry.condition.equals(c))
-//					.flatMap(entry -> entry.from.stream())
-//					.collect(Collectors.toList());
-//				bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
-//			}
-//			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
-//			final String condition = makeNotGroup(commonGroup, e.getKey());
-//			final List<String> words = parent.extractFromEndingWith(condition);
-//			final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
-//			//keep only rules that matches some existent words
-//			if(!words.isEmpty())
-//				newParents.add(newEntry);
-//			else
-//				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-//					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-//
-//			comm.forEach(bubblesCondition::remove);
-//		}
-//
-//		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
-//			cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
-//		//for each children-group-2
-//		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
-//			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
-//			final Set<Character> bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
-//			//do the bubble trick
-//			for(int i = conds.getKey().length(); i > 0; i --){
-//				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
-//					+ conds.getKey().substring(i)
-//					+ makeGroup(bubbleGroup, parent.condition);
-//				final List<String> words = parent.extractFromEndingWith(condition);
-//				final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
-//				//keep only rules that matches some existent words
-//				if(!words.isEmpty())
-//					newParents.add(newEntry);
-//				else
-//					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-//						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-//			}
-//		}
-//		return newParents;
-//	}
+	private List<RulesReducer.LineEntry> bubbleUpNotGroup(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> children){
+		final int parentConditionLength = parent.condition.length();
+		//bubble up by bucketing children for group-2
+		final Set<String> bubblesCondition = children.stream()
+			.map(entry -> entry.condition)
+			.collect(Collectors.toSet());
 
-//	private String makeNotGroup(final char group){
-//		return NOT_GROUP_START + group + GROUP_END;
-//	}
+		/*
+		extract communalities:
+		from
+			"è => [èdo, èđo, èxo]"
+			"ò => [òdo, òco, òko]"
+		transform into
+			"è => [èđo, èxo]"
+			"ò => [òco, òko]"
+			"èò => [òdo, èdo]"
+		extract common-group (key.length > 1)
+		add new rule from parent with condition starting with NOT(common-group) to final-list
+			'[^èò]do'
+		*/
+		final List<RulesReducer.LineEntry> newParents = new ArrayList<>();
+		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
+			cond -> cond.substring(cond.length() - parentConditionLength - 1));
+		//remove single conditions
+		Iterator<Map.Entry<String, List<String>>> itr = communalitiesBucket.entrySet().iterator();
+		while(itr.hasNext())
+			if(itr.next().getValue().size() == 1)
+				itr.remove();
+		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
+			final List<String> comm = e.getValue();
+			//FIXME
+//			if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
+//				throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
+//					+ "', comm '" + comm.toString());
+
+			for(String c : comm){
+				final List<String> gg = children.stream()
+					.filter(entry -> entry.condition.equals(c))
+					.flatMap(entry -> entry.from.stream())
+					.collect(Collectors.toList());
+				bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
+			}
+			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
+			final String condition = makeNotGroup(commonGroup, e.getKey());
+			final List<String> words = parent.extractFromEndingWith(condition);
+			final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
+			//keep only rules that matches some existent words
+			if(!words.isEmpty())
+				newParents.add(newEntry);
+			else
+				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+
+			comm.forEach(bubblesCondition::remove);
+		}
+
+		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
+			cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
+		//for each children-group-2
+		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
+			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
+			final Set<Character> bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
+			//do the bubble trick
+			for(int i = conds.getKey().length(); i > 0; i --){
+				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
+					+ conds.getKey().substring(i)
+					+ makeGroup(bubbleGroup, parent.condition);
+				final List<String> words = parent.extractFromEndingWith(condition);
+				final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
+				//keep only rules that matches some existent words
+				if(!words.isEmpty())
+					newParents.add(newEntry);
+				else
+					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+			}
+		}
+		return newParents;
+	}
+
+	private String makeNotGroup(final char group){
+		return NOT_GROUP_START + group + GROUP_END;
+	}
 
 }
