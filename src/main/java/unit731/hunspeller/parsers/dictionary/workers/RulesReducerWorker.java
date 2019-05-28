@@ -43,25 +43,25 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 
 		final List<String> originalLines = new ArrayList<>();
-		final List<RulesReducer.LineEntry> plainRules = new ArrayList<>();
+		final List<RulesReducer.LineEntry> originalRules = new ArrayList<>();
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 			final RulesReducer.LineEntry compactedFilteredRule = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(compactedFilteredRule != null){
 				originalLines.add(line);
-				plainRules.add(compactedFilteredRule);
+				originalRules.add(compactedFilteredRule);
 			}
 		};
 		final Runnable completed = () -> {
 			try{
-				List<RulesReducer.LineEntry> compactedRules = rulesReducer.reduceProductions(plainRules);
+				List<RulesReducer.LineEntry> compactedRules = rulesReducer.reduceProductions(originalRules);
 
-				List<String> rules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
+				List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
-				rulesReducer.checkReductionCorrectness(flag, ruleToBeReduced, rules, plainRules, originalLines);
+				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalRules, originalLines);
 
-				for(final String rule : rules)
+				for(final String rule : reducedRules)
 					LOGGER.info(Backbone.MARKER_RULE_REDUCER, rule);
 			}
 			catch(final Exception e){

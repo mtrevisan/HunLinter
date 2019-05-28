@@ -284,10 +284,14 @@ public class RulesReducer{
 		return rules;
 	}
 
-	public void checkReductionCorrectness(final String flag, final RuleEntry ruleToBeReduced, final List<String> rules, final List<LineEntry> plainRules,
-			final List<String> originalLines) throws IllegalArgumentException{
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules, final List<String> originalLines)
+			throws IllegalArgumentException{
+		final RuleEntry ruleToBeReduced = affixData.getData(flag);
+		if(ruleToBeReduced == null)
+			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+
 		final Set<LineEntry> checkRules = new HashSet<>();
-		final List<AffixEntry> entries = rules.stream()
+		final List<AffixEntry> entries = reducedRules.stream()
 			.skip(1)
 			.map(line -> new AffixEntry(line, strategy, null, null))
 			.collect(Collectors.toList());
@@ -299,7 +303,7 @@ public class RulesReducer{
 			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
 			checkRules.add(compactedFilteredRule);
 		}
-		Set<LineEntry> uniquePlainRules = new HashSet<>(plainRules);
+		Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
 		if(!checkRules.equals(uniquePlainRules)){
 			//FIXME
 Set<LineEntry> intersection = SetHelper.intersection(checkRules, uniquePlainRules);

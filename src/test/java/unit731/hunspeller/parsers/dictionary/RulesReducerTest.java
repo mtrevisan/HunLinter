@@ -41,11 +41,14 @@ public class RulesReducerTest{
 		String flag = "ʼ0";
 		List<String> words = Arrays.asList("ge", "la", "na", "nu", "vu", "ge", "sto", "adove", "indove", "kome", "kuando", "tuto", "de", "so", "sora", "tèrŧo",
 			"tèrso", "kuarto", "koarto", "kuinto", "sèsto", "par", "kaxa", "sensa", "senŧa", "komòdo", "frate", "nudo");
-		List<RulesReducer.LineEntry> plainRules = words.stream()
-			.map(word -> wordGenerator.applyAffixRules(word + "/" + flag))
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(plainRules);
+		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
 		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
 			new RulesReducer.LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
@@ -78,6 +81,8 @@ public class RulesReducerTest{
 			"SFX ʼ0 ove óʼ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
 	@Test
@@ -98,11 +103,14 @@ public class RulesReducerTest{
 		String flag = "§1";
 		List<String> words = Arrays.asList("kanèƚo", "kapèƚa", "kapèƚo", "ƚibro", "vedèƚa", "vedèƚo", "moƚo", "rosiñoƚo", "roxiñoƚo", "kaƚandra", "kaƚandro",
 			"xeƚo", "rusiñoƚo", "ruxiñoƚo");
-		List<RulesReducer.LineEntry> plainRules = words.stream()
-			.map(word -> wordGenerator.applyAffixRules(word + "/" + flag))
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(plainRules);
+		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
 		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
 			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
@@ -123,6 +131,8 @@ public class RulesReducerTest{
 			"SFX §1 o ato [^è]ƚo"
 		);
 		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
