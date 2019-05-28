@@ -211,12 +211,34 @@ public class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX §0 Y 17",
+//			"SFX §0 Y 17",
+//			"SFX §0 0 ato [nr]",
+//			"SFX §0 èl elato èl",
+//			"SFX §0 0 ta [^bklns]a",
+//			"SFX §0 0 ato [^è]l",
+//			"SFX §0 o ato [^bkmv]o",
+//			"SFX §0 òba obata òba",
+//			"SFX §0 òka okata òka",
+//			"SFX §0 èla elata èla",
+//			"SFX §0 òna onata òna",
+//			"SFX §0 òsa osata òsa",
+//			"SFX §0 òbo obato òbo",
+//			"SFX §0 òko okato òko",
+//			"SFX §0 òmo omato òmo",
+//			"SFX §0 òvo ovato òvo",
+//			"SFX §0 0 ta [^è]la",
+//			"SFX §0 o ato [^ò]ko",
+//			"SFX §0 0 ta [^ò][kns]a"
+
+			"SFX §0 Y 19",
 			"SFX §0 0 ato [nr]",
 			"SFX §0 èl elato èl",
 			"SFX §0 0 ta [^bklns]a",
 			"SFX §0 0 ato [^è]l",
 			"SFX §0 o ato [^bkmv]o",
+			"SFX §0 0 ta rka",
+			"SFX §0 0 ta ala",
+			"SFX §0 0 ta esa",
 			"SFX §0 òba obata òba",
 			"SFX §0 òka okata òka",
 			"SFX §0 èla elata èla",
@@ -226,9 +248,8 @@ public class RulesReducerTest{
 			"SFX §0 òko okato òko",
 			"SFX §0 òmo omato òmo",
 			"SFX §0 òvo ovato òvo",
-			"SFX §0 0 ta [^è]la",
-			"SFX §0 o ato [^ò]ko",
-			"SFX §0 0 ta [^ò][kns]a"
+			"SFX §0 0 ta [^ò]na",
+			"SFX §0 o ato [^ò]ko"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 

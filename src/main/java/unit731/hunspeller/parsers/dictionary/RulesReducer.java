@@ -177,8 +177,8 @@ public class RulesReducer{
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegExpSequencer.splitSequence(entry.condition).length)
 			.thenComparing(Comparator.comparingInt(entry -> StringUtils.countMatches(entry.condition, GROUP_END)))
-			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
+			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
 			.thenComparing(Comparator.comparing(entry -> entry.removal, comparator))
 			.thenComparing(Comparator.comparingInt(entry -> entry.anAddition().length()))
 			.thenComparing(Comparator.comparing(entry -> entry.anAddition(), comparator));
