@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.LineEntry;
 import unit731.hunspeller.parsers.dictionary.RulesReducer;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -43,11 +44,11 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 
 		final List<String> originalLines = new ArrayList<>();
-		final List<RulesReducer.LineEntry> originalRules = new ArrayList<>();
+		final List<LineEntry> originalRules = new ArrayList<>();
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			final RulesReducer.LineEntry compactedFilteredRule = rulesReducer.collectProductionsByFlag(productions, flag, type);
+			final LineEntry compactedFilteredRule = rulesReducer.collectProductionsByFlag(productions, flag, type);
 			if(compactedFilteredRule != null){
 				originalLines.add(line);
 				originalRules.add(compactedFilteredRule);
@@ -55,7 +56,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		};
 		final Runnable completed = () -> {
 			try{
-				List<RulesReducer.LineEntry> compactedRules = rulesReducer.reduceProductions(originalRules);
+				List<LineEntry> compactedRules = rulesReducer.reduceProductions(originalRules);
 
 				List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 

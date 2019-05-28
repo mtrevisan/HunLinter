@@ -1,8 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -16,13 +14,8 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -34,7 +27,6 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 
 
@@ -42,7 +34,6 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
-	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	private static final String GROUP_END = "]";
@@ -60,111 +51,6 @@ public class RulesReducer{
 	private final WordGenerator wordGenerator;
 	private final Comparator<String> comparator;
 	private final Comparator<LineEntry> lineEntryComparator;
-
-
-	public static class LineEntry implements Serializable{
-
-		private static final long serialVersionUID = 8374397415767767436L;
-
-		private final Set<String> from;
-
-		private final String removal;
-		private final Set<String> addition;
-		private String condition;
-
-
-		public static LineEntry createFrom(final LineEntry entry, final String condition, final Collection<String> words){
-			return new LineEntry(entry.removal, entry.addition, condition, words);
-		}
-
-		LineEntry(final String removal, final String addition, final String condition, final String word){
-			this(removal, new HashSet<>(Arrays.asList(addition)), condition, word);
-		}
-
-		LineEntry(final String removal, final String addition, final String condition, final Collection<String> words){
-			this(removal, new HashSet<>(Arrays.asList(addition)), condition, words);
-		}
-
-		LineEntry(final String removal, final Set<String> addition, final String condition, final String word){
-			this(removal, addition, condition, Arrays.asList(word));
-		}
-
-		LineEntry(final String removal, final Set<String> addition, final String condition, final Collection<String> words){
-			this.removal = removal;
-			this.addition = addition;
-			this.condition = condition;
-
-			from = new HashSet<>();
-			if(words != null)
-				from.addAll(words);
-		}
-
-		public List<LineEntry> split(final AffixEntry.Type type){
-			final List<LineEntry> split = new ArrayList<>();
-			if(type == AffixEntry.Type.SUFFIX)
-				for(final String f : from){
-					final int index = f.length() - condition.length() - 1;
-					if(index < 0)
-						throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
-
-					split.add(new LineEntry(removal, addition, f.substring(index), f));
-				}
-			else
-				for(final String f : from){
-					final int index = condition.length() + 1;
-					if(index == f.length())
-						throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
-
-					split.add(new LineEntry(removal, addition, f.substring(0, index), f));
-				}
-			return split;
-		}
-
-		public List<String> extractFromEndingWith(String suffix){
-			final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
-			return from.stream()
-				.filter(from -> PatternHelper.find(from, conditionPattern))
-				.collect(Collectors.toList());
-		}
-
-		public String anAddition(){
-			return addition.iterator().next();
-		}
-
-		@Override
-		public String toString(){
-			return new ToStringBuilder(this, ToStringStyle.NO_CLASS_NAME_STYLE)
-				.append("from", from)
-				.append("rem", removal)
-				.append("add", addition)
-				.append("cond", condition)
-				.toString();
-		}
-
-		@Override
-		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(removal)
-				.append(addition)
-				.append(condition)
-				.toHashCode();
-		}
-
-		@Override
-		public boolean equals(Object obj){
-			if(this == obj)
-				return true;
-			if(obj == null || getClass() != obj.getClass())
-				return false;
-
-			final LineEntry other = (LineEntry)obj;
-			return new EqualsBuilder()
-				.append(removal, other.removal)
-				.append(addition, other.addition)
-				.append(condition, other.condition)
-				.isEquals();
-		}
-	}
 
 
 	public RulesReducer(final AffixData affixData, final WordGenerator wordGenerator){
@@ -698,14 +584,14 @@ System.out.println("fix me");
 
 
 
-	private List<RulesReducer.LineEntry> extractRuleBubbles(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> sortedList){
+	private List<LineEntry> extractRuleBubbles(final LineEntry parent, final List<LineEntry> sortedList){
 		final int parentConditionLength = parent.condition.length();
 		return sortedList.stream()
 			.filter(entry -> entry.condition.length() > parentConditionLength)
 			.collect(Collectors.toList());
 	}
 
-	private List<RulesReducer.LineEntry> bubbleUpNotGroup(final RulesReducer.LineEntry parent, final List<RulesReducer.LineEntry> children){
+	private List<LineEntry> bubbleUpNotGroup(final LineEntry parent, final List<LineEntry> children){
 		final int parentConditionLength = parent.condition.length();
 		//bubble up by bucketing children for group-2
 		final Set<String> bubblesCondition = children.stream()
@@ -725,7 +611,7 @@ System.out.println("fix me");
 		add new rule from parent with condition starting with NOT(common-group) to final-list
 			'[^èò]do'
 		*/
-		final List<RulesReducer.LineEntry> newParents = new ArrayList<>();
+		final List<LineEntry> newParents = new ArrayList<>();
 		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
 			cond -> cond.substring(cond.length() - parentConditionLength - 1));
 		//remove single conditions
@@ -750,7 +636,7 @@ System.out.println("fix me");
 			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
 			final String condition = makeNotGroup(commonGroup, e.getKey());
 			final List<String> words = parent.extractFromEndingWith(condition);
-			final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
+			final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
 			//keep only rules that matches some existent words
 			if(!words.isEmpty())
 				newParents.add(newEntry);
@@ -773,7 +659,7 @@ System.out.println("fix me");
 					+ conds.getKey().substring(i)
 					+ makeGroup(bubbleGroup, parent.condition);
 				final List<String> words = parent.extractFromEndingWith(condition);
-				final RulesReducer.LineEntry newEntry = RulesReducer.LineEntry.createFrom(parent, condition, words);
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
 				//keep only rules that matches some existent words
 				if(!words.isEmpty())
 					newParents.add(newEntry);

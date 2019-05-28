@@ -40,29 +40,29 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "ʼ0";
-		List<String> words = Arrays.asList("ge", "la", "na", "nu", "vu", "ge", "sto", "adove", "indove", "kome", "kuando", "tuto", "de", "so", "sora", "tèrŧo",
-			"tèrso", "kuarto", "koarto", "kuinto", "sèsto", "par", "kaxa", "sensa", "senŧa", "komòdo", "frate", "nudo");
+		List<String> words = Arrays.asList("ge", "la", "na", "nu", "vu", "ge", "sto", "adove", "indove", "kome", "kuando", "tuto", "de", "so",
+			"sora", "tèrŧo", "tèrso", "kuarto", "koarto", "kuinto", "sèsto", "par", "kaxa", "sensa", "senŧa", "komòdo", "frate", "nudo");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
-		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
-			new RulesReducer.LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
-			new RulesReducer.LineEntry("r", "ʼ", "r", "par"),
-			new RulesReducer.LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
-			new RulesReducer.LineEntry("ra", "ʼ", "ra", "sora"),
-			new RulesReducer.LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new RulesReducer.LineEntry("te", "ʼ", "te", "frate"),
-			new RulesReducer.LineEntry("xa", "ʼ", "xa", "kaxa"),
-			new RulesReducer.LineEntry("me", "ʼ", "me", "kome"),
-			new RulesReducer.LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tèrŧo", "tuto", "so", "sto")),
-			new RulesReducer.LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge")),
-			new RulesReducer.LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("sensa", "senŧa", "na", "la"))
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
+			new LineEntry("r", "ʼ", "r", "par"),
+			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
+			new LineEntry("ra", "ʼ", "ra", "sora"),
+			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
+			new LineEntry("te", "ʼ", "te", "frate"),
+			new LineEntry("xa", "ʼ", "xa", "kaxa"),
+			new LineEntry("me", "ʼ", "me", "kome"),
+			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tèrŧo", "tuto", "so", "sto")),
+			new LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge")),
+			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("sensa", "senŧa", "na", "la"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -102,23 +102,23 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "§1";
-		List<String> words = Arrays.asList("kanèƚo", "kapèƚa", "kapèƚo", "ƚibro", "vedèƚa", "vedèƚo", "moƚo", "rosiñoƚo", "roxiñoƚo", "kaƚandra", "kaƚandro",
-			"xeƚo", "rusiñoƚo", "ruxiñoƚo");
+		List<String> words = Arrays.asList("kanèƚo", "kapèƚa", "kapèƚo", "ƚibro", "vedèƚa", "vedèƚo", "moƚo", "rosiñoƚo", "roxiñoƚo", "kaƚandra",
+			"kaƚandro", "xeƚo", "rusiñoƚo", "ruxiñoƚo");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
-		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
-			new RulesReducer.LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
-			new RulesReducer.LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
-			new RulesReducer.LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
-			new RulesReducer.LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
-			new RulesReducer.LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
+			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
+			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
+			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
+			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -166,40 +166,42 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "§0";
-		List<String> words = Arrays.asList("aria", "bar", "baron", "bon", "borso", "bosko", "dixnar", "dòna", "fakin", "far", "fator", "fatora", "grada", "granfo",
-			"gòba", "gòbo", "inkuixitor", "inkuixitora", "inspetor", "inspetora", "kalandra", "kalandro", "kanèl", "kapèl", "kapèla", "kara", "kojon", "konto",
-			"kora", "koɉon", "kuadra", "kuadro", "kòsa", "libro", "maca", "mando", "manxo", "manđo", "marenda", "merenda", "mol", "muso", "padron", "paron",
-			"patron", "pecenin", "pesenin", "peŧenin", "porko", "pòka", "pòko", "rexon", "rosiñol", "roxiñol", "rusiñol", "ruxiñol", "ròba", "savia", "savio", "sen",
-			"sinsin", "soko", "solfro", "sorgo", "speso", "sporko", "tabar", "toxa", "vedèl", "vedèla", "verdo", "vesin", "vexin", "vexo", "veŧin", "visio", "viŧio",
-			"xbir", "xel", "òka", "òko", "òmo", "òvo", "đeneral", "đilio", "ŧedro", "ŧinŧin", "ŧoko");
+		List<String> words = Arrays.asList("aria", "bar", "baron", "bon", "borso", "bosko", "dixnar", "dòna", "fakin", "far", "fator", "fatora",
+			"grada", "granfo", "gòba", "gòbo", "inkuixitor", "inkuixitora", "inspetor", "inspetora", "kalandra", "kalandro", "kanèl", "kapèl",
+			"kapèla", "kara", "kojon", "konto", "kora", "koɉon", "kuadra", "kuadro", "kòsa", "libro", "maca", "mando", "manxo", "manđo", "marenda",
+			"merenda", "mol", "muso", "padron", "paron", "patron", "pecenin", "pesenin", "peŧenin", "porko", "pòka", "pòko", "rexon", "rosiñol",
+			"roxiñol", "rusiñol", "ruxiñol", "ròba", "savia", "savio", "sen", "sinsin", "soko", "solfro", "sorgo", "speso", "sporko", "tabar",
+			"toxa", "vedèl", "vedèla", "verdo", "vesin", "vexin", "vexo", "veŧin", "visio", "viŧio", "xbir", "xel", "òka", "òko", "òmo", "òvo",
+			"đeneral", "đilio", "ŧedro", "ŧinŧin", "ŧoko");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
-		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
-			new RulesReducer.LineEntry("òbo", "obato", "òbo", "gòbo"),
-			new RulesReducer.LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
-			new RulesReducer.LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
-			new RulesReducer.LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
-			new RulesReducer.LineEntry("òna", "onata", "òna", "dòna"),
-			new RulesReducer.LineEntry("òmo", "omato", "òmo", "òmo"),
-			new RulesReducer.LineEntry("òsa", "osata", "òsa", "kòsa"),
-			new RulesReducer.LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
-			new RulesReducer.LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
-			new RulesReducer.LineEntry("òvo", "ovato", "òvo", "òvo"),
-			new RulesReducer.LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
-				"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),
-			new RulesReducer.LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("òbo", "obato", "òbo", "gòbo"),
+			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
+			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
+			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
+			new LineEntry("òna", "onata", "òna", "dòna"),
+			new LineEntry("òmo", "omato", "òmo", "òmo"),
+			new LineEntry("òsa", "osata", "òsa", "kòsa"),
+			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
+			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
+			new LineEntry("òvo", "ovato", "òvo", "òvo"),
+			new LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
+				"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron",
+				"pesenin", "fakin")),
+			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
 				"ŧedro", "konto", "manđo", "granfo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "solfro")),
-			new RulesReducer.LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
-			new RulesReducer.LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra",
+			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
+			new LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra",
 				"inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
-			new RulesReducer.LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko"))
+			new LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -249,30 +251,31 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v1";
-		List<String> words = Arrays.asList("folar", "foƚar", "spiƚorsar", "kaxo", "arte", "bonba", "dente", "dornal", "đornal", "fegura", "fogo", "kal", "kaƚo",
-			"kapital", "kapitaƚe", "kolor", "koƚor", "lexe", "ƚexe", "mòda", "paexe", "palaso", "palaŧo", "paƚaseto", "paƚaso", "real", "reaƚe", "stua", "xornal",
-			"xornaƚe", "bragièr", "figura", "boridon", "filoxomía", "fiƚoxomía", "alarme", "alkimía", "aƚarme", "arkimía", "bonton", "finoxomía", "kanbio",
-			"kitara", "konto", "ŧerimònia", "ŧifra", "bregièr");
+		List<String> words = Arrays.asList("folar", "foƚar", "spiƚorsar", "kaxo", "arte", "bonba", "dente", "dornal", "đornal", "fegura", "fogo",
+			"kal", "kaƚo", "kapital", "kapitaƚe", "kolor", "koƚor", "lexe", "ƚexe", "mòda", "paexe", "palaso", "palaŧo", "paƚaseto", "paƚaso",
+			"real", "reaƚe", "stua", "xornal", "xornaƚe", "bragièr", "figura", "boridon", "filoxomía", "fiƚoxomía", "alarme", "alkimía", "aƚarme",
+			"arkimía", "bonton", "finoxomía", "kanbio", "kitara", "konto", "ŧerimònia", "ŧifra", "bregièr");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
-		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
-			new RulesReducer.LineEntry("òda", "odista", "òda", "mòda"),
-			new RulesReducer.LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente", "arte")),
-			new RulesReducer.LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
-			new RulesReducer.LineEntry("ònia", "onista", "ònia", "ŧerimònia"),
-			new RulesReducer.LineEntry("èr", "erista", "èr", Arrays.asList("bregièr", "bragièr")),
-			new RulesReducer.LineEntry("0", "ista", "[ln]", Arrays.asList("dornal", "kal", "bonton", "đornal", "xornal", "real", "boridon", "kapital")),
-			new RulesReducer.LineEntry("o", "ista", "[^i]o", Arrays.asList("fogo", "konto", "paƚaso", "palaŧo", "kaƚo", "palaso", "paƚaseto", "kaxo")),
-			new RulesReducer.LineEntry("o", "sta", "io", "kanbio"),
-			new RulesReducer.LineEntry("a", "ista", "[^dií]a", Arrays.asList("fegura", "figura", "ŧifra", "bonba", "stua", "kitara")),
-			new RulesReducer.LineEntry("0", "ista", "[^è]r", Arrays.asList("folar", "koƚor", "foƚar", "spiƚorsar", "kolor"))
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("òda", "odista", "òda", "mòda"),
+			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente",
+				"arte")),
+			new LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
+			new LineEntry("ònia", "onista", "ònia", "ŧerimònia"),
+			new LineEntry("èr", "erista", "èr", Arrays.asList("bregièr", "bragièr")),
+			new LineEntry("0", "ista", "[ln]", Arrays.asList("dornal", "kal", "bonton", "đornal", "xornal", "real", "boridon", "kapital")),
+			new LineEntry("o", "ista", "[^i]o", Arrays.asList("fogo", "konto", "paƚaso", "palaŧo", "kaƚo", "palaso", "paƚaseto", "kaxo")),
+			new LineEntry("o", "sta", "io", "kanbio"),
+			new LineEntry("a", "ista", "[^dií]a", Arrays.asList("fegura", "figura", "ŧifra", "bonba", "stua", "kitara")),
+			new LineEntry("0", "ista", "[^è]r", Arrays.asList("folar", "koƚor", "foƚar", "spiƚorsar", "kolor"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -380,84 +383,90 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v0";
-		List<String> words = Arrays.asList("albergar", "ardentar", "arđentar", "arxentar", "axenar", "bañar", "barar", "berekinar", "berikinar", "bibiar", "birar",
-			"birbantar", "bonbar", "bufonar", "cakolar", "cakoƚar", "drapar", "strafantar", "fatucar", "rafinar", "fondar", "fornar", "fraskar", "garbar", "gardar",
-			"garđar", "garxar", "grixonar", "guanto", "vanto", "jetar", "ɉetar", "kanselar", "kanŧelar", "kanseƚar", "kañar", "kapocar", "kastronar", "kavalar",
-			"kavaƚar", "kojonar", "koɉonar", "kojonbarar", "koɉonbarar", "kokolar", "kokoƚar", "komandar", "komensar", "komenŧar", "komensiar", "komenŧiar",
-			"kontar", "kontrolar", "kontroƚar", "koro", "kordar", "rekordar", "krokar", "kuadro", "ladrar", "ƚadrar", "lexinar", "ƚexinar", "lotar", "ƚotar",
-			"mañar", "minconar", "nodar", "panetar", "peocar", "peskar", "piedar", "pieđar", "piexar", "pièxo", "spilorŧar", "spilorsar", "piocar", "pitokar",
-			"poltronar", "pomo", "porkar", "portar", "putelar", "puteƚar", "retelar", "reteƚar", "robar", "saonar", "senpiar", "skorsar", "skorŧar", "soldar",
-			"sovercar", "spesiar", "speŧiar", "spisiar", "spiŧiar", "sporkar", "isporkar", "stanpar", "stranbar", "strasar", "straŧar", "striar", "strigar",
-			"takonar", "tapesar", "tapeŧar", "tartufolar", "tartufoƚar", "sansar", "ŧimar", "simar", "vakar", "provedo", "vergexar", "xmorfiar", "mèdo", "mèđo",
-			"mèxo", "kaxo", "bianka", "banko", "banpor", "batería", "bekèr", "còdo", "fresa", "freŧa", "kasèla", "kasèƚa", "kojon", "koɉon", "libro", "ƚibro",
-			"muscèr", "pedòco", "peòco", "persegèr", "piòco", "polar", "poƚar", "prado", "salgèr", "sensèr", "siñor", "sior", "skoasa", "skoaŧa", "skovasa",
-			"skovaŧa", "spesièr", "speŧièr", "strasa", "straŧa", "striga", "tintor", "trator", "vaka", "bira", "boletin", "boƚetin", "cetin", "dolfin", "fante",
-			"fator", "forestería", "fraska", "furbo", "galante", "gaƚante", "goloxo", "goƚoxo", "kalegèr", "kaƚegèr", "kamarlengo", "konetrería", "ladro", "lata",
-			"ludro", "ƚadro", "ƚata", "ƚudro", "marsèr", "marŧèr", "masèr", "nodara", "olivo", "oƚivo", "paregin", "parejin", "pareɉin", "pedante", "pistor",
-			"raxente", "sekreto", "skorsèr", "skorŧèr", "skroa", "spada", "storno", "tentor", "teña", "birbante", "boèr", "boteja", "boteɉa", "ridikolería",
-			"ridikoƚería", "artejería", "arteɉería", "artelería", "arteƚería", "kaxolería", "kaxoƚería", "kortexan", "ladron", "ƚadron", "merkandería", "ostèr",
-			"pelatería", "peƚatería", "podestería", "poestería", "señor", "skrova", "skudo", "kaxèla", "kaxèƚa", "strion", "angería", "fiskal", "fiskaƚe",
-			"mersería", "merŧería", "meseto", "momería", "palandería", "paƚandería", "panatería", "piskería", "desentería", "erbería", "fravo", "garda", "garđa",
-			"garxa", "gril", "griƚo", "kaxolin", "kaxoƚin", "adorator", "asesor", "baldería", "balestrería", "baƚestrería", "bibioxo", "bixutería", "botilia",
-			"botiƚia", "butilia", "butiƚia", "falkon", "galería", "gaƚería", "inbasería", "kafetería", "kakofonería", "kotería", "piavolería", "piavoƚería",
-			"porko", "rajonato", "raɉonato", "salegèr", "saƚegèr", "santocería", "senpio", "siòko", "sixor", "skorería", "sovarcería", "spakon", "spiŧièr",
-			"sporko", "stranbo", "supercería", "telería", "teƚería", "teñoxería", "tersería", "terŧería", "ŧaratan", "ŧibaldería", "ŧixor", "vetrería",
-			"grixonería", "kordería", "ŧimexería", "citin", "sapientería", "segretería", "maŧèr", "gexo");
+		List<String> words = Arrays.asList("albergar", "ardentar", "arđentar", "arxentar", "axenar", "bañar", "barar", "berekinar", "berikinar",
+			"bibiar", "birar", "birbantar", "bonbar", "bufonar", "cakolar", "cakoƚar", "drapar", "strafantar", "fatucar", "rafinar", "fondar",
+			"fornar", "fraskar", "garbar", "gardar", "garđar", "garxar", "grixonar", "guanto", "vanto", "jetar", "ɉetar", "kanselar", "kanŧelar",
+			"kanseƚar", "kañar", "kapocar", "kastronar", "kavalar", "kavaƚar", "kojonar", "koɉonar", "kojonbarar", "koɉonbarar", "kokolar",
+			"kokoƚar", "komandar", "komensar", "komenŧar", "komensiar", "komenŧiar", "kontar", "kontrolar", "kontroƚar", "koro", "kordar",
+			"rekordar", "krokar", "kuadro", "ladrar", "ƚadrar", "lexinar", "ƚexinar", "lotar", "ƚotar", "mañar", "minconar", "nodar", "panetar",
+			"peocar", "peskar", "piedar", "pieđar", "piexar", "pièxo", "spilorŧar", "spilorsar", "piocar", "pitokar", "poltronar", "pomo", "porkar",
+			"portar", "putelar", "puteƚar", "retelar", "reteƚar", "robar", "saonar", "senpiar", "skorsar", "skorŧar", "soldar", "sovercar",
+			"spesiar", "speŧiar", "spisiar", "spiŧiar", "sporkar", "isporkar", "stanpar", "stranbar", "strasar", "straŧar", "striar", "strigar",
+			"takonar", "tapesar", "tapeŧar", "tartufolar", "tartufoƚar", "sansar", "ŧimar", "simar", "vakar", "provedo", "vergexar", "xmorfiar",
+			"mèdo", "mèđo", "mèxo", "kaxo", "bianka", "banko", "banpor", "batería", "bekèr", "còdo", "fresa", "freŧa", "kasèla", "kasèƚa", "kojon",
+			"koɉon", "libro", "ƚibro", "muscèr", "pedòco", "peòco", "persegèr", "piòco", "polar", "poƚar", "prado", "salgèr", "sensèr", "siñor",
+			"sior", "skoasa", "skoaŧa", "skovasa", "skovaŧa", "spesièr", "speŧièr", "strasa", "straŧa", "striga", "tintor", "trator", "vaka", "bira",
+			"boletin", "boƚetin", "cetin", "dolfin", "fante", "fator", "forestería", "fraska", "furbo", "galante", "gaƚante", "goloxo", "goƚoxo",
+			"kalegèr", "kaƚegèr", "kamarlengo", "konetrería", "ladro", "lata", "ludro", "ƚadro", "ƚata", "ƚudro", "marsèr", "marŧèr", "masèr",
+			"nodara", "olivo", "oƚivo", "paregin", "parejin", "pareɉin", "pedante", "pistor", "raxente", "sekreto", "skorsèr", "skorŧèr", "skroa",
+			"spada", "storno", "tentor", "teña", "birbante", "boèr", "boteja", "boteɉa", "ridikolería", "ridikoƚería", "artejería", "arteɉería",
+			"artelería", "arteƚería", "kaxolería", "kaxoƚería", "kortexan", "ladron", "ƚadron", "merkandería", "ostèr", "pelatería", "peƚatería",
+			"podestería", "poestería", "señor", "skrova", "skudo", "kaxèla", "kaxèƚa", "strion", "angería", "fiskal", "fiskaƚe", "mersería",
+			"merŧería", "meseto", "momería", "palandería", "paƚandería", "panatería", "piskería", "desentería", "erbería", "fravo", "garda", "garđa",
+			"garxa", "gril", "griƚo", "kaxolin", "kaxoƚin", "adorator", "asesor", "baldería", "balestrería", "baƚestrería", "bibioxo", "bixutería",
+			"botilia", "botiƚia", "butilia", "butiƚia", "falkon", "galería", "gaƚería", "inbasería", "kafetería", "kakofonería", "kotería",
+			"piavolería", "piavoƚería", "porko", "rajonato", "raɉonato", "salegèr", "saƚegèr", "santocería", "senpio", "siòko", "sixor", "skorería",
+			"sovarcería", "spakon", "spiŧièr", "sporko", "stranbo", "supercería", "telería", "teƚería", "teñoxería", "tersería", "terŧería",
+			"ŧaratan", "ŧibaldería", "ŧixor", "vetrería", "grixonería", "kordería", "ŧimexería", "citin", "sapientería", "segretería", "maŧèr",
+			"gexo");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> originalRules = originalLines.stream()
+		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
 			.collect(Collectors.toList());
-		List<RulesReducer.LineEntry> compactedRules = reducer.reduceProductions(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceProductions(originalRules);
 
-		List<RulesReducer.LineEntry> expectedCompactedRules = Arrays.asList(
-			new RulesReducer.LineEntry("èla", new HashSet<>(Arrays.asList("elaría", "elería", "elarieta", "elerieta")), "èla", Arrays.asList("kasèla", "kaxèla")),
-			new RulesReducer.LineEntry("èr", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "èr", Arrays.asList("kalegèr", "sensèr", "marŧèr",
-				"muscèr", "masèr", "bekèr", "persegèr", "ostèr", "speŧièr", "saƚegèr", "maŧèr", "skorŧèr", "spiŧièr", "kaƚegèr", "marsèr", "salgèr", "skorsèr",
-				"spesièr", "boèr", "salegèr")),
-			new RulesReducer.LineEntry("ería", new HashSet<>(Arrays.asList("arieta", "aría", "erieta")), "ería", Arrays.asList("supercería", "konetrería",
-				"pelatería", "poestería", "baldería", "kafetería", "angería", "mersería", "tersería", "galería", "ŧibaldería", "kaxolería", "peƚatería", "erbería",
-				"sovarcería", "segretería", "kotería", "teƚería", "artejería", "momería", "batería", "inbasería", "piavoƚería", "paƚandería", "kordería", "sapientería",
-				"terŧería", "teñoxería", "ŧimexería", "bixutería", "forestería", "kakofonería", "ridikoƚería", "artelería", "podestería", "baƚestrería", "grixonería",
-				"piskería", "balestrería", "telería", "arteƚería", "ridikolería", "panatería", "piavolería", "santocería", "vetrería", "gaƚería", "desentería",
-				"arteɉería", "kaxoƚería", "palandería", "merkandería", "merŧería", "skorería")),
-			new RulesReducer.LineEntry("èdo", new HashSet<>(Arrays.asList("edería", "ederieta", "edarieta", "edaría")), "èdo", "mèdo"),
-			new RulesReducer.LineEntry("èƚa", new HashSet<>(Arrays.asList("eƚaría", "eƚerieta", "eƚería", "eƚarieta")), "èƚa", Arrays.asList("kasèƚa", "kaxèƚa")),
-			new RulesReducer.LineEntry("ar", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "ar", Arrays.asList("axenar", "sporkar", "portar",
-				"fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar", "komandar",
-				"kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar", "panetar", "tapeŧar", "kokoƚar",
-				"strasar", "tartufolar", "retelar", "vergexar", "senpiar", "bibiar", "putelar", "pitokar", "berikinar", "saonar", "strigar", "kavaƚar", "striar",
-				"straŧar", "polar", "cakoƚar", "lotar", "piocar", "kokolar", "isporkar", "garbar", "rafinar", "kanseƚar", "nodar", "kojonar", "stanpar", "garđar",
-				"poltronar", "ƚexinar", "speŧiar", "spilorŧar", "soldar", "ɉetar", "minconar", "piexar", "poƚar", "jetar", "reteƚar", "peocar", "piedar", "skorsar",
-				"garxar", "kontroƚar", "kanselar", "puteƚar", "albergar", "ardentar", "spilorsar", "kordar", "tapesar", "grixonar", "ƚotar", "sovercar", "xmorfiar",
-				"stranbar", "cakolar", "kapocar", "kontrolar", "sansar", "spiŧiar", "ŧimar", "robar", "simar", "fraskar", "komenŧiar", "bañar", "birbantar", "bufonar",
-				"porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar", "lexinar", "berekinar",
-				"tartufoƚar", "vakar", "spesiar")),
-			new RulesReducer.LineEntry("òko", new HashSet<>(Arrays.asList("okarieta", "okería", "okaría", "okerieta")), "òko", "siòko"),
-			new RulesReducer.LineEntry("èđo", new HashSet<>(Arrays.asList("eđarieta", "eđaría", "eđería", "eđerieta")), "èđo", "mèđo"),
-			new RulesReducer.LineEntry("èxo", new HashSet<>(Arrays.asList("exerieta", "exería", "exaría", "exarieta")), "èxo", Arrays.asList("mèxo", "pièxo")),
-			new RulesReducer.LineEntry("òco", new HashSet<>(Arrays.asList("ocarieta", "ocería", "ocerieta", "ocaría")), "òco", Arrays.asList("pedòco", "peòco",
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("èla", new HashSet<>(Arrays.asList("elaría", "elería", "elarieta", "elerieta")), "èla", Arrays.asList("kasèla", "kaxèla")),
+			new LineEntry("èr", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "èr", Arrays.asList("kalegèr", "sensèr", "marŧèr",
+				"muscèr", "masèr", "bekèr", "persegèr", "ostèr", "speŧièr", "saƚegèr", "maŧèr", "skorŧèr", "spiŧièr", "kaƚegèr", "marsèr", "salgèr",
+				"skorsèr", "spesièr", "boèr", "salegèr")),
+			new LineEntry("ería", new HashSet<>(Arrays.asList("arieta", "aría", "erieta")), "ería", Arrays.asList("supercería", "konetrería",
+				"pelatería", "poestería", "baldería", "kafetería", "angería", "mersería", "tersería", "galería", "ŧibaldería", "kaxolería",
+				"peƚatería", "erbería", "sovarcería", "segretería", "kotería", "teƚería", "artejería", "momería", "batería", "inbasería",
+				"piavoƚería", "paƚandería", "kordería", "sapientería", "terŧería", "teñoxería", "ŧimexería", "bixutería", "forestería", "kakofonería",
+				"ridikoƚería", "artelería", "podestería", "baƚestrería", "grixonería", "piskería", "balestrería", "telería", "arteƚería",
+				"ridikolería", "panatería", "piavolería", "santocería", "vetrería", "gaƚería", "desentería", "arteɉería", "kaxoƚería", "palandería",
+				"merkandería", "merŧería", "skorería")),
+			new LineEntry("èdo", new HashSet<>(Arrays.asList("edería", "ederieta", "edarieta", "edaría")), "èdo", "mèdo"),
+			new LineEntry("èƚa", new HashSet<>(Arrays.asList("eƚaría", "eƚerieta", "eƚería", "eƚarieta")), "èƚa", Arrays.asList("kasèƚa", "kaxèƚa")),
+			new LineEntry("ar", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "ar", Arrays.asList("axenar", "sporkar", "portar",
+				"fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar",
+				"komandar", "kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar",
+				"panetar", "tapeŧar", "kokoƚar", "strasar", "tartufolar", "retelar", "vergexar", "senpiar", "bibiar", "putelar", "pitokar",
+				"berikinar", "saonar", "strigar", "kavaƚar", "striar", "straŧar", "polar", "cakoƚar", "lotar", "piocar", "kokolar", "isporkar",
+				"garbar", "rafinar", "kanseƚar", "nodar", "kojonar", "stanpar", "garđar", "poltronar", "ƚexinar", "speŧiar", "spilorŧar", "soldar",
+				"ɉetar", "minconar", "piexar", "poƚar", "jetar", "reteƚar", "peocar", "piedar", "skorsar", "garxar", "kontroƚar", "kanselar",
+				"puteƚar", "albergar", "ardentar", "spilorsar", "kordar", "tapesar", "grixonar", "ƚotar", "sovercar", "xmorfiar", "stranbar",
+				"cakolar", "kapocar", "kontrolar", "sansar", "spiŧiar", "ŧimar", "robar", "simar", "fraskar", "komenŧiar", "bañar", "birbantar",
+				"bufonar", "porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar",
+				"lexinar", "berekinar", "tartufoƚar", "vakar", "spesiar")),
+			new LineEntry("òko", new HashSet<>(Arrays.asList("okarieta", "okería", "okaría", "okerieta")), "òko", "siòko"),
+			new LineEntry("èđo", new HashSet<>(Arrays.asList("eđarieta", "eđaría", "eđería", "eđerieta")), "èđo", "mèđo"),
+			new LineEntry("èxo", new HashSet<>(Arrays.asList("exerieta", "exería", "exaría", "exarieta")), "èxo", Arrays.asList("mèxo", "pièxo")),
+			new LineEntry("òco", new HashSet<>(Arrays.asList("ocarieta", "ocería", "ocerieta", "ocaría")), "òco", Arrays.asList("pedòco", "peòco",
 				"piòco")),
-			new RulesReducer.LineEntry("òdo", new HashSet<>(Arrays.asList("odaría", "oderieta", "odería", "odarieta")), "òdo", "còdo"),
-			new RulesReducer.LineEntry("e", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "e", Arrays.asList("raxente", "galante", "gaƚante",
+			new LineEntry("òdo", new HashSet<>(Arrays.asList("odaría", "oderieta", "odería", "odarieta")), "òdo", "còdo"),
+			new LineEntry("e", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "e", Arrays.asList("raxente", "galante", "gaƚante",
 				"birbante", "fiskaƚe", "fante", "pedante")),
-			new RulesReducer.LineEntry("0", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[ln]", Arrays.asList("strion", "kaxoƚin", "kortexan",
-				"kaxolin", "boƚetin", "fiskal", "falkon", "ŧaratan", "kojon", "ladron", "spakon", "cetin", "pareɉin", "citin", "dolfin", "koɉon", "boletin", "paregin",
-				"ƚadron", "parejin", "gril")),
-			new RulesReducer.LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^cdđkx]o", Arrays.asList("meseto", "libro", "furbo",
-				"ƚadro", "olivo", "ƚudro", "oƚivo", "ludro", "storno", "rajonato", "griƚo", "vanto", "ƚibro", "koro", "kamarlengo", "ladro", "pomo", "raɉonato",
-				"guanto", "sekreto", "stranbo", "senpio", "fravo", "kuadro")),
-			new RulesReducer.LineEntry("a", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^ílƚ]a", Arrays.asList("skovasa", "butiƚia", "skovaŧa",
-				"strasa", "garda", "ƚata", "lata", "skoaŧa", "garđa", "botiƚia", "fraska", "skrova", "bira", "garxa", "freŧa", "butilia", "botilia", "striga", "spada",
-				"skroa", "skoasa", "nodara", "fresa", "vaka", "teña", "boteja", "bianka", "boteɉa", "straŧa")),
-			new RulesReducer.LineEntry("0", new HashSet<>(Arrays.asList("ieta", "ía")), "or", Arrays.asList("banpor", "pistor", "adorator", "sixor", "señor", "asesor",
-				"sior", "ŧixor", "tentor", "trator", "tintor", "fator", "siñor")),
-			new RulesReducer.LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^èò]do", Arrays.asList("provedo", "prado", "skudo")),
-			new RulesReducer.LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^è]xo", Arrays.asList("goloxo", "gexo", "bibioxo",
+			new LineEntry("0", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[ln]", Arrays.asList("strion", "kaxoƚin",
+				"kortexan", "kaxolin", "boƚetin", "fiskal", "falkon", "ŧaratan", "kojon", "ladron", "spakon", "cetin", "pareɉin", "citin", "dolfin",
+				"koɉon", "boletin", "paregin", "ƚadron", "parejin", "gril")),
+			new LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^cdđkx]o", Arrays.asList("meseto", "libro",
+				"furbo", "ƚadro", "olivo", "ƚudro", "oƚivo", "ludro", "storno", "rajonato", "griƚo", "vanto", "ƚibro", "koro", "kamarlengo", "ladro",
+				"pomo", "raɉonato", "guanto", "sekreto", "stranbo", "senpio", "fravo", "kuadro")),
+			new LineEntry("a", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^ílƚ]a", Arrays.asList("skovasa", "butiƚia",
+				"skovaŧa", "strasa", "garda", "ƚata", "lata", "skoaŧa", "garđa", "botiƚia", "fraska", "skrova", "bira", "garxa", "freŧa", "butilia",
+				"botilia", "striga", "spada", "skroa", "skoasa", "nodara", "fresa", "vaka", "teña", "boteja", "bianka", "boteɉa", "straŧa")),
+			new LineEntry("0", new HashSet<>(Arrays.asList("ieta", "ía")), "or", Arrays.asList("banpor", "pistor", "adorator", "sixor", "señor",
+				"asesor", "sior", "ŧixor", "tentor", "trator", "tintor", "fator", "siñor")),
+			new LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^èò]do", Arrays.asList("provedo", "prado",
+				"skudo")),
+			new LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^è]xo", Arrays.asList("goloxo", "gexo", "bibioxo",
 				"goƚoxo", "kaxo")),
-			new RulesReducer.LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^ò]ko", Arrays.asList("banko", "porko", "sporko"))
+			new LineEntry("o", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[^ò]ko", Arrays.asList("banko", "porko", "sporko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
