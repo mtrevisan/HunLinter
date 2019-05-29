@@ -303,26 +303,10 @@ for(final LineEntry entry : uniquePlainRules)
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
 				//FIXME condition not always the best...
-				String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 || parentGroup.size() < childrenGroup.size()?
+				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
 					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
-
-				//if parent.condition is not empty
-//				if(!parent.condition.isEmpty()){
-//					final List<LineEntry> bubbles = extractRuleBubbles(parent, children);
-					//if can-bubble-up
-//					if(!bubbles.isEmpty()){
-						//FIXME
-//						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
-//						rules.addAll(bubbledRules);
-
-						//remove bubbles from current-list
-//						bubbles.forEach(sortedList::remove);
-//bubbledRules.size();
-//System.out.println("fix me");
-//					}
-//				}
 
 				final List<LineEntry> sameConditionChildren = children.stream()
 					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
@@ -344,28 +328,6 @@ for(final LineEntry entry : uniquePlainRules)
 			}
 			else{
 				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
-
-//				if(parentGroup.equals(groupIntersection) && children.size() == 1){
-//					LineEntry child = children.get(0);
-//					final String condition = notGroupIntersection + child.condition;
-//					List<String> words = child.extractFromEndingWith(condition);
-//					if(!words.isEmpty()){
-//if("[^e]entar".equals(condition))
-//System.out.println("");
-//						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
-//						rules.add(newEntry);
-//					}
-//				}
-				//should be here...
-//				if(parentGroup.equals(groupIntersection)){
-//					final String condition = notGroupIntersection + parent.condition;
-//					final List<String> words = parent.extractFromEndingWith(condition);
-//					if(!words.isEmpty()){
-//						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-//						rules.add(newEntry);
-//					}
-//				}
-
 				final Map<String, List<String>> fromBucket = bucket(parent.from,
 					from -> {
 						char chr = from.charAt(from.length() - parentConditionLength - 1);
@@ -379,24 +341,6 @@ for(final LineEntry entry : uniquePlainRules)
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 					rules.add(newEntry);
 				}
-				//... or here?
-//				else{
-//					final String condition = notGroupIntersection + parent.condition;
-//					final List<String> words = parent.extractFromEndingWith(condition);
-//					if(!words.isEmpty()){
-//						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-//						rules.add(newEntry);
-//					}
-//				}
-//				else if(parentGroup.equals(groupIntersection) && children.size() == 1){
-//					LineEntry child = children.get(0);
-//					final String condition = notGroupIntersection + child.condition;
-//					List<String> words = child.extractFromEndingWith(condition);
-//					if(!words.isEmpty()){
-//						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
-//						rules.add(newEntry);
-//					}
-//				}
 				for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
 					final String condition = entry.getKey() + parent.condition;
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
@@ -600,98 +544,5 @@ for(final LineEntry entry : uniquePlainRules)
 			.add(partialLine.condition.isEmpty()? DOT: partialLine.condition)
 			.toString();
 	}
-
-
-
-//	private List<LineEntry> extractRuleBubbles(final LineEntry parent, final List<LineEntry> sortedList){
-//		final int parentConditionLength = parent.condition.length();
-//		return sortedList.stream()
-//			.filter(entry -> entry.condition.length() > parentConditionLength)
-//			.collect(Collectors.toList());
-//	}
-
-//	private List<LineEntry> bubbleUpNotGroup(final LineEntry parent, final List<LineEntry> children){
-//		final int parentConditionLength = parent.condition.length();
-//		//bubble up by bucketing children for group-2
-//		final Set<String> bubblesCondition = children.stream()
-//			.map(entry -> entry.condition)
-//			.collect(Collectors.toSet());
-//
-//		/*
-//		extract communalities:
-//		from
-//			"è => [èdo, èđo, èxo]"
-//			"ò => [òdo, òco, òko]"
-//		transform into
-//			"è => [èđo, èxo]"
-//			"ò => [òco, òko]"
-//			"èò => [òdo, èdo]"
-//		extract common-group (key.length > 1)
-//		add new rule from parent with condition starting with NOT(common-group) to final-list
-//			'[^èò]do'
-//		*/
-//		final List<LineEntry> newParents = new ArrayList<>();
-//		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
-//			cond -> cond.substring(cond.length() - parentConditionLength - 1));
-//		//remove single conditions
-//		Iterator<Map.Entry<String, List<String>>> itr = communalitiesBucket.entrySet().iterator();
-//		while(itr.hasNext())
-//			if(itr.next().getValue().size() == 1)
-//				itr.remove();
-//		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
-//			final List<String> comm = e.getValue();
-//			//FIXME
-////			if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
-////				throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
-////					+ "', comm '" + comm.toString());
-//
-//			for(String c : comm){
-//				final List<String> gg = children.stream()
-//					.filter(entry -> entry.condition.equals(c))
-//					.flatMap(entry -> entry.from.stream())
-//					.collect(Collectors.toList());
-//				bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
-//			}
-//			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
-//			final String condition = makeNotGroup(commonGroup, e.getKey());
-//			final List<String> words = parent.extractFromEndingWith(condition);
-//			final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-//			//keep only rules that matches some existent words
-//			if(!words.isEmpty())
-//				newParents.add(newEntry);
-//			else
-//				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-//					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-//
-//			comm.forEach(bubblesCondition::remove);
-//		}
-//
-//		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
-//			cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
-//		//for each children-group-2
-//		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
-//			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
-//			final Set<Character> bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
-//			//do the bubble trick
-//			for(int i = conds.getKey().length(); i > 0; i --){
-//				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
-//					+ conds.getKey().substring(i)
-//					+ makeGroup(bubbleGroup, parent.condition);
-//				final List<String> words = parent.extractFromEndingWith(condition);
-//				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
-//				//keep only rules that matches some existent words
-//				if(!words.isEmpty())
-//					newParents.add(newEntry);
-//				else
-//					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-//						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-//			}
-//		}
-//		return newParents;
-//	}
-
-//	private String makeNotGroup(final char group){
-//		return NOT_GROUP_START + group + GROUP_END;
-//	}
 
 }
