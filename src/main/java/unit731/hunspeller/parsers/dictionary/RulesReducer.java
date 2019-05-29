@@ -315,8 +315,7 @@ for(final LineEntry entry : uniquePlainRules)
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
 					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-					condition = (sameConditionChildren.size() == 1 && !sameConditionChildren.containsAll(childGroup) && childGroup.size() > 1?
-						makeNotGroup(parentGroup, child.condition): makeGroup(childGroup, child.condition));
+					condition = makeGroup(childGroup, child.condition);
 					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}
