@@ -1639,6 +1639,7 @@ public class RulesReducerTest{
 			new LineEntry("òde", "odesa", "òde", Arrays.asList("pròde")),
 			new LineEntry("èl", "elesa", "èl", Arrays.asList("bèl")),
 			new LineEntry("èr", "eresa", "èr", Arrays.asList("ledièr", "leđièr", "lexièr", "ƚexièr", "fièr")),
+//FIXME
 			new LineEntry("èƚo", "eƚesa", "èƚo", Arrays.asList("bèƚo", "sòdo")),
 			new LineEntry("0", "esa", "n", Arrays.asList("molexin", "moƚexin", "mulexin", "muƚexin", "repien", "fin", "sorafin", "man")),
 			new LineEntry("o", "esa", "[^dƚs]o", Arrays.asList("onorato", "relasato", "seko", "skuexito", "pronto", "reƚasato", "ardito", "alto",
