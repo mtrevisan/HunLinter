@@ -1167,13 +1167,13 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("ñerò", "nsion", "ñerò", Arrays.asList("konveñerò")),
+			new LineEntry("ñerò", "nsion", "ñerò", "konveñerò"),
 			new LineEntry("merò", "nsion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
-			new LineEntry("guerò", "sion", "guerò", Arrays.asList("destinguerò")),
+			new LineEntry("guerò", "sion", "guerò", "destinguerò"),
 			new LineEntry("àer", "asion", "àer", Arrays.asList("tràer", "estràer")),
 			new LineEntry("nerò", "xision", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò",
 				"konponerò", "proponerò", "xustaponerò")),
-			new LineEntry("orxerò", "uresion", "orxerò", Arrays.asList("sorxerò")),
+			new LineEntry("orxerò", "uresion", "orxerò", "sorxerò"),
 			new LineEntry("ir", "sion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir",
 				"instruir", "destribuir", "diminuir", "lokuir")),
 			new LineEntry("r", "sion", "[^u]ir", Arrays.asList("proibir", "rekuixir", "monir", "kondir", "inkuixir", "benedir", "nudrir",
@@ -1199,18 +1199,18 @@ public class RulesReducerTest{
 				"panixar", "legalidar", "iluminar", "kontaminar", "libarar", "malvarsar", "examinar", "suporar", "pelar", "espurgar",
 				"palatixar", "mortifegar", "kalsinar", "soporar", "nomenar", "rivar", "sperar", "mixurar", "senplifegar", "situar",
 				"sistemar", "xmenbrar", "strolegar", "tranxar", "negar")),
-			new LineEntry("erò", "ision", "terò", Arrays.asList("repeterò")),
+			new LineEntry("erò", "ision", "terò", "repeterò"),
 			new LineEntry("r", "sion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar",
 				"sitar", "butar", "mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar",
 				"deputar", "permutar", "vixitar", "valutar", "votar")),
 			new LineEntry("derò", "sion", "[^l]derò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò",
 				"tenderò")),
-			new LineEntry("derò", "usion", "lderò", Arrays.asList("solderò")),
+			new LineEntry("derò", "usion", "lderò", "solderò"),
 			new LineEntry("verò", "usion", "[^i]verò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
 			new LineEntry("verò", "sion", "iverò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
 			new LineEntry("xerò", "sion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò",
 				"aflixerò", "struxerò", "produxerò", "introduxerò")),
-			new LineEntry("tar", "sion", "petar", Arrays.asList("sospetar")),
+			new LineEntry("tar", "sion", "petar", "sospetar"),
 			new LineEntry("r", "sion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "setar", "fetar", "interpretar")),
 			new LineEntry("tar", "sion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
 			new LineEntry("r", "sion", "[^vx]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar",
@@ -1325,13 +1325,13 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("guerò", "ŧion", "guerò", Arrays.asList("destinguerò")),
+			new LineEntry("guerò", "ŧion", "guerò", "destinguerò"),
 			new LineEntry("merò", "nŧion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
 			new LineEntry("nerò", "xiŧion", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò",
 				"proponerò", "xustaponerò")),
-			new LineEntry("ñerò", "nŧion", "ñerò", Arrays.asList("konveñerò")),
+			new LineEntry("ñerò", "nŧion", "ñerò", "konveñerò"),
 			new LineEntry("àer", "aŧion", "àer", Arrays.asList("tràer, estràer")),
-			new LineEntry("orxerò", "ureŧion", "orxerò", Arrays.asList("sorxerò")),
+			new LineEntry("orxerò", "ureŧion", "orxerò", "sorxerò"),
 			new LineEntry("ir", "ŧion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir",
 				"destribuir", "diminuir", "lokuir")),
 			new LineEntry("r", "ŧion", "[^u]ir", Arrays.asList("monir", "inibir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir",
@@ -1358,7 +1358,7 @@ public class RulesReducerTest{
 				"malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "soporar", "nomenar", "vokaliđar", "rivar",
 				"sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "xmenbrar", "strolegar", "tranxar", "negar")),
 			new LineEntry("erò", "ion", "[đsŧ]erò", Arrays.asList("raserò", "faserò", "struđerò", "raŧerò")),
-			new LineEntry("erò", "iŧion", "terò", Arrays.asList("repeterò")),
+			new LineEntry("erò", "iŧion", "terò", "repeterò"),
 			new LineEntry("r", "ŧion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar", "butar",
 				"mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar", "deputar", "ŧitar", "permutar",
 				"vixitar", "valutar", "votar")),
@@ -1367,8 +1367,8 @@ public class RulesReducerTest{
 			new LineEntry("verò", "ŧion", "[^l]verò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
 			new LineEntry("verò", "uŧion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
 			new LineEntry("derò", "ŧion", "[^l]derò", Arrays.asList("fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
-			new LineEntry("derò", "uŧion", "lderò", Arrays.asList("solderò")),
-			new LineEntry("tar", "ŧion", "petar", Arrays.asList("sospetar")),
+			new LineEntry("derò", "uŧion", "lderò", "solderò"),
+			new LineEntry("tar", "ŧion", "petar", "sospetar"),
 			new LineEntry("r", "ŧion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "ŧetar", "fetar", "interpretar")),
 			new LineEntry("tar", "ŧion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
 			new LineEntry("r", "ŧion", "[^vx]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar",
@@ -1400,6 +1400,57 @@ public class RulesReducerTest{
 			"SFX r2 orxerò ureŧion orxerò",
 			"SFX r2 r ŧion [^vx]entar",
 			"SFX r2 tar ŧion [^mt]entar"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
+	@Test
+	public void simple15() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX r1 Y 2",
+			"SFX r1 r mento r",
+			"SFX r1 rò mento arò"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "r1";
+		List<String> words = Arrays.asList("pispoƚar", "josoƚar", "ƚatar", "xbesoƚar", "diƚatar", "ƚontanar", "bagoƚar", "indeboƚir", "vaƚir",
+			"strukoƚar", "boƚegar", "indoƚentrar", "deƚinear", "formigoƚar", "desarveƚar", "biskoƚar", "kaƚar", "sifoƚar", "rueƚar", "dindoƚar",
+			"krikoƚar", "ƚigar", "siaƚakuar", "ƚoxar", "ƚisar", "deserveƚar", "ƚanpexar", "nuvoƚar", "kabaƚar", "ñaoƚar", "bueƚar", "ƚanpixar",
+			"spigoƚar", "triboƚar", "turbuƚar", "proƚongar", "trabakoƚar", "krokoƚar", "skonbusoƚar", "cicoƚar", "skorkoƚar", "kavaƚar",
+			"skrisoƚar", "troboƚar", "basiƚar", "torboƚar", "ƚogar", "paƚar", "faƚir", "ƚanbikar", "peƚar", "dexserveƚar", "sigaƚar",
+			"dexsarveƚar", "buƚegar", "strakoƚar", "voltoƚar", "koƚar", "ɉosoƚar", "guaƚivar", "ƚuxarò");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("r", "mento", "r", Arrays.asList("pispoƚar", "josoƚar", "ƚatar", "xbesoƚar", "diƚatar", "ƚontanar", "bagoƚar",
+				"indeboƚir", "vaƚir", "strukoƚar", "boƚegar", "indoƚentrar", "deƚinear", "formigoƚar", "desarveƚar", "biskoƚar", "kaƚar", "sifoƚar",
+				"rueƚar", "dindoƚar", "krikoƚar", "ƚigar", "siaƚakuar", "ƚoxar", "ƚisar", "deserveƚar", "ƚanpexar", "nuvoƚar", "kabaƚar", "ñaoƚar",
+				"bueƚar", "ƚanpixar", "spigoƚar", "triboƚar", "turbuƚar", "proƚongar", "trabakoƚar", "krokoƚar", "skonbusoƚar", "cicoƚar", "skorkoƚar",
+				"kavaƚar", "skrisoƚar", "troboƚar", "basiƚar", "torboƚar", "ƚogar", "paƚar", "faƚir", "ƚanbikar", "peƚar", "dexserveƚar", "sigaƚar",
+				"dexsarveƚar", "buƚegar", "strakoƚar", "voltoƚar", "koƚar", "ɉosoƚar", "guaƚivar")),
+			new LineEntry("rò", "mento", "rò", "ƚuxarò")
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX r1 Y 2",
+			"SFX r1 r mento r",
+			"SFX r1 rò mento rò"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
