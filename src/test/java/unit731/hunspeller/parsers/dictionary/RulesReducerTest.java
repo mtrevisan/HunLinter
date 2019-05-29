@@ -909,10 +909,9 @@ public class RulesReducerTest{
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r6";
-		List<String> words = Arrays.asList("ƚargar", "boƚar", "noƚixar", "noƚexar", "spigoƚar", "ƚustrar", "sesoƚar", "kalkoƚar", "ƚavorar",
-			"iƚuminar", "piƚar", "regoƚar", "kaƚibrar", "señaƚar", "oxeƚar", "kriveƚar", "saƚixar", "ventiƚar", "ƚuminar", "aƚienar", "ƚexixlar",
-			"triveƚar", "spekuƚar", "garbeƚar", "ƚibar", "paƚar", "koƚorir", "ƚigar", "siaƚakuar", "mormoƚar", "ƚikar", "soƚesitar", "skarpeƚar",
-			"ƚaorar", "foƚar", "stroƚegar", "spoƚar", "stroƚogar", "baƚar", "fiƚar", "koƚar", "saƚar", "ƚevar", "baƚotar", "ƚavar");
+		List<String> words = Arrays.asList("baƚar", "boƚar", "doƚar", "fiƚar", "gaƚopar", "kaneƚar", "kavaƚar", "koƚar", "inkordeƚar", "kriveƚar",
+			"ƚatar", "ƚavar", "ƚeskar", "ƚetarar", "ƚeterar", "ƚexenar", "ƚexixlar", "ƚigar", "ƚimar", "ƚuminar", "iƚuminar", "moƚar", "paƚar",
+			"paƚetar", "peƚar", "saƚar", "skarseƚar", "stabiƚir", "soƚar", "vaƚir", "vixiƚar", "koƚadur", "stabeƚidura", "vaƚidur");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
@@ -923,11 +922,12 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("r", new HashSet<>(Arrays.asList("ureta", "ura", "dureta", "dura")), "r", Arrays.asList("ƚargar", "boƚar", "noƚixar",
-				"noƚexar", "spigoƚar", "ƚustrar", "sesoƚar", "kalkoƚar", "ƚavorar", "iƚuminar", "piƚar", "regoƚar", "kaƚibrar", "señaƚar", "oxeƚar",
-				"kriveƚar", "saƚixar", "ventiƚar", "ƚuminar", "aƚienar", "ƚexixlar", "triveƚar", "spekuƚar", "garbeƚar", "ƚibar", "paƚar", "koƚorir",
-				"ƚigar", "siaƚakuar", "mormoƚar", "ƚikar", "soƚesitar", "skarpeƚar", "ƚaorar", "foƚar", "stroƚegar", "spoƚar", "stroƚogar", "baƚar",
-				"fiƚar", "koƚar", "saƚar", "ƚevar", "baƚotar", "ƚavar"))
+			new LineEntry("dura", new HashSet<>(Arrays.asList("ureta", "ura")), "dura", "stabeƚidura"),
+			new LineEntry("dur", new HashSet<>(Arrays.asList("ureto", "ur")), "dur", Arrays.asList("koƚadur", "vaƚidur")),
+			new LineEntry("r", new HashSet<>(Arrays.asList("ureta", "ura", "dureta", "dura")), "[^u]r", Arrays.asList("ƚatar", "ƚeterar", "boƚar",
+				"vaƚir", "ƚetarar", "iƚuminar", "moƚar", "doƚar", "kriveƚar", "kavaƚar", "ƚuminar", "kaneƚar", "ƚexixlar", "soƚar", "paƚar", "stabiƚir",
+				"paƚetar", "peƚar", "ƚigar", "ƚimar", "inkordeƚar", "ƚexenar", "skarseƚar", "baƚar", "fiƚar", "koƚar", "saƚar", "vixiƚar", "ƚeskar",
+				"gaƚopar", "ƚavar"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
