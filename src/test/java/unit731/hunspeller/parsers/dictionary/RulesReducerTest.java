@@ -1247,6 +1247,165 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	public void simple14() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX r2 Y 26",
+			"SFX r2 r ŧion [^aei]r",
+			"SFX r2 r ŧion [^t]ar",
+			"SFX r2 r ŧion [^en]tar",
+			"SFX r2 r ŧion [^p]etar",
+			"SFX r2 r ŧion [^s]petar",
+			"SFX r2 r ŧion [^e]ntar",
+			"SFX r2 r ŧion [^vx]entar",
+			"SFX r2 r ŧion [^à]er",
+			"SFX r2 r ŧion [^u]ir",
+			"SFX r2 tar ŧion spetar",
+			"SFX r2 tar ŧion [vx]entar",
+			"SFX r2 àer aŧion àer",
+			"SFX r2 ir ŧion uir",
+			"SFX r2 erò ion [^dmnñtuvsŧx]erò",
+			"SFX r2 erò ion [sŧ]erò",
+			"SFX r2 xerò ŧion [aeiu]xerò",
+			"SFX r2 orxerò ureŧion sorxerò",
+			"SFX r2 merò nŧion umerò",
+			"SFX r2 nerò xiŧion onerò",
+			"SFX r2 verò ŧion iverò",
+			"SFX r2 erò iŧion eterò",
+			"SFX r2 derò ŧion [ae]nderò",
+			"SFX r2 ñerò nŧion eñerò",
+			"SFX r2 derò uŧion olderò",
+			"SFX r2 verò uŧion olverò",
+			"SFX r2 guerò ŧion stinguerò"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "r2";
+		List<String> words = Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò", "sorxerò", "konveñerò", "solverò", "evolverò",
+			"revolverò", "rexolverò", "tràer", "estràer", "prexentar", "exentar", "ventar", "sospetar", "destinguerò", "konstituir", "atribuir",
+			"kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir", "raserò", "faserò", "struđerò",
+			"raŧerò", "repeterò", "kavar", "đenerar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar",
+			"galidar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "kanŧelar",
+			"eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "lamentar",
+			"sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "prosimar", "koniugar", "klasifegar", "kuantifegar",
+			"realiđar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "sonoriđar", "konvokar", "bitar", "numarar", "reputar",
+			"tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar", "valutar", "palatiđar",
+			"sekurar", "ostentar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar",
+			"krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar",
+			"opinar", "privar", "sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar",
+			"mutar", "segurar", "maledir", "provokar", "petir", "satisfar", "notifegar", "akuixir", "panidar", "artikolar", "piegar", "mormolar",
+			"alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar",
+			"salutar", "ŧetar", "ordenar", "partir", "redar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar",
+			"votar", "monir", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "autoriđar", "skalinar",
+			"terminar", "far", "desimilar", "rekuiđir", "vidimar", "ondar", "parteŧipar", "interogar", "augumentar", "emular", "strukar",
+			"sonoridar", "levar", "legaliđar", "fenir", "malfar", "mirar", "palpitar", "deputar", "galixar", "variar", "operar", "exborsar",
+			"mormorar", "tesar", "konsumar", "tratar", "đeneraliđar", "đenaraliđar", "fetar", "salvar", "xetar", "limitar", "depoxitar", "sikurar",
+			"vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "ŧitar",
+			"obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar",
+			"denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar",
+			"proibir", "cetar", "manipolar", "revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "benedir", "formar", "vaŧinar",
+			"balotar", "denerar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "rekuidir", "varsar", "sodisfar", "finir", "kapitolar",
+			"skaldar", "deletar", "proar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar", "inibir", "malvarsar",
+			"examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "soporar", "tentar", "lenir", "nomenar",
+			"vokaliđar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar",
+			"testar", "xmenbrar", "strolegar", "tranxar", "negar", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "prexuponerò",
+			"posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "asumerò", "prexumerò", "konsumerò", "duxerò",
+			"elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "solderò");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("guerò", "ŧion", "guerò", Arrays.asList("destinguerò")),
+			new LineEntry("merò", "nŧion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
+			new LineEntry("nerò", "xiŧion", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò",
+				"proponerò", "xustaponerò")),
+			new LineEntry("ñerò", "nŧion", "ñerò", Arrays.asList("konveñerò")),
+			new LineEntry("àer", "aŧion", "àer", Arrays.asList("tràer, estràer")),
+			new LineEntry("orxerò", "ureŧion", "orxerò", Arrays.asList("sorxerò")),
+			new LineEntry("ir", "ŧion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir",
+				"destribuir", "diminuir", "lokuir")),
+			new LineEntry("r", "ŧion", "[^u]ir", Arrays.asList("monir", "inibir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir",
+				"punir", "akuixir", "rekuiđir", "vestir", "munir", "lenir", "proibir", "rekuixir", "kondir", "inkuixir", "benedir", "nudrir",
+				"tradir", "rekuidir", "fenir", "partir", "finir")),
+			new LineEntry("r", "ŧion", "[^t]ar", Arrays.asList("kavar", "đenerar", "sastufar", "strologar", "aplikar", "traxlokar", "galidar",
+				"komodar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kanŧelar", "eskorporar", "danar", "konmixerar",
+				"tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "sonorixar", "fidar", "subordenar", "liberar", "oparar",
+				"versar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "realiđar", "tonar", "sklamar", "torefar", "mexurar", "koordenar",
+				"sonoriđar", "konvokar", "numarar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar",
+				"palatiđar", "sekurar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar",
+				"krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "sindikar", "stilar", "konmixarar", "verifegar", "opinar", "privar",
+				"sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "segurar",
+				"provokar", "satisfar", "notifegar", "panidar", "artikolar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar",
+				"vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar", "ordenar", "redar", "estermenar", "prevarikar",
+				"trasformar", "realixar", "skriturar", "skorporar", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar",
+				"autoriđar", "skalinar", "terminar", "far", "desimilar", "vidimar", "ondar", "parteŧipar", "interogar", "emular", "strukar",
+				"sonoridar", "levar", "legaliđar", "malfar", "mirar", "galixar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar",
+				"đeneraliđar", "đenaraliđar", "salvar", "sikurar", "legrar", "orar", "traversar", "identifegar", "radar", "rafinar", "asimilar",
+				"obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar",
+				"denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "manipolar",
+				"revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "formar", "vaŧinar", "denerar", "kolar", "xrenar", "stalar",
+				"elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "proar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar",
+				"malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "soporar", "nomenar", "vokaliđar", "rivar",
+				"sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "xmenbrar", "strolegar", "tranxar", "negar")),
+			new LineEntry("erò", "ion", "[đsŧ]erò", Arrays.asList("raserò", "faserò", "struđerò", "raŧerò")),
+			new LineEntry("erò", "iŧion", "terò", Arrays.asList("repeterò")),
+			new LineEntry("r", "ŧion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar", "butar",
+				"mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar", "deputar", "ŧitar", "permutar",
+				"vixitar", "valutar", "votar")),
+			new LineEntry("xerò", "ŧion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò",
+				"struxerò", "produxerò", "introduxerò")),
+			new LineEntry("verò", "ŧion", "[^l]verò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
+			new LineEntry("verò", "uŧion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
+			new LineEntry("derò", "ŧion", "[^l]derò", Arrays.asList("fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
+			new LineEntry("derò", "uŧion", "lderò", Arrays.asList("solderò")),
+			new LineEntry("tar", "ŧion", "petar", Arrays.asList("sospetar")),
+			new LineEntry("r", "ŧion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "ŧetar", "fetar", "interpretar")),
+			new LineEntry("tar", "ŧion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
+			new LineEntry("r", "ŧion", "[^vx]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar",
+				"augumentar"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX r2 Y 21",
+			"SFX r2 ir ŧion uir",
+			"SFX r2 àer aŧion àer",
+			"SFX r2 r ŧion [^t]ar",
+			"SFX r2 r ŧion [^u]ir",
+			"SFX r2 erò iŧion terò",
+			"SFX r2 merò nŧion merò",
+			"SFX r2 nerò xiŧion nerò",
+			"SFX r2 ñerò nŧion ñerò",
+			"SFX r2 r ŧion [^en]tar",
+			"SFX r2 erò ion [đsŧ]erò",
+			"SFX r2 tar ŧion petar",
+			"SFX r2 derò uŧion lderò",
+			"SFX r2 verò uŧion lverò",
+			"SFX r2 guerò ŧion guerò",
+			"SFX r2 r ŧion [^p]etar",
+			"SFX r2 derò ŧion [^l]derò",
+			"SFX r2 verò ŧion [^l]verò",
+			"SFX r2 xerò ŧion [^r]xerò",
+			"SFX r2 orxerò ureŧion orxerò",
+			"SFX r2 r ŧion [^vx]entar",
+			"SFX r2 tar ŧion [^mt]entar"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();

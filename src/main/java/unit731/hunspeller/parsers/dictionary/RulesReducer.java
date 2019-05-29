@@ -381,8 +381,6 @@ System.out.println("fix me");
 					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
 					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition, parent.condition):
 						makeNotGroup(childrenGroup, parent.condition));
-//if("[^en]tar".equals(condition))
-//System.out.println("");
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 					rules.add(newEntry);
 				}
@@ -400,8 +398,6 @@ System.out.println("fix me");
 //					final String condition = notGroupIntersection + child.condition;
 //					List<String> words = child.extractFromEndingWith(condition);
 //					if(!words.isEmpty()){
-//if("[^e]entar".equals(condition))
-//System.out.println("");
 //						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
 //						rules.add(newEntry);
 //					}
