@@ -71,9 +71,7 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-		//FIXME
-//		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
-final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
