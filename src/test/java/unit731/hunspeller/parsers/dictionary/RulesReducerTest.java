@@ -1220,7 +1220,7 @@ public class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX r3 Y 21",
+			"SFX r3 Y 20",
 			"SFX r3 ir sion uir",
 			"SFX r3 àer asion àer",
 			"SFX r3 r sion [^t]ar",
@@ -1244,7 +1244,7 @@ public class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-//		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
 
