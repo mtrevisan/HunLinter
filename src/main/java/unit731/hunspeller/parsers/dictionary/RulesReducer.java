@@ -350,15 +350,17 @@ System.out.println("fix me");
 			else{
 				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
 
-				if(parentGroup.equals(groupIntersection) && children.size() == 1){
-					LineEntry child = children.get(0);
-					final String condition = notGroupIntersection + child.condition;
-					List<String> words = child.extractFromEndingWith(condition);
-					if(!words.isEmpty()){
-						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
-						rules.add(newEntry);
-					}
-				}
+//				if(parentGroup.equals(groupIntersection) && children.size() == 1){
+//					LineEntry child = children.get(0);
+//					final String condition = notGroupIntersection + child.condition;
+//					List<String> words = child.extractFromEndingWith(condition);
+//					if(!words.isEmpty()){
+//if("[^e]entar".equals(condition))
+//System.out.println("");
+//						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
+//						rules.add(newEntry);
+//					}
+//				}
 				//should be here...
 //				if(parentGroup.equals(groupIntersection)){
 //					final String condition = notGroupIntersection + parent.condition;
@@ -379,6 +381,8 @@ System.out.println("fix me");
 					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
 					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition, parent.condition):
 						makeNotGroup(childrenGroup, parent.condition));
+//if("[^en]tar".equals(condition))
+//System.out.println("");
 					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 					rules.add(newEntry);
 				}
@@ -388,6 +392,17 @@ System.out.println("fix me");
 //					final List<String> words = parent.extractFromEndingWith(condition);
 //					if(!words.isEmpty()){
 //						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+//						rules.add(newEntry);
+//					}
+//				}
+//				else if(parentGroup.equals(groupIntersection) && children.size() == 1){
+//					LineEntry child = children.get(0);
+//					final String condition = notGroupIntersection + child.condition;
+//					List<String> words = child.extractFromEndingWith(condition);
+//					if(!words.isEmpty()){
+//if("[^e]entar".equals(condition))
+//System.out.println("");
+//						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
 //						rules.add(newEntry);
 //					}
 //				}
