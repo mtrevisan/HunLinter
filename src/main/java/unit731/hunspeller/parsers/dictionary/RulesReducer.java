@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 
 
@@ -149,7 +152,7 @@ public class RulesReducer{
 	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
 		final List<LineEntry> compactedRules = compactRules(plainRules);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules", compactedRules.size());
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(), plainRules.size());
 
 		removeOverlappingConditions(compactedRules);
 
@@ -314,12 +317,12 @@ for(final LineEntry entry : uniquePlainRules)
 					//if can-bubble-up
 					if(!bubbles.isEmpty()){
 						//FIXME
-						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
+//						final List<LineEntry> bubbledRules = bubbleUpNotGroup(parent, bubbles);
 //						rules.addAll(bubbledRules);
 
 						//remove bubbles from current-list
 //						bubbles.forEach(sortedList::remove);
-bubbledRules.size();
+//bubbledRules.size();
 System.out.println("fix me");
 					}
 				}
@@ -347,15 +350,24 @@ System.out.println("fix me");
 			else{
 				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
 
-				//should be here...
-				if(parentGroup.equals(groupIntersection)){
-					final String condition = notGroupIntersection + parent.condition;
-					final List<String> words = parent.extractFromEndingWith(condition);
+				if(parentGroup.equals(groupIntersection) && children.size() == 1){
+					LineEntry child = children.get(0);
+					final String condition = notGroupIntersection + child.condition;
+					List<String> words = child.extractFromEndingWith(condition);
 					if(!words.isEmpty()){
-						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+						final LineEntry newEntry = LineEntry.createFrom(child, condition, words);
 						rules.add(newEntry);
 					}
 				}
+				//should be here...
+//				if(parentGroup.equals(groupIntersection)){
+//					final String condition = notGroupIntersection + parent.condition;
+//					final List<String> words = parent.extractFromEndingWith(condition);
+//					if(!words.isEmpty()){
+//						final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+//						rules.add(newEntry);
+//					}
+//				}
 
 				final Map<String, List<String>> fromBucket = bucket(parent.from,
 					from -> {
@@ -436,23 +448,21 @@ System.out.println("fix me");
 
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(List<LineEntry> entries){
-		Map<String, List<LineEntry>> similarityBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
+		final Map<String, List<LineEntry>> similarityBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
 			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegExpSequencer.splitSequence(entry.condition).length:
 			null));
 		for(List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
-				LineEntry firstEntry = similarities.iterator().next();
-				String[] firstCondition = RegExpSequencer.splitSequence(firstEntry.condition);
-				String[] commonPreCondition = SEQUENCER.subSequence(firstCondition, 0, 1);
-				String[] commonPostCondition = SEQUENCER.subSequence(firstCondition, 2);
+				final LineEntry firstEntry = similarities.iterator().next();
+				final String[] firstCondition = RegExpSequencer.splitSequence(firstEntry.condition);
+				final String[] commonPreCondition = SEQUENCER.subSequence(firstCondition, 0, 1);
+				final String[] commonPostCondition = SEQUENCER.subSequence(firstCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				String condition = similarities.stream()
-					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1])
-					.sorted(comparator)
-					.distinct()
-					.collect(Collectors.joining(StringUtils.EMPTY, GROUP_START, GROUP_END));
-				condition = StringUtils.join(commonPreCondition) + condition + StringUtils.join(commonPostCondition);
+				final Set<Character> group = similarities.stream()
+					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
+					.collect(Collectors.toSet());
+				String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
 				final List<String> words = firstEntry.extractFromEndingWith(condition);
 				entries.add(LineEntry.createFrom(firstEntry, condition, words));
 
