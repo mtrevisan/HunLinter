@@ -203,7 +203,7 @@ for(final LineEntry entry : checkRules)
 LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules");
 for(final LineEntry entry : uniquePlainRules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-			throw new IllegalArgumentException("Something very bad occurs while reducing, expected " + uniquePlainRules.size()
+			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + uniquePlainRules.size()
 				+ " productions, obtained " + checkRules.size());
 		}
 	}

@@ -1593,6 +1593,89 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	public void simple17() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX q1 Y 14",
+			"SFX q1 0 sa [^d]e",
+			"SFX q1 0 sa [^ò]de",
+			"SFX q1 òde odesa òde",
+			"SFX q1 o esa [^dƚs]o",
+			"SFX q1 o esa [^ò][ds]o",
+			"SFX q1 òdo odesa òdo",
+			"SFX q1 òso osesa òso",
+			"SFX q1 0 esa n",
+			"SFX q1 0 esa [^è]l",
+			"SFX q1 èl elesa èl",
+			"SFX q1 0 esa [^è]r",
+			"SFX q1 èr eresa èr",
+			"SFX q1 o esa [^è]ƚo",
+			"SFX q1 èƚo eƚesa èƚo"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "q1";
+		List<String> words = Arrays.asList("onorato", "seko", "pronto", "tondo", "reƚasato", "ardito", "xɉonfo", "xjonfo", "stranio", "kieto",
+			"sfrenato", "raro", "streto", "tato", "burto", "gaɉardo", "fiako", "goƚoxo", "sfasato", "goloxo", "kontento", "aspro", "ƚegro",
+			"straño", "presto", "fondo", "relasato", "skuexito", "sutiƚo", "baldo", "alto", "ƚargo", "exato", "grando", "longo", "fato", "largo",
+			"guaƚivo", "bastardo", "vago", "keto", "gajardo", "legro", "suto", "kueto", "riko", "fiso", "adeguato", "ceto", "grevo", "bruto",
+			"gualivo", "garbo", "bojo", "magro", "boɉo", "molexin", "moƚexin", "xal", "mulexin", "muƚexin", "car", "segur", "repien", "fin",
+			"sorafin", "man", "sutil", "grave", "mite", "bèl", "pròde", "ledièr", "leđièr", "lexièr", "ƚexièr", "fièr", "bèƚo", "sòdo", "gròso");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("òso", "osesa", "òso", Arrays.asList("gròso")),
+			new LineEntry("òde", "odesa", "òde", Arrays.asList("pròde")),
+			new LineEntry("èl", "elesa", "èl", Arrays.asList("bèl")),
+			new LineEntry("èr", "eresa", "èr", Arrays.asList("ledièr", "leđièr", "lexièr", "ƚexièr", "fièr")),
+			new LineEntry("èƚo", "eƚesa", "èƚo", Arrays.asList("bèƚo", "sòdo")),
+			new LineEntry("0", "esa", "n", Arrays.asList("molexin", "moƚexin", "mulexin", "muƚexin", "repien", "fin", "sorafin", "man")),
+			new LineEntry("o", "esa", "[^dƚs]o", Arrays.asList("onorato", "relasato", "seko", "skuexito", "pronto", "reƚasato", "ardito", "alto",
+				"ƚargo", "exato", "xɉonfo", "xjonfo", "longo", "stranio", "kieto", "sfrenato", "raro", "fato", "streto", "largo", "tato",
+				"guaƚivo", "burto", "vago", "keto", "legro", "suto", "fiako", "kueto", "riko", "goƚoxo", "sfasato", "goloxo", "adeguato", "ceto",
+				"grevo", "kontento", "aspro", "ƚegro", "bruto", "straño", "gualivo", "garbo", "bojo", "magro", "boɉo", "presto")),
+			new LineEntry("0", "sa", "[^d]e", Arrays.asList("grave", "mite")),
+			new LineEntry("o", "esa", "[^ò]so", Arrays.asList("fiso")),
+			new LineEntry("o", "esa", "do", Arrays.asList("fondo", "bastardo", "gaɉardo", "grando", "gajardo", "tondo", "baldo")),
+			new LineEntry("o", "esa", "iƚo", Arrays.asList("sutiƚo")),
+			new LineEntry("0", "esa", "[^è][lr]", Arrays.asList("car", "segur"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX q1 Y 14",
+			"SFX q1 0 sa [^d]e",
+			"SFX q1 0 sa [^ò]de",
+			"SFX q1 òde odesa òde",
+			"SFX q1 o esa [^dƚs]o",
+			"SFX q1 o esa [^ò][ds]o",
+			"SFX q1 òdo odesa òdo",
+			"SFX q1 òso osesa òso",
+			"SFX q1 0 esa n",
+			"SFX q1 0 esa [^è]l",
+			"SFX q1 èl elesa èl",
+			"SFX q1 0 esa [^è]r",
+			"SFX q1 èr eresa èr",
+			"SFX q1 o esa [^è]ƚo",
+			"SFX q1 èƚo eƚesa èƚo"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
