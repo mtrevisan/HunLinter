@@ -53,16 +53,16 @@ public class RulesReducerTest{
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
-			new LineEntry("r", "ʼ", "r", "par"),
-			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
-			new LineEntry("ra", "ʼ", "ra", "sora"),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new LineEntry("te", "ʼ", "te", "frate"),
-			new LineEntry("xa", "ʼ", "xa", "kaxa"),
 			new LineEntry("me", "ʼ", "me", "kome"),
+			new LineEntry("ra", "ʼ", "ra", "sora"),
+			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
+			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
+			new LineEntry("xa", "ʼ", "xa", "kaxa"),
+			new LineEntry("r", "ʼ", "r", "par"),
+			new LineEntry("te", "ʼ", "te", "frate"),
+			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("sensa", "senŧa", "na", "la")),
 			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tèrŧo", "tuto", "so", "sto")),
-			new LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("sensa", "senŧa", "na", "la"))
+			new LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -114,8 +114,8 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
+			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
 			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
@@ -184,23 +184,23 @@ public class RulesReducerTest{
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("òbo", "obato", "òbo", "gòbo"),
-			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
-			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
-			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
-			new LineEntry("òna", "onata", "òna", "dòna"),
 			new LineEntry("òmo", "omato", "òmo", "òmo"),
-			new LineEntry("òsa", "osata", "òsa", "kòsa"),
-			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
+			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
+			new LineEntry("òna", "onata", "òna", "dòna"),
 			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
+			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
+			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
+			new LineEntry("òsa", "osata", "òsa", "kòsa"),
 			new LineEntry("òvo", "ovato", "òvo", "òvo"),
+			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
 			new LineEntry("0", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor",
 				"sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron",
 				"pesenin", "fakin")),
 			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "libro", "đilio", "mando", "viŧio", "savio", "speso", "kalandro", "vexo",
 				"ŧedro", "konto", "manđo", "granfo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "solfro")),
-			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
 			new LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra",
 				"inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
+			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
 			new LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
@@ -265,16 +265,16 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("èr", "erista", "èr", Arrays.asList("bregièr", "bragièr")),
+			new LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
 			new LineEntry("òda", "odista", "òda", "mòda"),
 			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente",
 				"arte")),
-			new LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
 			new LineEntry("ònia", "onista", "ònia", "ŧerimònia"),
-			new LineEntry("èr", "erista", "èr", Arrays.asList("bregièr", "bragièr")),
 			new LineEntry("0", "ista", "[ln]", Arrays.asList("dornal", "kal", "bonton", "đornal", "xornal", "real", "boridon", "kapital")),
-			new LineEntry("o", "ista", "[^i]o", Arrays.asList("fogo", "konto", "paƚaso", "palaŧo", "kaƚo", "palaso", "paƚaseto", "kaxo")),
-			new LineEntry("o", "sta", "io", "kanbio"),
 			new LineEntry("a", "ista", "[^dií]a", Arrays.asList("fegura", "figura", "ŧifra", "bonba", "stua", "kitara")),
+			new LineEntry("o", "sta", "io", "kanbio"),
+			new LineEntry("o", "ista", "[^i]o", Arrays.asList("fogo", "konto", "paƚaso", "palaŧo", "kaƚo", "palaso", "paƚaseto", "kaxo")),
 			new LineEntry("0", "ista", "[^è]r", Arrays.asList("folar", "koƚor", "foƚar", "spiƚorsar", "kolor"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
@@ -419,19 +419,16 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("èđo", new HashSet<>(Arrays.asList("eđarieta", "eđaría", "eđería", "eđerieta")), "èđo", "mèđo"),
+			new LineEntry("èxo", new HashSet<>(Arrays.asList("exerieta", "exería", "exaría", "exarieta")), "èxo", Arrays.asList("mèxo", "pièxo")),
+			new LineEntry("òdo", new HashSet<>(Arrays.asList("odaría", "oderieta", "odería", "odarieta")), "òdo", "còdo"),
 			new LineEntry("èla", new HashSet<>(Arrays.asList("elaría", "elería", "elarieta", "elerieta")), "èla", Arrays.asList("kasèla", "kaxèla")),
+			new LineEntry("èdo", new HashSet<>(Arrays.asList("edería", "ederieta", "edarieta", "edaría")), "èdo", "mèdo"),
+			new LineEntry("òco", new HashSet<>(Arrays.asList("ocarieta", "ocería", "ocerieta", "ocaría")), "òco", Arrays.asList("pedòco", "peòco",
+				"piòco")),
 			new LineEntry("èr", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "èr", Arrays.asList("kalegèr", "sensèr", "marŧèr",
 				"muscèr", "masèr", "bekèr", "persegèr", "ostèr", "speŧièr", "saƚegèr", "maŧèr", "skorŧèr", "spiŧièr", "kaƚegèr", "marsèr", "salgèr",
 				"skorsèr", "spesièr", "boèr", "salegèr")),
-			new LineEntry("ería", new HashSet<>(Arrays.asList("arieta", "aría", "erieta")), "ería", Arrays.asList("supercería", "konetrería",
-				"pelatería", "poestería", "baldería", "kafetería", "angería", "mersería", "tersería", "galería", "ŧibaldería", "kaxolería",
-				"peƚatería", "erbería", "sovarcería", "segretería", "kotería", "teƚería", "artejería", "momería", "batería", "inbasería",
-				"piavoƚería", "paƚandería", "kordería", "sapientería", "terŧería", "teñoxería", "ŧimexería", "bixutería", "forestería", "kakofonería",
-				"ridikoƚería", "artelería", "podestería", "baƚestrería", "grixonería", "piskería", "balestrería", "telería", "arteƚería",
-				"ridikolería", "panatería", "piavolería", "santocería", "vetrería", "gaƚería", "desentería", "arteɉería", "kaxoƚería", "palandería",
-				"merkandería", "merŧería", "skorería")),
-			new LineEntry("èdo", new HashSet<>(Arrays.asList("edería", "ederieta", "edarieta", "edaría")), "èdo", "mèdo"),
-			new LineEntry("èƚa", new HashSet<>(Arrays.asList("eƚaría", "eƚerieta", "eƚería", "eƚarieta")), "èƚa", Arrays.asList("kasèƚa", "kaxèƚa")),
 			new LineEntry("ar", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "ar", Arrays.asList("axenar", "sporkar", "portar",
 				"fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar",
 				"komandar", "kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar",
@@ -444,11 +441,14 @@ public class RulesReducerTest{
 				"bufonar", "porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar",
 				"lexinar", "berekinar", "tartufoƚar", "vakar", "spesiar")),
 			new LineEntry("òko", new HashSet<>(Arrays.asList("okarieta", "okería", "okaría", "okerieta")), "òko", "siòko"),
-			new LineEntry("èđo", new HashSet<>(Arrays.asList("eđarieta", "eđaría", "eđería", "eđerieta")), "èđo", "mèđo"),
-			new LineEntry("èxo", new HashSet<>(Arrays.asList("exerieta", "exería", "exaría", "exarieta")), "èxo", Arrays.asList("mèxo", "pièxo")),
-			new LineEntry("òco", new HashSet<>(Arrays.asList("ocarieta", "ocería", "ocerieta", "ocaría")), "òco", Arrays.asList("pedòco", "peòco",
-				"piòco")),
-			new LineEntry("òdo", new HashSet<>(Arrays.asList("odaría", "oderieta", "odería", "odarieta")), "òdo", "còdo"),
+			new LineEntry("ería", new HashSet<>(Arrays.asList("arieta", "aría", "erieta")), "ería", Arrays.asList("supercería", "konetrería",
+				"pelatería", "poestería", "baldería", "kafetería", "angería", "mersería", "tersería", "galería", "ŧibaldería", "kaxolería",
+				"peƚatería", "erbería", "sovarcería", "segretería", "kotería", "teƚería", "artejería", "momería", "batería", "inbasería",
+				"piavoƚería", "paƚandería", "kordería", "sapientería", "terŧería", "teñoxería", "ŧimexería", "bixutería", "forestería", "kakofonería",
+				"ridikoƚería", "artelería", "podestería", "baƚestrería", "grixonería", "piskería", "balestrería", "telería", "arteƚería",
+				"ridikolería", "panatería", "piavolería", "santocería", "vetrería", "gaƚería", "desentería", "arteɉería", "kaxoƚería", "palandería",
+				"merkandería", "merŧería", "skorería")),
+			new LineEntry("èƚa", new HashSet<>(Arrays.asList("eƚaría", "eƚerieta", "eƚería", "eƚarieta")), "èƚa", Arrays.asList("kasèƚa", "kaxèƚa")),
 			new LineEntry("e", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "e", Arrays.asList("raxente", "galante", "gaƚante",
 				"birbante", "fiskaƚe", "fante", "pedante")),
 			new LineEntry("0", new HashSet<>(Arrays.asList("arieta", "aría", "ería", "erieta")), "[ln]", Arrays.asList("strion", "kaxoƚin",
@@ -578,8 +578,8 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("ía", "ixmo", "ía", "maƚinkonía"),
 			new LineEntry("òmo", "omixmo", "òmo", "gaƚantòmo"),
+			new LineEntry("ía", "ixmo", "ía", "maƚinkonía"),
 			new LineEntry("0", "ixmo", "r", "ƚuminar")
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
@@ -626,10 +626,10 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("òko", "okixmo", "òko", "pitòko"),
-			new LineEntry("ía", "ixmo", "ía", "malinkonía"),
 			new LineEntry("òmo", "omixmo", "òmo", "galantòmo"),
 			new LineEntry("òto", "otixmo", "òto", "bigòto"),
+			new LineEntry("òko", "okixmo", "òko", "pitòko"),
+			new LineEntry("ía", "ixmo", "ía", "malinkonía"),
 			new LineEntry("0", "ixmo", "[nr]", Arrays.asList("baron", "kokon", "konpar", "luminar")),
 			new LineEntry("a", "ixmo", "[^í]a", Arrays.asList("franŧexa", "fransexa"))
 		);

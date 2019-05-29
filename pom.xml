@@ -185,6 +185,7 @@
 		<org.apache.commons.text.version>1.6</org.apache.commons.text.version>
 		<org.apache.commons.math3.version>3.6.1</org.apache.commons.math3.version>
 		<org.apache.commons.io.version>2.6</org.apache.commons.io.version>
+		<org.apache.commons.codec.version>1.9</org.apache.commons.codec.version>
 
 		<!-- XChart -->
 		<org.knowm.xchart.version>3.5.4</org.knowm.xchart.version>
@@ -225,6 +226,11 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${org.apache.commons.io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>${org.apache.commons.codec.version}</version>
 		</dependency>
 
 		<!-- XChart -->

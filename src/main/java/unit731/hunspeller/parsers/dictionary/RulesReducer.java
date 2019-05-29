@@ -210,7 +210,7 @@ for(final LineEntry entry : uniquePlainRules)
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
-		return collect(rules, entry -> entry.hashCode(), (rule, entry) -> rule.from.addAll(entry.from));
+		return collect(rules, entry -> entry.sha(), (rule, entry) -> rule.from.addAll(entry.from));
 	}
 
 	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
@@ -218,9 +218,6 @@ for(final LineEntry entry : uniquePlainRules)
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			final V rule = compaction.putIfAbsent(key, entry);
-//FIXME rulesReducerTest:1643 bèƚo-sòdo maps to the same key!!
-if(key instanceof Integer && (Integer)key == -64242987)
-	System.out.println("");
 			if(rule != null)
 				mergeFunction.accept(rule, entry);
 		}
