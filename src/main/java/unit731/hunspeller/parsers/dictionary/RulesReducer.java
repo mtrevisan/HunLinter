@@ -311,11 +311,23 @@ for(final LineEntry entry : uniquePlainRules)
 				final List<LineEntry> sameConditionChildren = children.stream()
 					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
 					.collect(Collectors.toList());
+				final Set<String> cf = sameConditionChildren.stream()
+					 .flatMap(entry -> entry.from.stream())
+					 .collect(Collectors.toSet());
+				final Set<Character> cg = extractGroup(cf, parentConditionLength);
 				//for each children-same-condition
 				for(final LineEntry child : sameConditionChildren){
 					//add new rule from child with condition starting with (child-group) to final-list
 					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-					condition = makeGroup(childGroup, child.condition);
+
+//FIXME
+					final Set<Character> pg = new HashSet<>(parentGroup);
+					pg.addAll(cg);
+					pg.removeAll(extractGroup(child.from, parentConditionLength));
+					condition = (sameConditionChildren.size() == 1 && !sameConditionChildren.containsAll(childGroup) && childGroup.size() > 1?
+						makeNotGroup(pg, child.condition): makeGroup(childGroup, child.condition));
+
+//					condition = makeGroup(childGroup, child.condition);
 					newEntry = LineEntry.createFrom(child, condition, child.from);
 					rules.add(newEntry);
 				}
