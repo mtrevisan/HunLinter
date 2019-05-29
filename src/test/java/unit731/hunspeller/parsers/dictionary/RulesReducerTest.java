@@ -61,7 +61,7 @@ public class RulesReducerTest{
 			new LineEntry("xa", "ʼ", "xa", "kaxa"),
 			new LineEntry("me", "ʼ", "me", "kome"),
 			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tèrŧo", "tuto", "so", "sto")),
-			new LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge")),
+			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
 			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("sensa", "senŧa", "na", "la"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
@@ -77,7 +77,7 @@ public class RulesReducerTest{
 			"SFX ʼ0 te ʼ te",
 			"SFX ʼ0 do ʼ do",
 			"SFX ʼ0 a ʼ [^rx]a",
-			"SFX ʼ0 e ʼ [dg]e",
+			"SFX ʼ0 e ʼ [^mtv]e",
 			"SFX ʼ0 o ʼ [^d]o",
 			"SFX ʼ0 ove óʼ ove"
 		);
@@ -1203,10 +1203,10 @@ public class RulesReducerTest{
 			new LineEntry("r", "sion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar",
 				"sitar", "butar", "mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar",
 				"deputar", "permutar", "vixitar", "valutar", "votar")),
-			new LineEntry("derò", "sion", "[^l]derò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò",
+			new LineEntry("derò", "sion", "nderò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò",
 				"tenderò")),
 			new LineEntry("derò", "usion", "lderò", "solderò"),
-			new LineEntry("verò", "usion", "[^i]verò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
+			new LineEntry("verò", "usion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
 			new LineEntry("verò", "sion", "iverò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
 			new LineEntry("xerò", "sion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò",
 				"aflixerò", "struxerò", "produxerò", "introduxerò")),
@@ -1232,11 +1232,11 @@ public class RulesReducerTest{
 			"SFX r3 r sion [^en]tar",
 			"SFX r3 tar sion petar",
 			"SFX r3 derò usion lderò",
+			"SFX r3 derò sion nderò",
 			"SFX r3 verò sion iverò",
+			"SFX r3 verò usion lverò",
 			"SFX r3 guerò sion guerò",
 			"SFX r3 r sion [^p]etar",
-			"SFX r3 derò sion [^l]derò",
-			"SFX r3 verò usion [^i]verò",
 			"SFX r3 xerò sion [^r]xerò",
 			"SFX r3 orxerò uresion orxerò",
 			"SFX r3 r sion [^vx]entar",

@@ -302,7 +302,8 @@ for(final LineEntry entry : uniquePlainRules)
 			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			if(groupIntersection.isEmpty()){
 				//add new rule from parent with condition starting with NOT(children-group) to final-list
-				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
+				//FIXME condition not always the best...
+				String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 || parentGroup.size() < childrenGroup.size()?
 					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
 				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
 				rules.add(newEntry);
