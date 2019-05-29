@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Serializable;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,9 +9,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.digest.MessageDigestAlgorithms;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,8 +24,6 @@ public class LineEntry implements Serializable{
 	private static final String PATTERN_END_OF_WORD = "$";
 
 	private static final String TAB = "\t";
-
-	private static final MessageDigest DIGEST = DigestUtils.getDigest(MessageDigestAlgorithms.SHA_1);
 
 
 	final Set<String> from;
@@ -108,9 +102,13 @@ public class LineEntry implements Serializable{
 	}
 
 	public String sha(){
-		byte[] payload = org.apache.commons.codec.binary.StringUtils.getBytesUtf8(removal + TAB + StringUtils.join(addition, null) + TAB + condition);
-		byte[] sha = DIGEST.digest(payload);
-		return org.apache.commons.codec.binary.StringUtils.newStringUtf8(sha);
+		return removal + TAB + mergeSet(addition) + TAB + condition;
+	}
+
+	private String mergeSet(final Set<String> set){
+		return set.stream()
+			.sorted()
+			.collect(Collectors.joining());
 	}
 
 	@Override
