@@ -77,6 +77,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       reducedSetTextArea = new javax.swing.JTextArea();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+      setMinimumSize(new java.awt.Dimension(547, 476));
 
       lblRule.setText("Rule:");
 
