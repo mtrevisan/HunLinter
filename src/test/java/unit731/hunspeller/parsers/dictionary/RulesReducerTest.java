@@ -1279,7 +1279,7 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
-	//mf, W2, V1 cases
+	//mf, W2, V1, V0, U0, P8, P7, P6, ... cases
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();

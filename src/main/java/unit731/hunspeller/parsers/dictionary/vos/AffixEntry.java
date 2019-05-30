@@ -118,7 +118,7 @@ public class AffixEntry{
 		checkValidity(cond, removal, line);
 
 
-		entry = PatternHelper.clear(line, PATTERN_ENTRY);
+		entry = line;
 	}
 
 	private void checkValidity(final String cond, final String removal, final String line) throws IllegalArgumentException{
