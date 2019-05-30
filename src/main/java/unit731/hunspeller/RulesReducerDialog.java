@@ -213,6 +213,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
    private void reduceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
 		mainProgressBar.setValue(0);
 		reducedSetTextArea.setText(null);
+		ruleComboBox.setEnabled(false);
+		optimizeClosedGroupCheckBox.setEnabled(false);
 
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
@@ -231,6 +233,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if(answer == JOptionPane.YES_OPTION){
 				rulesReducerWorker.cancel();
+				ruleComboBox.setEnabled(true);
+				optimizeClosedGroupCheckBox.setEnabled(true);
 
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rules reducer aborted");
 
@@ -255,6 +259,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		}
 		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
 			reducedSetTextArea.setCaretPosition(0);
+
+			ruleComboBox.setEnabled(true);
+			optimizeClosedGroupCheckBox.setEnabled(true);
 		}
 	}
 
@@ -271,6 +278,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				rulesReducerWorker.execute();
 			}
 			catch(Exception e){
+				ruleComboBox.setEnabled(true);
+				optimizeClosedGroupCheckBox.setEnabled(true);
+
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		}
