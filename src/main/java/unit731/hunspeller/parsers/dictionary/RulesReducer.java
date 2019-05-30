@@ -306,8 +306,10 @@ for(final LineEntry entry : uniquePlainRules)
 			//prevent a word in parent from to be too short
 			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
 				//TODO
-				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short wrt the condition '"
+				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
 					+ parent.condition + "'");
+
+//				continue;
 			}
 
 			//find parent-group
