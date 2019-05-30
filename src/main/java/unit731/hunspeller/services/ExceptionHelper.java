@@ -1,5 +1,8 @@
 package unit731.hunspeller.services;
 
+import org.apache.commons.lang3.StringUtils;
+
+
 
 public class ExceptionHelper{
 
@@ -17,8 +20,17 @@ public class ExceptionHelper{
 	}
 
 	private static String composeExceptionMessage(Throwable t){
+		String exceptionType = extractExceptionName(t);
 		String codePosition = extractExceptionPosition(t);
-		return extractExceptionName(t) + " at " + codePosition + " " + t.getMessage();
+		String msg = t.getMessage();
+		StringBuilder sb = new StringBuilder();
+		sb.append(exceptionType)
+			.append(" at ")
+			.append(codePosition);
+		if(msg != null)
+			sb.append(StringUtils.SPACE)
+				.append(msg);
+		return sb.toString();
 	}
 
 	private static String extractExceptionPosition(Throwable t){

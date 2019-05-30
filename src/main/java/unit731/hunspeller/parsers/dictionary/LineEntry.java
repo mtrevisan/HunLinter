@@ -23,8 +23,6 @@ public class LineEntry implements Serializable{
 
 	private static final String PATTERN_END_OF_WORD = "$";
 
-	private static final String TAB = "\t";
-
 
 	final Set<String> from;
 
@@ -83,7 +81,7 @@ public class LineEntry implements Serializable{
 	public List<String> extractFromEndingWith(String suffix){
 		final Pattern conditionPattern = PatternHelper.pattern(suffix + PATTERN_END_OF_WORD);
 		return from.stream()
-			.filter(from -> PatternHelper.find(from, conditionPattern))
+			.filter(word -> PatternHelper.find(word, conditionPattern))
 			.collect(Collectors.toList());
 	}
 
@@ -99,16 +97,6 @@ public class LineEntry implements Serializable{
 			.append("cond", condition)
 			.append("from", from)
 			.toString();
-	}
-
-	public String sha(){
-		return removal + TAB + mergeSet(addition) + TAB + condition;
-	}
-
-	private String mergeSet(final Set<String> set){
-		return set.stream()
-			.sorted()
-			.collect(Collectors.joining());
 	}
 
 	@Override

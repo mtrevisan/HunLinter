@@ -134,12 +134,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		catch(final Exception e){
 			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
 				LOGGER.warn("Thread interrupted");
-			else{
-				final String message = ExceptionHelper.getMessage(e);
-				LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);
-			}
+			else
+				LOGGER.error("{}", ExceptionHelper.getMessage(e));
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
+			LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Stopped processing Dictionary file");
 
 			cancel(true);
 		}
@@ -168,7 +167,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 					throw new RuntimeException(e);
 			}
 			catch(final Exception e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+				String errorMessage = ExceptionHelper.getMessage(e);
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
 
 				if(!isPreventExceptionRelaunch())
 					throw e;
@@ -232,6 +233,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		}
 		
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped processing Dictionary file");
+		LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Stopped processing Dictionary file");
 		
 		cancel(true);
 	}

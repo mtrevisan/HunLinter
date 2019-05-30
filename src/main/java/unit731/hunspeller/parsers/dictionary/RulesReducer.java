@@ -88,7 +88,7 @@ public class RulesReducer{
 
 		LineEntry compactedFilteredRule = null;
 		if(!filteredRules.isEmpty()){
-			//same same removal and same condition parts
+			//same removal and same condition parts
 			final List<LineEntry> compactedFilteredRules = collect(filteredRules,
 				entry -> entry.removal + TAB + entry.condition,
 				(rule, entry) -> rule.addition.addAll(entry.addition));
@@ -102,6 +102,8 @@ public class RulesReducer{
 					final int delta = longestConditionLength - rule.condition.length();
 					final String from = rule.from.iterator().next();
 					final int startIndex = from.length() - longestConditionLength;
+if(startIndex < 0)
+System.out.println("");
 					final String deltaAddition = from.substring(startIndex, startIndex + delta);
 					for(final String addition : rule.addition)
 						compactedFilteredRule.addition.add(deltaAddition + addition);
@@ -210,7 +212,7 @@ for(final LineEntry entry : uniquePlainRules)
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
-		return collect(rules, entry -> entry.sha(), (rule, entry) -> rule.from.addAll(entry.from));
+		return collect(rules, entry -> entry.removal + TAB + mergeSet(entry.addition) + TAB + entry.condition, (rule, entry) -> rule.from.addAll(entry.from));
 	}
 
 	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
@@ -386,7 +388,7 @@ for(final LineEntry entry : uniquePlainRules)
 		return NOT_GROUP_START + merge + GROUP_END + suffix;
 	}
 
-	private String mergeSet(final Set<Character> set){
+	private <V> String mergeSet(final Set<V> set){
 		return set.stream()
 			.map(String::valueOf)
 			.sorted(comparator)
