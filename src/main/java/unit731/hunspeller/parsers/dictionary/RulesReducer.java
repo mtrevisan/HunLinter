@@ -103,18 +103,21 @@ public class RulesReducer{
 				final int longestConditionLength = compactedFilteredRule.condition.length();
 				for(final LineEntry rule : compactedFilteredRules){
 					//recover the missing characters for the current condition to become of length the maximum found earlier
-					final int delta = longestConditionLength - rule.condition.length();
 					final String from = rule.from.iterator().next();
 					final int startIndex = from.length() - longestConditionLength;
 					//FIXME what if a condition is not long enough? keep separate?
-					if(startIndex < 0)
-						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
-							+ compactedFilteredRule.condition + "'");
+//					if(startIndex < 0)
+//						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
+//							+ compactedFilteredRule.condition + "'");
 
-					final String deltaAddition = from.substring(startIndex, startIndex + delta);
-					//add addition
-					for(final String addition : rule.addition)
-						compactedFilteredRule.addition.add(deltaAddition + addition);
+					//if a condition is not long enough, keep them separate
+					if(startIndex >= 0){
+						final int delta = longestConditionLength - rule.condition.length();
+						final String deltaAddition = from.substring(startIndex, startIndex + delta);
+						//add addition
+						for(final String addition : rule.addition)
+							compactedFilteredRule.addition.add(deltaAddition + addition);
+					}
 				}
 			}
 		}
@@ -299,6 +302,14 @@ for(final LineEntry entry : uniquePlainRules)
 			}
 
 			final int parentConditionLength = parent.condition.length();
+
+			//prevent a word in parent from to be too short
+			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
+				//TODO
+				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short wrt the condition '"
+					+ parent.condition + "'");
+			}
+
 			//find parent-group
 			final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
 
@@ -379,7 +390,7 @@ for(final LineEntry entry : uniquePlainRules)
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
 				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
-					+ "] at index " + indexFromLast + " from last because of the presence of the word " + word + " that is too short");
+					+ "] at index " + indexFromLast + " from last because of the presence of the word '" + word + "' that is too short");
 
 			group.add(word.charAt(index));
 		}
