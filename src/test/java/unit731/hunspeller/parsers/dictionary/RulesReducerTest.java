@@ -1279,6 +1279,7 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	//mf case
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();

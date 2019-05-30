@@ -175,11 +175,9 @@ public class RulesReducer{
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
-		final List<String> rules = new ArrayList<>();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		rules.add(composeHeader(type, flag, ruleToBeReduced.combineableChar(), prettyPrintRules.size()));
-		rules.addAll(prettyPrintRules);
-		return rules;
+		prettyPrintRules.add(0, composeHeader(type, flag, ruleToBeReduced.combineableChar(), prettyPrintRules.size()));
+		return prettyPrintRules;
 	}
 
 	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules,
@@ -220,7 +218,9 @@ for(final LineEntry entry : uniquePlainRules)
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
-		return collect(rules, entry -> entry.removal + TAB + mergeSet(entry.addition) + TAB + entry.condition, (rule, entry) -> rule.from.addAll(entry.from));
+		return collect(rules,
+			entry -> entry.removal + TAB + mergeSet(entry.addition) + TAB + entry.condition,
+			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
 	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
@@ -554,13 +554,18 @@ for(final LineEntry entry : uniquePlainRules)
 	}
 
 	private String composeLine(final AffixEntry.Type type, final String flag, final LineEntry partialLine){
-		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		return sj.add(type.getTag().getCode())
-			.add(flag)
-			.add(partialLine.removal)
-			.add(partialLine.anAddition())
-			.add(partialLine.condition.isEmpty()? DOT: partialLine.condition)
-			.toString();
+		String addition = partialLine.anAddition();
+		String morphologicalRules = StringUtils.EMPTY;
+		int idx = addition.indexOf(TAB);
+		if(idx >= 0){
+			morphologicalRules = addition.substring(idx);
+			addition = addition.substring(0, idx);
+		}
+		String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + partialLine.removal + StringUtils.SPACE
+			+ addition + StringUtils.SPACE + (partialLine.condition.isEmpty()? DOT: partialLine.condition);
+		if(idx >= 0)
+			line += morphologicalRules;
+		return line;
 	}
 
 }
