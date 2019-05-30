@@ -973,9 +973,9 @@ public class RulesReducerTest{
 			new LineEntry("tar", "sion", "petar", "sospetar"),
 			new LineEntry("r", "sion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "setar", "fetar", "interpretar")),
 			new LineEntry("tar", "sion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
-			new LineEntry("r", "sion", "[^vx]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
+			new LineEntry("r", "sion", "[mt]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
 		);
-//		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
@@ -998,7 +998,7 @@ public class RulesReducerTest{
 			"SFX r3 verò sion [^l]verò",
 			"SFX r3 xerò sion [^r]xerò",
 			"SFX r3 orxerò uresion orxerò",
-			"SFX r3 r sion [^vx]entar",
+			"SFX r3 r sion [mt]entar",
 			"SFX r3 tar sion [^mt]entar"
 		);
 		Assertions.assertEquals(expectedRules, rules);
@@ -1065,7 +1065,7 @@ public class RulesReducerTest{
 			new LineEntry("r", "ŧion", "[^u]ir", Arrays.asList("monir", "inibir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir", "punir", "akuixir", "rekuiđir", "vestir", "munir", "lenir", "proibir", "rekuixir", "kondir", "inkuixir", "benedir", "nudrir", "tradir", "rekuidir", "fenir", "partir", "finir")),
 			new LineEntry("r", "ŧion", "[^t]ar", Arrays.asList("kavar", "đenerar", "sastufar", "strologar", "aplikar", "traxlokar", "galidar", "komodar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kanŧelar", "eskorporar", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "sonorixar", "fidar", "subordenar", "liberar", "oparar", "versar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "realiđar", "tonar", "sklamar", "torefar", "mexurar", "koordenar", "sonoriđar", "konvokar", "numarar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar", "palatiđar", "sekurar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar", "krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "sindikar", "stilar", "konmixarar", "verifegar", "opinar", "privar", "sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "segurar", "provokar", "satisfar", "notifegar", "panidar", "artikolar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar", "ordenar", "redar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "autoriđar", "skalinar", "terminar", "far", "desimilar", "vidimar", "ondar", "parteŧipar", "interogar", "emular", "strukar", "sonoridar", "levar", "legaliđar", "malfar", "mirar", "galixar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "đeneraliđar", "đenaraliđar", "salvar", "sikurar", "legrar", "orar", "traversar", "identifegar", "radar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar", "denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "manipolar", "revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "formar", "vaŧinar", "denerar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "proar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar", "malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "soporar", "nomenar", "vokaliđar", "rivar", "sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "xmenbrar", "strolegar", "tranxar", "negar")),
 			new LineEntry("erò", "iŧion", "terò", "repeterò"),
-			new LineEntry("erò", "ion", "[^t]erò", Arrays.asList("raserò", "faserò", "struđerò", "raŧerò")),
+			new LineEntry("erò", "ion", "[đsŧ]erò", Arrays.asList("raserò", "faserò", "struđerò", "raŧerò")),
 			new LineEntry("r", "ŧion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar", "butar", "mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar", "deputar", "ŧitar", "permutar", "vixitar", "valutar", "votar")),
 			new LineEntry("verò", "ŧion", "[^l]verò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
 			new LineEntry("verò", "uŧion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
@@ -1075,7 +1075,7 @@ public class RulesReducerTest{
 			new LineEntry("tar", "ŧion", "petar", "sospetar"),
 			new LineEntry("r", "ŧion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "ŧetar", "fetar", "interpretar")),
 			new LineEntry("tar", "ŧion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
-			new LineEntry("r", "ŧion", "[^vx]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
+			new LineEntry("r", "ŧion", "[mt]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -1091,7 +1091,7 @@ public class RulesReducerTest{
 			"SFX r2 nerò xiŧion nerò",
 			"SFX r2 ñerò nŧion ñerò",
 			"SFX r2 r ŧion [^en]tar",
-			"SFX r2 erò ion [^t]erò",
+			"SFX r2 erò ion [đsŧ]erò",
 			"SFX r2 tar ŧion petar",
 			"SFX r2 derò ŧion nderò",
 			"SFX r2 verò uŧion lverò",
@@ -1101,7 +1101,7 @@ public class RulesReducerTest{
 			"SFX r2 verò ŧion [^l]verò",
 			"SFX r2 xerò ŧion [^r]xerò",
 			"SFX r2 orxerò ureŧion orxerò",
-			"SFX r2 r ŧion [^vx]entar",
+			"SFX r2 r ŧion [mt]entar",
 			"SFX r2 tar ŧion [^mt]entar"
 		);
 		Assertions.assertEquals(expectedRules, rules);
