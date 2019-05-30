@@ -95,19 +95,24 @@ public class RulesReducer{
 				entry -> entry.removal + TAB + entry.condition,
 				(rule, entry) -> rule.addition.addAll(entry.addition));
 
-			//FIXME
+			//retrieve rule with longest condition (all the other conditions must be this length)
 			compactedFilteredRule = compactedFilteredRules.stream()
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
 			if(compactedFilteredRules.size() > 1){
 				final int longestConditionLength = compactedFilteredRule.condition.length();
 				for(final LineEntry rule : compactedFilteredRules){
+					//recover the missing characters for the current condition to become of length the maximum found earlier
 					final int delta = longestConditionLength - rule.condition.length();
 					final String from = rule.from.iterator().next();
 					final int startIndex = from.length() - longestConditionLength;
-if(startIndex < 0)
-System.out.println("");
+					//FIXME what if a word is not long enough?
+					if(startIndex < 0)
+						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
+							+ compactedFilteredRule.condition + "'");
+
 					final String deltaAddition = from.substring(startIndex, startIndex + delta);
+					//add addition
 					for(final String addition : rule.addition)
 						compactedFilteredRule.addition.add(deltaAddition + addition);
 				}
