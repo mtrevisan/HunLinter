@@ -87,7 +87,7 @@ public class RulesReducer{
 			}
 		}
 
-		//compact rule by aggregating production with same removal and condition, and different additions
+		//compact rules by aggregating productions with same removal and condition, and different additions
 		LineEntry compactedFilteredRule = null;
 		if(!filteredRules.isEmpty()){
 			//same removal and same condition parts
@@ -95,7 +95,7 @@ public class RulesReducer{
 				entry -> entry.removal + TAB + entry.condition,
 				(rule, entry) -> rule.addition.addAll(entry.addition));
 
-			//retrieve rule with longest condition (all the other conditions must be this length)
+			//retrieve rule with longest condition (all the other conditions must be this long)
 			compactedFilteredRule = compactedFilteredRules.stream()
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
@@ -106,7 +106,7 @@ public class RulesReducer{
 					final int delta = longestConditionLength - rule.condition.length();
 					final String from = rule.from.iterator().next();
 					final int startIndex = from.length() - longestConditionLength;
-					//FIXME what if a word is not long enough?
+					//FIXME what if a condition is not long enough? keep separate?
 					if(startIndex < 0)
 						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
 							+ compactedFilteredRule.condition + "'");
