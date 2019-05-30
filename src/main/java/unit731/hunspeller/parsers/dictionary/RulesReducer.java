@@ -74,6 +74,7 @@ public class RulesReducer{
 	public LineEntry collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
 		//remove base production
 		productions.remove(0);
+		//collect all productions that generates from the given flag
 		final List<LineEntry> filteredRules = new ArrayList<>();
 		for(final Production production : productions){
 			final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
@@ -86,6 +87,7 @@ public class RulesReducer{
 			}
 		}
 
+		//compact rule by aggregating production with same removal and condition, and different additions
 		LineEntry compactedFilteredRule = null;
 		if(!filteredRules.isEmpty()){
 			//same removal and same condition parts
@@ -93,6 +95,7 @@ public class RulesReducer{
 				entry -> entry.removal + TAB + entry.condition,
 				(rule, entry) -> rule.addition.addAll(entry.addition));
 
+			//FIXME
 			compactedFilteredRule = compactedFilteredRules.stream()
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
@@ -414,17 +417,17 @@ for(final LineEntry entry : uniquePlainRules)
 			null));
 		for(List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
-				final LineEntry firstEntry = similarities.iterator().next();
-				final String[] firstCondition = RegExpSequencer.splitSequence(firstEntry.condition);
-				final String[] commonPreCondition = SEQUENCER.subSequence(firstCondition, 0, 1);
-				final String[] commonPostCondition = SEQUENCER.subSequence(firstCondition, 2);
+				final LineEntry anEntry = similarities.iterator().next();
+				final String[] aCondition = RegExpSequencer.splitSequence(anEntry.condition);
+				final String[] commonPreCondition = SEQUENCER.subSequence(aCondition, 0, 1);
+				final String[] commonPostCondition = SEQUENCER.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
 				String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
-				final List<String> words = firstEntry.extractFromEndingWith(condition);
-				entries.add(LineEntry.createFrom(firstEntry, condition, words));
+				final List<String> words = anEntry.extractFromEndingWith(condition);
+				entries.add(LineEntry.createFrom(anEntry, condition, words));
 
 				similarities.forEach(entries::remove);
 			}
