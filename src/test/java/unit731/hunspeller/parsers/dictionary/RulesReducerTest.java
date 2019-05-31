@@ -1480,7 +1480,127 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
-	//mf, W2, V1, V0, U0, P8, P7, P6, ... cases
+//	@Test
+	public void simple19() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"SFX V1 Y 42",
+			"SFX V1 a eta/F0 oƚa",
+			"SFX V1 o eto/M0mf oƚo",
+			"SFX V1 0 eto/M0mf dor",
+			"SFX V1 èr er/M0mf ièr",
+			"SFX V1 oƚa òƚa/F0 oƚa",
+			"SFX V1 oƚa ioƚa/F0 oƚa",
+			"SFX V1 oƚa iòƚa/F0 oƚa",
+			"SFX V1 oƚa ioƚeta/F0 oƚa",
+			"SFX V1 oƚo òƚo/M0 oƚo",
+			"SFX V1 oƚo iòƚo/M0 oƚo",
+			"SFX V1 oƚo ioƚo/M0mf oƚo",
+			"SFX V1 oƚo ioƚeto/M0mf oƚo",
+			"SFX V1 ièr ar/M0 ièr",
+			"SFX V1 ièr er/M0mf ièr",
+			"SFX V1 ièr areto/M0mf ièr",
+			"SFX V1 ièr ereto/M0mf ièr",
+			"SFX V1 dor or/M0mf dor",
+			"SFX V1 dor tor/M0mf dor",
+			"SFX V1 dor oreto/M0mf dor",
+			"SFX V1 dor toreto/M0mf dor",
+			"SFX V1 èr ar/M0 [^i]èr",
+			"SFX V1 èr ièr/M0 [^cijɉñ]èr",
+			"SFX V1 èr ier/M0mf [^cijɉñ]èr",
+			"SFX V1 èr areto/M0mf [^i]èr",
+			"SFX V1 èr ereto/M0mf [^i]èr",
+			"SFX V1 èr iereto/M0mf [^cijɉñ]èr",
+			"SFX V1 a eta/F0 dora",
+			"SFX V1 ièra ara/F0 ièra",
+			"SFX V1 ièra era/F0 ièra",
+			"SFX V1 ièra areta/F0 ièra",
+			"SFX V1 ièra ereta/F0 ièra",
+			"SFX V1 dora ora/F0 dora",
+			"SFX V1 dora tora/F0 dora",
+			"SFX V1 dora oreta/F0 dora",
+			"SFX V1 dora toreta/F0 dora",
+			"SFX V1 èra ara/F0 [^i]èra",
+			"SFX V1 èra era/F0 [^i]èra",
+			"SFX V1 èra iera/F0 [^cijɉñ]èra",
+			"SFX V1 èra ièra/F0 [^cijɉñ]èra",
+			"SFX V1 èra areta/F0 [^i]èra",
+			"SFX V1 èra ereta/F0 [^i]èra",
+			"SFX V1 èra iereta/F0 [^cijɉñ]èra"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "V1";
+		List<String> words = Arrays.asList("ŧakoloxamente", "beƚamente", "preŧioxamente", "jaroxamente", "akuxativamente", "dretamente", "ŧitimamente", "farinoxamente", "perikoloxamente", "vantajoxamente", "jeloxamente", "belamente", "mirakoloxamente", "presioxamente", "perfetamente", "grasioxamente", "konpletamente", "parsonalmente", "determinativamente", "ŧimentoxamente", "đeneroxamente", "jendenoxamente", "permaƚoxamente", "ativamente", "fortunatamente", "ƚongetamente", "maraveɉoxamente", "juredegamente", "grintoxamente", "guaƚivamente", "fredoloxamente", "graŧioxamente", "kademegamente", "ŧiteriormente", "justamente", "fregoƚoxamente", "pisoƚarmente", "fregoloxamente", "đontativamente", "fadegoxamente", "maravejoxamente", "fredoƚoxamente", "gustoxamente", "đentilmente", "deñoxamente", "đeneralmente", "longamente", "maledetamente", "ƚegramente", "piŧolarmente", "dopiamente", "diferentemente", "antramente", "bravoxamente", "kademikamente", "fadigoxamente", "vivamente", "kontrariamente", "parfetivamente", "pauroxamente", "vantaxoxamente", "ergativamente", "altramente", "đeloxamente", "filoxamente", "difarentemente", "ordenariamente", "ƚimitativamente", "mirakoƚoxamente", "defarentemente", "determenativamente", "permaloxamente", "jeƚoxamente", "vantaɉoxamente", "maƚedetamente", "bondantemente", "onestamente", "parfetamente", "stra-pienemente", "ŧertamente", "gualivamente", "ƚongamente", "strapienemente", "ŧaltroxamente", "bravamente", "limitativamente", "perikoƚoxamente", "posibilmente", "legramente", "fiƚoxamente", "kataroxamente", "pisolarmente", "đenitivamente");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		List<LineEntry> expectedCompactedRules = Arrays.asList(
+			new LineEntry("te", new HashSet<>(Arrays.asList("0", "tre")), "te", Arrays.asList("ŧakoloxamente", "beƚamente", "preŧioxamente", "jaroxamente", "akuxativamente", "dretamente", "ŧitimamente", "farinoxamente", "perikoloxamente", "vantajoxamente", "jeloxamente", "belamente", "mirakoloxamente", "presioxamente", "perfetamente", "grasioxamente", "konpletamente", "parsonalmente", "determinativamente", "ŧimentoxamente", "đeneroxamente", "jendenoxamente", "permaƚoxamente", "ativamente", "fortunatamente", "ƚongetamente", "maraveɉoxamente", "juredegamente", "grintoxamente", "guaƚivamente", "fredoloxamente", "graŧioxamente", "kademegamente", "ŧiteriormente", "justamente", "fregoƚoxamente", "pisoƚarmente", "fregoloxamente", "đontativamente", "fadegoxamente", "maravejoxamente", "fredoƚoxamente", "gustoxamente", "đentilmente", "deñoxamente", "đeneralmente", "longamente", "maledetamente", "ƚegramente", "piŧolarmente", "dopiamente", "diferentemente", "antramente", "bravoxamente", "kademikamente", "fadigoxamente", "vivamente", "kontrariamente", "parfetivamente", "pauroxamente", "vantaxoxamente", "ergativamente", "altramente", "đeloxamente", "filoxamente", "difarentemente", "ordenariamente", "ƚimitativamente", "mirakoƚoxamente", "defarentemente", "determenativamente", "permaloxamente", "jeƚoxamente", "vantaɉoxamente", "maƚedetamente", "bondantemente", "onestamente", "parfetamente", "stra-pienemente", "ŧertamente", "gualivamente", "ƚongamente", "strapienemente", "ŧaltroxamente", "bravamente", "limitativamente", "perikoƚoxamente", "posibilmente", "legramente", "fiƚoxamente", "kataroxamente", "pisolarmente", "đenitivamente"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX V1 Y 42",
+			"SFX V1 a eta/F0 oƚa",
+			"SFX V1 o eto/M0mf oƚo",
+			"SFX V1 0 eto/M0mf dor",
+			"SFX V1 èr er/M0mf ièr",
+			"SFX V1 oƚa òƚa/F0 oƚa",
+			"SFX V1 oƚa ioƚa/F0 oƚa",
+			"SFX V1 oƚa iòƚa/F0 oƚa",
+			"SFX V1 oƚa ioƚeta/F0 oƚa",
+			"SFX V1 oƚo òƚo/M0 oƚo",
+			"SFX V1 oƚo iòƚo/M0 oƚo",
+			"SFX V1 oƚo ioƚo/M0mf oƚo",
+			"SFX V1 oƚo ioƚeto/M0mf oƚo",
+			"SFX V1 ièr ar/M0 ièr",
+			"SFX V1 ièr er/M0mf ièr",
+			"SFX V1 ièr areto/M0mf ièr",
+			"SFX V1 ièr ereto/M0mf ièr",
+			"SFX V1 dor or/M0mf dor",
+			"SFX V1 dor tor/M0mf dor",
+			"SFX V1 dor oreto/M0mf dor",
+			"SFX V1 dor toreto/M0mf dor",
+			"SFX V1 èr ar/M0 [^i]èr",
+			"SFX V1 èr ièr/M0 [^cijɉñ]èr",
+			"SFX V1 èr ier/M0mf [^cijɉñ]èr",
+			"SFX V1 èr areto/M0mf [^i]èr",
+			"SFX V1 èr ereto/M0mf [^i]èr",
+			"SFX V1 èr iereto/M0mf [^cijɉñ]èr",
+			"SFX V1 a eta/F0 dora",
+			"SFX V1 ièra ara/F0 ièra",
+			"SFX V1 ièra era/F0 ièra",
+			"SFX V1 ièra areta/F0 ièra",
+			"SFX V1 ièra ereta/F0 ièra",
+			"SFX V1 dora ora/F0 dora",
+			"SFX V1 dora tora/F0 dora",
+			"SFX V1 dora oreta/F0 dora",
+			"SFX V1 dora toreta/F0 dora",
+			"SFX V1 èra ara/F0 [^i]èra",
+			"SFX V1 èra era/F0 [^i]èra",
+			"SFX V1 èra iera/F0 [^cijɉñ]èra",
+			"SFX V1 èra ièra/F0 [^cijɉñ]èra",
+			"SFX V1 èra areta/F0 [^i]èra",
+			"SFX V1 èra ereta/F0 [^i]èra",
+			"SFX V1 èra iereta/F0 [^cijɉñ]èra"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
+	//mf, V1, V0, U0, P8, P7, P6, ... cases
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
