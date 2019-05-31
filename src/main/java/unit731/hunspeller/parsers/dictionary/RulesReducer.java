@@ -138,8 +138,9 @@ public class RulesReducer{
 
 		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
-		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
+		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
+		if(lastAppliedRule != null)
+			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
 	}
@@ -304,13 +305,12 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
 					.length();
 				if(lcsLength > 0){
+					LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
+						rule.condition.substring(lcsLength), rule.from);
 					//merge rules with that already present
-					for(LineEntry originalRule : sortedList){
-						LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength), rule.condition.substring(lcsLength),
-							rule.from);
-						if(originalRule.equals(newEntry))
-							originalRule.from.addAll(rule.from);
-					}
+					sortedList.stream()
+						.filter(originalRule -> originalRule.equals(newEntry))
+						.forEach(originalRule -> originalRule.from.addAll(rule.from));
 				}
 			}
 		//TODO
@@ -333,54 +333,54 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			final int parentConditionLength = parent.condition.length();
 
 			//prevent a word in parent from being too short
-			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
-				LOGGER.debug("A word from {} is too short w.r.t. the condition '{}'", parent, parent.condition);
-
-				//check to see if the greater-than-the-shortest conditions leads to the same productions as the shorter one
-				//if so, the addition of the greater-than-the-shortest conditions can be removed safely
-
-if(children.size() > 1)
-	throw new IllegalArgumentException("Too many children?");
-//FIXME
-				for(LineEntry child : children){
-					boolean all = true;
-					List<String> childAdditionsToBeRemoved = new ArrayList<>();
-					for(String parentAddition : parent.addition){
-						//each parent addition has at least one addition in each children
-						boolean found = false;
-						for(String childAddition : child.addition){
-							String lcs = longestCommonAffix(Arrays.asList(childAddition, child.removal),
-								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-							if(childAddition.substring(lcs.length()).equals(parentAddition)){
-								found = true;
-								childAdditionsToBeRemoved.add(childAddition);
-								break;
-							}
-						}
-						if(!found){
-							all = false;
-							break;
-						}
-					}
-
-					if(all){
-						child.addition.removeAll(childAdditionsToBeRemoved);
-						parent.from.addAll(child.from);
-
-						if(!rules.contains(parent))
-							rules.add(parent);
-					}
-					else
-						throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
-							+ parent.condition + "'");
-				}
+//			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
+//				LOGGER.debug("A word from {} is too short w.r.t. the condition '{}'", parent, parent.condition);
+//
+//				//check to see if the greater-than-the-shortest conditions leads to the same productions as the shorter one
+//				//if so, the addition of the greater-than-the-shortest conditions can be removed safely
+//
+//if(children.size() > 1)
+//	throw new IllegalArgumentException("Too many children?");
+////FIXME
+//				for(LineEntry child : children){
+//					boolean all = true;
+//					List<String> childAdditionsToBeRemoved = new ArrayList<>();
+//					for(String parentAddition : parent.addition){
+//						//each parent addition has at least one addition in each children
+//						boolean found = false;
+//						for(String childAddition : child.addition){
+//							String lcs = longestCommonAffix(Arrays.asList(childAddition, child.removal),
+//								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+//							if(childAddition.substring(lcs.length()).equals(parentAddition)){
+//								found = true;
+//								childAdditionsToBeRemoved.add(childAddition);
+//								break;
+//							}
+//						}
+//						if(!found){
+//							all = false;
+//							break;
+//						}
+//					}
+//
+//					if(all){
+//						child.addition.removeAll(childAdditionsToBeRemoved);
+//						parent.from.addAll(child.from);
+//
+//						if(!rules.contains(parent))
+//							rules.add(parent);
+//					}
+//					else
+//						throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
+//							+ parent.condition + "'");
+//				}
 
 				//TODO
 //				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
 //					+ parent.condition + "'");
 
-				continue;
-			}
+//				continue;
+//			}
 
 			//find parent-group
 			final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
