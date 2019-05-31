@@ -292,6 +292,9 @@ for(final LineEntry entry : uniquePlainRules)
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
 
+		//another way: collect all (removal and addition) words
+		//TODO
+
 		//while current-list is not empty
 		while(!sortedList.isEmpty()){
 			//extract rule from current-list
@@ -316,10 +319,10 @@ for(final LineEntry entry : uniquePlainRules)
 				//check to see if the greater-than-the-shortest conditions leads to the same productions as the shorter one
 				//if so, the addition of the greater-than-the-shortest conditions can be removed safely
 
+if(children.size() > 1)
+	throw new IllegalArgumentException("Too many children?");
 //FIXME
 AffixEntry.Type type = AffixEntry.Type.PREFIX;
-if(children.size() > 1)
-	throw new IllegalArgumentException("Too many children");
 				for(LineEntry child : children){
 					boolean all = true;
 					List<String> childAdditionsToBeRemoved = new ArrayList<>();
