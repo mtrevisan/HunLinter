@@ -293,6 +293,25 @@ for(final LineEntry entry : uniquePlainRules)
 		sortedList.sort(shortestConditionComparator);
 
 		//another way: collect all (removal and addition) words
+		List<LineEntry> multipleAdditionRules = sortedList.stream()
+			.filter(rule -> rule.addition.size() > 1)
+			.collect(Collectors.toList());
+AffixEntry.Type type = AffixEntry.Type.PREFIX;
+		List<LineEntry> transferredRules = new ArrayList<>();
+		for(LineEntry rule : multipleAdditionRules){
+			for(String childAddition : rule.addition){
+				String lcs = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
+					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+				if(!lcs.isEmpty()){
+					LineEntry newEntry = LineEntry.createFrom(rule, rule.condition, rule.from);
+					newEntry.addition.clear();
+					newEntry.addition.add(childAddition.substring(lcs.length()));
+					transferredRules.add(newEntry);
+					break;
+				}
+			}
+		}
+transferredRules.size();
 		//TODO
 
 		//while current-list is not empty
@@ -322,7 +341,6 @@ for(final LineEntry entry : uniquePlainRules)
 if(children.size() > 1)
 	throw new IllegalArgumentException("Too many children?");
 //FIXME
-AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				for(LineEntry child : children){
 					boolean all = true;
 					List<String> childAdditionsToBeRemoved = new ArrayList<>();
