@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -165,7 +166,8 @@ public class RulesReducer{
 	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
 		final List<LineEntry> compactedRules = compactRules(plainRules);
 
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(), plainRules.size());
+		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(),
+			DictionaryParser.COUNTER_FORMATTER.format(plainRules.size()));
 
 		removeOverlappingConditions(compactedRules);
 
@@ -208,17 +210,18 @@ public class RulesReducer{
 		Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
 		if(!checkRules.equals(uniquePlainRules)){
 			//FIXME
+int expected = uniquePlainRules.size();
+int obtained = checkRules.size();
 Set<LineEntry> intersection = SetHelper.intersection(checkRules, uniquePlainRules);
 checkRules.removeAll(intersection);
 uniquePlainRules.removeAll(intersection);
-LOGGER.info(Backbone.MARKER_RULE_REDUCER, "overproduced rules");
+LOGGER.info(Backbone.MARKER_RULE_REDUCER, "overproduced rules:");
 for(final LineEntry entry : checkRules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules");
+LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules:");
 for(final LineEntry entry : uniquePlainRules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + uniquePlainRules.size()
-				+ " productions, obtained " + checkRules.size());
+			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + expected + " productions, obtained " + obtained);
 		}
 	}
 
@@ -284,7 +287,7 @@ for(final LineEntry entry : uniquePlainRules)
 	 * }
 	 * </pre>
 	 */
-	private void removeOverlappingConditions(final List<LineEntry> rules){
+	private void removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
 		//sort current-list by shortest condition
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
@@ -308,11 +311,53 @@ for(final LineEntry entry : uniquePlainRules)
 
 			//prevent a word in parent from being too short
 			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
-				//TODO
-				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
-					+ parent.condition + "'");
+				LOGGER.debug("A word from {} is too short w.r.t. the condition '{}'", parent, parent.condition);
 
-//				continue;
+				//check to see if the greater-than-the-shortest conditions leads to the same productions as the shorter one
+				//if so, the addition of the greater-than-the-shortest conditions can be removed safely
+
+//FIXME
+AffixEntry.Type type = AffixEntry.Type.PREFIX;
+if(children.size() > 1)
+	throw new IllegalArgumentException("Too many children");
+				for(LineEntry child : children){
+					boolean all = true;
+					List<String> childAdditionsToBeRemoved = new ArrayList<>();
+					for(String parentAddition : parent.addition){
+						//each parent addition has at least one addition in each children
+						boolean found = false;
+						for(String childAddition : child.addition){
+							String lcs = longestCommonAffix(Arrays.asList(childAddition, child.removal),
+								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+							if(childAddition.substring(lcs.length()).equals(parentAddition)){
+								found = true;
+								childAdditionsToBeRemoved.add(childAddition);
+								break;
+							}
+						}
+						if(!found){
+							all = false;
+							break;
+						}
+					}
+
+					if(all){
+						child.addition.removeAll(childAdditionsToBeRemoved);
+						parent.from.addAll(child.from);
+
+						if(!rules.contains(parent))
+							rules.add(parent);
+					}
+					else
+						throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
+							+ parent.condition + "'");
+				}
+
+				//TODO
+//				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
+//					+ parent.condition + "'");
+
+				continue;
 			}
 
 			//find parent-group
