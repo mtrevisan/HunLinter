@@ -110,7 +110,7 @@ public class RulesReducer{
 //						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
 //							+ compactedFilteredRule.condition + "'");
 
-					//if a condition is not long enough, keep them separate
+					//if a condition is not long enough, keep it separate
 					if(startIndex >= 0){
 						final int delta = longestConditionLength - rule.condition.length();
 						final String deltaAddition = from.substring(startIndex, startIndex + delta);
@@ -303,7 +303,7 @@ for(final LineEntry entry : uniquePlainRules)
 
 			final int parentConditionLength = parent.condition.length();
 
-			//prevent a word in parent from to be too short
+			//prevent a word in parent from being too short
 			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
 				//TODO
 				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"

@@ -176,7 +176,7 @@ public class AffixEntryTest{
 
 		String representation = entry.toString();
 
-		Assertions.assertEquals("PFX TB ŧ s ŧ", representation);
+		Assertions.assertEquals("PFX TB ŧ s ŧ	po:noun", representation);
 	}
 
 }
