@@ -293,25 +293,26 @@ for(final LineEntry entry : uniquePlainRules)
 		sortedList.sort(shortestConditionComparator);
 
 		//another way: collect all (removal and addition) words
+//FIXME to be tested
 		List<LineEntry> multipleAdditionRules = sortedList.stream()
 			.filter(rule -> rule.addition.size() > 1)
 			.collect(Collectors.toList());
 AffixEntry.Type type = AffixEntry.Type.PREFIX;
-		List<LineEntry> transferredRules = new ArrayList<>();
-		for(LineEntry rule : multipleAdditionRules){
+		for(LineEntry rule : multipleAdditionRules)
 			for(String childAddition : rule.addition){
-				String lcs = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
-					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-				if(!lcs.isEmpty()){
-					LineEntry newEntry = LineEntry.createFrom(rule, rule.condition, rule.from);
-					newEntry.addition.clear();
-					newEntry.addition.add(childAddition.substring(lcs.length()));
-					transferredRules.add(newEntry);
-					break;
+				int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
+					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+					.length();
+				if(lcsLength > 0){
+					//merge rules with that already present
+					for(LineEntry originalRule : sortedList){
+						LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength), rule.condition.substring(lcsLength),
+							rule.from);
+						if(originalRule.equals(newEntry))
+							originalRule.from.addAll(rule.from);
+					}
 				}
 			}
-		}
-transferredRules.size();
 		//TODO
 
 		//while current-list is not empty
