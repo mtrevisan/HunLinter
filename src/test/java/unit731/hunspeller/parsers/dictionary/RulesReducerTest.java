@@ -46,7 +46,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -107,7 +107,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -170,7 +170,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -245,7 +245,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -373,7 +373,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -503,7 +503,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -550,7 +550,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -609,7 +609,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -691,7 +691,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -772,7 +772,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -830,7 +830,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -886,7 +886,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -949,7 +949,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1050,7 +1050,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1129,7 +1129,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1175,7 +1175,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1238,7 +1238,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(line -> wordGenerator.applyAffixRules(line))
-			.map(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 

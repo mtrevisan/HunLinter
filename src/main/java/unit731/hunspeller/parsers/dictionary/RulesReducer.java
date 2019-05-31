@@ -71,7 +71,7 @@ public class RulesReducer{
 	}
 
 
-	public LineEntry collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
+	public List<LineEntry> collectProductionsByFlag(final List<Production> productions, final String flag, final AffixEntry.Type type){
 		//remove base production
 		productions.remove(0);
 		//collect all productions that generates from the given flag
@@ -86,24 +86,23 @@ public class RulesReducer{
 				filteredRules.add(affixEntry);
 			}
 		}
+		return compactProductions(filteredRules);
+	}
 
-		//compact rules by aggregating productions with same removal and condition, and different additions
-		LineEntry compactedFilteredRule = null;
-		if(!filteredRules.isEmpty()){
-			//same removal and same condition parts
-			final List<LineEntry> compactedFilteredRules = collect(filteredRules,
-				entry -> entry.removal + TAB + entry.condition,
-				(rule, entry) -> rule.addition.addAll(entry.addition));
-
-			//retrieve rule with longest condition (all the other conditions must be this long)
-			compactedFilteredRule = compactedFilteredRules.stream()
-				.max(Comparator.comparingInt(rule -> rule.condition.length()))
-				.get();
-			if(compactedFilteredRules.size() > 1){
-				final int longestConditionLength = compactedFilteredRule.condition.length();
-				for(final LineEntry rule : compactedFilteredRules){
+	private List<LineEntry> compactProductions(final List<LineEntry> filteredRules){
+		//compact rules by aggregating productions with same originating word
+		Map<String, List<LineEntry>> fromBucket = bucket(new HashSet<>(filteredRules), rule -> rule.from.iterator().next());
+		for(Map.Entry<String, List<LineEntry>> entry : fromBucket.entrySet()){
+			List<LineEntry> rules = entry.getValue();
+			if(rules.size() > 1){
+				//retrieve rule with longest condition (all the other conditions must be this long)
+				final LineEntry compactedRule = rules.stream()
+					.max(Comparator.comparingInt(rule -> rule.condition.length()))
+					.get();
+				final int longestConditionLength = compactedRule.condition.length();
+				final String from = entry.getKey();
+				for(final LineEntry rule : rules){
 					//recover the missing characters for the current condition to become of length the maximum found earlier
-					final String from = rule.from.iterator().next();
 					final int startIndex = from.length() - longestConditionLength;
 					//FIXME what if a condition is not long enough? keep separate?
 //					if(startIndex < 0)
@@ -116,12 +115,16 @@ public class RulesReducer{
 						final String deltaAddition = from.substring(startIndex, startIndex + delta);
 						//add addition
 						for(final String addition : rule.addition)
-							compactedFilteredRule.addition.add(deltaAddition + addition);
+							compactedRule.addition.add(deltaAddition + addition);
 					}
 				}
+				rules.clear();
+				rules.add(compactedRule);
 			}
 		}
-		return compactedFilteredRule;
+		return fromBucket.values().stream()
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 	}
 
 	private LineEntry createSuffixEntry(final Production production, final String word, final AffixEntry.Type type){
@@ -199,8 +202,8 @@ public class RulesReducer{
 		for(String line : originalLines){
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
 
-			final LineEntry compactedFilteredRule = collectProductionsByFlag(productions, flag, type);
-			checkRules.add(compactedFilteredRule);
+			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
+			checkRules.addAll(filteredRules);
 		}
 		Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
 		if(!checkRules.equals(uniquePlainRules)){

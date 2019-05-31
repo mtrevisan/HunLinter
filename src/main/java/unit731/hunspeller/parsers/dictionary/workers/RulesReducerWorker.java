@@ -48,10 +48,10 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
 			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			final LineEntry compactedFilteredRule = rulesReducer.collectProductionsByFlag(productions, flag, type);
-			if(compactedFilteredRule != null){
+			final List<LineEntry> filteredRules = rulesReducer.collectProductionsByFlag(productions, flag, type);
+			if(!filteredRules.isEmpty()){
 				originalLines.add(line);
-				originalRules.add(compactedFilteredRule);
+				originalRules.addAll(filteredRules);
 			}
 		};
 		final Runnable completed = () -> {
@@ -71,7 +71,8 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 				e.printStackTrace();
 			}
 		};
-		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+//		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+final WorkerData data = WorkerData.create(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}
