@@ -105,7 +105,7 @@ public class RulesReducer{
 				for(final LineEntry rule : rules){
 					//recover the missing characters for the current condition to become of length the maximum found earlier
 					final int startIndex = from.length() - longestConditionLength;
-					//FIXME what if a condition is not long enough? keep separate?
+					//FIXME what if a condition is not long enough? keep it separate?
 //					if(startIndex < 0)
 //						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
 //							+ compactedFilteredRule.condition + "'");

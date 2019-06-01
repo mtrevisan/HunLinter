@@ -19,7 +19,7 @@ import unit731.hunspeller.services.FileHelper;
 public class RulesReducerTest{
 
 	@Test
-	public void simple1() throws IOException{
+	public void case1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -86,7 +86,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple2() throws IOException{
+	public void case2() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -135,7 +135,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple3() throws IOException{
+	public void case3() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -218,7 +218,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple4() throws IOException{
+	public void case4() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -283,7 +283,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple5() throws IOException{
+	public void case5() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -483,7 +483,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple6() throws IOException{
+	public void case6() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -527,7 +527,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple7() throws IOException{
+	public void case7() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -580,7 +580,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple8() throws IOException{
+	public void case8() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -640,7 +640,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple9() throws IOException{
+	public void case9() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -747,7 +747,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple10() throws IOException{
+	public void case10() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -801,7 +801,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple11() throws IOException{
+	public void case11() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -864,7 +864,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple12() throws IOException{
+	public void case12() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -912,7 +912,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple13() throws IOException{
+	public void case13() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1007,7 +1007,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple14() throws IOException{
+	public void case14() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1110,7 +1110,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple15() throws IOException{
+	public void case15() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1151,7 +1151,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple16() throws IOException{
+	public void case16() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1207,7 +1207,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple17() throws IOException{
+	public void case17() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1280,7 +1280,7 @@ public class RulesReducerTest{
 	}
 
 //	@Test
-	public void simple18() throws IOException{
+	public void case18() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1481,7 +1481,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void simple19() throws IOException{
+	public void case19() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1570,8 +1570,8 @@ public class RulesReducerTest{
 			"SFX V1 oƚa iòƚa oƚa",
 			"SFX V1 oƚa ioƚeta oƚa",
 			"SFX V1 oƚo òƚo oƚo",
-			"SFX V1 oƚo iòƚo oƚo",
 			"SFX V1 oƚo ioƚo oƚo",
+			"SFX V1 oƚo iòƚo oƚo",
 			"SFX V1 oƚo ioƚeto oƚo",
 			"SFX V1 ièr ar ièr",
 			"SFX V1 ièr er ièr",
@@ -1581,12 +1581,12 @@ public class RulesReducerTest{
 			"SFX V1 dor tor dor",
 			"SFX V1 dor oreto dor",
 			"SFX V1 dor toreto dor",
-			"SFX V1 èr ar [^i]èr",
-			"SFX V1 èr ièr [^cijɉñ]èr",
-			"SFX V1 èr ier [^cijɉñ]èr",
-			"SFX V1 èr areto [^i]èr",
-			"SFX V1 èr ereto [^i]èr",
-			"SFX V1 èr iereto [^cijɉñ]èr",
+			"SFX V1 èr ar [dgjɉƚmnñrstvx]èr",
+			"SFX V1 èr ier [dgƚmnrstvx]èr",
+			"SFX V1 èr ièr [dgƚmnrstvx]èr",
+			"SFX V1 èr areto [dgjɉƚmnñrstvx]èr",
+			"SFX V1 èr ereto [dgjɉƚmnñrstvx]èr",
+			"SFX V1 èr iereto [dgƚmnrstvx]èr",
 			"SFX V1 a eta dora",
 			"SFX V1 ièra ara ièra",
 			"SFX V1 ièra era ièra",
@@ -1598,13 +1598,13 @@ public class RulesReducerTest{
 			"SFX V1 dora toreta dora",
 			"SFX V1 èra ara [^i]èra",
 			"SFX V1 èra era [^i]èra",
-			"SFX V1 èra iera [^cijɉñ]èra",
-			"SFX V1 èra ièra [^cijɉñ]èra",
+			"SFX V1 èra iera [^ijɉñ]èra",
+			"SFX V1 èra ièra [^ijɉñ]èra",
 			"SFX V1 èra areta [^i]èra",
 			"SFX V1 èra ereta [^i]èra",
-			"SFX V1 èra iereta [^cijɉñ]èra"
+			"SFX V1 èra iereta [^ijɉñ]èra"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
