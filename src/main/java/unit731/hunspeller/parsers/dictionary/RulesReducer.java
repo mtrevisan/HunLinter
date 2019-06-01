@@ -222,7 +222,8 @@ for(final LineEntry entry : checkRules)
 LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules:");
 for(final LineEntry entry : uniquePlainRules)
 	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + expected + " productions, obtained " + obtained);
+			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + expected + " productions, obtained "
+				+ obtained);
 		}
 	}
 
@@ -295,24 +296,30 @@ for(final LineEntry entry : uniquePlainRules)
 
 		//another way: collect all (removal and addition) words
 //FIXME to be tested
-		List<LineEntry> multipleAdditionRules = sortedList.stream()
-			.filter(rule -> rule.addition.size() > 1)
-			.collect(Collectors.toList());
+//		List<LineEntry> multipleAdditionRules = sortedList.stream()
+//			.filter(rule -> rule.addition.size() > 1)
+//			.collect(Collectors.toList());
 AffixEntry.Type type = AffixEntry.Type.PREFIX;
-		for(LineEntry rule : multipleAdditionRules)
-			for(String childAddition : rule.addition){
-				int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
-					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
-					.length();
-				if(lcsLength > 0){
-					LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
-						rule.condition.substring(lcsLength), rule.from);
-					//merge rules with that already present
-					sortedList.stream()
-						.filter(originalRule -> originalRule.equals(newEntry))
-						.forEach(originalRule -> originalRule.from.addAll(rule.from));
-				}
-			}
+//		for(LineEntry rule : multipleAdditionRules){
+//			Iterator<String> itr = rule.addition.iterator();
+//			while(itr.hasNext()){
+//				String childAddition = itr.next();
+//
+//				int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
+//					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+//					.length();
+//				if(lcsLength > 0){
+//					LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
+//						rule.condition.substring(lcsLength), rule.from);
+//					//merge rules with that already present
+//					sortedList.stream()
+//						.filter(originalRule -> originalRule.equals(newEntry))
+//						.forEach(originalRule -> originalRule.from.addAll(rule.from));
+//
+//					itr.remove();
+//				}
+//			}
+//		}
 		//TODO
 
 		//while current-list is not empty
@@ -329,6 +336,33 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 
 				continue;
 			}
+
+			//extract raw additions from parent
+//			Set<String> parentAdditions = parent.addition.stream()
+//				.map(addition -> {
+//					String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
+//						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+//					return addition.substring(lcs.length());
+//				})
+//				.collect(Collectors.toSet());
+//			for(LineEntry child : children)
+//				if(child.removal.equals(parent.removal)){
+//					//extract raw additions from child
+//					Set<String> childAdditions = child.addition.stream()
+//						.map(addition -> {
+//							String lcs = longestCommonAffix(Arrays.asList(addition, child.removal),
+//								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+//							return addition.substring(lcs.length());
+//						})
+//						.collect(Collectors.toSet());
+//
+//					//extract from each child all the additions present in parent
+//					if(childAdditions.containsAll(parentAdditions)){
+//						//extract all the common from
+//						child.addition.removeAll(parent.addition);
+//						parent.from.addAll(child.from);
+//					}
+//				}
 
 			final int parentConditionLength = parent.condition.length();
 
@@ -426,30 +460,68 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				sameConditionChildren.forEach(sortedList::remove);
 				//remove same-condition-children from final-list
 				sameConditionChildren.forEach(rules::remove);
-			}
-			else{
-				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
-				final Map<String, List<String>> fromBucket = bucket(parent.from,
-					from -> {
-						char chr = from.charAt(from.length() - parentConditionLength - 1);
-						return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
-					});
-				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
-				if(notGroupList != null){
-					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-					final String condition = (parent.condition.isEmpty()? makeGroup(preCondition, parent.condition):
-						makeNotGroup(childrenGroup, parent.condition));
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
-					rules.add(newEntry);
-				}
-				for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
-					final String condition = entry.getKey() + parent.condition;
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
-					sortedList.add(newEntry);
-				}
 
-				sortedList.sort(shortestConditionComparator);
+				//remove parent from final list
+				rules.remove(parent);
+
+				continue;
 			}
+
+			//else if parent-group is a subset of children-group
+//			if(groupIntersection.equals(parentGroup)){
+//				boolean transfer = false;
+//				for(LineEntry rule : children){
+//					Iterator<String> itr = rule.addition.iterator();
+//					while(itr.hasNext()){
+//						String childAddition = itr.next();
+//
+//						int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
+//							(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+//							.length();
+//						if(lcsLength > 0){
+//							LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
+//								rule.condition.substring(lcsLength), rule.from);
+//							//transfer originating words from children to parent
+//							if(parent.equals(newEntry))
+//								parent.from.addAll(rule.from);
+//							//remove corresponding addition from child
+//							itr.remove();
+//
+//							transfer = true;
+//						}
+//					}
+//				}
+//
+//				if(transfer){
+//					sortedList.add(0, parent);
+//
+//					continue;
+//				}
+//			}
+
+			//else
+			final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
+			final Map<String, List<String>> fromBucket = bucket(parent.from,
+				from -> {
+					char chr = from.charAt(from.length() - parentConditionLength - 1);
+					return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
+				});
+			final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
+			if(notGroupList != null){
+				final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
+				final String condition = (parent.condition.isEmpty() /*|| preCondition.size() < childrenGroup.size()*/?
+					makeGroup(preCondition, parent.condition):
+					makeNotGroup(childrenGroup, parent.condition));
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+				rules.add(newEntry);
+			}
+			for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
+				final String condition = entry.getKey() + parent.condition;
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+				sortedList.add(newEntry);
+			}
+
+			sortedList.sort(shortestConditionComparator);
 
 			//remove parent from final list
 			rules.remove(parent);
