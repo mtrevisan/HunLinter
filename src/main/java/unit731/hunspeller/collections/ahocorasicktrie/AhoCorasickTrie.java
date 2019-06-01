@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 
 
 /**
- * An implementation of the Aho-Corasick Radix Trie algorithm based on a triple-array data structure
+ * An implementation of the Aho-Corasick Radix Trie algorithm based on a double-array data structure
  * 
  * @see <a href="https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm">Aho–Corasick algorithm</a>
  * @see <a href="https://pdfs.semanticscholar.org/18b9/da082ef35aea8bf9853ae6b35242539ff7da.pdf">Efficient implementation of Unicode string pattern matching automaton in Java</a>
