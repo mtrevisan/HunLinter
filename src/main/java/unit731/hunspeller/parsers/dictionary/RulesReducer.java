@@ -93,8 +93,8 @@ public class RulesReducer{
 	private List<LineEntry> compactProductions(final List<LineEntry> filteredRules){
 		//compact rules by aggregating productions with same originating word
 		Map<String, List<LineEntry>> fromBucket = bucket(new HashSet<>(filteredRules), rule -> rule.from.iterator().next());
-		for(Map.Entry<String, List<LineEntry>> entry : fromBucket.entrySet()){
-			List<LineEntry> rules = entry.getValue();
+		for(final Map.Entry<String, List<LineEntry>> entry : fromBucket.entrySet()){
+			final List<LineEntry> rules = entry.getValue();
 			if(rules.size() > 1){
 				//retrieve rule with longest condition (all the other conditions must be this long)
 				final LineEntry compactedRule = rules.stream()
@@ -202,13 +202,13 @@ public class RulesReducer{
 			.collect(Collectors.toList());
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combineableChar(), entries);
-		for(String line : originalLines){
+		for(final String line : originalLines){
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
 
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
 			checkRules.addAll(filteredRules);
 		}
-		Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
+		final Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
 		if(!checkRules.equals(uniquePlainRules)){
 			//FIXME
 int expected = uniquePlainRules.size();
@@ -337,32 +337,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				continue;
 			}
 
-			//extract raw additions from parent
-//			Set<String> parentAdditions = parent.addition.stream()
-//				.map(addition -> {
-//					String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
-//						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-//					return addition.substring(lcs.length());
-//				})
-//				.collect(Collectors.toSet());
-//			for(LineEntry child : children)
-//				if(child.removal.equals(parent.removal)){
-//					//extract raw additions from child
-//					Set<String> childAdditions = child.addition.stream()
-//						.map(addition -> {
-//							String lcs = longestCommonAffix(Arrays.asList(addition, child.removal),
-//								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-//							return addition.substring(lcs.length());
-//						})
-//						.collect(Collectors.toSet());
-//
-//					//extract from each child all the additions present in parent
-//					if(childAdditions.containsAll(parentAdditions)){
-//						//extract all the common from
-//						child.addition.removeAll(parent.addition);
-//						parent.from.addAll(child.from);
-//					}
-//				}
+			redistributeAdditions(parent, children, type);
 
 			final int parentConditionLength = parent.condition.length();
 
@@ -509,13 +484,14 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
 			if(notGroupList != null){
 				final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-				final String condition = (parent.condition.isEmpty() /*|| preCondition.size() < childrenGroup.size()*/?
+				final String condition = (parent.condition.isEmpty()
+						|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
 					makeGroup(preCondition, parent.condition):
 					makeNotGroup(childrenGroup, parent.condition));
 				final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 				rules.add(newEntry);
 			}
-			for(Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
+			for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
 				final String condition = entry.getKey() + parent.condition;
 				final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
 				sortedList.add(newEntry);
@@ -528,9 +504,42 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 		}
 	}
 
+	/** Reshuffle originating list to place the correct productions in the correct rule */
+	private void redistributeAdditions(final LineEntry parent, final List<LineEntry> children, AffixEntry.Type type){
+		//extract raw additions from parent
+		final Set<String> parentAdditions = parent.addition.stream()
+			.map(addition -> {
+				final String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
+					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+				return addition.substring(lcs.length());
+			})
+			.collect(Collectors.toSet());
+		for(final LineEntry child : children)
+			if(child.removal.equals(parent.removal)){
+				//extract raw additions from child
+				int minimumLCSLength = Integer.MAX_VALUE;
+				final Set<String> childAdditions = new HashSet<>();
+				for(final String addition : child.addition){
+					final int lcsLength = longestCommonAffix(Arrays.asList(addition, child.removal),
+						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+						.length();
+					if(lcsLength < minimumLCSLength)
+						minimumLCSLength = lcsLength;
+					childAdditions.add(addition.substring(lcsLength));
+				}
+				
+				//extract from each child all the additions present in parent
+				if(child.condition.substring(minimumLCSLength).equals(parent.condition) && childAdditions.containsAll(parentAdditions)){
+					//extract all the common from
+					child.addition.removeAll(parent.addition);
+					parent.from.addAll(child.from);
+				}
+			}
+	}
+
 	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
 		final Set<Character> group = new HashSet<>();
-		for(String word : words){
+		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
 				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
@@ -542,12 +551,12 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 	}
 
 	private String makeGroup(final Set<Character> group, final String suffix){
-		String merge = mergeSet(group);
+		final String merge = mergeSet(group);
 		return (merge.length() > 1? GROUP_START + merge + GROUP_END: merge) + suffix;
 	}
 
 	private String makeNotGroup(final Set<Character> group, final String suffix){
-		String merge = mergeSet(group);
+		final String merge = mergeSet(group);
 		return NOT_GROUP_START + merge + GROUP_END + suffix;
 	}
 
@@ -560,7 +569,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 
 	private <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
 		final Map<K, List<V>> bucket = new HashMap<>();
-		for(V entry : entries){
+		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			if(key != null)
 				bucket.computeIfAbsent(key, k -> new ArrayList<>())
@@ -575,7 +584,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegExpSequencer.splitSequence(entry.condition).length:
 			null));
-		for(List<LineEntry> similarities : similarityBucket.values())
+		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
 				final String[] aCondition = RegExpSequencer.splitSequence(anEntry.condition);
@@ -585,7 +594,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
+				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
 				final List<String> words = anEntry.extractFromEndingWith(condition);
 				entries.add(LineEntry.createFrom(anEntry, condition, words));
 
@@ -694,7 +703,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){
 		final int size = entries.size();
 		final List<String> rules = new ArrayList<>(size);
-		for(LineEntry entry : entries)
+		for(final LineEntry entry : entries)
 			rules.add(composeLine(type, flag, entry));
 		return rules;
 	}
@@ -711,7 +720,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 	private String composeLine(final AffixEntry.Type type, final String flag, final LineEntry partialLine){
 		String addition = partialLine.anAddition();
 		String morphologicalRules = StringUtils.EMPTY;
-		int idx = addition.indexOf(TAB);
+		final int idx = addition.indexOf(TAB);
 		if(idx >= 0){
 			morphologicalRules = addition.substring(idx);
 			addition = addition.substring(0, idx);
