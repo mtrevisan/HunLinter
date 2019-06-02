@@ -345,6 +345,8 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 //						rulesParkingLot.add(newEntry);
 					}
 
+					//continue adding next char to group until maxConditionLength
+
 					children.forEach(sortedList::remove);
 				}
 				//if the group intersects the negated group of all the other children
