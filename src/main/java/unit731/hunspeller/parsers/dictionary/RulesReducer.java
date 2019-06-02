@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,8 +16,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,6 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.services.SetHelper;
 
 
 public class RulesReducer{
@@ -198,7 +194,6 @@ public class RulesReducer{
 		if(ruleToBeReduced == null)
 			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
 
-		final Set<LineEntry> checkRules = new HashSet<>();
 		final List<AffixEntry> entries = reducedRules.stream()
 			.skip(1)
 			.map(line -> new AffixEntry(line, strategy, null, null))
@@ -206,27 +201,14 @@ public class RulesReducer{
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combineableChar(), entries);
 		for(final String line : originalLines){
+			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
 
+			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
 			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
-			checkRules.addAll(filteredRules);
-		}
-		final Set<LineEntry> uniquePlainRules = new HashSet<>(originalRules);
-		if(!checkRules.equals(uniquePlainRules)){
-			//FIXME
-int expected = uniquePlainRules.size();
-int obtained = checkRules.size();
-Set<LineEntry> intersection = SetHelper.intersection(checkRules, uniquePlainRules);
-checkRules.removeAll(intersection);
-uniquePlainRules.removeAll(intersection);
-LOGGER.info(Backbone.MARKER_RULE_REDUCER, "overproduced rules:");
-for(final LineEntry entry : checkRules)
-	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-LOGGER.info(Backbone.MARKER_RULE_REDUCER, "undersupplied rules:");
-for(final LineEntry entry : uniquePlainRules)
-	LOGGER.info(Backbone.MARKER_RULE_REDUCER, entry.toString());
-			throw new IllegalArgumentException("Something very bad occurs while reducing: expected " + expected + " productions, obtained "
-				+ obtained);
+			if(!filteredOriginalRules.equals(filteredRules))
+				throw new IllegalArgumentException("Something very bad occurs while producing from '" + line + "', expected "
+					+ filteredOriginalRules + ", obtained " + filteredRules);
 		}
 	}
 
@@ -307,6 +289,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 			if(children.size() == 1){
+				sortedList.remove(0);
 				if(!rules.contains(parent))
 					rules.add(parent);
 
@@ -316,35 +299,62 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			redistributeAdditions(children, type);
 
 			//collect all the length of the children's conditions
-			List<Integer> conditionLengths = children.stream()
+			final List<Integer> conditionLengths = children.stream()
 				.map(child -> child.condition.length())
 				.sorted()
 				.collect(Collectors.toList());
 			//extract minimum and maximum of the conditions' length
 			final int minConditionLength = conditionLengths.get(0);
 			final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
+			if(maxConditionLength > minConditionLength + 1)
+				throw new IllegalArgumentException("case not handled yet");
 			for(int index = minConditionLength; index < maxConditionLength; index ++){
 				//extract the group of each child
 				final int indexFromLast = index;
-				List<Set<Character>> groups = children.stream()
+				final List<Set<Character>> groups = children.stream()
 					.map(child -> extractGroup(child.from, indexFromLast))
 					.collect(Collectors.toList());
 
 				//calculate intersection between all groups
-				Set<Character> groupIntersection = new HashSet<>(groups.get(0));
-				for(int i = 1; i < groups.size(); i ++)
-					groupIntersection.retainAll(groups.get(i));
-
-				//if intersection is empty
-				if(groupIntersection.isEmpty()){
-					System.out.println("");
+				final Set<Character> groupsIntersection = new HashSet<>(groups.get(0));
+				final Set<Character> groupsUnion = new HashSet<>(groups.get(0));
+				for(int i = 1; i < groups.size(); i ++){
+					final Set<Character> group = groups.get(i);
+					groupsIntersection.retainAll(group);
+					groupsUnion.addAll(group);
 				}
 
-groups.size();
+				//if intersection is empty
+				if(groupsIntersection.isEmpty()){
+					//for each group, either is the group itself or the negated group of all the others children
+					//'Aèr': that is 'Aèr' or '[^Bi]èr'
+					//'Bèr': that is 'Bèr' or '[^Ai]èr'
+					//'ièr': that is 'ièr' or '[^AB]èr'
+//					final List<LineEntry> rulesParkingLot = new ArrayList<>();
+					for(int i = 0; i < children.size(); i ++){
+						final Set<Character> childGroup = groups.get(i);
+						final Set<Character> childNotGroup = new HashSet<>(groupsUnion);
+						childNotGroup.removeAll(childGroup);
+						final LineEntry child = children.get(i);
+						final int childConditionLength = child.condition.length();
+						child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
+							makeGroup(childGroup): makeNotGroup(childNotGroup))
+							+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
+//						final LineEntry newEntry = LineEntry.createFrom(child, condition, child.from);
+						//TODO park this entry temporarily somewhere... it is not the end until the condition reaches maxConditionLength...
+//						rulesParkingLot.add(newEntry);
+					}
+
+					children.forEach(sortedList::remove);
+				}
+				//if the group intersects the negated group of all the other children
+				else{
+					throw new IllegalArgumentException("and now?");
+				}
 			}
-			final Set<String> childrenFrom = children.stream()
-				.flatMap(entry -> entry.from.stream())
-				.collect(Collectors.toSet());
+//			final Set<String> childrenFrom = children.stream()
+//				.flatMap(entry -> entry.from.stream())
+//				.collect(Collectors.toSet());
 			//find children-group
 //			final Set<Character> childrenGroup = extractGroup(childrenFrom, parentConditionLength);
 //
@@ -410,10 +420,10 @@ groups.size();
 //				sortedList.sort(shortestConditionComparator);
 //			}
 
-			sortedList.remove(0);
+//			sortedList.remove(0);
 
 			//remove parent from final list
-			rules.remove(parent);
+//			rules.remove(parent);
 		}
 	}
 
