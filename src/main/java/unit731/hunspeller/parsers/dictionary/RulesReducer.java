@@ -341,56 +341,6 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 
 			final int parentConditionLength = parent.condition.length();
 
-			//prevent a word in parent from being too short
-//			if(parent.from.stream().anyMatch(word -> word.length() == parentConditionLength)){
-//				LOGGER.debug("A word from {} is too short w.r.t. the condition '{}'", parent, parent.condition);
-//
-//				//check to see if the greater-than-the-shortest conditions leads to the same productions as the shorter one
-//				//if so, the addition of the greater-than-the-shortest conditions can be removed safely
-//
-//if(children.size() > 1)
-//	throw new IllegalArgumentException("Too many children?");
-////FIXME
-//				for(LineEntry child : children){
-//					boolean all = true;
-//					List<String> childAdditionsToBeRemoved = new ArrayList<>();
-//					for(String parentAddition : parent.addition){
-//						//each parent addition has at least one addition in each children
-//						boolean found = false;
-//						for(String childAddition : child.addition){
-//							String lcs = longestCommonAffix(Arrays.asList(childAddition, child.removal),
-//								(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-//							if(childAddition.substring(lcs.length()).equals(parentAddition)){
-//								found = true;
-//								childAdditionsToBeRemoved.add(childAddition);
-//								break;
-//							}
-//						}
-//						if(!found){
-//							all = false;
-//							break;
-//						}
-//					}
-//
-//					if(all){
-//						child.addition.removeAll(childAdditionsToBeRemoved);
-//						parent.from.addAll(child.from);
-//
-//						if(!rules.contains(parent))
-//							rules.add(parent);
-//					}
-//					else
-//						throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
-//							+ parent.condition + "'");
-//				}
-
-				//TODO
-//				throw new IllegalArgumentException("A word in [" + StringUtils.join(parent.from, ",") + "] is too short w.r.t. the condition '"
-//					+ parent.condition + "'");
-
-//				continue;
-//			}
-
 			//find parent-group
 			final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
 
@@ -435,69 +385,32 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				sameConditionChildren.forEach(sortedList::remove);
 				//remove same-condition-children from final-list
 				sameConditionChildren.forEach(rules::remove);
-
-				//remove parent from final list
-				rules.remove(parent);
-
-				continue;
 			}
+			else{
+				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
+				final Map<String, List<String>> fromBucket = bucket(parent.from,
+					from -> {
+						char chr = from.charAt(from.length() - parentConditionLength - 1);
+						return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
+					});
+				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
+				if(notGroupList != null){
+					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
+					final String condition = (parent.condition.isEmpty()
+							|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
+						makeGroup(preCondition, parent.condition):
+						makeNotGroup(childrenGroup, parent.condition));
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+					rules.add(newEntry);
+				}
+				for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
+					final String condition = entry.getKey() + parent.condition;
+					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+					sortedList.add(newEntry);
+				}
 
-			//else if parent-group is a subset of children-group
-//			if(groupIntersection.equals(parentGroup)){
-//				boolean transfer = false;
-//				for(LineEntry rule : children){
-//					Iterator<String> itr = rule.addition.iterator();
-//					while(itr.hasNext()){
-//						String childAddition = itr.next();
-//
-//						int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
-//							(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
-//							.length();
-//						if(lcsLength > 0){
-//							LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
-//								rule.condition.substring(lcsLength), rule.from);
-//							//transfer originating words from children to parent
-//							if(parent.equals(newEntry))
-//								parent.from.addAll(rule.from);
-//							//remove corresponding addition from child
-//							itr.remove();
-//
-//							transfer = true;
-//						}
-//					}
-//				}
-//
-//				if(transfer){
-//					sortedList.add(0, parent);
-//
-//					continue;
-//				}
-//			}
-
-			//else
-			final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
-			final Map<String, List<String>> fromBucket = bucket(parent.from,
-				from -> {
-					char chr = from.charAt(from.length() - parentConditionLength - 1);
-					return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
-				});
-			final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
-			if(notGroupList != null){
-				final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-				final String condition = (parent.condition.isEmpty()
-						|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
-					makeGroup(preCondition, parent.condition):
-					makeNotGroup(childrenGroup, parent.condition));
-				final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
-				rules.add(newEntry);
+				sortedList.sort(shortestConditionComparator);
 			}
-			for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
-				final String condition = entry.getKey() + parent.condition;
-				final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
-				sortedList.add(newEntry);
-			}
-
-			sortedList.sort(shortestConditionComparator);
 
 			//remove parent from final list
 			rules.remove(parent);
