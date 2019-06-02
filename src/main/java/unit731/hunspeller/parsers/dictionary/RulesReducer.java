@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -294,123 +297,120 @@ for(final LineEntry entry : uniquePlainRules)
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
 
-		//another way: collect all (removal and addition) words
-//FIXME to be tested
-//		List<LineEntry> multipleAdditionRules = sortedList.stream()
-//			.filter(rule -> rule.addition.size() > 1)
-//			.collect(Collectors.toList());
 AffixEntry.Type type = AffixEntry.Type.PREFIX;
-//		for(LineEntry rule : multipleAdditionRules){
-//			Iterator<String> itr = rule.addition.iterator();
-//			while(itr.hasNext()){
-//				String childAddition = itr.next();
-//
-//				int lcsLength = longestCommonAffix(Arrays.asList(childAddition, rule.removal),
-//					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
-//					.length();
-//				if(lcsLength > 0){
-//					LineEntry newEntry = new LineEntry(rule.removal.substring(lcsLength), childAddition.substring(lcsLength),
-//						rule.condition.substring(lcsLength), rule.from);
-//					//merge rules with that already present
-//					sortedList.stream()
-//						.filter(originalRule -> originalRule.equals(newEntry))
-//						.forEach(originalRule -> originalRule.from.addAll(rule.from));
-//
-//					itr.remove();
-//				}
-//			}
-//		}
-		//TODO
 
 		//while current-list is not empty
 		while(!sortedList.isEmpty()){
 			//extract rule from current-list
-			final LineEntry parent = sortedList.remove(0);
-
+			final LineEntry parent = sortedList.get(0);
 			final List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
-			if(children.isEmpty()){
+			if(children.size() == 1){
 				if(!rules.contains(parent))
 					rules.add(parent);
 
 				continue;
 			}
 
-			redistributeAdditions(parent, children, type);
+			redistributeAdditions(children, type);
 
-			final int parentConditionLength = parent.condition.length();
+			//collect all the length of the children's conditions
+			List<Integer> conditionLengths = children.stream()
+				.map(child -> child.condition.length())
+				.sorted()
+				.collect(Collectors.toList());
+			//extract minimum and maximum of the conditions' length
+			final int minConditionLength = conditionLengths.get(0);
+			final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
+			for(int index = minConditionLength; index < maxConditionLength; index ++){
+				//extract the group of each child
+				final int indexFromLast = index;
+				List<Set<Character>> groups = children.stream()
+					.map(child -> extractGroup(child.from, indexFromLast))
+					.collect(Collectors.toList());
 
-			//find parent-group
-			final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
+				//calculate intersection between all groups
+				Set<Character> groupIntersection = new HashSet<>(groups.get(0));
+				for(int i = 1; i < groups.size(); i ++)
+					groupIntersection.retainAll(groups.get(i));
 
+				//if intersection is empty
+				if(groupIntersection.isEmpty()){
+					System.out.println("");
+				}
+
+groups.size();
+			}
 			final Set<String> childrenFrom = children.stream()
 				.flatMap(entry -> entry.from.stream())
 				.collect(Collectors.toSet());
 			//find children-group
-			final Set<Character> childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+//			final Set<Character> childrenGroup = extractGroup(childrenFrom, parentConditionLength);
+//
+//			//if intersection(parent-group, children-group) is empty
+//			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+//			if(groupIntersection.isEmpty()){
+//				//add new rule from parent with condition starting with NOT(children-group) to final-list
+//				//FIXME condition not always the best...
+//				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
+//					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
+//				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+//				rules.add(newEntry);
+//
+//				final List<LineEntry> sameConditionChildren = children.stream()
+//					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
+//					.collect(Collectors.toList());
+//				//for each children-same-condition
+//				for(final LineEntry child : sameConditionChildren){
+//					//add new rule from child with condition starting with (child-group) to final-list
+//					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
+//					final Set<String> sameConditionChildrenFrom = children.stream()
+//						.filter(c -> c != child)
+//						.filter(c -> c.condition.endsWith(child.condition))
+//						.flatMap(entry -> entry.from.stream())
+//						.collect(Collectors.toSet());
+//					final Set<Character> sameConditionChildrenGroup = extractGroup(sameConditionChildrenFrom, parentConditionLength);
+//					if(sameConditionChildrenGroup.isEmpty() && parentGroup.size() < childGroup.size() || parentGroup.equals(sameConditionChildrenGroup))
+//						condition = makeNotGroup(parentGroup, child.condition);
+//					else
+//						condition = makeGroup(childGroup, child.condition);
+//					newEntry = LineEntry.createFrom(child, condition, child.from);
+//					rules.add(newEntry);
+//				}
+//
+//				//remove same-condition-children from current-list
+//				sameConditionChildren.forEach(sortedList::remove);
+//				//remove same-condition-children from final-list
+//				sameConditionChildren.forEach(rules::remove);
+//			}
+//			else{
+//				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
+//				final Map<String, List<String>> fromBucket = bucket(parent.from,
+//					from -> {
+//						char chr = from.charAt(from.length() - parentConditionLength - 1);
+//						return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
+//					});
+//				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
+//				if(notGroupList != null){
+//					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
+//					final String condition = (parent.condition.isEmpty()
+//							|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
+//						makeGroup(preCondition, parent.condition):
+//						makeNotGroup(childrenGroup, parent.condition));
+//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+//					rules.add(newEntry);
+//				}
+//				for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
+//					final String condition = entry.getKey() + parent.condition;
+//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+//					sortedList.add(newEntry);
+//				}
+//
+//				sortedList.sort(shortestConditionComparator);
+//			}
 
-			//if intersection(parent-group, children-group) is empty
-			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-			if(groupIntersection.isEmpty()){
-				//add new rule from parent with condition starting with NOT(children-group) to final-list
-				//FIXME condition not always the best...
-				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
-					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
-				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-				rules.add(newEntry);
-
-				final List<LineEntry> sameConditionChildren = children.stream()
-					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
-					.collect(Collectors.toList());
-				//for each children-same-condition
-				for(final LineEntry child : sameConditionChildren){
-					//add new rule from child with condition starting with (child-group) to final-list
-					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-					final Set<String> sameConditionChildrenFrom = children.stream()
-						.filter(c -> c != child)
-						.filter(c -> c.condition.endsWith(child.condition))
-						.flatMap(entry -> entry.from.stream())
-						.collect(Collectors.toSet());
-					final Set<Character> sameConditionChildrenGroup = extractGroup(sameConditionChildrenFrom, parentConditionLength);
-					if(sameConditionChildrenGroup.isEmpty() && parentGroup.size() < childGroup.size() || parentGroup.equals(sameConditionChildrenGroup))
-						condition = makeNotGroup(parentGroup, child.condition);
-					else
-						condition = makeGroup(childGroup, child.condition);
-					newEntry = LineEntry.createFrom(child, condition, child.from);
-					rules.add(newEntry);
-				}
-
-				//remove same-condition-children from current-list
-				sameConditionChildren.forEach(sortedList::remove);
-				//remove same-condition-children from final-list
-				sameConditionChildren.forEach(rules::remove);
-			}
-			else{
-				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
-				final Map<String, List<String>> fromBucket = bucket(parent.from,
-					from -> {
-						char chr = from.charAt(from.length() - parentConditionLength - 1);
-						return (groupIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
-					});
-				final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
-				if(notGroupList != null){
-					final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
-					final String condition = (parent.condition.isEmpty()
-							|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
-						makeGroup(preCondition, parent.condition):
-						makeNotGroup(childrenGroup, parent.condition));
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
-					rules.add(newEntry);
-				}
-				for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
-					final String condition = entry.getKey() + parent.condition;
-					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
-					sortedList.add(newEntry);
-				}
-
-				sortedList.sort(shortestConditionComparator);
-			}
+			sortedList.remove(0);
 
 			//remove parent from final list
 			rules.remove(parent);
@@ -418,7 +418,9 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
-	private void redistributeAdditions(final LineEntry parent, final List<LineEntry> children, AffixEntry.Type type){
+	private void redistributeAdditions(final List<LineEntry> children, AffixEntry.Type type){
+		//TODO
+		LineEntry parent = children.remove(0);
 		//extract raw additions from parent
 		final Set<String> parentAdditions = parent.addition.stream()
 			.map(addition -> {
@@ -448,6 +450,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 					parent.from.addAll(child.from);
 				}
 			}
+		children.add(0, parent);
 	}
 
 	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
@@ -463,14 +466,22 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 		return group;
 	}
 
-	private String makeGroup(final Set<Character> group, final String suffix){
+	private String makeGroup(final Set<Character> group){
 		final String merge = mergeSet(group);
-		return (merge.length() > 1? GROUP_START + merge + GROUP_END: merge) + suffix;
+		return (merge.length() > 1? GROUP_START + merge + GROUP_END: merge);
+	}
+
+	private String makeGroup(final Set<Character> group, final String suffix){
+		return makeGroup(group) + suffix;
+	}
+
+	private String makeNotGroup(final Set<Character> group){
+		final String merge = mergeSet(group);
+		return NOT_GROUP_START + merge + GROUP_END;
 	}
 
 	private String makeNotGroup(final Set<Character> group, final String suffix){
-		final String merge = mergeSet(group);
-		return NOT_GROUP_START + merge + GROUP_END + suffix;
+		return makeNotGroup(group) + suffix;
 	}
 
 	private <V> String mergeSet(final Set<V> set){
