@@ -277,8 +277,10 @@ public class RulesReducer{
 	 * </pre>
 	 */
 	private List<LineEntry> removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
-		//sort processing-list by shortest condition
-		rules.sort(shortestConditionComparator);
+		//reshuffle originating list to place the correct productions in the correct rule
+//FIXME
+AffixEntry.Type type = AffixEntry.Type.SUFFIX;
+		redistributeAdditions(rules, type);
 
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
@@ -292,7 +294,7 @@ public class RulesReducer{
 		}
 
 		//subdivide rules by condition ending
-		final List<List<LineEntry>> forest = bucketRulesByConditionEnding(rules);
+		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
 		//for each bush in the forest
 		for(final List<LineEntry> bush : forest){
@@ -301,14 +303,17 @@ public class RulesReducer{
 				nonOverlappingRules.add(bush.get(0));
 			//otherwise process it to separate the rules
 			else{
+				//extract the group of each bush of the forest
+				final int indexFromLast = bush.get(0).condition.length();
+				final Map<LineEntry, Set<Character>> groups = bush.stream()
+					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
+
 				//TODO
 System.out.println(bush);
 			}
 		}
 
 
-//FIXME
-AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 		List<LineEntry> sortedRules = new ArrayList<>(rules);
 		//while processing-list is not empty
@@ -484,7 +489,7 @@ if("[^ò]o".equals(condition))
 		return nonOverlappingRules;
 	}
 
-	private List<List<LineEntry>> bucketRulesByConditionEnding(final List<LineEntry> sortedRules){
+	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
 		List<List<LineEntry>> forest = new ArrayList<>();
 		while(!sortedRules.isEmpty()){
 			//extract base condition
@@ -560,9 +565,12 @@ if("[^ò]o".equals(condition))
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
-	private void redistributeAdditions(final List<LineEntry> children, AffixEntry.Type type){
+	private void redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
+		//sort processing-list by shortest condition
+		rules.sort(shortestConditionComparator);
+
 		//cycle parent in all the children
-		for(final LineEntry parent : children){
+		for(final LineEntry parent : rules){
 			//extract raw additions from parent
 			final Set<String> parentAdditions = parent.addition.stream()
 				.map(addition -> {
@@ -571,7 +579,7 @@ if("[^ò]o".equals(condition))
 					return addition.substring(lcs.length());
 				})
 				.collect(Collectors.toSet());
-			for(final LineEntry child : children)
+			for(final LineEntry child : rules)
 				if(child != parent && child.removal.equals(parent.removal)){
 					//extract raw additions from child
 					int minimumLCSLength = Integer.MAX_VALUE;
