@@ -15,6 +15,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -285,15 +286,14 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 		//while current-list is not empty
 		while(!sortedList.isEmpty()){
 			//extract rule from current-list
-			final LineEntry parent = sortedList.get(0);
+			final String parentCondition = sortedList.get(0).condition;
 			final List<LineEntry> children = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parent.condition))
+				.filter(entry -> entry.condition.endsWith(parentCondition))
 				.collect(Collectors.toList());
-			if(children.size() == 1){
-				for(final LineEntry c : children)
-					if(!rules.contains(c))
-						rules.add(c);
-			}
+			if(children.size() == 1)
+				children.stream()
+					.filter(Predicate.not(rules::contains))
+					.forEach(rules::add);
 			else{
 				redistributeAdditions(children, type);
 
@@ -309,6 +309,8 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 					//calculate intersection between all groups
 					final Set<Character> groupsIntersection = SetHelper.intersection(groups.values());
 
+					//if there was no intersection on a previous run, then it means the conditions are already disjoint,
+					//so if there is no intersection again it can be skipped as already disjoint
 					if(wereNotIntersecting && groupsIntersection.isEmpty())
 						break;
 
@@ -323,29 +325,37 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 							final LineEntry child = itr.next();
 							final int childConditionLength = child.condition.length();
 							if(childConditionLength <= index){
+								//extract ratifing group
 								final Set<Character> childGroup = groups.get(child);
 
+								//extract negated group (excluding the current group)
 								final Set<Character> childNotGroup = new HashSet<>();
 								for(final Set<Character> group : groups.values())
 									if(group != childGroup)
 										childNotGroup.addAll(group);
 
+								//calculate new condition (if it was empty or the ratifing group is smaller than the negated one, choose the ratifing)
 								child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
 									makeGroup(childGroup): makeNotGroup(childNotGroup))
 									+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
 
 								//exclude from further processing
 								if(childConditionLength == index){
+									//remove from subsequent runs
 									itr.remove();
+									//remove from processing list
 									sortedList.remove(child);
 								}
 							}
 						}
 
+						//set condition is already disjoint (for further runs)
 						wereNotIntersecting = true;
 					}
 					//if the group intersects the negated group of all the other children
 					else{
+						//TODO keep only intersecting rules?
+
 						throw new IllegalArgumentException("and now?");
 					}
 				}
