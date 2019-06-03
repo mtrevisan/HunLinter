@@ -53,15 +53,15 @@ public class RulesReducerTest{
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
 			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
 			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
-			new LineEntry("e", "ʼ", "[dg]e", Arrays.asList("de", "ge")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
 			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
 			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
 			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
 			new LineEntry("me", "ʼ", "me", Arrays.asList("kome")),
 			new LineEntry("ra", "ʼ", "ra", Arrays.asList("sora")),
-			new LineEntry("te", "ʼ", "te", Arrays.asList("frate"))
+			new LineEntry("te", "ʼ", "te", Arrays.asList("frate")),
+			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
+			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
@@ -76,7 +76,7 @@ public class RulesReducerTest{
 			"SFX ʼ0 te ʼ te",
 			"SFX ʼ0 do ʼ do",
 			"SFX ʼ0 a ʼ [^rx]a",
-			"SFX ʼ0 e ʼ [dg]e",
+			"SFX ʼ0 e ʼ [^mtv]e",
 			"SFX ʼ0 o ʼ [^d]o",
 			"SFX ʼ0 ove óʼ ove"
 		);
@@ -115,8 +115,8 @@ public class RulesReducerTest{
 			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
 			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
-			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
-			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
+			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo")),
+			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra")
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
