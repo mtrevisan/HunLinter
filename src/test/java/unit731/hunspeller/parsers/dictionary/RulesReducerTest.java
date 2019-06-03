@@ -18,6 +18,19 @@ import unit731.hunspeller.services.SetHelper;
 
 public class RulesReducerTest{
 
+	/**
+	[rem= o,add=[ʼ],cond= o,from=[koarto, kuinto, kuarto, sèsto, tèrso, tuto, tèrŧo, so, sto]]	=> [s, t, ŧ]
+	[rem=do,add=[ʼ],cond=do,from=[nudo, komòdo, kuando]]														=> [d]
+
+	[rem=  e,add=[ ʼ],cond=  e,from=[de, ge]]				=> [d, g]
+	[rem= te,add=[ ʼ],cond= te,from=[frate]]				=> [t]
+	[rem= me,add=[ ʼ],cond= me,from=[kome]]				=> [m]
+	[rem=ove,add=[óʼ],cond=ove,from=[indove, adove]]	=> [v]
+
+	[rem= a,add=[ʼ],cond= a,from=[senŧa, na, la, sensa]]	=> [s, ŧ, l, n]
+	[rem=ra,add=[ʼ],cond=ra,from=[sora]]						=> [r]
+	[rem=xa,add=[ʼ],cond=xa,from=[kaxa]]						=> [x]
+	*/
 	@Test
 	public void case1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
@@ -85,6 +98,13 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	/**
+	[rem=  o,add=[  ato],cond=  o,from=[ƚibro, moƚo, roxiñoƚo, kaƚandro, rosiñoƚo, xeƚo, ruxiñoƚo, rusiñoƚo]]	=> [r, ƚ]
+	[rem=èƚo,add=[eƚato],cond=èƚo,from=[kapèƚo, vedèƚo, kanèƚo]]																=> [ƚ]
+
+	[rem=  0,add=[   ta],cond=  a,from=[kaƚandra]]			=> [r]
+	[rem=èƚa,add=[eƚata],cond=èƚa,from=[kapèƚa, vedèƚa]]	=> [ƚ]
+	*/
 	@Test
 	public void case2() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
@@ -134,6 +154,25 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	/**
+		[rem=  o,add=[  ato],cond=  o,from=[verdo, mando, viŧio, savio, speso, kalandro, vexo, konto, granfo, solfro, libro, đilio, ŧoko, porko,
+			ŧedro, bosko, manđo, soko, sorgo, visio, muso, borso, manxo, kuadro, sporko]]	=> [đ, r, s, d, t, f, g, x, i, k]
+		[rem=òbo,add=[obato],cond=òbo,from=[gòbo]]													=> [b]
+		[rem=òvo,add=[ovato],cond=òvo,from=[òvo]]														=> [v]
+		[rem=òko,add=[okato],cond=òko,from=[pòko, òko]]												=> [k]
+		[rem=òmo,add=[omato],cond=òmo,from=[òmo]]														=> [m]
+
+		[rem=  0,add=[   ta],cond=  a,from=[kalandra, kora, maca, savia, aria, inkuixitora, marenda, kuadra, inspetora, toxa, grada, merenda,
+			kara, fatora]]													=> [r, c, d, x, i]
+		[rem=òsa,add=[osata],cond=òsa,from=[kòsa]]				=> [s]
+		[rem=òka,add=[okata],cond=òka,from=[òka, pòka]]			=> [k]
+		[rem=òba,add=[obata],cond=òba,from=[gòba, ròba]]		=> [b]
+		[rem=èla,add=[elata],cond=èla,from=[kapèla, vedèla]]	=> [l]
+		[rem=òna,add=[onata],cond=òna,from=[dòna]]				=> [n]
+
+		[rem= 0,add=[  ato],cond= l,from=[rusiñol, ruxiñol, rosiñol, mol, đeneral, roxiñol, xel]]	=> [a, e, o]
+		[rem=èl,add=[elato],cond=èl,from=[vedèl, kanèl, kapèl]]												=> [è]
+	*/
 	@Test
 	public void case3() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
