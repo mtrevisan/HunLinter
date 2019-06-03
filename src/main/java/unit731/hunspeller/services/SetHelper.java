@@ -25,7 +25,7 @@ public class SetHelper{
 	}
 
 	public static <T> Set<T> sortedSetOf(Comparator<? super T> comparator, T... values){
-		Set<T> set = new TreeSet<>(comparator);
+		final Set<T> set = new TreeSet<>(comparator);
 		set.addAll(Arrays.asList(values));
 		return set;
 	}
@@ -80,7 +80,7 @@ public class SetHelper{
 	 * @return	The union of {@code set1} and {@code set2}
 	 */
 	public static <T> Set<T> union(Set<T> set1, Set<T> set2){
-		Set<T> union = new HashSet<>(set1);
+		final Set<T> union = new HashSet<>(set1);
 		union.addAll(set2);
 		return union;
 	}
@@ -97,8 +97,27 @@ public class SetHelper{
 	 * @return	The intersection of {@code set1} and {@code set2}
 	 */
 	public static <T> Set<T> intersection(Set<T> set1, Set<T> set2){
-		Set<T> intersection = new HashSet<>(set1);
+		final Set<T> intersection = new HashSet<>(set1);
 		intersection.retainAll(set2);
+		return intersection;
+	}
+
+	/**
+	 * Returns a set with the intersection between a list of sets (A ∩ B ∩ ...).
+	 * <p>
+	 * The returned set contains all elements that are contained in every set of {@code sets}.
+	 * The iteration order of the returned set is undefined.
+	 * 
+	 * @param <T>	The type of the values contained into the sets
+	 * @param sets	List of sets
+	 * @return	The intersection of {@code set1} and {@code set2}
+	 */
+	public static <T> Set<T> intersection(Set<T> ... sets){
+		final Set<T> intersection = new HashSet<>(sets[0]);
+		for(int i = 1; i < sets.length; i ++){
+			final Set<T> group = sets[i];
+			intersection.retainAll(group);
+		}
 		return intersection;
 	}
 
@@ -106,7 +125,6 @@ public class SetHelper{
 	 * Returns a set with the intersection between two sets (A ∩ B).
 	 * <p>
 	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
-	 * The iteration order of the returned set is undefined.
 	 * 
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
@@ -140,7 +158,7 @@ public class SetHelper{
 	 * @return	The difference of {@code set1} and {@code set2}
 	 */
 	public static <T> Set<T> difference(Set<T> set1, Set<T> set2){
-		Set<T> intersection = new HashSet<>(set1);
+		final Set<T> intersection = new HashSet<>(set1);
 		intersection.removeAll(set2);
 		return intersection;
 	}
@@ -182,10 +200,10 @@ public class SetHelper{
 	 * @return	The symmetric difference between {@code set1} and {@code set2}
 	 */
 	public static <T> Set<T> symmetricDifference(Set<T> set1, Set<T> set2){
-		Set<T> union = new HashSet<>(set1);
+		final Set<T> union = new HashSet<>(set1);
 		union.addAll(set2);
 
-		Set<T> intersection = new HashSet<>(set1);
+		final Set<T> intersection = new HashSet<>(set1);
 		intersection.retainAll(set2);
 
 		union.removeAll(intersection);
