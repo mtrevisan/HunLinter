@@ -276,7 +276,9 @@ public class RulesReducer{
 	 * }
 	 * </pre>
 	 */
-	private void removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
+	private List<LineEntry> removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
+		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
+
 		//sort processing-list by shortest condition
 		final List<LineEntry> sortedRules = new ArrayList<>(rules);
 		sortedRules.sort(shortestConditionComparator);
@@ -291,8 +293,26 @@ public class RulesReducer{
 					itr.remove();
 			for(final LineEntry rule : finalRules)
 				if(!rules.contains(rule))
-					rules.add(rule);
+					nonOverlappingRules.add(rule);
 		}
+
+		final List<List<LineEntry>> forest = bucketRulesByConditionEnding(sortedRules);
+
+		final Iterator<List<LineEntry>> itr = forest.iterator();
+		while(itr.hasNext()){
+			final  List<LineEntry> bush = itr.next();
+			if(bush.size() == 1){
+				nonOverlappingRules.add(bush.get(0));
+
+				itr.remove();
+			}
+		}
+
+		for(final List<LineEntry> bush : forest){
+			//TODO
+System.out.println(bush);
+		}
+
 
 //FIXME
 AffixEntry.Type type = AffixEntry.Type.SUFFIX;
@@ -340,9 +360,9 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						//'Aèr': that is 'Aèr' or '[^Bi]èr'
 						//'Bèr': that is 'Bèr' or '[^Ai]èr'
 						//'ièr': that is 'ièr' or '[^AB]èr'
-						final Iterator<LineEntry> itr = children.iterator();
-						while(itr.hasNext()){
-							final LineEntry child = itr.next();
+						final Iterator<LineEntry> itr2 = children.iterator();
+						while(itr2.hasNext()){
+							final LineEntry child = itr2.next();
 
 							//process only smaller conditions
 							final int childConditionLength = child.condition.length();
@@ -366,7 +386,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 								//exclude from further processing
 								if(childConditionLength == index){
 									//remove from subsequent runs
-									itr.remove();
+									itr2.remove();
 									//remove from final-list
 									rules.remove(child);
 									//remove from processing-list
@@ -466,6 +486,30 @@ if("[^ò]o".equals(condition))
 			//remove parent from final list
 //			rules.remove(parent);
 		}
+
+		return nonOverlappingRules;
+	}
+
+	private List<List<LineEntry>> bucketRulesByConditionEnding(final List<LineEntry> sortedRules){
+		List<List<LineEntry>> forest = new ArrayList<>();
+		while(!sortedRules.isEmpty()){
+			//extract base condition
+			final String parentCondition = sortedRules.get(0).condition;
+			
+			//extract similar (same ending condition) rules from processing-list
+			final List<LineEntry> children = new ArrayList<>();
+			final Iterator<LineEntry> itr = sortedRules.iterator();
+			while(itr.hasNext()){
+				final LineEntry rule = itr.next();
+
+				if(rule.condition.endsWith(parentCondition)){
+					children.add(rule);
+					itr.remove();
+				}
+			}
+			forest.add(children);
+		}
+		return forest;
 	}
 
 	private List<LineEntry> expandEmptyCondition(final List<LineEntry> sortedRules){
