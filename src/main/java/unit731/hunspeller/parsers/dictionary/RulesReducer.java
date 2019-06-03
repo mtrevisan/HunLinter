@@ -285,12 +285,14 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 
 		//while current-list is not empty
 		while(!sortedList.isEmpty()){
-			//extract rule from current-list
+			//extract similar (same ending condition) rules from current-list
 			final String parentCondition = sortedList.get(0).condition;
 			final List<LineEntry> children = sortedList.stream()
 				.filter(entry -> entry.condition.endsWith(parentCondition))
 				.collect(Collectors.toList());
+
 			if(children.size() == 1)
+				//if there is only one rule that ends with the current condition, then accept it (and add to final-list if it's not already there)
 				children.stream()
 					.filter(Predicate.not(rules::contains))
 					.forEach(rules::add);
@@ -323,6 +325,8 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 						Iterator<LineEntry> itr = children.iterator();
 						while(itr.hasNext()){
 							final LineEntry child = itr.next();
+
+							//process only smaller conditions
 							final int childConditionLength = child.condition.length();
 							if(childConditionLength <= index){
 								//extract ratifing group
