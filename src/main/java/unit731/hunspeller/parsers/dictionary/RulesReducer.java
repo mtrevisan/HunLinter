@@ -281,6 +281,19 @@ public class RulesReducer{
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
 
+		final LineEntry emptyConditionParent = sortedList.get(0);
+		if(emptyConditionParent.condition.isEmpty()){
+			List<LineEntry> okRules = expandEmptyCondition(sortedList);
+
+			Iterator<LineEntry> itr = rules.iterator();
+			while(itr.hasNext())
+				if(itr.next().condition.isEmpty())
+					itr.remove();
+			for(final LineEntry rule : okRules)
+				if(!rules.contains(rule))
+					rules.add(rule);
+		}
+
 //FIXME
 AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
@@ -288,11 +301,6 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		while(!sortedList.isEmpty()){
 			//extract base condition
 			final LineEntry parent = sortedList.get(0);
-			if(expandEmptyCondition(parent, sortedList)){
-				rules.remove(parent);
-
-				continue;
-			}
 
 			//extract similar (same ending condition) rules from processing-list
 			final List<LineEntry> children = sortedList.stream()
@@ -389,8 +397,9 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 							final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
 							final String condition = (parent.condition.isEmpty()
 									|| !groupsIntersection.containsAll(preCondition) && preCondition.size() < groupsIntersection.size()?
-								makeGroup(preCondition, parent.condition):
-								makeNotGroup(groupsIntersection, parent.condition));
+								makeGroup(preCondition): makeNotGroup(groupsIntersection)) + parent.condition;
+if("[^ò]o".equals(condition))
+	System.out.println("");
 							final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
 							rules.add(newEntry);
 						}
@@ -458,25 +467,45 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		}
 	}
 
-	private boolean expandEmptyCondition(final LineEntry parent, final List<LineEntry> sortedList){
-		boolean expanded = false;
-		if(parent.condition.isEmpty()){
-			sortedList.remove(0);
+	private List<LineEntry> expandEmptyCondition(final List<LineEntry> sortedRules){
+		//collect empty conditions
+		final List<LineEntry> parents = new ArrayList<>();
+		final Iterator<LineEntry> itr = sortedRules.iterator();
+		while(itr.hasNext()){
+			final LineEntry parent = itr.next();
+			if(parent.condition.isEmpty()){
+				parents.add(parent);
+				itr.remove();
+			}
+		}
 
+		final Set<String> otherFrom = sortedRules.stream()
+			.flatMap(rule -> rule.from.stream())
+			.collect(Collectors.toSet());
+		final Set<Character> otherGroup = extractGroup(otherFrom, 0);
+
+		//for each rule with empty condition
+		final List<LineEntry> finalRules = new ArrayList<>();
+		for(final LineEntry parent : parents){
 			//expand empty condition
 			final Set<Character> parentGroup = extractGroup(parent.from, 0);
-			for(final Character chr : parentGroup){
+			final Set<Character> intersection = SetHelper.intersection(parentGroup, otherGroup);
+			parentGroup.removeAll(intersection);
+			if(!parentGroup.isEmpty()){
+				final String condition = makeGroup(parentGroup);
+				final List<String> from = parent.extractFromEndingWith(condition);
+				final LineEntry newRule = LineEntry.createFrom(parent, condition, from);
+				finalRules.add(newRule);
+			}
+			for(final Character chr : intersection){
 				final String condition = String.valueOf(chr);
 				final List<String> from = parent.extractFromEndingWith(condition);
-				final LineEntry newEntry = LineEntry.createFrom(parent, condition, from);
-				sortedList.add(newEntry);
+				final LineEntry newRule = LineEntry.createFrom(parent, condition, from);
+				sortedRules.add(newRule);
 			}
-
-			sortedList.sort(shortestConditionComparator);
-
-			expanded = true;
 		}
-		return expanded;
+		sortedRules.sort(shortestConditionComparator);
+		return finalRules;
 	}
 
 	private int[] extractMinAndMax(final List<LineEntry> children){
