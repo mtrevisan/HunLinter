@@ -281,7 +281,8 @@ public class RulesReducer{
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
 
-AffixEntry.Type type = AffixEntry.Type.PREFIX;
+//FIXME
+AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 		//while current-list is not empty
 		while(!sortedList.isEmpty()){
@@ -297,6 +298,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 					.filter(Predicate.not(rules::contains))
 					.forEach(rules::add);
 			else{
+				//reshuffle originating list to place the correct productions in the correct rule
 				redistributeAdditions(children, type);
 
 				boolean wereNotIntersecting = false;
@@ -463,7 +465,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			final Set<String> parentAdditions = parent.addition.stream()
 				.map(addition -> {
 					final String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
-						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+						(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix));
 					return addition.substring(lcs.length());
 				})
 				.collect(Collectors.toSet());
@@ -474,7 +476,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 					final Set<String> childAdditions = new HashSet<>();
 					for(final String addition : child.addition){
 						final int lcsLength = longestCommonAffix(Arrays.asList(addition, child.removal),
-							(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+							(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
 							.length();
 						if(lcsLength < minimumLCSLength)
 							minimumLCSLength = lcsLength;
