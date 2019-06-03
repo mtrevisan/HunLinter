@@ -277,46 +277,40 @@ public class RulesReducer{
 	 * </pre>
 	 */
 	private List<LineEntry> removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
+		//sort processing-list by shortest condition
+		rules.sort(shortestConditionComparator);
+
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
-		//sort processing-list by shortest condition
-		final List<LineEntry> sortedRules = new ArrayList<>(rules);
-		sortedRules.sort(shortestConditionComparator);
-
-		final LineEntry emptyConditionParent = sortedRules.get(0);
+		//expand empty conditions (if any)
+		final LineEntry emptyConditionParent = rules.get(0);
 		if(emptyConditionParent.condition.isEmpty()){
-			List<LineEntry> finalRules = expandEmptyCondition(sortedRules);
+			List<LineEntry> finalRules = expandEmptyCondition(rules);
 
-			Iterator<LineEntry> itr = rules.iterator();
-			while(itr.hasNext())
-				if(itr.next().condition.isEmpty())
-					itr.remove();
-			for(final LineEntry rule : finalRules)
-				if(!rules.contains(rule))
-					nonOverlappingRules.add(rule);
+			//store surely disjoint rules
+			finalRules.forEach(nonOverlappingRules::add);
 		}
 
-		final List<List<LineEntry>> forest = bucketRulesByConditionEnding(sortedRules);
+		//subdivide rules by condition ending
+		final List<List<LineEntry>> forest = bucketRulesByConditionEnding(rules);
 
-		final Iterator<List<LineEntry>> itr = forest.iterator();
-		while(itr.hasNext()){
-			final  List<LineEntry> bush = itr.next();
-			if(bush.size() == 1){
-				nonOverlappingRules.add(bush.get(0));
-
-				itr.remove();
-			}
-		}
-
+		//for each bush in the forest
 		for(final List<LineEntry> bush : forest){
-			//TODO
+			//if there is only one rule, then it goes in the final set
+			if(bush.size() == 1)
+				nonOverlappingRules.add(bush.get(0));
+			//otherwise process it to separate the rules
+			else{
+				//TODO
 System.out.println(bush);
+			}
 		}
 
 
 //FIXME
 AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
+		List<LineEntry> sortedRules = new ArrayList<>(rules);
 		//while processing-list is not empty
 		while(!sortedRules.isEmpty()){
 			//extract base condition
