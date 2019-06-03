@@ -17,6 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -28,6 +29,7 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class RulesReducer{
@@ -289,62 +291,54 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 			if(children.size() == 1){
-				sortedList.remove(0);
-				if(!rules.contains(parent))
-					rules.add(parent);
-
-				continue;
+				for(final LineEntry c : children)
+					if(!rules.contains(c))
+						rules.add(c);
 			}
+			else{
+				redistributeAdditions(children, type);
 
-			redistributeAdditions(children, type);
+				//extract minimum and maximum of the conditions' length
+				boolean wereNotIntersecting = false;
+				int[] minAndMaxConditionLength = extractMinAndMax(children);
+				for(int index = minAndMaxConditionLength[0]; index < minAndMaxConditionLength[1]; index ++){
+					//extract the group of each child
+					final int indexFromLast = index;
+					final List<Set<Character>> groups = children.stream()
+						.map(child -> extractGroup(child.from, indexFromLast))
+						.collect(Collectors.toList());
 
-			//collect all the length of the children's conditions
-			final List<Integer> conditionLengths = children.stream()
-				.map(child -> child.condition.length())
-				.sorted()
-				.collect(Collectors.toList());
-			//extract minimum and maximum of the conditions' length
-			final int minConditionLength = conditionLengths.get(0);
-			final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
-			boolean wereNotIntersecting = false;
-			for(int index = minConditionLength; index < maxConditionLength; index ++){
-				//extract the group of each child
-				final int indexFromLast = index;
-				final List<Set<Character>> groups = children.stream()
-					.map(child -> extractGroup(child.from, indexFromLast))
-					.collect(Collectors.toList());
+					//calculate intersection between all groups
+					final Set<Character> groupsIntersection = SetHelper.intersection(groups);
 
-				//calculate intersection between all groups
-				final Set<Character> groupsIntersection = new HashSet<>(groups.get(0));
-				final Set<Character> groupsUnion = new HashSet<>(groups.get(0));
-				for(int i = 1; i < groups.size(); i ++){
-					final Set<Character> group = groups.get(i);
-					groupsIntersection.retainAll(group);
-					groupsUnion.addAll(group);
-				}
+					//if intersection is empty
+					if(wereNotIntersecting || groupsIntersection.isEmpty()){
+						//for each group, either is the group itself or the negated group of all the others children
+						//'Aèr': that is 'Aèr' or '[^Bi]èr'
+						//'Bèr': that is 'Bèr' or '[^Ai]èr'
+						//'ièr': that is 'ièr' or '[^AB]èr'
+						for(int i = 0; i < children.size(); i ++){
+							final LineEntry child = children.get(i);
+							final int childConditionLength = child.condition.length();
+							if(childConditionLength <= index){
+								final Set<Character> childGroup = groups.get(i);
 
-				//if intersection is empty
-				if(wereNotIntersecting || groupsIntersection.isEmpty()){
-					//for each group, either is the group itself or the negated group of all the others children
-					//'Aèr': that is 'Aèr' or '[^Bi]èr'
-					//'Bèr': that is 'Bèr' or '[^Ai]èr'
-					//'ièr': that is 'ièr' or '[^AB]èr'
-					for(int i = 0; i < children.size(); i ++){
-						final Set<Character> childGroup = groups.get(i);
-						final Set<Character> childNotGroup = new HashSet<>(groupsUnion);
-						childNotGroup.removeAll(childGroup);
-						final LineEntry child = children.get(i);
-						final int childConditionLength = child.condition.length();
-						child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
-							makeGroup(childGroup): makeNotGroup(childNotGroup))
-							+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
+								final List<Set<Character>> childNotGroupList = new ArrayList<>(groups);
+								childNotGroupList.remove(childGroup);
+								final Set<Character> childNotGroup = SetHelper.union(childNotGroupList);
+
+								child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
+									makeGroup(childGroup): makeNotGroup(childNotGroup))
+									+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
+							}
+						}
+
+						wereNotIntersecting = true;
 					}
-
-					wereNotIntersecting = true;
-				}
-				//if the group intersects the negated group of all the other children
-				else{
-					throw new IllegalArgumentException("and now?");
+					//if the group intersects the negated group of all the other children
+					else{
+						throw new IllegalArgumentException("and now?");
+					}
 				}
 			}
 
@@ -426,40 +420,52 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 		}
 	}
 
+	private int[] extractMinAndMax(final List<LineEntry> children){
+		//collect all the length of the children's conditions
+		final List<Integer> conditionLengths = children.stream()
+			.map(child -> child.condition.length())
+			.sorted()
+			.collect(Collectors.toList());
+		//extract minimum and maximum of the conditions' length
+		final int minConditionLength = conditionLengths.get(0);
+		final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
+		return new int[]{minConditionLength, maxConditionLength};
+	}
+
 	/** Reshuffle originating list to place the correct productions in the correct rule */
 	private void redistributeAdditions(final List<LineEntry> children, AffixEntry.Type type){
-		//TODO
-		LineEntry parent = children.remove(0);
-		//extract raw additions from parent
-		final Set<String> parentAdditions = parent.addition.stream()
-			.map(addition -> {
-				final String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
-					(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
-				return addition.substring(lcs.length());
-			})
-			.collect(Collectors.toSet());
-		for(final LineEntry child : children)
-			if(child.removal.equals(parent.removal)){
-				//extract raw additions from child
-				int minimumLCSLength = Integer.MAX_VALUE;
-				final Set<String> childAdditions = new HashSet<>();
-				for(final String addition : child.addition){
-					final int lcsLength = longestCommonAffix(Arrays.asList(addition, child.removal),
-						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
-						.length();
-					if(lcsLength < minimumLCSLength)
-						minimumLCSLength = lcsLength;
-					childAdditions.add(addition.substring(lcsLength));
+		//cycle parent in all the children
+		for(final LineEntry parent : children){
+			//extract raw additions from parent
+			final Set<String> parentAdditions = parent.addition.stream()
+				.map(addition -> {
+					final String lcs = longestCommonAffix(Arrays.asList(addition, parent.removal),
+						(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+					return addition.substring(lcs.length());
+				})
+				.collect(Collectors.toSet());
+			for(final LineEntry child : children)
+				if(child != parent && child.removal.equals(parent.removal)){
+					//extract raw additions from child
+					int minimumLCSLength = Integer.MAX_VALUE;
+					final Set<String> childAdditions = new HashSet<>();
+					for(final String addition : child.addition){
+						final int lcsLength = longestCommonAffix(Arrays.asList(addition, child.removal),
+							(type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix))
+							.length();
+						if(lcsLength < minimumLCSLength)
+							minimumLCSLength = lcsLength;
+						childAdditions.add(addition.substring(lcsLength));
+					}
+
+					//extract from each child all the additions present in parent
+					if(child.condition.substring(minimumLCSLength).equals(parent.condition) && childAdditions.containsAll(parentAdditions)){
+						//extract all the common from
+						child.addition.removeAll(parent.addition);
+						parent.from.addAll(child.from);
+					}
 				}
-				
-				//extract from each child all the additions present in parent
-				if(child.condition.substring(minimumLCSLength).equals(parent.condition) && childAdditions.containsAll(parentAdditions)){
-					//extract all the common from
-					child.addition.removeAll(parent.addition);
-					parent.from.addAll(child.from);
-				}
-			}
-		children.add(0, parent);
+		}
 	}
 
 	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
