@@ -17,7 +17,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -298,38 +297,48 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			else{
 				redistributeAdditions(children, type);
 
-				//extract minimum and maximum of the conditions' length
 				boolean wereNotIntersecting = false;
+				//extract minimum and maximum of the conditions' length
 				int[] minAndMaxConditionLength = extractMinAndMax(children);
 				for(int index = minAndMaxConditionLength[0]; index < minAndMaxConditionLength[1]; index ++){
 					//extract the group of each child
 					final int indexFromLast = index;
-					final List<Set<Character>> groups = children.stream()
-						.map(child -> extractGroup(child.from, indexFromLast))
-						.collect(Collectors.toList());
+					final Map<LineEntry, Set<Character>> groups = children.stream()
+						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
 
 					//calculate intersection between all groups
-					final Set<Character> groupsIntersection = SetHelper.intersection(groups);
+					final Set<Character> groupsIntersection = SetHelper.intersection(groups.values());
+
+					if(wereNotIntersecting && groupsIntersection.isEmpty())
+						break;
 
 					//if intersection is empty
-					if(wereNotIntersecting || groupsIntersection.isEmpty()){
+					if(groupsIntersection.isEmpty()){
 						//for each group, either is the group itself or the negated group of all the others children
 						//'Aèr': that is 'Aèr' or '[^Bi]èr'
 						//'Bèr': that is 'Bèr' or '[^Ai]èr'
 						//'ièr': that is 'ièr' or '[^AB]èr'
-						for(int i = 0; i < children.size(); i ++){
-							final LineEntry child = children.get(i);
+						Iterator<LineEntry> itr = children.iterator();
+						while(itr.hasNext()){
+							final LineEntry child = itr.next();
 							final int childConditionLength = child.condition.length();
 							if(childConditionLength <= index){
-								final Set<Character> childGroup = groups.get(i);
+								final Set<Character> childGroup = groups.get(child);
 
-								final List<Set<Character>> childNotGroupList = new ArrayList<>(groups);
-								childNotGroupList.remove(childGroup);
-								final Set<Character> childNotGroup = SetHelper.union(childNotGroupList);
+								final Set<Character> childNotGroup = new HashSet<>();
+								for(final Set<Character> group : groups.values())
+									if(group != childGroup)
+										childNotGroup.addAll(group);
 
 								child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
 									makeGroup(childGroup): makeNotGroup(childNotGroup))
 									+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
+
+								//exclude from further processing
+								if(childConditionLength == index){
+									itr.remove();
+									sortedList.remove(child);
+								}
 							}
 						}
 

@@ -1,10 +1,11 @@
 package unit731.hunspeller.services;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -96,7 +97,7 @@ public class SetHelper{
 	 * @param sets	List of sets
 	 * @return	The union of {@code sets}
 	 */
-	public static <T> Set<T> union(final List<Set<T>> sets){
+	public static <T> Set<T> union(final Collection<Set<T>> sets){
 		final Set<T> union = new HashSet<>();
 		sets.forEach(union::addAll);
 		return union;
@@ -129,10 +130,11 @@ public class SetHelper{
 	 * @param sets	List of sets
 	 * @return	The intersection of {@code sets}
 	 */
-	public static <T> Set<T> intersection(final List<Set<T>> sets){
-		final Set<T> intersection = new HashSet<>(sets.get(0));
-		for(int i = 1; i < sets.size(); i ++)
-			intersection.retainAll(sets.get(i));
+	public static <T> Set<T> intersection(final Collection<Set<T>> sets){
+		final Iterator<Set<T>> itr = sets.iterator();
+		final Set<T> intersection = new HashSet<>(itr.next());
+		while(itr.hasNext())
+			intersection.retainAll(itr.next());
 		return intersection;
 	}
 
