@@ -308,6 +308,7 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
 			if(maxConditionLength > minConditionLength + 1)
 				throw new IllegalArgumentException("case not handled yet");
+			boolean wereNotIntersecting = false;
 			for(int index = minConditionLength; index < maxConditionLength; index ++){
 				//extract the group of each child
 				final int indexFromLast = index;
@@ -325,12 +326,11 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 				}
 
 				//if intersection is empty
-				if(groupsIntersection.isEmpty()){
+				if(wereNotIntersecting || groupsIntersection.isEmpty()){
 					//for each group, either is the group itself or the negated group of all the others children
 					//'Aèr': that is 'Aèr' or '[^Bi]èr'
 					//'Bèr': that is 'Bèr' or '[^Ai]èr'
 					//'ièr': that is 'ièr' or '[^AB]èr'
-//					final List<LineEntry> rulesParkingLot = new ArrayList<>();
 					for(int i = 0; i < children.size(); i ++){
 						final Set<Character> childGroup = groups.get(i);
 						final Set<Character> childNotGroup = new HashSet<>(groupsUnion);
@@ -340,20 +340,19 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 						child.condition = (childConditionLength == 0 || childGroup.size() < childNotGroup.size()?
 							makeGroup(childGroup): makeNotGroup(childNotGroup))
 							+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
-//						final LineEntry newEntry = LineEntry.createFrom(child, condition, child.from);
-						//TODO park this entry temporarily somewhere... it is not the end until the condition reaches maxConditionLength...
-//						rulesParkingLot.add(newEntry);
 					}
 
-					//continue adding next char to group until maxConditionLength
-
-					children.forEach(sortedList::remove);
+					wereNotIntersecting = true;
 				}
 				//if the group intersects the negated group of all the other children
 				else{
 					throw new IllegalArgumentException("and now?");
 				}
 			}
+
+			children.forEach(sortedList::remove);
+
+
 //			final Set<String> childrenFrom = children.stream()
 //				.flatMap(entry -> entry.from.stream())
 //				.collect(Collectors.toSet());
