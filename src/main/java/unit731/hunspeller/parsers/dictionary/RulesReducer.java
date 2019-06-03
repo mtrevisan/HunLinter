@@ -306,8 +306,6 @@ AffixEntry.Type type = AffixEntry.Type.PREFIX;
 			//extract minimum and maximum of the conditions' length
 			final int minConditionLength = conditionLengths.get(0);
 			final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
-			if(maxConditionLength > minConditionLength + 1)
-				throw new IllegalArgumentException("case not handled yet");
 			boolean wereNotIntersecting = false;
 			for(int index = minConditionLength; index < maxConditionLength; index ++){
 				//extract the group of each child

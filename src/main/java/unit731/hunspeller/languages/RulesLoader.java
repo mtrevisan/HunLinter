@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class RulesLoader{
@@ -101,7 +102,7 @@ public class RulesLoader{
 
 	public final Set<String> readPropertyAsSet(final String key, final char separator){
 		final String line = readProperty(key);
-		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
+		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.<String>emptySet());
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){

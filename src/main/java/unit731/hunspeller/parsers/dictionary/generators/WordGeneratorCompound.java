@@ -24,6 +24,7 @@ import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.DictionaryInclusionTestWorker;
 import unit731.hunspeller.services.ExceptionHelper;
+import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
 
 
@@ -34,12 +35,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private static final Map<StringHelper.Casing, Set<StringHelper.Casing>> COMPOUND_WORD_BOUNDARY_COLLISIONS
 		= new EnumMap<>(StringHelper.Casing.class);
 	static{
-		Set<StringHelper.Casing> lowerOrTitleCase = new HashSet<>(Arrays.asList(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
-			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE));
+		Set<StringHelper.Casing> lowerOrTitleCase = SetHelper.setOf(StringHelper.Casing.TITLE_CASE, StringHelper.Casing.ALL_CAPS,
+			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.LOWER_CASE, lowerOrTitleCase);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.TITLE_CASE, lowerOrTitleCase);
-		Set<StringHelper.Casing> allCaps = new HashSet<>(Arrays.asList(StringHelper.Casing.LOWER_CASE, StringHelper.Casing.TITLE_CASE,
-			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE));
+		Set<StringHelper.Casing> allCaps = SetHelper.setOf(StringHelper.Casing.LOWER_CASE, StringHelper.Casing.TITLE_CASE,
+			StringHelper.Casing.CAMEL_CASE, StringHelper.Casing.PASCAL_CASE);
 		COMPOUND_WORD_BOUNDARY_COLLISIONS.put(StringHelper.Casing.ALL_CAPS, allCaps);
 	}
 
@@ -261,7 +262,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final List<String[]> prefixes = compoundEntries.get(0).extractAllAffixes(affixData, false);
 		final List<String[]> suffixes = compoundEntries.get(compoundEntries.size() - 1).extractAllAffixes(affixData, false);
 
-		final Set<String> terminals = new HashSet<>(Arrays.asList(prefixes.get(2)));
+		final Set<String> terminals = SetHelper.setOf(prefixes.get(2));
 		terminals.addAll(Arrays.asList(suffixes.get(2)));
 		terminals.remove(compoundFlag);
 

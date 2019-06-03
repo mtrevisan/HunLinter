@@ -4,9 +4,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import unit731.hunspeller.services.SetHelper;
 
 
 class CharsetParsingStrategy implements FlagParsingStrategy{
@@ -62,7 +62,7 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
-		final Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
+		final Set<String> unduplicatedFlags = SetHelper.setOf(flags);
 		if(unduplicatedFlags.size() < originalFlags.length())
 			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}

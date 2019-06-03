@@ -15,6 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class LineEntry implements Serializable{
@@ -36,11 +37,11 @@ public class LineEntry implements Serializable{
 	}
 
 	LineEntry(final String removal, final String addition, final String condition, final String word){
-		this(removal, new HashSet<>(Arrays.asList(addition)), condition, word);
+		this(removal, SetHelper.setOf(addition), condition, word);
 	}
 
 	LineEntry(final String removal, final String addition, final String condition, final Collection<String> words){
-		this(removal, new HashSet<>(Arrays.asList(addition)), condition, words);
+		this(removal, SetHelper.setOf(addition), condition, words);
 	}
 
 	LineEntry(final String removal, final Set<String> addition, final String condition, final String word){
