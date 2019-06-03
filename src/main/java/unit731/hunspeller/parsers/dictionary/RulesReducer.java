@@ -233,9 +233,9 @@ public class RulesReducer{
 	}
 
 	/**<pre>
-	 * sort current-list by shortest condition
-	 * while current-list is not empty{
-	 * 	extract rule from current-list
+	 * sort processing-list by shortest condition
+	 * while processing-list is not empty{
+	 * 	extract rule from processing-list
 	 * 	find parent-group
 	 * 	find children-group
 	 * 	if intersection(parent-group, children-group) is empty{
@@ -246,13 +246,13 @@ public class RulesReducer{
 	 * 			for each children-group-2
 	 * 				add new rule from parent with condition starting with NOT(children-group-1) to final-list
 	 *
-	 * 			remove bubbles from current-list
+	 * 			remove bubbles from processing-list
 	 * 		}
 	 *
 	 * 		for each children-same-condition
 	 * 			add new rule from child with condition starting with (child-group) to final-list
 	 *
-	 * 		remove same-condition-children from current-list
+	 * 		remove same-condition-children from processing-list
 	 * 		remove same-condition-children from final-list
 	 * 	}
 	 * 	else if parent.condition is empty{
@@ -277,19 +277,23 @@ public class RulesReducer{
 	 * </pre>
 	 */
 	private void removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
-		//sort current-list by shortest condition
+		//sort processing-list by shortest condition
 		final List<LineEntry> sortedList = new ArrayList<>(rules);
 		sortedList.sort(shortestConditionComparator);
 
 //FIXME
 AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
-		//while current-list is not empty
+		//while processing-list is not empty
 		while(!sortedList.isEmpty()){
-			//extract similar (same ending condition) rules from current-list
-			final String parentCondition = sortedList.get(0).condition;
+			//extract base condition
+			final LineEntry parent = sortedList.get(0);
+			if(expandEmptyCondition(parent, sortedList))
+				continue;
+
+			//extract similar (same ending condition) rules from processing-list
 			final List<LineEntry> children = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parentCondition))
+				.filter(entry -> entry.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 
 			if(children.size() == 1)
@@ -349,7 +353,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 								if(childConditionLength == index){
 									//remove from subsequent runs
 									itr.remove();
-									//remove from processing list
+									//remove from processing-list
 									sortedList.remove(child);
 								}
 							}
@@ -360,6 +364,30 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					}
 					//if the group intersects the negated group of all the other children
 					else{
+//						final String notGroupIntersection = makeNotGroup(groupsIntersection, StringUtils.EMPTY);
+//						final Map<String, List<String>> fromBucket = bucket(parent.from,
+//							from -> {
+//								char chr = from.charAt(from.length() - parentConditionLength - 1);
+//								return (groupsIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
+//							});
+//						final List<String> notGroupList = fromBucket.remove(notGroupIntersection);
+//						if(notGroupList != null){
+//							final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
+//							final String condition = (parent.condition.isEmpty()
+//									|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
+//								makeGroup(preCondition, parent.condition):
+//								makeNotGroup(childrenGroup, parent.condition));
+//							final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+//							rules.add(newEntry);
+//						}
+//						for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
+//							final String condition = entry.getKey() + parent.condition;
+//							final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+//							sortedList.add(newEntry);
+//						}
+//
+//						sortedList.sort(shortestConditionComparator);
+
 						//TODO keep only intersecting rules?
 
 						throw new IllegalArgumentException("and now?");
@@ -379,38 +407,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 //			//if intersection(parent-group, children-group) is empty
 //			final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 //			if(groupIntersection.isEmpty()){
-//				//add new rule from parent with condition starting with NOT(children-group) to final-list
-//				//FIXME condition not always the best...
-//				String condition = (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size()?
-//					makeGroup(parentGroup, parent.condition): makeNotGroup(childrenGroup, parent.condition));
-//				LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-//				rules.add(newEntry);
-//
-//				final List<LineEntry> sameConditionChildren = children.stream()
-//					.filter(entry -> !entry.condition.isEmpty() && entry.condition.equals(parent.condition))
-//					.collect(Collectors.toList());
-//				//for each children-same-condition
-//				for(final LineEntry child : sameConditionChildren){
-//					//add new rule from child with condition starting with (child-group) to final-list
-//					final Set<Character> childGroup = extractGroup(child.from, parentConditionLength);
-//					final Set<String> sameConditionChildrenFrom = children.stream()
-//						.filter(c -> c != child)
-//						.filter(c -> c.condition.endsWith(child.condition))
-//						.flatMap(entry -> entry.from.stream())
-//						.collect(Collectors.toSet());
-//					final Set<Character> sameConditionChildrenGroup = extractGroup(sameConditionChildrenFrom, parentConditionLength);
-//					if(sameConditionChildrenGroup.isEmpty() && parentGroup.size() < childGroup.size() || parentGroup.equals(sameConditionChildrenGroup))
-//						condition = makeNotGroup(parentGroup, child.condition);
-//					else
-//						condition = makeGroup(childGroup, child.condition);
-//					newEntry = LineEntry.createFrom(child, condition, child.from);
-//					rules.add(newEntry);
-//				}
-//
-//				//remove same-condition-children from current-list
-//				sameConditionChildren.forEach(sortedList::remove);
-//				//remove same-condition-children from final-list
-//				sameConditionChildren.forEach(rules::remove);
+//				...
 //			}
 //			else{
 //				final String notGroupIntersection = makeNotGroup(groupIntersection, StringUtils.EMPTY);
@@ -443,6 +440,27 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			//remove parent from final list
 //			rules.remove(parent);
 		}
+	}
+
+	private boolean expandEmptyCondition(final LineEntry parent, final List<LineEntry> sortedList){
+		boolean expanded = false;
+		if(parent.condition.isEmpty()){
+			sortedList.remove(0);
+
+			//expand empty condition
+			final Set<Character> parentGroup = extractGroup(parent.from, 0);
+			for(final Character chr : parentGroup){
+				final String condition = String.valueOf(chr);
+				final List<String> from = parent.extractFromEndingWith(condition);
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition, from);
+				sortedList.add(newEntry);
+			}
+
+			sortedList.sort(shortestConditionComparator);
+
+			expanded = true;
+		}
+		return expanded;
 	}
 
 	private int[] extractMinAndMax(final List<LineEntry> children){
