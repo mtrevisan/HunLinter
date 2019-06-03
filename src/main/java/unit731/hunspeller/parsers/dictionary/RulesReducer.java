@@ -278,18 +278,18 @@ public class RulesReducer{
 	 */
 	private void removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
 		//sort processing-list by shortest condition
-		final List<LineEntry> sortedList = new ArrayList<>(rules);
-		sortedList.sort(shortestConditionComparator);
+		final List<LineEntry> sortedRules = new ArrayList<>(rules);
+		sortedRules.sort(shortestConditionComparator);
 
-		final LineEntry emptyConditionParent = sortedList.get(0);
+		final LineEntry emptyConditionParent = sortedRules.get(0);
 		if(emptyConditionParent.condition.isEmpty()){
-			List<LineEntry> okRules = expandEmptyCondition(sortedList);
+			List<LineEntry> finalRules = expandEmptyCondition(sortedRules);
 
 			Iterator<LineEntry> itr = rules.iterator();
 			while(itr.hasNext())
 				if(itr.next().condition.isEmpty())
 					itr.remove();
-			for(final LineEntry rule : okRules)
+			for(final LineEntry rule : finalRules)
 				if(!rules.contains(rule))
 					rules.add(rule);
 		}
@@ -298,13 +298,13 @@ public class RulesReducer{
 AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 		//while processing-list is not empty
-		while(!sortedList.isEmpty()){
+		while(!sortedRules.isEmpty()){
 			//extract base condition
-			final LineEntry parent = sortedList.get(0);
+			final LineEntry parent = sortedRules.get(0);
 
 			//extract similar (same ending condition) rules from processing-list
-			final List<LineEntry> children = sortedList.stream()
-				.filter(entry -> entry.condition.endsWith(parent.condition))
+			final List<LineEntry> children = sortedRules.stream()
+				.filter(rule -> rule.condition.endsWith(parent.condition))
 				.collect(Collectors.toList());
 
 			if(children.size() == 1)
@@ -318,7 +318,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 				boolean wereNotIntersecting = false;
 				//extract minimum and maximum of the conditions' length
-				int[] minAndMaxConditionLength = extractMinAndMax(children);
+				final int[] minAndMaxConditionLength = extractMinAndMax(children);
 				for(int index = minAndMaxConditionLength[0]; children.size() > 1 && index < minAndMaxConditionLength[1]; index ++){
 					//extract the group of each child
 					final int indexFromLast = index;
@@ -333,13 +333,14 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					if(wereNotIntersecting && groupsIntersection.isEmpty())
 						break;
 
+//TODO
 					//if intersection is empty
 					if(groupsIntersection.isEmpty()){
 						//for each group, either is the group itself or the negated group of all the others children
 						//'Aèr': that is 'Aèr' or '[^Bi]èr'
 						//'Bèr': that is 'Bèr' or '[^Ai]èr'
 						//'ièr': that is 'ièr' or '[^AB]èr'
-						Iterator<LineEntry> itr = children.iterator();
+						final Iterator<LineEntry> itr = children.iterator();
 						while(itr.hasNext()){
 							final LineEntry child = itr.next();
 
@@ -369,7 +370,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 									//remove from final-list
 									rules.remove(child);
 									//remove from processing-list
-									sortedList.remove(child);
+									sortedRules.remove(child);
 								}
 							}
 						}
@@ -392,7 +393,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 							//remove parent from final list
 							rules.remove(parent);
 							children.remove(parent);
-							sortedList.remove(parent);
+							sortedRules.remove(parent);
 
 							final Set<Character> preCondition = extractGroup(notGroupList, parentConditionLength);
 							final String condition = (parent.condition.isEmpty()
@@ -420,7 +421,7 @@ if("[^ò]o".equals(condition))
 				}
 			}
 
-			children.forEach(sortedList::remove);
+			children.forEach(sortedRules::remove);
 
 
 //			final Set<String> childrenFrom = children.stream()
