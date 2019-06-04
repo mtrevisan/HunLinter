@@ -155,23 +155,23 @@ public class RulesReducerTest{
 	}
 
 	/**
-		[rem=  o,add=[  ato],cond=  o,from=[verdo, mando, viŧio, savio, speso, kalandro, vexo, konto, granfo, solfro, libro, đilio, ŧoko, porko,
-			ŧedro, bosko, manđo, soko, sorgo, visio, muso, borso, manxo, kuadro, sporko]]	=> [đ, r, s, d, t, f, g, x, i, k]
-		[rem=òbo,add=[obato],cond=òbo,from=[gòbo]]													=> [b]
-		[rem=òvo,add=[ovato],cond=òvo,from=[òvo]]														=> [v]
-		[rem=òko,add=[okato],cond=òko,from=[pòko, òko]]												=> [k]
-		[rem=òmo,add=[omato],cond=òmo,from=[òmo]]														=> [m]
+	[rem=  o,add=[  ato],cond=  o,from=[verdo, mando, viŧio, savio, speso, kalandro, vexo, konto, granfo, solfro, libro, đilio, ŧoko, porko,
+		ŧedro, bosko, manđo, soko, sorgo, visio, muso, borso, manxo, kuadro, sporko]]	=> [đ, r, s, d, t, f, g, x, i, k]
+	[rem=òbo,add=[obato],cond=òbo,from=[gòbo]]													=> [b]
+	[rem=òvo,add=[ovato],cond=òvo,from=[òvo]]														=> [v]
+	[rem=òko,add=[okato],cond=òko,from=[pòko, òko]]												=> [k]
+	[rem=òmo,add=[omato],cond=òmo,from=[òmo]]														=> [m]
 
-		[rem=  0,add=[   ta],cond=  a,from=[kalandra, kora, maca, savia, aria, inkuixitora, marenda, kuadra, inspetora, toxa, grada, merenda,
-			kara, fatora]]													=> [r, c, d, x, i]
-		[rem=òsa,add=[osata],cond=òsa,from=[kòsa]]				=> [s]
-		[rem=òka,add=[okata],cond=òka,from=[òka, pòka]]			=> [k]
-		[rem=òba,add=[obata],cond=òba,from=[gòba, ròba]]		=> [b]
-		[rem=èla,add=[elata],cond=èla,from=[kapèla, vedèla]]	=> [l]
-		[rem=òna,add=[onata],cond=òna,from=[dòna]]				=> [n]
+	[rem=  0,add=[   ta],cond=  a,from=[kalandra, kora, maca, savia, aria, inkuixitora, marenda, kuadra, inspetora, toxa, grada, merenda,
+		kara, fatora]]													=> [r, c, d, x, i]
+	[rem=òsa,add=[osata],cond=òsa,from=[kòsa]]				=> [s]
+	[rem=òka,add=[okata],cond=òka,from=[òka, pòka]]			=> [k]
+	[rem=òba,add=[obata],cond=òba,from=[gòba, ròba]]		=> [b]
+	[rem=èla,add=[elata],cond=èla,from=[kapèla, vedèla]]	=> [l]
+	[rem=òna,add=[onata],cond=òna,from=[dòna]]				=> [n]
 
-		[rem= 0,add=[  ato],cond= l,from=[rusiñol, ruxiñol, rosiñol, mol, đeneral, roxiñol, xel]]	=> [a, e, o]
-		[rem=èl,add=[elato],cond=èl,from=[vedèl, kanèl, kapèl]]												=> [è]
+	[rem= 0,add=[  ato],cond= l,from=[rusiñol, ruxiñol, rosiñol, mol, đeneral, roxiñol, xel]]	=> [a, e, o]
+	[rem=èl,add=[elato],cond=èl,from=[vedèl, kanèl, kapèl]]												=> [è]
 	*/
 	@Test
 	public void case3() throws IOException{

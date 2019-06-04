@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -294,11 +294,11 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		}
 
 		//subdivide rules by condition ending
-		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
+		final Stack<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
 		//for each bush in the forest
-		for(int i = 0; i < forest.size(); i ++){
-			final List<LineEntry> bush = forest.get(i);
+		while(!forest.isEmpty()){
+			final List<LineEntry> bush = forest.pop();
 
 			//if there is only one rule, then it goes in the final set
 			if(bush.size() == 1)
@@ -310,11 +310,13 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				final Map<LineEntry, Set<Character>> groups = bush.stream()
 					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
 
+				//base case
 				if(bush.size() == 2){
+					final LineEntry ratifying = bush.get(0);
+
 					//calculate intersection between all groups
 					final Set<Character> groupsIntersection = SetHelper.intersection(groups.values());
 					if(groupsIntersection.isEmpty()){
-						final LineEntry ratifying = bush.get(0);
 						//extract ratifying group
 						final Set<Character> childGroup = groups.get(ratifying);
 
@@ -331,7 +333,6 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						nonOverlappingRules.add(negated);
 					}
 					else{
-						final LineEntry ratifying = bush.get(0);
 						//separate parent condition into belonging to not-intersection and belonging to intersection
 						final String notGroupIntersection = makeNotGroup(groupsIntersection);
 						final Map<String, List<String>> intersectionBucket = bucket(ratifying.from,
@@ -354,7 +355,8 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 							ratifying.from.removeIf(f -> !f.endsWith(ratifying.condition));
 						}
 
-						forest.add(bush);
+						//reprocess new bush
+						forest.push(bush);
 					}
 				}
 				else{
@@ -541,8 +543,8 @@ System.out.println(bush);
 		return nonOverlappingRules;
 	}
 
-	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
-		List<List<LineEntry>> forest = new ArrayList<>();
+	private Stack<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
+		Stack<List<LineEntry>> forest = new Stack<>();
 		while(!sortedRules.isEmpty()){
 			//extract base condition
 			final String parentCondition = sortedRules.get(0).condition;
@@ -558,7 +560,7 @@ System.out.println(bush);
 					itr.remove();
 				}
 			}
-			forest.add(children);
+			forest.push(children);
 		}
 		return forest;
 	}
