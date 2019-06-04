@@ -16,6 +16,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -360,10 +361,55 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					}
 				}
 				else{
-					throw new IllegalArgumentException("to do 1");
+					//check if all the rules are disjoint
+					boolean disjoint = true;
+					for(final LineEntry rule : bush){
+						final List<String> otherFrom = bush.stream()
+							.filter(entry -> entry != rule)
+							.flatMap(entry -> entry.from.stream())
+							.collect(Collectors.toList());
+						final Set<Character> parentCondition = extractGroup(rule.from, indexFromLast);
+						final Set<Character> childrenCondition = extractGroup(otherFrom, indexFromLast);
+						final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
+						if(!groupsIntersection.isEmpty()){
+							disjoint = false;
+							break;
+						}
+					}
+
+					if(disjoint){
+						//extract all the rules that needs another char in the condition
+						final List<LineEntry> needingRules = new ArrayList<>();
+						final List<LineEntry> notNeedingRules = new ArrayList<>();
+						for(final LineEntry rule : bush){
+							if(rule.condition.length() <= indexFromLast)
+								needingRules.add(rule);
+							else
+								notNeedingRules.add(rule);
+						}
+
+						notNeedingRules.forEach(nonOverlappingRules::add);
+
+						if(needingRules.size() == 1){
+							final List<String> from = notNeedingRules.stream()
+								.flatMap(entry -> entry.from.stream())
+								.collect(Collectors.toList());
+							final Set<Character> group = extractGroup(from, indexFromLast);
+							final LineEntry rule = needingRules.get(0);
+							rule.condition = makeNotGroup(group) + rule.condition;
+							nonOverlappingRules.add(rule);
+						}
+						else
+							for(final LineEntry rule : needingRules){
+								final Set<Character> group = extractGroup(rule.from, indexFromLast);
+								rule.condition = makeGroup(group) + rule.condition;
+								nonOverlappingRules.add(rule);
+							}
+					}
+					else
+						throw new IllegalArgumentException("to do 1");
 					//TODO
 				}
-System.out.println(bush);
 			}
 		}
 

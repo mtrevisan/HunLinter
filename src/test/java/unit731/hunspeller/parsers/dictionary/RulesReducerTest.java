@@ -64,17 +64,17 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Arrays.asList(
-			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
-			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
 			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
-			new LineEntry("me", "ʼ", "me", Arrays.asList("kome")),
+			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
+			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
 			new LineEntry("ra", "ʼ", "ra", Arrays.asList("sora")),
+			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
+			new LineEntry("me", "ʼ", "me", Arrays.asList("kome")),
 			new LineEntry("te", "ʼ", "te", Arrays.asList("frate")),
-			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
 			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa"))
+			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, compactedRules);
 
