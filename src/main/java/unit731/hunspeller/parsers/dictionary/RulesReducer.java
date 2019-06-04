@@ -307,29 +307,32 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			//otherwise process it to separate the rules
 			else{
 				//extract the group of each bush of the forest
-				final int indexFromLast = bush.get(0).condition.length();
-				final Map<LineEntry, Set<Character>> groups = bush.stream()
-					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
+//				final int indexFromLast = bush.get(0).condition.length();
+//				final Map<LineEntry, Set<Character>> groups = bush.stream()
+//					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
+//
+//				//check if each rule is disjoint w.r.t. each other rules
+//				boolean disjoint = true;
+//				for(final LineEntry rule : bush){
+//					final Set<Character> parentCondition = groups.get(rule);
+//					final Set<Character> childrenCondition = bush.stream()
+//						.filter(entry -> entry != rule)
+//						.map(groups::get)
+//						.flatMap(Set::stream)
+//						.collect(Collectors.toSet());
+//					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
+//					if(!groupsIntersection.isEmpty()){
+//						disjoint = false;
+//						break;
+//					}
+//				}
+				final Iterator<LineEntry> itr = bush.iterator();
+				while(itr.hasNext()){
+					final LineEntry rule = itr.next();
 
-				//check if each rule is disjoint w.r.t. each other rules
-				boolean disjoint = true;
-				for(final LineEntry rule : bush){
-					final Set<Character> parentCondition = groups.get(rule);
-					final Set<Character> childrenCondition = bush.stream()
-						.filter(entry -> entry != rule)
-						.map(groups::get)
-						.flatMap(Set::stream)
-						.collect(Collectors.toSet());
-					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
-					if(!groupsIntersection.isEmpty()){
-						disjoint = false;
-						break;
-					}
-				}
-				final Iterator<LineEntry> itr2 = bush.iterator();
-				while(itr2.hasNext()){
-					final LineEntry rule = itr2.next();
-					final int indexFromLast2 = rule.condition.length();
+					final int indexFromLast = rule.condition.length();
+					final Map<LineEntry, Set<Character>> groups = bush.stream()
+						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
 
 					//extract ratifying group
 					final Set<Character> parentGroup = groups.get(rule);
@@ -343,120 +346,22 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					if(groupsIntersection.isEmpty()){
-						final Set<Character> notGroup = bush.stream()
-							.filter(r -> r.condition.length() > indexFromLast2)
-							.map(groups::get)
-							.flatMap(Set::stream)
-							.collect(Collectors.toSet());
-
-						if(!notGroup.isEmpty())
-							//calculate new condition (if it was empty, choose the ratifying)
-							rule.condition = (rule.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(notGroup))
-								+ rule.condition;
+						if(!childrenGroup.isEmpty())
+							//calculate new condition (if it was empty, choose the ratifying over the negated)
+							rule.condition = (indexFromLast == 0? makeGroup(parentGroup): makeNotGroup(childrenGroup)) + rule.condition;
 
 						//add new rule to final-list
-						nonOverlappingRules.add(rule);
+						nonOverlappingRules.addAll(bush);
 
-						itr2.remove();
-					}
-					else
-						disjoint = false;
-				}
-
-				if(disjoint){
-					//extract all the rules that needs another char in the condition
-					final List<LineEntry> needingRules = new ArrayList<>();
-					final List<LineEntry> notNeedingRules = new ArrayList<>();
-					for(final LineEntry rule : bush){
-						if(rule.condition.length() <= indexFromLast)
-							needingRules.add(rule);
-						else
-							notNeedingRules.add(rule);
-					}
-
-					//add all non-overlapping rules to final-list
-					//TODO be sure all these rules are non-overlapping!
-					notNeedingRules.forEach(nonOverlappingRules::add);
-
-					//if there is only one rule that have its condition to be augmented
-					if(needingRules.size() == 1){
-						//extract ratifying group
-						final LineEntry rule = needingRules.get(0);
-						final Set<Character> group = groups.get(rule);
-
-						//extract negated group
-						final Set<Character> notGroup = new HashSet<>();
-						notNeedingRules.forEach(r -> notGroup.addAll(groups.get(r)));
-
-						//calculate new condition (if it was empty, choose the ratifying)
-						rule.condition = (rule.condition.isEmpty()? makeGroup(group): makeNotGroup(notGroup))
-							+ rule.condition;
-
-						//add new rule to final-list
-						nonOverlappingRules.add(rule);
-					}
-					//otherwise for each rule, add another char in front of the actual condition
-					else
-						for(final LineEntry rule : needingRules){
-							final Set<Character> group = groups.get(rule);
-							rule.condition = makeGroup(group) + rule.condition;
-							nonOverlappingRules.add(rule);
-						}
-				}
-				else{
-					//FIXME
-					if(bush.size() == 2){
-						final LineEntry ratifying = bush.get(0);
-
-						//calculate intersection between all groups
-						final Set<Character> groupsIntersection = SetHelper.intersection(groups.values());
-						//separate parent condition into belonging to not-intersection and belonging to intersection
-						final String notGroupIntersection = makeNotGroup(groupsIntersection);
-						final Map<String, List<String>> intersectionBucket = bucket(ratifying.from,
-							from -> {
-								char chr = from.charAt(from.length() - indexFromLast - 1);
-								return (groupsIntersection.contains(chr)? String.valueOf(chr): notGroupIntersection);
-							});
-						final List<String> notGroupList = intersectionBucket.remove(notGroupIntersection);
-						if(notGroupList != null){
-							final Set<Character> preCondition = extractGroup(notGroupList, indexFromLast);
-							final String condition = (ratifying.condition.isEmpty()
-								|| !groupsIntersection.containsAll(preCondition) && preCondition.size() < groupsIntersection.size()?
-								makeGroup(preCondition): makeNotGroup(groupsIntersection))
-								+ ratifying.condition;
-							final LineEntry newEntry = LineEntry.createFrom(ratifying, condition, notGroupList);
-							nonOverlappingRules.add(newEntry);
-						}
-						for(final Map.Entry<String, List<String>> entry : intersectionBucket.entrySet()){
-							ratifying.condition = entry.getKey() + ratifying.condition;
-							ratifying.from.removeIf(f -> !f.endsWith(ratifying.condition));
-						}
-
-						//reprocess new bush
-						forest.push(bush);
+						break;
 					}
 					else{
-						final Iterator<LineEntry> itr = bush.iterator();
-						while(itr.hasNext()){
-							final LineEntry rule = itr.next();
-							final Set<Character> parentCondition = groups.get(rule);
-							final Set<Character> childrenCondition = bush.stream()
-								.filter(entry -> entry != rule)
-								.map(groups::get)
-								.flatMap(Set::stream)
-								.collect(Collectors.toSet());
-							final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
-							if(groupsIntersection.isEmpty()){
-								nonOverlappingRules.add(rule);
-
-								itr.remove();
-							}
-						}
-
-						//reprocess new bush
-						forest.push(bush);
-
 						//TODO
+						for(final LineEntry r : bush){
+							final Set<Character> group = groups.get(r);
+							r.condition = makeGroup(group) + r.condition;
+							nonOverlappingRules.add(r);
+						}
 //						throw new IllegalArgumentException("to do");
 					}
 				}
