@@ -326,24 +326,42 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						break;
 					}
 				}
-//				final Iterator<LineEntry> itr = bush.iterator();
-//				while(itr.hasNext()){
-//					final LineEntry rule = itr.next();
-//					final Set<Character> parentCondition = groups.get(rule);
-//					final Set<Character> childrenCondition = bush.stream()
-//						.filter(entry -> entry != rule)
-//						.map(groups::get)
-//						.flatMap(Set::stream)
-//						.collect(Collectors.toSet());
-//					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
-//					if(groupsIntersection.isEmpty()){
-//						nonOverlappingRules.add(rule);
-//
-//						itr.remove();
-//					}
-//					else
-//						disjoint = false;
-//				}
+				final Iterator<LineEntry> itr2 = bush.iterator();
+				while(itr2.hasNext()){
+					final LineEntry rule = itr2.next();
+					final int indexFromLast2 = rule.condition.length();
+
+					//extract ratifying group
+					final Set<Character> parentGroup = groups.get(rule);
+
+					//extract negated group
+					final Set<Character> childrenGroup = bush.stream()
+						.filter(entry -> entry != rule)
+						.map(groups::get)
+						.flatMap(Set::stream)
+						.collect(Collectors.toSet());
+
+					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+					if(groupsIntersection.isEmpty()){
+						final Set<Character> notGroup = bush.stream()
+							.filter(r -> r.condition.length() > indexFromLast2)
+							.map(groups::get)
+							.flatMap(Set::stream)
+							.collect(Collectors.toSet());
+
+						if(!notGroup.isEmpty())
+							//calculate new condition (if it was empty, choose the ratifying)
+							rule.condition = (rule.condition.isEmpty()? makeGroup(parentGroup): makeNotGroup(notGroup))
+								+ rule.condition;
+
+						//add new rule to final-list
+						nonOverlappingRules.add(rule);
+
+						itr2.remove();
+					}
+					else
+						disjoint = false;
+				}
 
 				if(disjoint){
 					//extract all the rules that needs another char in the condition
@@ -750,7 +768,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 	private String makeGroup(final Set<Character> group){
 		final String merge = mergeSet(group);
-		return (merge.length() > 1? GROUP_START + merge + GROUP_END: merge);
+		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
 	}
 
 	private String makeGroup(final Set<Character> group, final String suffix){
