@@ -16,7 +16,6 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -291,7 +290,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			List<LineEntry> finalRules = expandEmptyCondition(rules);
 
 			//store surely disjoint rules
-			finalRules.forEach(nonOverlappingRules::add);
+			nonOverlappingRules.addAll(finalRules);
 		}
 
 		//subdivide rules by condition ending
@@ -306,30 +305,11 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				nonOverlappingRules.add(bush.get(0));
 			//otherwise process it to separate the rules
 			else{
-				//extract the group of each bush of the forest
-//				final int indexFromLast = bush.get(0).condition.length();
-//				final Map<LineEntry, Set<Character>> groups = bush.stream()
-//					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
-//
-//				//check if each rule is disjoint w.r.t. each other rules
-//				boolean disjoint = true;
-//				for(final LineEntry rule : bush){
-//					final Set<Character> parentCondition = groups.get(rule);
-//					final Set<Character> childrenCondition = bush.stream()
-//						.filter(entry -> entry != rule)
-//						.map(groups::get)
-//						.flatMap(Set::stream)
-//						.collect(Collectors.toSet());
-//					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
-//					if(!groupsIntersection.isEmpty()){
-//						disjoint = false;
-//						break;
-//					}
-//				}
 				final Iterator<LineEntry> itr = bush.iterator();
 				while(itr.hasNext()){
 					final LineEntry rule = itr.next();
 
+					//extract the group of each bush of the forest
 					final int indexFromLast = rule.condition.length();
 					final Map<LineEntry, Set<Character>> groups = bush.stream()
 						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
