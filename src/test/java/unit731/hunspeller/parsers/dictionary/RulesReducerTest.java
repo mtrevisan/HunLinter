@@ -66,17 +66,17 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
-			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
 			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
-			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
+			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
 			new LineEntry("ra", "ʼ", "ra", Arrays.asList("sora")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
+			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
 			new LineEntry("me", "ʼ", "me", Arrays.asList("kome")),
 			new LineEntry("te", "ʼ", "te", Arrays.asList("frate")),
-			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove")),
+			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
+			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
 			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
 			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando"))
+			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove"))
 		));
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
@@ -135,10 +135,10 @@ public class RulesReducerTest{
 
 		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
-			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
-			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo")),
-			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo"))
+			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
+			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
+			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
 		));
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
@@ -216,21 +216,21 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
-			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
-			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
-			new LineEntry("òmo", "omato", "òmo", "òmo"),
-			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
-			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
-			new LineEntry("òna", "onata", "òna", "dòna"),
-			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
-			new LineEntry("òbo", "obato", "òbo", "gòbo"),
-			new LineEntry("òsa", "osata", "òsa", "kòsa"),
-			new LineEntry("òvo", "ovato", "òvo", "òvo"),
 			new LineEntry("0", "ato", "[nr]", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
-			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
-			new LineEntry("o", "ato", "[^ò]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
+			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
 			new LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra", "inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
-			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel"))
+			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
+			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
+			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
+			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
+			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),
+			new LineEntry("òna", "onata", "òna", "dòna"),
+			new LineEntry("òsa", "osata", "òsa", "kòsa"),
+			new LineEntry("òbo", "obato", "òbo", "gòbo"),
+			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
+			new LineEntry("òmo", "omato", "òmo", "òmo"),
+			new LineEntry("òvo", "ovato", "òvo", "òvo"),
+			new LineEntry("o", "ato", "[^ò]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko"))
 		));
 //		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
