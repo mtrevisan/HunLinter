@@ -287,7 +287,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		//expand empty conditions (if any)
 		final LineEntry emptyConditionParent = rules.get(0);
 		if(emptyConditionParent.condition.isEmpty()){
-			List<LineEntry> finalRules = expandEmptyCondition(rules);
+			final List<LineEntry> finalRules = expandEmptyCondition(rules);
 
 			//store surely disjoint rules
 			nonOverlappingRules.addAll(finalRules);
@@ -301,25 +301,27 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			final List<LineEntry> bush = forest.pop();
 
 			//if there is only one rule, then it goes in the final set
-			if(bush.size() == 1)
-				nonOverlappingRules.add(bush.get(0));
+			if(bush.size() == 1){
+				final LineEntry parent = bush.get(0);
+				nonOverlappingRules.add(parent);
+			}
 			//otherwise process it to separate the rules
 			else{
 				final Iterator<LineEntry> itr = bush.iterator();
 				while(itr.hasNext()){
-					final LineEntry rule = itr.next();
+					final LineEntry parent = itr.next();
 
 					//extract the group of each bush of the forest
-					final int indexFromLast = rule.condition.length();
+					final int indexFromLast = parent.condition.length();
 					final Map<LineEntry, Set<Character>> groups = bush.stream()
 						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
 
 					//extract ratifying group
-					final Set<Character> parentGroup = groups.get(rule);
+					final Set<Character> parentGroup = groups.get(parent);
 
 					//extract negated group
 					final Set<Character> childrenGroup = bush.stream()
-						.filter(entry -> entry != rule)
+						.filter(child -> child != parent)
 						.map(groups::get)
 						.flatMap(Set::stream)
 						.collect(Collectors.toSet());
@@ -328,7 +330,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					if(groupsIntersection.isEmpty()){
 						if(!childrenGroup.isEmpty())
 							//calculate new condition (if it was empty, choose the ratifying over the negated)
-							rule.condition = (indexFromLast == 0? makeGroup(parentGroup): makeNotGroup(childrenGroup)) + rule.condition;
+							parent.condition = (indexFromLast == 0? makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
 
 						//add new rule to final-list
 						nonOverlappingRules.addAll(bush);
@@ -337,10 +339,10 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					}
 					else{
 						//TODO
-						for(final LineEntry r : bush){
-							final Set<Character> group = groups.get(r);
-							r.condition = makeGroup(group) + r.condition;
-							nonOverlappingRules.add(r);
+						for(final LineEntry child : bush){
+							final Set<Character> group = groups.get(child);
+							child.condition = makeGroup(group) + child.condition;
+							nonOverlappingRules.add(child);
 						}
 //						throw new IllegalArgumentException("to do");
 					}
