@@ -311,7 +311,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				final Map<LineEntry, Set<Character>> groups = bush.stream()
 					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
 
-				//check if all the rules are disjoint
+				//check if each rule is disjoint w.r.t. each other rules
 				boolean disjoint = true;
 				for(final LineEntry rule : bush){
 					final List<String> otherFrom = bush.stream()
@@ -368,6 +368,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						}
 				}
 				else{
+					//FIXME
 					if(bush.size() == 2){
 						final LineEntry ratifying = bush.get(0);
 
@@ -400,7 +401,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					}
 					else{
 						//TODO
-						throw new IllegalArgumentException("to do 1");
+						throw new IllegalArgumentException("to do");
 					}
 				}
 			}
