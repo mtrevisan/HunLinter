@@ -308,45 +308,57 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			}
 			//otherwise process the rules
 			else{
-				final Iterator<LineEntry> itr = bush.iterator();
+				Iterator<LineEntry> itr = bush.iterator();
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
 
+					/*
+					extract communalities:
+					from
+						"è => [èdo, èđo, èxo]"
+						"ò => [òdo, òco, òko]"
+					transform into
+						"è => [èđo, èxo]"
+						"ò => [òco, òko]"
+						"èò => [òdo, èdo]"
+					extract common-group (key.length > 1)
+					add new rule from parent with condition starting with NOT(common-group) to final-list
+						'[^èò]do'
+					*/
 					//extract bubbles
 					final int parentConditionLength = parent.condition.length();
 					final List<LineEntry> bubbles = bush.stream()
-						.filter(rule -> rule.condition.length() > parentConditionLength)
+						.filter(child -> child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
-
 					if(!bubbles.isEmpty()){
+						final Set<Character> groups = bubbles.stream()
+							.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
+							.collect(Collectors.toSet());
+						final String condition = makeNotGroup(groups) + parent.condition;
+						final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
+						nonOverlappingRules.add(newEntry);
+						nonOverlappingRules.addAll(bubbles);
+
+						bush.removeAll(bubbles);
+					}
+					bush.remove(parent);
+
+					itr = bush.iterator();
+
+
+					//extract bubbles
+//					final List<LineEntry> bubbles = bush.stream()
+//						.filter(rule -> rule.condition.length() > parentConditionLength)
+//						.collect(Collectors.toList());
+
+//					if(!bubbles.isEmpty()){
 //						final List<LineEntry> newRules = bubbleUpNotGroup(parent, bubbles);
 
 						//bubble up not-group
-						final Set<String> bubblesConditions = bubbles.stream()
-							.map(rule -> rule.condition)
-							.collect(Collectors.toSet());
-
-						/*
-						extract communalities:
-						from
-							"è => [èdo, èđo, èxo]"
-							"ò => [òdo, òco, òko]"
-						transform into
-							"è => [èđo, èxo]"
-							"ò => [òco, òko]"
-							"èò => [òdo, èdo]"
-						extract common-group (key.length > 1)
-						add new rule from parent with condition starting with NOT(common-group) to final-list
-							'[^èò]do'
-						*/
-//						final List<LineEntry> newParents = new ArrayList<>();
-						final Map<String, List<String>> communalitiesBucket = bucket(bubblesConditions,
-							cond -> cond.substring(cond.length() - parentConditionLength - 1));
-communalitiesBucket.size();
-
-						bush.removeAll(bubbles);
-System.out.println("");
-					}
+//						final Set<String> bubblesConditions = bubbles.stream()
+//							.map(rule -> rule.condition)
+//							.collect(Collectors.toSet());
+//					}
 				}
 
 
