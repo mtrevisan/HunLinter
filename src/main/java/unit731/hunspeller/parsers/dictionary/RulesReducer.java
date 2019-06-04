@@ -314,18 +314,36 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				//check if each rule is disjoint w.r.t. each other rules
 				boolean disjoint = true;
 				for(final LineEntry rule : bush){
-					final List<String> otherFrom = bush.stream()
+					final Set<Character> parentCondition = groups.get(rule);
+					final Set<Character> childrenCondition = bush.stream()
 						.filter(entry -> entry != rule)
-						.flatMap(entry -> entry.from.stream())
-						.collect(Collectors.toList());
-					final Set<Character> parentCondition = extractGroup(rule.from, indexFromLast);
-					final Set<Character> childrenCondition = extractGroup(otherFrom, indexFromLast);
+						.map(groups::get)
+						.flatMap(Set::stream)
+						.collect(Collectors.toSet());
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
 					if(!groupsIntersection.isEmpty()){
 						disjoint = false;
 						break;
 					}
 				}
+//				final Iterator<LineEntry> itr = bush.iterator();
+//				while(itr.hasNext()){
+//					final LineEntry rule = itr.next();
+//					final Set<Character> parentCondition = groups.get(rule);
+//					final Set<Character> childrenCondition = bush.stream()
+//						.filter(entry -> entry != rule)
+//						.map(groups::get)
+//						.flatMap(Set::stream)
+//						.collect(Collectors.toSet());
+//					final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
+//					if(groupsIntersection.isEmpty()){
+//						nonOverlappingRules.add(rule);
+//
+//						itr.remove();
+//					}
+//					else
+//						disjoint = false;
+//				}
 
 				if(disjoint){
 					//extract all the rules that needs another char in the condition
@@ -400,8 +418,28 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						forest.push(bush);
 					}
 					else{
+						final Iterator<LineEntry> itr = bush.iterator();
+						while(itr.hasNext()){
+							final LineEntry rule = itr.next();
+							final Set<Character> parentCondition = groups.get(rule);
+							final Set<Character> childrenCondition = bush.stream()
+								.filter(entry -> entry != rule)
+								.map(groups::get)
+								.flatMap(Set::stream)
+								.collect(Collectors.toSet());
+							final Set<Character> groupsIntersection = SetHelper.intersection(parentCondition, childrenCondition);
+							if(groupsIntersection.isEmpty()){
+								nonOverlappingRules.add(rule);
+
+								itr.remove();
+							}
+						}
+
+						//reprocess new bush
+						forest.push(bush);
+
 						//TODO
-						throw new IllegalArgumentException("to do");
+//						throw new IllegalArgumentException("to do");
 					}
 				}
 			}
