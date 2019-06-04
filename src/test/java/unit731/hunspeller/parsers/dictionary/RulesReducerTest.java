@@ -158,14 +158,14 @@ public class RulesReducerTest{
 
 	/**
 	[rem=  o,add=[  ato],cond=  o,from=[verdo, mando, viŧio, savio, speso, kalandro, vexo, konto, granfo, solfro, libro, đilio, ŧoko, porko,
-		ŧedro, bosko, manđo, soko, sorgo, visio, muso, borso, manxo, kuadro, sporko]]	=> [đ, r, s, d, t, f, g, x, i, k]
+		ŧedro, bosko, manđo, soko, sorgo, visio, muso, borso, manxo, kuadro, sporko]]	=> [d, f, g, i, k, r, s, t, x, đ]
 	[rem=òbo,add=[obato],cond=òbo,from=[gòbo]]													=> [b]
 	[rem=òvo,add=[ovato],cond=òvo,from=[òvo]]														=> [v]
 	[rem=òko,add=[okato],cond=òko,from=[pòko, òko]]												=> [k]
 	[rem=òmo,add=[omato],cond=òmo,from=[òmo]]														=> [m]
 
 	[rem=  0,add=[   ta],cond=  a,from=[kalandra, kora, maca, savia, aria, inkuixitora, marenda, kuadra, inspetora, toxa, grada, merenda,
-		kara, fatora]]													=> [r, c, d, x, i]
+		kara, fatora]]													=> [c, d, i, r, x]
 	[rem=òsa,add=[osata],cond=òsa,from=[kòsa]]				=> [s]
 	[rem=òka,add=[okata],cond=òka,from=[òka, pòka]]			=> [k]
 	[rem=òba,add=[obata],cond=òba,from=[gòba, ròba]]		=> [b]
