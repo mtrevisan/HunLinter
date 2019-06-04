@@ -3,7 +3,9 @@ package unit731.hunspeller.parsers.dictionary;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -63,7 +65,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		List<LineEntry> expectedCompactedRules = Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
 			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
 			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
 			new LineEntry("xa", "ʼ", "xa", Arrays.asList("kaxa")),
@@ -75,8 +77,8 @@ public class RulesReducerTest{
 			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
 			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
 			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+		));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
@@ -131,14 +133,14 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		List<LineEntry> expectedCompactedRules = Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
 			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
 			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo")),
 			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+		));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
@@ -213,7 +215,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		List<LineEntry> expectedCompactedRules = Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
 			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
 			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
 			new LineEntry("òmo", "omato", "òmo", "òmo"),
@@ -229,8 +231,8 @@ public class RulesReducerTest{
 			new LineEntry("o", "ato", "[^ò]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
 			new LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra", "inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
 			new LineEntry("0", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel"))
-		);
-//		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+		));
+//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
