@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -305,48 +306,119 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				final LineEntry parent = bush.get(0);
 				nonOverlappingRules.add(parent);
 			}
-			//otherwise process it to separate the rules
+			//otherwise process the rules
 			else{
 				final Iterator<LineEntry> itr = bush.iterator();
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
 
-					//extract the group of each bush of the forest
-					final int indexFromLast = parent.condition.length();
-					final Map<LineEntry, Set<Character>> groups = bush.stream()
-						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
+					//extract bubbles
+					final int parentConditionLength = parent.condition.length();
+					final List<LineEntry> bubbles = bush.stream()
+						.filter(rule -> rule.condition.length() > parentConditionLength)
+						.collect(Collectors.toList());
 
-					//extract ratifying group
-					final Set<Character> parentGroup = groups.get(parent);
+					if(!bubbles.isEmpty()){
+//						final List<LineEntry> newRules = bubbleUpNotGroup(parent, bubbles);
 
-					//extract negated group
-					final Set<Character> childrenGroup = bush.stream()
-						.filter(child -> child != parent)
-						.map(groups::get)
-						.flatMap(Set::stream)
-						.collect(Collectors.toSet());
+						//bubble up not-group
+						final Set<String> bubblesConditions = bubbles.stream()
+							.map(rule -> rule.condition)
+							.collect(Collectors.toSet());
 
-					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-					if(groupsIntersection.isEmpty()){
-						if(!childrenGroup.isEmpty())
-							//calculate new condition (if it was empty, choose the ratifying over the negated)
-							parent.condition = (indexFromLast == 0? makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
+						/*
+						extract communalities:
+						from
+							"è => [èdo, èđo, èxo]"
+							"ò => [òdo, òco, òko]"
+						transform into
+							"è => [èđo, èxo]"
+							"ò => [òco, òko]"
+							"èò => [òdo, èdo]"
+						extract common-group (key.length > 1)
+						add new rule from parent with condition starting with NOT(common-group) to final-list
+							'[^èò]do'
+						*/
+//						final List<LineEntry> newParents = new ArrayList<>();
+						final Map<String, List<String>> communalitiesBucket = bucket(bubblesConditions,
+							cond -> cond.substring(cond.length() - parentConditionLength - 1));
+communalitiesBucket.size();
 
-						//add new rule to final-list
-						nonOverlappingRules.addAll(bush);
-
-						break;
-					}
-					else{
-						//TODO
-						for(final LineEntry child : bush){
-							final Set<Character> group = groups.get(child);
-							child.condition = makeGroup(group) + child.condition;
-							nonOverlappingRules.add(child);
-						}
-//						throw new IllegalArgumentException("to do");
+						bush.removeAll(bubbles);
+System.out.println("");
 					}
 				}
+
+
+
+//				final Iterator<LineEntry> itr = bush.iterator();
+//				while(itr.hasNext()){
+//					final LineEntry parent = itr.next();
+//
+//					//extract the group of each bush of the forest
+//					final int indexFromLast = parent.condition.length();
+//					final Map<LineEntry, Set<Character>> groups = bush.stream()
+//						.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, indexFromLast)));
+//
+//					//extract ratifying group
+//					final Set<Character> parentGroup = groups.get(parent);
+//
+//					//extract negated group
+//					Set<Character> childrenGroup = bush.stream()
+//						.filter(child -> child != parent)
+//						.map(groups::get)
+//						.flatMap(Set::stream)
+//						.collect(Collectors.toSet());
+//
+//					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+//					if(groupsIntersection.isEmpty()){
+////						final List<LineEntry> bubbles = extractRuleBubbles(bush);
+////						if(!bubbles.isEmpty()){
+////							final List<LineEntry> newRules = bubbleUpNotGroup(bubbles);
+////System.out.println("");
+////						}
+//
+//						if(!childrenGroup.isEmpty()){
+//							//calculate new condition (if it was empty, choose the ratifying over the negated)
+//							if(indexFromLast == 0){
+//								for(final LineEntry rule : bush)
+//									if(rule.condition.length() == indexFromLast)
+//										rule.condition = makeGroup(groups.get(rule)) + rule.condition;
+//							}
+//							else{
+//								final int maxConditionLength = bush.get(bush.size() - 1).condition.length() - 1;
+//								for(final LineEntry rule : bush)
+//									if(rule.condition.length() == indexFromLast){
+//										childrenGroup = bush.stream()
+//											.filter(child -> child != parent)
+//											.map(groups::get)
+//											.flatMap(Set::stream)
+//											.collect(Collectors.toSet());
+//										for(int i = indexFromLast; i < maxConditionLength; i ++){
+//											final LineEntry newEntry = LineEntry.createFrom(rule, /*addition.substring(lcp) +*/ rule.condition,
+//												Collections.<String>emptyList());
+//											nonOverlappingRules.add(newEntry);
+//										}
+//										rule.condition = makeNotGroup(childrenGroup) + rule.condition;
+//									}
+//							}
+//						}
+//
+//						//add new rule to final-list
+//						nonOverlappingRules.addAll(bush);
+//
+//						break;
+//					}
+//					else{
+//						//TODO
+//						for(final LineEntry child : bush){
+//							final Set<Character> group = groups.get(child);
+//							child.condition = makeGroup(group) + child.condition;
+//							nonOverlappingRules.add(child);
+//						}
+////						throw new IllegalArgumentException("to do");
+//					}
+//				}
 			}
 		}
 
@@ -526,6 +598,93 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		return nonOverlappingRules;
 	}
 
+	private List<LineEntry> extractBubbles(final LineEntry parent, final List<LineEntry> rules){
+		final int parentConditionLength = parent.condition.length();
+		return rules.stream()
+			.filter(rule -> rule.condition.length() > parentConditionLength)
+			.collect(Collectors.toList());
+	}
+
+	private List<LineEntry> bubbleUpNotGroup(final LineEntry parent, final List<LineEntry> rules){
+		final int parentConditionLength = parent.condition.length();
+		//bubble up by bucketing children for group-2
+		final Set<String> bubblesCondition = rules.stream()
+			.map(rule -> rule.condition)
+			.collect(Collectors.toSet());
+
+		/*
+		extract communalities:
+		from
+			"è => [èdo, èđo, èxo]"
+			"ò => [òdo, òco, òko]"
+		transform into
+			"è => [èđo, èxo]"
+			"ò => [òco, òko]"
+			"èò => [òdo, èdo]"
+		extract common-group (key.length > 1)
+		add new rule from parent with condition starting with NOT(common-group) to final-list
+			'[^èò]do'
+		*/
+		final List<LineEntry> newParents = new ArrayList<>();
+		final Map<String, List<String>> communalitiesBucket = bucket(bubblesCondition,
+			cond -> cond.substring(cond.length() - parentConditionLength - 1));
+		//remove single conditions
+		Iterator<Map.Entry<String, List<String>>> itr = communalitiesBucket.entrySet().iterator();
+		while(itr.hasNext())
+			if(itr.next().getValue().size() == 1)
+				itr.remove();
+		for(final Map.Entry<String, List<String>> e : communalitiesBucket.entrySet()){
+			final List<String> comm = e.getValue();
+			//FIXME
+//			if(e.getKey().length() + 1 != comm.get(0).length() || !comm.stream().allMatch(c -> c.length() == comm.get(0).length()))
+//				throw new IllegalArgumentException("e.key.length + 1 != comm[0].length || comm.get(.).length() differs: key '" + e.getKey()
+//					+ "', comm '" + comm.toString());
+
+			for(String c : comm){
+				final List<String> gg = rules.stream()
+					.filter(entry -> entry.condition.equals(c))
+					.flatMap(entry -> entry.from.stream())
+					.collect(Collectors.toList());
+				bucket(gg, cond -> cond.substring(cond.length() - parentConditionLength - 1));
+			}
+			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
+			final String condition = makeNotGroup(commonGroup, e.getKey());
+			final List<String> words = parent.extractFromEndingWith(condition);
+			final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+			//keep only rules that matches some existent words
+			if(!words.isEmpty())
+				newParents.add(newEntry);
+			else
+				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+
+			comm.forEach(bubblesCondition::remove);
+		}
+
+		final Map<String, List<String>> conditionBucket = bucket(bubblesCondition,
+			cond -> cond.substring(0, cond.length() - parentConditionLength - 1));
+		//for each children-group-2
+		for(final Map.Entry<String, List<String>> conds : conditionBucket.entrySet()){
+			//add new rule from parent with condition starting with NOT(children-group-2) to final-list
+			final Set<Character> bubbleGroup = extractGroup(conds.getValue(), parentConditionLength);
+			//do the bubble trick
+			for(int i = conds.getKey().length(); i > 0; i --){
+				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
+					+ conds.getKey().substring(i)
+					+ makeGroup(bubbleGroup, parent.condition);
+				final List<String> words = parent.extractFromEndingWith(condition);
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+				//keep only rules that matches some existent words
+				if(!words.isEmpty())
+					newParents.add(newEntry);
+				else
+					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+			}
+		}
+		return newParents;
+	}
+
 	private Stack<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
 		Stack<List<LineEntry>> forest = new Stack<>();
 		while(!sortedRules.isEmpty()){
@@ -660,6 +819,10 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 	private String makeGroup(final Set<Character> group, final String suffix){
 		return makeGroup(group) + suffix;
+	}
+
+	private String makeNotGroup(final Character group){
+		return NOT_GROUP_START + group + GROUP_END;
 	}
 
 	private String makeNotGroup(final Set<Character> group){
