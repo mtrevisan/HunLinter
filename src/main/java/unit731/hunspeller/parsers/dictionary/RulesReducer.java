@@ -325,44 +325,52 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
 							.collect(Collectors.toSet());
 
-						//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
-						final String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 && childrenGroup.size() > 1?
-							makeGroup(parentGroup): makeNotGroup(childrenGroup))
-							+ parent.condition;
-						LineEntry newEntry = LineEntry.createFrom(parent, condition);
+						//if intersection(parent-group, children-group) is empty
+						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+						//TODO
+//						if(groupIntersection.isEmpty()){
+							//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
+							final String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 && childrenGroup.size() > 1?
+								makeGroup(parentGroup): makeNotGroup(childrenGroup))
+								+ parent.condition;
+							LineEntry newEntry = LineEntry.createFrom(parent, condition);
 
-						//keep only rules that matches some existent words
-						if(newEntry.isProductive())
-							nonOverlappingRules.add(newEntry);
-						else
-							LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-								(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+							//keep only rules that matches some existent words
+							if(newEntry.isProductive())
+								nonOverlappingRules.add(newEntry);
+							else
+								LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+									(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
-						final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
-						if(parentConditionLength + 1 < maxConditionLength){
-							bush.remove(parent);
+							final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
+							if(parentConditionLength + 1 < maxConditionLength){
+								bush.remove(parent);
 
-							if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
-								final List<LineEntry> bushes = new ArrayList<>(bush);
-								bushes.add(parent);
-								for(final Character chr : childrenGroup){
-									final String cond = chr + parent.condition;
-									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
-									if(!bush.contains(newEntry))
-										bush.add(newEntry);
+								if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+									final List<LineEntry> bushes = new ArrayList<>(bush);
+									bushes.add(parent);
+									for(final Character chr : childrenGroup){
+										final String cond = chr + parent.condition;
+										newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+										if(!bush.contains(newEntry))
+											bush.add(newEntry);
+									}
+
+									bush.sort(shortestConditionComparator);
 								}
-
-								bush.sort(shortestConditionComparator);
 							}
-						}
-						else{
-							nonOverlappingRules.addAll(bubbles);
+							else{
+								nonOverlappingRules.addAll(bubbles);
 
-							bush.remove(parent);
-							bush.removeAll(bubbles);
-						}
+								bush.remove(parent);
+								bush.removeAll(bubbles);
+							}
 
-						//continue until bubbles.condition length is reached
+							//continue until bubbles.condition length is reached
+//						}
+//						else{
+//							throw new IllegalArgumentException("to do");
+//						}
 					}
 					else{
 						bush.remove(parent);
