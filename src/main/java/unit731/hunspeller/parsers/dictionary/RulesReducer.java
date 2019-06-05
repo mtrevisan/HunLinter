@@ -317,11 +317,20 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
 					if(!bubbles.isEmpty()){
-						final Set<Character> groups = bubbles.stream()
+						//extract ratifying group
+						final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
+
+						//extract negated group
+						final Set<Character> childrenGroup = bubbles.stream()
 							.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
 							.collect(Collectors.toSet());
-						final String condition = makeNotGroup(groups) + parent.condition;
+
+						//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
+						final String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 && childrenGroup.size() > 1?
+							makeGroup(parentGroup): makeNotGroup(childrenGroup))
+							+ parent.condition;
 						LineEntry newEntry = LineEntry.createFrom(parent, condition);
+
 						//keep only rules that matches some existent words
 						if(newEntry.isProductive())
 							nonOverlappingRules.add(newEntry);
@@ -336,7 +345,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
 								final List<LineEntry> bushes = new ArrayList<>(bush);
 								bushes.add(parent);
-								for(final Character chr : groups){
+								for(final Character chr : childrenGroup){
 									final String cond = chr + parent.condition;
 									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
 									if(!bush.contains(newEntry))
