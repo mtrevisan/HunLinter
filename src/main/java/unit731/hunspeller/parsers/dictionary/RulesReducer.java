@@ -293,12 +293,10 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		nonOverlappingRules.addAll(expandSameCondition(rules));
 
 		//subdivide rules by condition ending
-		final Stack<List<LineEntry>> forest = bucketByConditionEnding(rules);
+		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
 		//for each bush in the forest
-		while(!forest.isEmpty()){
-			final List<LineEntry> bush = forest.pop();
-
+		for(final List<LineEntry> bush : forest){
 			//if there is only one rule, then it goes in the final set
 			if(bush.size() == 1){
 				final LineEntry parent = bush.get(0);
@@ -309,6 +307,8 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				Iterator<LineEntry> itr = bush.iterator();
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
+
+					bush.remove(parent);
 
 					final int parentConditionLength = parent.condition.length();
 final Map<LineEntry, Set<Character>> groups2 = bush.stream()
@@ -328,9 +328,26 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						//if intersection(parent-group, children-group) is empty
 						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 						//TODO
+//						if(!groupIntersection.isEmpty() && childrenGroup.containsAll(parentGroup)){
+//							for(final char chr : parentGroup){
+//								final String condition = chr + parent.condition;
+//								final LineEntry newEntry = LineEntry.createFrom(parent, condition);
+//								bush.add(newEntry);
+//							}
+//
+//							bush.remove(parent);
+//							bush.sort(shortestConditionComparator);
+//
+//							nonOverlappingRules.addAll(expandSameCondition(bush));
+//
+//							itr = bush.iterator();
+//
+//							continue;
+//						}
+
 //						if(groupIntersection.isEmpty()){
 							//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
-							final String condition = (parent.condition.isEmpty() || parentGroup.size() == 1 && childrenGroup.size() > 1?
+							final String condition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
 								makeGroup(parentGroup): makeNotGroup(childrenGroup))
 								+ parent.condition;
 							LineEntry newEntry = LineEntry.createFrom(parent, condition);
@@ -343,27 +360,22 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 									(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
 							final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
-							if(parentConditionLength + 1 < maxConditionLength){
-								bush.remove(parent);
-
-								if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
-									final List<LineEntry> bushes = new ArrayList<>(bush);
-									bushes.add(parent);
-									for(final Character chr : childrenGroup){
-										final String cond = chr + parent.condition;
-										newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
-										if(!bush.contains(newEntry))
-											bush.add(newEntry);
-									}
-
-									bush.sort(shortestConditionComparator);
-								}
-							}
-							else{
-								nonOverlappingRules.addAll(bubbles);
-
-								bush.remove(parent);
+							if(parentConditionLength + 1 >= maxConditionLength){
 								bush.removeAll(bubbles);
+
+								nonOverlappingRules.addAll(bubbles);
+							}
+							else if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+								final List<LineEntry> bushes = new ArrayList<>(bush);
+								bushes.add(parent);
+								for(final Character chr : childrenGroup){
+									final String cond = chr + parent.condition;
+									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+									if(!bush.contains(newEntry))
+										bush.add(newEntry);
+								}
+
+								bush.sort(shortestConditionComparator);
 							}
 
 							//continue until bubbles.condition length is reached
@@ -372,11 +384,8 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //							throw new IllegalArgumentException("to do");
 //						}
 					}
-					else{
-						bush.remove(parent);
-
+					else
 						nonOverlappingRules.add(parent);
-					}
 
 					itr = bush.iterator();
 				}
@@ -715,8 +724,8 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 		return newParents;
 	}
 
-	private Stack<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
-		Stack<List<LineEntry>> forest = new Stack<>();
+	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
+		List<List<LineEntry>> forest = new ArrayList<>();
 		while(!sortedRules.isEmpty()){
 			//extract base condition
 			final String parentCondition = sortedRules.get(0).condition;
@@ -732,7 +741,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					itr.remove();
 				}
 			}
-			forest.push(children);
+			forest.add(children);
 		}
 		return forest;
 	}
@@ -812,7 +821,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
-						final String cond = (groupsIntersection.isEmpty() && (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size())?
+						final String cond = (groupsIntersection.isEmpty() && (parent.condition.isEmpty() || parentGroup.size() <= childrenGroup.size())?
 							makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
 						final LineEntry newRule = LineEntry.createFrom(parent, cond);
 						finalRules.add(newRule);
