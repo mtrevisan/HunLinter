@@ -326,7 +326,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							.collect(Collectors.toSet());
 
 						//if intersection(parent-group, children-group) is empty
-						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+//						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 						//TODO
 //						if(!groupIntersection.isEmpty() && childrenGroup.containsAll(parentGroup)){
 //							for(final char chr : parentGroup){
@@ -377,6 +377,20 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 
 								bush.sort(shortestConditionComparator);
 							}
+							//FIXME
+//							else if(!newEntry.isProductive()){
+//								//expand intersection
+//								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+//								for(final Character chr : groupIntersection){
+//									final String cond = chr + parent.condition;
+//									newEntry = LineEntry.createFrom(parent, cond);
+//									if(!bush.contains(newEntry))
+//										//TODO manage adding of same condition rule
+//										bush.add(newEntry);
+//								}
+//
+//								bush.sort(shortestConditionComparator);
+//							}
 
 							//continue until bubbles.condition length is reached
 //						}
