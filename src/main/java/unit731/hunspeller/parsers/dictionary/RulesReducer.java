@@ -287,12 +287,13 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 		//expand empty conditions (if any)
 		final LineEntry emptyConditionParent = rules.get(0);
-		if(emptyConditionParent.condition.isEmpty()){
-			final List<LineEntry> finalRules = expandEmptyCondition(rules);
-
+		if(emptyConditionParent.condition.isEmpty())
 			//store surely disjoint rules
-			nonOverlappingRules.addAll(finalRules);
-		}
+			nonOverlappingRules.addAll(expandEmptyCondition(rules));
+
+		//expand same conditions (if any)
+		//store surely disjoint rules
+		nonOverlappingRules.addAll(expandSameCondition(rules));
 
 		//subdivide rules by condition ending
 		final Stack<List<LineEntry>> forest = bucketByConditionEnding(rules);
@@ -327,6 +328,8 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					*/
 					//extract bubbles
 					final int parentConditionLength = parent.condition.length();
+final Map<LineEntry, Set<Character>> groups2 = bush.stream()
+	.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, parentConditionLength)));
 					final List<LineEntry> bubbles = bush.stream()
 						.filter(child -> child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
@@ -719,10 +722,10 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		return forest;
 	}
 
-	private List<LineEntry> expandEmptyCondition(final List<LineEntry> sortedRules){
+	private List<LineEntry> expandEmptyCondition(final List<LineEntry> rules){
 		//collect empty conditions
 		final List<LineEntry> parents = new ArrayList<>();
-		final Iterator<LineEntry> itr = sortedRules.iterator();
+		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
 			final LineEntry parent = itr.next();
 			if(parent.condition.isEmpty()){
@@ -731,7 +734,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 			}
 		}
 
-		final Set<String> otherFrom = sortedRules.stream()
+		final Set<String> otherFrom = rules.stream()
 			.flatMap(rule -> rule.from.stream())
 			.collect(Collectors.toSet());
 		final Set<Character> otherGroup = extractGroup(otherFrom, 0);
@@ -739,7 +742,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		//for each rule with empty condition
 		final List<LineEntry> finalRules = new ArrayList<>();
 		for(final LineEntry parent : parents){
-			//expand empty condition
+			//expand empty condition:
 			final Set<Character> parentGroup = extractGroup(parent.from, 0);
 			final Set<Character> intersection = SetHelper.intersection(parentGroup, otherGroup);
 			parentGroup.removeAll(intersection);
@@ -753,10 +756,63 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				final String condition = String.valueOf(chr);
 				final List<String> from = parent.extractFromEndingWith(condition);
 				final LineEntry newRule = LineEntry.createFrom(parent, condition, from);
-				sortedRules.add(newRule);
+				rules.add(newRule);
 			}
 		}
-		sortedRules.sort(shortestConditionComparator);
+		rules.sort(shortestConditionComparator);
+		return finalRules;
+	}
+
+	private List<LineEntry> expandSameCondition(final List<LineEntry> rules){
+		final List<LineEntry> finalRules = new ArrayList<>();
+
+		//bucket by same condition
+		final Map<String, List<LineEntry>> conditionBucket = bucket(rules, rule -> rule.condition);
+		for(final Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
+			final List<LineEntry> sameCondition = entry.getValue();
+			if(sameCondition.size() > 1){
+				//extract children
+				final String condition = entry.getKey();
+				final List<LineEntry> children = rules.stream()
+					.filter(rule -> rule.condition.endsWith(condition))
+					.collect(Collectors.toList());
+
+				final Map<LineEntry, Set<Character>> groups = children.stream()
+					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, condition.length())));
+
+				//separate conditions:
+				//for each rule with empty condition
+				for(final LineEntry parent : sameCondition){
+					//extract ratifying group
+					final Set<Character> parentGroup = groups.get(parent);
+
+					//extract negated group
+					final Set<Character> childrenGroup = children.stream()
+						.filter(child -> child != parent)
+						.map(groups::get)
+						.flatMap(Set::stream)
+						.collect(Collectors.toSet());
+
+					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+					parentGroup.removeAll(groupsIntersection);
+					if(!parentGroup.isEmpty()){
+						final String cond = (groupsIntersection.isEmpty() && (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size())?
+							makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
+						final List<String> from = parent.extractFromEndingWith(cond);
+						final LineEntry newRule = LineEntry.createFrom(parent, cond, from);
+						finalRules.add(newRule);
+					}
+					for(final Character chr : groupsIntersection){
+						final String cond = String.valueOf(chr);
+						final List<String> from = parent.extractFromEndingWith(cond);
+						final LineEntry newRule = LineEntry.createFrom(parent, cond, from);
+						rules.add(newRule);
+					}
+				}
+				rules.removeAll(sameCondition);
+			}
+		}
+
 		return finalRules;
 	}
 

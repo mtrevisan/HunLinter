@@ -258,6 +258,20 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	/**
+	[rem= 0,add=[  ista],cond= r,from=[folar, koƚor, foƚar, spiƚorsar, kolor]]	=> [a, o]
+	[rem=èr,add=[erista],cond=èr,from=[bregièr, bragièr]]								=> [è]
+
+	[rem=   a,add=[  ista],cond=   a,from=[fegura, figura, ŧifra, bonba, stua, kitara]]				=> [r, b, u]
+	[rem=  ía,add=[  ista],cond=  ía,from=[finoxomía, fiƚoxomía, alkimía, arkimía, filoxomía]]	=> [í]
+	[rem= òda,add=[odista],cond= òda,from=[mòda]]																=> [d]
+	[rem=ònia,add=[onista],cond=ònia,from=[ŧerimònia]]															=> [i]
+
+	[rem=o,add=[ista],cond=o,from=[fogo, konto, paƚaso, palaŧo, kaƚo, palaso, paƚaseto, kaxo]]	=> [s, t, g, ŧ, x, ƚ]
+	[rem=o,add=[ sta],cond=o,from=[kanbio]]																		=> [i]
+
+	[rem=o,add=[sta],cond=o,from=[kanbio]]	=> [i]
+	*/
 	@Test
 	public void case4() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
@@ -290,7 +304,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		List<LineEntry> expectedCompactedRules = Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
 			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente", "arte")),
 			new LineEntry("òda", "odista", "òda", "mòda"),
 			new LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
@@ -301,8 +315,8 @@ public class RulesReducerTest{
 			new LineEntry("o", "sta", "io", "kanbio"),
 			new LineEntry("a", "ista", "[^dií]a", Arrays.asList("fegura", "figura", "ŧifra", "bonba", "stua", "kitara")),
 			new LineEntry("0", "ista", "[^è]r", Arrays.asList("folar", "koƚor", "foƚar", "spiƚorsar", "kolor"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, compactedRules);
+		));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
