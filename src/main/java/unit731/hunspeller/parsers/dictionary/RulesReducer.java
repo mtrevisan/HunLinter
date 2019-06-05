@@ -333,22 +333,18 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						if(parentConditionLength + 1 < maxConditionLength){
 							bush.remove(parent);
 
-							if(bush.stream().anyMatch(rule -> rule.condition.length() == parentConditionLength + 1)){
-								itr = bush.iterator();
+							if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+								for(final Character chr : groups){
+									final String cond = chr + parent.condition;
+									final List<LineEntry> bushes = new ArrayList<>(bush);
+									bushes.add(parent);
+									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+									if(!bush.contains(newEntry))
+										bush.add(newEntry);
+								}
 
-								continue;
+								bush.sort(shortestConditionComparator);
 							}
-
-							for(final Character chr : groups){
-								final String cond = chr + parent.condition;
-								final List<LineEntry> bushes = new ArrayList<>(bush);
-								bushes.add(parent);
-								newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
-								if(!bush.contains(newEntry))
-									bush.add(newEntry);
-							}
-
-							bush.sort(shortestConditionComparator);
 						}
 						else{
 							nonOverlappingRules.addAll(bubbles);
@@ -359,10 +355,14 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						}
 
 						//continue until bubbles.condition length is reached
-						itr = bush.iterator();
 					}
-					else
+					else{
+						bush.remove(parent);
+
 						nonOverlappingRules.add(parent);
+					}
+
+					itr = bush.iterator();
 				}
 
 
