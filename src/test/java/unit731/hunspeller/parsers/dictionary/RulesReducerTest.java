@@ -984,6 +984,20 @@ public class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	/**
+	[rem=   erò,add=[  ision],cond=   erò,from=[repeterò]]																														=> [t]
+	[rem=  nerò,add=[ xision],cond=  nerò,from=[prexuponerò, posponerò, esponerò, oponerò, ponerò, konponerò, proponerò, xustaponerò]]					=> [n]
+	[rem=  xerò,add=[   sion],cond=  xerò,from=[duxerò, elexerò, estraxerò, lexerò, faxerò, korexerò, aflixerò, struxerò, produxerò, introduxerò]]	=> [x]
+	[rem=  ñerò,add=[  nsion],cond=  ñerò,from=[konveñerò]]																														=> [ñ]
+	[rem=  merò,add=[  nsion],cond=  merò,from=[asumerò, prexumerò, konsumerò]]																							=> [m]
+	[rem= guerò,add=[   sion],cond= guerò,from=[destinguerò]]																													=> [u]
+	[rem=orxerò,add=[uresion],cond=orxerò,from=[sorxerò]]																															=> [x]
+
+	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, komodar, ...]]			=> [a, i]
+	[rem= ir,add=[ sion],cond= ir,from=[konstituir, atribuir, kostituir, kostruir, deminuir, sostituir, instruir, destribuir, diminuir, lokuir]]	=> [i]
+	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																														=> [e]
+	[rem=tar,add=[ sion],cond=tar,from=[prexentar, exentar, ventar, sospetar]]																							=> [a]
+	*/
 	@Test
 	public void case13() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
