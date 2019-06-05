@@ -65,7 +65,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "ʼ", "r", Arrays.asList("par")),
 			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
 			new LineEntry("ra", "ʼ", "ra", Arrays.asList("sora")),
@@ -77,7 +77,7 @@ public class RulesReducerTest{
 			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
 			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
 			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -133,13 +133,13 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
 			new LineEntry("o", "ato", "[^ƚ]o", Arrays.asList("ƚibro", "kaƚandro")),
 			new LineEntry("èƚa", "eƚata", "èƚa", Arrays.asList("kapèƚa", "vedèƚa")),
 			new LineEntry("èƚo", "eƚato", "èƚo", Arrays.asList("kapèƚo", "vedèƚo", "kanèƚo")),
 			new LineEntry("o", "ato", "[^è]ƚo", Arrays.asList("moƚo", "roxiñoƚo", "rosiñoƚo", "xeƚo", "ruxiñoƚo", "rusiñoƚo"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -215,7 +215,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ato", "[nr]", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
 			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
 			new LineEntry("0", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra", "inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
@@ -230,9 +230,9 @@ public class RulesReducerTest{
 			new LineEntry("òko", "okato", "òko", Arrays.asList("pòko", "òko")),
 			new LineEntry("òmo", "omato", "òmo", "òmo"),
 			new LineEntry("òvo", "ovato", "òvo", "òvo"),
-			new LineEntry("o", "ato", "[^ò]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko"))
-		));
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+			new LineEntry("o", "ato", "[^ò]ko", Arrays.asList("bosko", "soko", "ŧoko", "porko", "sporko"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
@@ -253,7 +253,7 @@ public class RulesReducerTest{
 			"SFX §0 òvo ovato òvo",
 			"SFX §0 o ato [^ò]ko"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
@@ -304,7 +304,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente", "arte")),
 			new LineEntry("òda", "odista", "òda", "mòda"),
 			new LineEntry("ía", "ista", "ía", Arrays.asList("finoxomía", "fiƚoxomía", "alkimía", "arkimía", "filoxomía")),
@@ -315,7 +315,7 @@ public class RulesReducerTest{
 			new LineEntry("o", "sta", "io", "kanbio"),
 			new LineEntry("a", "ista", "[^dií]a", Arrays.asList("fegura", "figura", "ŧifra", "bonba", "stua", "kitara")),
 			new LineEntry("0", "ista", "[^è]r", Arrays.asList("folar", "koƚor", "foƚar", "spiƚorsar", "kolor"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -450,7 +450,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("ar", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "ar", Arrays.asList("axenar", "sporkar", "portar", "fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar", "komandar", "kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar", "panetar", "tapeŧar", "kokoƚar", "strasar", "tartufolar", "retelar", "vergexar", "senpiar", "bibiar", "putelar", "pitokar", "berikinar", "saonar", "strigar", "kavaƚar", "striar", "straŧar", "polar", "cakoƚar", "lotar", "piocar", "kokolar", "isporkar", "garbar", "rafinar", "kanseƚar", "nodar", "kojonar", "stanpar", "garđar", "poltronar", "ƚexinar", "speŧiar", "spilorŧar", "soldar", "ɉetar", "minconar", "piexar", "poƚar", "jetar", "reteƚar", "peocar", "piedar", "skorsar", "garxar", "kontroƚar", "kanselar", "puteƚar", "albergar", "ardentar", "spilorsar", "kordar", "tapesar", "grixonar", "ƚotar", "sovercar", "xmorfiar", "stranbar", "cakolar", "kapocar", "kontrolar", "sansar", "spiŧiar", "ŧimar", "robar", "simar", "fraskar", "komenŧiar", "bañar", "birbantar", "bufonar", "porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar", "lexinar", "berekinar", "tartufoƚar", "vakar", "spesiar")),
 			new LineEntry("èla", SetHelper.setOf("elaría", "elería", "elarieta", "elerieta"), "èla", Arrays.asList("kasèla", "kaxèla")),
 			new LineEntry("òco", SetHelper.setOf("ocarieta", "ocería", "ocerieta", "ocaría"), "òco", Arrays.asList("pedòco", "peòco", "piòco")),
@@ -470,7 +470,7 @@ public class RulesReducerTest{
 			new LineEntry("o", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "[^èò]do", Arrays.asList("provedo", "prado", "skudo")),
 			new LineEntry("o", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "[^è]xo", Arrays.asList("goloxo", "gexo", "bibioxo", "goƚoxo", "kaxo")),
 			new LineEntry("o", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "[^ò]ko", Arrays.asList("banko", "porko", "sporko"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -580,11 +580,11 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "gaƚantòmo"),
 			new LineEntry("ía", "ixmo", "ía", "maƚinkonía"),
 			new LineEntry("0", "ixmo", "r", "ƚuminar")
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -627,14 +627,14 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "galantòmo"),
 			new LineEntry("òko", "okixmo", "òko", "pitòko"),
 			new LineEntry("òto", "otixmo", "òto", "bigòto"),
 			new LineEntry("ía", "ixmo", "ía", "malinkonía"),
 			new LineEntry("0", "ixmo", "[nr]", Arrays.asList("baron", "kokon", "konpar", "luminar")),
 			new LineEntry("a", "ixmo", "[^í]a", Arrays.asList("franŧexa", "fransexa"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -768,12 +768,12 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dor", SetHelper.setOf("oreto", "toreto", "doreto", "tor", "or"), "dor", Arrays.asList("reŧevidor", "reŧeidor", "stridor", "resevidor", "reseidor")),
 			new LineEntry("rò", SetHelper.setOf("oreto", "dora", "doreta", "ora", "toreto", "doreto", "tor", "toreta", "oreta", "or", "tora", "dor"), "rò", Arrays.asList("fondarò", "batarò", "duxarò", "vendarò", "kredarò", "provedarò", "bevarò")),
 			new LineEntry("dora", SetHelper.setOf("doreta", "ora", "toreta", "oreta", "tora"), "dora", Arrays.asList("resevidora", "reseidora", "bratadora", "feridora", "reŧevidora", "reŧeidora")),
 			new LineEntry("r", SetHelper.setOf("oreto", "dora", "doreta", "ora", "toreto", "doreto", "tor", "toreta", "oreta", "or", "tora", "dor"), "[^o]r", Arrays.asList("dopiar", "kavar", "armar", "soleŧitar", "sadar", "trionfar", "kojonbarar", "pasar", "strologar", "dorar", "salar", "arar", "barar", "rengar", "ligar", "partegar", "bevarar", "destramedar", "kolorir", "spekular", "tajar", "guidar", "paŧifegar", "ventilar", "komandar", "noledar", "inpaɉar", "tubiar", "barkar", "spolar", "sopresar", "sagurar", "suxerir", "filar", "karexar", "stokar", "taɉar", "xjonfar", "mendar", "remar", "sostentar", "mexar", "sperdurar", "faitar", "versar", "sprexurar", "alienar", "trebiar", "kronpar", "suɉerir", "xogar", "kuantifegar", "inbiankar", "garbelar", "audir", "palar", "studiar", "renkurar", "renfreskar", "vixitar", "fiokar", "međar", "mexurar", "befar", "kaređar", "kalŧar", "desturbar", "botiđar", "kurar", "falsifegar", "spigolar", "kalkar", "stronđar", "bitar", "brunir", "xugar", "kartar", "kalsar", "raxar", "trufar", "sujarir", "koniar", "vanpar", "garđar", "bufar", "salidar", "semenar", "danexar", "sekurar", "minconar", "piantar", "kuadrar", "nolixar", "krivelar", "tarixar", "stuŧegar", "infrandar", "krear", "inbotir", "strondar", "setar", "travaxar", "buratar", "akuxar", "sparxurar", "menar", "kopar", "kuniar", "mediar", "dupiar", "skansar", "botonar", "suɉarir", "oxelar", "goernar", "pasifegar", "solesitar", "ingraviar", "saltar", "mentir", "servar", "kastrar", "parar", "segurar", "konfortar", "mokar", "sekar", "kalibrar", "sorar", "medar", "pionar", "kaŧar", "bufonar", "xɉonfar", "karedar", "mormolar", "đontar", "kasar", "takar", "predegar", "mañar", "sesolar", "luminar", "konŧar", "koñar", "stimar", "xbrufar", "paisar", "kantar", "ŧarlar", "fondar", "sarlar", "defamar", "fornir", "gardar", "botidar", "ŧetar", "kondurar", "banpar", "partir", "redar", "menestrar", "xontar", "konsar", "inpajar", "portar", "rekamar", "inpinir", "infranđar", "governar", "koɉonbarar", "sitar", "sarvar", "aldir", "sperxurar", "dugar", "pagar", "pisar", "sapar", "nolexar", "tokar", "saxar", "tirar", "likar", "peskar", "kalkolar", "gabar", "tornir", "ŧernir", "kuñar", "rascar", "xgrafiñar", "istuar", "sfroxar", "spaŧar", "dimandar", "stivar", "apaltar", "borar", "lavorar", "levar", "konđurar", "destramexar", "saldar", "varar", "mirar", "stusegar", "koɉonar", "noliđar", "sagomar", "operar", "kontar", "kaveŧar", "mormorar", "konsumar", "vantar", "cacarar", "sperđurar", "papar", "montar", "tamixar", "murar", "tariđar", "urtar", "kavesar", "argomentar", "libar", "spasar", "fiabar", "sikurar", "strisar", "kargar", "misiar", "pilar", "piŧar", "prokurar", "skarpelar", "salixar", "ŧerkar", "lustrar", "forar", "balar", "purgar", "sađar", "radar", "spedir", "dontar", "rafinar", "ŧapar", "ŧitar", "kojonar", "stanpar", "spredurar", "estimar", "serkar", "bruskar", "noar", "pianar", "subarendar", "fiorir", "stronxar", "lavar", "sajar", "spređurar", "rear", "braŧar", "pontar", "kapar", "springar", "beverar", "fregar", "ordir", "brasar", "petenar", "siegar", "garxar", "pekar", "xbuxar", "kaminar", "laorar", "cetar", "đogar", "sigurar", "saɉar", "gomiar", "bolar", "maxenar", "formar", "trivelar", "suxarir", "balotar", "biastemar", "nolidar", "ŧanŧar", "kolar", "supiar", "sialakuar", "infiar", "noleđar", "sernir", "varsar", "granir", "pertegar", "trovar", "rinfreskar", "matar", "sugar", "andar", "segar", "sansar", "konxurar", "iluminar", "sujerir", "botixar", "mankar", "ŧimar", "petar", "sonar", "examinar", "largar", "señalar", "guarnir", "simar", "saliđar", "guastar", "kagar", "refreskar", "lexixlar", "señar", "dogar", "minusar", "konprar", "inpastar", "trasinar", "regolar", "rostir", "dexeñar", "taridar", "skardar", "folar", "kalmar", "raspar", "butar", "đugar", "minuŧar", "strupiar", "infranxar", "destrameđar", "bosar", "frapar", "stuar", "mixurar", "ŧoetar", "manestrar", "testar", "kortegar", "maŧar", "soetar", "strolegar", "boŧar", "parlar", "sublokar", "guantar", "fortifegar", "fumar", "inganar", "negar", "masar", "stukar"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -849,11 +849,11 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ureto", "ur"), "dur", Arrays.asList("koƚadur", "vaƚidur")),
 			new LineEntry("dura", SetHelper.setOf("ureta", "ura"), "dura", "stabeƚidura"),
 			new LineEntry("r", SetHelper.setOf("ureta", "ura", "dureta", "dura"), "[^u]r", Arrays.asList("ƚatar", "ƚeterar", "boƚar", "vaƚir", "ƚetarar", "iƚuminar", "moƚar", "doƚar", "kriveƚar", "kavaƚar", "ƚuminar", "kaneƚar", "ƚexixlar", "soƚar", "paƚar", "stabiƚir", "paƚetar", "peƚar", "ƚigar", "ƚimar", "inkordeƚar", "ƚexenar", "skarseƚar", "baƚar", "fiƚar", "koƚar", "saƚar", "vixiƚar", "ƚeskar", "gaƚopar", "ƚavar"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -907,12 +907,12 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ur", "ureto"), "dur", Arrays.asList("madur", "traxeɉadur", "traxejadur", "tradadur", "trađadur", "kagadur", "traxadur", "tragadur", "ordadur", "koladur", "validur", "ordidur", "skortegadur")),
 			new LineEntry("erò", SetHelper.setOf("idura", "iura", "iureta", "idureta"), "erò", Arrays.asList("fenderò", "teserò", "inprimerò", "sebaterò", "baterò", "kuxerò", "torderò", "koxerò", "torđerò", "sobaterò", "torxerò")),
 			new LineEntry("dura", SetHelper.setOf("ureta", "ura"), "dura", Arrays.asList("bokadura", "inđinadura", "nadura", "sfendadura", "batadura", "resapadura", "strenxadura", "madura", "sobatidura", "bastidura", "skrivadura", "alberadura", "sprokadura", "sobatadura", "fredura", "introfregadura", "stabelidura", "tesadura", "sfendidura", "spakadura", "anadura", "reŧapadura", "strenđadura", "sabatadura", "albaradura", "proŧedura", "vertadura", "sperdadura", "korporadura", "fogonadura", "ponxadura", "sferdadura", "inxinadura", "prosedura", "indinadura", "strendadura")),
 			new LineEntry("r", SetHelper.setOf("dura", "ureta", "dureta", "ura"), "[^u]r", Arrays.asList("dopiar", "kavar", "armar", "broɉar", "pasar", "pontedar", "forŧar", "salar", "sejar", "arar", "latar", "roxegar", "serar", "ardenar", "ligar", "kadenar", "forsar", "ingarđir", "inɉermar", "tajar", "dentar", "vixilar", "injermar", "mastegar", "seɉar", "ingropar", "inpaɉar", "brojar", "bonar", "vokar", "tragar", "filar", "leterar", "piŧegar", "kornar", "skurtar", "risar", "riŧar", "stokar", "taɉar", "bordar", "inkrespar", "mendar", "bojir", "farar", "alborar", "sakar", "inɉarmar", "indopionar", "palar", "paletar", "ponsar", "kalŧar", "inkordelar", "kurar", "infarinar", "bardar", "boɉir", "ŧeɉar", "kalkar", "stronđar", "brunir", "kartar", "incodar", "kalsar", "josar", "arborar", "garđar", "inkroxar", "remurcar", "joŧar", "injarmar", "fasar", "skuarsar", "dolar", "pisegar", "bragar", "ɉetar", "jetar", "molar", "ŧejar", "stortar", "skuarŧar", "krivelar", "inbotir", "strondar", "gomitar", "ponteđar", "ŧerpir", "mostar", "valir", "xbokar", "dupiar", "netar", "spasiar", "botonar", "tresar", "ingarxir", "letarar", "ɉosar", "ɉoŧar", "rusar", "ingraviar", "baronar", "travar", "ferar", "vomitar", "sivansar", "bastir", "kavalkar", "mokar", "sekar", "iriŧar", "sivanŧar", "inbriagar", "toxar", "piegar", "xgrafar", "puñar", "đontar", "kasar", "takar", "mañar", "limar", "luminar", "konŧar", "frixar", "invastir", "kaenar", "fornir", "gardar", "partir", "veriar", "xontar", "konsar", "rondar", "sfexar", "tenperar", "inpajar", "portar", "spalmar", "rekamar", "skarselar", "vansar", "foɉar", "musar", "arxenar", "kanelar", "skoar", "krepar", "kavalar", "sapar", "copar", "guxar", "bavar", "tirar", "rasar", "strukar", "spaŧar", "bekar", "spakar", "borar", "saldar", "pontexar", "rekordar", "serpir", "vanŧar", "tastar", "kaveŧar", "inkarnar", "papar", "montar", "solar", "kavesar", "xetar", "spasar", "stabilir", "vestir", "kargar", "inmaltar", "ŧercar", "arđenar", "stranŧir", "fojar", "manegar", "spinar", "balar", "inpajetar", "purgar", "bastonar", "stransir", "garbar", "rexentar", "sercar", "vergar", "inboxemar", "dontar", "rafinar", "ŧapar", "skotar", "lexenar", "kalŧinar", "bruskar", "ingardir", "pianar", "rebaltar", "stronxar", "lavar", "rear", "leskar", "vedriar", "braŧar", "sarar", "pontar", "kapar", "fregar", "ordir", "brasar", "petenar", "kinkar", "siegar", "garxar", "botar", "ingrespar", "postar", "inpaɉetar", "bolar", "maxenar", "speŧar", "spesar", "kolar", "kordar", "spaŧiar", "infiar", "granir", "ingaxiar", "skaldar", "andar", "segar", "iluminar", "breviar", "ŧimar", "inkorsar", "kuxinar", "guarnir", "preŧar", "simar", "raɉar", "fodrar", "pelar", "kagar", "inbokar", "lexixlar", "señar", "skorlar", "bañar", "bendar", "kalsinar", "bruxar", "rostir", "fiankar", "makar", "vardar", "galopar", "strupiar", "kuxir", "gonfiar", "testar", "kortegar", "presar", "skontrar", "morsegar", "inkamixar", "stekar", "rajar", "fumar", "skermar"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -963,12 +963,12 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("lderò", "ƚusion", "lderò", "solderò"),
 			new LineEntry("r", "sion", "r", Arrays.asList("ƚegrar", "reaƚixar", "saƚuar", "veƚar", "manipoƚar", "artikoƚar", "desimiƚar", "spekuƚar", "naturaƚixar", "saƚutar", "ƚegar", "ƚiberar", "mormoƚar", "ƚibarar", "vaƚutar", "saƚudar", "stroƚegar", "asimiƚar", "xeneraƚixar", "xenaraƚixar", "maƚedir", "ƚimitar", "emuƚar", "koƚaudar", "triboƚar", "gaƚixar", "paƚatixar", "turbuƚar", "deƚetar", "iƚuminar", "ƚokuir", "simuƚar", "ƚuminar", "troboƚar", "torboƚar", "peƚar", "skaƚinar", "ƚenir", "eƚevar", "ƚegaƚixar", "kapitoƚar", "steƚar", "kanseƚar", "stiƚar", "ƚamentar", "soƚevar", "strakoƚar", "staƚar", "stroƚogar", "vokaƚixar", "koƚar", "ƚevar", "baƚotar")),
 			new LineEntry("xerò", "sion", "xerò", Arrays.asList("eƚexerò", "ƚexerò")),
 			new LineEntry("lverò", "ƚusion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
@@ -1026,7 +1026,7 @@ public class RulesReducerTest{
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
-		Set<LineEntry> expectedCompactedRules = new HashSet<>(Arrays.asList(
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("nerò", "xision", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò")),
 			new LineEntry("merò", "nsion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
 			new LineEntry("orxerò", "uresion", "orxerò", "sorxerò"),
@@ -1047,7 +1047,7 @@ public class RulesReducerTest{
 			new LineEntry("r", "sion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "setar", "fetar", "interpretar")),
 			new LineEntry("tar", "sion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
 			new LineEntry("r", "sion", "[mt]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
-		));
+		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);

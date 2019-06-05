@@ -813,18 +813,6 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 		return finalRules;
 	}
 
-	private int[] extractMinAndMax(final List<LineEntry> children){
-		//collect all the length of the children's conditions
-		final List<Integer> conditionLengths = children.stream()
-			.map(child -> child.condition.length())
-			.sorted()
-			.collect(Collectors.toList());
-		//extract minimum and maximum of the conditions' length
-		final int minConditionLength = conditionLengths.get(0);
-		final int maxConditionLength = conditionLengths.get(conditionLengths.size() - 1);
-		return new int[]{minConditionLength, maxConditionLength};
-	}
-
 	/** Reshuffle originating list to place the correct productions in the correct rule */
 	private void redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
 		//sort processing-list by shortest condition
