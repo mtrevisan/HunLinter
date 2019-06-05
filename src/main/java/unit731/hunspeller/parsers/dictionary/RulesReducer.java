@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -286,10 +285,8 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
 		//expand empty conditions (if any)
-		final LineEntry emptyConditionParent = rules.get(0);
-		if(emptyConditionParent.condition.isEmpty())
-			//store surely disjoint rules
-			nonOverlappingRules.addAll(expandEmptyCondition(rules));
+		//store surely disjoint rules
+		nonOverlappingRules.addAll(expandEmptyCondition(rules));
 
 		//expand same conditions (if any)
 		//store surely disjoint rules
@@ -313,55 +310,59 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
 
-					/*
-					extract communalities:
-					from
-						"è => [èdo, èđo, èxo]"
-						"ò => [òdo, òco, òko]"
-					transform into
-						"è => [èđo, èxo]"
-						"ò => [òco, òko]"
-						"èò => [òdo, èdo]"
-					extract common-group (key.length > 1)
-					add new rule from parent with condition starting with NOT(common-group) to final-list
-						'[^èò]do'
-					*/
-					//extract bubbles
 					final int parentConditionLength = parent.condition.length();
 final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 	.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, parentConditionLength)));
 					final List<LineEntry> bubbles = bush.stream()
-						.filter(child -> child.condition.length() > parentConditionLength)
+						.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
 					if(!bubbles.isEmpty()){
 						final Set<Character> groups = bubbles.stream()
 							.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
 							.collect(Collectors.toSet());
 						final String condition = makeNotGroup(groups) + parent.condition;
-						final LineEntry newEntry = LineEntry.createFrom(parent, condition, parent.from);
-						nonOverlappingRules.add(newEntry);
-						nonOverlappingRules.addAll(bubbles);
+						LineEntry newEntry = LineEntry.createFrom(parent, condition);
+						//keep only rules that matches some existent words
+						if(newEntry.isProductive())
+							nonOverlappingRules.add(newEntry);
+						else
+							LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+								(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
-						bush.removeAll(bubbles);
+						final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
+						if(parentConditionLength + 1 < maxConditionLength){
+							bush.remove(parent);
+
+							if(bush.stream().anyMatch(rule -> rule.condition.length() == parentConditionLength + 1)){
+								itr = bush.iterator();
+
+								continue;
+							}
+
+							for(final Character chr : groups){
+								final String cond = chr + parent.condition;
+								final List<LineEntry> bushes = new ArrayList<>(bush);
+								bushes.add(parent);
+								newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+								if(!bush.contains(newEntry))
+									bush.add(newEntry);
+							}
+
+							bush.sort(shortestConditionComparator);
+						}
+						else{
+							nonOverlappingRules.addAll(bubbles);
+
+//							bush.removeAll(bubbles);
+
+							break;
+						}
+
+						//continue until bubbles.condition length is reached
+						itr = bush.iterator();
 					}
-					bush.remove(parent);
-
-					itr = bush.iterator();
-
-
-					//extract bubbles
-//					final List<LineEntry> bubbles = bush.stream()
-//						.filter(rule -> rule.condition.length() > parentConditionLength)
-//						.collect(Collectors.toList());
-
-//					if(!bubbles.isEmpty()){
-//						final List<LineEntry> newRules = bubbleUpNotGroup(parent, bubbles);
-
-						//bubble up not-group
-//						final Set<String> bubblesConditions = bubbles.stream()
-//							.map(rule -> rule.condition)
-//							.collect(Collectors.toSet());
-//					}
+					else
+						nonOverlappingRules.add(parent);
 				}
 
 
@@ -410,7 +411,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //											.flatMap(Set::stream)
 //											.collect(Collectors.toSet());
 //										for(int i = indexFromLast; i < maxConditionLength; i ++){
-//											final LineEntry newEntry = LineEntry.createFrom(rule, /*addition.substring(lcp) +*/ rule.condition,
+//											final LineEntry newEntry = LineEntry.createFromWithWords(rule, /*addition.substring(lcp) +*/ rule.condition,
 //												Collections.<String>emptyList());
 //											nonOverlappingRules.add(newEntry);
 //										}
@@ -503,7 +504,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //								final String condition = (childConditionLength == 0 /*|| childGroup.size() < childNotGroup.size()*/?
 //									makeGroup(childGroup): makeNotGroup(childNotGroup))
 //									+ (childConditionLength > 0? child.condition.substring(childConditionLength - index): child.condition);
-//								final LineEntry newEntry = LineEntry.createFrom(child, condition, child.from);
+//								final LineEntry newEntry = LineEntry.createFromWithWords(child, condition, child.from);
 //								rules.add(newEntry);
 //
 //								//exclude from further processing
@@ -544,12 +545,12 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //								makeGroup(preCondition): makeNotGroup(groupsIntersection)) + parent.condition;
 //if("[^ò]o".equals(condition))
 //	System.out.println("");
-//							final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+//							final LineEntry newEntry = LineEntry.createFromWithWords(parent, condition, notGroupList);
 //							rules.add(newEntry);
 //						}
 //						for(final Map.Entry<String, List<String>> entry : parentBucket.entrySet()){
 //							final String condition = entry.getKey() + parent.condition;
-//							final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+//							final LineEntry newEntry = LineEntry.createFromWithWords(parent, condition, entry.getValue());
 //							children.add(newEntry);
 //						}
 //
@@ -592,12 +593,12 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //							|| !childrenGroup.containsAll(preCondition) && preCondition.size() < childrenGroup.size()?
 //						makeGroup(preCondition, parent.condition):
 //						makeNotGroup(childrenGroup, parent.condition));
-//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, notGroupList);
+//					final LineEntry newEntry = LineEntry.createFromWithWords(parent, condition, notGroupList);
 //					rules.add(newEntry);
 //				}
 //				for(final Map.Entry<String, List<String>> entry : fromBucket.entrySet()){
 //					final String condition = entry.getKey() + parent.condition;
-//					final LineEntry newEntry = LineEntry.createFrom(parent, condition, entry.getValue());
+//					final LineEntry newEntry = LineEntry.createFromWithWords(parent, condition, entry.getValue());
 //					sortedList.add(newEntry);
 //				}
 //
@@ -664,10 +665,9 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 			}
 			final Set<Character> commonGroup = extractGroup(comm, e.getKey().length());
 			final String condition = makeNotGroup(commonGroup, e.getKey());
-			final List<String> words = parent.extractFromEndingWith(condition);
-			final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+			final LineEntry newEntry = LineEntry.createFrom(parent, condition);
 			//keep only rules that matches some existent words
-			if(!words.isEmpty())
+			if(newEntry.isProductive())
 				newParents.add(newEntry);
 			else
 				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
@@ -687,10 +687,9 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 				final String condition = makeNotGroup(conds.getKey().charAt(i - 1))
 					+ conds.getKey().substring(i)
 					+ makeGroup(bubbleGroup, parent.condition);
-				final List<String> words = parent.extractFromEndingWith(condition);
-				final LineEntry newEntry = LineEntry.createFrom(parent, condition, words);
+				final LineEntry newEntry = LineEntry.createFrom(parent, condition);
 				//keep only rules that matches some existent words
-				if(!words.isEmpty())
+				if(newEntry.isProductive())
 					newParents.add(newEntry);
 				else
 					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
@@ -723,43 +722,44 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 	}
 
 	private List<LineEntry> expandEmptyCondition(final List<LineEntry> rules){
-		//collect empty conditions
-		final List<LineEntry> parents = new ArrayList<>();
-		final Iterator<LineEntry> itr = rules.iterator();
-		while(itr.hasNext()){
-			final LineEntry parent = itr.next();
-			if(parent.condition.isEmpty()){
-				parents.add(parent);
-				itr.remove();
-			}
-		}
-
-		final Set<String> otherFrom = rules.stream()
-			.flatMap(rule -> rule.from.stream())
-			.collect(Collectors.toSet());
-		final Set<Character> otherGroup = extractGroup(otherFrom, 0);
-
-		//for each rule with empty condition
 		final List<LineEntry> finalRules = new ArrayList<>();
-		for(final LineEntry parent : parents){
-			//expand empty condition:
-			final Set<Character> parentGroup = extractGroup(parent.from, 0);
-			final Set<Character> intersection = SetHelper.intersection(parentGroup, otherGroup);
-			parentGroup.removeAll(intersection);
-			if(!parentGroup.isEmpty()){
-				final String condition = makeGroup(parentGroup);
-				final List<String> from = parent.extractFromEndingWith(condition);
-				final LineEntry newRule = LineEntry.createFrom(parent, condition, from);
-				finalRules.add(newRule);
+		final LineEntry emptyConditionParent = rules.get(0);
+		if(emptyConditionParent.condition.isEmpty()){
+			//collect empty conditions
+			final List<LineEntry> parents = new ArrayList<>();
+			final Iterator<LineEntry> itr = rules.iterator();
+			while(itr.hasNext()){
+				final LineEntry parent = itr.next();
+				if(parent.condition.isEmpty()){
+					parents.add(parent);
+					itr.remove();
+				}
 			}
-			for(final Character chr : intersection){
-				final String condition = String.valueOf(chr);
-				final List<String> from = parent.extractFromEndingWith(condition);
-				final LineEntry newRule = LineEntry.createFrom(parent, condition, from);
-				rules.add(newRule);
+
+			final Set<String> otherFrom = rules.stream()
+				.flatMap(rule -> rule.from.stream())
+				.collect(Collectors.toSet());
+			final Set<Character> otherGroup = extractGroup(otherFrom, 0);
+
+			//for each rule with empty condition
+			for(final LineEntry parent : parents){
+				//expand empty condition:
+				final Set<Character> parentGroup = extractGroup(parent.from, 0);
+				final Set<Character> intersection = SetHelper.intersection(parentGroup, otherGroup);
+				parentGroup.removeAll(intersection);
+				if(!parentGroup.isEmpty()){
+					final String condition = makeGroup(parentGroup);
+					final LineEntry newRule = LineEntry.createFrom(parent, condition);
+					finalRules.add(newRule);
+				}
+				for(final Character chr : intersection){
+					final String condition = String.valueOf(chr);
+					final LineEntry newRule = LineEntry.createFrom(parent, condition);
+					rules.add(newRule);
+				}
 			}
+			rules.sort(shortestConditionComparator);
 		}
-		rules.sort(shortestConditionComparator);
 		return finalRules;
 	}
 
@@ -798,14 +798,12 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					if(!parentGroup.isEmpty()){
 						final String cond = (groupsIntersection.isEmpty() && (parent.condition.isEmpty() || parentGroup.size() < childrenGroup.size())?
 							makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
-						final List<String> from = parent.extractFromEndingWith(cond);
-						final LineEntry newRule = LineEntry.createFrom(parent, cond, from);
+						final LineEntry newRule = LineEntry.createFrom(parent, cond);
 						finalRules.add(newRule);
 					}
 					for(final Character chr : groupsIntersection){
 						final String cond = String.valueOf(chr);
-						final List<String> from = parent.extractFromEndingWith(cond);
-						final LineEntry newRule = LineEntry.createFrom(parent, cond, from);
+						final LineEntry newRule = LineEntry.createFrom(parent, cond);
 						rules.add(newRule);
 					}
 				}
@@ -937,8 +935,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
 				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
-				final List<String> words = anEntry.extractFromEndingWith(condition);
-				entries.add(LineEntry.createFrom(anEntry, condition, words));
+				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);
 			}

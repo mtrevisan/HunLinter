@@ -32,7 +32,19 @@ public class LineEntry implements Serializable{
 	String condition;
 
 
-	public static LineEntry createFrom(final LineEntry entry, final String condition, final Collection<String> words){
+	public static LineEntry createFrom(final LineEntry entry, final String condition){
+		final List<String> words = entry.extractFromEndingWith(condition);
+		return createFromWithWords(entry, condition, words);
+	}
+
+	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
+		final List<String> words = parentRulesFrom.stream()
+			.flatMap(rule -> rule.extractFromEndingWith(condition).stream())
+			.collect(Collectors.toList());
+		return createFromWithWords(entry, condition, words);
+	}
+
+	public static LineEntry createFromWithWords(final LineEntry entry, final String condition, final List<String> words){
 		return new LineEntry(entry.removal, entry.addition, condition, words);
 	}
 
@@ -84,6 +96,10 @@ public class LineEntry implements Serializable{
 		return from.stream()
 			.filter(word -> PatternHelper.find(word, conditionPattern))
 			.collect(Collectors.toList());
+	}
+
+	public boolean isProductive(){
+		return !from.isEmpty();
 	}
 
 	public String anAddition(){
