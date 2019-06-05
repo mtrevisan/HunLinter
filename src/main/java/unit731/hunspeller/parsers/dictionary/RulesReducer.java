@@ -334,10 +334,10 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							bush.remove(parent);
 
 							if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+								final List<LineEntry> bushes = new ArrayList<>(bush);
+								bushes.add(parent);
 								for(final Character chr : groups){
 									final String cond = chr + parent.condition;
-									final List<LineEntry> bushes = new ArrayList<>(bush);
-									bushes.add(parent);
 									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
 									if(!bush.contains(newEntry))
 										bush.add(newEntry);
@@ -349,9 +349,8 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						else{
 							nonOverlappingRules.addAll(bubbles);
 
-//							bush.removeAll(bubbles);
-
-							break;
+							bush.remove(parent);
+							bush.removeAll(bubbles);
 						}
 
 						//continue until bubbles.condition length is reached
