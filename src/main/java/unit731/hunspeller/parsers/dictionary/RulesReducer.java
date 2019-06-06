@@ -379,16 +379,20 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							}
 							//FIXME
 							else{
-								//TODO manage 'inpenir' in r3 (it disappears)?
+								//TODO manage 'inpenir' in r3 (it disappears)? - case5 & case13
 								//expand intersection
-								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+//								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+								final Set<Character> groupIntersection = SetHelper.difference(parentGroup, childrenGroup);
 								if(!groupIntersection.isEmpty()){
+									final List<LineEntry> bushes = new ArrayList<>(bush);
+									bushes.add(parent);
 									for(final Character chr : groupIntersection){
 										final String cond = chr + parent.condition;
-										newEntry = LineEntry.createFrom(parent, cond);
-										if(!bush.contains(newEntry))
-											//TODO manage adding of same condition rule
-											bush.add(newEntry);
+										newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+										if(newEntry.isProductive())
+											if(!bush.contains(newEntry))
+												//TODO manage adding of same condition rule
+												bush.add(newEntry);
 									}
 
 									bush.sort(shortestConditionComparator);
