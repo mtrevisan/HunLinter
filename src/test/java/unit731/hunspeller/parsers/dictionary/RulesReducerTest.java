@@ -993,10 +993,9 @@ public class RulesReducerTest{
 	[rem= guerò,add=[   sion],cond= guerò,from=[destinguerò]]																										=> [u]
 	[rem=orxerò,add=[uresion],cond=orxerò,from=[sorxerò]]																												=> [x]
 
-	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, ...]]		=> [a, i]
-	[rem= ir,add=[ sion],cond= ir,from=[konstituir, atribuir, kostituir, kostruir, deminuir, sostituir, instruir, destribuir, ...]]	=> [i]
-	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																										=> [e]
-	[rem=tar,add=[ sion],cond=tar,from=[prexentar, exentar, ventar, sospetar]]																			=> [a]
+	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, komodar, permutar, suparar, ...]] => [a, i]
+	[rem= ir,add=[ sion],cond= ir,from=[konstituir, atribuir, kostituir, kostruir, deminuir, sostituir, instruir, destribuir, diminuir, lokuir]]					=> [i]
+	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																																		=> [e]
 	*/
 	@Test
 	public void case13() throws IOException{
@@ -1004,33 +1003,30 @@ public class RulesReducerTest{
 			"SET UTF-8",
 			"LANG vec",
 			"FLAG long",
-			"SFX r3 Y 20",
-			"SFX r3 àer asion àer",
+			"SFX r3 Y 17",
 			"SFX r3 ir sion uir",
+			"SFX r3 àer asion àer",
 			"SFX r3 r sion [^t]ar",
 			"SFX r3 r sion [^u]ir",
+			"SFX r3 erò ision terò",
 			"SFX r3 merò nsion merò",
 			"SFX r3 nerò xision nerò",
 			"SFX r3 ñerò nsion ñerò",
-			"SFX r3 erò ision terò",
-			"SFX r3 r sion [^en]tar",
-			"SFX r3 derò usion lderò",
+			"SFX r3 r sion tar",
 			"SFX r3 derò sion nderò",
-			"SFX r3 guerò sion guerò",
-			"SFX r3 verò sion iverò",
 			"SFX r3 verò usion lverò",
-			"SFX r3 tar sion petar",
-			"SFX r3 xerò sion [^r]xerò",
+			"SFX r3 guerò sion guerò",
 			"SFX r3 r sion [^p]etar",
-			"SFX r3 orxerò uresion orxerò",
-			"SFX r3 tar sion [vx]entar",
-			"SFX r3 r sion [^vx]entar"
+			"SFX r3 derò usion [^n]derò",
+			"SFX r3 verò sion [^l]verò",
+			"SFX r3 xerò sion [^r]xerò",
+			"SFX r3 orxerò uresion orxerò"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r3";
-		List<String> words = Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "destinguerò", "solderò", "kavar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "autorixar", "provokar", "petir", "satisfar", "notifegar", "akuixir", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "partir", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "fenir", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "benedir", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "lenir", "nomenar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "sorxerò", "prexentar", "exentar", "ventar", "sospetar", "repeterò", "estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "asumerò", "prexumerò", "konsumerò", "koskriverò", "sotoskriverò", "skriverò", "iskriverò", "tràer", "estràer", "konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò");
+		List<String> words = Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "destinguerò", "solderò", "kavar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "autorixar", "provokar", "petir", "satisfar", "notifegar", "akuixir", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "partir", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "fenir", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "benedir", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "lenir", "nomenar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "sorxerò", "prexentar", "exentar", "ventar", "sospetar", "repeterò", "estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "asumerò", "prexumerò", "konsumerò", "koskriverò", "sotoskriverò", "skriverò", "iskriverò", "tràer", "estràer", "konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò", "lokuir");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
@@ -1041,54 +1037,42 @@ public class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("nerò", "xision", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò")),
-			new LineEntry("merò", "nsion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
-			new LineEntry("orxerò", "uresion", "orxerò", "sorxerò"),
-			new LineEntry("ñerò", "nsion", "ñerò", "konveñerò"),
-			new LineEntry("guerò", "sion", "guerò", "destinguerò"),
-			new LineEntry("àer", "asion", "àer", Arrays.asList("tràer", "estràer")),
-			new LineEntry("ir", "sion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir")),
-			new LineEntry("r", "sion", "[^u]ir", Arrays.asList("proibir", "rekuixir", "monir", "kondir", "inkuixir", "benedir", "nudrir", "inibir", "tradir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir", "punir", "fenir", "akuixir", "partir", "vestir", "munir", "finir", "lenir")),
-			new LineEntry("r", "sion", "[^t]ar", Arrays.asList("kavar", "sastufar", "strologar", "aplikar", "traxlokar", "komodar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "eskorporar", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "sonorixar", "fidar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "torefar", "mexurar", "koordenar", "konvokar", "numarar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "sekurar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "akuxar", "legar", "oblar", "sindikar", "stilar", "konmixarar", "verifegar", "opinar", "privar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "segurar", "autorixar", "provokar", "satisfar", "notifegar", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "ordenar", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "emular", "strukar", "mansipar", "rasionar", "levar", "malfar", "mirar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "salvar", "spesifegar", "sikurar", "legrar", "orar", "traversar", "identifegar", "radar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "kanselar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "formar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "proar", "panixar", "legalidar", "iluminar", "kontaminar", "libarar", "malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "kalsinar", "soporar", "nomenar", "rivar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "xmenbrar", "strolegar", "tranxar", "negar")),
-			new LineEntry("erò", "ision", "terò", "repeterò"),
-			new LineEntry("r", "sion", "[^en]tar", Arrays.asList("exaltar", "exortar", "tratar", "pernotar", "soportar", "notar", "bitar", "sitar", "butar", "mutar", "reputar", "balotar", "limitar", "dexertar", "testar", "salutar", "depoxitar", "palpitar", "deputar", "permutar", "vixitar", "valutar", "votar")),
-			new LineEntry("derò", "usion", "lderò", "solderò"),
-			new LineEntry("derò", "sion", "nderò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
-			new LineEntry("xerò", "sion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò")),
 			new LineEntry("verò", "sion", "iverò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
 			new LineEntry("verò", "usion", "lverò", Arrays.asList("solverò", "evolverò", "revolverò", "rexolverò")),
-			new LineEntry("tar", "sion", "petar", "sospetar"),
-			new LineEntry("r", "sion", "[^p]etar", Arrays.asList("deletar", "cetar", "xetar", "setar", "fetar", "interpretar")),
-			new LineEntry("tar", "sion", "[^mt]entar", Arrays.asList("prexentar", "exentar", "ventar")),
-			new LineEntry("r", "sion", "[mt]entar", Arrays.asList("substentar", "fermentar", "ostentar", "lamentar", "tentar", "sostentar", "augumentar"))
+			new LineEntry("derò", "usion", "lderò", "solderò"),
+			new LineEntry("derò", "sion", "nderò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
+			new LineEntry("r", "sion", "[^ei]r", Arrays.asList("kavar", "fermentar", "notar", "sastufar", "strologar", "aplikar", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "eskorporar", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "ventar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "sospetar", "autorixar", "provokar", "prexentar", "satisfar", "exentar", "notifegar", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "nomenar", "exaltar", "exortar", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar")),
+			new LineEntry("ir", "sion", "ir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir")),
+			new LineEntry("àer", "asion", "àer", Arrays.asList("tràer", "estràer")),
+			new LineEntry("erò", "ision", "terò", "repeterò"),
+			new LineEntry("xerò", "sion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò")),
+			new LineEntry("nerò", "xision", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò")),
+			new LineEntry("merò", "nsion", "merò", Arrays.asList("asumerò", "prexumerò", "konsumerò")),
+			new LineEntry("ñerò", "nsion", "ñerò", "konveñerò"),
+			new LineEntry("guerò", "sion", "guerò", "destinguerò"),
+			new LineEntry("orxerò", "uresion", "orxerò", "sorxerò")
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX r3 Y 20",
-			"SFX r3 ir sion uir",
+			"SFX r3 Y 14",
+			"SFX r3 ir sion ir",
+			"SFX r3 r sion [^ei]r",
 			"SFX r3 àer asion àer",
-			"SFX r3 r sion [^t]ar",
-			"SFX r3 r sion [^u]ir",
 			"SFX r3 erò ision terò",
 			"SFX r3 merò nsion merò",
 			"SFX r3 nerò xision nerò",
 			"SFX r3 ñerò nsion ñerò",
-			"SFX r3 r sion [^en]tar",
-			"SFX r3 tar sion petar",
+			"SFX r3 derò usion lderò",
 			"SFX r3 derò sion nderò",
+			"SFX r3 verò sion iverò",
 			"SFX r3 verò usion lverò",
 			"SFX r3 guerò sion guerò",
-			"SFX r3 r sion [^p]etar",
-			"SFX r3 derò usion [^n]derò",
-			"SFX r3 verò sion [^l]verò",
 			"SFX r3 xerò sion [^r]xerò",
-			"SFX r3 orxerò uresion orxerò",
-			"SFX r3 r sion [mt]entar",
-			"SFX r3 tar sion [^mt]entar"
+			"SFX r3 orxerò uresion orxerò"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
@@ -1099,33 +1083,25 @@ public class RulesReducerTest{
 			"SET UTF-8",
 			"LANG vec",
 			"FLAG long",
-			"SFX r2 Y 26",
-			"SFX r2 r ŧion [^aei]r",
-			"SFX r2 r ŧion [^t]ar",
-			"SFX r2 r ŧion [^en]tar",
-			"SFX r2 r ŧion [^p]etar",
-			"SFX r2 r ŧion [^s]petar",
-			"SFX r2 r ŧion [^e]ntar",
-			"SFX r2 r ŧion [^vx]entar",
-			"SFX r2 r ŧion [^à]er",
-			"SFX r2 r ŧion [^u]ir",
-			"SFX r2 tar ŧion spetar",
-			"SFX r2 tar ŧion [vx]entar",
-			"SFX r2 àer aŧion àer",
+			"SFX r2 Y 18",
 			"SFX r2 ir ŧion uir",
-			"SFX r2 erò ion [^dmnñtuvsŧx]erò",
-			"SFX r2 erò ion [sŧ]erò",
-			"SFX r2 xerò ŧion [aeiu]xerò",
-			"SFX r2 orxerò ureŧion sorxerò",
-			"SFX r2 merò nŧion umerò",
-			"SFX r2 nerò xiŧion onerò",
-			"SFX r2 verò ŧion iverò",
-			"SFX r2 erò iŧion eterò",
-			"SFX r2 derò ŧion [ae]nderò",
-			"SFX r2 ñerò nŧion eñerò",
-			"SFX r2 derò uŧion olderò",
-			"SFX r2 verò uŧion olverò",
-			"SFX r2 guerò ŧion stinguerò"
+			"SFX r2 àer aŧion àer",
+			"SFX r2 r ŧion [^t]ar",
+			"SFX r2 r ŧion [^u]ir",
+			"SFX r2 erò iŧion terò",
+			"SFX r2 merò nŧion merò",
+			"SFX r2 nerò xiŧion nerò",
+			"SFX r2 ñerò nŧion ñerò",
+			"SFX r2 r ŧion tar",
+			"SFX r2 erò ion [đsŧ]erò",
+			"SFX r2 derò ŧion nderò",
+			"SFX r2 verò uŧion lverò",
+			"SFX r2 guerò ŧion guerò",
+			"SFX r2 r ŧion [^p]etar",
+			"SFX r2 derò uŧion [^n]derò",
+			"SFX r2 verò ŧion [^l]verò",
+			"SFX r2 xerò ŧion [^r]xerò",
+			"SFX r2 orxerò ureŧion orxerò"
 		);
 		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
 		RulesReducer reducer = pair.getLeft();
@@ -1168,7 +1144,7 @@ public class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX r2 Y 21",
+			"SFX r2 Y 18",
 			"SFX r2 ir ŧion uir",
 			"SFX r2 àer aŧion àer",
 			"SFX r2 r ŧion [^t]ar",
@@ -1177,9 +1153,8 @@ public class RulesReducerTest{
 			"SFX r2 merò nŧion merò",
 			"SFX r2 nerò xiŧion nerò",
 			"SFX r2 ñerò nŧion ñerò",
-			"SFX r2 r ŧion [^en]tar",
+			"SFX r2 r ŧion tar",
 			"SFX r2 erò ion [đsŧ]erò",
-			"SFX r2 tar ŧion petar",
 			"SFX r2 derò ŧion nderò",
 			"SFX r2 verò uŧion lverò",
 			"SFX r2 guerò ŧion guerò",
@@ -1187,9 +1162,7 @@ public class RulesReducerTest{
 			"SFX r2 derò uŧion [^n]derò",
 			"SFX r2 verò ŧion [^l]verò",
 			"SFX r2 xerò ŧion [^r]xerò",
-			"SFX r2 orxerò ureŧion orxerò",
-			"SFX r2 r ŧion [mt]entar",
-			"SFX r2 tar ŧion [^mt]entar"
+			"SFX r2 orxerò ureŧion orxerò"
 		);
 //		Assertions.assertEquals(expectedRules, rules);
 

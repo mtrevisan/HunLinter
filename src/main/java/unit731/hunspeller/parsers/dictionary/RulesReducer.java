@@ -308,11 +308,11 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
 
+final Map<LineEntry, Set<Character>> groups2 = bush.stream()
+	.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, parent.condition.length())));
 					bush.remove(parent);
 
 					final int parentConditionLength = parent.condition.length();
-final Map<LineEntry, Set<Character>> groups2 = bush.stream()
-	.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, parentConditionLength)));
 					final List<LineEntry> bubbles = bush.stream()
 						.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
