@@ -378,19 +378,22 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 								bush.sort(shortestConditionComparator);
 							}
 							//FIXME
-//							else if(!newEntry.isProductive()){
-//								//expand intersection
-//								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-//								for(final Character chr : groupIntersection){
-//									final String cond = chr + parent.condition;
-//									newEntry = LineEntry.createFrom(parent, cond);
-//									if(!bush.contains(newEntry))
-//										//TODO manage adding of same condition rule
-//										bush.add(newEntry);
-//								}
-//
-//								bush.sort(shortestConditionComparator);
-//							}
+							else{
+								//TODO manage 'inpenir' in r3 (it disappears)?
+								//expand intersection
+								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+								if(!groupIntersection.isEmpty()){
+									for(final Character chr : groupIntersection){
+										final String cond = chr + parent.condition;
+										newEntry = LineEntry.createFrom(parent, cond);
+										if(!bush.contains(newEntry))
+											//TODO manage adding of same condition rule
+											bush.add(newEntry);
+									}
+
+									bush.sort(shortestConditionComparator);
+								}
+							}
 
 							//continue until bubbles.condition length is reached
 //						}
