@@ -165,7 +165,7 @@ public class AffixData{
 	}
 
 	public boolean isForbidTriplesInCompound(){
-		return containsData(AffixTag.FORBIT_TRIPLES_IN_COMPOUND);
+		return containsData(AffixTag.FORBID_TRIPLES_IN_COMPOUND);
 	}
 
 	public boolean isSimplifyTriplesInCompound(){

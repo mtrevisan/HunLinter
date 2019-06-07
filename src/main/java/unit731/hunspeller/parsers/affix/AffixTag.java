@@ -94,7 +94,7 @@ public enum AffixTag{
 	/** Forbid upper case characters at word bound in compounds */
 	FORBID_DIFFERENT_CASES_IN_COMPOUND("CHECKCOMPOUNDCASE"),
 	/** Forbid compounding, if compound word contains triple repeating letters (e.g. foo|ox or xo|oof) */
-	FORBIT_TRIPLES_IN_COMPOUND("CHECKCOMPOUNDTRIPLE"),
+	FORBID_TRIPLES_IN_COMPOUND("CHECKCOMPOUNDTRIPLE"),
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -&gt; Schiffahrt) */
 	SIMPLIFIED_TRIPLES_IN_COMPOUND("SIMPLIFIEDTRIPLE"),
 	/*
