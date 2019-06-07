@@ -267,6 +267,9 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
 						.collect(Collectors.toList());
 					if(!bubbles.isEmpty()){
+						//TODO what if parent is contained into one of the bubbles? ([rem=en,add=[ini],cond=en,...] is into
+						//[rem=órden,add=[órdini,úrdini],cond=órden,...], that is [rem=en,add=[ini],cond=órden,...] + [rem=órden,add=[úrdini],cond=órden,...])
+
 						//extract ratifying group
 						final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
 
