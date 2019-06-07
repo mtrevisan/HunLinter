@@ -326,7 +326,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 							.collect(Collectors.toSet());
 
 						//if intersection(parent-group, children-group) is empty
-//						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 						//TODO
 //						if(!groupIntersection.isEmpty() && childrenGroup.containsAll(parentGroup)){
 //							for(final char chr : parentGroup){
@@ -345,6 +345,7 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 //							continue;
 //						}
 
+						parentGroup.removeAll(groupIntersection);
 //						if(groupIntersection.isEmpty()){
 							//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
 							final String condition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
@@ -378,30 +379,30 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 								bush.sort(shortestConditionComparator);
 							}
 							//FIXME
-							else{
-								//TODO manage 'inpenir' in r3 (it disappears)? - case5 & case13
-								//expand intersection
-//								final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-								final Set<Character> groupIntersection = SetHelper.difference(parentGroup, childrenGroup);
-								if(!groupIntersection.isEmpty()){
-									final List<LineEntry> bushes = new ArrayList<>(bush);
-									bushes.add(parent);
-									for(final Character chr : groupIntersection){
-										final String cond = chr + parent.condition;
-										newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
-										if(newEntry.isProductive())
-											if(!bush.contains(newEntry))
-												//TODO manage adding of same condition rule
-												bush.add(newEntry);
-									}
-
-									bush.sort(shortestConditionComparator);
-								}
-							}
+//							else if(!SetHelper.intersection(parentGroup, childrenGroup).isEmpty()){
+//								//TODO manage 'inpenir' in r3 (it disappears)? - case5 & case13
+//								//expand intersection
+//								final Set<Character> groupIntersection2 = SetHelper.difference(parentGroup, childrenGroup);
+//								if(!groupIntersection2.isEmpty()){
+//									final List<LineEntry> bushes = new ArrayList<>(bush);
+//									bushes.add(parent);
+//									for(final Character chr : groupIntersection2){
+//										final String cond = chr + parent.condition;
+//										newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+//										if(newEntry.isProductive())
+//											if(!bush.contains(newEntry))
+//												//TODO manage adding of same condition rule
+//												bush.add(newEntry);
+//									}
+//
+//									bush.sort(shortestConditionComparator);
+//								}
+//							}
 
 							//continue until bubbles.condition length is reached
 //						}
 //						else{
+//						if(!groupIntersection.isEmpty()){
 //							throw new IllegalArgumentException("to do");
 //						}
 					}
