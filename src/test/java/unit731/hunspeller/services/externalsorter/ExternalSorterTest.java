@@ -49,7 +49,7 @@ class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assertions.assertTrue(outputFile.length() == 27);
+		Assertions.assertEquals(27, outputFile.length());
 	}
 
 	@Test
@@ -61,7 +61,7 @@ class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assertions.assertTrue(outputFile.length() == 27);
+		Assertions.assertEquals(27, outputFile.length());
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assertions.assertTrue(outputFile.length() == 21);
+		Assertions.assertEquals(21, outputFile.length());
 		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
 	}
 
@@ -88,7 +88,7 @@ class ExternalSorterTest{
 
 		sorter.sort(inputFile, options, outputFile);
 
-		Assertions.assertTrue(outputFile.length() == 27);
+		Assertions.assertEquals(27, outputFile.length());
 		Assertions.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
 	}
 

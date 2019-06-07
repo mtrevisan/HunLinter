@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;

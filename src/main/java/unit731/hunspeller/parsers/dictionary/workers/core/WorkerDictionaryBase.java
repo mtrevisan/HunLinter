@@ -33,7 +33,7 @@ public class WorkerDictionaryBase{
 		worker.execute();
 	}
 
-	public void executeInline() throws IOException{
+	public void executeInline(){
 		clear();
 
 		worker.doInBackground();

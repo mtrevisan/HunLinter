@@ -39,7 +39,7 @@ public class WordVEC{
 	}
 
 	private static final String COLLATOR_RULE = ", ' ' < ʼ=''' , '-'='‒' & '-'='–' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < '/' < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ú,Ú < v,V < x,X";
-	private static final Collator COLLATOR;
+	private static Collator COLLATOR;
 	static{
 		try{
 			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);

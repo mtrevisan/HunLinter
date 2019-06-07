@@ -55,7 +55,7 @@ public class FileHelper{
 				reader.read();
 				return cs;
 			}
-			catch(IOException e){}
+			catch(IOException ignored){}
 		}
 
 		throw new IllegalArgumentException("The file is not in an allowable charset ("

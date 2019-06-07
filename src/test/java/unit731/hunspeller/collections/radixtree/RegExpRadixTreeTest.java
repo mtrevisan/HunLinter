@@ -634,10 +634,10 @@ class RegExpRadixTreeTest{
 		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("h"));
 		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("hell"));
 		Assertions.assertTrue(tree.getValuesPrefixedTo("helloworld").contains("hello"));
-		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("he"));
-		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("hat"));
-		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("cat"));
-		Assertions.assertTrue(!tree.getValuesPrefixedTo("helloworld").contains("hey"));
+		Assertions.assertFalse(tree.getValuesPrefixedTo("helloworld").contains("he"));
+		Assertions.assertFalse(tree.getValuesPrefixedTo("helloworld").contains("hat"));
+		Assertions.assertFalse(tree.getValuesPrefixedTo("helloworld").contains("cat"));
+		Assertions.assertFalse(tree.getValuesPrefixedTo("helloworld").contains("hey"));
 		Assertions.assertTrue(tree.getValuesPrefixedTo("animal").isEmpty());
 	}
 
@@ -736,7 +736,7 @@ class RegExpRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("ape", "ape");
 
-		Assertions.assertTrue(tree.size() == 5);
+		Assertions.assertEquals(5, tree.size());
 	}
 
 	@Test
@@ -748,7 +748,7 @@ class RegExpRadixTreeTest{
 
 		tree.removePrefixedBy("appleshack");
 
-		Assertions.assertTrue(tree.size() == 1);
+		Assertions.assertEquals(1, tree.size());
 	}
 
 

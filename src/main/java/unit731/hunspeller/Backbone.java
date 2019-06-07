@@ -161,7 +161,7 @@ public class Backbone implements FileChangeListener{
 		wordGenerator = null;
 	}
 
-	public void registerFileListener() throws IOException{
+	public void registerFileListener(){
 		File hypFile = getHyphenationFile();
 		File aidFile = getAidFile();
 		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
@@ -194,7 +194,7 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
-	private void openHyphenationFile(File hypFile) throws IOException{
+	private void openHyphenationFile(File hypFile){
 		if(hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 

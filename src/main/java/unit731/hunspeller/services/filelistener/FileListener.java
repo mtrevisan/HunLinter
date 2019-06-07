@@ -1,7 +1,5 @@
 package unit731.hunspeller.services.filelistener;
 
-import java.io.IOException;
-
 
 public interface FileListener{
 

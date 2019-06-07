@@ -634,10 +634,10 @@ class StringRadixTreeTest{
 		Assertions.assertTrue(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("h"));
 		Assertions.assertTrue(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hell"));
 		Assertions.assertTrue(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hello"));
-		Assertions.assertTrue(!tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("he"));
-		Assertions.assertTrue(!tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hat"));
-		Assertions.assertTrue(!tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("cat"));
-		Assertions.assertTrue(!tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hey"));
+		Assertions.assertFalse(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("he"));
+		Assertions.assertFalse(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hat"));
+		Assertions.assertFalse(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("cat"));
+		Assertions.assertFalse(tree.getValues("helloworld", RadixTree.PrefixType.PREFIXED_TO).contains("hey"));
 		Assertions.assertTrue(tree.getValues("animal", RadixTree.PrefixType.PREFIXED_TO).isEmpty());
 	}
 
@@ -736,7 +736,7 @@ class StringRadixTreeTest{
 		tree.put("applepie", "applepie");
 		tree.put("ape", "ape");
 
-		Assertions.assertTrue(tree.size() == 5);
+		Assertions.assertEquals(5, tree.size());
 	}
 
 	@Test
@@ -748,7 +748,7 @@ class StringRadixTreeTest{
 
 		tree.remove("appleshack");
 
-		Assertions.assertTrue(tree.size() == 1);
+		Assertions.assertEquals(1, tree.size());
 	}
 
 }

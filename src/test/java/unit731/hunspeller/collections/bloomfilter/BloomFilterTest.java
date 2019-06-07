@@ -50,7 +50,7 @@ class BloomFilterTest{
 			boolean present = filter.contains(uuid);
 			if(present){
 				//false positive
-				Assertions.assertEquals(false, contained.contains(uuid));
+				Assertions.assertFalse(contained.contains(uuid));
 				fpp ++;
 			}
 		}
@@ -70,7 +70,7 @@ class BloomFilterTest{
 			boolean present = filter.contains(uuid);
 			if(present){
 				// false positive
-				Assertions.assertEquals(false, contained.contains(uuid));
+				Assertions.assertFalse(contained.contains(uuid));
 				fpp ++;
 			}
 		}
