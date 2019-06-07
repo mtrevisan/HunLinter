@@ -383,11 +383,9 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 								for(final Character chr : groupIntersection){
 									final String cond = chr + parent.condition;
 									newEntry = LineEntry.createFrom(parent, cond);
-									//FIXME
-									//TODO manage 'inpenir' in r3 (it disappears)? - case5 & case13
-//									//TODO manage adding of same condition rule
 									bush.add(newEntry);
-System.out.println("");
+
+									nonOverlappingRules.addAll(expandSameCondition(bush));
 								}
 
 								bush.sort(shortestConditionComparator);
