@@ -272,7 +272,10 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 						for(final LineEntry child : bubbles)
 							if(isContainedInto(parent, child, type)){
 								//TODO
-								System.out.println("");
+								//transfer `from` from child to parent
+								//remove parent addition from child
+								//remove child from bubbles, insert into `nonOverlappingRules`
+System.out.println("");
 							}
 
 						//extract ratifying group
