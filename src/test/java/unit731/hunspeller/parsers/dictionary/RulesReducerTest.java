@@ -1333,6 +1333,12 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	/**
+	[rem=   en,add=[           ini],cond=   en,from=[scavàđen, ƚankúxen, marúxen, bokàđen, lankúden, fien, ...]]	=> [b, d, f, g, ŧ, i, l, m, n, p, đ, r, s, t, v, x]
+	[rem=órden,add=[órdini, úrdini],cond=órden,from=[órden]]																			=> [d]
+
+	...
+	*/
 	@Test
 	void case18() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
