@@ -269,6 +269,11 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					if(!bubbles.isEmpty()){
 						//TODO what if parent is contained into one of the bubbles? ([rem=en,add=[ini],cond=en,...] is into
 						//[rem=órden,add=[órdini,úrdini],cond=órden,...], that is [rem=en,add=[ini],cond=órden,...] + [rem=órden,add=[úrdini],cond=órden,...])
+						for(final LineEntry child : bubbles)
+							if(isContainedInto(parent, child, type)){
+								//TODO
+								System.out.println("");
+							}
 
 						//extract ratifying group
 						final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
@@ -820,6 +825,23 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 					}
 				}
 		}
+	}
+
+	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
+		final Set<String> parentBones = extractRuleSpine(parent, type);
+		final Set<String> childBones = extractRuleSpine(child, type);
+		return childBones.containsAll(parentBones);
+	}
+
+	private Set<String> extractRuleSpine(final LineEntry rule, final AffixEntry.Type type){
+		final Set<String> parentBones = new HashSet<>();
+		for(final String add : rule.addition){
+			final int lcsLength = longestCommonAffix(Arrays.asList(add, rule.removal),
+				(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
+				.length();
+			parentBones.add(add.substring(lcsLength) + TAB + rule.removal.substring(lcsLength));
+		}
+		return parentBones;
 	}
 
 	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
