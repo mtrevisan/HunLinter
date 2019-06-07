@@ -302,8 +302,8 @@ public class HyphenationParser{
 	/**
 	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
 	 *
-	 * @param {String} data	The data from an affix file.
-	 * @return {String}		The cleaned-up data.
+	 * @param line	The line from an affix file
+	 * @return The cleaned-up line
 	 */
 	private static String removeComment(String line){
 		//remove comments

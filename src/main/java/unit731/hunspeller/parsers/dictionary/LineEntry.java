@@ -2,8 +2,8 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +57,7 @@ public class LineEntry implements Serializable{
 	}
 
 	LineEntry(final String removal, final Set<String> addition, final String condition, final String word){
-		this(removal, addition, condition, Arrays.asList(word));
+		this(removal, addition, condition, Collections.singletonList(word));
 	}
 
 	LineEntry(final String removal, final Set<String> addition, final String condition, final Collection<String> words){

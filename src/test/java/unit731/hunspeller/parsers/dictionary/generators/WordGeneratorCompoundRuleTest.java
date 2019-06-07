@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -295,7 +296,7 @@ public class WordGeneratorCompoundRuleTest{
 		List<Production> words = backbone.getWordGenerator().applyCompoundRules(inputCompounds, line, 5);
 //words.forEach(System.out::println);
 
-		List<Production> expected = Arrays.asList(
+		List<Production> expected = Collections.singletonList(
 			createProduction("Arbeitsscheu", null, "pa:arbeits st:arbeits pa:scheu st:scheu")
 		);
 		Assertions.assertEquals(expected, words);

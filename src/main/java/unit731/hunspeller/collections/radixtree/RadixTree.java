@@ -424,7 +424,7 @@ public class RadixTree<S, V extends Serializable>{
 	 *
 	 * @param visitor	The visitor
 	 * @param prefix	The prefix used to restrict visitation
-	 * @param condition	Condition that has to be verified in order to match
+	 * @param type	The type of search to perform
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
 	private void visit(Function<VisitElement<S, V>, Boolean> visitor, S prefix, PrefixType type){

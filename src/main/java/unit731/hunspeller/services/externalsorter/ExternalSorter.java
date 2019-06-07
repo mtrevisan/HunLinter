@@ -156,7 +156,6 @@ public class ExternalSorter{
 	 * @param sortedLines	Data to be sorted
 	 * @param options	Sorting options
 	 * @param out	The output stream
-	 * @return the file containing the sorted data
 	 * @throws IOException generic IO exception
 	 */
 	private void saveChunk(List<String> headers, List<String> sortedLines, ExternalSorterOptions options, OutputStream out) throws IOException{

@@ -9,14 +9,15 @@ public class ExceptionHelper{
 	private ExceptionHelper(){}
 
 	public static String getMessage(Throwable t){
-		String message = composeExceptionMessage(t);
+		StringBuilder message = new StringBuilder(composeExceptionMessage(t));
 		Throwable cause = t.getCause();
 		while(cause != null){
-			message += System.lineSeparator() + composeExceptionMessage(cause);
+			message.append(System.lineSeparator())
+				.append(composeExceptionMessage(cause));
 
 			cause = cause.getCause();
 		}
-		return message;
+		return message.toString();
 	}
 
 	private static String composeExceptionMessage(Throwable t){
