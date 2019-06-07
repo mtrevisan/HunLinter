@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class StringHelper{
 
-	public static enum Casing{
+	public enum Casing{
 		/** All lower case or neutral case, e.g. "lowercase" or "123" */
 		LOWER_CASE,
 		/** Start upper case, rest lower case, e.g. "Initcap" */

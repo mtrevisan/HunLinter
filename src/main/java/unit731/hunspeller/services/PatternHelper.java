@@ -23,7 +23,7 @@ public class PatternHelper{
 	}
 
 	/**
-	 * Returns the delimiters along with the splitted elements
+	 * Returns the delimiters along with the split elements
 	 * 
 	 * @param delimitersRegex	regex stating the delimiters
 	 * @return	The pattern to be used to split a string

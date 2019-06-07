@@ -39,13 +39,13 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	private final File outputFile;
 
 
-	public static final WorkerDictionary createReadWorker(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor){
+	public static WorkerDictionary createReadWorker(final WorkerData workerData, final BiConsumer<String, Integer> readLineProcessor){
 		Objects.requireNonNull(readLineProcessor);
 
 		return new WorkerDictionary(workerData, readLineProcessor, null, null);
 	}
 
-	public static final WorkerDictionary createWriteWorker(final WorkerData workerData,
+	public static WorkerDictionary createWriteWorker(final WorkerData workerData,
 			final BiConsumer<BufferedWriter, Pair<Integer, String>> writeLineProcessor, final File outputFile){
 		Objects.requireNonNull(writeLineProcessor);
 		Objects.requireNonNull(outputFile);

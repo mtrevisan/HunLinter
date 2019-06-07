@@ -24,13 +24,13 @@ public class AffixHandler implements Handler{
 		try{
 			final boolean isSuffix = AffixEntry.Type.SUFFIX.is(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
-			final char combineable = context.getSecondParameter().charAt(0);
+			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context + "\": The third parameter is not a number");
 
 			final List<AffixEntry> entries = readEntries(context, strategy, getData);
 
-			addData.accept(ruleFlag, new RuleEntry(isSuffix, combineable, entries));
+			addData.accept(ruleFlag, new RuleEntry(isSuffix, combinable, entries));
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());

@@ -40,7 +40,7 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  */
 public class RadixTree<S, V extends Serializable>{
 
-	public static enum PrefixType{PREFIXED_BY, PREFIXED_TO};
+	public enum PrefixType{PREFIXED_BY, PREFIXED_TO}
 
 
 	/** The root node in this tree */
@@ -97,7 +97,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * 
 	 * @param prefix	The prefix to look for
 	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
-	 * @return The node founr, or <code>null</code> if empty
+	 * @return The node found, or <code>null</code> if empty
 	 */
 	public RadixTreeNode<S, V> find(S prefix, PrefixType type){
 		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
@@ -214,9 +214,7 @@ public class RadixTree<S, V extends Serializable>{
 		Objects.requireNonNull(value);
 
 		try{
-			V previousValue = put(key, value, root);
-
-			return previousValue;
+			return put(key, value, root);
 		}
 		catch(DuplicateKeyException e){
 			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'");
@@ -384,7 +382,7 @@ public class RadixTree<S, V extends Serializable>{
 
 
 	/**
-	 * Performa a BFS traversal on the tree, calling the traverser for each node found
+	 * Perform a BFS traversal on the tree, calling the traverser for each node found
 	 *
 	 * @param traverser	The traverser
 	 */

@@ -15,19 +15,19 @@ public class WorkerData{
 	final boolean preventExceptionRelaunch;
 
 
-	public static final WorkerData create(final String workerName, final DictionaryParser dicParser){
+	public static WorkerData create(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, false, false);
 	}
 
-	public static final WorkerData createPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
+	public static WorkerData createPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, false, true);
 	}
 
-	public static final WorkerData createParallel(final String workerName, final DictionaryParser dicParser){
+	public static WorkerData createParallel(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, false);
 	}
 
-	public static final WorkerData createParallelPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
+	public static WorkerData createParallelPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, true);
 	}
 

@@ -53,8 +53,8 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
-		final Set<String> unduplicatedFlags = SetHelper.setOf(flags);
-		if((unduplicatedFlags.size() << 1) < originalFlags.length())
+		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+		if((notDuplicatedFlags.size() << 1) < originalFlags.length())
 			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 

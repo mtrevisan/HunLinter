@@ -50,7 +50,7 @@ public class WordlistWorker extends WorkerDictionaryBase{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
 			try{
-				FileHelper.openFileWithChoosenEditor(outputFile);
+				FileHelper.openFileWithChosenEditor(outputFile);
 			}
 			catch(final IOException | InterruptedException e){
 				LOGGER.warn("Exception while opening the resulting file", e);

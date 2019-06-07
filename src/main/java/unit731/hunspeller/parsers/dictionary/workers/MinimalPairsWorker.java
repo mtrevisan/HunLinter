@@ -222,7 +222,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs extracted successfully (in {})", watch.toStringMinuteSeconds());
 
 			try{
-				FileHelper.openFileWithChoosenEditor(outputFile);
+				FileHelper.openFileWithChosenEditor(outputFile);
 			}
 			catch(final IOException | InterruptedException e){
 				LOGGER.warn("Exception while opening the resulting file", e);

@@ -239,7 +239,7 @@ public class ExternalSorter{
 		int rowCounter = 0;
 		try{
 			if(options.isRemoveDuplicates())
-				rowCounter = mergeSortRemoveDulicates(queue, writer, rowCounter);
+				rowCounter = mergeSortRemoveDuplicates(queue, writer, rowCounter);
 			else
 				rowCounter = mergeSort(queue, writer, rowCounter);
 		}
@@ -251,7 +251,7 @@ public class ExternalSorter{
 		return rowCounter;
 	}
 
-	private int mergeSortRemoveDulicates(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
+	private int mergeSortRemoveDuplicates(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
 		String lastLine = null;
 		if(!queue.isEmpty()){
 			BinaryFileBuffer buffer = queue.poll();

@@ -76,7 +76,7 @@ public class LineEntry implements Serializable{
 			for(final String f : from){
 				final int index = f.length() - condition.length() - 1;
 				if(index < 0)
-					throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
+					throw new IllegalArgumentException("Cannot reduce rule, should be split further because of '" + f + "'");
 
 				split.add(new LineEntry(removal, addition, f.substring(index), f));
 			}
@@ -84,7 +84,7 @@ public class LineEntry implements Serializable{
 			for(final String f : from){
 				final int index = condition.length() + 1;
 				if(index == f.length())
-					throw new IllegalArgumentException("Cannot reduce rule, should be splitted further because of '" + f + "'");
+					throw new IllegalArgumentException("Cannot reduce rule, should be split further because of '" + f + "'");
 
 				split.add(new LineEntry(removal, addition, f.substring(0, index), f));
 			}

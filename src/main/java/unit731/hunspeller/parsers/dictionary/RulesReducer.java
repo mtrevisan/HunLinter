@@ -180,7 +180,7 @@ public class RulesReducer{
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, composeHeader(type, flag, ruleToBeReduced.combineableChar(), prettyPrintRules.size()));
+		prettyPrintRules.add(0, composeHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
 
@@ -195,7 +195,7 @@ public class RulesReducer{
 			.map(line -> new AffixEntry(line, strategy, null, null))
 			.collect(Collectors.toList());
 		final AffixEntry.Type type = ruleToBeReduced.getType();
-		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combineableChar(), entries);
+		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combinableChar(), entries);
 		for(final String line : originalLines){
 			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
 			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
@@ -1001,11 +1001,11 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 		return rules;
 	}
 
-	private String composeHeader(final AffixEntry.Type type, final String flag, final char combineableChar, final int size){
+	private String composeHeader(final AffixEntry.Type type, final String flag, final char combinableChar, final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getTag().getCode())
 			.add(flag)
-			.add(Character.toString(combineableChar))
+			.add(Character.toString(combinableChar))
 			.add(Integer.toString(size))
 			.toString();
 	}

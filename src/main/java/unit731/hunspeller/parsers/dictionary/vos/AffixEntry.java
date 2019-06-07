@@ -36,7 +36,7 @@ public class AffixEntry{
 	public static final String ZERO = "0";
 
 
-	public static enum Type{
+	public enum Type{
 		SUFFIX(AffixTag.SUFFIX),
 		PREFIX(AffixTag.PREFIX);
 
@@ -83,7 +83,7 @@ public class AffixEntry{
 
 
 	public AffixEntry(final String line, final FlagParsingStrategy strategy, final List<String> aliasesFlag,
-			final List<String> aliasesMorphologicaField){
+			final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -101,7 +101,7 @@ public class AffixEntry{
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
-		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
+		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
 		type = Type.createFromCode(ruleType);
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));

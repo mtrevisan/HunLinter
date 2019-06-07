@@ -236,7 +236,7 @@ public class AffixData{
 				word = table.applySingleConversionTable(word);
 			}
 			catch(final IllegalArgumentException e){
-				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too much appliable rules");
+				throw new IllegalArgumentException("Cannot " + type + " convert word " + word + ", too many applicable rules");
 			}
 		}
 		return word;

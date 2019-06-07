@@ -309,8 +309,8 @@ public class DictionaryStatisticsDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-		int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
-		if(fileChoosen == JFileChooser.APPROVE_OPTION){
+		int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);
 
 			try{

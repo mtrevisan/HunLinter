@@ -117,7 +117,7 @@ class WordGeneratorBase{
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<Production> twofoldProductions = new ArrayList<>();
 		for(final Production production : onefoldProductions)
-			if(production.isCombineable()){
+			if(production.isCombinable()){
 				final List<Production> prods = getOnefoldProductions(production, isCompound, reverse, overriddenRule);
 
 				final List<AffixEntry> appliedRules = production.getAppliedRules();
@@ -274,7 +274,7 @@ class WordGeneratorBase{
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
-				final Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombineable());
+				final Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombinable());
 				if(!production.hasContinuationFlag(forbiddenWordFlag))
 					productions.add(production);
 			}

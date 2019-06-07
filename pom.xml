@@ -86,7 +86,7 @@
 								<include>**</include>
 							</includes>
 						</filter>
-						<!-- FIXME: strenghten the inclusions -->
+						<!-- FIXME: strengthen the inclusions -->
 						<filter>
 							<artifact>com.fasterxml.jackson.core:jackson-databind</artifact>
 							<includes>

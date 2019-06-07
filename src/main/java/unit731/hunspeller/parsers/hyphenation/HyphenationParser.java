@@ -96,7 +96,7 @@ public class HyphenationParser{
 	public static final Pattern PATTERN_REDUCE = PatternHelper.pattern("/.+$");
 	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^$|\\s*[%#].*$");
 
-	public static enum Level{NON_COMPOUND, COMPOUND}
+	public enum Level{NON_COMPOUND, COMPOUND}
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);

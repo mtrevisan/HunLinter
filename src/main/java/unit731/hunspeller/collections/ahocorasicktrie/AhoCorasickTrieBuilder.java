@@ -29,8 +29,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	//options:
 	private boolean caseInsensitive;
 
-	/** Whether the position has been used */
-	private boolean used[];
+	/**
+	 * Whether the position has been used
+	 */
+	private boolean[] used;
 	/** The allocation size of the dynamic array */
 	private int allocSize;
 	/** A parameter that controls the memory growth speed of the dynamic array */
@@ -52,7 +54,6 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param map	A map containing key-value pairs
 	 * @return	The trie
 	 */
-	@SuppressWarnings("unchecked")
 	public AhoCorasickTrie<V> build(final Map<String, V> map){
 		Objects.requireNonNull(map);
 
@@ -72,7 +73,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				.collect(Collectors.toSet());
 		addAllKeywords(keySet);
 
-		//vuilding a double array trie tree based on a two-point trie tree
+		//building a double array trie tree based on a two-point trie tree
 		buildTrie(keySet.size());
 
 		//build the failure table and merge the output table
@@ -164,7 +165,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		if(childrenIds == null || childrenIds.isEmpty())
 			return;
 
-		final int output[] = new int[childrenIds.size()];
+		final int[] output = new int[childrenIds.size()];
 		final Iterator<Integer> it = childrenIds.iterator();
 		for(int i = 0; i < output.length; i ++)
 			output[i] = it.next();

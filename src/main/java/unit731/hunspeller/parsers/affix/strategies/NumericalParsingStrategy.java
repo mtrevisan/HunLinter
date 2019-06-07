@@ -51,8 +51,8 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	}
 
 	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
-		final Set<String> unduplicatedFlags = SetHelper.setOf(flags);
-		if(unduplicatedFlags.size() < flags.length)
+		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+		if(notDuplicatedFlags.size() < flags.length)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 

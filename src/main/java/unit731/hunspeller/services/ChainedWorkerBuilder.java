@@ -10,7 +10,6 @@ import javax.swing.SwingWorker;
 public class ChainedWorkerBuilder<T, V>{
 
 	private final List<SwingWorker<T, V>> workers = new ArrayList<>();
-	private volatile SwingWorker<T, V> current;
 
 
 	public ChainedWorkerBuilder<T, V> add(SwingWorker<T, V> worker){
@@ -20,7 +19,7 @@ public class ChainedWorkerBuilder<T, V>{
 
 	public void execute(){
 		if(!workers.isEmpty()){
-			current = workers.remove(0);
+			SwingWorker<T, V> current = workers.remove(0);
 			current.addPropertyChangeListener(new PropertyChangeListener(){
 				@Override
 				public void propertyChange(PropertyChangeEvent evt){

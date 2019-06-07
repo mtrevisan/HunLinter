@@ -172,7 +172,7 @@ public class DictionaryParser{
 	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
 	 * 
 	 * @param line	The line to be cleaned
-	 * @return	The cleaned line (withou comments or spaces at the beginning or at the end)
+	 * @return	The cleaned line (without comments or spaces at the beginning or at the end)
 	 */
 	public static String cleanLine(String line){
 		//remove comments

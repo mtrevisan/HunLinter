@@ -39,7 +39,7 @@ public class ByteSink{
 	/**
 	 * Store the given bytes in this sink
 	 *
-	 * @param bytes	The arra of bytes to be added
+	 * @param bytes	The array of bytes to be added
 	 * @return	This instance
 	 */
 	public ByteSink putBytes(final byte[] bytes){

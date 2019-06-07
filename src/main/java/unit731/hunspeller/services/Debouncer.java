@@ -56,7 +56,7 @@ public class Debouncer<T>{
 
 		public boolean extend(){
 			synchronized(lock){
-				//task has been shutted down
+				//task has been shut down
 				if(dueTime < 0)
 					return false;
 

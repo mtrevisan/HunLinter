@@ -134,7 +134,6 @@ public class AffixParser{
 	}
 
 
-	private Charset charset;
 	private final AffixData data = new AffixData();
 
 
@@ -149,7 +148,7 @@ public class AffixParser{
 		data.clear();
 
 		boolean encodingRead = false;
-		charset = FileHelper.determineCharset(affFile.toPath());
+		Charset charset = FileHelper.determineCharset(affFile.toPath());
 		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
 			String line;
 			while((line = br.readLine()) != null){
@@ -176,7 +175,7 @@ public class AffixParser{
 			}
 		}
 
-		postProccessData(affFile);
+		postProcessData(affFile);
 
 		data.close();
 
@@ -184,7 +183,7 @@ public class AffixParser{
 //7 490 848 B
 	}
 
-	private void postProccessData(final File affFile){
+	private void postProcessData(final File affFile){
 		if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
 		else{

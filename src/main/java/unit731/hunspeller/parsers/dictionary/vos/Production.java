@@ -31,20 +31,20 @@ public class Production extends DictionaryEntry{
 			final FlagParsingStrategy strategy){
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
-		final boolean combineable = true;
+		final boolean combinable = true;
 		final List<AffixEntry> appliedRules = null;
-		return new Production(word, cfs, morphologicalFields, combineable,
+		return new Production(word, cfs, morphologicalFields, combinable,
 			appliedRules, compoundEntries);
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,
-			final String[] remainingContinuationFlags, final boolean combineable){
+			final String[] remainingContinuationFlags, final boolean combinable){
 		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final List<AffixEntry> appliedRules = new ArrayList<>(3);
 		appliedRules.add(appliedEntry);
 		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
-		return new Production(word, continuationFlags, morphologicalFields, combineable,
+		return new Production(word, continuationFlags, morphologicalFields, combinable,
 			appliedRules, compoundEntries);
 	}
 
@@ -58,9 +58,9 @@ public class Production extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combineable,
+	private Production(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable,
 			final List<AffixEntry> appliedRules, final List<DictionaryEntry> compoundEntries){
-		super(word, continuationFlags, morphologicalFields, combineable);
+		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
 		this.compoundEntries = compoundEntries;
@@ -188,21 +188,11 @@ public class Production extends DictionaryEntry{
 
 	@Override
 	public String toString(){
-		final StringJoiner sj = new StringJoiner(TAB);
-		sj.add(super.toString());
-		if(hasProductionRules()){
-			sj.add(FROM);
-			sj.add(appliedRules.stream()
-				.map(AffixEntry::getFlag)
-				.collect(Collectors.joining(LEADS_TO)));
-		}
-		return sj.toString();
+		return toString(null);
 	}
 
 	@Override
 	public String toString(final FlagParsingStrategy strategy){
-		Objects.requireNonNull(strategy);
-
 		final StringJoiner sj = new StringJoiner(TAB);
 		sj.add(super.toString(strategy));
 		if(hasProductionRules()){

@@ -42,7 +42,7 @@ public class DictionaryEntry{
 	protected String word;
 	protected String[] continuationFlags;
 	protected final String[] morphologicalFields;
-	private final boolean combineable;
+	private final boolean combinable;
 
 
 	public static DictionaryEntry createFromDictionaryLine(final String line, final FlagParsingStrategy strategy){
@@ -50,7 +50,7 @@ public class DictionaryEntry{
 	}
 
 	public static DictionaryEntry createFromDictionaryLineWithAliases(final String line, final FlagParsingStrategy strategy,
-			final List<String> aliasesFlag, final List<String> aliasesMorphologicaField){
+			final List<String> aliasesFlag, final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
@@ -62,10 +62,10 @@ public class DictionaryEntry{
 		final String dicFlags = m.group(PARAM_FLAGS);
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
-		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicaField));
+		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
 		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
-		final boolean combineable = true;
-		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combineable);
+		final boolean combinable = true;
+		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 	}
 
 	public static DictionaryEntry clone(final DictionaryEntry dicEntry){
@@ -78,16 +78,16 @@ public class DictionaryEntry{
 		word = dicEntry.word;
 		continuationFlags = ArrayUtils.clone(dicEntry.continuationFlags);
 		morphologicalFields = ArrayUtils.clone(dicEntry.morphologicalFields);
-		combineable = dicEntry.combineable;
+		combinable = dicEntry.combinable;
 	}
 
-	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combineable){
+	protected DictionaryEntry(final String word, final String[] continuationFlags, final String[] morphologicalFields, final boolean combinable){
 		Objects.requireNonNull(word);
 
 		this.word = word;
 		this.continuationFlags = continuationFlags;
 		this.morphologicalFields = morphologicalFields;
-		this.combineable = combineable;
+		this.combinable = combinable;
 	}
 
 	private static String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
@@ -119,8 +119,8 @@ public class DictionaryEntry{
 		return word;
 	}
 
-	public boolean isCombineable(){
-		return combineable;
+	public boolean isCombinable(){
+		return combinable;
 	}
 
 	public void applyInputConversionTable(final AffixData affixData){
@@ -271,23 +271,14 @@ public class DictionaryEntry{
 
 	@Override
 	public String toString(){
-		final StringBuffer sb = new StringBuffer(word);
-		if(continuationFlags != null && continuationFlags.length > 0){
-			sb.append(SLASH);
-			sb.append(StringUtils.join(continuationFlags, COMMA));
-		}
-		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
-		return sb.toString();
+		return toString(null);
 	}
 
 	public String toString(final FlagParsingStrategy strategy){
-		Objects.requireNonNull(strategy);
-
 		final StringBuffer sb = new StringBuffer(word);
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
-			sb.append(strategy.joinFlags(continuationFlags));
+			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
 		}
 		if(morphologicalFields != null && morphologicalFields.length > 0)
 			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));

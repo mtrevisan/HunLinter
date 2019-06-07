@@ -119,7 +119,7 @@ public class RulesLoader{
 	}
 
 
-	public Properties getRulesPorperties(){
+	public Properties getRulesProperties(){
 		return rulesProperties;
 	}
 

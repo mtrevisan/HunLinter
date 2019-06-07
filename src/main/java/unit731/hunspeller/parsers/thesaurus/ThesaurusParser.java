@@ -115,7 +115,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * Parse the rows out from a .aid file.
 	 *
 	 * @param theFile	The content of the thesaurus file
-	 * @throws IOException	If an I/O error occurse
+	 * @throws IOException	If an I/O error occurs
 	 */
 	public void parse(final File theFile) throws IOException{
 		clearInternal();

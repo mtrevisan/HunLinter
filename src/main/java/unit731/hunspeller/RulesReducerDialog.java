@@ -199,7 +199,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 			String header = sj.add(rule.getType().getTag().getCode())
 				.add(flag)
-				.add(Character.toString(rule.combineableChar()))
+				.add(Character.toString(rule.combinableChar()))
 				.add(Integer.toString(rule.getEntries().size()))
 				.toString();
 			String rules = rule.getEntries().stream()

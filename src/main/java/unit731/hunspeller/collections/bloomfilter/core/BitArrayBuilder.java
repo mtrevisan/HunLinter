@@ -12,12 +12,11 @@ public class BitArrayBuilder{
 	private static final Logger LOGGER = LoggerFactory.getLogger(BitArrayBuilder.class);
 
 
-	public static enum Type{JAVA, MEMORY_MAPPED_FILE}
+	public enum Type{JAVA, MEMORY_MAPPED_FILE}
 
 
 	private BitArrayBuilder(){}
 
-	@SuppressWarnings("fallthrough")
 	public static BitArray getBitArray(final Type type, final int bits){
 		Objects.requireNonNull(type);
 

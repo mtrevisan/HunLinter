@@ -369,7 +369,7 @@ public class Backbone implements FileChangeListener{
 			catch(IOException e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
-				LOGGER.error("Something very bad happend while creating package", e);
+				LOGGER.error("Something very bad happened while creating package", e);
 			}
 		}
 	}
@@ -397,10 +397,9 @@ public class Backbone implements FileChangeListener{
 
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
-		String[] lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
+		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
-		return lines;
 	}
 
 	public void mergeSectionsToDictionary(List<File> files) throws IOException{

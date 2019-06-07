@@ -116,7 +116,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			if(!duplicates.isEmpty()){
 				try{
-					FileHelper.openFileWithChoosenEditor(outputFile);
+					FileHelper.openFileWithChosenEditor(outputFile);
 				}
 				catch(final IOException | InterruptedException e){
 					LOGGER.warn("Exception while opening the resulting file", e);

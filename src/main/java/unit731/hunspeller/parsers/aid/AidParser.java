@@ -19,7 +19,7 @@ public class AidParser{
 	 * Parse the rows out from a .aid file.
 	 *
 	 * @param aidFile	The content of the dictionary file
-	 * @throws IOException	If an I/O error occurse
+	 * @throws IOException	If an I/O error occurs
 	 */
 	public void parse(final File aidFile) throws IOException{
 		lines.clear();

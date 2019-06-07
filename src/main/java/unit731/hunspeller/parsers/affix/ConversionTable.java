@@ -102,7 +102,7 @@ public class ConversionTable{
 	public String applySingleConversionTable(final String word){
 		final List<String> conversions = applyConversionTable(word);
 		if(conversions.size() > 1)
-			throw new IllegalArgumentException("Cannot convert word " + word + ", too much appliable rules");
+			throw new IllegalArgumentException("Cannot convert word " + word + ", too many applicable rules");
 
 		return (!conversions.isEmpty()? conversions.get(0): word);
 	}
@@ -156,7 +156,7 @@ public class ConversionTable{
 			int keyLength = key.length();
 			int valueLength = value.length();
 
-			//search every occurence of the pattern in the word
+			//search every occurrence of the pattern in the word
 			int idx = -valueLength;
 			final StringBuffer sb = new StringBuffer();
 			while((idx = word.indexOf(key, idx + valueLength)) >= 0){

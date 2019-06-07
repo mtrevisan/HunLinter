@@ -58,7 +58,7 @@ public class FileHelper{
 			catch(IOException e){}
 		}
 
-		throw new IllegalArgumentException("The file is not in an ammissible charset ("
+		throw new IllegalArgumentException("The file is not in an allowable charset ("
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
 	}
 
@@ -86,7 +86,7 @@ public class FileHelper{
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
-	public static void openFileWithChoosenEditor(File file) throws InterruptedException, IOException{
+	public static void openFileWithChosenEditor(File file) throws InterruptedException, IOException{
 		ProcessBuilder builder = null;
 		if(SystemUtils.IS_OS_WINDOWS)
 			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());
