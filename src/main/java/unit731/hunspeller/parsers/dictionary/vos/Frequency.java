@@ -23,7 +23,7 @@ import unit731.hunspeller.services.Memoizer;
  * 
  * @param <T>	Type of value
  */
-public class Frequency<T>{
+public class Frequency<T extends Comparable>{
 
 	private final Function<Integer, Long> SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
 

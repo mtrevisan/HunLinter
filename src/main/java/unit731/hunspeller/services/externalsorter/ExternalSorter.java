@@ -109,7 +109,7 @@ public class ExternalSorter{
 		if(options.isSortInParallel())
 			list = list.stream().parallel()
 				.sorted(options.getComparator())
-				.collect(Collectors.toCollection(ArrayList<String>::new));
+				.collect(Collectors.toCollection(ArrayList::new));
 		else
 			Collections.sort(list, options.getComparator());
 		return list;

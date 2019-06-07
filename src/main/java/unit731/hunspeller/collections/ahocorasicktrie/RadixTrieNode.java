@@ -90,7 +90,7 @@ public class RadixTrieNode{
 	 * @return	The children ids
 	 */
 	public Collection<Integer> getChildrenIds(){
-		return (childrenIds == null? Collections.<Integer>emptyList(): childrenIds);
+		return (childrenIds == null? Collections.emptyList(): childrenIds);
 	}
 
 	/**

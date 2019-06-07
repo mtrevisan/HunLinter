@@ -192,10 +192,7 @@ public class ConversionTable{
 
 	@Override
 	public String toString(){
-		final StringBuffer sb = new StringBuffer();
-		sb.append("[affixTag=").append(affixTag).append(',');
-		sb.append("table=").append(table).append(']');
-		return sb.toString();
+		return "[affixTag=" + affixTag + ',' + "table=" + table + ']';
 	}
 
 }

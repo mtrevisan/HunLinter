@@ -40,7 +40,7 @@ class WordGeneratorBase{
 			throws IllegalArgumentException, NoApplicableRuleException{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-			return Collections.<Production>emptyList();
+			return Collections.emptyList();
 
 		//extract base production
 		final Production baseProduction = getBaseProduction(dicEntry);
@@ -53,7 +53,7 @@ class WordGeneratorBase{
 		final List<Production> onefoldProductions = getOnefoldProductions(baseProduction, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
 		printProductions((affixData.isComplexPrefixes()? "Prefix productions:": "Suffix productions:"), onefoldProductions);
 
-		List<Production> twofoldProductions = Collections.<Production>emptyList();
+		List<Production> twofoldProductions = Collections.emptyList();
 		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
 			//extract prefixed productions
 			twofoldProductions = getTwofoldProductions(onefoldProductions, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
@@ -252,7 +252,7 @@ class WordGeneratorBase{
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))
-				return Collections.<Production>emptyList();
+				return Collections.emptyList();
 
 			final List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);

@@ -40,7 +40,7 @@ public class Orthography{
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
 	public List<Integer> getStressIndexFromLast(final List<String> syllabes){
-		return Collections.<Integer>emptyList();
+		return Collections.emptyList();
 	}
 
 	public int countGraphemes(final String word){

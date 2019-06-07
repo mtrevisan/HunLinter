@@ -33,7 +33,7 @@ public class SetHelper{
 	}
 
 	public static <T> Set<T> emptySet(){
-		return Collections.<T>emptySet();
+		return Collections.emptySet();
 	}
 
 	/**

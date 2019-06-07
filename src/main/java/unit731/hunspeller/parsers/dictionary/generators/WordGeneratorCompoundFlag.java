@@ -46,7 +46,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
 		//check if it's possible to compound some words
 		if(inputs.isEmpty())
-			return Collections.<Production>emptyList();
+			return Collections.emptyList();
 
 		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplications);
 		final List<int[]> permutations = perm.permutations(limit);

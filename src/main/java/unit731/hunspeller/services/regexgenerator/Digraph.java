@@ -81,7 +81,7 @@ public final class Digraph<T>{
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
-		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Pair<Integer, T>>emptyList());
+		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());
 	}
 
 	/**

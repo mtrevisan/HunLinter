@@ -166,7 +166,7 @@ public class DictionaryEntry{
 	}
 
 	public List<AffixEntry> getAppliedRules(){
-		return Collections.<AffixEntry>emptyList();
+		return Collections.emptyList();
 	}
 
 	/**

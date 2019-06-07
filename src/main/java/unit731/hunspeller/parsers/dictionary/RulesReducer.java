@@ -63,12 +63,12 @@ public class RulesReducer{
 		this.wordGenerator = wordGenerator;
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegExpSequencer.splitSequence(entry.condition).length)
-			.thenComparing(Comparator.comparingInt(entry -> StringUtils.countMatches(entry.condition, GROUP_END)))
-			.thenComparing(Comparator.comparingInt(entry -> entry.removal.length()))
-			.thenComparing(Comparator.comparing(entry -> StringUtils.reverse(entry.condition), comparator))
-			.thenComparing(Comparator.comparing(entry -> entry.removal, comparator))
-			.thenComparing(Comparator.comparingInt(entry -> entry.anAddition().length()))
-			.thenComparing(Comparator.comparing(entry -> entry.anAddition(), comparator));
+			.thenComparingInt(entry -> StringUtils.countMatches(entry.condition, GROUP_END))
+			.thenComparingInt(entry -> entry.removal.length())
+			.thenComparing(entry -> StringUtils.reverse(entry.condition), comparator)
+			.thenComparing(entry -> entry.removal, comparator)
+			.thenComparingInt(entry -> entry.anAddition().length())
+			.thenComparing(entry -> entry.anAddition(), comparator);
 	}
 
 

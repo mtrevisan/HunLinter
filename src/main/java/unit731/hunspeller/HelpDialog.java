@@ -1,7 +1,6 @@
 package unit731.hunspeller;
 
-import java.awt.Frame;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,7 +112,7 @@ public class HelpDialog extends JDialog{
 
       lblManagedOptionsTextArea.setEditable(false);
       lblManagedOptionsTextArea.setColumns(20);
-      lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      lblManagedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
       lblManagedOptionsTextArea.setLineWrap(true);
       lblManagedOptionsTextArea.setRows(1);
       lblManagedOptionsTextArea.setTabSize(3);

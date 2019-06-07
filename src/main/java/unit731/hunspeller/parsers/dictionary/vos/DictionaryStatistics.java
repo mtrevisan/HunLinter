@@ -137,8 +137,6 @@ public class DictionaryStatistics implements Closeable{
 		else{
 			lengthsFrequencies.addValue(word.length());
 			storeLongestWord(word);
-			if(word.length() < word.length())
-				compoundWords ++;
 			if(word.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
 			totalProductions ++;

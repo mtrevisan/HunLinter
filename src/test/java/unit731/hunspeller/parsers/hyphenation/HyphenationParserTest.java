@@ -235,7 +235,7 @@ public class HyphenationParserTest{
 	@Test
 	public void customHyphenation(){
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
-			.build(Collections.<String, String>emptyMap());
+			.build(Collections.emptyMap());
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		Map<HyphenationParser.Level, Map<String, String>> custom = new HashMap<>();
@@ -526,7 +526,7 @@ public class HyphenationParserTest{
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
-			.build(Collections.<String, String>emptyMap());
+			.build(Collections.emptyMap());
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
@@ -551,7 +551,7 @@ public class HyphenationParserTest{
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(hyphenations);
 		AhoCorasickTrie<String> patterns2ndLevel = new AhoCorasickTrieBuilder<String>()
-			.build(Collections.<String, String>emptyMap());
+			.build(Collections.emptyMap());
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);

@@ -164,8 +164,7 @@ public class DictionaryParser{
 	}
 
 	public final void clear(){
-		if(boundaries != null)
-			boundaries.clear();
+		boundaries.clear();
 	}
 
 	/**

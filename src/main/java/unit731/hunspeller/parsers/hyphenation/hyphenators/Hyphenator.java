@@ -132,7 +132,7 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 		else if(getNormalizedLength(word) < options.getMinimumLength())
 			//ignore short words (early out):
-			hyphBreak = new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), wordSize);
+			hyphBreak = new HyphenationBreak(Collections.emptyMap(), wordSize);
 		else
 			hyphBreak = calculateBreakpoints(word, patterns.get(level), options);
 
@@ -176,7 +176,7 @@ public class Hyphenator implements HyphenatorInterface{
 			//apply retro-compatibility word separators
 			response = Arrays.asList(PatternHelper.split(word, hypParser.getPatternNoHyphen()));
 		else
-			response = Collections.<String>emptyList();
+			response = Collections.emptyList();
 		return response;
 	}
 

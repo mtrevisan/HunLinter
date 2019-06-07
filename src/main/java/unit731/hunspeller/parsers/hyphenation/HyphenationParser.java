@@ -146,9 +146,9 @@ public class HyphenationParser{
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(Level level : Level.values())
 			this.patterns.put(level, patterns.get(level));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.<Level, Map<String, String>>emptyMap());
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.emptyMap());
 		for(Level level : Level.values()){
-			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
+			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.emptyMap());
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());

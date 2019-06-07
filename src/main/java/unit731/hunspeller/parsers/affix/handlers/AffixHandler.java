@@ -52,7 +52,7 @@ public class AffixHandler implements Handler{
 		final List<String> aliasesFlag = getData.apply(AffixTag.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = getData.apply(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 		int i = 0;
-		String line = null;
+		String line;
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		try{
 			while(i < numEntries){

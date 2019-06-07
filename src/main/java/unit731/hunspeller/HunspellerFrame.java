@@ -1231,7 +1231,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				theMeaningsTextField.requestFocusInWindow();
 
 				String duplicatedWords = String.join(", ", duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.toList()));
-				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", -1,
+				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
@@ -1757,7 +1757,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		formerHyphenationText = text;
 
 		String count = null;
-		List<String> rules = Collections.<String>emptyList();
+		List<String> rules = Collections.emptyList();
 		if(StringUtils.isNotBlank(text)){
 			Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
 

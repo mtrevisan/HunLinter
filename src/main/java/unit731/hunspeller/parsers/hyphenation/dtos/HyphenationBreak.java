@@ -34,7 +34,7 @@ public class HyphenationBreak{
 
 
 	public static HyphenationBreak getEmptyInstance(){
-		return new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), 0);
+		return new HyphenationBreak(Collections.emptyMap(), 0);
 	}
 
 	public HyphenationBreak(Map<Integer, Pair<Integer, String>> indexesAndRules, int size){

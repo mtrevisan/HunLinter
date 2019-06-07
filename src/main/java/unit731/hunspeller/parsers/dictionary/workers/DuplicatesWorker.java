@@ -309,7 +309,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 		final List<List<Duplicate>> result = new ArrayList<>(dupls.values());
 		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
-			.thenComparing(Comparator.comparing(list -> list.get(0).getProduction().getWord(), comparator)));
+			.thenComparing(list -> list.get(0).getProduction().getWord(), comparator));
 		return result;
 	}
 

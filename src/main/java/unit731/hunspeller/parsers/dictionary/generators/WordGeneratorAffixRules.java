@@ -29,12 +29,12 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData);
 
-		List<Production> productions = Collections.<Production>emptyList();
+		List<Production> productions = Collections.emptyList();
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(!dicEntry.hasContinuationFlag(circumfixFlag)){
 			final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 			if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-				return Collections.<Production>emptyList();
+				return Collections.emptyList();
 
 			//extract suffixed productions
 			boolean isCompound = false;

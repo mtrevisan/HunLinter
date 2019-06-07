@@ -181,7 +181,7 @@ public class AffixEntry{
 	 */
 	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
-		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
+		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
 //		final boolean containsPartOfSpeech = amf.stream()
 //			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));

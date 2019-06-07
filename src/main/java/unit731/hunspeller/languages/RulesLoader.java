@@ -102,7 +102,7 @@ public class RulesLoader{
 
 	public final Set<String> readPropertyAsSet(final String key, final char separator){
 		final String line = readProperty(key);
-		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.<String>emptySet());
+		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.emptySet());
 	}
 
 	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){

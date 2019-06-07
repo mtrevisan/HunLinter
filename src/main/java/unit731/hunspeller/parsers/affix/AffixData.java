@@ -118,7 +118,7 @@ public class AffixData{
 	}
 
 	public Set<String> getCompoundRules(){
-		return getDataOrDefault(AffixTag.COMPOUND_RULE, Collections.<String>emptySet());
+		return getDataOrDefault(AffixTag.COMPOUND_RULE, Collections.emptySet());
 	}
 
 	public boolean isManagedByCompoundRule(final String flag){
@@ -217,7 +217,7 @@ public class AffixData{
 
 	public List<String> applyReplacementTable(final String word){
 		final ConversionTable table = getData(AffixTag.REPLACEMENT_TABLE);
-		return (table != null? table.applyConversionTable(word): Collections.<String>emptyList());
+		return (table != null? table.applyConversionTable(word): Collections.emptyList());
 	}
 
 	public String applyInputConversionTable(final String word){
