@@ -166,7 +166,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 						final List<Production> productions = wordGenerator.applyAffixRules(line);
 
 						productions.stream()
-							.map(production -> production.toStringWithPartOfSpeechFields())
+							.map(Production::toStringWithPartOfSpeechFields)
 							.filter(Predicate.not(bloomFilter::add))
 							.forEach(duplicatesBloomFilter::add);
 					}
@@ -251,7 +251,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 
 			duplicatesBloomFilter.clear();
 
-			Collections.sort(result, (d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
+			result.sort((d1, d2) -> comparator.compare(d1.getProduction().getWord(), d2.getProduction().getWord()));
 		}
 		else
 			LOGGER.info(Backbone.MARKER_APPLICATION, "No duplicates found, skip remaining passes");

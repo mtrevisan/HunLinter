@@ -37,7 +37,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private static final double LN2_SQUARE = LN2 * LN2;
 
 	/** The decomposer to use when there is none specified at construction */
-	private static final Decomposer<Object> DECOMPOSER_DEFAULT = new DefaultDecomposer();
+	private final Decomposer<T> DECOMPOSER_DEFAULT = new DefaultDecomposer<>();
 	/** The default hasher to use if one is not specified */
 	private static final HashFunction HASHER_DEFAULT = new Murmur3HashFunction();
 
@@ -248,10 +248,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	private byte[] decomposeValue(final T value){
 		final ByteSink sink = new ByteSink();
-		if(decomposer != null)
-			decomposer.decompose(value, sink, charset);
-		else
-			DECOMPOSER_DEFAULT.decompose(value, sink, charset);
+		Objects.requireNonNullElse(decomposer, DECOMPOSER_DEFAULT)
+			.decompose(value, sink, charset);
 		return sink.getByteArray();
 	}
 

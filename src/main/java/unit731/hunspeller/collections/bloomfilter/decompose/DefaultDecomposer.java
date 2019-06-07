@@ -8,14 +8,16 @@ import java.nio.charset.Charset;
  * {@link Object#toString()} method.
  *
  * To convert the {@link String} thus obtained into bytes, the default platform {@link Charset} encoding is used.
+ *
+ * @param <T> the type of objects to be stored in the filter
  */
-public class DefaultDecomposer implements Decomposer<Object>{
+public class DefaultDecomposer<T> implements Decomposer<T>{
 
 	/**
 	 * Decompose the object
 	 */
 	@Override
-	public void decompose(final Object object, final ByteSink sink, final Charset charset){
+	public void decompose(final T object, final ByteSink sink, final Charset charset){
 		if(object != null){
 			byte[] bytes;
 			if(String.class.isAssignableFrom(object.getClass()))

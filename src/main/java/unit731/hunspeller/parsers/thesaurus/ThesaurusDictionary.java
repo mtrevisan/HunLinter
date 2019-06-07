@@ -5,6 +5,7 @@ import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -111,7 +112,7 @@ public class ThesaurusDictionary{
 	}
 
 	public void sort(){
-		synonyms.sort((s0, s1) -> s0.compareTo(s1));
+		synonyms.sort(Comparator.naturalOrder());
 	}
 
 	public void setMeanings(final int index, final List<MeaningEntry> meanings,final  String text){

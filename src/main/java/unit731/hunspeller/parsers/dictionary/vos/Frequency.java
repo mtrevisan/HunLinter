@@ -103,7 +103,7 @@ public class Frequency<T extends Comparable>{
 
 	public List<T> getMostCommonValues(final int limit){
 		final List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
-		Collections.sort(sortedEntries, (e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+		sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
 		return sortedEntries.stream()
 			.limit(limit)

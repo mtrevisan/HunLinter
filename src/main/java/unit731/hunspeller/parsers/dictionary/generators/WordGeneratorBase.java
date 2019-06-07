@@ -145,29 +145,15 @@ class WordGeneratorBase{
 
 	protected List<Production> enforceOnlyInCompound(final List<Production> productions){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
-		if(onlyInCompoundFlag != null){
-			final Iterator<Production> itr = productions.iterator();
-			while(itr.hasNext()){
-				final Production production = itr.next();
-
-				if(!production.hasContinuationFlag(onlyInCompoundFlag))
-					itr.remove();
-			}
-		}
+		if(onlyInCompoundFlag != null)
+			productions.removeIf(production -> !production.hasContinuationFlag(onlyInCompoundFlag));
 		return productions;
 	}
 
 	private List<Production> enforceCircumfix(final List<Production> lastfoldProductions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
-		if(circumfixFlag != null){
-			final Iterator<Production> itr = lastfoldProductions.iterator();
-			while(itr.hasNext()){
-				final Production production = itr.next();
-
-				if(affixWithCircumfix(production, circumfixFlag))
-					itr.remove();
-			}
-		}
+		if(circumfixFlag != null)
+			lastfoldProductions.removeIf(production -> affixWithCircumfix(production, circumfixFlag));
 		return lastfoldProductions;
 	}
 
@@ -191,15 +177,8 @@ class WordGeneratorBase{
 
 	protected void enforceNeedAffixFlag(final List<Production> productions){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
-		if(needAffixFlag != null){
-			final Iterator<Production> itr = productions.iterator();
-			while(itr.hasNext()){
-				final Production production = itr.next();
-
-				if(hasNeedAffixFlag(production, needAffixFlag))
-					itr.remove();
-			}
-		}
+		if(needAffixFlag != null)
+			productions.removeIf(production -> hasNeedAffixFlag(production, needAffixFlag));
 	}
 
 	private boolean hasNeedAffixFlag(final Production production, final String needAffixFlag){

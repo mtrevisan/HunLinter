@@ -63,9 +63,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		final Runnable cancelled = () -> {
-			dicStatistics.close();
-		};
+		final Runnable cancelled = dicStatistics::close;
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);

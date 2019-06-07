@@ -111,7 +111,7 @@ public class ExternalSorter{
 				.sorted(options.getComparator())
 				.collect(Collectors.toCollection(ArrayList::new));
 		else
-			Collections.sort(list, options.getComparator());
+			list.sort(options.getComparator());
 		return list;
 	}
 

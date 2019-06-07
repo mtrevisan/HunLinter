@@ -18,8 +18,8 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 public class BaseBuilder{
 
-	public static final Comparator<String> COMPARATOR_LENGTH = (r1, r2) -> Integer.compare(r1.length(), r2.length());
-	public static final Comparator<String> COMPARATOR_DEFAULT = (r1, r2) -> r1.compareTo(r2);
+	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
+	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
 
 	private static class LanguageData{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
@@ -34,7 +34,7 @@ public class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.baseClass = DictionaryCorrectnessChecker.class;
 		LANGUAGE_DATA_DEFAULT.comparator = COMPARATOR_DEFAULT;
 		LANGUAGE_DATA_DEFAULT.dictionaryBaseData = DictionaryBaseData.getInstance();
-		LANGUAGE_DATA_DEFAULT.checker = (affixData, hyphenator) -> new DictionaryCorrectnessChecker(affixData, hyphenator);
+		LANGUAGE_DATA_DEFAULT.checker = DictionaryCorrectnessChecker::new;
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 	}
 	private static final Map<String, LanguageData> DATAS = new HashMap<>();
@@ -43,7 +43,7 @@ public class BaseBuilder{
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
 		langData.comparator = WordVEC.sorterComparator();
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();
-		langData.checker = (affixData, hyphenator) -> new DictionaryCorrectnessCheckerVEC(affixData, hyphenator);
+		langData.checker = DictionaryCorrectnessCheckerVEC::new;
 		langData.orthography = OrthographyVEC.getInstance();
 		DATAS.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
 	}

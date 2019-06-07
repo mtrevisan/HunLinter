@@ -68,7 +68,7 @@ public class RulesReducer{
 			.thenComparing(entry -> StringUtils.reverse(entry.condition), comparator)
 			.thenComparing(entry -> entry.removal, comparator)
 			.thenComparingInt(entry -> entry.anAddition().length())
-			.thenComparing(entry -> entry.anAddition(), comparator);
+			.thenComparing(LineEntry::anAddition, comparator);
 	}
 
 

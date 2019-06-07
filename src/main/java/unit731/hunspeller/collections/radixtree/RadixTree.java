@@ -432,7 +432,7 @@ public class RadixTree<S, V extends Serializable>{
 		Objects.requireNonNull(prefix);
 		Objects.requireNonNull(type);
 
-		BiFunction<S, S, Boolean> condition = (type == PrefixType.PREFIXED_BY? (pre, preAllowed) -> sequencer.startsWith(pre, preAllowed):
+		BiFunction<S, S, Boolean> condition = (type == PrefixType.PREFIXED_BY? sequencer::startsWith:
 			(pre, preAllowed) -> sequencer.startsWith(preAllowed, pre));
 
 		int prefixAllowedLength = sequencer.length(prefix);

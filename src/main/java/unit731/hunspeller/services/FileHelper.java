@@ -70,7 +70,7 @@ public class FileHelper{
 
 		try{
 			File tmpFile = File.createTempFile((prefix != null? prefix: "test"), extension);
-			Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
+			Files.writeString(tmpFile.toPath(), content);
 			tmpFile.deleteOnExit();
 			return tmpFile;
 		}

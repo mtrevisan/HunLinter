@@ -50,9 +50,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		final Runnable cancelled = () -> {
-			dictionary.close();
-		};
+		final Runnable cancelled = dictionary::close;
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);
