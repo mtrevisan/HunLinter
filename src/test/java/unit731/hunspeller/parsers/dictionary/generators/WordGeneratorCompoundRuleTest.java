@@ -238,7 +238,7 @@ class WordGeneratorCompoundRuleTest{
 
 
 	@Test
-	void forbiddenWordMissingRule() throws IOException{
+	void forbiddenWordMissingRule(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",

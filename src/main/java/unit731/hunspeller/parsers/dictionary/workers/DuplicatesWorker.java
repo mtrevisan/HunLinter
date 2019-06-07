@@ -98,7 +98,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception{
+	protected Void doInBackground(){
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
 

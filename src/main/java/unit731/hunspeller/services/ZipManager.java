@@ -43,7 +43,7 @@ public class ZipManager{
 		}
 	}
 
-	private List<String> extractFilesList(File dir) throws IOException{
+	private List<String> extractFilesList(File dir){
 		List<String> filesListInDir = new ArrayList<>();
 
 		File[] files = dir.listFiles();

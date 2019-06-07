@@ -62,7 +62,7 @@ public class Memoizer<T, U>{
 		return input -> {
 			lock.lock();
 			try{
-				return cache.computeIfAbsent(input, function::apply);
+				return cache.computeIfAbsent(input, function);
 			}
 			finally{
 				lock.unlock();

@@ -1230,7 +1230,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			else{
 				theMeaningsTextField.requestFocusInWindow();
 
-				String duplicatedWords = String.join(", ", duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.toList()));
+				String duplicatedWords = duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "));
 				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
@@ -1400,7 +1400,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				List<Production> words;
 				AffixData affixData = backbone.getAffixData();
 				if(affixData.getCompoundFlag().equals(inputText)){
-					Integer maxCompounds = affixData.getCompoundMaxWordCount();
+					int maxCompounds = affixData.getCompoundMaxWordCount();
 					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
 				}
 				else
@@ -2110,7 +2110,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

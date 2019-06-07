@@ -365,7 +365,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")";
 		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
-		String formattedLengthsMode = String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
 		String formattedLongestWords = String.join(LIST_SEPARATOR, longestWords)
 			+ " (" + longestWordCharsCount + ")";
 
@@ -390,7 +390,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
-		String formattedSyllabeLengthsMode = String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
 		String formattedMostCommonSyllabes = String.join(LIST_SEPARATOR, mostCommonSyllabes);
 		String formattedLongestWordSyllabes = String.join(LIST_SEPARATOR, longestWordSyllabes)
 			+ " (" + longestWordSyllabesCount + ")";
@@ -526,7 +526,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
 	}
 

@@ -75,7 +75,7 @@ public class ProductionTableModel extends AbstractTableModel implements Hunspell
 		throw new NotSerializableException(ProductionTableModel.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(ProductionTableModel.class.getName());
 	}
 

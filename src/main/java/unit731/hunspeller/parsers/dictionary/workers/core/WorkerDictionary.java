@@ -65,7 +65,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 	}
 
 	@Override
-	protected Void doInBackground() throws IOException{
+	protected Void doInBackground(){
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file (pass 1/2)");
 		setProgress(0);
 

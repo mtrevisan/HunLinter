@@ -20,7 +20,6 @@ public class RuleEntry{
 
 
 	public RuleEntry(final boolean suffix, final char combinable, final List<AffixEntry> entries){
-		Objects.requireNonNull(combinable);
 		Objects.requireNonNull(entries);
 
 		this.suffix = suffix;

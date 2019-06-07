@@ -182,10 +182,9 @@ public class HyphenationParser{
 	 * Parse the hyphenation rules out from a .dic file.
 	 *
 	 * @param hypFile	The content of the hyphenation file
-	 * @throws IOException	If an I/O error occurs
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
-	public void parse(File hypFile) throws IOException, IllegalArgumentException{
+	public void parse(File hypFile) throws IllegalArgumentException{
 		try{
 			clearInternal();
 

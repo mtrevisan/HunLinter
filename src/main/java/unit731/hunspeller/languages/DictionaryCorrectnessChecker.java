@@ -21,7 +21,7 @@ public class DictionaryCorrectnessChecker{
 	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("{0} has an unknown morphological field value: {1}");
 
 
-	protected AffixData affixData;
+	protected final AffixData affixData;
 	protected final HyphenatorInterface hyphenator;
 	protected Orthography orthography;
 

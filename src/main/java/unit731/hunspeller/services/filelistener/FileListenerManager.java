@@ -74,7 +74,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void register(FileChangeListener listener, String... patterns) throws IOException{
+	public void register(FileChangeListener listener, String... patterns){
 		Objects.requireNonNull(listener);
 
 		for(String pattern : patterns){

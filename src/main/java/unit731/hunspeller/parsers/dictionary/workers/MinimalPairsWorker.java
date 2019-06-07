@@ -69,7 +69,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception{
+	protected Void doInBackground(){
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
 
 		watch = TimeWatch.start();
@@ -194,7 +194,7 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 					final String key = entry.getKey();
 					final List<String> values = entry.getValue();
 
-					destinationWriter.write(key + ": " + values.stream().collect(Collectors.joining(", ")));
+					destinationWriter.write(key + ": " + String.join(", ", values));
 					destinationWriter.newLine();
 
 					setProgress((int)((index * 100.) / size));

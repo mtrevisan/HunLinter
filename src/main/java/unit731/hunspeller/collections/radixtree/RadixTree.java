@@ -44,9 +44,9 @@ public class RadixTree<S, V extends Serializable>{
 
 
 	/** The root node in this tree */
-	protected RadixTreeNode<S, V> root;
-	protected SequencerInterface<S> sequencer;
-	protected boolean noDuplicatesAllowed;
+	protected final RadixTreeNode<S, V> root;
+	protected final SequencerInterface<S> sequencer;
+	protected final boolean noDuplicatesAllowed;
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){

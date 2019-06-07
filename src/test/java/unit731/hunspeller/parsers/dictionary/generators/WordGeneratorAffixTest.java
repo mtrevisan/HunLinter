@@ -368,7 +368,7 @@ class WordGeneratorAffixTest{
 
 
 	@Test
-	void stemsInvalidFullstrip() throws IOException{
+	void stemsInvalidFullstrip(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -403,7 +403,7 @@ class WordGeneratorAffixTest{
 
 
 	@Test
-	void stemsInvalidTwofold1() throws IOException{
+	void stemsInvalidTwofold1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -427,7 +427,7 @@ class WordGeneratorAffixTest{
 	}
 
 	@Test
-	void stemsInvalidTwofold2() throws IOException{
+	void stemsInvalidTwofold2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -546,7 +546,7 @@ class WordGeneratorAffixTest{
 	}
 
 	@Test
-	void complexPrefixesInvalidTwofold() throws IOException{
+	void complexPrefixesInvalidTwofold(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",

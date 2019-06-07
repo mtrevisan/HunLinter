@@ -175,7 +175,7 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	@Override
-	public void close() throws IOException{
+	public void close(){
 		bloomFilter.close();
 	}
 

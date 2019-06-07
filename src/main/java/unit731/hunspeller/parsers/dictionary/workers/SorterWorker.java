@@ -48,7 +48,7 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	}
 
 	@Override
-	protected Void doInBackground() throws Exception{
+	protected Void doInBackground(){
 		try{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
 			setProgress(0);

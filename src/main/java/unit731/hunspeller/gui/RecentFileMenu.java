@@ -82,7 +82,7 @@ public class RecentFileMenu extends JMenu{
 		throw new NotSerializableException(RecentFileMenu.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(RecentFileMenu.class.getName());
 	}
 

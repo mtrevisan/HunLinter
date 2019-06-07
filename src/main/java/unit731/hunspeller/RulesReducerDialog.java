@@ -300,7 +300,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 

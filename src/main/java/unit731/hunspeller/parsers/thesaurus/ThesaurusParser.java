@@ -237,7 +237,6 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			if(!duplicatesDiscriminator.get())
 				throw e;
 
-			duplicates.clear();
 			forcedInsertion = true;
 		}
 		return new DuplicationResult(duplicates, forcedInsertion);
