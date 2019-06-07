@@ -52,7 +52,7 @@ public class Murmur3HashFunction implements HashFunction{
 
 		//----------
 		// body
-		for(int i = 0; i < nblocks; i++){
+		for(int i = 0; i < nblocks; i ++){
 			final int i4 = i << 2;
 
 			long k1 = (data[i4] & UNSIGNED_MASK);
