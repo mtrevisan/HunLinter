@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -56,10 +55,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			}
 		};
 		final Runnable completed = () -> {
-			try{
-				dicStatistics.close();
-			}
-			catch(final IOException ignored){}
+			dicStatistics.close();
 
 			//show statistics window
 			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
@@ -68,10 +64,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			dialog.setVisible(true);
 		};
 		final Runnable cancelled = () -> {
-			try{
-				dicStatistics.close();
-			}
-			catch(final IOException ignored){}
+			dicStatistics.close();
 		};
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);

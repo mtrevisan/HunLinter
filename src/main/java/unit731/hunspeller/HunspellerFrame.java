@@ -1616,15 +1616,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		loadFileInternal(filePath);
 
-		try{
-			backbone.registerFileListener();
-			backbone.startFileListener();
-		}
-		catch(IOException e){
-			LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot start file listener");
-
-			LOGGER.error("Cannot start file listener", e);
-		}
+		backbone.registerFileListener();
+		backbone.startFileListener();
 	}
 
 	@Override
