@@ -22,10 +22,12 @@ public class SetHelper{
 			.collect(Collectors.toSet());
 	}
 
+	@SafeVarargs
 	public static <T> Set<T> setOf(final T... values){
 		return new HashSet<>(Arrays.asList(values));
 	}
 
+	@SafeVarargs
 	public static <T> Set<T> sortedSetOf(final Comparator<? super T> comparator, final T... values){
 		final Set<T> set = new TreeSet<>(comparator);
 		set.addAll(Arrays.asList(values));

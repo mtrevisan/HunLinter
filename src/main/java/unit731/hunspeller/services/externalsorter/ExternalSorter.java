@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -63,7 +62,7 @@ public class ExternalSorter{
 	 */
 	private List<File> splitAndSortFiles(BufferedReader fbr, ExternalSorterOptions options, long blockSize) throws IOException{
 		List<File> files = new ArrayList<>();
-		try{
+		try(fbr){
 			List<String> headers = new ArrayList<>();
 			List<String> temporaryList = new ArrayList<>();
 			String line = StringUtils.EMPTY;
@@ -98,9 +97,6 @@ public class ExternalSorter{
 
 				temporaryList.clear();
 			}
-		}
-		finally{
-			fbr.close();
 		}
 		return files;
 	}
@@ -236,14 +232,13 @@ public class ExternalSorter{
 			.filter(Predicate.not(BinaryFileBuffer::empty))
 			.forEachOrdered(queue::add);
 		int rowCounter = 0;
-		try{
+		try(writer){
 			if(options.isRemoveDuplicates())
 				rowCounter = mergeSortRemoveDuplicates(queue, writer, rowCounter);
 			else
 				rowCounter = mergeSort(queue, writer, rowCounter);
 		}
 		finally{
-			writer.close();
 			for(final BinaryFileBuffer buffer : queue)
 				buffer.close();
 		}

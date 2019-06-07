@@ -899,14 +899,12 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 			final Collection<LineEntry> entries){
 		//restore original rules
 		final List<LineEntry> restoredRules = entries.stream()
-			.flatMap(rule -> {
-				return rule.addition.stream()
-					.map(addition -> {
-						final int lcp = commonPrefix(rule.removal, addition).length();
-						final String removal = rule.removal.substring(lcp);
-						return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
-					});
-			})
+			.flatMap(rule -> rule.addition.stream()
+				.map(addition -> {
+					final int lcp = commonPrefix(rule.removal, addition).length();
+					final String removal = rule.removal.substring(lcp);
+					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
+				}))
 			.collect(Collectors.toList());
 
 		final List<LineEntry> sortedEntries = prepareRules(type, keepLongestCommonAffix, restoredRules);

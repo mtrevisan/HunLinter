@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -147,9 +146,8 @@ public class Frequency<T extends Comparable>{
 
 	private long sumOfFrequencies(final int hashCode){
 		long result = 0l;
-		final Iterator<Long> iterator = frequencies.values().iterator();
-		while(iterator.hasNext())
-			result += iterator.next();
+		for(Long aLong : frequencies.values())
+			result += aLong;
 		return result;
 	}
 
@@ -161,16 +159,13 @@ public class Frequency<T extends Comparable>{
 	@Override
 	public String toString(){
 		final StringBuffer sb = new StringBuffer("Value \t Freq. \t Perc. \n");
-		final Iterator<T> iter = frequencies.keySet().iterator();
-		while(iter.hasNext()){
-			final T value = iter.next();
+		for(T value : frequencies.keySet())
 			sb.append(value)
 				.append('\t')
 				.append(getCount(value))
 				.append('\t')
 				.append(DictionaryParser.PERCENT_FORMATTER_1.format(getPercentOf(value)))
 				.append('\n');
-		}
 		return sb.toString();
 	}
 

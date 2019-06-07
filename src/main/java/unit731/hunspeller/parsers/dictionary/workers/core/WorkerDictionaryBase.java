@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary.workers.core;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
 import java.util.function.BiConsumer;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;

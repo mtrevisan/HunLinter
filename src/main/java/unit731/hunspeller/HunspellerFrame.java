@@ -514,7 +514,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<ThesaurusTableModel>((ThesaurusTableModel)theTable.getModel()));
+      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel) theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
