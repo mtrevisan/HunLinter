@@ -102,6 +102,9 @@ public class RulesReducer{
 					.get();
 				final int longestConditionLength = compactedRule.condition.length();
 				final String from = entry.getKey();
+//TODO
+if(from.equals("órden"))
+	System.out.println("");
 				for(final LineEntry rule : rules){
 					//recover the missing characters for the current condition to become of length the maximum found earlier
 					final int startIndex = from.length() - longestConditionLength;
@@ -796,7 +799,7 @@ System.out.println("");
 		//sort processing-list by shortest condition
 		rules.sort(shortestConditionComparator);
 
-		//cycle parent in all the children
+		//for each parent rule
 		for(final LineEntry parent : rules){
 			//extract raw additions from parent
 			final Set<String> parentAdditions = parent.addition.stream()
