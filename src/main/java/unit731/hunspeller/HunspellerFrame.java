@@ -157,7 +157,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 

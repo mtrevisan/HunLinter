@@ -39,7 +39,7 @@ public class HelpDialog extends JDialog{
 			ImageIcon icon = new ImageIcon(img.getScaledInstance(lblLogo.getHeight(), lblLogo.getHeight(), Image.SCALE_SMOOTH));
 			lblLogo.setIcon(icon);
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		String artifactID = null;
 		String version = null;
@@ -52,7 +52,7 @@ public class HelpDialog extends JDialog{
 			version = prop.getProperty("version");
 			buildTimestamp = LocalDate.parse(prop.getProperty("buildTimestamp"));
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		lblProductNameOut.setText(artifactID);
 		lblProductVersionOut.setText(version);

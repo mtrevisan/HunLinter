@@ -27,7 +27,7 @@ public enum AffixTag{
 	ALIASES_MORPHOLOGICAL_FIELD("AM"),
 
 	//Options for suggestions
-	/** Search and suggest words with one different character replaced by a neighbor character */
+	/* Search and suggest words with one different character replaced by a neighbor character */
 //	KEY("KEY"),
 //	TRY("TRY"),
 	/** Words signed with this flag are not suggested (but still accepted when typed correctly) */
@@ -36,7 +36,7 @@ public enum AffixTag{
 //	MAX_NGRAM_SUGGEST("MAXNGRAMSUGS"),
 //	MAX_NGRAM_SIMILARITY_FACTOR("MAXDIFF"),
 //	ONLY_MAX_NGRAM_SIMILARITY_FACTOR("ONLYMAXDIFF"),
-	/** Sable word suggestions with spaces */
+	/* Sable word suggestions with spaces */
 //	NO_SPLIT_SUGGEST("NOSPLITSUGS"),
 	/** Similar to NOSUGGEST, but it forbids to use the word in n-gram based (more, than 1-character distance) suggestions */
 //	NO_NGRAM_SUGGEST("NONGRAMSUGGEST"),
@@ -80,7 +80,7 @@ public enum AffixTag{
 	FORBID_COMPOUND_FLAG("COMPOUNDFORBIDFLAG"),
 	/** Allow twofold suffixes within compounds */
 	ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND("COMPOUNDMORESUFFIXES"),
-	/** Signs the compounds in the dictionary */
+	/* Signs the compounds in the dictionary */
 //	COMPOUND_ROOT("COMPOUNDROOT"),
 	/** Set maximum word count in a compound word (default is unlimited) */
 	COMPOUND_MAX_WORD_COUNT("COMPOUNDWORDMAX"),
@@ -97,18 +97,18 @@ public enum AffixTag{
 	FORBIT_TRIPLES_IN_COMPOUND("CHECKCOMPOUNDTRIPLE"),
 	/** Allow simplified 2-letter forms of the compounds forbidden by CHECKCOMPOUNDTRIPLE (Schiff|fahrt -&gt; Schiffahrt) */
 	SIMPLIFIED_TRIPLES_IN_COMPOUND("SIMPLIFIEDTRIPLE"),
-	/**
-	 * Forbid compounding, if the first word in the compound ends with <endchars>, and next word begins with <beginchars> and (optionally)
-	 * they have the requested flags. The optional replacement parameter allows simplified compound form.
-	 * The special <endchars> pattern 0 (zero) limits the rule to the unmodified stems (stems and stems with zero affixes)
-	 * Note: COMPOUNDMIN doesn't work correctly with the compound word alternation, so it may need to set COMPOUNDMIN to lower value.
+	/*
+	  Forbid compounding, if the first word in the compound ends with <endchars>, and next word begins with <beginchars> and (optionally)
+	  they have the requested flags. The optional replacement parameter allows simplified compound form.
+	  The special <endchars> pattern 0 (zero) limits the rule to the unmodified stems (stems and stems with zero affixes)
+	  Note: COMPOUNDMIN doesn't work correctly with the compound word alternation, so it may need to set COMPOUNDMIN to lower value.
 	 */
 //	CHECK_COMPOUND_PATTERN("CHECKCOMPOUNDPATTERN"),
 	/** The last word of a compound with this flag forces capitalization of the whole compound word */
 	FORCE_COMPOUND_UPPERCASE_FLAG("FORCEUCASE"),
-	/**
-	 * Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound,
-	 * if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables)
+	/*
+	  Needed for special compounding rules in Hungarian (first parameter is the maximum syllable number, that may be in a compound,
+	  if words in compounds are more than COMPOUNDWORDMAX; second parameter is the list of vowels -- for calculating syllables)
 	 */
 //	COMPOUND_SYLLABLE("COMPOUNDSYLLABLE"),
 	/** Needed for special compounding rules in Hungarian */
@@ -136,9 +136,9 @@ public enum AffixTag{
 	 * (it works also with prefixes and prefix + suffix combinations)
 	 */
 	NEED_AFFIX_FLAG("NEEDAFFIX");
-	/** Signs affix rules and dictionary words (allomorphs) not used in morphological generation and root words removed from suggestion */
+	/* Signs affix rules and dictionary words (allomorphs) not used in morphological generation and root words removed from suggestion */
 //	SUB_STANDARD("SUBSTANDARD"),
-	/** Extends tokenizer of Hunspell command line interface with additional word character */
+	/* Extends tokenizer of Hunspell command line interface with additional word character */
 //	WORD_CHARS("WORDCHARS"),
 	/**
 	 * SS letter pair in uppercased (German) words may be uppercase sharp s (ß). Hunspell can handle this special casing with the

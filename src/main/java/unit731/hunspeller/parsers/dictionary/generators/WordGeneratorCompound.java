@@ -293,7 +293,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(dicInclusionTestWorker.isInDictionary(candidate)){
 					compoundAsReplacement.add(word);
 
-					return true;
+					exists = true;
+					break;
 				}
 		}
 		return exists;

@@ -8,10 +8,10 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.services.FileHelper;
 
 
-public class DictionaryEntryTest{
+class DictionaryEntryTest{
 
 	@Test
-	public void parse() throws IOException{
+	void parse() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX C",

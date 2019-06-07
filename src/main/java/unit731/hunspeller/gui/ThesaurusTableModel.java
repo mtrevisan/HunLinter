@@ -79,7 +79,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				for(String line : lines)
 					meanings.add(new MeaningEntry(line));
 			}
-			catch(IllegalArgumentException e){}
+			catch(IllegalArgumentException ignored){}
 		}
 	}
 

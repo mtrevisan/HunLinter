@@ -15,7 +15,7 @@ import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.SetHelper;
 
 
-public class RulesReducerTest{
+class RulesReducerTest{
 
 	/**
 	[rem= o,add=[ʼ],cond= o,from=[koarto, kuinto, kuarto, sèsto, tèrso, tuto, tèrŧo, so, sto]]	=> [s, t, ŧ]
@@ -31,7 +31,7 @@ public class RulesReducerTest{
 	[rem=xa,add=[ʼ],cond=xa,from=[kaxa]]						=> [x]
 	*/
 	@Test
-	public void case1() throws IOException{
+	void case1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -105,7 +105,7 @@ public class RulesReducerTest{
 	[rem=èƚa,add=[eƚata],cond=èƚa,from=[kapèƚa, vedèƚa]]	=> [ƚ]
 	*/
 	@Test
-	public void case2() throws IOException{
+	void case2() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -173,7 +173,7 @@ public class RulesReducerTest{
 	[rem=èl,add=[elato],cond=èl,from=[vedèl, kanèl, kapèl]]												=> [è]
 	*/
 	@Test
-	public void case3() throws IOException{
+	void case3() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -270,7 +270,7 @@ public class RulesReducerTest{
 	[rem=o,add=[sta],cond=o,from=[kanbio]]	=> [i]
 	*/
 	@Test
-	public void case4() throws IOException{
+	void case4() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -353,7 +353,7 @@ public class RulesReducerTest{
 	[rem=èdo,add=[ederieta, edarieta, edería, edaría],cond=èdo,from=[mèdo]]											=> [d]
 	*/
 	@Test
-	public void case5() throws IOException{
+	void case5() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -553,7 +553,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case6() throws IOException{
+	void case6() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -597,7 +597,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case7() throws IOException{
+	void case7() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -650,7 +650,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case8() throws IOException{
+	void case8() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -710,7 +710,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case9() throws IOException{
+	void case9() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -817,7 +817,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case10() throws IOException{
+	void case10() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -871,7 +871,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case11() throws IOException{
+	void case11() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -934,7 +934,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case12() throws IOException{
+	void case12() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -995,7 +995,7 @@ public class RulesReducerTest{
 	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																																		=> [e]
 	*/
 	@Test
-	public void case13() throws IOException{
+	void case13() throws IOException{
 		//what happens to 'inpenir'?
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
@@ -1079,7 +1079,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case14() throws IOException{
+	void case14() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1164,7 +1164,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case15() throws IOException{
+	void case15() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1205,7 +1205,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case16() throws IOException{
+	void case16() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1261,7 +1261,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case17() throws IOException{
+	void case17() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1334,7 +1334,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case18() throws IOException{
+	void case18() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1535,7 +1535,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case19() throws IOException{
+	void case19() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1664,7 +1664,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case20() throws IOException{
+	void case20() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
@@ -1797,7 +1797,7 @@ public class RulesReducerTest{
 	}
 
 	@Test
-	public void case21() throws IOException{
+	void case21() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",

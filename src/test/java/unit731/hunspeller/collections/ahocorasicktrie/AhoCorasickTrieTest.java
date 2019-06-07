@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class AhoCorasickTrieTest{
+class AhoCorasickTrieTest{
 
 	@Test
-	public void emptyTree(){
+	void emptyTree(){
 		Map<String, String> map = new HashMap<>();
 		AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
 			.build(map);
@@ -27,7 +27,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void singleInsertion(){
+	void singleInsertion(){
 		Map<String, Integer> map = Collections.singletonMap("test", 1);
 		AhoCorasickTrie<Integer> trie = new AhoCorasickTrieBuilder<Integer>()
 			.build(map);
@@ -42,7 +42,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void multipleInsertions(){
+	void multipleInsertions(){
 		Map<String, Integer> map = new HashMap<>();
 		map.put("test", 1);
 		map.put("tent", 2);
@@ -72,7 +72,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void multipleInsertionOfTheSameKey(){
+	void multipleInsertionOfTheSameKey(){
 		Map<String, Integer> map = new HashMap<>();
 		map.put("test", 1);
 		map.put("tent", 2);
@@ -90,7 +90,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void simplePut(){
+	void simplePut(){
 		Map<String, Boolean> map = new HashMap<>();
 		map.put("java.lang.", Boolean.TRUE);
 		map.put("java.i", Boolean.TRUE);
@@ -111,7 +111,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void hasStartsWithMatch(){
+	void hasStartsWithMatch(){
 		Map<String, Boolean> map = new HashMap<>();
 		map.put("bookshelf", Boolean.TRUE);
 		map.put("wowza", Boolean.FALSE);
@@ -126,7 +126,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void searchForPartialParentAndLeafKeyWhenOverlapExists(){
+	void searchForPartialParentAndLeafKeyWhenOverlapExists(){
 		Map<String, String> map = new HashMap<>();
 		map.put("abcd", "abcd");
 		map.put("abce", "abce");
@@ -138,7 +138,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void searchForLeafNodesWhenOverlapExists(){
+	void searchForLeafNodesWhenOverlapExists(){
 		Map<String, String> map = new HashMap<>();
 		map.put("abcd", "abcd");
 		map.put("abce", "abce");
@@ -150,7 +150,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void searchForStringSmallerThanSharedParentWhenOverlapExists(){
+	void searchForStringSmallerThanSharedParentWhenOverlapExists(){
 		Map<String, String> map = new HashMap<>();
 		map.put("abcd", "abcd");
 		map.put("abce", "abce");
@@ -161,7 +161,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void searchForStringEqualToSharedParentWhenOverlapExists(){
+	void searchForStringEqualToSharedParentWhenOverlapExists(){
 		Map<String, String> map = new HashMap<>();
 		map.put("abcd", "abcd");
 		map.put("abce", "abce");
@@ -172,7 +172,7 @@ public class AhoCorasickTrieTest{
 	}
 
 	@Test
-	public void size(){
+	void size(){
 		Map<String, String> map = new HashMap<>();
 		map.put("apple", "apple");
 		map.put("appleshack", "appleshack");

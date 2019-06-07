@@ -14,7 +14,7 @@ import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-public class WordGeneratorCompoundFlagTest{
+class WordGeneratorCompoundFlagTest{
 
 	private final Backbone backbone = new Backbone(null, null);
 
@@ -33,7 +33,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void simple() throws IOException{
+	void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -65,7 +65,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void compoundMinLength() throws IOException{
+	void compoundMinLength() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -90,7 +90,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void checkCompoundTriple() throws IOException{
+	void checkCompoundTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -123,7 +123,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void simplifiedTriple() throws IOException{
+	void simplifiedTriple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -148,7 +148,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void forbidWordDuplication() throws IOException{
+	void forbidWordDuplication() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -176,7 +176,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void withAffixes() throws IOException{
+	void withAffixes() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -229,7 +229,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void withAffixesOnefold() throws IOException{
+	void withAffixesOnefold() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -286,7 +286,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void withAffixesTwofold() throws IOException{
+	void withAffixesTwofold() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -352,7 +352,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void permitFlag() throws IOException{
+	void permitFlag() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -454,7 +454,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void forbidFlag() throws IOException{
+	void forbidFlag() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDFLAG X",
@@ -496,7 +496,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void checkCompoundCase() throws IOException{
+	void checkCompoundCase() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPOUNDMIN 1",
@@ -600,7 +600,7 @@ public class WordGeneratorCompoundFlagTest{
 	}
 
 	@Test
-	public void compoundReplacement() throws IOException{
+	void compoundReplacement() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -664,7 +664,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 	@Test
-	public void forbiddenWord() throws IOException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -706,7 +706,7 @@ public class WordGeneratorCompoundFlagTest{
 
 
 	@Test
-	public void forceUppercase() throws IOException{
+	void forceUppercase() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

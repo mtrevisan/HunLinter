@@ -13,7 +13,7 @@ import unit731.hunspeller.services.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-public class WordGeneratorCompoundBeginMiddleEndTest{
+class WordGeneratorCompoundBeginMiddleEndTest{
 
 	private final Backbone backbone = new Backbone(null, null);
 
@@ -28,7 +28,7 @@ public class WordGeneratorCompoundBeginMiddleEndTest{
 	}
 
 	@Test
-	public void germanCompounding() throws IOException{
+	void germanCompounding() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

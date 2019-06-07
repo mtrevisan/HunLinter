@@ -17,13 +17,13 @@ import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.PatternHelper;
 
 
-public class HyphenationParserTest{
+class HyphenationParserTest{
 
 	private static final Pattern PATTERN_CLEANER = PatternHelper.pattern("\\d|/.+$");
 
 
 	@Test
-	public void noHyphenationDueToLeftMin(){
+	void noHyphenationDueToLeftMin(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "a1bc");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -39,7 +39,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void noHyphenationDueToRightMin(){
+	void noHyphenationDueToRightMin(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -55,7 +55,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void hyphenationOkLeftMin(){
+	void hyphenationOkLeftMin(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "a1bc");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -71,7 +71,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void hyphenationOkRightMin(){
+	void hyphenationOkRightMin(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -87,7 +87,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedWithRemovalBeforeHyphen(){
+	void augmentedWithRemovalBeforeHyphen(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje/=,2,1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -103,7 +103,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedWithIndexes(){
+	void augmentedWithIndexes(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1–/–=,1,1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -119,7 +119,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedWithoutIndexes(){
+	void augmentedWithoutIndexes(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1–/–=");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -135,7 +135,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedAfterBreak(){
+	void augmentedAfterBreak(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "–1/–=–");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -151,7 +151,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedAfterBreakWithRuleOverlap(){
+	void augmentedAfterBreakWithRuleOverlap(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "–3/–=–");
 		addRule(hyphenations, "1c");
@@ -168,7 +168,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedAfterBreak2(){
+	void augmentedAfterBreak2(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1k");
 		addRule(hyphenations, "–1/–=–");
@@ -185,7 +185,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedNonWordInitial(){
+	void augmentedNonWordInitial(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "eigh1teen/ht=t,4,2");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -201,7 +201,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedWordInitial(){
+	void augmentedWordInitial(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, ".schif1fahrt/ff=f,5,2");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -217,7 +217,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void augmentedBase(){
+	void augmentedBase(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "c1k/k=k");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -233,7 +233,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void customHyphenation(){
+	void customHyphenation(){
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
 			.build(Collections.emptyMap());
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
@@ -249,7 +249,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void competingRules(){
+	void competingRules(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ab1c");
 		addRule(hyphenations, "2c");
@@ -267,7 +267,7 @@ public class HyphenationParserTest{
 
 	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
 	@Test
-	public void germanPreReform(){
+	void germanPreReform(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "f1f");
 		addRule(hyphenations, "if3fa/ff=f,2,2");
@@ -286,7 +286,7 @@ public class HyphenationParserTest{
 
 	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
 	@Test
-	public void hungarianSimplifiedDoubleConsonants(){
+	void hungarianSimplifiedDoubleConsonants(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "s1sz/sz=sz,1,3");
 		addRule(hyphenations, "n1ny/ny=ny,1,3");
@@ -302,7 +302,7 @@ public class HyphenationParserTest{
 
 	/** Dutch: omaatje -> oma-tje */
 	@Test
-	public void dutch1(){
+	void dutch1(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje./=,2,1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -317,7 +317,7 @@ public class HyphenationParserTest{
 
 	/** Dutch: omaatje -> oma-tje */
 	@Test
-	public void dutch2(){
+	void dutch2(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "aa1tje./a=tje,1,5");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -331,7 +331,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void french(){
+	void french(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "xé1ém/á=a,2,2");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -346,7 +346,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void baseAlt(){
+	void baseAlt(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "l·1l/l=l,1,3");
 		addRule(hyphenations, "a1atje./a=t,1,3");
@@ -375,7 +375,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void englishCompound1(){
+	void englishCompound1(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "motor1cycle");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -399,7 +399,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void englishCompound2(){
+	void englishCompound2(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "motor1cycle");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -423,7 +423,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void compound2(){
+	void compound2(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "szony1fő");
 		addRule(hyphenations1stLevel, "ök1assz");
@@ -449,7 +449,7 @@ public class HyphenationParserTest{
 	 * and recursive compound hyphenation (kilowatt->kilo-watt)
 	 */
 	@Test
-	public void compound3(){
+	void compound3(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "wat1time/tt=t,3,2");
 		addRule(hyphenations1stLevel, ".kilo1watt");
@@ -470,7 +470,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void compound5(){
+	void compound5(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, ".post1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -494,7 +494,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void compound6(){
+	void compound6(){
 		Map<String, String> hyphenations1stLevel = new HashMap<>();
 		addRule(hyphenations1stLevel, "1que.");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -517,7 +517,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void noHyphen1(){
+	void noHyphen1(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
@@ -542,7 +542,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void noHyphen2(){
+	void noHyphen2(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "1_1");
 		addRule(hyphenations, "1" + HyphenationParser.MINUS_SIGN + "1");
@@ -568,7 +568,7 @@ public class HyphenationParserTest{
 
 	/** Unicode ligature hyphenation (ffi -> f=fi) */
 	@Test
-	public void ligature(){
+	void ligature(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ﬃ1/f=ﬁ,1,1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -583,7 +583,7 @@ public class HyphenationParserTest{
 	}
 
 		@Test
-	public void settings(){
+	void settings(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "ő1");
 		AhoCorasickTrie<String> patterns1stLevel = new AhoCorasickTrieBuilder<String>()
@@ -597,7 +597,7 @@ public class HyphenationParserTest{
 	}
 
 	@Test
-	public void unicode(){
+	void unicode(){
 		Map<String, String> hyphenations = new HashMap<>();
 		addRule(hyphenations, "l·1l/l=l,1,3");
 		addRule(hyphenations, "e1ë/e=e,1,2");

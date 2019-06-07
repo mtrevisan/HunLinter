@@ -107,8 +107,8 @@ public class HyphenationBreak{
 				}
 				else{
 					//merge syllabe with previous
-					String removedSyllabe1 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
-					String removedSyllabe0 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
+					String removedSyllabe1 = syllabes.remove(i);
+					String removedSyllabe0 = syllabes.remove(i);
 					if(syllabes.isEmpty())
 						syllabes.add(removedSyllabe1 + removedSyllabe0);
 					else

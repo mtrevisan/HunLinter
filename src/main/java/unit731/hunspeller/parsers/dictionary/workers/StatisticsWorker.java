@@ -45,25 +45,21 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			for(final Production production : productions){
 				//collect statistics
 				final String word = production.getWord();
-				if(hyphenator != null){
-					final List<String> subwords = hyphenator.splitIntoCompounds(word);
-					if(subwords.isEmpty())
-						dicStatistics.addData(word);
-					else
-						for(final String subword : subwords){
-							final Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-							dicStatistics.addData(word, hyph);
-						}
-				}
-				else
+				final List<String> subwords = hyphenator.splitIntoCompounds(word);
+				if(subwords.isEmpty())
 					dicStatistics.addData(word);
+				else
+					for(final String subword : subwords){
+						final Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+						dicStatistics.addData(word, hyph);
+					}
 			}
 		};
 		final Runnable completed = () -> {
 			try{
 				dicStatistics.close();
 			}
-			catch(final IOException e){}
+			catch(final IOException ignored){}
 
 			//show statistics window
 			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
@@ -75,7 +71,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			try{
 				dicStatistics.close();
 			}
-			catch(final IOException e){}
+			catch(final IOException ignored){}
 		};
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);

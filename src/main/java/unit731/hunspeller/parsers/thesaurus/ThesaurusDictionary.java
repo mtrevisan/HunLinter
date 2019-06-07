@@ -70,10 +70,12 @@ public class ThesaurusDictionary{
 	}
 
 	public boolean add(final ThesaurusEntry entry){
-		boolean result = synonyms.add(entry);
+		boolean result = false;
+		if(!synonyms.contains(entry)){
+			result = synonyms.add(entry);
 
-		modified = true;
-
+			modified = true;
+		}
 		return result;
 	}
 

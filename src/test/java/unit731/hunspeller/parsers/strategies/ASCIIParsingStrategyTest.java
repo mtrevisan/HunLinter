@@ -7,34 +7,34 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
-public class ASCIIParsingStrategyTest{
+class ASCIIParsingStrategyTest{
 
 	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 
 
 	@Test
-	public void ok(){
+	void ok(){
 		String[] flags = strategy.parseFlags("ab");
 
 		Assertions.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
 	}
 
 	@Test
-	public void empty(){
+	void empty(){
 		String[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void nullFlags(){
+	void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void joinFlags(){
+	void joinFlags(){
 		String[] flags = new String[]{"a", "b"};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -42,7 +42,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithError(){
+	void joinFlagsWithError(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
@@ -51,7 +51,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithNoASCII(){
+	void joinFlagsWithNoASCII(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
@@ -60,7 +60,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithEmpty(){
+	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
@@ -69,7 +69,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithNull(){
+	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
@@ -78,7 +78,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinEmptyFlags(){
+	void joinEmptyFlags(){
 		String[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -86,7 +86,7 @@ public class ASCIIParsingStrategyTest{
 	}
 
 	@Test
-	public void joinNullFlags(){
+	void joinNullFlags(){
 		String continuationFlags = strategy.joinFlags(null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());

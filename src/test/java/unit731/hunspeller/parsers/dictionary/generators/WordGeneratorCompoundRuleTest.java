@@ -14,7 +14,7 @@ import unit731.hunspeller.services.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-public class WordGeneratorCompoundRuleTest{
+class WordGeneratorCompoundRuleTest{
 
 	private final Backbone backbone = new Backbone(null, null);
 
@@ -29,7 +29,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void testBjörnJacke() throws IOException{
+	void testBjörnJacke() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -63,7 +63,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void simple() throws IOException{
+	void simple() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -88,7 +88,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void infinite() throws IOException{
+	void infinite() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -148,7 +148,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void zeroOrOne() throws IOException{
+	void zeroOrOne() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -177,7 +177,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void longFlag() throws IOException{
+	void longFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -207,7 +207,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void numericalFlag() throws IOException{
+	void numericalFlag() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -238,7 +238,7 @@ public class WordGeneratorCompoundRuleTest{
 
 
 	@Test
-	public void forbiddenWordMissingRule() throws IOException{
+	void forbiddenWordMissingRule() throws IOException{
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String language = "xxx";
 			File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
@@ -258,7 +258,7 @@ public class WordGeneratorCompoundRuleTest{
 	}
 
 	@Test
-	public void forbiddenWord() throws IOException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -279,7 +279,7 @@ public class WordGeneratorCompoundRuleTest{
 
 
 	@Test
-	public void forceUppercase() throws IOException{
+	void forceUppercase() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

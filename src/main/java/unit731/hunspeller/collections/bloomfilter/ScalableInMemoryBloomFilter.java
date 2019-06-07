@@ -24,8 +24,8 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
-		Objects.nonNull(charset);
-		Objects.nonNull(parameters);
+		Objects.requireNonNull(charset);
+		Objects.requireNonNull(parameters);
 
 		parameters.validate();
 

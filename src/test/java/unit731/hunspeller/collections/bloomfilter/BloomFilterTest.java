@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class BloomFilterTest{
+class BloomFilterTest{
 
 	private static final int MAX = 100 * 100;
 
@@ -16,7 +16,7 @@ public class BloomFilterTest{
 
 
 	@Test
-	public void defaultFilter(){
+	void defaultFilter(){
 		BloomFilterParameters params = new BloomFilterParameters(){
 			@Override
 			public int getExpectedNumberOfElements(){

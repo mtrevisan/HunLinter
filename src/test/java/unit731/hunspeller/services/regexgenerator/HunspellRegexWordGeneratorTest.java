@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class HunspellRegexWordGeneratorTest{
+class HunspellRegexWordGeneratorTest{
 
 	@Test
-	public void allOne(){
+	void allOne(){
 		String[] regex = new String[]{"abc", "de", "a"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -23,7 +23,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void oneForEach(){
+	void oneForEach(){
 		String[] regex = new String[]{"abc", "de", "?", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -41,7 +41,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOne(){
+	void allZeroOrOne(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -60,7 +60,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOneWithZeroMinimum(){
+	void allZeroOrOneWithZeroMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -79,7 +79,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOneWithTwoMinimum(){
+	void allZeroOrOneWithTwoMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -95,7 +95,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrMore(){
+	void allZeroOrMore(){
 		String[] regex = new String[]{"abc", "*", "de", "*", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);

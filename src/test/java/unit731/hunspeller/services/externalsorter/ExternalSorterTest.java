@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
-public class ExternalSorterTest{
+class ExternalSorterTest{
 
 	private final ExternalSorter sorter = new ExternalSorter();
 	private final Comparator<String>DEFAULT_COMPARATOR = (r1, r2) -> r1.compareTo(r2);
@@ -19,7 +19,7 @@ public class ExternalSorterTest{
 
 
 	@BeforeEach
-	public void setUp() throws Exception{
+	void setUp() throws Exception{
 		inputFile = new File(getClass().getClassLoader().getResource("external-sorter-test-file.txt").toURI());
 
 		outputFile = File.createTempFile("sort", ".out");
@@ -27,7 +27,7 @@ public class ExternalSorterTest{
 	}
 
 	@Test
-	public void emptyFile() throws Exception{
+	void emptyFile() throws Exception{
 		File in = File.createTempFile("sort", ".in");
 		in.deleteOnExit();
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -41,7 +41,7 @@ public class ExternalSorterTest{
 	}
 
 	@Test
-	public void simpleSort() throws Exception{
+	void simpleSort() throws Exception{
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(StandardCharsets.UTF_8)
 			.comparator(DEFAULT_COMPARATOR)
@@ -53,7 +53,7 @@ public class ExternalSorterTest{
 	}
 
 	@Test
-	public void sortDistinctFileResult() throws Exception{
+	void sortDistinctFileResult() throws Exception{
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(StandardCharsets.UTF_8)
 			.comparator(DEFAULT_COMPARATOR)
@@ -65,7 +65,7 @@ public class ExternalSorterTest{
 	}
 
 	@Test
-	public void sortDistinctFileDistinctResult() throws Exception{
+	void sortDistinctFileDistinctResult() throws Exception{
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(StandardCharsets.UTF_8)
 			.comparator(DEFAULT_COMPARATOR)
@@ -79,7 +79,7 @@ public class ExternalSorterTest{
 	}
 
 	@Test
-	public void skipHeader() throws Exception{
+	void skipHeader() throws Exception{
 		ExternalSorterOptions options = ExternalSorterOptions.builder()
 			.charset(StandardCharsets.UTF_8)
 			.comparator(DEFAULT_COMPARATOR)

@@ -70,7 +70,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			GUIUtils.addPopupMenu(copyingPopupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
 				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		addListenerOnClose();
 

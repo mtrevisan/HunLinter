@@ -24,7 +24,7 @@ public class ThesaurusTableRenderer extends JLabel implements TableCellRenderer{
 		try{
 			table.setRowHeight(row, height);
 		}
-		catch(ArrayIndexOutOfBoundsException e){}
+		catch(ArrayIndexOutOfBoundsException ignored){}
 
 		return this;
 	}

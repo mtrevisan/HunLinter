@@ -38,7 +38,7 @@ public class FileHelper{
 				try{
 					cs = Charset.forName(name);
 				}
-				catch(Exception e){}
+				catch(Exception ignored){}
 				return cs;
 			})
 			.filter(Objects::nonNull)
