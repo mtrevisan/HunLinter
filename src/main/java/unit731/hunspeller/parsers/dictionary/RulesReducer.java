@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Stack;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -106,11 +105,6 @@ public class RulesReducer{
 				for(final LineEntry rule : rules){
 					//recover the missing characters for the current condition to become of length the maximum found earlier
 					final int startIndex = from.length() - longestConditionLength;
-					//FIXME what if a condition is not long enough? keep it separate?
-//					if(startIndex < 0)
-//						throw new IllegalArgumentException("condition '" + from + "' cannot be extended to reach longest condition '"
-//							+ compactedFilteredRule.condition + "'");
-
 					//if a condition is not long enough, keep it separate
 					if(startIndex >= 0){
 						final int delta = longestConditionLength - rule.condition.length();
@@ -232,50 +226,6 @@ public class RulesReducer{
 		return new ArrayList<>(compaction.values());
 	}
 
-	/**<pre>
-	 * sort processing-list by shortest condition
-	 * while processing-list is not empty{
-	 * 	extract rule from processing-list
-	 * 	find parent-group
-	 * 	find children-group
-	 * 	if intersection(parent-group, children-group) is empty{
-	 * 		add new rule from parent with condition starting with NOT(children-group) to final-list
-	 *
-	 * 		if parent.condition is not empty and can-bubble-up{
-	 * 			bubble up by bucketing children for group-2
-	 * 			for each children-group-2
-	 * 				add new rule from parent with condition starting with NOT(children-group-1) to final-list
-	 *
-	 * 			remove bubbles from processing-list
-	 * 		}
-	 *
-	 * 		for each children-same-condition
-	 * 			add new rule from child with condition starting with (child-group) to final-list
-	 *
-	 * 		remove same-condition-children from processing-list
-	 * 		remove same-condition-children from final-list
-	 * 	}
-	 * 	else if parent.condition is empty{
-	 * 		for each last-char of parent.from
-	 * 			if last-char is contained into intersection
-	 * 				add new rule from parent with condition the last-char
-	 *
-	 * 		if intersection is proper subset of parent-group{
-	 * 			add new rule from parent with condition the difference between parent-grop and intersection to final-list
-	 * 			keep only rules that matches some existent words
-	 * 		}
-	 * 	}
-	 * 	else{
-	 * 		?
-	 * //		calculate intersection between parent and children conditions
-	 * //		if intersection is empty
-	 * //			check if removal == 0 && exists a rule in children that have another-rule.removal = removal+condition and another-rule.condition == condition
-	 * 	}
-	 *
-	 * 	remove parent from final-list
-	 * }
-	 * </pre>
-	 */
 	private List<LineEntry> removeOverlappingConditions(final List<LineEntry> rules/*, final AffixEntry.Type type*/){
 		//reshuffle originating list to place the correct productions in the correct rule
 //FIXME
@@ -327,76 +277,53 @@ final Map<LineEntry, Set<Character>> groups2 = bush.stream()
 
 						//if intersection(parent-group, children-group) is empty
 						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-						//TODO
-//						if(!groupIntersection.isEmpty() && childrenGroup.containsAll(parentGroup)){
-//							for(final char chr : parentGroup){
-//								final String condition = chr + parent.condition;
-//								final LineEntry newEntry = LineEntry.createFrom(parent, condition);
-//								bush.add(newEntry);
-//							}
-//
-//							bush.remove(parent);
-//							bush.sort(shortestConditionComparator);
-//
-//							nonOverlappingRules.addAll(expandSameCondition(bush));
-//
-//							itr = bush.iterator();
-//
-//							continue;
-//						}
-
 						parentGroup.removeAll(groupIntersection);
-//						if(groupIntersection.isEmpty()){
-							//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
-							final String condition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
-								makeGroup(parentGroup): makeNotGroup(childrenGroup))
-								+ parent.condition;
-							LineEntry newEntry = LineEntry.createFrom(parent, condition);
 
-							//keep only rules that matches some existent words
-							if(newEntry.isProductive())
-								nonOverlappingRules.add(newEntry);
-							else
-								LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
-									(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+						//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
+						final String condition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
+							makeGroup(parentGroup): makeNotGroup(childrenGroup))
+							+ parent.condition;
+						LineEntry newEntry = LineEntry.createFrom(parent, condition);
 
-							final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
-							if(parentConditionLength + 1 >= maxConditionLength){
-								bush.removeAll(bubbles);
+						//keep only rules that matches some existent words
+						if(newEntry.isProductive())
+							nonOverlappingRules.add(newEntry);
+						else
+							LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
+								(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
-								nonOverlappingRules.addAll(bubbles);
-							}
-							else if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
-								final List<LineEntry> bushes = new ArrayList<>(bush);
-								bushes.add(parent);
-								for(final Character chr : childrenGroup){
-									final String cond = chr + parent.condition;
-									newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
-									if(!bush.contains(newEntry))
-										bush.add(newEntry);
-								}
+						final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
+						if(parentConditionLength + 1 >= maxConditionLength){
+							bush.removeAll(bubbles);
 
-								bush.sort(shortestConditionComparator);
-							}
-							else if(!groupIntersection.isEmpty() && !parentGroup.isEmpty()){
-								//expand intersection
-								for(final Character chr : groupIntersection){
-									final String cond = chr + parent.condition;
-									newEntry = LineEntry.createFrom(parent, cond);
+							nonOverlappingRules.addAll(bubbles);
+						}
+						else if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+							final List<LineEntry> bushes = new ArrayList<>(bush);
+							bushes.add(parent);
+							for(final Character chr : childrenGroup){
+								final String cond = chr + parent.condition;
+								newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+								if(!bush.contains(newEntry))
 									bush.add(newEntry);
-
-									nonOverlappingRules.addAll(expandSameCondition(bush));
-								}
-
-								bush.sort(shortestConditionComparator);
 							}
 
-							//continue until bubbles.condition length is reached
-//						}
-//						else{
-//						if(!groupIntersection.isEmpty()){
-//							throw new IllegalArgumentException("to do");
-//						}
+							bush.sort(shortestConditionComparator);
+						}
+						else if(!groupIntersection.isEmpty() && !parentGroup.isEmpty()){
+							//expand intersection
+							for(final Character chr : groupIntersection){
+								final String cond = chr + parent.condition;
+								newEntry = LineEntry.createFrom(parent, cond);
+								bush.add(newEntry);
+
+								nonOverlappingRules.addAll(expandSameCondition(bush));
+							}
+
+							bush.sort(shortestConditionComparator);
+						}
+
+						//continue until bubbles.condition length is reached
 					}
 					else
 						nonOverlappingRules.add(parent);
