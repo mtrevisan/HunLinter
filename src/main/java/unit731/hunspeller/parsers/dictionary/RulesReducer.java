@@ -267,23 +267,10 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 
 					bush.remove(parent);
 
-					final int parentConditionLength = parent.condition.length();
-					final List<LineEntry> bubbles = bush.stream()
-						.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
-						.collect(Collectors.toList());
+					final List<LineEntry> bubbles = extractBubbles(bush, parent);
 					if(!bubbles.isEmpty()){
-						//TODO what if parent is contained into one of the bubbles? ([rem=en,add=[ini],cond=en,...] is into
-						//[rem=órden,add=[órdini,úrdini],cond=órden,...], that is [rem=en,add=[ini],cond=órden,...] + [rem=órden,add=[úrdini],cond=órden,...])
-//						for(final LineEntry child : bubbles)
-//							if(isContainedInto(parent, child, type)){
-								//TODO
-								//transfer `from` from child to parent
-								//remove parent addition from child
-								//remove child from bubbles, insert into `nonOverlappingRules`
-//System.out.println("");
-//							}
-
 						//extract ratifying group
+						final int parentConditionLength = parent.condition.length();
 						final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
 
 						//extract negated group
@@ -350,6 +337,22 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		}
 
 		return nonOverlappingRules;
+	}
+
+	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
+		final int parentConditionLength = parent.condition.length();
+		final List<LineEntry> bubbles = bush.stream()
+			.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
+			.collect(Collectors.toList());
+
+		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
+		final Iterator<LineEntry> itr = bubbles.iterator();
+		while(itr.hasNext()){
+			final LineEntry bubble = itr.next();
+			if(parent.equals(bubble) && !SetHelper.isDisjoint(parent.from, bubble.from))
+				itr.remove();
+		}
+		return bubbles;
 	}
 
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
@@ -500,8 +503,6 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 						childAdditions.add(addition.substring(lcsLength));
 					}
 
-if(parent.from.contains("órden"))
-	System.out.println("");
 					final String childEndingCondition = child.condition.substring(minimumLCSLength);
 					//extract from each child all the additions present in the parent
 					if(parentRemoval.containsKey(childEndingCondition) && childAdditions.containsAll(parentAdditions)){
