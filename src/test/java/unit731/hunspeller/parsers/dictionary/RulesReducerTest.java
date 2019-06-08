@@ -996,7 +996,6 @@ class RulesReducerTest{
 	*/
 	@Test
 	void case13() throws IOException{
-		//what happens to 'inpenir'?
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"LANG vec",
