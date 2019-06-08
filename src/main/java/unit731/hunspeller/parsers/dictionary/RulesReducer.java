@@ -502,6 +502,15 @@ public class RulesReducer{
 					}
 				}
 		}
+
+		//make additions disjoint
+		//TODO
+		//rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=[
+		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
+		//into
+		//rem=èra,add=[iera, ièra, iereta],cond=èra,from=[
+		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
+System.out.println("");
 	}
 
 	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
