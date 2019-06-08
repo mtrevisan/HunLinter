@@ -159,12 +159,10 @@ public class RulesReducer{
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	public List<LineEntry> reduceRules(final List<LineEntry> plainRules/*, final AffixEntry.Type type*/){
+	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final AffixEntry.Type type){
 		List<LineEntry> compactedRules = compactRules(plainRules);
 
 		//reshuffle originating list to place the correct productions in the correct rule
-//FIXME
-AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		redistributeAdditions(compactedRules, type);
 
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(),
@@ -258,13 +256,6 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 				while(itr.hasNext()){
 					final LineEntry parent = itr.next();
 
-					if(LOGGER.isTraceEnabled()){
-						final Map<LineEntry, Set<Character>> logGroups = bush.stream()
-							.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, parent.condition.length())));
-						LOGGER.trace(StringUtils.EMPTY);
-						logGroups.forEach((entry, group) -> LOGGER.trace("{} => {}", entry, group));
-					}
-
 					bush.remove(parent);
 
 					final List<LineEntry> bubbles = extractBubbles(bush, parent);
@@ -306,7 +297,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 							bushes.add(parent);
 							for(final Character chr : childrenGroup){
 								final String cond = chr + parent.condition;
-								newEntry = LineEntry.createFromWithRules(parent, cond, bushes);
+								newEntry = LineEntry.createFrom(parent, cond);
 								if(!bush.contains(newEntry))
 									bush.add(newEntry);
 							}
@@ -349,7 +340,7 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 		final Iterator<LineEntry> itr = bubbles.iterator();
 		while(itr.hasNext()){
 			final LineEntry bubble = itr.next();
-			if(parent.equals(bubble) && !SetHelper.isDisjoint(parent.from, bubble.from))
+			if(!SetHelper.isDisjoint(parent.from, bubble.from))
 				itr.remove();
 		}
 		return bubbles;
@@ -511,11 +502,6 @@ AffixEntry.Type type = AffixEntry.Type.SUFFIX;
 					}
 				}
 		}
-
-
-		//TODO redistribute rules
-		//[rem=órden,add=[órdini,úrdini],cond=órden,...], that is [rem=en,add=[ini],cond=órden,...] + [rem=órden,add=[úrdini],cond=órden,...])
-System.out.println("");
 	}
 
 	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){

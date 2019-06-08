@@ -2,7 +2,11 @@ package unit731.hunspeller.parsers.dictionary;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -60,7 +64,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "ʼ", "r", "par"),
@@ -128,7 +132,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
@@ -210,7 +214,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ato", "[nr]", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
@@ -299,7 +303,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente", "arte")),
@@ -445,7 +449,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("ar", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "ar", Arrays.asList("axenar", "sporkar", "portar", "fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar", "komandar", "kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar", "panetar", "tapeŧar", "kokoƚar", "strasar", "tartufolar", "retelar", "vergexar", "senpiar", "bibiar", "putelar", "pitokar", "berikinar", "saonar", "strigar", "kavaƚar", "striar", "straŧar", "polar", "cakoƚar", "lotar", "piocar", "kokolar", "isporkar", "garbar", "rafinar", "kanseƚar", "nodar", "kojonar", "stanpar", "garđar", "poltronar", "ƚexinar", "speŧiar", "spilorŧar", "soldar", "ɉetar", "minconar", "piexar", "poƚar", "jetar", "reteƚar", "peocar", "piedar", "skorsar", "garxar", "kontroƚar", "kanselar", "puteƚar", "albergar", "ardentar", "spilorsar", "kordar", "tapesar", "grixonar", "ƚotar", "sovercar", "xmorfiar", "stranbar", "cakolar", "kapocar", "kontrolar", "sansar", "spiŧiar", "ŧimar", "robar", "simar", "fraskar", "komenŧiar", "bañar", "birbantar", "bufonar", "porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar", "lexinar", "berekinar", "tartufoƚar", "vakar", "spesiar")),
@@ -575,7 +579,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "gaƚantòmo"),
@@ -622,7 +626,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "galantòmo"),
@@ -681,7 +685,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		List<LineEntry> expectedCompactedRules = Collections.singletonList(
 			new LineEntry("r", SetHelper.setOf("oreto", "toreto", "dora", "doreta", "ora", "doreto", "tor", "toreta", "oreta", "or", "tora", "dor"), "r", Arrays.asList("ƚargar", "boƚar", "noƚixar", "noƚexar", "spigoƚar", "ƚustrar", "sesoƚar", "kalkoƚar", "ƚavorar", "iƚuminar", "piƚar", "regoƚar", "kaƚibrar", "señaƚar", "oxeƚar", "kriveƚar", "saƚixar", "ventiƚar", "ƚuminar", "aƚienar", "ƚexixlar", "triveƚar", "spekuƚar", "garbeƚar", "ƚibar", "paƚar", "koƚorir", "ƚigar", "siaƚakuar", "mormoƚar", "ƚikar", "soƚesitar", "skarpeƚar", "ƚaorar", "foƚar", "stroƚegar", "spoƚar", "stroƚogar", "baƚar", "fiƚar", "koƚar", "saƚar", "ƚevar", "baƚotar", "ƚavar"))
@@ -763,7 +767,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dor", SetHelper.setOf("oreto", "toreto", "doreto", "tor", "or"), "dor", Arrays.asList("reŧevidor", "reŧeidor", "stridor", "resevidor", "reseidor")),
@@ -844,7 +848,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ureto", "ur"), "dur", Arrays.asList("koƚadur", "vaƚidur")),
@@ -902,7 +906,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ur", "ureto"), "dur", Arrays.asList("madur", "traxeɉadur", "traxejadur", "tradadur", "trađadur", "kagadur", "traxadur", "tragadur", "ordadur", "koladur", "validur", "ordidur", "skortegadur")),
@@ -958,7 +962,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("lderò", "ƚusion", "lderò", "solderò"),
@@ -1031,7 +1035,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("verò", "sion", "iverò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
@@ -1115,7 +1119,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("erò", "iŧion", "terò", "repeterò"),
@@ -1184,7 +1188,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "mento", "r", Arrays.asList("pispoƚar", "josoƚar", "ƚatar", "xbesoƚar", "diƚatar", "ƚontanar", "bagoƚar", "indeboƚir", "vaƚir", "strukoƚar", "boƚegar", "indoƚentrar", "deƚinear", "formigoƚar", "desarveƚar", "biskoƚar", "kaƚar", "sifoƚar", "rueƚar", "dindoƚar", "krikoƚar", "ƚigar", "siaƚakuar", "ƚoxar", "ƚisar", "deserveƚar", "ƚanpexar", "nuvoƚar", "kabaƚar", "ñaoƚar", "bueƚar", "ƚanpixar", "spigoƚar", "triboƚar", "turbuƚar", "proƚongar", "trabakoƚar", "krokoƚar", "skonbusoƚar", "cicoƚar", "skorkoƚar", "kavaƚar", "skrisoƚar", "troboƚar", "basiƚar", "torboƚar", "ƚogar", "paƚar", "faƚir", "ƚanbikar", "peƚar", "dexserveƚar", "sigaƚar", "dexsarveƚar", "buƚegar", "strakoƚar", "voltoƚar", "koƚar", "ɉosoƚar", "guaƚivar")),
@@ -1230,7 +1234,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("erò", "imento", "erò", Arrays.asList("bojerò", "fenderò", "moverò", "naserò", "sebaterò", "renkreserò", "torđerò", "meterò", "manteñerò", "sobaterò", "akorxerò", "skoderò", "ponxerò", "sorxerò", "skonbaterò", "veñerò", "galderò", "sparxerò", "akorderò", "goderò", "vederò", "boɉerò", "ponđerò", "roderò", "rexerò", "ponderò", "rinkreserò", "baterò", "kreserò", "provederò", "akorđerò", "korerò", "torxerò")),
@@ -1293,7 +1297,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("èl", "elesa", "èl", "bèl"),
@@ -1414,74 +1418,74 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("olko", SetHelper.setOf("ulki"), "olko", Arrays.asList("bifolko", "olko", "folko", "beolko", "solko", "biolko")),
-			new LineEntry("evo", SetHelper.setOf("ivi"), "evo", Arrays.asList("grevo", "trevo", "kànevo", "arlevo", "véskevo")),
-			new LineEntry("eño", SetHelper.setOf("iñi"), "eño", Arrays.asList("dexeño", "maƚedeño", "seño", "sosteño", "kondeño", "pareño", "maledeño", "konđeño", "reteño", "cipileño", "cipiƚeño", "kontraseño", "inđeño", "maxeño", "deño", "despeño", "lexeño", "soveño", "ƚexeño", "ordeño", "konveño", "konxeño", "poseño")),
-			new LineEntry("ol", SetHelper.setOf("uli"), "ol", Arrays.asList("pisarol", "skodarol", "sotarol", "brònbol", "rovejol", "kódol", "porésol", "èrbol", "korósol", "fínfol", "buxigàtol", "narónkol", "jèvol", "fífol", "poréŧol", "onbrígol", "ígol", "ucarol", "kuriàtol", "réfol", "postríbol", "piàvol", "deñévol", "fisol", "ovarol", "xjoŧarol", "íxol", "ranarol", "kortívol", "karígol", "pípol", "sièol", "brúfol", "skrópol", "pisàndol", "fiŧol", "libarol", "ròdol", "đógol", "revendígol", "núgol", "desútol", "orbexígol", "koriàndol", "skapuŧiol", "màskol", "spónxol", "jègol", "róndol", "ràxol", "saldarol", "beđarol", "tastarol", "intíngol", "piàgol", "ponterol", "faxiol", "kortígol", "persénbol", "bròkol", "kòtol", "kanarol", "trémol", "tòpol", "supiarol", "biavarol", "prexudiŧiévol", "bògol", "búsol", "rapónsol", "parol", "liŧarol", "bronbeɉol", "níol", "perdonévol", "sóŧol", "garofol", "faŧiol", "rapónŧol", "faxol", "arđigògol", "braŧarol", "pikàñol", "sósol", "ŧendrarol", "piàol", "morévol")),
-			new LineEntry("orse", SetHelper.setOf("ursi"), "orse", "forse"),
-			new LineEntry("eko", SetHelper.setOf("iki"), "eko", Arrays.asList("straleko", "baƚeko", "seko", "ŧanbeko", "mexoseko", "beko", "straƚeko", "međoseko", "arketeko", "medoseko", "baleko", "xñeko", "pasteko")),
-			new LineEntry("er", SetHelper.setOf("iri"), "er", Arrays.asList("tomier", "soaxier", "pólver", "xberoer", "viperier", "kalsinier", "mulinier", "peƚatier", "krivelier", "balkoner", "sanbugier", "nespolier", "latonier", "đaletier", "sorboƚier", "baretier", "magađener", "bísker", "samitier", "angurer", "bronbexier", "ŧarexier", "ganŧier", "pitarier", "đojelier", "stopier", "pelatier", "poster", "trameser", "miliardier", "spuƚexier", "fogolier", "lagrimier", "poƚastrier", "doaner", "ƚusernier", "karoboƚier", "figier", "pionbier", "manteñer", "ŧínger", "riŧolier", "baƚestrier", "kukúmer", "lavranier", "peƚaƚer", "konŧer", "meƚionier", "paraŧéner", "arminier", "anŧipresier", "muƚinier", "fornier", "fragier", "lanŧier", "bolsier", "kriveƚier", "perier", "dènder", "bronđier", "korbelier", "fontegier", "spulexier", "vivier", "kredenser", "pelaler", "maskarier", "piader", "armeƚinier", "ofeƚer", "diamantier", "nespoƚier", "portinier", "fabriŧer", "sorbolier", "peƚisier", "gadeter", "librier")),
-			new LineEntry("oŧo", SetHelper.setOf("uŧi"), "oŧo", Arrays.asList("goŧo", "bragoŧo", "biroŧo", "robegoŧo", "scoŧo", "toŧo", "ɉoŧo", "loŧo", "moŧo", "skabioŧo", "boŧo", "joŧo")),
-			new LineEntry("eƚo", SetHelper.setOf("iƚi"), "eƚo", Arrays.asList("kavieƚo", "sieƚo", "jeƚo", "pomeƚo", "kontrapeƚo", "kueƚo", "kaosteƚo", "pexeƚo", "veƚo", "strapeƚo", "kavakaveƚo", "brògeƚo", "ceƚo", "kaveeƚo", "kontropeƚo", "xeƚo", "bruxapeƚo", "eƚo", "peteƚo")),
-			new LineEntry("oɉoxo", SetHelper.setOf("oɉuxi", "uɉuxi"), "oɉoxo", Arrays.asList("foɉoxo", "noɉoxo", "voɉoxo", "xoɉoxo", "oɉoxo")),
-			new LineEntry("orxo", SetHelper.setOf("urxi"), "orxo", "orxo"),
-			new LineEntry("ovo", SetHelper.setOf("uvi"), "ovo", Arrays.asList("pòrta–ovo", "véskovo", "vovo", "xlansaƚovo", "xlanŧalovo", "novo", "ovo", "védovo", "portavovo", "pòrta–vovo", "lovo", "ƚovo", "portaovo", "xlansalovo", "véovo")),
-			new LineEntry("obioxo", SetHelper.setOf("obiuxi", "ubiuxi"), "obioxo", "obrobioxo"),
-			new LineEntry("oñoxo", SetHelper.setOf("uñuxi", "oñuxi"), "oñoxo", Arrays.asList("xmaƚankoñoxo", "roñoxo", "malenkoñoxo", "maƚenkoñoxo", "xmalankoñoxo")),
-			new LineEntry("ente", SetHelper.setOf("inti"), "ente", Arrays.asList("analidente", "franxoxente", "eseƚente", "romansinente", "intitoƚente", "ƚekiñente", "lidierente", "kaveŧente", "botixente", "ƚogorente", "voƚente", "agredente", "ingrotoƚente", "xenbente", "superbente", "xboxemente", "spreferente", "xbisaɉente", "sparnuɉente", "perkorente", "sparpañente", "inbalinente", "koramidente", "guañente", "dejarente", "solesitente", "sestente", "ƚavente", "scopidente", "spređudigente", "xmarente", "tilente", "maluxente", "fanfarente", "tindonente", "frabikente", "destegolente", "inbarente", "dexgrapiente", "tormentente", "oblente", "spaxemente", "inskeletrente", "sifrente", "guantente", "opinente", "sparpanente", "favoriđente", "xboente", "inpermalente", "ardondente", "fradeliđente", "pinsente", "stente", "ŧoetente", "xbanpolente", "josolente", "intestardente", "bekotente", "despendiente", "bigolente", "interogente", "potensiente", "sfiƚasente", "lapasente", "ronfente", "sfioridente")),
-			new LineEntry("on", SetHelper.setOf("uni"), "on", Arrays.asList("remoŧion", "autorixasion", "radaŧion", "filtraŧion", "tinason", "xlovon", "paragon", "faraon", "manaŧon", "inrotulaŧion", "truson", "sonorixaŧion", "frustadon", "kalandron", "saƚison", "ŧavaton", "saƚudasion", "malision", "groon", "emision", "peaŧon", "arđaron", "sifon", "xɉonfon", "bandieron", "boladon", "goldon", "lion", "ubigaŧion", "folon", "gucon", "kotolon", "moreton", "tormenton", "garlon", "rosteƚon", "piavolon", "previxion", "ventron", "greson", "salvaŧion", "milion", "legaŧion", "brustolon", "guidon", "seƚadon", "bagajon", "pekatoron", "dopion", "velion", "sudiŧion", "ventolon", "sinserasion", "galidaŧion", "erbion", "ƚimon", "cokoƚaton", "xustapoxiŧion", "darion", "rođeton", "braŧon", "xganbeton", "stafon", "union", "skuakueron", "moreƚon", "litigon", "arđiñon", "baston", "tavaron", "alberon", "boton", "kospeton", "torŧon", "torcon", "ƚerijon", "proporŧion", "bregieron", "xganberlon", "xguaɉaton", "sporton")),
-			new LineEntry("onto", SetHelper.setOf("unti"), "onto", Arrays.asList("dexaponto", "konfronto", "dekonto", "defonto", "pronto", "straponto", "rendikonto", "đonto", "rakonto", "konto", "soxonto", "ponto", "soraponto", "arxonto", "seraponto", "ardonto", "raxonto", "sara–ponto", "arđonto", "rađonto", "soraxonto", "tokaponto", "sođonto", "rexikonto", "sorađonto", "skonto", "sotoponto", "sodonto", "radonto", "onto", "soradonto", "monto", "bixonto", "sèra–ponto", "tornakonto")),
-			new LineEntry("el", SetHelper.setOf("ili"), "el", Arrays.asList("bruxapel", "konprensíbel", "kuel", "fiel", "riferíbel", "el", "kontropel", "kaveel", "débel", "cel", "pomel", "ŧiel", "kontrapel", "pexel", "jel", "kel", "strapel", "kaviel", "fiével", "vel", "brògel", "inviolàbel")),
-			new LineEntry("oto", SetHelper.setOf("uti"), "oto", Arrays.asList("sedoto", "voto", "kurakondoto", "dedoto", "feroto", "salvakondoto", "doto", "kura–kondoto", "introdoto", "roto", "intaroto", "rekondoto", "interoto", "kondoto", "feroroto", "koroto", "skoto", "bioto", "dèspoto", "mèdoto", "fèro–roto", "reprodoto", "prodoto", "groto")),
-			new LineEntry("eđo", SetHelper.setOf("iđi"), "eđo", Arrays.asList("gređo", "laveđo", "xboteđo")),
-			new LineEntry("ordioxo", SetHelper.setOf("urdiuxi", "ordiuxi"), "ordioxo", "mexerekordioxo"),
-			new LineEntry("obrioxo", SetHelper.setOf("ubriuxi", "obriuxi"), "obrioxo", "obrobrioxo"),
-			new LineEntry("onte", SetHelper.setOf("unti"), "onte", Arrays.asList("jàronte", "solféjonte", "xbravéđonte", "kanónonte", "búligonte", "bragétonte", "inɉúrionte", "spàkonte", "denòconte", "tamúsonte", "xbiƚànsionte", "đenaralíđonte", "paríxonte", "múltonte", "lóronte", "ŧúpegonte", "fórmolonte", "strađúronte", "marmoríxonte", "popétonte", "deskàvedonte", "xlúxegonte", "negréxonte", "dópionte", "ústonte", "tenporéjonte", "èrdonte", "kuèstuonte", "đògonte", "fròlonte", "inkuèrconte", "ingaƚúsonte", "xgílsonte", "visígonte", "kòƚonte", "espàtrionte", "venesiànonte", "dexradíxonte", "súlonte", "skúrionte", "piàsonte", "incòstronte", "ŧavàrionte", "mucegàronte", "fiàbonte", "đirlàndonte", "prométonte", "pégolonte", "scàtonte", "pànsonte", "artíkolonte", "miètonte", "aƚàrmonte", "tavanéxonte", "brilàntonte", "xàfonte", "doméstegonte", "pólxonte", "bàlonte", "dexjémonte", "paŧídonte", "sémenonte", "stípuƚonte", "konđéñonte", "ràxonte", "kojónbaronte", "ƚímonte", "palangónonte", "pèrmutonte")),
-			new LineEntry("órden", SetHelper.setOf("órdini", "úrdini"), "órden", "órden"),
-			new LineEntry("ostoxo", SetHelper.setOf("ustuxi", "ostuxi"), "ostoxo", Arrays.asList("malmostoxo", "kostoxo", "mostoxo")),
-			new LineEntry("oƚioxo", SetHelper.setOf("oƚiuxi", "uƚiuxi"), "oƚioxo", "oƚioxo"),
-			new LineEntry("orko", SetHelper.setOf("urki"), "orko", Arrays.asList("orko", "porko", "forko", "sporko")),
-			new LineEntry("oldo", SetHelper.setOf("uldi"), "oldo", Arrays.asList("senpioldo", "senplisioldo", "sinpioldo", "ŧeoldo")),
-			new LineEntry("exo", SetHelper.setOf("ixi"), "exo", Arrays.asList("protexo", "sotintexo", "lavexo", "bilexo", "desparexo", "prexo", "soraintexo", "intraprexo", "propexo", "krexo", "entexo", "preintexo", "sotointexo", "perintexo", "parintexo", "xbotexo", "spexo", "resiexo", "splexo", "spàrexo", "fexo", "sospexo", "vilipexo", "ƚavexo", "texo", "insexo", "rexo", "pontexo", "suspexo", "malintexo", "inŧexo", "sorprexo", "raprexo", "ofexo", "sfexo", "parexo", "estexo", "maƚintexo", "sorintexo", "viƚipexo", "biƚexo", "xbertexo", "xgrexo")),
-			new LineEntry("ento", SetHelper.setOf("inti"), "ento", Arrays.asList("xvegramento", "dormensamento", "akorđimento", "malsontamento", "ƚigamento", "rekordamento", "renkresimento", "basixamento", "fotivento", "stento", "stravinamento", "caceramento", "trovamento", "uƚimento", "cacaramento", "aŧokimento", "torbolamento", "pastisamento", "mostravento", "joŧolamento", "roxamento", "sasinamento", "ŧimento", "bonimento", "bagoƚamento", "brasamento", "nuvoƚamento", "asento", "predegamento", "spavento", "indurimento", "torbiamento", "ƚuxamento", "rueƚamento", "malkontento", "kavaƚamento", "sonkamento", "valimento", "skonkasamento", "spegaŧamento", "seneɉamento", "ingropamento", "konsamento", "indupionamento", "komento", "josolamento", "flatulento", "buƚegamento", "inpedimento", "desarvelamento", "ƚisamento", "suɉarimento", "konvento", "agravamento", "skuinternamento", "taɉusamento", "falimento", "danamento", "trabakoƚamento", "baŧixamento", "latamento", "basilamento", "dexŧervelamento")),
-			new LineEntry("ođo", SetHelper.setOf("uđi"), "ođo", Arrays.asList("stođo", "trođo", "pođo")),
-			new LineEntry("odo", SetHelper.setOf("udi"), "odo", Arrays.asList("nevodo", "gederodo", "stodo", "vodo", "ànodo", "trodo", "mètodo", "anètodo", "período", "neodo", "podo", "kòmodo")),
-			new LineEntry("orđo", SetHelper.setOf("urđi"), "orđo", "orđo"),
-			new LineEntry("eto", SetHelper.setOf("iti"), "eto", Arrays.asList("kortelaŧeto", "biƚietereto", "skapineto", "malaneto", "saoreto", "kocereto", "boraoreto", "formaɉereto", "coeto", "miseto", "datolereto", "saŧieto", "kaparoŧoleto", "farinaroleto", "naransereto", "fisoleto", "granŧideto", "bronbeƚereto", "vensatoreto", "kalegereto", "versaoreto", "ƚuamereto", "olanereto", "paɉaroleto", "ƚustraoreto", "roxiñoleto", "kalŧareto", "veriolereto", "ŧeriexereto", "kaloreto", "kalamereto", "kaloroxeto", "grumeto", "manganereto", "podoleto", "formajereto", "triveƚaoreto", "destrameđaoreto", "molonereto", "sufieto", "ŧerfoɉereto", "ƚumineto", "soneto", "baƚonereto", "ruxiñoleto", "panpalugeto", "toƚineto", "kaƚiseto", "subioƚereto", "ƚeutereto", "vovaroƚeto", "skabeƚeto", "skuarseto", "kordaroleto", "grataroƚeto", "straneto", "kolmeƚeto", "sforŧanereto", "nevodeto", "peƚeto", "guseto", "peƚaƚereto", "seradurereto", "suketo", "margaritereto", "đoeto", "konŧereto", "paraoreto", "ŧerfojereto")),
-			new LineEntry("en", SetHelper.setOf("ini"), "en", Arrays.asList("scavàđen", "ƚankúxen", "marúxen", "freskúđen", "rúđen", "arko–vèrxen", "taja–fen", "teren", "sènen", "infiúxen", "fenòmen", "magađen", "àxen", "lentíden", "bokàxen", "inbeŧilàxen", "grèmen", "kaƚúxen", "pèten", "taɉafen", "terapien", "notaben", "bokàden", "vertíxen", "stra-pien", "kalúđen", "strapien", "réden", "ultrateren", "skargalàxen", "ŧéxen", "strabúxen", "pien", "repien", "ƚentíxen", "meden", "inkúđen", "skargaƚàxen", "sen", "kalíđen", "màrden", "scopàđen", "incetúden", "freskúxen", "jóven", "freskúden", "marúden", "tajafen", "grèben", "lankúđen", "piantàden", "bokàđen", "lankúden", "fien", "vèrgen", "orbàxen", "piantàxen", "màrxen", "ben", "paragrànden", "kalúden", "solitúden", "seren", "làvren", "magaxen", "kalúxen", "kàrpen", "similituden", "lankúxen", "sèlen", "vèrđen", "arkovèrxen", "mexen", "velen", "ŧérŧen", "scavàden", "guardamagaxen", "lentíđen", "inbesilàxen", "inkúxen", "magaden", "tientinben", "vírxen")),
-			new LineEntry("ojoxo", SetHelper.setOf("ujuxi", "ojuxi"), "ojoxo", Arrays.asList("xojoxo", "ojoxo", "fojoxo", "vojoxo", "nojoxo")),
-			new LineEntry("oloxo", SetHelper.setOf("oluxi", "uluxi"), "oloxo", Arrays.asList("xbrodoloxo", "katisoloxo", "riŧoloxo", "fregoloxo", "anpoloxo", "katorigoloxo", "sasoloxo", "gropoloxo", "risoloxo", "xgronsoloxo", "fredoloxo", "barboloxo", "xgronŧoloxo", "skrupoloxo", "skrovoloxo", "kagoloxo", "kokoloxo", "ridikoloxo", "xbrisoloxo", "mirakoloxo", "mokoloxo", "soŧoloxo", "mitikoloxo", "bruskoloxo", "ŧakoloxo", "nuvoloxo", "straŧoloxo", "bagoloxo", "semoloxo", "brufoloxo", "strasoloxo", "perigoloxo", "tuberkoloxo", "katiŧoloxo", "goloxo", "petoloxo", "perikoloxo", "xbrindoloxo", "piatoloxo", "spetakoloxo", "sosoloxo", "prigoloxo", "vergoloxo")),
-			new LineEntry("oso", SetHelper.setOf("usi"), "oso", Arrays.asList("kaoroso", "toso", "skabioso", "koaroso", "boso", "bragoso", "ɉoso", "infraroso", "loso", "ƚoso", "moso", "joso", "robegoso", "paƚoso", "petoroso", "pèto–roso", "kodaroso", "biroso", "paloso", "scoso")),
-			new LineEntry("omoxo", SetHelper.setOf("omuxi", "umuxi"), "omoxo", "promoxo"),
-			new LineEntry("oño", SetHelper.setOf("iñi"), "oño", Arrays.asList("koño", "moño", "barkoño", "kodoño", "sfroño")),
-			new LineEntry("ordo", SetHelper.setOf("urdi"), "ordo", Arrays.asList("ingordo", "tordo", "balordo", "baƚordo", "parabordo", "sordo", "bordo", "xlordo", "ordo")),
-			new LineEntry("oxo", SetHelper.setOf("uxi"), "oxo", Arrays.asList("ƚeñoxo", "speƚumoxo", "skisiñoxo", "bordeloxo", "kreoxo", "malaugurioxo", "inŧendoxo", "montoxo", "robegoxo", "koraɉoxo", "piaɉoxo", "spelusoxo", "krestoxo", "astioxo", "maƚenoxo", "flatoxo", "kontrastoxo", "likoxo", "paltanoxo", "xbosegoxo", "spiritoxo", "xmanioxo", "moxo", "peƚoxo", "fanoxo", "oŧioxo", "strasoxo", "malenoxo", "kaloxo", "skorusoxo", "skoruŧoxo", "rekalŧitroxo", "ƚuminoxo", "veseoxo", "lerijoxo", "piovoxo", "deveoxo", "xbrisoxo", "riondoxo", "leñoxo", "xmerdoxo", "koraxoxo", "spreŧilioxo", "scamoxo", "ƚeproxo", "prunoxo", "skejoxo", "velenoxo", "grasioxo", "spongoxo", "meravejoxo", "paludoxo", "begoxo", "lekoxo", "superstisioxo", "despetoxo", "inŧendioxo", "bakanoxo", "virtulioxo", "rivoltoxo", "sekajinoxo", "voƚontaroxo", "sasoxo", "skuarŧoxo", "ventoxo", "xmolsinoxo", "karnoxo", "nebuloxo", "verenoxo", "revoltoxo", "xmorfioxo", "nebioxo", "sekaɉinoxo", "skuarsoxo", "ƚikoxo", "veƚenoxo", "rixegoxo")),
-			new LineEntry("edo", SetHelper.setOf("idi"), "edo", Arrays.asList("vènedo", "sínedo", "notevedo", "dedo", "refredo", "gredo", "kontraspedo", "tapedo", "boƚedo", "kredo", "kòspedo", "fredo", "lavedo", "axedo", "tréspedo", "kanedo", "boledo", "xbotedo", "sòsedo", "spedo", "sòŧedo")),
-			new LineEntry("or", SetHelper.setOf("uri"), "or", Arrays.asList("kavaor", "strondaor", "proditor", "oldor", "governaor", "voltor", "fondidor", "ƚéor", "apaltaor", "debitor", "trusor", "vivador", "robor", "traitor", "miraor", "skritor", "laoraor", "stuŧegaor", "saxaor", "menor", "suxarior", "provedaor", "spontitor", "luxor", "ŧimor", "ingranditor", "pexor", "penđador", "balotaor", "konplementador", "kalkolaor", "belumor", "nolexaor", "piuxor", "milefior", "batikor", "serkaor", "kalor", "posterior", "gladiator", "bonsior", "kargaor", "retor", "onor", "sferdor", "tarixaor", "lexixlaor", "minusaor", "radiotraxmetitor", "operaor", "bañafior", "sprendor", "ŧiterior", "ŧapaor", "pekator", "peskaor", "spasaor", "konfortaor", "anterior", "interior", "ŧexor", "iƚuminaor", "camor", "burataor", "ventilaor", "malfator", "sagomaor", "vivaor", "kantor", "setaor", "petaor", "stronđaor", "pistor", "tremor", "vendidor", "kalkoƚador", "koniaor", "trivelaor", "braŧaor", "inbasador", "kreaor", "maxor")),
-			new LineEntry("ofioxo", SetHelper.setOf("ufiuxi", "ofiuxi"), "ofioxo", "skarmofioxo"),
-			new LineEntry("eso", SetHelper.setOf("isi"), "eso", Arrays.asList("isteso", "senpieso", "tateso", "xmorbeso", "boɉeso", "kareso", "steso", "ñoñoleso", "kageso", "kokoƚeso", "boreso", "goƚeso", "munegeso", "bibieso", "ribreso", "morbieso", "dotoreso", "emeso", "permeso", "buƚeso", "strioneso", "lekeso", "gongoƚeso", "puteƚeso", "paƚeso", "dexmestegeso", "viƚaneso", "bojeso", "piageso", "xentilomeneso", "piajeso", "xgibieso", "skarmofieso", "gengeso", "petegoleso", "sigaƚeso", "ƚadroneso", "kagoleso", "konsaƚaveso", "frameso", "strafareso", "baroneso", "traxmeso", "skivoƚeso", "cakoƚeso", "xmorfieso", "pitokeso", "stomegeso", "bordeleso", "sproteso", "ƚanpeso", "kavaƚeso", "neso", "poltroneso", "muƚeso", "bufoneso", "piavoleso", "xbrikeso", "piaɉeso", "skamufieso", "pakañeso", "mañoleso", "goleso", "menareso", "rabioxeso", "gexeso", "stufeso", "trameso", "fioƚeso", "meƚeso", "sotomeso", "piatoƚeso", "moroxeso", "skamofieso", "fiseso", "rufianeso", "bagoƚeso", "kaveso", "ñoñoƚeso")),
-			new LineEntry("oko", SetHelper.setOf("uki"), "oko", Arrays.asList("xboko", "reŧíproko", "poko", "scapaŧoko", "ŧoko", "scapasoko", "scapa–soko", "pàroko", "toko", "scapa–ŧoko", "ñoko", "resíproko")),
-			new LineEntry("olioxo", SetHelper.setOf("oliuxi", "uliuxi"), "olioxo", "olioxo"),
-			new LineEntry("oƚo", SetHelper.setOf("uƚi"), "oƚo", Arrays.asList("trémoƚo", "xíroƚo", "pesoƚo", "rasaroƚo", "biavaroƚo", "garétoƚo", "grúmoƚo", "vèrgoƚo", "verloƚo", "bòdoƚo", "gataroƚo", "pípoƚo", "saldaroƚo", "narúnkoƚo", "revendígoƚo", "barkaroƚo", "nèspoƚo", "kapítoƚo", "bixékoƚo", "nisoƚo", "xgriñapòpoƚo", "ranabòtoƚo", "bexaroƚo", "skrimiàtoƚo", "kòtoƚo", "riàoƚo", "tubèrkoƚo", "móskoƚo", "franségoƚo", "scoparoƚo", "bròkoƚo", "ridòtoƚo", "ƚónboƚo", "garúxoƚo", "primaroƚo", "xbríndoƚo", "bígoƚo", "miñòñoƚo", "róndoƚo", "resetàkoƚo", "bugaroƚo", "strupiaskóvoƚo", "orxoƚo", "bàtoƚo", "fusténgoƚo", "brónboƚo", "spondoƚo", "pékoƚo", "búfoƚo", "réfoƚo", "bixígoƚo", "brànkoƚo", "poƚo", "nónsoƚo", "trataroƚo", "basaroƚo", "sàpoƚo", "físoƚo", "sotokòtoƚo", "dóngoƚo", "símoƚo", "skapusioƚo", "bronbeɉoƚo", "ƚaxaroƚo", "kortígoƚo", "múskoƚo", "stisaroƚo", "jéskoƚo", "kivoƚo", "kodarósoƚo", "orbégoƚo", "ƚibèrkoƚo", "pómoƚo", "rosiñoƚo", "apòstoƚo", "bronbijoƚo", "àmoƚo", "ucaroƚo")),
-			new LineEntry("eŧo", SetHelper.setOf("iŧi"), "eŧo", Arrays.asList("sporkeŧo", "konŧalaveŧo", "stolideŧo", "kaveŧo", "ladroneŧo", "laveŧo", "fioleŧo", "goleŧo", "kavaleŧo", "fureŧo", "pakañeŧo", "mateŧo", "gongoleŧo", "bulegeŧo", "puteleŧo", "inbriageŧo", "diavoleŧo", "putaneŧo", "buleŧo", "đentilomeneŧo", "demonieŧo", "ñeñeŧo", "fifeŧo", "balbeŧo", "morbineŧo", "rabieŧo", "aveŧo", "tatareŧo", "strolegeŧo", "vermineŧo", "kokoleŧo", "sonoleŧo", "bandiereŧo", "xñanfeŧo", "beŧo", "vilaneŧo", "spiriteŧo", "cakoleŧo", "xbugeŧo", "cacareŧo", "skivoleŧo", "lanpeŧo", "cetineŧo", "karoñeŧo", "burleŧo", "strigeŧo", "muleŧo", "peteŧo", "piatoleŧo", "kokoneŧo", "vermeneŧo", "xmorbeŧo", "fufiñeŧo", "tateŧo", "ñoñoleŧo", "kageŧo", "morbieŧo", "dentilomeneŧo", "piajeŧo", "stranbeŧo", "bagoleŧo", "goloxeŧo", "boɉeŧo", "kareŧo", "senpieŧo", "bibieŧo", "piageŧo", "boreŧo", "munegeŧo", "ribreŧo", "dotoreŧo", "xmorfioxeŧo", "gengeŧo", "lekeŧo", "bojeŧo", "skarmofieŧo", "xgibieŧo", "petegoleŧo")),
-			new LineEntry("onioxo", SetHelper.setOf("uniuxi", "oniuxi"), "onioxo", Arrays.asList("maƚenkonioxo", "akrimonioxo", "malankonioxo", "maƚankonioxo", "malenkonioxo")),
-			new LineEntry("oƚoxo", SetHelper.setOf("oƚuxi", "uƚuxi"), "oƚoxo", Arrays.asList("bruskoƚoxo", "xbrodoƚoxo", "anpoƚoxo", "sasoƚoxo", "perigoƚoxo", "xbrindoƚoxo", "sosoƚoxo", "spetakoƚoxo", "vergoƚoxo", "semoƚoxo", "risoƚoxo", "katorigoƚoxo", "perikoƚoxo", "prigoƚoxo", "piatoƚoxo", "katisoƚoxo", "petoƚoxo", "xbrisoƚoxo", "strasoƚoxo", "brufoƚoxo", "nuvoƚoxo", "skrupoƚoxo", "sakoƚoxo", "fredoƚoxo", "tuberkoƚoxo", "goƚoxo", "mokoƚoxo", "barboƚoxo", "kokoƚoxo", "ridikoƚoxo", "xgronsoƚoxo", "gropoƚoxo", "fregoƚoxo", "bagoƚoxo", "mirakoƚoxo", "mitikoƚoxo", "skrovoƚoxo", "kagoƚoxo")),
-			new LineEntry("oroxo", SetHelper.setOf("oruxi", "uruxi"), "oroxo", Arrays.asList("koroxo", "kaƚoroxo", "saoroxo", "vigoroxo", "valoroxo", "moroxo", "amoroxo", "kaloroxo", "rigoroxo", "vaƚoroxo")),
-			new LineEntry("orioxo", SetHelper.setOf("oriuxi", "uriuxi"), "orioxo", Arrays.asList("vitorioxo", "glorioxo")),
-			new LineEntry("exe", SetHelper.setOf("ixi"), "exe", Arrays.asList("monŧelexe", "làrexe", "kòdexe", "ƚexe", "seguxinexe", "éndexe", "inglexe", "élexe", "pistorexe", "kararexe", "pòlexe", "àrpexe", "kontramantexe", "màstexe", "borgexe", "lexe", "kòpexe", "rèvexe", "pòƚexe", "konejanexe", "muranexe", "veneŧiexe", "paƚexe", "orèvexe", "kornudexe", "provexe", "đenoexe", "orexe", "cinexe", "èƚexe", "púlexe", "léexe", "turkexe", "kàƚexe", "monseƚexe", "júdexe", "krémexe", "éƚexe", "ŧímexe", "koneɉanexe", "préndexe", "monselexe", "sàlexe", "penexe", "venesiexe", "montebelunexe", "sélexe", "palexe", "poƚexe", "séƚexe", "pistolexe", "fórvexe", "orèdexe", "sàƚexe", "polexe", "ƚàrexe", "danexe", "pistoƚexe", "màntexe", "montebeƚunexe", "paexe", "krèmexe", "ƚéexe", "púƚexe", "pavexe", "príndexe", "índexe", "féƚexe", "kàlexe", "veronexe", "fórfexe", "fórbexe", "đenovexe", "àspexe", "kalŧexe", "àstexe", "èlexe", "đúdexe", "félexe", "kalsexe", "sandonatexe"))
+			new LineEntry("ol", "uli", "ol", Arrays.asList("pisarol", "skodarol", "sotarol", "brònbol", "rovejol", "kódol", "porésol", "èrbol", "korósol", "fínfol", "buxigàtol", "narónkol", "jèvol", "fífol", "poréŧol", "onbrígol", "ígol", "ucarol", "kuriàtol", "réfol", "postríbol", "piàvol", "deñévol", "fisol", "ovarol", "xjoŧarol", "íxol", "ranarol", "kortívol", "karígol", "pípol", "sièol", "brúfol", "skrópol", "pisàndol", "fiŧol", "libarol", "ròdol", "đógol", "revendígol", "núgol", "desútol", "orbexígol", "koriàndol", "skapuŧiol", "màskol", "spónxol", "jègol", "róndol", "ràxol", "saldarol", "beđarol", "tastarol", "intíngol", "piàgol", "ponterol", "faxiol", "kortígol", "persénbol", "bròkol", "kòtol", "kanarol", "trémol", "tòpol", "supiarol", "biavarol", "prexudiŧiévol", "bògol", "búsol", "rapónsol", "parol", "liŧarol", "bronbeɉol", "níol", "perdonévol", "sóŧol", "garofol", "faŧiol", "rapónŧol", "faxol", "arđigògol", "braŧarol", "pikàñol", "sósol", "ŧendrarol", "piàol", "morévol")),
+			new LineEntry("er", "iri", "er", Arrays.asList("fontegier", "spulexier", "tomier", "soaxier", "vivier", "pólver", "kredenser", "xberoer", "viperier", "kalsinier", "mulinier", "peƚatier", "krivelier", "balkoner", "sanbugier", "pelaler", "nespolier", "maskarier", "piader", "armeƚinier", "ofeƚer", "latonier", "đaletier", "diamantier", "sorboƚier", "baretier", "magađener", "bísker", "samitier", "nespoƚier", "portinier", "angurer", "bronbexier", "ŧarexier", "ganŧier", "pitarier", "đojelier", "stopier", "fabriŧer", "pelatier", "poster", "sorbolier", "peƚisier", "gadeter", "trameser", "librier", "miliardier", "spuƚexier", "fogolier", "lagrimier", "poƚastrier", "doaner", "ƚusernier", "karoboƚier", "figier", "pionbier", "manteñer", "ŧínger", "riŧolier", "baƚestrier", "kukúmer", "lavranier", "peƚaƚer", "konŧer", "meƚionier", "paraŧéner", "arminier", "anŧipresier", "muƚinier", "fornier", "fragier", "lanŧier", "bolsier", "kriveƚier", "perier", "dènder", "bronđier", "korbelier")),
+			new LineEntry("on", "uni", "on", Arrays.asList("kospeton", "torŧon", "torcon", "remoŧion", "autorixasion", "ƚerijon", "proporŧion", "bregieron", "xganberlon", "xguaɉaton", "sporton", "radaŧion", "filtraŧion", "tinason", "xlovon", "paragon", "faraon", "manaŧon", "inrotulaŧion", "truson", "sonorixaŧion", "frustadon", "kalandron", "saƚison", "ŧavaton", "saƚudasion", "malision", "groon", "emision", "peaŧon", "arđaron", "sifon", "xɉonfon", "bandieron", "boladon", "goldon", "lion", "ubigaŧion", "folon", "gucon", "kotolon", "moreton", "tormenton", "garlon", "rosteƚon", "piavolon", "previxion", "ventron", "greson", "salvaŧion", "milion", "legaŧion", "brustolon", "guidon", "seƚadon", "bagajon", "pekatoron", "dopion", "velion", "sudiŧion", "ventolon", "sinserasion", "galidaŧion", "erbion", "ƚimon", "cokoƚaton", "xustapoxiŧion", "darion", "rođeton", "braŧon", "xganbeton", "stafon", "union", "skuakueron", "moreƚon", "litigon", "arđiñon", "baston", "tavaron", "alberon", "boton")),
+			new LineEntry("el", "ili", "el", Arrays.asList("bruxapel", "konprensíbel", "kuel", "fiel", "riferíbel", "el", "kontropel", "kaveel", "débel", "cel", "pomel", "ŧiel", "kontrapel", "pexel", "jel", "kel", "strapel", "kaviel", "fiével", "vel", "brògel", "inviolàbel")),
+			new LineEntry("en", "ini", "en", Arrays.asList("scavàđen", "ƚankúxen", "marúxen", "bokàđen", "lankúden", "fien", "vèrgen", "freskúđen", "orbàxen", "piantàxen", "màrxen", "ben", "paragrànden", "kalúden", "solitúden", "seren", "rúđen", "làvren", "arko–vèrxen", "taja–fen", "magaxen", "teren", "kalúxen", "kàrpen", "similituden", "sènen", "infiúxen", "lankúxen", "sèlen", "fenòmen", "vèrđen", "arkovèrxen", "magađen", "àxen", "lentíden", "mexen", "bokàxen", "velen", "ŧérŧen", "inbeŧilàxen", "grèmen", "kaƚúxen", "scavàden", "guardamagaxen", "pèten", "taɉafen", "terapien", "lentíđen", "inbesilàxen", "inkúxen", "magaden", "notaben", "tientinben", "vírxen", "bokàden", "vertíxen", "stra-pien", "kalúđen", "strapien", "réden", "ultrateren", "skargalàxen", "ŧéxen", "strabúxen", "pien", "repien", "ƚentíxen", "meden", "inkúđen", "skargaƚàxen", "órden", "sen", "kalíđen", "màrden", "scopàđen", "incetúden", "freskúxen", "jóven", "freskúden", "marúden", "tajafen", "grèben", "lankúđen", "piantàden")),
+			new LineEntry("órden", "úrdini", "órden", "órden"),
+			new LineEntry("or", "uri", "or", Arrays.asList("kavaor", "strondaor", "proditor", "oldor", "governaor", "voltor", "fondidor", "ƚéor", "apaltaor", "debitor", "trusor", "vivador", "robor", "traitor", "miraor", "skritor", "laoraor", "stuŧegaor", "saxaor", "menor", "suxarior", "provedaor", "spontitor", "luxor", "ŧimor", "ingranditor", "pexor", "penđador", "balotaor", "konplementador", "kalkolaor", "belumor", "nolexaor", "piuxor", "milefior", "batikor", "serkaor", "kalor", "posterior", "gladiator", "bonsior", "kargaor", "retor", "onor", "sferdor", "tarixaor", "lexixlaor", "minusaor", "radiotraxmetitor", "operaor", "bañafior", "sprendor", "ŧiterior", "ŧapaor", "pekator", "peskaor", "spasaor", "konfortaor", "anterior", "interior", "ŧexor", "iƚuminaor", "camor", "burataor", "ventilaor", "malfator", "sagomaor", "vivaor", "kantor", "setaor", "petaor", "stronđaor", "pistor", "tremor", "vendidor", "kalkoƚador", "koniaor", "trivelaor", "braŧaor", "inbasador", "kreaor", "maxor")),
+			new LineEntry("evo", "ivi", "evo", Arrays.asList("grevo", "trevo", "kànevo", "arlevo", "véskevo")),
+			new LineEntry("eño", "iñi", "eño", Arrays.asList("dexeño", "maƚedeño", "seño", "sosteño", "kondeño", "pareño", "maledeño", "konđeño", "reteño", "cipileño", "cipiƚeño", "kontraseño", "inđeño", "maxeño", "deño", "despeño", "lexeño", "soveño", "ƚexeño", "ordeño", "konveño", "konxeño", "poseño")),
+			new LineEntry("eko", "iki", "eko", Arrays.asList("straleko", "baƚeko", "seko", "ŧanbeko", "mexoseko", "beko", "straƚeko", "međoseko", "arketeko", "medoseko", "baleko", "xñeko", "pasteko")),
+			new LineEntry("oŧo", "uŧi", "oŧo", Arrays.asList("goŧo", "bragoŧo", "biroŧo", "robegoŧo", "scoŧo", "toŧo", "ɉoŧo", "loŧo", "moŧo", "skabioŧo", "boŧo", "joŧo")),
+			new LineEntry("eƚo", "iƚi", "eƚo", Arrays.asList("kavieƚo", "sieƚo", "jeƚo", "pomeƚo", "kontrapeƚo", "kueƚo", "kaosteƚo", "pexeƚo", "veƚo", "strapeƚo", "kavakaveƚo", "brògeƚo", "ceƚo", "kaveeƚo", "kontropeƚo", "xeƚo", "bruxapeƚo", "eƚo", "peteƚo")),
+			new LineEntry("ovo", "uvi", "ovo", Arrays.asList("pòrta–ovo", "véskovo", "vovo", "xlansaƚovo", "xlanŧalovo", "novo", "ovo", "védovo", "portavovo", "pòrta–vovo", "lovo", "ƚovo", "portaovo", "xlansalovo", "véovo")),
+			new LineEntry("oto", "uti", "oto", Arrays.asList("sedoto", "voto", "kurakondoto", "dedoto", "feroto", "salvakondoto", "doto", "kura–kondoto", "introdoto", "roto", "intaroto", "rekondoto", "interoto", "kondoto", "feroroto", "koroto", "skoto", "bioto", "dèspoto", "mèdoto", "fèro–roto", "reprodoto", "prodoto", "groto")),
+			new LineEntry("eđo", "iđi", "eđo", Arrays.asList("gređo", "laveđo", "xboteđo")),
+			new LineEntry("exo", "ixi", "exo", Arrays.asList("protexo", "sotintexo", "lavexo", "bilexo", "desparexo", "prexo", "soraintexo", "intraprexo", "propexo", "krexo", "entexo", "preintexo", "sotointexo", "perintexo", "parintexo", "xbotexo", "spexo", "resiexo", "splexo", "spàrexo", "fexo", "sospexo", "vilipexo", "ƚavexo", "texo", "insexo", "rexo", "pontexo", "suspexo", "malintexo", "inŧexo", "sorprexo", "raprexo", "ofexo", "sfexo", "parexo", "estexo", "maƚintexo", "sorintexo", "viƚipexo", "biƚexo", "xbertexo", "xgrexo")),
+			new LineEntry("ođo", "uđi", "ođo", Arrays.asList("stođo", "trođo", "pođo")),
+			new LineEntry("odo", "udi", "odo", Arrays.asList("nevodo", "gederodo", "stodo", "vodo", "ànodo", "trodo", "mètodo", "anètodo", "período", "neodo", "podo", "kòmodo")),
+			new LineEntry("eto", "iti", "eto", Arrays.asList("kortelaŧeto", "biƚietereto", "skapineto", "malaneto", "saoreto", "kocereto", "boraoreto", "formaɉereto", "coeto", "miseto", "datolereto", "saŧieto", "kaparoŧoleto", "farinaroleto", "naransereto", "fisoleto", "granŧideto", "bronbeƚereto", "vensatoreto", "kalegereto", "versaoreto", "ƚuamereto", "olanereto", "paɉaroleto", "ƚustraoreto", "roxiñoleto", "kalŧareto", "veriolereto", "ŧeriexereto", "kaloreto", "kalamereto", "kaloroxeto", "grumeto", "manganereto", "podoleto", "formajereto", "triveƚaoreto", "destrameđaoreto", "molonereto", "sufieto", "ŧerfoɉereto", "ƚumineto", "soneto", "baƚonereto", "ruxiñoleto", "panpalugeto", "toƚineto", "kaƚiseto", "subioƚereto", "ƚeutereto", "vovaroƚeto", "skabeƚeto", "skuarseto", "kordaroleto", "grataroƚeto", "straneto", "kolmeƚeto", "sforŧanereto", "nevodeto", "peƚeto", "guseto", "peƚaƚereto", "seradurereto", "suketo", "margaritereto", "đoeto", "konŧereto", "paraoreto", "ŧerfojereto")),
+			new LineEntry("oso", "usi", "oso", Arrays.asList("kaoroso", "toso", "skabioso", "koaroso", "boso", "bragoso", "ɉoso", "infraroso", "loso", "ƚoso", "moso", "joso", "robegoso", "paƚoso", "petoroso", "pèto–roso", "kodaroso", "biroso", "paloso", "scoso")),
+			new LineEntry("oño", "iñi", "oño", Arrays.asList("koño", "moño", "barkoño", "kodoño", "sfroño")),
+			new LineEntry("oxo", "uxi", "oxo", Arrays.asList("ƚeñoxo", "speƚumoxo", "skisiñoxo", "bordeloxo", "kreoxo", "oƚioxo", "xbrodoƚoxo", "malaugurioxo", "inŧendoxo", "montoxo", "robegoxo", "anpoloxo", "sasoloxo", "koraɉoxo", "piaɉoxo", "spelusoxo", "krestoxo", "skrupoloxo", "kaƚoroxo", "saoroxo", "astioxo", "maƚenoxo", "xbrisoloxo", "mirakoloxo", "maƚenkonioxo", "flatoxo", "kontrastoxo", "skarmofioxo", "soŧoloxo", "likoxo", "katisoƚoxo", "paltanoxo", "bagoloxo", "xbosegoxo", "spiritoxo", "xmanioxo", "moxo", "mexerekordioxo", "peƚoxo", "fanoxo", "oŧioxo", "strasoxo", "sakoƚoxo", "tuberkoƚoxo", "malenoxo", "goƚoxo", "kaloxo", "foɉoxo", "skorusoxo", "skoruŧoxo", "rekalŧitroxo", "ƚuminoxo", "veseoxo", "lerijoxo", "kaloroxo", "piovoxo", "nojoxo", "deveoxo", "xbrisoxo", "malenkoñoxo", "riondoxo", "leñoxo", "xmerdoxo", "koraxoxo", "spreŧilioxo", "scamoxo", "ƚeproxo", "prunoxo", "skejoxo", "risoloxo", "xgronsoloxo", "fredoloxo", "velenoxo", "grasioxo", "spongoxo", "kokoloxo", "meravejoxo", "paludoxo", "begoxo", "lekoxo", "perikoƚoxo", "superstisioxo", "despetoxo", "maƚenkoñoxo", "inŧendioxo", "bakanoxo", "xbrisoƚoxo", "semoloxo", "brufoloxo", "virtulioxo", "rivoltoxo", "strasoloxo", "sekajinoxo", "voƚontaroxo", "sasoxo", "skuarŧoxo", "ventoxo", "xmolsinoxo", "karnoxo", "nebuloxo", "verenoxo", "barboƚoxo", "revoltoxo", "xmorfioxo", "nebioxo", "voɉoxo", "sekaɉinoxo", "skuarsoxo", "ƚikoxo", "veƚenoxo", "olioxo", "akrimonioxo", "rixegoxo", "fregoloxo", "oɉoxo", "xbrindoƚoxo", "sosoƚoxo", "vergoƚoxo", "semoƚoxo", "vojoxo", "nuvoƚoxo", "goloxo", "mitikoƚoxo", "glorioxo", "prigoloxo", "mostoxo", "bruskoƚoxo", "malmostoxo", "moroxo", "perigoƚoxo", "risoƚoxo", "katorigoƚoxo", "malankonioxo", "mokoloxo", "petoƚoxo", "strasoƚoxo", "brufoƚoxo", "fredoƚoxo", "kostoxo", "piatoloxo", "xgronsoƚoxo", "vigoroxo", "riŧoloxo", "gropoloxo", "vaƚoroxo", "xgronŧoloxo", "kagoloxo", "spetakoƚoxo", "ridikoloxo", "fojoxo", "rigoroxo", "piatoƚoxo", "noɉoxo", "skrovoƚoxo", "katorigoloxo", "prigoƚoxo", "bruskoloxo", "xojoxo", "perigoloxo", "petoloxo", "mokoƚoxo", "spetakoloxo", "vitorioxo", "xmalankoñoxo", "kagoƚoxo", "xmaƚankoñoxo", "xbrodoloxo", "katisoloxo", "anpoƚoxo", "sasoƚoxo", "skrovoloxo", "ŧakoloxo", "straŧoloxo", "ojoxo", "skrupoƚoxo", "tuberkoloxo", "katiŧoloxo", "koroxo", "perikoloxo", "ridikoƚoxo", "gropoƚoxo", "bagoƚoxo", "amoroxo", "roñoxo", "valoroxo", "obrobioxo", "barboloxo", "promoxo", "xoɉoxo", "mitikoloxo", "nuvoloxo", "maƚankonioxo", "malenkonioxo", "obrobrioxo", "xbrindoloxo", "kokoƚoxo", "sosoloxo", "fregoƚoxo", "mirakoƚoxo", "vergoloxo")),
+			new LineEntry("oɉoxo", "uɉuxi", "oɉoxo", Arrays.asList("foɉoxo", "noɉoxo", "voɉoxo", "xoɉoxo", "oɉoxo")),
+			new LineEntry("oñoxo", "uñuxi", "oñoxo", Arrays.asList("xmaƚankoñoxo", "roñoxo", "malenkoñoxo", "maƚenkoñoxo", "xmalankoñoxo")),
+			new LineEntry("ojoxo", "ujuxi", "ojoxo", Arrays.asList("xojoxo", "ojoxo", "fojoxo", "vojoxo", "nojoxo")),
+			new LineEntry("oloxo", "uluxi", "oloxo", Arrays.asList("xbrodoloxo", "katisoloxo", "riŧoloxo", "fregoloxo", "anpoloxo", "katorigoloxo", "sasoloxo", "gropoloxo", "risoloxo", "xgronsoloxo", "fredoloxo", "barboloxo", "xgronŧoloxo", "skrupoloxo", "skrovoloxo", "kagoloxo", "kokoloxo", "ridikoloxo", "xbrisoloxo", "mirakoloxo", "mokoloxo", "soŧoloxo", "mitikoloxo", "bruskoloxo", "ŧakoloxo", "nuvoloxo", "straŧoloxo", "bagoloxo", "semoloxo", "brufoloxo", "strasoloxo", "perigoloxo", "tuberkoloxo", "katiŧoloxo", "goloxo", "petoloxo", "perikoloxo", "xbrindoloxo", "piatoloxo", "spetakoloxo", "sosoloxo", "prigoloxo", "vergoloxo")),
+			new LineEntry("omoxo", "umuxi", "omoxo", "promoxo"),
+			new LineEntry("oƚoxo", "uƚuxi", "oƚoxo", Arrays.asList("bruskoƚoxo", "xbrodoƚoxo", "anpoƚoxo", "sasoƚoxo", "perigoƚoxo", "xbrindoƚoxo", "sosoƚoxo", "spetakoƚoxo", "vergoƚoxo", "semoƚoxo", "risoƚoxo", "katorigoƚoxo", "perikoƚoxo", "prigoƚoxo", "piatoƚoxo", "katisoƚoxo", "petoƚoxo", "xbrisoƚoxo", "strasoƚoxo", "brufoƚoxo", "nuvoƚoxo", "skrupoƚoxo", "sakoƚoxo", "fredoƚoxo", "tuberkoƚoxo", "goƚoxo", "mokoƚoxo", "barboƚoxo", "kokoƚoxo", "ridikoƚoxo", "xgronsoƚoxo", "gropoƚoxo", "fregoƚoxo", "bagoƚoxo", "mirakoƚoxo", "mitikoƚoxo", "skrovoƚoxo", "kagoƚoxo")),
+			new LineEntry("oroxo", "uruxi", "oroxo", Arrays.asList("koroxo", "kaƚoroxo", "saoroxo", "vigoroxo", "valoroxo", "moroxo", "amoroxo", "kaloroxo", "rigoroxo", "vaƚoroxo")),
+			new LineEntry("obioxo", "ubiuxi", "obioxo", "obrobioxo"),
+			new LineEntry("ostoxo", "ustuxi", "ostoxo", Arrays.asList("malmostoxo", "kostoxo", "mostoxo")),
+			new LineEntry("oƚioxo", "uƚiuxi", "oƚioxo", "oƚioxo"),
+			new LineEntry("ofioxo", "ufiuxi", "ofioxo", "skarmofioxo"),
+			new LineEntry("olioxo", "uliuxi", "olioxo", "olioxo"),
+			new LineEntry("onioxo", "uniuxi", "onioxo", Arrays.asList("maƚenkonioxo", "akrimonioxo", "malankonioxo", "maƚankonioxo", "malenkonioxo")),
+			new LineEntry("orioxo", "uriuxi", "orioxo", Arrays.asList("vitorioxo", "glorioxo")),
+			new LineEntry("ordioxo", "urdiuxi", "ordioxo", "mexerekordioxo"),
+			new LineEntry("obrioxo", "ubriuxi", "obrioxo", "obrobrioxo"),
+			new LineEntry("edo", "idi", "edo", Arrays.asList("vènedo", "sínedo", "notevedo", "dedo", "refredo", "gredo", "kontraspedo", "tapedo", "boƚedo", "kredo", "kòspedo", "fredo", "lavedo", "axedo", "tréspedo", "kanedo", "boledo", "xbotedo", "sòsedo", "spedo", "sòŧedo")),
+			new LineEntry("eso", "isi", "eso", Arrays.asList("isteso", "senpieso", "bagoƚeso", "tateso", "xmorbeso", "kaveso", "ñoñoƚeso", "boɉeso", "kareso", "steso", "ñoñoleso", "kageso", "kokoƚeso", "boreso", "goƚeso", "munegeso", "bibieso", "ribreso", "morbieso", "dotoreso", "emeso", "permeso", "buƚeso", "strioneso", "lekeso", "gongoƚeso", "puteƚeso", "paƚeso", "dexmestegeso", "viƚaneso", "bojeso", "piageso", "xentilomeneso", "piajeso", "xgibieso", "skarmofieso", "gengeso", "petegoleso", "sigaƚeso", "ƚadroneso", "kagoleso", "konsaƚaveso", "frameso", "strafareso", "baroneso", "traxmeso", "skivoƚeso", "cakoƚeso", "xmorfieso", "pitokeso", "stomegeso", "bordeleso", "sproteso", "ƚanpeso", "kavaƚeso", "neso", "poltroneso", "muƚeso", "bufoneso", "piavoleso", "xbrikeso", "piaɉeso", "skamufieso", "pakañeso", "mañoleso", "goleso", "menareso", "rabioxeso", "gexeso", "stufeso", "trameso", "fioƚeso", "meƚeso", "sotomeso", "piatoƚeso", "moroxeso", "skamofieso", "fiseso", "rufianeso")),
+			new LineEntry("oko", "uki", "oko", Arrays.asList("xboko", "reŧíproko", "poko", "scapaŧoko", "ŧoko", "scapasoko", "scapa–soko", "pàroko", "toko", "scapa–ŧoko", "ñoko", "resíproko")),
+			new LineEntry("oƚo", "uƚi", "oƚo", Arrays.asList("trémoƚo", "orbégoƚo", "xíroƚo", "pesoƚo", "rasaroƚo", "ƚibèrkoƚo", "biavaroƚo", "garétoƚo", "grúmoƚo", "vèrgoƚo", "pómoƚo", "rosiñoƚo", "verloƚo", "apòstoƚo", "bronbijoƚo", "bòdoƚo", "gataroƚo", "pípoƚo", "saldaroƚo", "narúnkoƚo", "àmoƚo", "ucaroƚo", "revendígoƚo", "barkaroƚo", "nèspoƚo", "kapítoƚo", "bixékoƚo", "nisoƚo", "xgriñapòpoƚo", "ranabòtoƚo", "bexaroƚo", "skrimiàtoƚo", "kòtoƚo", "riàoƚo", "tubèrkoƚo", "móskoƚo", "franségoƚo", "scoparoƚo", "bròkoƚo", "ridòtoƚo", "ƚónboƚo", "garúxoƚo", "primaroƚo", "xbríndoƚo", "bígoƚo", "miñòñoƚo", "róndoƚo", "resetàkoƚo", "bugaroƚo", "strupiaskóvoƚo", "orxoƚo", "bàtoƚo", "fusténgoƚo", "brónboƚo", "spondoƚo", "pékoƚo", "búfoƚo", "réfoƚo", "bixígoƚo", "brànkoƚo", "poƚo", "nónsoƚo", "trataroƚo", "basaroƚo", "sàpoƚo", "físoƚo", "sotokòtoƚo", "dóngoƚo", "símoƚo", "skapusioƚo", "bronbeɉoƚo", "ƚaxaroƚo", "kortígoƚo", "múskoƚo", "stisaroƚo", "jéskoƚo", "kivoƚo", "kodarósoƚo")),
+			new LineEntry("eŧo", "iŧi", "eŧo", Arrays.asList("ñoñoleŧo", "sporkeŧo", "kageŧo", "konŧalaveŧo", "morbieŧo", "dentilomeneŧo", "piajeŧo", "stranbeŧo", "stolideŧo", "kaveŧo", "bagoleŧo", "goloxeŧo", "ladroneŧo", "boɉeŧo", "kareŧo", "laveŧo", "senpieŧo", "fioleŧo", "bibieŧo", "goleŧo", "kavaleŧo", "fureŧo", "pakañeŧo", "mateŧo", "piageŧo", "boreŧo", "gongoleŧo", "bulegeŧo", "puteleŧo", "inbriageŧo", "diavoleŧo", "putaneŧo", "buleŧo", "đentilomeneŧo", "munegeŧo", "ribreŧo", "dotoreŧo", "demonieŧo", "ñeñeŧo", "xmorfioxeŧo", "fifeŧo", "gengeŧo", "balbeŧo", "morbineŧo", "rabieŧo", "aveŧo", "tatareŧo", "lekeŧo", "bojeŧo", "strolegeŧo", "vermineŧo", "skarmofieŧo", "xgibieŧo", "petegoleŧo", "kokoleŧo", "sonoleŧo", "bandiereŧo", "xñanfeŧo", "beŧo", "vilaneŧo", "spiriteŧo", "cakoleŧo", "xbugeŧo", "cacareŧo", "skivoleŧo", "lanpeŧo", "cetineŧo", "karoñeŧo", "burleŧo", "strigeŧo", "muleŧo", "peteŧo", "piatoleŧo", "kokoneŧo", "vermeneŧo", "xmorbeŧo", "fufiñeŧo", "tateŧo")),
+			new LineEntry("exe", "ixi", "exe", Arrays.asList("monŧelexe", "làrexe", "kòdexe", "ƚexe", "seguxinexe", "éndexe", "inglexe", "élexe", "pistorexe", "kararexe", "pòlexe", "àrpexe", "kontramantexe", "màstexe", "borgexe", "lexe", "kòpexe", "rèvexe", "pòƚexe", "konejanexe", "muranexe", "veneŧiexe", "paƚexe", "orèvexe", "kornudexe", "provexe", "đenoexe", "orexe", "cinexe", "èƚexe", "púlexe", "léexe", "turkexe", "kàƚexe", "monseƚexe", "júdexe", "krémexe", "éƚexe", "ŧímexe", "koneɉanexe", "préndexe", "monselexe", "sàlexe", "penexe", "venesiexe", "montebelunexe", "sélexe", "palexe", "poƚexe", "séƚexe", "pistolexe", "fórvexe", "orèdexe", "sàƚexe", "polexe", "ƚàrexe", "danexe", "pistoƚexe", "màntexe", "montebeƚunexe", "paexe", "krèmexe", "ƚéexe", "púƚexe", "pavexe", "príndexe", "índexe", "féƚexe", "kàlexe", "veronexe", "fórfexe", "fórbexe", "đenovexe", "àspexe", "kalŧexe", "àstexe", "èlexe", "đúdexe", "félexe", "kalsexe", "sandonatexe")),
+			new LineEntry("olko", "ulki", "olko", Arrays.asList("bifolko", "olko", "folko", "beolko", "solko", "biolko")),
+			new LineEntry("orse", "ursi", "orse", "forse"),
+			new LineEntry("orxo", "urxi", "orxo", "orxo"),
+			new LineEntry("ente", "inti", "ente", Arrays.asList("analidente", "franxoxente", "eseƚente", "romansinente", "bekotente", "intitoƚente", "ƚekiñente", "lidierente", "kaveŧente", "despendiente", "bigolente", "interogente", "botixente", "potensiente", "ƚogorente", "voƚente", "agredente", "ingrotoƚente", "sfiƚasente", "lapasente", "ronfente", "xenbente", "sfioridente", "superbente", "xboxemente", "spreferente", "xbisaɉente", "sparnuɉente", "perkorente", "sparpañente", "inbalinente", "koramidente", "guañente", "dejarente", "solesitente", "sestente", "ƚavente", "scopidente", "spređudigente", "xmarente", "tilente", "maluxente", "fanfarente", "tindonente", "frabikente", "destegolente", "inbarente", "dexgrapiente", "tormentente", "oblente", "spaxemente", "inskeletrente", "sifrente", "guantente", "opinente", "sparpanente", "favoriđente", "xboente", "inpermalente", "ardondente", "fradeliđente", "pinsente", "stente", "ŧoetente", "xbanpolente", "josolente", "intestardente")),
+			new LineEntry("onto", "unti", "onto", Arrays.asList("dexaponto", "konfronto", "dekonto", "defonto", "pronto", "straponto", "rendikonto", "đonto", "rakonto", "konto", "soxonto", "ponto", "soraponto", "arxonto", "seraponto", "ardonto", "raxonto", "sara–ponto", "arđonto", "rađonto", "soraxonto", "tokaponto", "sođonto", "rexikonto", "sorađonto", "skonto", "sotoponto", "sodonto", "radonto", "onto", "soradonto", "monto", "bixonto", "sèra–ponto", "tornakonto")),
+			new LineEntry("onte", "unti", "onte", Arrays.asList("jàronte", "solféjonte", "sémenonte", "stípuƚonte", "xbravéđonte", "kanónonte", "búligonte", "konđéñonte", "ràxonte", "bragétonte", "inɉúrionte", "spàkonte", "kojónbaronte", "ƚímonte", "palangónonte", "pèrmutonte", "denòconte", "tamúsonte", "xbiƚànsionte", "đenaralíđonte", "paríxonte", "múltonte", "lóronte", "ŧúpegonte", "fórmolonte", "strađúronte", "marmoríxonte", "popétonte", "deskàvedonte", "xlúxegonte", "negréxonte", "dópionte", "ústonte", "tenporéjonte", "èrdonte", "kuèstuonte", "đògonte", "fròlonte", "inkuèrconte", "ingaƚúsonte", "xgílsonte", "visígonte", "kòƚonte", "espàtrionte", "venesiànonte", "dexradíxonte", "súlonte", "skúrionte", "piàsonte", "incòstronte", "ŧavàrionte", "mucegàronte", "fiàbonte", "đirlàndonte", "prométonte", "pégolonte", "scàtonte", "pànsonte", "artíkolonte", "miètonte", "aƚàrmonte", "tavanéxonte", "brilàntonte", "xàfonte", "doméstegonte", "pólxonte", "bàlonte", "dexjémonte", "paŧídonte")),
+			new LineEntry("orko", "urki", "orko", Arrays.asList("orko", "porko", "forko", "sporko")),
+			new LineEntry("oldo", "uldi", "oldo", Arrays.asList("senpioldo", "senplisioldo", "sinpioldo", "ŧeoldo")),
+			new LineEntry("ento", "inti", "ento", Arrays.asList("xvegramento", "dormensamento", "akorđimento", "malsontamento", "ƚigamento", "rekordamento", "renkresimento", "basixamento", "fotivento", "stento", "stravinamento", "caceramento", "trovamento", "uƚimento", "cacaramento", "aŧokimento", "torbolamento", "pastisamento", "mostravento", "joŧolamento", "roxamento", "sasinamento", "ŧimento", "bonimento", "bagoƚamento", "brasamento", "nuvoƚamento", "asento", "predegamento", "spavento", "indurimento", "torbiamento", "ƚuxamento", "rueƚamento", "malkontento", "kavaƚamento", "sonkamento", "valimento", "skonkasamento", "spegaŧamento", "seneɉamento", "ingropamento", "konsamento", "indupionamento", "komento", "josolamento", "flatulento", "buƚegamento", "inpedimento", "desarvelamento", "ƚisamento", "suɉarimento", "konvento", "agravamento", "skuinternamento", "taɉusamento", "falimento", "danamento", "trabakoƚamento", "baŧixamento", "latamento", "basilamento", "dexŧervelamento")),
+			new LineEntry("orđo", "urđi", "orđo", "orđo"),
+			new LineEntry("ordo", "urdi", "ordo", Arrays.asList("ingordo", "tordo", "balordo", "baƚordo", "parabordo", "sordo", "bordo", "xlordo", "ordo"))
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX mf Y 55",
 			"SFX mf el ili el",
 			"SFX mf ol uli ol",
-			"SFX mf on uni on",
 			"SFX mf en ini en",
+			"SFX mf on uni on",
 			"SFX mf er iri er",
 			"SFX mf or uri or",
 			"SFX mf exe ixi exe",
@@ -1516,6 +1520,7 @@ class RulesReducerTest{
 			"SFX mf ento inti ento",
 			"SFX mf onto unti onto",
 			"SFX mf orxo urxi orxo",
+			"SFX mf órden úrdini órden",
 			"SFX mf ojoxo ujuxi ojoxo",
 			"SFX mf oɉoxo uɉuxi oɉoxo",
 			"SFX mf oloxo uluxi oloxo",
@@ -1523,7 +1528,6 @@ class RulesReducerTest{
 			"SFX mf omoxo umuxi omoxo",
 			"SFX mf oñoxo uñuxi oñoxo",
 			"SFX mf oroxo uruxi oroxo",
-			"SFX mf órden úrdini órden",
 			"SFX mf obioxo ubiuxi obioxo",
 			"SFX mf ofioxo ufiuxi ofioxo",
 			"SFX mf olioxo uliuxi olioxo",
@@ -1531,10 +1535,10 @@ class RulesReducerTest{
 			"SFX mf onioxo uniuxi onioxo",
 			"SFX mf orioxo uriuxi orioxo",
 			"SFX mf ostoxo ustuxi ostoxo",
-			"SFX mf obrioxo ubriuxi obrioxo",
-			"SFX mf ordioxo urdiuxi ordioxo"
+			"SFX mf ordioxo urdiuxi ordioxo",
+			"SFX mf obrioxo ubriuxi obrioxo"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
@@ -1601,7 +1605,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("èra", SetHelper.setOf("ereta", "ara", "era", "iera", "ièra", "areta", "iereta"), "[^ijɉñ]èra", Arrays.asList("kanseƚèra", "seƚèra", "moƚonèra", "baƚestrèra", "ƚusernèra", "datoƚèra", "noxeƚèra", "ƚansèra", "kaƚegèra", "biƚietèra", "teƚèra", "bigoƚèra", "ocaƚèra", "karoboƚèra", "armiƚèra", "marineƚèra", "meƚiardèra", "fragoƚèra", "baƚonèra", "piñoƚèra", "xojeƚèra", "torkoƚèra", "brasoƚèra", "orioƚèra", "verioƚèra", "kartoƚèra", "miƚiardèra", "busoƚèra", "triveƚinèra", "moƚendinèra", "kriveƚèra", "bruƚèra", "korteƚèra", "ƚavandèra", "bronbeƚèra", "korbeƚèra", "saƚinèra", "puƚexèra", "cokoƚatèra", "kapeƚèra", "staeƚèra", "ƚeutèra", "fritoƚèra", "franboƚèra", "peƚatèra", "risoƚèra", "miƚèra", "visoƚèra", "ƚanèra", "saƚegèra", "skatoƚèra", "baƚansèra", "meƚegèra", "masteƚèra", "mesteƚèra", "xinxoƚèra", "peƚisèra", "subioƚèra", "skaƚetèra", "onbreƚèra", "staƚierèra", "xixoƚèra", "vioƚèra", "kaseƚèra", "maseƚèra", "ƚatonèra", "ventoƚèra", "sesteƚèra", "poƚastrèra", "bokaƚèra", "ƚagrimèra", "xuxoƚèra", "amoƚèra", "sokoƚèra", "ƚavexèra", "ƚautèra", "ƚatèra", "muƚinèra", "ƚibrèra", "oƚanèra", "skudeƚèra", "meƚionèra", "sardeƚèra", "fiƚatogèra", "gaƚinèra", "stadeƚèra", "sendaƚèra", "dudoƚèra", "miƚionèra", "ƚavranèra", "faxoƚèra", "meƚonèra", "staƚiarèra", "xoɉeƚèra", "gaƚèra", "kristaƚèra", "bronboƚèra", "mandoƚèra", "veƚèra", "ƚoamèra", "biƚiardèra", "fiƚandèra", "moƚinèra", "kalsoƚèra", "seƚegèra", "ƚunèra", "ƚuganegèra", "grixoƚèra", "korteƚinèra", "mastroveƚèra", "ƚanpadèra", "xansaƚèra", "ninxoƚèra", "saƚèra", "veƚudèra", "sorboƚèra", "ƚuamèra", "kornoƚèra", "ƚeamèra", "busoƚadèra", "armeƚinèra", "xaƚetèra", "oƚivèra", "kaxeƚèra", "skarpoƚèra", "ƚisèra", "kavaƚèra", "uƚivèra", "nespoƚèra", "paƚudèra")),
@@ -1737,7 +1741,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("èra", SetHelper.setOf("ereta", "ara", "era", "iera", "ièra", "areta", "iereta"), "[^ceijɉñou]èra", Arrays.asList("xuxolèra", "lunèra", "otonèra", "dindolèra", "ŧelegèra", "filatogèra", "ŧarèra", "ventolèra", "leutèra", "kanèra", "paltumèra", "frutèra", "piñokèra", "melegèra", "marsèra", "sforŧanèra", "sensèra", "ŧatarèra", "lansèra", "uxurèra", "tabakèra", "bruskinèra", "kanevèra", "sparexèra", "ŧestèra", "mersèra", "ŧedrèra", "perlèra", "mastrovelèra", "fiorèra", "galèra", "skaletèra", "trivelinèra", "sabionèra", "oriolèra", "grixolèra", "morèra", "salmistrèra", "bronbolèra", "fresèra", "ŧerexèra", "busolèra", "ganbarèra", "bugansèra", "karbonèra", "pasarèra", "botegèra", "bierèra", "kanpèra", "seradurèra", "selèra", "botèra", "pitèra", "onèra", "lisèra", "ranèra", "lautèra", "skarpolèra", "fasinèra", "leamèra", "meliardèra", "pipinèra", "margaritèra", "brasolèra", "roerèra", "sansèra", "kroxèra", "guantèra", "telèra", "orarèra", "bolŧèra", "mestelèra", "tamixèra", "xixibèra", "kornolèra", "puinèra", "fiaskèra", "kapotèra", "tavernèra", "kartolèra", "paludèra", "palmèra", "pasamanèra", "braŧolèra", "balansèra", "terasèra", "skarpèra", "masèra", "stiorèra", "ŧatèra", "kalierèra", "xatèra", "oxarèra", "violèra", "rixèra", "scaxèra", "piatèra", "maskerèra", "đanŧalèra", "busoladèra", "balonèra", "bastionèra", "papuŧèra", "gansèra", "kaldarèra", "malgaritèra", "ortrigèra", "porkèra", "lanèra", "maselèra", "pulexèra", "fiubèra", "scexèra", "birèra", "pestrinèra", "ponèra", "fagèra", "ansipresèra", "stuvèra", "spinèra", "storèra", "vrespèra", "bandèra", "karobèra", "veludèra", "sogèra", "sperlusèra", "kortelinèra", "piñatèra", "kavrèra", "staelèra", "skatolèra", "brespèra", "armèra", "botonèra", "risolèra", "portenèra", "semenŧèra", "verdasèra", "milionèra", "ŧestelèra", "perukèra", "ŧeriexèra", "karoŧèra", "vespèra", "vivèra", "kortelèra", "ŧariexèra", "kuxinèra", "fasèra", "pomèra", "ŧinbanèra", "kalegèra", "melionèra", "sorbolèra", "brulèra", "piñolèra", "roxèra", "fraskèra", "peatèra", "fornèra", "ŧendalèra", "marinèra", "koramèra", "karèra", "straŧèra", "murèra", "naranŧèra", "bixutèra", "balanŧèra", "riŧolèra", "lusernèra", "stalierèra", "mastelèra", "remesèra", "bigolèra", "salèra", "fragolèra", "kutèra", "persegèra", "skorŧèra", "buŧoladèra", "skoasèra", "torkolèra", "bolsèra", "verèra", "fritolèra", "kalmonèra", "spolverinèra", "xixolèra", "musèra", "spadèra", "onarèra", "montanèra", "melonèra", "sanbugèra", "karatèra", "loamèra", "ansopresèra", "pestèra", "akuavitèra", "armelinèra", "luganegèra", "spulxèra", "pegorèra", "felŧèra", "molinèra", "ocalèra", "kalŧerèra", "kantèra", "bastèra", "lagrimèra", "orèra", "tripèra", "tesèra", "saonèra", "maŧèra", "kalserèra", "saltèra", "lavranèra", "konfuxionèra", "ŧerèra", "arminèra", "dudolèra", "bronxèra", "bokalèra", "kalŧetèra", "fragèra", "roverèra", "manganèra", "lanŧèra", "skorsèra", "pontonèra", "kapuŧèra", "korbelèra", "perèra", "lavedèra", "finestrèra", "xansalèra", "bronbèra", "kalsolèra", "sanguetèra", "kuramèra", "ŧankanèra", "kapelèra", "viperèra", "fuxèra", "ŧentenèra", "frasenèra", "kristalèra", "nespolèra", "stopèra", "sparaxèra", "diamantèra", "merŧèra", "fornaxèra", "baretèra", "kavalèra", "remèra", "đinđolèra", "biskotèra", "pinèra", "bronbexèra", "karegèra", "pelatèra", "đojelèra", "xavaskèra", "librèra", "brondèra", "strasèra", "kalŧinèra", "fontanèra", "marinelèra", "kaxelèra", "karobolèra", "freŧèra", "kalŧolèra", "nogèra", "naspersegèra", "figèra", "điđolèra", "patinèra", "maxèra", "viŧolèra", "moskèra", "đuđolèra", "skagaŧèra", "filandèra", "damaskèra", "gatèra", "ŧierexèra", "skoaŧèra", "ninxolèra", "stadèra", "franbolèra", "stramasèra", "lanpadèra", "fontegèra", "latèra", "soaxèra", "kalderèra", "voltèra", "tomèra", "maronèra", "grasinèra", "kalsinèra", "krivelèra", "marŧèra", "maraskèra", "jaŧèra", "kalsetèra", "monèra", "maskarèra", "onbrelèra", "kordèra", "ŧenturèra", "amolèra", "latonèra", "armilèra", "laveđèra", "piegorèra", "samitèra", "mulinèra", "felsèra", "kaponèra", "danŧalèra", "ŧarexèra", "pitarèra", "portinèra", "ŧukèra", "tarmèra", "đaletèra", "musatèra", "antanèra", "sperlongèra", "petenèra", "kakèra", "karetèra", "kaselèra", "granèra", "pastèra", "jasèra", "xinxolèra", "braxèra", "sperluŧèra", "tinaŧèra", "vakèra", "olivèra", "festèra", "tinasèra", "ulivèra", "faxolèra", "salinèra", "sforsanèra", "gomarèra", "đenŧaminèra", "polastrèra", "gotèra", "peltrèra", "suxinèra", "stadelèra", "bilietèra", "ŧimoxèra", "ŧirexèra", "semensèra", "cokolatèra", "munèra", "salgèra", "verdaŧèra", "milèra", "morsèra", "visolèra", "velèra", "ŧavatèra", "mandolèra", "stropèra", "ruxèra", "pelisèra", "sagèra", "bixèra", "denŧaminèra", "naransèra", "galinèra", "molonèra", "sorđèra", "karosèra", "sorxèra", "ostregèra", "salegèra", "pastiŧèra", "đensaminèra", "ferèra", "bekèra", "biliardèra", "olmèra", "pastisèra", "buŧolèra", "oltrigèra", "personèra", "sordèra", "noxelèra", "balestrèra", "buganŧèra", "skagasèra", "kanselèra", "peliŧèra", "xanŧalèra", "pionbèra", "datolèra", "molendinèra", "đoɉelèra", "didolèra", "codèra", "bronđèra", "olanèra", "senavèra", "varotèra", "anŧipresèra", "anŧopresèra", "stramaŧèra", "kanpanèra", "ŧuketèra", "kartèra", "koronèra", "fenestrèra", "kaldierèra", "bonbaxèra", "luamèra", "veriolèra", "kaxèra", "teraŧèra", "jandèra", "lavandèra", "subiolèra", "anemèra", "fiokèra", "lavexèra", "staliarèra", "sardelèra", "ostèra", "liŧèra", "skudelèra", "ŧokolèra", "limonèra", "tornèra", "ganŧèra", "bronbelèra", "scopetèra", "miliardèra", "ortigèra", "papusèra")),
@@ -1841,7 +1845,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, AffixEntry.Type.SUFFIX).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, AffixEntry.Type.SUFFIX);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("en", "éi", "en", Arrays.asList("ultrateren", "guardamagađen", "seren", "baxen", "međen", "taja–fen", "magaxen", "teren", "saraŧen", "repien", "meden", "similituden", "sen", "stra-ben", "magađen", "mexen", "maxagen", "baŧen", "velen", "straben", "basen", "guardamagaxen", "taɉafen", "terapien", "taɉa–fen", "tajafen", "magaden", "notaben", "tientinben", "guardamagaden", "stra-pien", "strapien")),
