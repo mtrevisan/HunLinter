@@ -163,7 +163,7 @@ public class RulesReducer{
 		List<LineEntry> compactedRules = compactRules(plainRules);
 
 		//reshuffle originating list to place the correct productions in the correct rule
-		redistributeAdditions(compactedRules, type);
+		compactedRules = redistributeAdditions(compactedRules, type);
 
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(),
 			DictionaryParser.COUNTER_FORMATTER.format(plainRules.size()));
@@ -462,7 +462,7 @@ public class RulesReducer{
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
-	private void redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
+	private List<LineEntry> redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
 		//sort processing-list by shortest condition
 		rules.sort(shortestConditionComparator);
 
@@ -503,14 +503,33 @@ public class RulesReducer{
 				}
 		}
 
-		//make additions disjoint
-		//TODO
-		//rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
+		makeAdditionsDisjoint(rules);
+
+		return compactRules(rules);
+	}
+
+	private void makeAdditionsDisjoint(final List<LineEntry> rules){
+		//tranform
+		//	rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=[
+		//	rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
 		//into
-		//rem=èra,add=[iera, ièra, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
-System.out.println("");
+		//	rem=èra,add=[iera, ièra, iereta],cond=èra,from=[
+		//	rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
+		final Map<String, List<LineEntry>> conditionBucket = bucket(rules, rule -> rule.condition);
+		for(final List<LineEntry> entry : conditionBucket.values())
+			if(entry.size() == 2){
+				final Set<String> additionIntersection = SetHelper.intersection(entry.get(0).addition, entry.get(1).addition);
+				if(!additionIntersection.isEmpty()){
+					final LineEntry container = entry.get(entry.get(0).addition.size() >= entry.get(1).addition.size()? 0: 1);
+					container.addition.removeAll(additionIntersection);
+					final LineEntry newEntry = new LineEntry(container.removal, additionIntersection, container.condition, container.from);
+					rules.add(newEntry);
+				}
+//				else
+//					throw new IllegalArgumentException("1");
+			}
+			else if(entry.size() != 1)
+				throw new IllegalArgumentException("2");
 	}
 
 	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
