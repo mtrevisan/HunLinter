@@ -449,7 +449,7 @@ public class RulesReducer{
 						finalRules.add(newRule);
 					}
 					for(final Character chr : groupsIntersection){
-						final String cond = String.valueOf(chr);
+						final String cond = String.valueOf(chr) + parent.condition;
 						final LineEntry newRule = LineEntry.createFrom(parent, cond);
 						rules.add(newRule);
 					}
