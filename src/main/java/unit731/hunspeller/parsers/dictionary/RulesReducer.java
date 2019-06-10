@@ -229,12 +229,12 @@ public class RulesReducer{
 		return new ArrayList<>(compaction.values());
 	}
 
-	private List<LineEntry> removeOverlappingConditions(final List<LineEntry> rules){
+	private List<LineEntry> removeOverlappingConditions(List<LineEntry> rules){
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
 		//expand empty conditions (if any)
 		//store surely disjoint rules
-		nonOverlappingRules.addAll(expandEmptyCondition(rules));
+		rules = expandEmptyCondition(rules);
 
 		//expand same conditions (if any)
 		//store surely disjoint rules
@@ -369,12 +369,13 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> expandEmptyCondition(final List<LineEntry> rules){
-		final List<LineEntry> finalRules = new ArrayList<>();
-		final LineEntry emptyConditionParent = rules.get(0);
+		final List<LineEntry> newRules = new ArrayList<>(rules);
+
+		final LineEntry emptyConditionParent = newRules.get(0);
 		if(emptyConditionParent.condition.isEmpty()){
 			//collect empty conditions
 			final List<LineEntry> parents = new ArrayList<>();
-			final Iterator<LineEntry> itr = rules.iterator();
+			final Iterator<LineEntry> itr = newRules.iterator();
 			while(itr.hasNext()){
 				final LineEntry parent = itr.next();
 				if(parent.condition.isEmpty()){
@@ -383,7 +384,7 @@ public class RulesReducer{
 				}
 			}
 
-			final Set<String> otherFrom = rules.stream()
+			final Set<String> otherFrom = newRules.stream()
 				.flatMap(rule -> rule.from.stream())
 				.collect(Collectors.toSet());
 			final Set<Character> otherGroup = extractGroup(otherFrom, 0);
@@ -397,17 +398,18 @@ public class RulesReducer{
 				if(!parentGroup.isEmpty()){
 					final String condition = makeGroup(parentGroup);
 					final LineEntry newRule = LineEntry.createFrom(parent, condition);
-					finalRules.add(newRule);
+					newRules.add(newRule);
 				}
 				for(final Character chr : intersection){
 					final String condition = String.valueOf(chr);
 					final LineEntry newRule = LineEntry.createFrom(parent, condition);
-					rules.add(newRule);
+					newRules.add(newRule);
 				}
 			}
-			rules.sort(shortestConditionComparator);
+			newRules.sort(shortestConditionComparator);
 		}
-		return finalRules;
+
+		return newRules;
 	}
 
 	private List<LineEntry> expandSameCondition(final List<LineEntry> rules){
