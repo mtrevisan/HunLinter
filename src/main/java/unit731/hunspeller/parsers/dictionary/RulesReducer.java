@@ -381,6 +381,8 @@ public class RulesReducer{
 				final Map<LineEntry, Set<Character>> groups = children.stream()
 					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, condition.length())));
 
+				rules.removeAll(sameCondition);
+
 				//separate conditions:
 				//for each rule with same condition
 				for(final LineEntry parent : sameCondition){
@@ -397,18 +399,15 @@ public class RulesReducer{
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
-						final String cond = (parent.condition.isEmpty() || groupsIntersection.isEmpty() && parentGroup.size() <= childrenGroup.size()?
-							makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
-						final LineEntry newRule = LineEntry.createFrom(parent, cond);
+						final String preCondition = (parent.condition.isEmpty() || groupsIntersection.isEmpty() && parentGroup.size() <= childrenGroup.size()?
+							makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
 					}
-					for(final Character chr : groupsIntersection){
-						final String cond = String.valueOf(chr) + parent.condition;
-						final LineEntry newRule = LineEntry.createFrom(parent, cond);
-						rules.add(newRule);
-					}
+					groupsIntersection.stream()
+						.map(chr -> LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition))
+						.forEach(rules::add);
 				}
-				rules.removeAll(sameCondition);
 			}
 		}
 
