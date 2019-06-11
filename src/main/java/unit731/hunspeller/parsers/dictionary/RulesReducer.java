@@ -262,7 +262,7 @@ System.out.println();
 
 	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules, AffixEntry.Type type){
 		//sort processing-list by longest condition
-		rules.sort(shortestConditionComparator.reversed());
+//		rules.sort(shortestConditionComparator.reversed());
 
 		//tranform
 		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=...]
@@ -278,6 +278,7 @@ System.out.println();
 		//	[rem=ièr,add=[ar, areto, ereto, èr, er],cond=ièr,from=...]
 		final List<LineEntry> disjointedRules = new ArrayList<>();
 		for(final LineEntry rule : rules){
+			final List<LineEntry> temporaryRules = new ArrayList<>();
 			final Map<String, List<String>> lcss = bucket(rule.addition,
 				add -> longestCommonAffix(Arrays.asList(add, rule.removal), (type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix)));
 			if(lcss.size() > 1){
@@ -297,12 +298,20 @@ System.out.println();
 						.map(add -> add.substring(keyLength))
 						.collect(Collectors.toSet());
 					final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
-					insertRuleOrUpdateFrom(disjointedRules, newEntry);
+					if(rules.contains(newEntry))
+						temporaryRules.add(newEntry);
 				}
+
+				if(temporaryRules.size() == keys.size())
+					disjointedRules.addAll(temporaryRules);
 			}
-			else
-				insertRuleOrUpdateFrom(disjointedRules, rule);
+
+			if(temporaryRules.isEmpty())
+				disjointedRules.add(rule);
 		}
+
+		//merge rules from disjoint list where removal, addition, and condition part are the same
+		//TODO
 
 		final Map<String, List<LineEntry>> conditionBucket = bucket(disjointedRules, rule -> rule.condition);
 		for(final List<LineEntry> entry : conditionBucket.values())
