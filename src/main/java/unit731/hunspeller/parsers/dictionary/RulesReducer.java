@@ -273,12 +273,11 @@ public class RulesReducer{
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
-			for(final LineEntry expandedRule : expandedRules){
+			for(final LineEntry expandedRule : expandedRules)
 				if(isContainedInto(expandedRule, rule, type)){
-//TODO split rule
-System.out.println();
+					rule.addition.removeAll(expandedRule.addition);
+					expandedRule.from.addAll(rule.from);
 				}
-			}
 			expandedRules.add(rule);
 		}
 	}
@@ -494,7 +493,7 @@ System.out.println();
 			final int lcsLength = longestCommonAffix(Arrays.asList(add, rule.removal),
 				(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
 				.length();
-			parentBones.add(add.substring(lcsLength) + TAB + rule.removal.substring(lcsLength));
+			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
 		}
 		return parentBones;
 	}
