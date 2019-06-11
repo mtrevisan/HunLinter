@@ -444,6 +444,9 @@ public class RulesReducer{
 					parentAdditions.add(add.substring(lcsLength));
 				}
 			});
+			if(parentRemoval.isEmpty())
+				continue;
+
 			for(final LineEntry child : rules)
 				if(child != parent && parentRemoval.containsKey(child.removal)){
 					//extract raw additions from child
