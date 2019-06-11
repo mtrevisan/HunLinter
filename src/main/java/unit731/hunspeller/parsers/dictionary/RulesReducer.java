@@ -292,7 +292,7 @@ System.out.println();
 					if(condition.isEmpty())
 						break;
 
-					final String removal = (rule.removal.length() > condition.length()? condition: rule.removal);
+					final String removal = (condition.length() <= rule.removal.length()? condition: rule.removal);
 					final Set<String> addition = lcss.get(key).stream()
 						.map(add -> add.substring(keyLength))
 						.collect(Collectors.toSet());
