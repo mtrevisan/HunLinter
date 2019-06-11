@@ -171,18 +171,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> {
-			dicCheckCorrectnessMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
-			dicExtractDuplicatesMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
-			dicSortDictionaryMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
-			dicWordCountMenuItem.setEnabled(true);
-		});
+		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				hypStatisticsMenuItem.setEnabled(true);
@@ -200,9 +192,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
 		});
-		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> {
-			hypCheckCorrectnessMenuItem.setEnabled(true);
-		});
+		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> hypCheckCorrectnessMenuItem.setEnabled(true));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -2118,9 +2108,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 
 		//create and display the form
-		EventQueue.invokeLater(() -> {
-			(new HunspellerFrame()).setVisible(true);
-		});
+		EventQueue.invokeLater(() -> (new HunspellerFrame()).setVisible(true));
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

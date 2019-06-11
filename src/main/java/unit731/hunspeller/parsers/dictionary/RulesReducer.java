@@ -256,7 +256,7 @@ public class RulesReducer{
 					}
 				}
 		}
-System.out.println("");
+System.out.println();
 	}
 
 	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules, AffixEntry.Type type){
@@ -397,7 +397,7 @@ System.out.println("");
 						finalRules.add(newRule);
 					}
 					groupsIntersection.stream()
-						.map(chr -> LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition))
+						.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
 						.forEach(rules::add);
 				}
 			}
@@ -527,12 +527,7 @@ System.out.println("");
 			.collect(Collectors.toList());
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
-		final Iterator<LineEntry> itr = bubbles.iterator();
-		while(itr.hasNext()){
-			final LineEntry bubble = itr.next();
-			if(!SetHelper.isDisjoint(parent.from, bubble.from))
-				itr.remove();
-		}
+		bubbles.removeIf(bubble -> !SetHelper.isDisjoint(parent.from, bubble.from));
 		return bubbles;
 	}
 
