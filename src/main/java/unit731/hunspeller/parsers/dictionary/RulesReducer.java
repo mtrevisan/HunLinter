@@ -212,6 +212,7 @@ public class RulesReducer{
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
 	private void redistributeAdditions(List<LineEntry> rules, AffixEntry.Type type){
+		//TODO
 		rules = makeAdditionsDisjoint(rules, type);
 
 		//sort processing-list by shortest condition
