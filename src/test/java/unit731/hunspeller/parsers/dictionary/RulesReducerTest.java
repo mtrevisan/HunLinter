@@ -1598,17 +1598,20 @@ class RulesReducerTest{
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX V0 Y 14",
-			"SFX V0 èr er ièr",
-			"SFX V0 ièr ar ièr",
+			"SFX V0 èr er èr",
+			"SFX V0 èr ar èr",
+			"SFX V0 èr ereto èr",
+			"SFX V0 èr areto èr",
 			"SFX V0 ièr er ièr",
-			"SFX V0 ièr areto ièr",
+			"SFX V0 ièr èr ièr",
+			"SFX V0 ièr ar ièr",
 			"SFX V0 ièr ereto ièr",
-			"SFX V0 èr ar [^i]èr",
-			"SFX V0 èr areto [^i]èr",
-			"SFX V0 èr ereto [^i]èr",
-			"SFX V0 èr ièr [^aeoucijɉñ]èr",
+			"SFX V0 ièr areto ièr",
 			"SFX V0 èr ier [^aeoucijɉñ]èr",
-			"SFX V0 èr iereto [^aeoucijɉñ]èr"
+			"SFX V0 èr ièr [^aeoucijɉñ]èr",
+			"SFX V0 èr iar [^aeoucijɉñ]èr",
+			"SFX V0 èr iereto [^aeoucijɉñ]èr",
+			"SFX V0 èr iareto [^aeoucijɉñ]èr"
 		);
 //		Assertions.assertEquals(expectedRules, rules);
 
