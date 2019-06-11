@@ -168,7 +168,7 @@ public class RulesReducer{
 		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(),
 			DictionaryParser.COUNTER_FORMATTER.format(plainRules.size()));
 
-		compactedRules = removeOverlappingConditions(compactedRules);
+		compactedRules = disjoinConditions(compactedRules);
 
 		mergeSimilarRules(compactedRules);
 
@@ -229,35 +229,17 @@ public class RulesReducer{
 		return new ArrayList<>(compaction.values());
 	}
 
-	private List<LineEntry> removeOverlappingConditions(List<LineEntry> rules){
-		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
-
+	private List<LineEntry> disjoinConditions(List<LineEntry> rules){
 		//expand same conditions (if any); store surely disjoint rules
-		nonOverlappingRules.addAll(disjoinSameCondition(rules));
+		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules);
 
 		//expand same ending conditions (if any); store surely disjoint rules
-		nonOverlappingRules.addAll(disjoinSameEndingCondition(rules));
+		nonOverlappingRules.addAll(disjoinSameEndingConditions(rules));
 
 		return nonOverlappingRules;
 	}
 
-	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
-		final int parentConditionLength = parent.condition.length();
-		final List<LineEntry> bubbles = bush.stream()
-			.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
-			.collect(Collectors.toList());
-
-		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
-		final Iterator<LineEntry> itr = bubbles.iterator();
-		while(itr.hasNext()){
-			final LineEntry bubble = itr.next();
-			if(!SetHelper.isDisjoint(parent.from, bubble.from))
-				itr.remove();
-		}
-		return bubbles;
-	}
-
-	private List<LineEntry> disjoinSameCondition(final List<LineEntry> rules){
+	private List<LineEntry> disjoinSameConditions(final List<LineEntry> rules){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by same condition
@@ -309,7 +291,7 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private List<LineEntry> disjoinSameEndingCondition(final List<LineEntry> rules){
+	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by condition ending
@@ -380,7 +362,7 @@ public class RulesReducer{
 								newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 								bush.add(newEntry);
 
-								finalRules.addAll(disjoinSameCondition(bush));
+								finalRules.addAll(disjoinSameConditions(bush));
 							}
 
 							bush.sort(shortestConditionComparator);
@@ -421,6 +403,22 @@ public class RulesReducer{
 			forest.add(children);
 		}
 		return forest;
+	}
+
+	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
+		final int parentConditionLength = parent.condition.length();
+		final List<LineEntry> bubbles = bush.stream()
+			.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
+			.collect(Collectors.toList());
+
+		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
+		final Iterator<LineEntry> itr = bubbles.iterator();
+		while(itr.hasNext()){
+			final LineEntry bubble = itr.next();
+			if(!SetHelper.isDisjoint(parent.from, bubble.from))
+				itr.remove();
+		}
+		return bubbles;
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
