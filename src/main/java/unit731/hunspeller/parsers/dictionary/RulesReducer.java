@@ -211,7 +211,9 @@ public class RulesReducer{
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
-	private void redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
+	private void redistributeAdditions(List<LineEntry> rules, AffixEntry.Type type){
+		rules = makeAdditionsDisjoint(rules, type);
+
 		//sort processing-list by shortest condition
 		rules.sort(shortestConditionComparator);
 
@@ -254,15 +256,80 @@ public class RulesReducer{
 					}
 				}
 		}
-
-		//make additions disjoint
-		//TODO
-		//rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
-		//into
-		//rem=èra,add=[iera, ièra, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
 System.out.println("");
+	}
+
+	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules, AffixEntry.Type type){
+		//sort processing-list by longest condition
+		rules.sort(shortestConditionComparator.reversed());
+
+		//tranform
+		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=...]
+		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
+		//into
+		//	[rem=èra,add=[iera, ièra, iereta],    cond=èra,from=...]
+		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
+
+		//transform
+		//	[rem=ièr,add=[ar, areto, ereto, ier, èr, iar, iereto, er],cond=ièr,from=...]
+		//into
+		//	[rem= èr,add=[er, ar, ereto],           cond=ièr,from=...]
+		//	[rem=ièr,add=[ar, areto, ereto, èr, er],cond=ièr,from=...]
+		final List<LineEntry> disjointedRules = new ArrayList<>();
+		for(final LineEntry rule : rules){
+			final Map<String, List<String>> lcss = bucket(rule.addition,
+				add -> longestCommonAffix(Arrays.asList(add, rule.removal), (type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix)));
+			if(lcss.size() > 1){
+				//order keys from longer to shorter
+				final List<String> keys = new ArrayList<>(lcss.keySet());
+				keys.sort(Comparator.comparingInt(String::length).reversed());
+
+				//add each key, remove the list from the addition
+				for(final String key : keys){
+					final int keyLength = key.length();
+					final String condition = rule.condition.substring(keyLength);
+					if(condition.isEmpty())
+						break;
+
+					final String removal = (rule.removal.length() > condition.length()? condition: rule.removal);
+					final Set<String> addition = lcss.get(key).stream()
+						.map(add -> add.substring(keyLength))
+						.collect(Collectors.toSet());
+					final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
+					insertRuleOrUpdateFrom(disjointedRules, newEntry);
+				}
+			}
+			else
+				insertRuleOrUpdateFrom(disjointedRules, rule);
+		}
+
+		final Map<String, List<LineEntry>> conditionBucket = bucket(disjointedRules, rule -> rule.condition);
+		for(final List<LineEntry> entry : conditionBucket.values())
+			if(entry.size() == 2){
+				final Set<String> additionIntersection = SetHelper.intersection(entry.get(0).addition, entry.get(1).addition);
+				if(!additionIntersection.isEmpty()){
+					final LineEntry container = entry.get(entry.get(0).addition.size() >= entry.get(1).addition.size()? 0: 1);
+					final LineEntry contained = entry.get(entry.get(0).addition.size() >= entry.get(1).addition.size()? 1: 0);
+					container.addition.removeAll(additionIntersection);
+					if(contained.addition.equals(additionIntersection))
+						contained.from.addAll(container.from);
+					else
+						throw new IllegalArgumentException("to do 1");
+				}
+			}
+			else if(entry.size() != 1)
+				throw new IllegalArgumentException("to do 2");
+
+		return disjointedRules;
+	}
+
+	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
+		final int idx = expandedRules.indexOf(rule);
+		if(idx >= 0)
+			expandedRules.get(idx)
+				.from.addAll(rule.from);
+		else
+			expandedRules.add(rule);
 	}
 
 	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
@@ -329,14 +396,6 @@ System.out.println("");
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
 					}
-//					for(final Character chr : groupsIntersection){
-//						final LineEntry newRule = LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition);
-//						final int ruleIndex = rules.indexOf(newRule);
-//						if(ruleIndex >= 0)
-//							rules.get(ruleIndex).from.addAll(newRule.from);
-//						else
-//							rules.add(newRule);
-//					}
 					groupsIntersection.stream()
 						.map(chr -> LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition))
 						.forEach(rules::add);
