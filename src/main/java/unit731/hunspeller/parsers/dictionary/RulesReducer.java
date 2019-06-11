@@ -91,6 +91,7 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> compactProductions(final List<LineEntry> rules){
+		final List<LineEntry> compactedRules = new ArrayList<>();
 		if(rules.size() > 1){
 			final String from = rules.get(0).from.iterator().next();
 			//retrieve rule with longest condition (all the other conditions must be this long)
@@ -110,10 +111,11 @@ public class RulesReducer{
 						compactedRule.addition.add(deltaAddition + addition);
 				}
 			}
-			rules.clear();
-			rules.add(compactedRule);
+			compactedRules.add(compactedRule);
 		}
-		return rules;
+		else
+			compactedRules.addAll(rules);
+		return compactedRules;
 	}
 
 	private LineEntry createSuffixEntry(final Production production, final String word, final AffixEntry.Type type){
