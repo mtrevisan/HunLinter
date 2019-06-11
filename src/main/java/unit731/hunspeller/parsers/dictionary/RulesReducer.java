@@ -232,10 +232,6 @@ public class RulesReducer{
 	private List<LineEntry> removeOverlappingConditions(List<LineEntry> rules){
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
-		//expand empty conditions (if any)
-		//store surely disjoint rules
-		rules = expandEmptyCondition(rules);
-
 		//expand same conditions (if any)
 		//store surely disjoint rules
 		nonOverlappingRules.addAll(expandSameCondition(rules));
@@ -368,50 +364,6 @@ public class RulesReducer{
 		return forest;
 	}
 
-	private List<LineEntry> expandEmptyCondition(final List<LineEntry> rules){
-		final List<LineEntry> newRules = new ArrayList<>(rules);
-
-		final LineEntry emptyConditionParent = newRules.get(0);
-		if(emptyConditionParent.condition.isEmpty()){
-			//collect empty conditions
-			final List<LineEntry> parents = new ArrayList<>();
-			final Iterator<LineEntry> itr = newRules.iterator();
-			while(itr.hasNext()){
-				final LineEntry parent = itr.next();
-				if(parent.condition.isEmpty()){
-					parents.add(parent);
-					itr.remove();
-				}
-			}
-
-			final Set<String> otherFrom = newRules.stream()
-				.flatMap(rule -> rule.from.stream())
-				.collect(Collectors.toSet());
-			final Set<Character> otherGroup = extractGroup(otherFrom, 0);
-
-			//for each rule with empty condition
-			for(final LineEntry parent : parents){
-				//expand empty condition:
-				final Set<Character> parentGroup = extractGroup(parent.from, 0);
-				final Set<Character> intersection = SetHelper.intersection(parentGroup, otherGroup);
-				parentGroup.removeAll(intersection);
-				if(!parentGroup.isEmpty()){
-					final String condition = makeGroup(parentGroup);
-					final LineEntry newRule = LineEntry.createFrom(parent, condition);
-					newRules.add(newRule);
-				}
-				for(final Character chr : intersection){
-					final String condition = String.valueOf(chr);
-					final LineEntry newRule = LineEntry.createFrom(parent, condition);
-					newRules.add(newRule);
-				}
-			}
-			newRules.sort(shortestConditionComparator);
-		}
-
-		return newRules;
-	}
-
 	private List<LineEntry> expandSameCondition(final List<LineEntry> rules){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
@@ -419,7 +371,7 @@ public class RulesReducer{
 		final Map<String, List<LineEntry>> conditionBucket = bucket(rules, rule -> rule.condition);
 		for(final Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
 			final List<LineEntry> sameCondition = entry.getValue();
-			if(sameCondition.size() > 1){
+			if(entry.getKey().isEmpty() || sameCondition.size() > 1){
 				//extract children
 				final String condition = entry.getKey();
 				final List<LineEntry> children = rules.stream()
@@ -430,7 +382,7 @@ public class RulesReducer{
 					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, condition.length())));
 
 				//separate conditions:
-				//for each rule with empty condition
+				//for each rule with same condition
 				for(final LineEntry parent : sameCondition){
 					//extract ratifying group
 					final Set<Character> parentGroup = groups.get(parent);
@@ -445,7 +397,7 @@ public class RulesReducer{
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
-						final String cond = (groupsIntersection.isEmpty() && (parent.condition.isEmpty() || parentGroup.size() <= childrenGroup.size())?
+						final String cond = (parent.condition.isEmpty() || groupsIntersection.isEmpty() && parentGroup.size() <= childrenGroup.size()?
 							makeGroup(parentGroup): makeNotGroup(childrenGroup)) + parent.condition;
 						final LineEntry newRule = LineEntry.createFrom(parent, cond);
 						finalRules.add(newRule);
@@ -459,6 +411,8 @@ public class RulesReducer{
 				rules.removeAll(sameCondition);
 			}
 		}
+
+		rules.sort(shortestConditionComparator);
 
 		return finalRules;
 	}
