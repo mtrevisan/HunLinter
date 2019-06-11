@@ -255,25 +255,32 @@ public class RulesReducer{
 				}
 
 				for(final LineEntry temporaryRule : temporaryRules)
-					insertRuleOrUpdateFrom(disjointedRules, temporaryRule);
+					insertRuleOrUpdateFrom(disjointedRules, temporaryRule, type);
 				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
 			}
 
 			if(temporaryRules.isEmpty())
-				insertRuleOrUpdateFrom(disjointedRules, rule);
+				insertRuleOrUpdateFrom(disjointedRules, rule, type);
 		}
 
 		return disjointedRules;
 	}
 
-	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
+	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule, final AffixEntry.Type type){
 		final int ruleIndex = expandedRules.indexOf(rule);
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
-		else
+		else{
+			for(final LineEntry expandedRule : expandedRules){
+				if(isContainedInto(expandedRule, rule, type)){
+//TODO split rule
+System.out.println();
+				}
+			}
 			expandedRules.add(rule);
+		}
 	}
 
 	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
@@ -475,7 +482,7 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
+	private boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
 		final Set<String> parentBones = extractRuleSpine(parent, type);
 		final Set<String> childBones = extractRuleSpine(child, type);
 		return childBones.containsAll(parentBones);
