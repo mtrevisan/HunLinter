@@ -233,10 +233,10 @@ public class RulesReducer{
 		final List<LineEntry> nonOverlappingRules = new ArrayList<>();
 
 		//expand same conditions (if any); store surely disjoint rules
-		nonOverlappingRules.addAll(expandSameCondition(rules));
+		nonOverlappingRules.addAll(disjoinSameCondition(rules));
 
 		//expand same ending conditions (if any); store surely disjoint rules
-		nonOverlappingRules.addAll(expandSameEndingCondition(rules));
+		nonOverlappingRules.addAll(disjoinSameEndingCondition(rules));
 
 		return nonOverlappingRules;
 	}
@@ -257,29 +257,7 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> sortedRules){
-		List<List<LineEntry>> forest = new ArrayList<>();
-		while(!sortedRules.isEmpty()){
-			//extract base condition
-			final String parentCondition = sortedRules.get(0).condition;
-			
-			//extract similar (same ending condition) rules from processing-list
-			final List<LineEntry> children = new ArrayList<>();
-			final Iterator<LineEntry> itr = sortedRules.iterator();
-			while(itr.hasNext()){
-				final LineEntry rule = itr.next();
-
-				if(rule.condition.endsWith(parentCondition)){
-					children.add(rule);
-					itr.remove();
-				}
-			}
-			forest.add(children);
-		}
-		return forest;
-	}
-
-	private List<LineEntry> expandSameCondition(final List<LineEntry> rules){
+	private List<LineEntry> disjoinSameCondition(final List<LineEntry> rules){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by same condition
@@ -328,12 +306,10 @@ public class RulesReducer{
 			}
 		}
 
-		rules.sort(shortestConditionComparator);
-
 		return finalRules;
 	}
 
-	private List<LineEntry> expandSameEndingCondition(final List<LineEntry> rules){
+	private List<LineEntry> disjoinSameEndingCondition(final List<LineEntry> rules){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by condition ending
@@ -370,10 +346,9 @@ public class RulesReducer{
 						parentGroup.removeAll(groupIntersection);
 
 						//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
-						final String condition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
-							makeGroup(parentGroup): makeNotGroup(childrenGroup))
-							+ parent.condition;
-						LineEntry newEntry = LineEntry.createFrom(parent, condition);
+						final String preCondition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
+							makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
 
 						//keep only rules that matches some existent words
 						if(newEntry.isProductive())
@@ -392,8 +367,7 @@ public class RulesReducer{
 							final List<LineEntry> bushes = new ArrayList<>(bush);
 							bushes.add(parent);
 							for(final Character chr : childrenGroup){
-								final String cond = chr + parent.condition;
-								newEntry = LineEntry.createFrom(parent, cond);
+								newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 								if(!bush.contains(newEntry))
 									bush.add(newEntry);
 							}
@@ -403,11 +377,10 @@ public class RulesReducer{
 						else if(!groupIntersection.isEmpty() && !parentGroup.isEmpty()){
 							//expand intersection
 							for(final Character chr : groupIntersection){
-								final String cond = chr + parent.condition;
-								newEntry = LineEntry.createFrom(parent, cond);
+								newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 								bush.add(newEntry);
 
-								finalRules.addAll(expandSameCondition(bush));
+								finalRules.addAll(disjoinSameCondition(bush));
 							}
 
 							bush.sort(shortestConditionComparator);
@@ -424,6 +397,30 @@ public class RulesReducer{
 		}
 
 		return finalRules;
+	}
+
+	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
+		rules.sort(shortestConditionComparator);
+
+		List<List<LineEntry>> forest = new ArrayList<>();
+		while(!rules.isEmpty()){
+			//extract base condition
+			final String parentCondition = rules.get(0).condition;
+			
+			//extract similar (same ending condition) rules from processing-list
+			final List<LineEntry> children = new ArrayList<>();
+			final Iterator<LineEntry> itr = rules.iterator();
+			while(itr.hasNext()){
+				final LineEntry rule = itr.next();
+
+				if(rule.condition.endsWith(parentCondition)){
+					children.add(rule);
+					itr.remove();
+				}
+			}
+			forest.add(children);
+		}
+		return forest;
 	}
 
 	/** Reshuffle originating list to place the correct productions in the correct rule */
