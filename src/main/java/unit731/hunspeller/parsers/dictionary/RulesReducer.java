@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.Backbone;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -156,12 +155,6 @@ public class RulesReducer{
 
 	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final AffixEntry.Type type){
 		List<LineEntry> compactedRules = compactRules(plainRules);
-
-		//reshuffle originating list to place the correct productions in the correct rule
-		redistributeAdditions(compactedRules, type);
-
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Extracted {} rules from {} productions", compactedRules.size(),
-			DictionaryParser.COUNTER_FORMATTER.format(plainRules.size()));
 
 		compactedRules = disjoinConditions(compactedRules);
 
@@ -423,61 +416,6 @@ public class RulesReducer{
 				itr.remove();
 		}
 		return bubbles;
-	}
-
-	/** Reshuffle originating list to place the correct productions in the correct rule */
-	private void redistributeAdditions(final List<LineEntry> rules, AffixEntry.Type type){
-		//sort processing-list by shortest condition
-		rules.sort(shortestConditionComparator);
-
-		//for each parent rule
-		for(final LineEntry parent : rules){
-			//extract raw additions from parent
-			final Map<String, String> parentRemoval = new HashMap<>();
-			final Set<String> parentAdditions = new HashSet<>();
-			parent.addition.forEach(add -> {
-				final int lcsLength = longestCommonAffix(Arrays.asList(add, parent.removal),
-					(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
-					.length();
-				if(lcsLength > 0){
-					parentRemoval.put(parent.removal.substring(lcsLength), add);
-					parentAdditions.add(add.substring(lcsLength));
-				}
-			});
-			if(parentRemoval.isEmpty())
-				continue;
-
-			for(final LineEntry child : rules)
-				if(child != parent && parentRemoval.containsKey(child.removal)){
-					//extract raw additions from child
-					int minimumLCSLength = Integer.MAX_VALUE;
-					final Set<String> childAdditions = new HashSet<>();
-					for(final String addition : child.addition){
-						final int lcsLength = longestCommonAffix(Arrays.asList(addition, child.removal),
-							(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
-							.length();
-						if(lcsLength < minimumLCSLength)
-							minimumLCSLength = lcsLength;
-						childAdditions.add(addition.substring(lcsLength));
-					}
-
-					final String childEndingCondition = child.condition.substring(minimumLCSLength);
-					//extract from each child all the additions present in the parent
-					if(parentRemoval.containsKey(childEndingCondition) && childAdditions.containsAll(parentAdditions)){
-						parent.addition.remove(parentRemoval.get(childEndingCondition));
-						child.from.addAll(parent.from);
-					}
-				}
-		}
-
-		//make additions disjoint
-		//TODO
-		//rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
-		//into
-		//rem=èra,add=[iera, ièra, iereta],cond=èra,from=[
-		//rem=èra,add=[ereta, ara, era, areta],cond=èra,from=[
-System.out.println("");
 	}
 
 	public boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
