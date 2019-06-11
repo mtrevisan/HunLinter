@@ -248,7 +248,7 @@ public class RulesReducer{
 
 					final String childEndingCondition = child.condition.substring(minimumLCSLength);
 					//extract from each child all the additions present in the parent
-					if(parentRemoval.containsKey(childEndingCondition) && childAdditions.containsAll(parentAdditions)){
+					if(parentRemoval.containsKey(childEndingCondition) && childAdditions.equals(parentAdditions)){
 						parent.addition.remove(parentRemoval.get(childEndingCondition));
 						child.from.addAll(parent.from);
 					}
