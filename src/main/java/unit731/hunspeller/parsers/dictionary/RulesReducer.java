@@ -90,37 +90,30 @@ public class RulesReducer{
 		return compactProductions(filteredRules);
 	}
 
-	private List<LineEntry> compactProductions(final List<LineEntry> filteredRules){
-		//compact rules by aggregating productions with same originating word
-		Map<String, List<LineEntry>> fromBucket = bucket(new HashSet<>(filteredRules), rule -> rule.from.iterator().next());
-		for(final Map.Entry<String, List<LineEntry>> entry : fromBucket.entrySet()){
-			final List<LineEntry> rules = entry.getValue();
-			if(rules.size() > 1){
-				//retrieve rule with longest condition (all the other conditions must be this long)
-				final LineEntry compactedRule = rules.stream()
-					.max(Comparator.comparingInt(rule -> rule.condition.length()))
-					.get();
-				final int longestConditionLength = compactedRule.condition.length();
-				final String from = entry.getKey();
-				for(final LineEntry rule : rules){
-					//recover the missing characters for the current condition to become of length the maximum found earlier
-					final int startIndex = from.length() - longestConditionLength;
-					//if a condition is not long enough, keep it separate
-					if(startIndex >= 0){
-						final int delta = longestConditionLength - rule.condition.length();
-						final String deltaAddition = from.substring(startIndex, startIndex + delta);
-						//add addition
-						for(final String addition : rule.addition)
-							compactedRule.addition.add(deltaAddition + addition);
-					}
+	private List<LineEntry> compactProductions(final List<LineEntry> rules){
+		if(rules.size() > 1){
+			final String from = rules.get(0).from.iterator().next();
+			//retrieve rule with longest condition (all the other conditions must be this long)
+			final LineEntry compactedRule = rules.stream()
+				.max(Comparator.comparingInt(rule -> rule.condition.length()))
+				.get();
+			final int longestConditionLength = compactedRule.condition.length();
+			for(final LineEntry rule : rules){
+				//recover the missing characters for the current condition to become of length the maximum found earlier
+				final int startIndex = from.length() - longestConditionLength;
+				//if a condition is not long enough, keep it separate
+				if(startIndex >= 0){
+					final int delta = longestConditionLength - rule.condition.length();
+					final String deltaAddition = from.substring(startIndex, startIndex + delta);
+					//add addition
+					for(final String addition : rule.addition)
+						compactedRule.addition.add(deltaAddition + addition);
 				}
-				rules.clear();
-				rules.add(compactedRule);
 			}
+			rules.clear();
+			rules.add(compactedRule);
 		}
-		return fromBucket.values().stream()
-			.flatMap(List::stream)
-			.collect(Collectors.toList());
+		return rules;
 	}
 
 	private LineEntry createSuffixEntry(final Production production, final String word, final AffixEntry.Type type){
@@ -249,8 +242,9 @@ public class RulesReducer{
 			final List<LineEntry> sameCondition = entry.getValue();
 			//remove empty condition and multiple rules with the same condition
 			if(entry.getKey().isEmpty() || sameCondition.size() > 1){
-				//extract children
 				final String condition = entry.getKey();
+
+				//extract children
 				final List<LineEntry> children = rules.stream()
 					.filter(rule -> rule.condition.endsWith(condition))
 					.collect(Collectors.toList());
@@ -281,6 +275,14 @@ public class RulesReducer{
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
 					}
+//					for(final Character chr : groupsIntersection){
+//						final LineEntry newRule = LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition);
+//						final int ruleIndex = rules.indexOf(newRule);
+//						if(ruleIndex >= 0)
+//							rules.get(ruleIndex).from.addAll(newRule.from);
+//						else
+//							rules.add(newRule);
+//					}
 					groupsIntersection.stream()
 						.map(chr -> LineEntry.createFrom(parent, String.valueOf(chr) + parent.condition))
 						.forEach(rules::add);

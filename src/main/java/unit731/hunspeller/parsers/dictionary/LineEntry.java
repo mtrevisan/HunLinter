@@ -112,7 +112,7 @@ public class LineEntry implements Serializable{
 			.append("rem", removal)
 			.append("add", addition)
 			.append("cond", condition)
-			.append("from", from)
+//			.append("from", from)
 			.toString();
 	}
 
