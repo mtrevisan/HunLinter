@@ -1994,14 +1994,10 @@ class RulesReducerTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX .0 Y 7",
-			"PFX .0 0 ar a",
-			"PFX .0 0 re a",
-			"PFX .0 0 ra ƚ",
-			"PFX .0 0 re ƚ",
-			"PFX .0 0 ar [^aƚ]",
-			"PFX .0 0 ra [àbcdđeéèfgiíklmnoòpstŧuúvx]",
-			"PFX .0 0 re [àbcdđeéèfgiíklmnoòpstŧuúvx]"
+			"PFX .0 Y 3",
+			"PFX .0 0 ar [^ƚ]",
+			"PFX .0 0 ra [àbcdđeéèfgiíklƚmnoòpstŧuúvx]",
+			"PFX .0 0 re [aàbcdđeéèfgiíklƚmnoòpstŧuúvx]"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
