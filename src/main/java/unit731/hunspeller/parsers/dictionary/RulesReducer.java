@@ -151,8 +151,7 @@ public class RulesReducer{
 					rule.from.addAll(entry.from);
 			}
 		final List<LineEntry> bla = collect(map.values(),
-//			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
-			entry -> entry.removal + TAB + entry.condition /*+ TAB + mergeSet(entry.from)*/,
+			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
 		plainRules.clear();
 		plainRules.addAll(bla);
