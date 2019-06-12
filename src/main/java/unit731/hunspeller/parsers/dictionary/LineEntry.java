@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 
@@ -68,27 +66,6 @@ public class LineEntry implements Serializable{
 		from = new HashSet<>();
 		if(words != null)
 			from.addAll(words);
-	}
-
-	public List<LineEntry> split(final AffixEntry.Type type){
-		final List<LineEntry> split = new ArrayList<>();
-		if(type == AffixEntry.Type.SUFFIX)
-			for(final String f : from){
-				final int index = f.length() - condition.length() - 1;
-				if(index < 0)
-					throw new IllegalArgumentException("Cannot reduce rule, should be split further because of '" + f + "'");
-
-				split.add(new LineEntry(removal, addition, f.substring(index), f));
-			}
-		else
-			for(final String f : from){
-				final int index = condition.length() + 1;
-				if(index == f.length())
-					throw new IllegalArgumentException("Cannot reduce rule, should be split further because of '" + f + "'");
-
-				split.add(new LineEntry(removal, addition, f.substring(0, index), f));
-			}
-		return split;
 	}
 
 	public List<String> extractFromEndingWith(String suffix){
