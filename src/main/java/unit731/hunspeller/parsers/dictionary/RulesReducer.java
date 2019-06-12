@@ -140,6 +140,24 @@ public class RulesReducer{
 	}
 
 	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
+		//redistribute additions
+		final Map<String, LineEntry> map = new HashMap<>();
+		for(final LineEntry entry : plainRules)
+			for(final String addition : entry.addition){
+				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
+				final String key = entry.removal + TAB + addition + TAB + entry.condition;
+				final LineEntry rule = map.putIfAbsent(key, newEntry);
+				if(rule != null)
+					rule.from.addAll(entry.from);
+			}
+		final List<LineEntry> bla = collect(map.values(),
+//			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
+			entry -> entry.removal + TAB + entry.condition /*+ TAB + mergeSet(entry.from)*/,
+			(rule, entry) -> rule.addition.addAll(entry.addition));
+		plainRules.clear();
+		plainRules.addAll(bla);
+
+
 		List<LineEntry> compactedRules = compactRules(plainRules);
 
 		//reshuffle originating list to place the correct productions in the correct rule
