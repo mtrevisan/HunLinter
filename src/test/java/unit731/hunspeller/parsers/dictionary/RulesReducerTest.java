@@ -1812,7 +1812,7 @@ class RulesReducerTest{
 			new LineEntry("d", "ʼ", "d", "otid"),
 			new LineEntry("òk", "ʼ", "òk", "asòk")
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
@@ -1827,7 +1827,7 @@ class RulesReducerTest{
 			"PFX ‘0 g ʼ g[^a]",
 			"PFX ‘0 in ʼ int"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}

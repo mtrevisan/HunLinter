@@ -406,17 +406,39 @@ public class RulesReducer{
 						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 						parentGroup.removeAll(groupIntersection);
 
-						//calculate new condition (if it was empty or the ratifying group is of cardinality 1, choose the ratifying over the negated)
-						final String preCondition = (parentConditionLength == 0 || parentGroup.size() == 1 && childrenGroup.size() > 1?
-							makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						//calculate new condition
+						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup);
+						final String preCondition = (chooseRatifyingOverNegated? makeGroup(parentGroup): makeNotGroup(childrenGroup));
 						LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
 
 						//keep only rules that matches some existent words
 						if(newEntry.isProductive())
 							finalRules.add(newEntry);
-						else
+						else{
+							final List<LineEntry> newBushes = new ArrayList<>();
+							final Iterator<LineEntry> itr2 = bush.iterator();
+							while(itr2.hasNext()){
+								final LineEntry child = itr2.next();
+								if(parent.from.containsAll(child.from)){
+									final Set<Character> childGroup = extractGroup(child.from, parentConditionLength + 1);
+									for(final Character chr : childGroup)
+										newBushes.add(LineEntry.createFrom(child, chr + child.condition));
+
+									itr2.remove();
+								}
+							}
+							if(!newBushes.isEmpty()){
+								bush.addAll(newBushes);
+								bush.add(parent);
+								bush.sort(shortestConditionComparator);
+								itr = bush.iterator();
+
+								continue;
+							}
+
 							LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
 								(newEntry.condition.isEmpty()? DOT: newEntry.condition));
+						}
 
 						final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
 						if(parentConditionLength + 1 >= maxConditionLength){
@@ -458,6 +480,17 @@ public class RulesReducer{
 		}
 
 		return finalRules;
+	}
+
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup, final Set<Character> childrenGroup){
+		final int parentGroupSize = parentGroup.size();
+		final int childrenGroupSize = childrenGroup.size();
+		boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
+		if(chooseRatifyingOverNegated && parentGroupSize == 0)
+			chooseRatifyingOverNegated = false;
+		if(!chooseRatifyingOverNegated && childrenGroupSize == 0)
+			chooseRatifyingOverNegated = true;
+		return chooseRatifyingOverNegated;
 	}
 
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
