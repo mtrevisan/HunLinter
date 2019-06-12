@@ -616,16 +616,16 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
-		Stream<LineEntry> stream = entries.stream();
-		if(type == AffixEntry.Type.PREFIX)
-			stream = stream.map(this::createReverseOf);
-		final List<LineEntry> restoredRules = stream
+		Stream<LineEntry> stream = entries.stream()
 			.flatMap(rule -> rule.addition.stream()
 				.map(addition -> {
 					final int lcp = commonPrefix(rule.removal, addition).length();
 					final String removal = rule.removal.substring(lcp);
 					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
-				}))
+				}));
+		if(type == AffixEntry.Type.PREFIX)
+			stream = stream.map(this::createReverseOf);
+		final List<LineEntry> restoredRules = stream
 			.collect(Collectors.toList());
 
 		final List<LineEntry> sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);

@@ -1897,21 +1897,21 @@ class RulesReducerTest{
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"PFX vŧ Y 15",
-			"PFX vŧ e a be",
-			"PFX vŧ e a fe",
-			"PFX vŧ e a pe",
-			"PFX vŧ e a re",
-			"PFX vŧ e a se",
-			"PFX vŧ e a Se",
-			"PFX vŧ e a te",
-			"PFX vŧ e a ve",
-			"PFX vŧ é à fé",
-			"PFX vŧ é à pé",
-			"PFX vŧ é à ré",
-			"PFX vŧ é à té",
-			"PFX vŧ è à pè",
-			"PFX vŧ è à rè",
-			"PFX vŧ è à sè"
+			"PFX vŧ be ba be",
+			"PFX vŧ fe fa fe",
+			"PFX vŧ pe pa pe",
+			"PFX vŧ re ra re",
+			"PFX vŧ se sa se",
+			"PFX vŧ Se Sa Se",
+			"PFX vŧ te ta te",
+			"PFX vŧ ve va ve",
+			"PFX vŧ fé fà fé",
+			"PFX vŧ pé pà pé",
+			"PFX vŧ ré rà ré",
+			"PFX vŧ té tà té",
+			"PFX vŧ pè pà pè",
+			"PFX vŧ rè rà rè",
+			"PFX vŧ sè sà sè"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
