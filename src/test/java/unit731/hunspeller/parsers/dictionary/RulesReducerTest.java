@@ -1821,12 +1821,12 @@ class RulesReducerTest{
 			"PFX ‘0 Y 9",
 			"PFX ‘0 a ʼ a",
 			"PFX ‘0 d ʼ d",
-			"PFX ‘0 g ʼ go",
 			"PFX ‘0 i ʼ i",
 			"PFX ‘0 l ʼ l",
 			"PFX ‘0 v ʼ v",
 			"PFX ‘0 ga ʼ ga",
 			"PFX ‘0 kò ʼ kò",
+			"PFX ‘0 g ʼ g[^a]",
 			"PFX ‘0 in ʼ int"
 		);
 //		Assertions.assertEquals(expectedRules, rules);
