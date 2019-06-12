@@ -1802,17 +1802,15 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("r", "ʼ", "r", "par"),
-			new LineEntry("u", "ʼ", "u", Arrays.asList("nu", "vu")),
-			new LineEntry("ra", "ʼ", "ra", "sora"),
-			new LineEntry("xa", "ʼ", "xa", "kaxa"),
-			new LineEntry("me", "ʼ", "me", "kome"),
-			new LineEntry("te", "ʼ", "te", "frate"),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("nudo", "komòdo", "kuando")),
-			new LineEntry("a", "ʼ", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
-			new LineEntry("e", "ʼ", "[^mtv]e", Arrays.asList("de", "ge")),
-			new LineEntry("o", "ʼ", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
-			new LineEntry("ove", "óʼ", "ove", Arrays.asList("indove", "adove"))
+			new LineEntry("g", "ʼ", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
+			new LineEntry("ag", "ʼ", "ag", "atevag"),
+			new LineEntry("l", "ʼ", "l", "exeràl"),
+			new LineEntry("a", "ʼ", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
+			new LineEntry("i", "ʼ", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "ʼtni", "étni")),
+			new LineEntry("ni", "ʼ", "tni", Arrays.asList("otnatni", "ʼtni", "étni")),
+			new LineEntry("v", "ʼ", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
+			new LineEntry("d", "ʼ", "d", "otid"),
+			new LineEntry("òk", "ʼ", "òk", "asòk")
 		);
 //		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 

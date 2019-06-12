@@ -491,7 +491,8 @@ public class RulesReducer{
 			.collect(Collectors.toList());
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
-		bubbles.removeIf(bubble -> !SetHelper.isDisjoint(parent.from, bubble.from));
+		bubbles.removeIf(bubble -> parent.from.containsAll(bubble.from));
+
 		return bubbles;
 	}
 
