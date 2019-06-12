@@ -329,8 +329,9 @@ public class RulesReducer{
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
-						final String preCondition = (parent.condition.isEmpty() || groupsIntersection.isEmpty() && parentGroup.size() <= childrenGroup.size()?
-							makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parent.condition.length(), parentGroup, childrenGroup,
+							groupsIntersection.size());
+						final String preCondition = (chooseRatifyingOverNegated? makeGroup(parentGroup): makeNotGroup(childrenGroup));
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
 					}
@@ -403,8 +404,8 @@ public class RulesReducer{
 							.collect(Collectors.toSet());
 
 						//if intersection(parent-group, children-group) is empty
-						final Set<Character> groupIntersection = SetHelper.intersection(parentGroup, childrenGroup);
-						parentGroup.removeAll(groupIntersection);
+						final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
+						parentGroup.removeAll(groupsIntersection);
 
 						//calculate new condition
 						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup);
@@ -457,9 +458,9 @@ public class RulesReducer{
 
 							bush.sort(shortestConditionComparator);
 						}
-						else if(!groupIntersection.isEmpty() && !parentGroup.isEmpty()){
+						else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty()){
 							//expand intersection
-							for(final Character chr : groupIntersection){
+							for(final Character chr : groupsIntersection){
 								newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 								bush.add(newEntry);
 
@@ -486,6 +487,18 @@ public class RulesReducer{
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
 		boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
+		if(chooseRatifyingOverNegated && parentGroupSize == 0)
+			chooseRatifyingOverNegated = false;
+		if(!chooseRatifyingOverNegated && childrenGroupSize == 0)
+			chooseRatifyingOverNegated = true;
+		return chooseRatifyingOverNegated;
+	}
+
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup, final Set<Character> childrenGroup,
+			final int intersectionGroupSize){
+		final int parentGroupSize = parentGroup.size();
+		final int childrenGroupSize = childrenGroup.size();
+		boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroupSize == 0) && parentGroupSize <= childrenGroupSize);
 		if(chooseRatifyingOverNegated && parentGroupSize == 0)
 			chooseRatifyingOverNegated = false;
 		if(!chooseRatifyingOverNegated && childrenGroupSize == 0)
