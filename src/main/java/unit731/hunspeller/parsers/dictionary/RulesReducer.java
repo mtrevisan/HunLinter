@@ -87,10 +87,10 @@ public class RulesReducer{
 				filteredRules.add(affixEntry);
 			}
 		}
-		return compactProductions(filteredRules);
+		return compactProductions(filteredRules, type);
 	}
 
-	private List<LineEntry> compactProductions(final List<LineEntry> rules){
+	private List<LineEntry> compactProductions(final List<LineEntry> rules, final AffixEntry.Type type){
 		final List<LineEntry> compactedRules = new ArrayList<>();
 		if(rules.size() > 1){
 			final String from = rules.get(0).from.iterator().next();
@@ -99,18 +99,29 @@ public class RulesReducer{
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
 			final int longestConditionLength = compactedRule.condition.length();
-			for(final LineEntry rule : rules){
-				//recover the missing characters for the current condition to become of length the maximum found earlier
-				final int startIndex = from.length() - longestConditionLength;
-				//if a condition is not long enough, keep it separate
-				if(startIndex >= 0){
-					final int delta = longestConditionLength - rule.condition.length();
-					final String deltaAddition = from.substring(startIndex, startIndex + delta);
-					//add addition
-					for(final String addition : rule.addition)
-						compactedRule.addition.add(deltaAddition + addition);
+			if(type == AffixEntry.Type.SUFFIX)
+				for(final LineEntry rule : rules){
+					//recover the missing characters for the current condition to become of length the maximum found earlier
+					final int startIndex = from.length() - longestConditionLength;
+					//if a condition is not long enough, keep it separate
+					if(startIndex >= 0){
+						final int delta = longestConditionLength - rule.condition.length();
+						final String deltaAddition = from.substring(startIndex, startIndex + delta);
+						//add addition
+						for(final String addition : rule.addition)
+							compactedRule.addition.add(deltaAddition + addition);
+					}
 				}
-			}
+			else
+				for(final LineEntry rule : rules)
+					//recover the missing characters for the current condition to become of length the maximum found earlier
+					//if a condition is not long enough, keep it separate
+					if(longestConditionLength > rule.condition.length()){
+						final String deltaAddition = from.substring(rule.condition.length(), longestConditionLength);
+						//add addition
+						for(final String addition : rule.addition)
+							compactedRule.addition.add(addition + deltaAddition);
+					}
 			compactedRules.add(compactedRule);
 		}
 		else
