@@ -1876,43 +1876,44 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("g", "ʼ", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
-			new LineEntry("ag", "ʼ", "ag", "atevag"),
-			new LineEntry("l", "ʼ", "l", "exeràl"),
-			new LineEntry("a", "ʼ", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
-			new LineEntry("i", "ʼ", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "ʼtni", "étni")),
-			new LineEntry("ni", "ʼ", "tni", Arrays.asList("otnatni", "ʼtni", "étni")),
-			new LineEntry("v", "ʼ", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
-			new LineEntry("d", "ʼ", "d", "otid"),
-			new LineEntry("òk", "ʼ", "òk", "asòk")
+			new LineEntry("es", "as", "es", Arrays.asList("ratàbes", "atares", "aítserges", "oterges", "otnopares", "odarges", "oiŧivres", "otabes", "oɉares", "lavares", "ojares", "oisivres", "natserges", "iđrèvares", "rabres", "ixrèvares", "etnexres", "otnemarges", "adaneres", "ogeràvles", "òretabes", "aíreterges", "eotàbes", "adares", "retàbes", "idrèvares", "òratabes", "oiraterges")),
+			new LineEntry("eb", "ab", "eb", Arrays.asList("oɉasreb", "ojasreb", "lèvotreb", "eoníkereb", "alèotreb", "atereb", "arèoreb", "eoɉàsreb", "eojàsreb", "nitereb", "alèvotreb", "raɉasreb", "ranikereb", "rajasreb", "nikereb", "rèoreb", "lèotreb", "onikereb", "alokòkireb")),
+			new LineEntry("ès", "às", "ès", Arrays.asList("idrèv–arès", "eobrès", "ixrèv–arès", "iđrèv–arès")),
+			new LineEntry("er", "ar", "er", Arrays.asList("noteper", "anier", "eognémer", "eosàger", "alotsèɉer", "raƚetser", "aŧager", "rèjoƚer", "raisefer", "arèletser", "onoxer", "rèɉoƚer", "alotsèjer", "arèjoƚer", "adasager", "oñeter", "ripser", "eonóɉer", "ratoɉer", "ragnemer", "ranojer", "raer", "oderfer", "notloer", "lètser", "aŧiatlaber", "odeŧer", "ognemer", "lèxeder", "eođéŧer", "rakserfer", "otnexer", "raxeser", "eotnéxer", "radufer", "logídnever", "osofer", "alèraper", "oƚètser", "lètojer", "lèdnemer", "eodúfer", "ratlaber", "arèɉoƚer", "eolètser", "eorúkner", "nifuber", "obnober", "eoƚètser", "oxeser", "oŧager", "odufer", "nojer", "nolotlover", "emaŧager", "eonójer", "lètoɉer", "abober", "eotòjer", "rabràber", "noxer", "arèiletser", "onojer", "ragner", "asager", "olètser", "ogner", "úvedner", "eotòɉer", "raŧager", "eoŧàger", "lèđeder", "adaƚetser", "otanemer", "atseuker", "lager", "eoxéser", "radeŧer", "eotlàber", "alotséɉer", "otòɉer", "oɉòler", "rarukner", "adaletser", "ocer", "anixnamer", "racer", "arèɉoler", "ranoxer", "ratnexer", "orukner", "lèdeder", "alotséjer", "raletser", "eoiséfer", "rèjoler", "emasager", "arèƚetser", "ratojer", "rèɉoler", "érter", "okserfer", "otlaber", "ranoɉer", "rađeŧer", "lèdnamer", "osager", "eoksérfer", "arèiƚetser", "alogídnever", "notlover", "oisefer", "etneŧer", "atlaber", "ojauker", "otlòker", "eodéŧer", "adaŧager", "logéber", "eonóxer", "ojòler", "aletlaber", "ođeŧer", "onoɉer", "otòjer", "rasager", "arèjoler", "etneser")),
+			new LineEntry("ét", "àt", "ét", "eotét"),
+			new LineEntry("èp", "àp", "èp", Arrays.asList("orteprèp", "otumrèp", "eotumrèp", "eorteprèp")),
+			new LineEntry("ef", "af", "ef", Arrays.asList("adarosref", "laref", "eorósref", "orosref", "ralaref", "olaref", "ramref", "arosref", "nixàref", "eolàref", "otnemref", "rarosref", "nirosref", "oƚaref", "okubanref", "raƚaref", "ratnemref", "omref", "eotnémref", "eoƚàref", "eƚaref")),
+			new LineEntry("ép", "àp", "ép", Arrays.asList("lorép", "eororép", "ororép")),
+			new LineEntry("ep", "ap", "ep", Arrays.asList("odnetnirep", "eogúsrep", "lokírep", "òrep", "riñivrep", "eotiugèsrep", "rarteprep", "otirep", "ougèsrep", "oxilanosrep", "anednòŧrep", "eotémrep", "otiugèsrep", "exinrep", "eodúmrep", "osrokrep", "otusrep", "ratumrep", "rartsulrep", "oxausrep", "eoxíƚanosrep", "otarteprep", "eodoírep", "eoñétrep", "anednòsrep", "raxilanosrep", "rinimrep", "otartsulrep", "eoutèprep", "nikurep", "odausrep", "ramufrep", "ripesrep", "oƚokírep", "aloŧúrep", "otòkrep", "otnatrep", "nisrep", "otrèvrep", "omufrep", "oñèvrep", "òŧrep", "outèprep", "osemrep", "atelosurep", "ripeŧrep", "riñevrep", "eoƚókrep", "ateloŧurep", "odumrep", "oradúmrep", "eodnétnirep", "riugesrep", "raradumrep", "oxarfírep", "arodarukrep", "rodukesrep", "oxolokirep", "ralokrep", "ogusrep", "eotòkrep", "eoñévrep", "oxanosrep", "rotukesrep", "oñètrep", "onamrep", "onifrep", "ortsulrep", "lobnésrep", "renamrep", "anosrep", "eougèsrep", "rarofrep", "lomésrep", "rèkurep", "eorókrep", "axinrep", "eoradúmrep", "rauteprep", "raƚokirep", "oxiƚanosrep", "noixausrep", "oxoƚamrep", "eoƚokírep", "oxamrep", "eolókrep", "ranesrep", "eoñètrep", "riñetrep", "omòrep", "eolokírep", "akurep", "orokrep", "osrèvrep", "raxiƚanosrep", "eoxílanosrep", "eotírep", "eoxarfírep", "alosúrep", "ratirep", "ratonrep", "nokurep", "raƚokrep", "ralokirep", "arèkurep", "eodàusrep", "rodarukrep", "ratiugesrep", "òsrep", "oñetrep", "eotònrep", "otemrep", "oròfrep", "anifrep", "emokrep", "ékrep", "oxolamrep", "ragusrep", "odoírep", "òcrep", "eoñèvrep", "oƚokrep", "eomúfrep", "otòxinrep", "eoròfrep", "otònrep", "radumrep", "rosrep", "ojanosrep", "eotrèvrep", "raxarfirep", "olokrep", "oxetnirep", "rasrep", "oxoƚokirep", "oñevrep", "eortsúlrep", "rarorep", "oiŧipeŧrep", "olokírep", "radoirep", "ratokrep")),
+			new LineEntry("ev", "av", "ev", Arrays.asList("orusrev", "eoƚòrev", "ralorev", "olòrev", "ragefirev", "eonérev", "ogefírev", "eorúsrev", "alogírev", "raƚorev", "oxigrev", "lòirev", "rarusrev", "eolòrev", "rosrev", "oƚòrev", "eoxígrev", "ranerev", "onerev", "raxigrev", "eogefírev")),
+			new LineEntry("éf", "àf", "éf", "eomréf"),
+			new LineEntry("èr", "àr", "èr", "eoèr"),
+			new LineEntry("et", "at", "et", Arrays.asList("aniret", "eojànet", "raloraŧret", "eolòiraŧret", "aɉanet", "oƚòrasret", "raloirasret", "raŧaret", "eoɉànet", "olòirasret", "anixaret", "raƚoirasret", "aiŧiret", "rasaret", "ajanet", "raneiparet", "olòrasret", "eoŧàret", "olòiraŧret", "arèitset", "ojanet", "eonéiparet", "oɉanet", "raloiraŧret", "otet", "ratet", "adatset", "oŧaret", "ralorasret", "eolòirasret", "eoƚòirasret", "osaret", "oneiparet", "raƚorasret", "olòraŧret", "oƚòirasret", "eosàret", "nixet", "eolòrasret", "eolòraŧret", "rajanet", "raɉanet", "eoƚòrasret")),
+			new LineEntry("ér", "àr", "ér", Arrays.asList("eocér", "eognér")),
+			new LineEntry("eS", "aS", "eS", Arrays.asList("lavareS", "eƚavareS"))
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX vŧ Y 20",
-			"PFX vŧ be ba ber",
-			"PFX vŧ bè bà bèr",
-			"PFX vŧ bé bà bér",
-			"PFX vŧ fe fa fer",
-			"PFX vŧ fè fà fèr",
-			"PFX vŧ fé fà fér",
-			"PFX vŧ pe pa per",
-			"PFX vŧ pè pà pèr",
-			"PFX vŧ pé pà pér",
-			"PFX vŧ re ra re",
-			"PFX vŧ rè rà rè",
-			"PFX vŧ ré rà ré",
-			"PFX vŧ se sa se",
-			"PFX vŧ sè sà sè",
-			"PFX vŧ sé sà sé",
-			"PFX vŧ Se Sa Se",
-			"PFX vŧ te ta te",
-			"PFX vŧ tè tà tè",
-			"PFX vŧ té tà té",
-			"PFX vŧ ve va ver"
+			"PFX vŧ Y 15",
+			"PFX vŧ e a be",
+			"PFX vŧ e a fe",
+			"PFX vŧ e a pe",
+			"PFX vŧ e a re",
+			"PFX vŧ e a se",
+			"PFX vŧ e a Se",
+			"PFX vŧ e a te",
+			"PFX vŧ e a ve",
+			"PFX vŧ é à fé",
+			"PFX vŧ é à pé",
+			"PFX vŧ é à ré",
+			"PFX vŧ é à té",
+			"PFX vŧ è à pè",
+			"PFX vŧ è à rè",
+			"PFX vŧ è à sè"
 		);
-//		Assertions.assertEquals(expectedRules, rules);
+		Assertions.assertEquals(expectedRules, rules);
 
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
