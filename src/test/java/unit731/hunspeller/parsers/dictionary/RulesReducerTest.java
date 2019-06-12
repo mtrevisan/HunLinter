@@ -1832,6 +1832,91 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	void casePrefix2() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"PFX vŧ Y 20",
+			"PFX vŧ be ba ber",
+			"PFX vŧ bè bà bèr",
+			"PFX vŧ bé bà bér",
+			"PFX vŧ fe fa fer",
+			"PFX vŧ fè fà fèr",
+			"PFX vŧ fé fà fér",
+			"PFX vŧ pe pa per",
+			"PFX vŧ pè pà pèr",
+			"PFX vŧ pé pà pér",
+			"PFX vŧ re ra re",
+			"PFX vŧ rè rà rè",
+			"PFX vŧ ré rà ré",
+			"PFX vŧ se sa se",
+			"PFX vŧ sè sà sè",
+			"PFX vŧ sé sà sé",
+			"PFX vŧ Se Sa Se",
+			"PFX vŧ te ta te",
+			"PFX vŧ tè tà tè",
+			"PFX vŧ té tà té",
+			"PFX vŧ ve va ver"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "vŧ";
+		AffixEntry.Type affixType = AffixEntry.Type.PREFIX;
+		List<String> words = Arrays.asList("Seravaƚe", "Seraval", "réngoe", "récoe", "tersaròƚoe", "tenaɉar", "tenajar", "terŧaròloe", "texin", "tersaròloe", "teràsoe", "tersariòƚo", "terŧaròlo", "tersaroƚar", "terapieno", "tersariòƚoe", "teraso", "tersariòloe", "tersarolar", "testada", "teraŧo", "teto", "tetar", "terŧariolar", "tenaɉo", "terapiénoe", "testièra", "tenajo", "terŧariòlo", "teràŧoe", "tersaròlo", "terapienar", "tenaja", "teriŧia", "terasar", "teraxina", "tersarioƚar", "tersariòlo", "tenàɉoe", "teraŧar", "tersariolar", "tenaɉa", "tersaròƚo", "terŧarolar", "terŧariòloe", "tenàjoe", "terina", "rèoe", "férmoe", "vergixar", "verífegoe", "vereno", "versor", "veròƚo", "vergíxoe", "verenar", "versurar", "veròloe", "veriòl", "veroƚar", "vergixo", "verígola", "versúroe", "verénoe", "verífego", "verifegar", "veròlo", "verolar", "veròƚoe", "versuro", "péroro", "péroroe", "pérol", "perkotar", "periodar", "perŧepiŧio", "períkolo", "perorar", "perlústroe", "perveño", "persar", "perikoƚoxo", "perintexo", "perkolo", "perifraxar", "persor", "personajo", "pervèrtoe", "permudar", "pernòto", "pernixòto", "perfòroe", "perkoƚo", "perfúmoe", "pervèñoe", "percò", "persugar", "período", "permaloxo", "perké", "perkome", "perfina", "permeto", "perfòro", "perteño", "pernòtoe", "persò", "perseguitar", "perkurador", "persuàdoe", "perukèra", "perikolar", "perkoƚar", "perukon", "pernotar", "peritar", "perúsola", "pervèrso", "personaƚixar", "personalíxoe", "perítoe", "perífraxoe", "perkoro", "peruka", "peròmo", "períkoloe", "perteñir", "persenar", "pertèñoe", "permaxo", "perkóloe", "permaƚoxo", "períkoƚoe", "persuaxion", "personaƚixo", "perpetuar", "perikoƚar", "pernixa", "permúdaroe", "perukèr", "perkóroe", "persémol", "perforar", "persona", "persèguoe", "permaner", "persénbol", "perfino", "perlustro", "pertèño", "permano", "personaxo", "persekutor", "pervéñoe", "perkòtoe", "persugo", "persekudor", "perikoloxo", "perkolar", "perkuradora", "perífraxo", "permudarar", "perseguir", "perinténdoe", "permúdaro", "permudo", "peruŧoleta", "perkóƚoe", "perveñir", "perusoleta", "perŧepir", "permeso", "perpètuo", "perŧò", "pervèño", "perfumo", "pervèrto", "persin", "pertanto", "perúŧola", "perkòto", "períkoƚo", "persepir", "perukin", "persuado", "perfumar", "perpètuoe", "perlustrato", "perminir", "persòndena", "personalixar", "pertéñoe", "períodoe", "persuaxo", "personaƚíxoe", "perpetrato", "permutar", "perlustrar", "persuto", "permúdoe", "perkorso", "pernixe", "persèguito", "permétoe", "perŧòndena", "personalixo", "persèguo", "perito", "persèguitoe", "perpetrar", "perviñir", "períkol", "però", "perintendo", "persúgoe", "feraƚe", "ferméntoe", "feràƚoe", "fermo", "fermentar", "feraƚar", "fernabuko", "feraƚo", "fersorin", "fersorar", "fermento", "feràloe", "feràxin", "fersora", "fermar", "feralo", "feralar", "fersóroe", "fersoro", "fersorada", "feral", "pèrpetroe", "pèrmutoe", "pèrmuto", "pèrpetro", "tétoe", "resente", "relojèra", "regasar", "rejòto", "reŧeđo", "reɉono", "rebaltela", "relòjo", "regaŧada", "rebégol", "rexónoe", "rekuajo", "rekòlto", "reŧédoe", "rebalta", "reŧente", "refesio", "revolton", "resteƚièra", "revendígola", "regaso", "refréskoe", "remandèl", "reŧeđar", "reɉonar", "retré", "refresko", "rebalto", "reloɉèr", "rejotar", "resteƚèra", "regasame", "relojèr", "refésioe", "restelar", "rejéstola", "rededèl", "renkuro", "rexonar", "rexentar", "reloɉèra", "recar", "remanxina", "restelada", "reco", "renkurar", "relòɉo", "reɉòto", "reɉéstola", "reŧedar", "rebàltoe", "rekuesta", "regal", "reséxoe", "remenato", "resteƚada", "redeđèl", "regàŧoe", "reɉòtoe", "regaŧar", "rendevú", "rengo", "regasa", "restèlo", "rengar", "rejono", "restelièra", "rexon", "rebàrbar", "reboba", "rejòtoe", "reɉotèl", "revoltolon", "regaŧame", "rejónoe", "rejon", "refudo", "regaŧo", "resexo", "restèƚoe", "rebufin", "rebonbo", "renkúroe", "restèloe", "reƚoɉèra", "rebaltar", "refúdoe", "remendèl", "rejotèl", "restèƚo", "refoso", "reparèla", "revendígol", "refudar", "rexéntoe", "resexar", "rexento", "redexèl", "reŧéđoe", "refreskar", "remengo", "reŧedo", "rebaltaiŧa", "reolton", "restèl", "refredo", "rejonar", "rear", "remengar", "reɉotar", "reteño", "respir", "reɉónoe", "reƚojèra", "regasada", "rejèstola", "reƚoɉèr", "rexono", "restelèra", "reƚojèr", "refesiar", "regaŧa", "resteƚar", "reɉèstola", "regàsoe", "reméngoe", "reina", "repeton", "sèra–vèrđi", "sèra–vèrxi", "sèra–vèrdi", "sèrboe", "berikòkola", "berekino", "bertoèl", "berekin", "beroèr", "bersajar", "berekinar", "bersaɉar", "bertovèla", "beretin", "bersàɉoe", "bersàjoe", "beroèra", "bereta", "bertoèla", "bertovèl", "berekínoe", "bersaɉo", "bersajo", "segretario", "sebatarò", "seravèrdi", "sebàter", "serada", "segretería", "sebàtoe", "sebaterò", "selvàrego", "serenada", "segramento", "serxente", "seravèrxi", "serbar", "seravèrđi", "segrestan", "serajo", "servisio", "seraval", "seraɉo", "sebato", "serviŧio", "segrado", "seraponto", "segreto", "serata", "segrestía", "sebàtar");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("g", "ʼ", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
+			new LineEntry("ag", "ʼ", "ag", "atevag"),
+			new LineEntry("l", "ʼ", "l", "exeràl"),
+			new LineEntry("a", "ʼ", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
+			new LineEntry("i", "ʼ", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "ʼtni", "étni")),
+			new LineEntry("ni", "ʼ", "tni", Arrays.asList("otnatni", "ʼtni", "étni")),
+			new LineEntry("v", "ʼ", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
+			new LineEntry("d", "ʼ", "d", "otid"),
+			new LineEntry("òk", "ʼ", "òk", "asòk")
+		);
+//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"PFX vŧ Y 20",
+			"PFX vŧ be ba ber",
+			"PFX vŧ bè bà bèr",
+			"PFX vŧ bé bà bér",
+			"PFX vŧ fe fa fer",
+			"PFX vŧ fè fà fèr",
+			"PFX vŧ fé fà fér",
+			"PFX vŧ pe pa per",
+			"PFX vŧ pè pà pèr",
+			"PFX vŧ pé pà pér",
+			"PFX vŧ re ra re",
+			"PFX vŧ rè rà rè",
+			"PFX vŧ ré rà ré",
+			"PFX vŧ se sa se",
+			"PFX vŧ sè sà sè",
+			"PFX vŧ sé sà sé",
+			"PFX vŧ Se Sa Se",
+			"PFX vŧ te ta te",
+			"PFX vŧ tè tà tè",
+			"PFX vŧ té tà té",
+			"PFX vŧ ve va ver"
+		);
+//		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 
 	//P8, ... cases
 
