@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
@@ -332,8 +333,10 @@ public class RulesReducer{
 					final Set<Character> parentGroup = groups.get(parent);
 
 					//extract negated group
-					final Set<Character> childrenGroup = children.stream()
+					final List<LineEntry> childrenNotParent = children.stream()
 						.filter(child -> child != parent)
+						.collect(Collectors.toList());
+					final Set<Character> childrenGroup = childrenNotParent.stream()
 						.map(groups::get)
 						.flatMap(Set::stream)
 						.collect(Collectors.toSet());
@@ -345,6 +348,32 @@ public class RulesReducer{
 							makeGroup(parentGroup): makeNotGroup(childrenGroup));
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
+					}
+
+					//extract and add new condition only if there are rules that ends with the new condition
+					final Set<Character> notPresentConditions = new HashSet<>();
+					final Iterator<Character> itr = groupsIntersection.iterator();
+					while(itr.hasNext()){
+						final Character chr = itr.next();
+
+						final LineEntry newEntryFromChildrenNotParent = LineEntry.createFromWithRules(parent, chr + parent.condition, childrenNotParent);
+						final LineEntry newEntryFromParent = LineEntry.createFrom(parent, chr + parent.condition);
+						if(newEntryFromChildrenNotParent.from.equals(newEntryFromParent.from)){
+							notPresentConditions.add(chr);
+
+							itr.remove();
+						}
+					}
+
+					if(!notPresentConditions.isEmpty()){
+						final String notCondition = makeNotGroup(notPresentConditions) + parent.condition;
+						final Optional<LineEntry> notRule = finalRules.stream()
+							.filter(rule -> rule.condition.equals(notCondition))
+							.findFirst();
+						if(notRule.isPresent())
+							notRule.get().condition = parent.condition;
+						else
+							rules.add(LineEntry.createFrom(parent, makeGroup(notPresentConditions) + parent.condition));
 					}
 					groupsIntersection.stream()
 						.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
