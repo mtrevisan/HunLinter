@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,16 +83,14 @@ public class RulesReducer{
 			final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
 				final String word = lastAppliedRule.undoRule(production.getWord());
-				final LineEntry affixEntry = (lastAppliedRule.isSuffix()?
-					createSuffixEntry(production, word, type):
-					createPrefixEntry(production, word, type));
-				filteredRules.add(affixEntry);
+				final LineEntry newEntry = createAffixEntry(production, word, type);
+				filteredRules.add(newEntry);
 			}
 		}
-		return compactProductions(filteredRules, type);
+		return compactProductions(filteredRules);
 	}
 
-	private List<LineEntry> compactProductions(final List<LineEntry> rules, final AffixEntry.Type type){
+	private List<LineEntry> compactProductions(final List<LineEntry> rules){
 		final List<LineEntry> compactedRules = new ArrayList<>();
 		if(rules.size() > 1){
 			final String from = rules.get(0).from.iterator().next();
@@ -99,29 +99,18 @@ public class RulesReducer{
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
 			final int longestConditionLength = compactedRule.condition.length();
-			if(type == AffixEntry.Type.SUFFIX)
-				for(final LineEntry rule : rules){
-					//recover the missing characters for the current condition to become of length the maximum found earlier
-					final int startIndex = from.length() - longestConditionLength;
-					//if a condition is not long enough, keep it separate
-					if(startIndex >= 0){
-						final int delta = longestConditionLength - rule.condition.length();
-						final String deltaAddition = from.substring(startIndex, startIndex + delta);
-						//add addition
-						for(final String addition : rule.addition)
-							compactedRule.addition.add(deltaAddition + addition);
-					}
+			for(final LineEntry rule : rules){
+				//recover the missing characters for the current condition to become of length the maximum found earlier
+				final int startIndex = from.length() - longestConditionLength;
+				//if a condition is not long enough, keep it separate
+				if(startIndex >= 0){
+					final int delta = longestConditionLength - rule.condition.length();
+					final String deltaAddition = from.substring(startIndex, startIndex + delta);
+					//add addition
+					for(final String addition : rule.addition)
+						compactedRule.addition.add(deltaAddition + addition);
 				}
-			else
-				for(final LineEntry rule : rules)
-					//recover the missing characters for the current condition to become of length the maximum found earlier
-					//if a condition is not long enough, keep it separate
-					if(longestConditionLength > rule.condition.length()){
-						final String deltaAddition = from.substring(rule.condition.length(), longestConditionLength);
-						//add addition
-						for(final String addition : rule.addition)
-							compactedRule.addition.add(addition + deltaAddition);
-					}
+			}
 			compactedRules.add(compactedRule);
 		}
 		else
@@ -129,10 +118,14 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private LineEntry createSuffixEntry(final Production production, final String word, final AffixEntry.Type type){
+	private LineEntry createAffixEntry(final Production production, String word, final AffixEntry.Type type){
+		String producedWord = production.getWord();
+		if(type == AffixEntry.Type.PREFIX){
+			producedWord = StringUtils.reverse(producedWord);
+			word = StringUtils.reverse(word);
+		}
 		int lastCommonLetter;
 		final int wordLength = word.length();
-		final String producedWord = production.getWord();
 		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
 			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
 				break;
@@ -146,30 +139,11 @@ public class RulesReducer{
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private LineEntry createPrefixEntry(final Production production, final String word, final AffixEntry.Type type){
-		int firstCommonLetter;
-		final int wordLength = word.length();
-		final String producedWord = production.getWord();
-		final int productionLength = producedWord.length();
-		final int minLength = Math.min(wordLength, productionLength);
-		for(firstCommonLetter = 1; firstCommonLetter <= minLength; firstCommonLetter ++)
-			if(word.charAt(wordLength - firstCommonLetter) != producedWord.charAt(productionLength - firstCommonLetter))
-				break;
-		firstCommonLetter --;
-
-		final String removal = (firstCommonLetter < wordLength? word.substring(0, wordLength - firstCommonLetter): AffixEntry.ZERO);
-		String addition = (firstCommonLetter < productionLength? producedWord.substring(0, productionLength - firstCommonLetter): AffixEntry.ZERO);
-		if(production.getContinuationFlagCount() > 0)
-			addition += production.getLastAppliedRule(type).toStringWithMorphologicalFields(strategy);
-		final String condition = (firstCommonLetter < wordLength? removal: StringUtils.EMPTY);
-		return new LineEntry(removal, addition, condition, word);
-	}
-
-	public List<LineEntry> reduceRules(final List<LineEntry> plainRules, final AffixEntry.Type type){
+	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
 		List<LineEntry> compactedRules = compactRules(plainRules);
 
 		//reshuffle originating list to place the correct productions in the correct rule
-		compactedRules = makeAdditionsDisjoint(compactedRules, type);
+		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		compactedRules = disjoinConditions(compactedRules);
 
@@ -221,7 +195,7 @@ public class RulesReducer{
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules, AffixEntry.Type type){
+	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules){
 		//tranform
 		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=...]
 		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
@@ -240,7 +214,7 @@ public class RulesReducer{
 			final List<LineEntry> temporaryRules = new ArrayList<>();
 
 			final Map<String, List<String>> lcss = bucket(rule.addition,
-				add -> longestCommonAffix(Arrays.asList(add, rule.removal), (type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix)));
+				add -> longestCommonAffix(Arrays.asList(add, rule.removal), this::commonPrefix));
 			if(lcss.size() > 1){
 				//order keys from longer to shorter
 				final List<String> keys = new ArrayList<>(lcss.keySet());
@@ -267,26 +241,26 @@ public class RulesReducer{
 				}
 
 				for(final LineEntry temporaryRule : temporaryRules)
-					insertRuleOrUpdateFrom(disjointedRules, temporaryRule, type);
+					insertRuleOrUpdateFrom(disjointedRules, temporaryRule);
 				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
 			}
 
 			if(temporaryRules.isEmpty())
-				insertRuleOrUpdateFrom(disjointedRules, rule, type);
+				insertRuleOrUpdateFrom(disjointedRules, rule);
 		}
 
 		return disjointedRules;
 	}
 
-	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule, final AffixEntry.Type type){
+	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
 		final int ruleIndex = expandedRules.indexOf(rule);
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
 			for(final LineEntry expandedRule : expandedRules)
-				if(isContainedInto(expandedRule, rule, type)){
+				if(isContainedInto(expandedRule, rule)){
 					rule.addition.removeAll(expandedRule.addition);
 					expandedRule.from.addAll(rule.from);
 				}
@@ -521,17 +495,16 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	private boolean isContainedInto(final LineEntry parent, final LineEntry child, final AffixEntry.Type type){
-		final Set<String> parentBones = extractRuleSpine(parent, type);
-		final Set<String> childBones = extractRuleSpine(child, type);
+	private boolean isContainedInto(final LineEntry parent, final LineEntry child){
+		final Set<String> parentBones = extractRuleSpine(parent);
+		final Set<String> childBones = extractRuleSpine(child);
 		return childBones.containsAll(parentBones);
 	}
 
-	private Set<String> extractRuleSpine(final LineEntry rule, final AffixEntry.Type type){
+	private Set<String> extractRuleSpine(final LineEntry rule){
 		final Set<String> parentBones = new HashSet<>();
 		for(final String add : rule.addition){
-			final int lcsLength = longestCommonAffix(Arrays.asList(add, rule.removal),
-				(type == AffixEntry.Type.SUFFIX? this::commonPrefix: this::commonSuffix))
+			final int lcsLength = longestCommonAffix(Arrays.asList(add, rule.removal), this::commonPrefix)
 				.length();
 			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
 		}
@@ -609,7 +582,10 @@ public class RulesReducer{
 	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,
 			final Collection<LineEntry> entries){
 		//restore original rules
-		final List<LineEntry> restoredRules = entries.stream()
+		Stream<LineEntry> stream = entries.stream();
+		if(type == AffixEntry.Type.PREFIX)
+			stream = stream.map(this::createReverseOf);
+		final List<LineEntry> restoredRules = stream
 			.flatMap(rule -> rule.addition.stream()
 				.map(addition -> {
 					final int lcp = commonPrefix(rule.removal, addition).length();
@@ -618,15 +594,24 @@ public class RulesReducer{
 				}))
 			.collect(Collectors.toList());
 
-		final List<LineEntry> sortedEntries = prepareRules(type, keepLongestCommonAffix, restoredRules);
+		final List<LineEntry> sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);
 
 		return composeAffixRules(flag, type, sortedEntries);
 	}
 
-	private List<LineEntry> prepareRules(final AffixEntry.Type type, final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
+	private LineEntry createReverseOf(final LineEntry entry){
+		final String removal = StringUtils.reverse(entry.removal);
+		final Set<String> addition = entry.addition.stream()
+			.map(StringUtils::reverse)
+			.collect(Collectors.toSet());
+		final String condition = SEQUENCER.toString(SEQUENCER.reverse(RegExpSequencer.splitSequence(entry.condition)));
+		return new LineEntry(removal, addition, condition, Collections.emptyList());
+	}
+
+	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
 			for(final LineEntry entry : entries){
-				String lcs = longestCommonAffix(entry.from, (type == AffixEntry.Type.SUFFIX? this::commonSuffix: this::commonPrefix));
+				String lcs = longestCommonAffix(entry.from, this::commonSuffix);
 				if(lcs == null)
 					lcs = entry.condition;
 				else if(entry.condition.contains(GROUP_END)){

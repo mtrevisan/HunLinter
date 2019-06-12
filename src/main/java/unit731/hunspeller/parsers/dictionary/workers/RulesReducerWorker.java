@@ -56,9 +56,9 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		};
 		final Runnable completed = () -> {
 			try{
-				List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules, type);
+				final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules);
 
-				List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
+				final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
 				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalRules, originalLines);
 

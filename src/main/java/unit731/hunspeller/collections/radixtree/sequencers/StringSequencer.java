@@ -46,6 +46,11 @@ public class StringSequencer implements SequencerInterface<String>{
 	}
 
 	@Override
+	public String reverse(String sequence){
+		return StringUtils.reverse(sequence);
+	}
+
+	@Override
 	public String toString(String sequence){
 		return sequence;
 	}

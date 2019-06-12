@@ -80,6 +80,8 @@ public interface SequencerInterface<S>{
 
 	S concat(S sequence, S other);
 
+	S reverse(S sequence);
+
 	String toString(S sequence);
 
 }

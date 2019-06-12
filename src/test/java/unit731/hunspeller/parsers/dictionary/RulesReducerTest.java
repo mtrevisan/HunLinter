@@ -66,7 +66,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "ʼ", "r", "par"),
@@ -136,7 +136,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ta", "[^ƚ]a", "kaƚandra"),
@@ -219,7 +219,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ato", "[nr]", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
@@ -309,7 +309,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("e", "ista", "e", Arrays.asList("kapitaƚe", "alarme", "ƚexe", "lexe", "paexe", "xornaƚe", "aƚarme", "reaƚe", "dente", "arte")),
@@ -456,7 +456,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("ar", SetHelper.setOf("arieta", "aría", "ería", "erieta"), "ar", Arrays.asList("axenar", "sporkar", "portar", "fatucar", "komensar", "kojonbarar", "koɉonbarar", "kavalar", "barar", "komensiar", "strafantar", "peskar", "komenŧar", "takonar", "komandar", "kanŧelar", "arđentar", "kastronar", "arxentar", "drapar", "bonbar", "koɉonar", "rekordar", "spisiar", "kontar", "panetar", "tapeŧar", "kokoƚar", "strasar", "tartufolar", "retelar", "vergexar", "senpiar", "bibiar", "putelar", "pitokar", "berikinar", "saonar", "strigar", "kavaƚar", "striar", "straŧar", "polar", "cakoƚar", "lotar", "piocar", "kokolar", "isporkar", "garbar", "rafinar", "kanseƚar", "nodar", "kojonar", "stanpar", "garđar", "poltronar", "ƚexinar", "speŧiar", "spilorŧar", "soldar", "ɉetar", "minconar", "piexar", "poƚar", "jetar", "reteƚar", "peocar", "piedar", "skorsar", "garxar", "kontroƚar", "kanselar", "puteƚar", "albergar", "ardentar", "spilorsar", "kordar", "tapesar", "grixonar", "ƚotar", "sovercar", "xmorfiar", "stranbar", "cakolar", "kapocar", "kontrolar", "sansar", "spiŧiar", "ŧimar", "robar", "simar", "fraskar", "komenŧiar", "bañar", "birbantar", "bufonar", "porkar", "kañar", "mañar", "krokar", "ladrar", "skorŧar", "fornar", "birar", "fondar", "pieđar", "ƚadrar", "gardar", "lexinar", "berekinar", "tartufoƚar", "vakar", "spesiar")),
@@ -587,7 +587,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "gaƚantòmo"),
@@ -635,7 +635,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("òmo", "omixmo", "òmo", "galantòmo"),
@@ -695,7 +695,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		List<LineEntry> expectedCompactedRules = Collections.singletonList(
 			new LineEntry("r", SetHelper.setOf("oreto", "toreto", "dora", "doreta", "ora", "doreto", "tor", "toreta", "oreta", "or", "tora", "dor"), "r", Arrays.asList("ƚargar", "boƚar", "noƚixar", "noƚexar", "spigoƚar", "ƚustrar", "sesoƚar", "kalkoƚar", "ƚavorar", "iƚuminar", "piƚar", "regoƚar", "kaƚibrar", "señaƚar", "oxeƚar", "kriveƚar", "saƚixar", "ventiƚar", "ƚuminar", "aƚienar", "ƚexixlar", "triveƚar", "spekuƚar", "garbeƚar", "ƚibar", "paƚar", "koƚorir", "ƚigar", "siaƚakuar", "mormoƚar", "ƚikar", "soƚesitar", "skarpeƚar", "ƚaorar", "foƚar", "stroƚegar", "spoƚar", "stroƚogar", "baƚar", "fiƚar", "koƚar", "saƚar", "ƚevar", "baƚotar", "ƚavar"))
@@ -778,7 +778,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dor", SetHelper.setOf("oreto", "toreto", "doreto", "tor", "or"), "dor", Arrays.asList("reŧevidor", "reŧeidor", "stridor", "resevidor", "reseidor")),
@@ -860,7 +860,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ureto", "ur"), "dur", Arrays.asList("koƚadur", "vaƚidur")),
@@ -919,7 +919,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("dur", SetHelper.setOf("ur", "ureto"), "dur", Arrays.asList("madur", "traxeɉadur", "traxejadur", "tradadur", "trađadur", "kagadur", "traxadur", "tragadur", "ordadur", "koladur", "validur", "ordidur", "skortegadur")),
@@ -975,7 +975,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("lderò", "ƚusion", "lderò", "solderò"),
@@ -1049,7 +1049,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("verò", "sion", "iverò", Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò")),
@@ -1134,7 +1134,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("erò", "iŧion", "terò", "repeterò"),
@@ -1204,7 +1204,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "mento", "r", Arrays.asList("pispoƚar", "josoƚar", "ƚatar", "xbesoƚar", "diƚatar", "ƚontanar", "bagoƚar", "indeboƚir", "vaƚir", "strukoƚar", "boƚegar", "indoƚentrar", "deƚinear", "formigoƚar", "desarveƚar", "biskoƚar", "kaƚar", "sifoƚar", "rueƚar", "dindoƚar", "krikoƚar", "ƚigar", "siaƚakuar", "ƚoxar", "ƚisar", "deserveƚar", "ƚanpexar", "nuvoƚar", "kabaƚar", "ñaoƚar", "bueƚar", "ƚanpixar", "spigoƚar", "triboƚar", "turbuƚar", "proƚongar", "trabakoƚar", "krokoƚar", "skonbusoƚar", "cicoƚar", "skorkoƚar", "kavaƚar", "skrisoƚar", "troboƚar", "basiƚar", "torboƚar", "ƚogar", "paƚar", "faƚir", "ƚanbikar", "peƚar", "dexserveƚar", "sigaƚar", "dexsarveƚar", "buƚegar", "strakoƚar", "voltoƚar", "koƚar", "ɉosoƚar", "guaƚivar")),
@@ -1251,7 +1251,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("erò", "imento", "erò", Arrays.asList("bojerò", "fenderò", "moverò", "naserò", "sebaterò", "renkreserò", "torđerò", "meterò", "manteñerò", "sobaterò", "akorxerò", "skoderò", "ponxerò", "sorxerò", "skonbaterò", "veñerò", "galderò", "sparxerò", "akorderò", "goderò", "vederò", "boɉerò", "ponđerò", "roderò", "rexerò", "ponderò", "rinkreserò", "baterò", "kreserò", "provederò", "akorđerò", "korerò", "torxerò")),
@@ -1315,7 +1315,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("èl", "elesa", "èl", "bèl"),
@@ -1437,7 +1437,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("ol", "uli", "ol", Arrays.asList("pisarol", "skodarol", "sotarol", "brònbol", "rovejol", "kódol", "porésol", "èrbol", "korósol", "fínfol", "buxigàtol", "narónkol", "jèvol", "fífol", "poréŧol", "onbrígol", "ígol", "ucarol", "kuriàtol", "réfol", "postríbol", "piàvol", "deñévol", "fisol", "ovarol", "xjoŧarol", "íxol", "ranarol", "kortívol", "karígol", "pípol", "sièol", "brúfol", "skrópol", "pisàndol", "fiŧol", "libarol", "ròdol", "đógol", "revendígol", "núgol", "desútol", "orbexígol", "koriàndol", "skapuŧiol", "màskol", "spónxol", "jègol", "róndol", "ràxol", "saldarol", "beđarol", "tastarol", "intíngol", "piàgol", "ponterol", "faxiol", "kortígol", "persénbol", "bròkol", "kòtol", "kanarol", "trémol", "tòpol", "supiarol", "biavarol", "prexudiŧiévol", "bògol", "búsol", "rapónsol", "parol", "liŧarol", "bronbeɉol", "níol", "perdonévol", "sóŧol", "garofol", "faŧiol", "rapónŧol", "faxol", "arđigògol", "braŧarol", "pikàñol", "sósol", "ŧendrarol", "piàol", "morévol")),
@@ -1597,7 +1597,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		compactedRules = compactedRules.stream()
 			.filter(rule -> !rule.from.isEmpty())
@@ -1663,7 +1663,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("en", "éi", "en", Arrays.asList("ultrateren", "guardamagađen", "seren", "baxen", "međen", "taja–fen", "magaxen", "teren", "saraŧen", "repien", "meden", "similituden", "sen", "stra-ben", "magađen", "mexen", "maxagen", "baŧen", "velen", "straben", "basen", "guardamagaxen", "taɉafen", "terapien", "taɉa–fen", "tajafen", "magaden", "notaben", "tientinben", "guardamagaden", "stra-pien", "strapien")),
@@ -1731,7 +1731,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("en", "éi", "en", Arrays.asList("ultrateren", "guardamagađen", "seren", "baxen", "međen", "taja–fen", "magaxen", "teren", "saraŧen", "repien", "meden", "similituden", "sen", "stra-ben", "magađen", "mexen", "maxagen", "baŧen", "velen", "straben", "basen", "guardamagaxen", "taɉafen", "terapien", "taɉa–fen", "tajafen", "magaden", "notaben", "tientinben", "guardamagaden", "stra-pien", "strapien")),
@@ -1799,7 +1799,7 @@ class RulesReducerTest{
 			.map(line -> wordGenerator.applyAffixRules(line))
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules, affixType);
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "ʼ", "r", "par"),
