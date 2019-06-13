@@ -139,7 +139,22 @@ public class RulesReducer{
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	public List<LineEntry> reduceRules(final List<LineEntry> plainRules){
+	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
+		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
+
+		compactedRules = compactRules(compactedRules);
+
+		//reshuffle originating list to place the correct productions in the correct rule
+		compactedRules = makeAdditionsDisjoint(compactedRules);
+
+		compactedRules = disjoinConditions(compactedRules);
+
+		mergeSimilarRules(compactedRules);
+
+		return compactedRules;
+	}
+
+	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
 		//redistribute additions
 		final Map<String, LineEntry> map = new HashMap<>();
 		for(final LineEntry entry : plainRules)
@@ -150,23 +165,9 @@ public class RulesReducer{
 				if(rule != null)
 					rule.from.addAll(entry.from);
 			}
-		final List<LineEntry> bla = collect(map.values(),
+		return collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
-		plainRules.clear();
-		plainRules.addAll(bla);
-
-
-		List<LineEntry> compactedRules = compactRules(plainRules);
-
-		//reshuffle originating list to place the correct productions in the correct rule
-		compactedRules = makeAdditionsDisjoint(compactedRules);
-
-		compactedRules = disjoinConditions(compactedRules);
-
-		mergeSimilarRules(compactedRules);
-
-		return compactedRules;
 	}
 
 	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules)
