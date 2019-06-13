@@ -17,6 +17,7 @@ import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +31,16 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.PatternHelper;
+import static unit731.hunspeller.services.PatternHelper.pattern;
 import unit731.hunspeller.services.SetHelper;
 
 
 public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
+
+	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
 
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
@@ -681,9 +686,9 @@ public class RulesReducer{
 		final String removal = StringUtils.reverse(entry.removal);
 		final Set<String> addition = entry.addition.stream()
 			.map(add -> {
-				final String[] additions = add.split(SLASH);
+				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
 				additions[0] = StringUtils.reverse(additions[0]);
-				return String.join(SLASH, additions);
+				return String.join(StringUtils.EMPTY, additions);
 			})
 			.collect(Collectors.toSet());
 		final String condition = SEQUENCER.toString(SEQUENCER.reverse(RegExpSequencer.splitSequence(entry.condition)));
