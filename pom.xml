@@ -200,8 +200,6 @@
 
 		<!-- JUnit -->
 		<org.junit.jupiter.version>5.4.2</org.junit.jupiter.version>
-		<!-- FindBugs -->
-		<!--<com.google.code.findbugs.version>3.0.1</com.google.code.findbugs.version>-->
 	</properties>
 
 	<dependencies>
@@ -262,11 +260,5 @@
 			<version>${org.junit.jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- FindBugs -->
-<!--		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>annotations</artifactId>
-			<version>${com.google.code.findbugs.version}</version>
-		</dependency>-->
 	</dependencies>
 </project>
