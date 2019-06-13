@@ -693,23 +693,17 @@ public class RulesReducer{
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
 			for(final LineEntry entry : entries){
-				String lcs = longestCommonAffix(entry.from, this::commonSuffix);
-				if(lcs == null)
-					lcs = entry.condition;
-				else if(entry.condition.contains(GROUP_END)){
-					final String[] entryCondition = RegExpSequencer.splitSequence(entry.condition);
-					if(!SEQUENCER.endsWith(RegExpSequencer.splitSequence(lcs), entryCondition)){
-						final int tailCharactersToExclude = entryCondition.length;
-						if(tailCharactersToExclude <= lcs.length())
-							lcs = lcs.substring(0, lcs.length() - tailCharactersToExclude) + entry.condition;
-						else
-							lcs = entry.condition;
+				final String lcs = longestCommonAffix(entry.from, this::commonSuffix);
+				if(lcs != null){
+					final Set<Character> group = new HashSet<>();
+					try{
+						group.addAll(extractGroup(entry.from, lcs.length()));
 					}
+					catch(IllegalArgumentException ignored){}
+					final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
+					if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
+						entry.condition = makeGroup(group) + lcs;
 				}
-				if(lcs.length() < entry.condition.length())
-					throw new IllegalArgumentException("really bad error, lcs.length < condition.length");
-
-				entry.condition = lcs;
 			}
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);
