@@ -378,13 +378,12 @@ public class RulesReducer{
 							notRule.get().condition = parent.condition;
 						else{
 							//find already present rule
-							final Optional<LineEntry> alreadyPresentRule = finalRules.stream()
+							final List<LineEntry> alreadyPresentRules = finalRules.stream()
 								.filter(r -> r.removal.equals(parent.removal) && r.addition.equals(parent.addition)
 									&& r.condition.endsWith(parent.condition))
-								.findFirst();
-							if(alreadyPresentRule.isPresent()){
-								final LineEntry r = alreadyPresentRule.get();
-								finalRules.remove(r);
+								.collect(Collectors.toList());
+							for(final LineEntry alreadyPresentRule : alreadyPresentRules){
+								finalRules.remove(alreadyPresentRule);
 								notPresentConditions.addAll(parentGroup);
 							}
 
