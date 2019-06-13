@@ -152,15 +152,14 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 				throw new RuntimeInterruptedException();
 
 			try{
-				if(paused.get())
+				while(paused.get())
 					Thread.sleep(500l);
-				else{
-					processingIndex.incrementAndGet();
 
-					readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
+				processingIndex.incrementAndGet();
 
-					setProgress(getProgress(processingIndex.get(), totalLines));
-				}
+				readLineProcessor.accept(rowLine.getValue(), rowLine.getKey());
+
+				setProgress(getProgress(processingIndex.get(), totalLines));
 			}
 			catch(final InterruptedException e){
 				if(!isPreventExceptionRelaunch())

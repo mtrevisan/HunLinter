@@ -17,7 +17,6 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -76,6 +75,7 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
+import unit731.hunspeller.parsers.dictionary.workers.ProjectLoaderWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
@@ -133,6 +133,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 
+	private ProjectLoaderWorker prjLoaderWorker;
 	private DictionaryCorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
@@ -1453,6 +1454,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
 		else{
+			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
+				prjLoaderWorker.pause();
+
+				Object[] options = {"Abort", "Cancel"};
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the project loader task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				if(answer == JOptionPane.YES_OPTION){
+					prjLoaderWorker.cancel();
+
+					dicCheckCorrectnessMenuItem.setEnabled(true);
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
+
+					prjLoaderWorker = null;
+				}
+				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+					prjLoaderWorker.resume();
+
+					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+				}
+			}
 			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
 				dicCorrectnessWorker.pause();
 
@@ -1612,11 +1633,21 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	@Override
 	public void loadFileInternal(String filePath){
-		try{
+		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
+			dicCheckCorrectnessMenuItem.setEnabled(false);
+
 			mainProgressBar.setValue(0);
-			backbone.loadFile(filePath);
 
+			prjLoaderWorker = new ProjectLoaderWorker(filePath, backbone, this::loadFileCompleted, this::loadFileCancelled);
+			prjLoaderWorker.addPropertyChangeListener(this);
+			prjLoaderWorker.execute();
 
+			filOpenAFFMenuItem.setEnabled(false);
+		}
+	}
+
+	private void loadFileCompleted(){
+		try{
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			hypCheckCorrectnessMenuItem.setEnabled(true);
@@ -1707,9 +1738,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 		}
-		catch(FileNotFoundException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "The file does not exists");
-		}
 		catch(IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
@@ -1718,6 +1746,41 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void loadFileCancelled(){
+		dicCheckCorrectnessMenuItem.setEnabled(false);
+		dicSortDictionaryMenuItem.setEnabled(false);
+		hypCheckCorrectnessMenuItem.setEnabled(false);
+
+
+		//affix file:
+		cmpInputComboBox.removeAllItems();
+		cmpInputComboBox.setEnabled(false);
+
+
+		//hyphenation file:
+		hypMenu.setEnabled(false);
+		hypStatisticsMenuItem.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+
+
+		filCreatePackageMenuItem.setEnabled(false);
+		dicMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+
+
+		//aid file:
+		dicRuleTagsAidComboBox.removeAllItems();
+		cmpRuleTagsAidComboBox.removeAllItems();
+		//enable combo-box only if an AID file exists
+		dicRuleTagsAidComboBox.setEnabled(false);
+		cmpRuleTagsAidComboBox.setEnabled(false);
+
+
+		//thesaurus file:
+		theMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 
 	private void updateSynonymsCounter(){
@@ -1928,7 +1991,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			String compoundFlag = affixData.getCompoundFlag();
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
-				String word = production.getWord();
 				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
