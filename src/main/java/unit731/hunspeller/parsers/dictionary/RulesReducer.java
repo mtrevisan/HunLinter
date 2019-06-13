@@ -128,12 +128,10 @@ public class RulesReducer{
 			producedWord = StringUtils.reverse(producedWord);
 			word = StringUtils.reverse(word);
 		}
-		int lastCommonLetter;
-		final int wordLength = word.length();
-		for(lastCommonLetter = 0; lastCommonLetter < Math.min(wordLength, producedWord.length()); lastCommonLetter ++)
-			if(word.charAt(lastCommonLetter) != producedWord.charAt(lastCommonLetter))
-				break;
 
+		final int lastCommonLetter = calculateLastCommonLetterIndex(word, producedWord);
+
+		final int wordLength = word.length();
 		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
 		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
@@ -141,6 +139,15 @@ public class RulesReducer{
 			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
+	}
+
+	private int calculateLastCommonLetterIndex(final String word1, final String word2){
+		int lastCommonLetter;
+		final int minWordLength = Math.min(word1.length(), word2.length());
+		for(lastCommonLetter = 0; lastCommonLetter < minWordLength; lastCommonLetter ++)
+			if(word1.charAt(lastCommonLetter) != word2.charAt(lastCommonLetter))
+				break;
+		return lastCommonLetter;
 	}
 
 	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
@@ -159,7 +166,6 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
-		//redistribute additions
 		final Map<String, LineEntry> map = new HashMap<>();
 		for(final LineEntry entry : plainRules)
 			for(final String addition : entry.addition){
@@ -169,6 +175,7 @@ public class RulesReducer{
 				if(rule != null)
 					rule.from.addAll(entry.from);
 			}
+
 		return collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
@@ -281,11 +288,12 @@ public class RulesReducer{
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
-			for(final LineEntry expandedRule : expandedRules)
-				if(isContainedInto(expandedRule, rule)){
+			expandedRules.stream()
+				.filter(expandedRule -> isContainedInto(expandedRule, rule))
+				.forEach(expandedRule -> {
 					rule.addition.removeAll(expandedRule.addition);
 					expandedRule.from.addAll(rule.from);
-				}
+				});
 			expandedRules.add(rule);
 		}
 	}
@@ -352,7 +360,7 @@ public class RulesReducer{
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
 						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parent.condition.length(), parentGroup, childrenGroup,
-							groupsIntersection.size());
+							groupsIntersection);
 						final String preCondition = (chooseRatifyingOverNegated? makeGroup(parentGroup): makeNotGroup(childrenGroup));
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
@@ -517,27 +525,22 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup, final Set<Character> childrenGroup){
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
+			final Set<Character> childrenGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
-		boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
-		if(chooseRatifyingOverNegated && parentGroupSize == 0)
-			chooseRatifyingOverNegated = false;
-		if(!chooseRatifyingOverNegated && childrenGroupSize == 0)
-			chooseRatifyingOverNegated = true;
-		return chooseRatifyingOverNegated;
+		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1)
+			&& parentGroupSize != 0);
+		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup, final Set<Character> childrenGroup,
-			final int intersectionGroupSize){
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
+			final Set<Character> childrenGroup, final Set<Character> intersectionGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
-		boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroupSize == 0) && parentGroupSize <= childrenGroupSize);
-		if(chooseRatifyingOverNegated && parentGroupSize == 0)
-			chooseRatifyingOverNegated = false;
-		if(!chooseRatifyingOverNegated && childrenGroupSize == 0)
-			chooseRatifyingOverNegated = true;
-		return chooseRatifyingOverNegated;
+		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
+			&& parentGroupSize <= childrenGroupSize && parentGroupSize != 0);
+		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
 	}
 
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
@@ -549,19 +552,25 @@ public class RulesReducer{
 			final String parentCondition = rules.get(0).condition;
 			
 			//extract similar (same ending condition) rules from processing-list
-			final List<LineEntry> children = new ArrayList<>();
-			final Iterator<LineEntry> itr = rules.iterator();
-			while(itr.hasNext()){
-				final LineEntry rule = itr.next();
-
-				if(rule.condition.endsWith(parentCondition)){
-					children.add(rule);
-					itr.remove();
-				}
-			}
+			final List<LineEntry> children = extractSimilarRules(rules, parentCondition);
 			forest.add(children);
 		}
 		return forest;
+	}
+
+	private List<LineEntry> extractSimilarRules(final List<LineEntry> rules, final String parentCondition){
+		final List<LineEntry> children = new ArrayList<>();
+		final Iterator<LineEntry> itr = rules.iterator();
+		while(itr.hasNext()){
+			final LineEntry rule = itr.next();
+			
+			if(rule.condition.endsWith(parentCondition)){
+				children.add(rule);
+				
+				itr.remove();
+			}
+		}
+		return children;
 	}
 
 	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
@@ -571,7 +580,8 @@ public class RulesReducer{
 			.collect(Collectors.toList());
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
-		bubbles.removeIf(bubble -> parent.from.containsAll(bubble.from) && bubble.from.equals(new HashSet<>(parent.extractFromEndingWith(bubble.condition))));
+		bubbles.removeIf(bubble -> parent.from.containsAll(bubble.from)
+			&& bubble.from.equals(new HashSet<>(parent.extractFromEndingWith(bubble.condition))));
 
 		return bubbles;
 	}
@@ -653,7 +663,8 @@ public class RulesReducer{
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY) + StringUtils.join(commonPostCondition);
+				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY)
+					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);
