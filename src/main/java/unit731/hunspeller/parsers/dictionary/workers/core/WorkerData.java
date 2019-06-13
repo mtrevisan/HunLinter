@@ -27,8 +27,21 @@ public class WorkerData{
 		return new WorkerData(workerName, dicParser, true, false);
 	}
 
+	public static WorkerData createParallelPreventExceptionRelaunch(final String workerName){
+		return new WorkerData(workerName, true, true);
+	}
+
 	public static WorkerData createParallelPreventExceptionRelaunch(final String workerName, final DictionaryParser dicParser){
 		return new WorkerData(workerName, dicParser, true, true);
+	}
+
+	private WorkerData(final String workerName, final boolean parallelProcessing, final boolean preventExceptionRelaunch){
+		Objects.requireNonNull(workerName);
+
+		this.workerName = workerName;
+		dicParser = null;
+		this.parallelProcessing = parallelProcessing;
+		this.preventExceptionRelaunch = preventExceptionRelaunch;
 	}
 
 	private WorkerData(final String workerName, final DictionaryParser dicParser, final boolean parallelProcessing,

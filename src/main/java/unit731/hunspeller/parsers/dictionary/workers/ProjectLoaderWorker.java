@@ -34,7 +34,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		this.affixFilePath = affixFilePath;
 		this.backbone = backbone;
 
-		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME, backbone.getDicParser());
+		workerData = WorkerData.createParallelPreventExceptionRelaunch(WORKER_NAME);
 		workerData.setCompletedCallback(completed);
 		workerData.setCancelledCallback(cancelled);
 	}
