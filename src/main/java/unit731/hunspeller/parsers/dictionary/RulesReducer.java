@@ -43,6 +43,7 @@ public class RulesReducer{
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
 	private static final String DOT = ".";
+	private static final String SLASH = "/";
 
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
@@ -679,7 +680,11 @@ public class RulesReducer{
 	private LineEntry createReverseOf(final LineEntry entry){
 		final String removal = StringUtils.reverse(entry.removal);
 		final Set<String> addition = entry.addition.stream()
-			.map(StringUtils::reverse)
+			.map(add -> {
+				final String[] additions = add.split(SLASH);
+				additions[0] = StringUtils.reverse(additions[0]);
+				return String.join(SLASH, additions);
+			})
 			.collect(Collectors.toSet());
 		final String condition = SEQUENCER.toString(SEQUENCER.reverse(RegExpSequencer.splitSequence(entry.condition)));
 		return new LineEntry(removal, addition, condition, Collections.emptyList());

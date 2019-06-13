@@ -2044,6 +2044,48 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
 	}
 
+	@Test
+	void casePrefix6() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"LANG vec",
+			"FLAG long",
+			"KEEPCASE Z0",
+			"PFX $1 Y 2",
+			"PFX $1 0 h/Z0 .",
+			"PFX $1 0 da/Z0 ."
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "$1";
+		AffixEntry.Type affixType = AffixEntry.Type.PREFIX;
+		List<String> words = Arrays.asList("u", "Wb", "lx", "s", "Bq", "Torr", "Gy", "m", "l", "Ω", "g", "Pl", "kat", "lm", "Np", "Sv", "W", "V", "T", "S", "bar", "eV", "Pa", "mmHg", "N", "Hz", "mol", "K", "J", "H", "F", "Å", "Da", "C", "sr", "A");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(line -> wordGenerator.applyAffixRules(line))
+			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("0", SetHelper.setOf("ad/Z0", "h/Z0"), "[AÅbBCDeFgGHJkKlmNPsSTuVWΩ]", Arrays.asList("rs", "A", "aD", "C", "Å", "F", "H", "J", "lom", "K", "gHmm", "N", "zH", "Ve", "aP", "rab", "S", "T", "V", "W", "vS", "pN", "tak", "ml", "lP", "g", "Ω", "l", "m", "yG", "rroT", "qB", "s", "xl", "u", "bW"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"PFX $1 Y 2",
+			"PFX $1 0 h/Z0 [AÅbBCDeFgGHJkKlmNPsSTuVWΩ]",
+			"PFX $1 0 da/Z0 [AÅbBCDeFgGHJkKlmNPsSTuVWΩ]"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalRules, originalLines);
+	}
+
 
 	private Pair<RulesReducer, WordGenerator> createReducer(File affFile) throws IOException{
 		AffixParser affParser = new AffixParser();
