@@ -10,7 +10,7 @@ public class DuplicationResult{
 	private final boolean forcedInsertion;
 
 
-	public DuplicationResult(List<ThesaurusEntry> duplicates, boolean forcedInsertion){
+	public DuplicationResult(final List<ThesaurusEntry> duplicates, final boolean forcedInsertion){
 		Objects.requireNonNull(duplicates);
 
 		this.duplicates = duplicates;

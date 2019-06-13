@@ -54,11 +54,11 @@ public class GraphVIZRepresentation{
 		RadixTreeTraverser<S, V> traverserForward = (wholeKey, node, parent) -> graphVIZAppendForwardTransition(sb, node, parent);
 		tree.traverseBFS(traverserForward);
 
-		if(tree instanceof AhoCorasickTree){
-			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphVIZAppendFailureTransitions(tree, sb, node,
-				displayEdgesToInitialState);
-			tree.traverseBFS(traverserFailure);
-		}
+//		if(tree instanceof AhoCorasickTree){
+//			RadixTreeTraverser<S, V> traverserFailure = (wholeKey, node, parent) -> graphVIZAppendFailureTransitions(tree, sb, node,
+//				displayEdgesToInitialState);
+//			tree.traverseBFS(traverserFailure);
+//		}
 
 		sb.append("}");
 		return sb.toString();

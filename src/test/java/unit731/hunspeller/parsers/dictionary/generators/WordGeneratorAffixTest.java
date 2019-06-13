@@ -14,7 +14,7 @@ import unit731.hunspeller.services.FileHelper;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
-public class WordGeneratorAffixTest{
+class WordGeneratorAffixTest{
 
 	private final Backbone backbone = new Backbone(null, null);
 
@@ -29,7 +29,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void affFormat() throws IOException{
+	void affFormat() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"# Testing also whitespace and comments.",
@@ -56,7 +56,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void flagUTF8() throws IOException{
+	void flagUTF8() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG UTF-8",
@@ -89,7 +89,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void flagNumerical() throws IOException{
+	void flagNumerical() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG num",
@@ -122,7 +122,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void flagASCII() throws IOException{
+	void flagASCII() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
@@ -154,7 +154,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void flagDoubleASCII() throws IOException{
+	void flagDoubleASCII() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
@@ -188,7 +188,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void conditions() throws IOException{
+	void conditions() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 6",
@@ -214,7 +214,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void stems1() throws IOException{
+	void stems1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
@@ -242,7 +242,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stems2() throws IOException{
+	void stems2() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
@@ -269,7 +269,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stems3() throws IOException{
+	void stems3() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
@@ -298,7 +298,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stems4() throws IOException{
+	void stems4() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FLAG long",
@@ -327,7 +327,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stems5() throws IOException{
+	void stems5() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
@@ -368,7 +368,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void stemsInvalidFullstrip() throws IOException{
+	void stemsInvalidFullstrip(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -383,7 +383,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stemsValidFullstrip() throws IOException{
+	void stemsValidFullstrip() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"FULLSTRIP",
@@ -403,7 +403,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void stemsInvalidTwofold1() throws IOException{
+	void stemsInvalidTwofold1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -427,7 +427,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void stemsInvalidTwofold2() throws IOException{
+	void stemsInvalidTwofold2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -457,7 +457,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void complexPrefixes1() throws IOException{
+	void complexPrefixes1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
@@ -498,7 +498,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void complexPrefixes2() throws IOException{
+	void complexPrefixes2() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
@@ -522,7 +522,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void complexPrefixesUTF8() throws IOException{
+	void complexPrefixesUTF8() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"COMPLEXPREFIXES",
@@ -546,7 +546,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void complexPrefixesInvalidTwofold() throws IOException{
+	void complexPrefixesInvalidTwofold(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 				"SET UTF-8",
@@ -577,7 +577,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void needAffix3() throws IOException{
+	void needAffix3() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
@@ -600,7 +600,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void needAffix5() throws IOException{
+	void needAffix5() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"NEEDAFFIX X",
@@ -638,7 +638,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void circumfix() throws IOException{
+	void circumfix() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
@@ -669,7 +669,7 @@ public class WordGeneratorAffixTest{
 	}
 
 
-	public void morphologicalAnalisys() throws IOException{
+	void morphologicalAnalisys() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"PFX P Y 1",
@@ -714,7 +714,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void alias1() throws IOException{
+	void alias1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"AF 2",
@@ -743,7 +743,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void escapeSlash() throws IOException{
+	void escapeSlash() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"SFX A Y 1",
@@ -767,7 +767,7 @@ public class WordGeneratorAffixTest{
 
 
 	@Test
-	public void forbiddenWord() throws IOException{
+	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -782,7 +782,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void germanCompounding1() throws IOException{
+	void germanCompounding1() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",
@@ -856,7 +856,7 @@ public class WordGeneratorAffixTest{
 	}
 
 	@Test
-	public void germanCompounding2() throws IOException{
+	void germanCompounding2() throws IOException{
 		String language = "ger";
 		File affFile = FileHelper.getTemporaryUTF8File(language, ".aff",
 			"SET UTF-8",

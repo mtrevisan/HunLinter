@@ -7,34 +7,33 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 
 public class RuleEntry{
 
-	public static final char COMBINEABLE = 'Y';
-	public static final char NOT_COMBINEABLE = 'N';
+	private static final char COMBINABLE = 'Y';
+	private static final char NOT_COMBINABLE = 'N';
 
 
 	private final boolean suffix;
 	//cross product flag
-	private final boolean combineable;
+	private final boolean combinable;
 	private final List<AffixEntry> entries;
 //private final List<AffixEntry> prefixEntries;
 //private final List<AffixEntry> suffixEntries;
 
 
-	public RuleEntry(boolean suffix, char combineable, List<AffixEntry> entries){
-		Objects.requireNonNull(combineable);
+	public RuleEntry(final boolean suffix, final char combinable, final List<AffixEntry> entries){
 		Objects.requireNonNull(entries);
 
 		this.suffix = suffix;
-		this.combineable = (combineable == COMBINEABLE);
+		this.combinable = (combinable == COMBINABLE);
 		this.entries = entries;
 	}
 
-//public RuleEntry(boolean isSuffix, char combineable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
-//	Objects.requireNonNull(combineable);
+//public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){
+//	Objects.requireNonNull(combinable);
 //	Objects.requireNonNull(prefixEntries);
 //	Objects.requireNonNull(suffixEntries);
 //
 //	this.isSuffix = isSuffix;
-//	this.combineable = (combineable == YES);
+//	this.combinable = (combinable == YES);
 //	this.entries = entries;
 //	this.prefixEntries = prefixEntries;
 //	this.suffixEntries = suffixEntries;
@@ -44,8 +43,12 @@ public class RuleEntry{
 		return suffix;
 	}
 
-	public boolean isCombineable(){
-		return combineable;
+	public boolean isCombinable(){
+		return combinable;
+	}
+
+	public char combinableChar(){
+		return (isCombinable()? COMBINABLE: NOT_COMBINABLE);
 	}
 
 	public AffixEntry.Type getType(){

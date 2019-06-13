@@ -13,7 +13,7 @@ public class ParsingContext{
 	private final BufferedReader reader;
 
 
-	public ParsingContext(String line, BufferedReader br){
+	public ParsingContext(final String line, final BufferedReader br){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(br);
 

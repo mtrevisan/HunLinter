@@ -7,20 +7,20 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
-public class NumericalParsingStrategyTest{
+class NumericalParsingStrategyTest{
 
 	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createNumericalParsingStrategy();
 
 
 	@Test
-	public void ok(){
+	void ok(){
 		String[] flags = strategy.parseFlags("1,2");
 
 		Assertions.assertEquals(Arrays.asList("1", "2"), Arrays.asList(flags));
 	}
 
 	@Test
-	public void notOk1(){
+	void notOk1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("ab");
 		});
@@ -28,7 +28,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void notOk2(){
+	void notOk2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("1.2");
 		});
@@ -36,21 +36,21 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void empty(){
+	void empty(){
 		String[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void nullFlags(){
+	void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void joinFlags(){
+	void joinFlags(){
 		String[] flags = new String[]{"1", "2"};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -58,7 +58,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithError1(){
+	void joinFlagsWithError1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", "c"};
 			strategy.joinFlags(flags);
@@ -67,7 +67,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithError2(){
+	void joinFlagsWithError2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", "1.2"};
 			strategy.joinFlags(flags);
@@ -76,7 +76,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithEmpty(){
+	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"1", ""};
 			strategy.joinFlags(flags);
@@ -85,7 +85,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithNull(){
+	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
@@ -94,7 +94,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinEmptyFlags(){
+	void joinEmptyFlags(){
 		String[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -102,7 +102,7 @@ public class NumericalParsingStrategyTest{
 	}
 
 	@Test
-	public void joinNullFlags(){
+	void joinNullFlags(){
 		String continuationFlags = strategy.joinFlags(null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());

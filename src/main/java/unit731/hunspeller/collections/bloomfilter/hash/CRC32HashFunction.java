@@ -14,14 +14,14 @@ public class CRC32HashFunction implements HashFunction{
 	}
 
 	@Override
-	public long hash(byte[] bytes){
-		CRC32 crc32 = new CRC32();
+	public long hash(final byte[] bytes){
+		final CRC32 crc32 = new CRC32();
 		crc32.update(bytes);
 		return crc32.getValue();
 	}
 
 	@Override
-	public long[] hashMultiple(byte[] bytes){
+	public long[] hashMultiple(final byte[] bytes){
 		return new long[]{hash(bytes)};
 	}
 

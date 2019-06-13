@@ -10,7 +10,7 @@ public interface FlagParsingStrategy{
 	 * @param flags	String to parse into flags
 	 * @return Parsed flags
 	 */
-	String[] parseFlags(String flags);
+	String[] parseFlags(final String flags);
 
 
 	/**
@@ -19,7 +19,7 @@ public interface FlagParsingStrategy{
 	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	String joinFlags(String[] flags);
+	String joinFlags(final String[] flags);
 
 	/**
 	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])
@@ -27,6 +27,6 @@ public interface FlagParsingStrategy{
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags
 	 */
-	String[] extractCompoundRule(String compoundRule);
+	String[] extractCompoundRule(final String compoundRule);
 
 }

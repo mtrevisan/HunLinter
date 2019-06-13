@@ -1,7 +1,5 @@
 package unit731.hunspeller.services.filelistener;
 
-import java.io.IOException;
-
 
 public interface FileListener{
 
@@ -19,8 +17,7 @@ public interface FileListener{
 	 * @param listener	The listener.
 	 * @param patterns	Zero or more file patterns to be matched against file names.
 	 *							If none provided, matches <em>any</em> file.
-	 * @throws IOException	If <code>dirPath</code> is not a directory.
 	 */
-	void register(FileChangeListener listener, String... patterns) throws IOException;
+	void register(FileChangeListener listener, String... patterns);
 
 }

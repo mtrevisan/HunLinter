@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,7 +37,7 @@ public class FileHelper{
 				try{
 					cs = Charset.forName(name);
 				}
-				catch(Exception e){}
+				catch(Exception ignored){}
 				return cs;
 			})
 			.filter(Objects::nonNull)
@@ -55,10 +54,10 @@ public class FileHelper{
 				reader.read();
 				return cs;
 			}
-			catch(IOException e){}
+			catch(IOException ignored){}
 		}
 
-		throw new IllegalArgumentException("The file is not in an ammissible charset ("
+		throw new IllegalArgumentException("The file is not in an allowable charset ("
 			+ HUNSPELL_CHARSETS.stream().map(Charset::name).collect(Collectors.joining(", ")) + ")");
 	}
 
@@ -70,7 +69,7 @@ public class FileHelper{
 
 		try{
 			File tmpFile = File.createTempFile((prefix != null? prefix: "test"), extension);
-			Files.write(tmpFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
+			Files.writeString(tmpFile.toPath(), content);
 			tmpFile.deleteOnExit();
 			return tmpFile;
 		}
@@ -86,7 +85,7 @@ public class FileHelper{
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
-	public static void openFileWithChoosenEditor(File file) throws InterruptedException, IOException{
+	public static void openFileWithChosenEditor(File file) throws InterruptedException, IOException{
 		ProcessBuilder builder = null;
 		if(SystemUtils.IS_OS_WINDOWS)
 			builder = new ProcessBuilder("rundll32.exe", "shell32.dll,OpenAs_RunDLL", file.getAbsolutePath());

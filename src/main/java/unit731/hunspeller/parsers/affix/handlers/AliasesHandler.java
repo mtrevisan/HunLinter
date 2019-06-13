@@ -18,21 +18,21 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 public class AliasesHandler implements Handler{
 
 	@Override
-	public void parse(ParsingContext context, FlagParsingStrategy strategy, BiConsumer<String, Object> addData,
-			Function<AffixTag, List<String>> getData){
+	public void parse(final ParsingContext context, final FlagParsingStrategy strategy, final BiConsumer<String, Object> addData,
+			final Function<AffixTag, List<String>> getData){
 		try{
-			BufferedReader br = context.getReader();
+			final BufferedReader br = context.getReader();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new IllegalArgumentException("Error reading line \"" + context + "\": The first parameter is not a number");
-			int numEntries = Integer.parseInt(context.getFirstParameter());
+			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0)
 				throw new IllegalArgumentException("Error reading line \"" + context + ": Bad number of entries, it must be a positive integer");
 
-			List<String> aliases = new ArrayList<>(numEntries);
+			final List<String> aliases = new ArrayList<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
-				String line = extractLine(br);
+				final String line = extractLine(br);
 
-				String[] parts = StringUtils.split(line);
+				final String[] parts = StringUtils.split(line);
 
 				checkValidity(parts, context);
 
@@ -41,12 +41,12 @@ public class AliasesHandler implements Handler{
 
 			addData.accept(context.getRuleType(), aliases);
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}
 
-	private void checkValidity(String[] parts, ParsingContext context) throws IllegalArgumentException{
+	private void checkValidity(final String[] parts, final ParsingContext context) throws IllegalArgumentException{
 		if(parts.length != 2)
 			throw new IllegalArgumentException("Error reading line \"" + context
 				+ ": Bad number of entries, it must be <tag> <flag/morphological field>");
@@ -55,8 +55,8 @@ public class AliasesHandler implements Handler{
 				+ ": Bad tag, it must be " + context.getRuleType());
 	}
 
-	private String extractLine(BufferedReader br) throws IOException, EOFException{
-		String line = br.readLine();
+	private String extractLine(final BufferedReader br) throws IOException, EOFException{
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
 

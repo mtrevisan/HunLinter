@@ -1,5 +1,6 @@
 package unit731.hunspeller.collections.radixtree.sequencers;
 
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
@@ -72,16 +73,6 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 		return matches(sequenceA[indexA], sequenceB[indexB]);
 	}
 
-	@Override
-	public String[] subSequence(String[] sequence, int beginIndex, int endIndex){
-		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
-	}
-
-	@Override
-	public String[] concat(String[] sequenceA, String[] sequenceB){
-		return (sequenceA.length > 0? ArrayUtils.addAll(sequenceA, sequenceB): sequenceB);
-	}
-
 	private boolean matches(String fieldA, String fieldB){
 		boolean response;
 		boolean fieldAHasClassStart = fieldA.startsWith(CLASS_START);
@@ -93,6 +84,23 @@ public class RegExpSequencer implements SequencerInterface<String[]>{
 		else
 			response = fieldA.equals(fieldB);
 		return response;
+	}
+
+	@Override
+	public String[] subSequence(String[] sequence, int beginIndex, int endIndex){
+		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
+	}
+
+	@Override
+	public String[] concat(String[] sequenceA, String[] sequenceB){
+		return (sequenceA.length > 0? ArrayUtils.addAll(sequenceA, sequenceB): sequenceB);
+	}
+
+	@Override
+	public String[] reverse(String[] sequence){
+		String[] reverse = Arrays.copyOf(sequence, sequence.length);
+		ArrayUtils.reverse(reverse);
+		return reverse;
 	}
 
 	@Override

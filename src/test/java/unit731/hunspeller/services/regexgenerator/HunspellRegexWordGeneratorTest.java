@@ -1,35 +1,36 @@
 package unit731.hunspeller.services.regexgenerator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class HunspellRegexWordGeneratorTest{
+class HunspellRegexWordGeneratorTest{
 
 	@Test
-	public void allOne(){
+	void allOne(){
 		String[] regex = new String[]{"abc", "de", "a"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
 
-		List<List<String>> expected = Arrays.asList(
+		List<List<String>> expected = Collections.singletonList(
 			Arrays.asList("abc", "de", "a")
 		);
 		Assertions.assertEquals(expected, words);
 	}
 
 	@Test
-	public void oneForEach(){
+	void oneForEach(){
 		String[] regex = new String[]{"abc", "de", "?", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 6);
 
 		List<List<String>> expected = Arrays.asList(
-			Arrays.asList("abc"),
+			Collections.singletonList("abc"),
 			Arrays.asList("abc", "de"),
 			Arrays.asList("abc", "a"),
 			Arrays.asList("abc", "de", "a"),
@@ -40,17 +41,17 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOne(){
+	void allZeroOrOne(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
 
 		List<List<String>> expected = Arrays.asList(
-			Arrays.asList("a"),
-			Arrays.asList("de"),
+			Collections.singletonList("a"),
+			Collections.singletonList("de"),
 			Arrays.asList("de", "a"),
-			Arrays.asList("abc"),
+			Collections.singletonList("abc"),
 			Arrays.asList("abc", "a"),
 			Arrays.asList("abc", "de"),
 			Arrays.asList("abc", "de", "a")
@@ -59,18 +60,18 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOneWithZeroMinimum(){
+	void allZeroOrOneWithZeroMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(0, 7);
 
 		List<List<String>> expected = Arrays.asList(
-			Arrays.asList(),
-			Arrays.asList("a"),
-			Arrays.asList("de"),
+			Collections.emptyList(),
+			Collections.singletonList("a"),
+			Collections.singletonList("de"),
 			Arrays.asList("de", "a"),
-			Arrays.asList("abc"),
+			Collections.singletonList("abc"),
 			Arrays.asList("abc", "a"),
 			Arrays.asList("abc", "de")
 		);
@@ -78,7 +79,7 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrOneWithTwoMinimum(){
+	void allZeroOrOneWithTwoMinimum(){
 		String[] regex = new String[]{"abc", "?", "de", "?", "a", "?"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
@@ -94,16 +95,16 @@ public class HunspellRegexWordGeneratorTest{
 	}
 
 	@Test
-	public void allZeroOrMore(){
+	void allZeroOrMore(){
 		String[] regex = new String[]{"abc", "*", "de", "*", "a", "*"};
 
 		HunspellRegexWordGenerator generator = new HunspellRegexWordGenerator(regex);
 		List<List<String>> words = generator.generateAll(1, 7);
 
 		List<List<String>> expected = Arrays.asList(
-			Arrays.asList("abc"),
-			Arrays.asList("de"),
-			Arrays.asList("a"),
+			Collections.singletonList("abc"),
+			Collections.singletonList("de"),
+			Collections.singletonList("a"),
 			Arrays.asList("abc", "abc"),
 			Arrays.asList("abc", "de"),
 			Arrays.asList("abc", "a"),

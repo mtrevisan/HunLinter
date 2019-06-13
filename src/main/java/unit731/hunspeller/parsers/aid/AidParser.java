@@ -19,14 +19,14 @@ public class AidParser{
 	 * Parse the rows out from a .aid file.
 	 *
 	 * @param aidFile	The content of the dictionary file
-	 * @throws IOException	If an I/O error occurse
+	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(File aidFile) throws IOException{
+	public void parse(final File aidFile) throws IOException{
 		lines.clear();
 
-		Path path = aidFile.toPath();
-		Charset charset = FileHelper.determineCharset(path);
-		try(LineNumberReader br = FileHelper.createReader(path, charset)){
+		final Path path = aidFile.toPath();
+		final Charset charset = FileHelper.determineCharset(path);
+		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line;
 			while((line = br.readLine()) != null)
 				if(!line.isEmpty())

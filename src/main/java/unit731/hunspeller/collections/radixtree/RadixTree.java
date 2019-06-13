@@ -40,13 +40,13 @@ import unit731.hunspeller.collections.radixtree.utils.RadixTreeNode;
  */
 public class RadixTree<S, V extends Serializable>{
 
-	public static enum PrefixType{PREFIXED_BY, PREFIXED_TO};
+	public enum PrefixType{PREFIXED_BY, PREFIXED_TO}
 
 
 	/** The root node in this tree */
-	protected RadixTreeNode<S, V> root;
-	protected SequencerInterface<S> sequencer;
-	protected boolean noDuplicatesAllowed;
+	protected final RadixTreeNode<S, V> root;
+	protected final SequencerInterface<S> sequencer;
+	protected final boolean noDuplicatesAllowed;
 
 
 	public static <K, T extends Serializable> RadixTree<K, T> createTree(SequencerInterface<K> sequencer){
@@ -97,7 +97,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * 
 	 * @param prefix	The prefix to look for
 	 * @param type	The type of search (key prefixed by the given prefix, or the given prefix prefixed to the key)
-	 * @return The node founr, or <code>null</code> if empty
+	 * @return The node found, or <code>null</code> if empty
 	 */
 	public RadixTreeNode<S, V> find(S prefix, PrefixType type){
 		AtomicReference<RadixTreeNode<S, V>> result = new AtomicReference<>(null);
@@ -209,14 +209,12 @@ public class RadixTree<S, V extends Serializable>{
 	 * @throws NullPointerException	If the given key or value is <code>null</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	public V put(S key, V value){
+	public V put(S key, V value) throws DuplicateKeyException{
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(value);
 
 		try{
-			V previousValue = put(key, value, root);
-
-			return previousValue;
+			return put(key, value, root);
 		}
 		catch(DuplicateKeyException e){
 			throw new DuplicateKeyException("Duplicate key: '" + sequencer.toString(key) + "'");
@@ -232,7 +230,7 @@ public class RadixTree<S, V extends Serializable>{
 	 * @return	The old value associated with the given key, or <code>null</code> if there was no mapping for <code>key</code>
 	 * @throws DuplicateKeyException	If a duplicated key is inserted and the tree does not allow it
 	 */
-	private V put(S key, V value, RadixTreeNode<S, V> node){
+	private V put(S key, V value, RadixTreeNode<S, V> node) throws DuplicateKeyException{
 		V ret = null;
 
 		S nodeKey = node.getKey();
@@ -288,7 +286,7 @@ public class RadixTree<S, V extends Serializable>{
 		//key and node.getPrefix() share a prefix, so split node
 		node.split(lcpLength, sequencer);
 		if(lcpLength == keyLength){
-			//the largest prefix is equal to the key, so set this node's value
+			//the longest prefix is equal to the key, so set this node's value
 			ret = node.getValue();
 			node.setValue(value);
 		}
@@ -312,7 +310,7 @@ public class RadixTree<S, V extends Serializable>{
 	 *
 	 * @param keyA	Character sequence A
 	 * @param keyB	Character sequence B
-	 * @return	The length of largest prefix of <code>A</code> and <code>B</code>
+	 * @return	The length of longest common prefix between <code>A</code> and <code>B</code>
 	 * @throws IllegalArgumentException	If either <code>A</code> or <code>B</code> is <code>null</code>
 	 */
 	protected int longestCommonPrefixLength(S keyA, S keyB){
@@ -384,7 +382,7 @@ public class RadixTree<S, V extends Serializable>{
 
 
 	/**
-	 * Performa a BFS traversal on the tree, calling the traverser for each node found
+	 * Perform a BFS traversal on the tree, calling the traverser for each node found
 	 *
 	 * @param traverser	The traverser
 	 */
@@ -426,7 +424,7 @@ public class RadixTree<S, V extends Serializable>{
 	 *
 	 * @param visitor	The visitor
 	 * @param prefix	The prefix used to restrict visitation
-	 * @param condition	Condition that has to be verified in order to match
+	 * @param type	The type of search to perform
 	 * @throws NullPointerException	If the given visitor or prefix allowed is <code>null</code>
 	 */
 	private void visit(Function<VisitElement<S, V>, Boolean> visitor, S prefix, PrefixType type){
@@ -434,7 +432,7 @@ public class RadixTree<S, V extends Serializable>{
 		Objects.requireNonNull(prefix);
 		Objects.requireNonNull(type);
 
-		BiFunction<S, S, Boolean> condition = (type == PrefixType.PREFIXED_BY? (pre, preAllowed) -> sequencer.startsWith(pre, preAllowed):
+		BiFunction<S, S, Boolean> condition = (type == PrefixType.PREFIXED_BY? sequencer::startsWith:
 			(pre, preAllowed) -> sequencer.startsWith(preAllowed, pre));
 
 		int prefixAllowedLength = sequencer.length(prefix);

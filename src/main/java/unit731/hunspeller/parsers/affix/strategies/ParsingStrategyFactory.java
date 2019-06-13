@@ -17,8 +17,8 @@ public class ParsingStrategyFactory{
 
 	private ParsingStrategyFactory(){}
 
-	public static FlagParsingStrategy createFromFlag(String flag){
-		FlagParsingStrategy strategy = STRATEGIES.get(flag);
+	public static FlagParsingStrategy createFromFlag(final String flag){
+		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
 			throw new IllegalArgumentException("Unknown strategy type: " + flag);
 

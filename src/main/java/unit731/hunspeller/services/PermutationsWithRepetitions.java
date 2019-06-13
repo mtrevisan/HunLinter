@@ -99,7 +99,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * Convert a number base 10 to another base
 	 *
 	 * @param decimalNumber	the input number (base 10)
-	 * @param base	the desired new number base
+	 * @param radix	the desired new number base
 	 * @return	The array of integers representing decimal number on new base
 	 */
 	private int[] convertBase(long decimalNumber, int radix) throws IllegalArgumentException{

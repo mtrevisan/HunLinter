@@ -12,18 +12,18 @@ public class Affixes{
 	private final String[] terminalAffixes;
 
 
-	public Affixes(List<String> prefixes, List<String> suffixes, List<String> terminalAffixes){
-		this.prefixes = prefixes.toArray(new String[prefixes.size()]);
-		this.suffixes = suffixes.toArray(new String[suffixes.size()]);
-		this.terminalAffixes = terminalAffixes.toArray(new String[terminalAffixes.size()]);
+	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminalAffixes){
+		this.prefixes = prefixes.toArray(new String[0]);
+		this.suffixes = suffixes.toArray(new String[0]);
+		this.terminalAffixes = terminalAffixes.toArray(new String[0]);
 	}
 
 	public String[] getTerminalAffixes(){
 		return terminalAffixes;
 	}
 
-	public List<String[]> extractAllAffixes(boolean reverseAffixes){
-		List<String[]> applyAffixes = new ArrayList<>(3);
+	public List<String[]> extractAllAffixes(final boolean reverseAffixes){
+		final List<String[]> applyAffixes = new ArrayList<>(3);
 		applyAffixes.add(prefixes);
 		applyAffixes.add(suffixes);
 		if(reverseAffixes)

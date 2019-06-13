@@ -69,7 +69,7 @@ public class CompoundTableModel extends AbstractTableModel implements Hunspeller
 		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 

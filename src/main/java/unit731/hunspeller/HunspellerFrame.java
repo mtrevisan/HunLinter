@@ -3,6 +3,7 @@ package unit731.hunspeller;
 import java.awt.Component;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +17,6 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -75,6 +75,7 @@ import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
+import unit731.hunspeller.parsers.dictionary.workers.ProjectLoaderWorker;
 import unit731.hunspeller.parsers.dictionary.workers.SorterWorker;
 import unit731.hunspeller.parsers.dictionary.workers.StatisticsWorker;
 import unit731.hunspeller.parsers.dictionary.workers.WordCountWorker;
@@ -121,7 +122,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private DictionarySortDialog dicSortDialog;
-	private RuleReducerDialog ruleReducerDialog;
+	private RulesReducerDialog rulesReducerDialog;
 
 	private final Backbone backbone;
 
@@ -132,6 +133,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
 
+	private ProjectLoaderWorker prjLoaderWorker;
 	private DictionaryCorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
@@ -156,7 +158,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
 			GUIUtils.addPopupMenu(copyingPopupMenu, hypSyllabationOutputLabel, hypRulesOutputLabel, hypAddRuleSyllabationOutputLabel);
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, Backbone.MARKER_APPLICATION);
 
@@ -170,18 +172,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> {
-			dicCheckCorrectnessMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> {
-			dicExtractDuplicatesMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> {
-			dicSortDictionaryMenuItem.setEnabled(true);
-		});
-		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> {
-			dicWordCountMenuItem.setEnabled(true);
-		});
+		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(StatisticsWorker.WORKER_NAME, () -> {
 			if(dicStatisticsWorker.isPerformHyphenationStatistics())
 				hypStatisticsMenuItem.setEnabled(true);
@@ -199,9 +193,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			if(compoundRulesExtractorWorker.isCancelled())
 				cmpLoadInputButton.setEnabled(true);
 		});
-		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> {
-			hypCheckCorrectnessMenuItem.setEnabled(true);
-		});
+		enableComponentFromWorker.put(HyphenationCorrectnessWorker.WORKER_NAME, () -> hypCheckCorrectnessMenuItem.setEnabled(true));
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -270,7 +262,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicMenu = new javax.swing.JMenu();
       dicCheckCorrectnessMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
-      dicRuleReducerMenuItem = new javax.swing.JMenuItem();
+      dicRulesReducerMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -513,7 +505,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<ThesaurusTableModel>((ThesaurusTableModel)theTable.getModel()));
+      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel) theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
@@ -879,14 +871,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       });
       dicMenu.add(dicSortDictionaryMenuItem);
 
-      dicRuleReducerMenuItem.setText("Rule reducer...");
-      dicRuleReducerMenuItem.setEnabled(false);
-      dicRuleReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
+      dicRulesReducerMenuItem.setText("Rules reducer...");
+      dicRulesReducerMenuItem.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
-            dicRuleReducerMenuItemActionPerformed(evt);
+            dicRulesReducerMenuItemActionPerformed(evt);
          }
       });
-      dicMenu.add(dicRuleReducerMenuItem);
+      dicMenu.add(dicRulesReducerMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
       dicWordCountMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/dictionary_count.png"))); // NOI18N
@@ -1114,6 +1105,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				ProductionTableModel dm = (ProductionTableModel)frame.dicTable.getModel();
 				dm.setProductions(productions);
 
+				//show first row
+				Rectangle cellRect = frame.dicTable.getCellRect(0, 0, true);
+				frame.dicTable.scrollRectToVisible(cellRect);
+
 				frame.totalProductionsOutputLabel.setText(Integer.toString(productions.size()));
 			}
 			catch(IllegalArgumentException e){
@@ -1226,8 +1221,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			else{
 				theMeaningsTextField.requestFocusInWindow();
 
-				String duplicatedWords = String.join(", ", duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.toList()));
-				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", -1,
+				String duplicatedWords = duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "));
+				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
 					JOptionPane.WARNING_MESSAGE, null, null, null);
 			}
 		}
@@ -1396,7 +1391,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				List<Production> words;
 				AffixData affixData = backbone.getAffixData();
 				if(affixData.getCompoundFlag().equals(inputText)){
-					Integer maxCompounds = affixData.getCompoundMaxWordCount();
+					int maxCompounds = affixData.getCompoundMaxWordCount();
 					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
 				}
 				else
@@ -1430,12 +1425,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		filEmptyRecentFilesMenuItem.setEnabled(false);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
-   private void dicRuleReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRuleReducerMenuItemActionPerformed
+   private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		dicRuleReducerMenuItem.setEnabled(false);
-		ruleReducerDialog.setVisible(true);
-   }//GEN-LAST:event_dicRuleReducerMenuItemActionPerformed
+		dicRulesReducerMenuItem.setEnabled(false);
+		rulesReducerDialog.setVisible(true);
+   }//GEN-LAST:event_dicRulesReducerMenuItemActionPerformed
 
    private void hypStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1459,6 +1454,26 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
 		else{
+			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
+				prjLoaderWorker.pause();
+
+				Object[] options = {"Abort", "Cancel"};
+				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the project loader task?", "Warning!",
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+				if(answer == JOptionPane.YES_OPTION){
+					prjLoaderWorker.cancel();
+
+					dicCheckCorrectnessMenuItem.setEnabled(true);
+					LOGGER.info(Backbone.MARKER_APPLICATION, "Project loader aborted");
+
+					prjLoaderWorker = null;
+				}
+				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+					prjLoaderWorker.resume();
+
+					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+				}
+			}
 			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
 				dicCorrectnessWorker.pause();
 
@@ -1612,24 +1627,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		loadFileInternal(filePath);
 
-		try{
-			backbone.registerFileListener();
-			backbone.startFileListener();
-		}
-		catch(IOException e){
-			LOGGER.error(Backbone.MARKER_APPLICATION, "Cannot start file listener");
-
-			LOGGER.error("Cannot start file listener", e);
-		}
+		backbone.registerFileListener();
+		backbone.startFileListener();
 	}
 
 	@Override
 	public void loadFileInternal(String filePath){
-		try{
+		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
+			dicCheckCorrectnessMenuItem.setEnabled(false);
+
 			mainProgressBar.setValue(0);
-			backbone.loadFile(filePath);
 
+			prjLoaderWorker = new ProjectLoaderWorker(filePath, backbone, this::loadFileCompleted, this::loadFileCancelled);
+			prjLoaderWorker.addPropertyChangeListener(this);
+			prjLoaderWorker.execute();
 
+			filOpenAFFMenuItem.setEnabled(false);
+		}
+	}
+
+	private void loadFileCompleted(){
+		try{
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			hypCheckCorrectnessMenuItem.setEnabled(true);
@@ -1676,20 +1694,27 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					}
 				}
 			});
-			ruleReducerDialog = new RuleReducerDialog(backbone, this);
-			ruleReducerDialog.setLocationRelativeTo(this);
-			ruleReducerDialog.addWindowListener(new WindowAdapter(){
-				@Override
-				public void windowClosed(WindowEvent e){
-					dicRuleReducerMenuItem.setEnabled(true);
-				}
-			});
 
 			filCreatePackageMenuItem.setEnabled(true);
 			dicMenu.setEnabled(true);
 			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
 			mainTabbedPane.setSelectedIndex(index);
+
+
+			//update rule reduced dialog:
+			if(rulesReducerDialog == null){
+				rulesReducerDialog = new RulesReducerDialog(backbone, this);
+				rulesReducerDialog.setLocationRelativeTo(this);
+				rulesReducerDialog.addWindowListener(new WindowAdapter(){
+					@Override
+					public void windowClosed(WindowEvent e){
+						dicRulesReducerMenuItem.setEnabled(true);
+					}
+				});
+			}
+			else
+				rulesReducerDialog.reload();
 
 
 			//aid file:
@@ -1713,9 +1738,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			theMenu.setEnabled(true);
 			setTabbedPaneEnable(mainTabbedPane, theLayeredPane, true);
 		}
-		catch(FileNotFoundException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "The file does not exists");
-		}
 		catch(IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, e.getMessage());
 		}
@@ -1724,6 +1746,41 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void loadFileCancelled(){
+		dicCheckCorrectnessMenuItem.setEnabled(false);
+		dicSortDictionaryMenuItem.setEnabled(false);
+		hypCheckCorrectnessMenuItem.setEnabled(false);
+
+
+		//affix file:
+		cmpInputComboBox.removeAllItems();
+		cmpInputComboBox.setEnabled(false);
+
+
+		//hyphenation file:
+		hypMenu.setEnabled(false);
+		hypStatisticsMenuItem.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, hypLayeredPane, false);
+
+
+		filCreatePackageMenuItem.setEnabled(false);
+		dicMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+
+
+		//aid file:
+		dicRuleTagsAidComboBox.removeAllItems();
+		cmpRuleTagsAidComboBox.removeAllItems();
+		//enable combo-box only if an AID file exists
+		dicRuleTagsAidComboBox.setEnabled(false);
+		cmpRuleTagsAidComboBox.setEnabled(false);
+
+
+		//thesaurus file:
+		theMenu.setEnabled(false);
+		setTabbedPaneEnable(mainTabbedPane, theLayeredPane, false);
 	}
 
 	private void updateSynonymsCounter(){
@@ -1746,7 +1803,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		formerHyphenationText = text;
 
 		String count = null;
-		List<String> rules = Collections.<String>emptyList();
+		List<String> rules = Collections.emptyList();
 		if(StringUtils.isNotBlank(text)){
 			Hyphenation hyphenation = frame.backbone.getHyphenator().hyphenate(text);
 
@@ -1878,8 +1935,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), backbone.getHyphenator(),
-				backbone.getWordGenerator(), performHyphenationStatistics, this);
+			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), (performHyphenationStatistics? backbone.getHyphenator(): null),
+				backbone.getWordGenerator(), this);
 			dicStatisticsWorker.addPropertyChangeListener(this);
 			dicStatisticsWorker.execute();
 		}
@@ -1934,7 +1991,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			String compoundFlag = affixData.getCompoundFlag();
 			List<Production> compounds = new ArrayList<>();
 			BiConsumer<Production, Integer> productionReader = (production, row) -> {
-				String word = production.getWord();
 				if(!production.distributeByCompoundRule(affixData).isEmpty() || production.hasContinuationFlag(compoundFlag))
 					compounds.add(production);
 			};
@@ -1980,6 +2036,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	@Override
 	public void clearAffixParser(){
 		clearDictionaryParser();
+
+
+		//update rule reduced dialog:
+		rulesReducerDialog.reload();
 	}
 
 	@Override
@@ -2095,7 +2155,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
@@ -2110,9 +2170,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 
 		//create and display the form
-		EventQueue.invokeLater(() -> {
-			(new HunspellerFrame()).setVisible(true);
-		});
+		EventQueue.invokeLater(() -> (new HunspellerFrame()).setVisible(true));
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2136,9 +2194,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JTextField dicInputTextField;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenu dicMenu;
-   private javax.swing.JMenuItem dicRuleReducerMenuItem;
    private javax.swing.JComboBox<String> dicRuleTagsAidComboBox;
    private javax.swing.JLabel dicRuleTagsAidLabel;
+   private javax.swing.JMenuItem dicRulesReducerMenuItem;
    private javax.swing.JScrollPane dicScrollPane;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;

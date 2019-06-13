@@ -36,30 +36,30 @@ public class AffixEntry{
 	public static final String ZERO = "0";
 
 
-	public static enum Type{
+	public enum Type{
 		SUFFIX(AffixTag.SUFFIX),
 		PREFIX(AffixTag.PREFIX);
 
 
-		private final AffixTag flag;
+		private final AffixTag tag;
 
-		Type(AffixTag flag){
-			this.flag = flag;
+		Type(final AffixTag tag){
+			this.tag = tag;
 		}
 
-		public static Type createFromCode(String code){
+		public static Type createFromCode(final String code){
 			return Arrays.stream(values())
-				.filter(tag -> tag.flag.getCode().equals(code))
+				.filter(t -> t.tag.getCode().equals(code))
 				.findFirst()
 				.orElse(null);
 		}
 
-		public boolean is(String flag){
-			return this.flag.getCode().equals(flag);
+		public boolean is(final String flag){
+			return this.tag.getCode().equals(flag);
 		}
 
-		public AffixTag getFlag(){
-			return flag;
+		public AffixTag getTag(){
+			return tag;
 		}
 
 	}
@@ -82,28 +82,29 @@ public class AffixEntry{
 	private final String entry;
 
 
-	public AffixEntry(String line, FlagParsingStrategy strategy, List<String> aliasesFlag, List<String> aliasesMorphologicaField){
+	public AffixEntry(final String line, final FlagParsingStrategy strategy, final List<String> aliasesFlag,
+			final List<String> aliasesMorphologicalField){
 		Objects.requireNonNull(line);
 		Objects.requireNonNull(strategy);
 
-		String[] lineParts = StringUtils.split(line, null, 6);
+		final String[] lineParts = StringUtils.split(line, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
 			throw new IllegalArgumentException("Expected an affix entry, found something else"
 				+ (lineParts.length > 0? ": '" + line + "'": StringUtils.EMPTY));
 
-		String ruleType = lineParts[0];
+		final String ruleType = lineParts[0];
 		this.flag = lineParts[1];
-		String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
-		Matcher m = PATTERN_LINE.matcher(lineParts[3]);
+		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
+		final Matcher m = PATTERN_LINE.matcher(lineParts[3]);
 		if(!m.find())
 			throw new IllegalArgumentException("Cannot parse affix line '" + line + "'");
-		String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
-		String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
-		String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
-		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicaField)): null);
+		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
+		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
+		final String cond = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
+		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
 
 		type = Type.createFromCode(ruleType);
-		String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
+		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? classes: null);
 		condition = new AffixCondition(cond, type);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
@@ -117,10 +118,10 @@ public class AffixEntry{
 		checkValidity(cond, removal, line);
 
 
-		entry = PatternHelper.clear(line, PATTERN_ENTRY);
+		entry = line;
 	}
 
-	private void checkValidity(String cond, String removal, String line) throws IllegalArgumentException{
+	private void checkValidity(final String cond, final String removal, final String line) throws IllegalArgumentException{
 		if(removingLength > 0){
 			if(isSuffix()){
 				if(!cond.endsWith(removal))
@@ -149,21 +150,21 @@ public class AffixEntry{
 		return condition;
 	}
 
-	private String expandAliases(String part, List<String> aliases) throws IllegalArgumentException{
+	private String expandAliases(final String part, final List<String> aliases) throws IllegalArgumentException{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	public boolean hasContinuationFlag(String flag){
+	public boolean hasContinuationFlag(final String flag){
 		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public String[] combineContinuationFlags(String[] otherContinuationFlags){
-		Set<String> flags = new HashSet<>();
+	public String[] combineContinuationFlags(final String[] otherContinuationFlags){
+		final Set<String> flags = new HashSet<>();
 		if(continuationFlags != null)
 			flags.addAll(Arrays.asList(continuationFlags));
 		if(otherContinuationFlags != null && otherContinuationFlags.length > 0)
 			flags.addAll(Arrays.asList(otherContinuationFlags));
-		int size = flags.size();
+		final int size = flags.size();
 		return (size > 0? flags.toArray(new String[size]): null);
 	}
 
@@ -178,13 +179,13 @@ public class AffixEntry{
 	 * @param dicEntry	The dictionary entry to combine from
 	 * @return	The list of new morphological fields
 	 */
-	public String[] combineMorphologicalFields(DictionaryEntry dicEntry){
+	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
 		List<String> mf = (dicEntry.morphologicalFields != null? new ArrayList<>(Arrays.asList(dicEntry.morphologicalFields)): new ArrayList<>());
-		List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.<String>emptyList());
+		final List<String> amf = (morphologicalFields != null? Arrays.asList(morphologicalFields): Collections.emptyList());
 
-//		boolean containsPartOfSpeech = amf.stream()
+//		final boolean containsPartOfSpeech = amf.stream()
 //			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));
-		boolean containsTerminalSuffixes = amf.stream()
+		final boolean containsTerminalSuffixes = amf.stream()
 			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
@@ -195,9 +196,9 @@ public class AffixEntry{
 
 		//find stem
 /*		String stem = null;
-		Iterator<String> itr = mf.iterator();
+		final Iterator<String> itr = mf.iterator();
 		while(itr.hasNext()){
-			String field = itr.next();
+			final String field = itr.next();
 			if(field.startsWith(MorphologicalTag.TAG_STEM)){
 				stem = field;
 				itr.remove();
@@ -207,7 +208,7 @@ public class AffixEntry{
 		if(stem != null){
 			itr = amf.iterator();
 			while(itr.hasNext()){
-				String field = itr.next();
+				final String field = itr.next();
 				if(field.startsWith(MorphologicalTag.TAG_STEM)){
 					stem = field;
 					itr.remove();
@@ -221,14 +222,14 @@ public class AffixEntry{
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
 
-		return mf.toArray(new String[mf.size()]);
+		return mf.toArray(new String[0]);
 	}
 
-	public static String[] extractMorphologicalFields(List<DictionaryEntry> compoundEntries){
-		List<String[]> mf = new ArrayList<>();
+	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
+		final List<String[]> mf = new ArrayList<>();
 		if(compoundEntries != null)
-			for(DictionaryEntry compoundEntry : compoundEntries){
-				String compound = compoundEntry.getWord();
+			for(final DictionaryEntry compoundEntry : compoundEntries){
+				final String compound = compoundEntry.getWord();
 				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART + compound}, compoundEntry.morphologicalFields));
 			}
 		return mf.stream()
@@ -240,11 +241,11 @@ public class AffixEntry{
 		return (type == Type.SUFFIX);
 	}
 
-	public boolean match(String word){
+	public boolean match(final String word){
 		return condition.match(word, type);
 	}
 
-	public String applyRule(String word, boolean isFullstrip) throws IllegalArgumentException{
+	public String applyRule(final String word, final boolean isFullstrip) throws IllegalArgumentException{
 		if(!isFullstrip && word.length() == removingLength)
 			throw new IllegalArgumentException("Cannot strip full words without the FULLSTRIP tag");
 
@@ -253,16 +254,16 @@ public class AffixEntry{
 			appending + word.substring(removingLength));
 	}
 
-	public String undoRule(String word) throws IllegalArgumentException{
+	public String undoRule(final String word) throws IllegalArgumentException{
 		return (isSuffix()?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));
 	}
 
-	public String toStringWithMorphologicalFields(FlagParsingStrategy strategy){
+	public String toStringWithMorphologicalFields(final FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy);
 
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		if(continuationFlags != null && continuationFlags.length > 0){
 			sb.append(SLASH);
 			sb.append(strategy.joinFlags(continuationFlags));
@@ -278,13 +279,13 @@ public class AffixEntry{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		AffixEntry rhs = (AffixEntry)obj;
+		final AffixEntry rhs = (AffixEntry)obj;
 		return new EqualsBuilder()
 			.append(entry, rhs.entry)
 			.isEquals();

@@ -1,21 +1,13 @@
 package unit731.hunspeller;
 
 import java.awt.Frame;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import javax.swing.JDialog;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import unit731.hunspeller.gui.GUIUtils;
 
 
 public class ThesaurusDuplicatesDialog extends JDialog{
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusDuplicatesDialog.class);
 
 	private static final long serialVersionUID = 5718588727397261977L;
 
@@ -67,37 +59,6 @@ public class ThesaurusDuplicatesDialog extends JDialog{
 
       pack();
    }// </editor-fold>//GEN-END:initComponents
-
-	public static void main(String args[]){
-		//<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-		try{
-			String lookAndFeelName = UIManager.getSystemLookAndFeelClassName();
-			UIManager.setLookAndFeel(lookAndFeelName);
-		}
-		catch(ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e){
-			LOGGER.error(null, e);
-		}
-		//</editor-fold>
-
-		java.awt.EventQueue.invokeLater(() -> {
-			try{
-				javax.swing.JFrame parent = new javax.swing.JFrame();
-				ThesaurusDuplicatesDialog dialog = new ThesaurusDuplicatesDialog(Arrays.asList("a", "b", "c"), parent);
-				GUIUtils.addCancelByEscapeKey(dialog);
-				dialog.setLocationRelativeTo(parent);
-				dialog.addWindowListener(new java.awt.event.WindowAdapter(){
-					@Override
-					public void windowClosing(java.awt.event.WindowEvent e){
-						System.exit(0);
-					}
-				});
-				dialog.setVisible(true);
-			}
-			catch(IllegalArgumentException e){
-				LOGGER.error(null, e);
-			}
-		});
-	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JTextArea duplicatesTextArea;

@@ -13,13 +13,13 @@ import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.services.FileHelper;
 
 
-public class DictionaryParserTest{
+class DictionaryParserTest{
 
 	private final AffixParser affParser = new AffixParser();
 
 
 	@Test
-	public void replacementTable() throws IOException{
+	void replacementTable() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"REP 4",
@@ -43,7 +43,7 @@ public class DictionaryParserTest{
 	}
 
 	@Test
-	public void applyLongest() throws IOException{
+	void applyLongest() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"REP 3",
@@ -57,7 +57,7 @@ public class DictionaryParserTest{
 	}
 
 	@Test
-	public void applyLongestOnStart() throws IOException{
+	void applyLongestOnStart() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"REP 3",
@@ -71,7 +71,7 @@ public class DictionaryParserTest{
 	}
 
 	@Test
-	public void applyLongestOnEnd() throws IOException{
+	void applyLongestOnEnd() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"REP 3",

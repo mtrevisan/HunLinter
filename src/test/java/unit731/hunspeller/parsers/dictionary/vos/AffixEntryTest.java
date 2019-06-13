@@ -6,10 +6,10 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
-public class AffixEntryTest{
+class AffixEntryTest{
 
 	@Test
-	public void notValidSuffix1(){
+	void notValidSuffix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -19,7 +19,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void notValidSuffix2(){
+	void notValidSuffix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "SFX M0 a ai a";
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -29,7 +29,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void notValidPrefix1(){
+	void notValidPrefix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 b i a";
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -39,7 +39,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void notValidPrefix2(){
+	void notValidPrefix2(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		String line = "PFX M0 a ia a";
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -49,7 +49,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void hasContinuationFlag(){
+	void hasContinuationFlag(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -59,7 +59,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void notHasContinuationFlag(){
+	void notHasContinuationFlag(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -69,7 +69,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void combineContinuationFlags(){
+	void combineContinuationFlags(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -79,7 +79,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void isSuffix(){
+	void isSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -89,7 +89,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void isPrefix(){
+	void isPrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -99,7 +99,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void matchOk(){
+	void matchOk(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -109,7 +109,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void matchNotOk(){
+	void matchNotOk(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -119,7 +119,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void applyRuleSuffix(){
+	void applyRuleSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
@@ -129,7 +129,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void cannotApplyRuleSuffixFullstrip(){
+	void cannotApplyRuleSuffixFullstrip(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 man i/A man", strategy, null, null);
 
@@ -140,7 +140,7 @@ public class AffixEntryTest{
 }
 
 	@Test
-	public void applyRulePrefix(){
+	void applyRulePrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX TB ŧ s ŧ	po:noun", strategy, null, null);
 
@@ -150,7 +150,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void undoRuleSuffix(){
+	void undoRuleSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i [^oaie]	po:noun", strategy, null, null);
 
@@ -160,7 +160,7 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void undoRulePrefix(){
+	void undoRulePrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX TB ŧ s ŧ	po:noun", strategy, null, null);
 
@@ -170,13 +170,13 @@ public class AffixEntryTest{
 	}
 
 	@Test
-	public void testToString(){
+	void testToString(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("PFX TB ŧ s ŧ	po:noun", strategy, null, null);
 
 		String representation = entry.toString();
 
-		Assertions.assertEquals("PFX TB ŧ s ŧ", representation);
+		Assertions.assertEquals("PFX TB ŧ s ŧ	po:noun", representation);
 	}
 
 }

@@ -2,7 +2,6 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -23,69 +22,56 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public static final String WORKER_NAME = "Collecting statistics";
 
-	private final boolean performHyphenationStatistics;
 	private final DictionaryStatistics dicStatistics;
+	private final HyphenatorInterface hyphenator;
 
 
-	public StatisticsWorker(AffixParser affParser, DictionaryParser dicParser, HyphenatorInterface hyphenator, WordGenerator wordGenerator,
-			boolean performHyphenationStatistics, Frame parent){
+	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
+			final WordGenerator wordGenerator, final Frame parent){
 		Objects.requireNonNull(affParser);
 		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(parent);
 
-		this.performHyphenationStatistics = performHyphenationStatistics;
-
-		AffixData affixData = affParser.getAffixData();
+		final AffixData affixData = affParser.getAffixData();
 		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset());
+		this.hyphenator = hyphenator;
 
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 
-			for(Production production : productions){
+			for(final Production production : productions){
 				//collect statistics
-				String word = production.getWord();
-				if(performHyphenationStatistics){
-					List<String> subwords = hyphenator.splitIntoCompounds(word);
-					if(subwords.isEmpty())
-						dicStatistics.addData(word);
-					else
-						for(String subword : subwords){
-							Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
-							dicStatistics.addData(word, hyph);
-						}
-				}
-				else
+				final String word = production.getWord();
+				final List<String> subwords = hyphenator.splitIntoCompounds(word);
+				if(subwords.isEmpty())
 					dicStatistics.addData(word);
+				else
+					for(final String subword : subwords){
+						final Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+						dicStatistics.addData(word, hyph);
+					}
 			}
 		};
-		Runnable completed = () -> {
-			try{
-				dicStatistics.close();
-			}
-			catch(IOException e){}
+		final Runnable completed = () -> {
+			dicStatistics.close();
 
 			//show statistics window
-			DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
+			final DictionaryStatisticsDialog dialog = new DictionaryStatisticsDialog(dicStatistics, parent);
 			GUIUtils.addCancelByEscapeKey(dialog);
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		Runnable cancelled = () -> {
-			try{
-				dicStatistics.close();
-			}
-			catch(IOException e){}
-		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final Runnable cancelled = dicStatistics::close;
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);
 		createReadWorker(data, lineProcessor);
 	}
 
 	public boolean isPerformHyphenationStatistics(){
-		return performHyphenationStatistics;
+		return (hyphenator != null);
 	}
 
 	@Override

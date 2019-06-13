@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.Deflater;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,7 @@ import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
+import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.thesaurus.ThesaurusParser;
 import unit731.hunspeller.services.ZipManager;
@@ -161,7 +162,7 @@ public class Backbone implements FileChangeListener{
 		wordGenerator = null;
 	}
 
-	public void registerFileListener() throws IOException{
+	public void registerFileListener(){
 		File hypFile = getHyphenationFile();
 		File aidFile = getAidFile();
 		flm.register(this, affFile.getAbsolutePath(), hypFile.getAbsolutePath(), aidFile.getAbsolutePath());
@@ -175,7 +176,7 @@ public class Backbone implements FileChangeListener{
 		flm.stop();
 	}
 
-	private void openAffixFile(String affixFilePath) throws IOException{
+	public void openAffixFile(String affixFilePath) throws IOException{
 		affFile = new File(affixFilePath);
 
 		if(!affFile.exists()){
@@ -194,14 +195,14 @@ public class Backbone implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
-	private void openHyphenationFile(File hypFile) throws IOException{
+	public void openHyphenationFile(File hypFile){
 		if(hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
-			hypParser = new HyphenationParser(HyphenatorFactory.Type.AHO_CORASICK, affParser.getAffixData().getLanguage());
+			hypParser = new HyphenationParser(affParser.getAffixData().getLanguage());
 			hypParser.parse(hypFile);
 
-			hyphenator = HyphenatorFactory.createHyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
+			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);
 
 			if(hunspellable != null)
 				hunspellable.clearHyphenationParser();
@@ -212,11 +213,18 @@ public class Backbone implements FileChangeListener{
 			hypParser.clear();
 	}
 
-	private void prepareDictionaryFile(File dicFile){
-		AffixData affixData = affParser.getAffixData();
+	public void obtainCorrectnessChecker() throws IOException{
+		Objects.requireNonNull(affParser);
+		Objects.requireNonNull(hyphenator);
+
+		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
+	}
+
+	public void prepareDictionaryFile(File dicFile){
+		final AffixData affixData = affParser.getAffixData();
 		if(dicFile.exists()){
-			String language = affixData.getLanguage();
-			Charset charset = affixData.getCharset();
+			final String language = affixData.getLanguage();
+			final Charset charset = affixData.getCharset();
 			dicParser = new DictionaryParser(dicFile, language, charset);
 
 			if(hunspellable != null)
@@ -228,7 +236,7 @@ public class Backbone implements FileChangeListener{
 		wordGenerator = new WordGenerator(affixData, dicParser);
 	}
 
-	private void openAidFile(File aidFile) throws IOException{
+	public void openAidFile(File aidFile) throws IOException{
 		if(aidFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Aid file: {}", aidFile.getName());
 
@@ -243,7 +251,7 @@ public class Backbone implements FileChangeListener{
 			aidParser.clear();
 	}
 
-	private void openThesaurusFile(File theDataFile) throws IOException{
+	public void openThesaurusFile(File theDataFile) throws IOException{
 		if(theDataFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theDataFile.getName());
 
@@ -280,7 +288,7 @@ public class Backbone implements FileChangeListener{
 		return getFile(FilenameUtils.removeExtension(affFile.getName()) + EXTENSION_DIC);
 	}
 
-	private File getAidFile(){
+	public File getAidFile(){
 		return new File(getCurrentWorkingDirectory() + FOLDER_AID + affParser.getAffixData().getLanguage() + EXTENSION_AID);
 	}
 
@@ -295,11 +303,11 @@ public class Backbone implements FileChangeListener{
 		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_INDEX);
 	}
 
-	private File getThesaurusDataFile(){
+	public File getThesaurusDataFile(){
 		return getFile(PREFIX_THESAURUS + affParser.getAffixData().getLanguage() + SUFFIX_THESAURUS + EXTENSION_THESAURUS_DATA);
 	}
 
-	private File getHyphenationFile(){
+	public File getHyphenationFile(){
 		return getFile(PREFIX_HYPHENATION + affParser.getAffixData().getLanguage() + EXTENSION_DIC);
 	}
 
@@ -369,7 +377,7 @@ public class Backbone implements FileChangeListener{
 			catch(IOException e){
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
-				LOGGER.error("Something very bad happend while creating package", e);
+				LOGGER.error("Something very bad happened while creating package", e);
 			}
 		}
 	}
@@ -397,10 +405,9 @@ public class Backbone implements FileChangeListener{
 
 	public String[] getDictionaryLines() throws IOException{
 		File dicFile = getDictionaryFile();
-		String[] lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
+		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
 			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
 			.toArray(String[]::new);
-		return lines;
 	}
 
 	public void mergeSectionsToDictionary(List<File> files) throws IOException{

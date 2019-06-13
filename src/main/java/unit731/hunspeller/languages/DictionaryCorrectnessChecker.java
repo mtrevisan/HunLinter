@@ -2,7 +2,6 @@ package unit731.hunspeller.languages;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -22,14 +21,14 @@ public class DictionaryCorrectnessChecker{
 	private static final MessageFormat WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("{0} has an unknown morphological field value: {1}");
 
 
-	protected AffixData affixData;
+	protected final AffixData affixData;
 	protected final HyphenatorInterface hyphenator;
 	protected Orthography orthography;
 
 	protected RulesLoader rulesLoader;
 
 
-	public DictionaryCorrectnessChecker(AffixData affixData, HyphenatorInterface hyphenator){
+	public DictionaryCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator){
 		Objects.requireNonNull(affixData);
 
 		this.affixData = affixData;
@@ -45,8 +44,8 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	//used by the correctness worker:
-	public void checkProduction(Production production) throws IllegalArgumentException{
-		String forbidCompoundFlag = affixData.getForbidCompoundFlag();
+	public void checkProduction(final Production production) throws IllegalArgumentException{
+		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !production.hasProductionRules() && production.hasContinuationFlag(forbidCompoundFlag))
 			throw new IllegalArgumentException("Non-affix entry contains " + AffixTag.FORBID_COMPOUND_FLAG.getCode());
 
@@ -54,23 +53,9 @@ public class DictionaryCorrectnessChecker{
 			morphologicalFieldCheck(production);
 
 		incompatibilityCheck(production);
-
-		if(hyphenator != null)
-			hyphenatorCheck(production);
 	}
 
-	private void hyphenatorCheck(Production production) throws IllegalArgumentException{
-		List<String> splittedWords = hyphenator.splitIntoCompounds(production.getWord());
-		int size = splittedWords.size();
-		int i = 1;
-		for(String subword : splittedWords){
-			checkCompoundProduction(subword, i - size, production);
-			
-			i ++;
-		}
-	}
-
-	private void morphologicalFieldCheck(Production production) throws IllegalArgumentException{
+	private void morphologicalFieldCheck(final Production production) throws IllegalArgumentException{
 		if(!production.hasMorphologicalFields())
 			throw new IllegalArgumentException(WORD_HAS_NOT_MORPHOLOGICAL_FIELD.format(new Object[]{production.getWord()}));
 
@@ -79,33 +64,34 @@ public class DictionaryCorrectnessChecker{
 				throw new IllegalArgumentException(WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 
-			String key = morphologicalField.substring(0, 3);
+			final String key = morphologicalField.substring(0, 3);
 			if(!rulesLoader.containsDataField(key))
 				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
-			Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
+			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField.substring(3)))
 				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{production.getWord(),
 					morphologicalField}));
 		});
 	}
 
-	private void incompatibilityCheck(Production production) throws IllegalArgumentException{
+	private void incompatibilityCheck(final Production production) throws IllegalArgumentException{
 		rulesLoader.letterToFlagIncompatibilityCheck(production);
 
 		rulesLoader.flagToFlagIncompatibilityCheck(production);
 	}
 
 	//used by the correctness worker:
-	protected void checkCompoundProduction(String subword, int subwordIndex, Production production) throws IllegalArgumentException{}
+	protected void checkCompoundProduction(final String subword, final int subwordIndex, final Production production)
+		throws IllegalArgumentException{}
 
 	//used by the minimal pairs worker:
-	public boolean isConsonant(char chr){
+	public boolean isConsonant(final char chr){
 		return true;
 	}
 
 	//used by the minimal pairs worker:
-	public boolean shouldBeProcessedForMinimalPair(Production production){
+	public boolean shouldBeProcessedForMinimalPair(final Production production){
 		return true;
 	}
 

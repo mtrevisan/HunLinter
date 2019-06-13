@@ -35,7 +35,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	private MappedByteBuffer buffer;
 
 
-	public MemoryMappedFileBitArray(File backingFile, int bits) throws FileNotFoundException, IOException{
+	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws FileNotFoundException, IOException{
 		if(backingFile == null)
 			throw new IllegalArgumentException("Backing file cannot be empty/null");
 		if(backingFile.exists() && !backingFile.isFile())
@@ -54,34 +54,34 @@ public class MemoryMappedFileBitArray implements BitArray{
 		buffer = this.backingFile.getChannel().map(MapMode.READ_WRITE, 0, this.backingFile.length());
 	}
 
-	private void extendFile(long newLength) throws IOException{
-		long current = backingFile.length();
-		int delta = (int)(newLength - current) + 1;
+	private void extendFile(final long newLength) throws IOException{
+		final long current = backingFile.length();
+		final int delta = (int)(newLength - current) + 1;
 		if(delta > 0){
 			backingFile.setLength(newLength);
 			backingFile.seek(current);
-			byte[] bytes = new byte[delta];
+			final byte[] bytes = new byte[delta];
 			Arrays.fill(bytes, (byte)0x00);
 			backingFile.write(bytes);
 		}
 	}
 
 	@Override
-	public boolean get(int index){
+	public boolean get(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
-		int pos = index >> 3;
-		int bit = 1 << (index & 0x07);
-		byte bite = buffer.get(pos);
+		final int pos = index >> 3;
+		final int bit = 1 << (index & 0x07);
+		final byte bite = buffer.get(pos);
 		return ((bite & bit) != 0);
 	}
 
 	@Override
-	public boolean set(int index){
+	public boolean set(final int index){
 		if(!get(index)){
-			int pos = index >> 3;
-			int bit = 1 << (index & 0x07);
+			final int pos = index >> 3;
+			final int bit = 1 << (index & 0x07);
 			buffer.put(pos, (byte)(buffer.get(pos) | bit));
 			return true;
 		}
@@ -89,12 +89,12 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public void clear(int index){
+	public void clear(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
-		int pos = index >> 3;
-		int bit = ~(1 << (index & 0x07));
+		final int pos = index >> 3;
+		final int bit = ~(1 << (index & 0x07));
 		buffer.put(pos, (byte)(buffer.get(pos) & bit));
 	}
 
@@ -125,21 +125,21 @@ public class MemoryMappedFileBitArray implements BitArray{
 //			try{
 //				((sun.nio.ch.DirectBuffer)buffer).cleaner().clean();
 //			}
-//			catch(Exception e){ }
+//			catch(final Exception e){ }
 
 //			try{
-//				Method cleaner = buffer.getClass().getMethod("cleaner");
+//				final Method cleaner = buffer.getClass().getMethod("cleaner");
 //				cleaner.setAccessible(true);
-//				Method clean = Class.forName("sun.misc.Cleaner").getMethod("clean");
+//				final Method clean = Class.forName("sun.misc.Cleaner").getMethod("clean");
 //				clean.setAccessible(true);
 //				clean.invoke(cleaner.invoke(buffer));
 //			}
-//			catch(ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e){ }
+//			catch(final ClassNotFoundException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException e){ }
 
 			try{
-				Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+				final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
 				//do not need to check for a specific class, we can call the Unsafe method with any buffer class
-				MethodHandle unmapper = MethodHandles.lookup().findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
+				final MethodHandle unmapper = MethodHandles.lookup().findVirtual(unsafeClass, "invokeCleaner", MethodType.methodType(void.class, ByteBuffer.class));
 				//fetch the unsafe instance and bind it to the virtual MethodHandle
 				final Field f = unsafeClass.getDeclaredField("theUnsafe");
 				f.setAccessible(true);
@@ -147,7 +147,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 				unmapper.bindTo(theUnsafe)
 					.invokeExact(buffer);
 			}
-			catch(Throwable e){ }
+			catch(final Throwable ignored){ }
 
 			buffer = null;
 		}

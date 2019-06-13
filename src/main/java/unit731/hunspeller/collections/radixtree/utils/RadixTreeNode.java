@@ -188,8 +188,8 @@ public class RadixTreeNode<S, V extends Serializable> implements Serializable{
 	 * @return	The leaf node just created
 	 */
 	public RadixTreeNode<S, V> split(int splitIndex, SequencerInterface<S> sequencer){
-		S leafPrefix = sequencer.subSequence(key, splitIndex);
-		RadixTreeNode<S, V> leafNode = new RadixTreeNode<>(leafPrefix, value);
+		S leafSuffix = sequencer.subSequence(key, splitIndex);
+		RadixTreeNode<S, V> leafNode = new RadixTreeNode<>(leafSuffix, value);
 		leafNode.addChildren(children);
 
 		key = sequencer.subSequence(key, 0, splitIndex);

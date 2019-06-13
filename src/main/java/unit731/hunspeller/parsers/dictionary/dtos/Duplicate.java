@@ -13,7 +13,7 @@ public class Duplicate{
 	private final int lineIndex;
 
 
-	public Duplicate(Production production, String word, int lineIndex){
+	public Duplicate(final Production production, final String word, final int lineIndex){
 		Objects.requireNonNull(production);
 		Objects.requireNonNull(word);
 
@@ -35,13 +35,13 @@ public class Duplicate{
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		Duplicate rhs = (Duplicate)obj;
+		final Duplicate rhs = (Duplicate)obj;
 		return new EqualsBuilder()
 			.append(lineIndex, rhs.lineIndex)
 			.isEquals();

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class BloomFilterTest{
+class BloomFilterTest{
 
 	private static final int MAX = 100 * 100;
 
@@ -16,7 +16,7 @@ public class BloomFilterTest{
 
 
 	@Test
-	public void defaultFilter(){
+	void defaultFilter(){
 		BloomFilterParameters params = new BloomFilterParameters(){
 			@Override
 			public int getExpectedNumberOfElements(){
@@ -50,7 +50,7 @@ public class BloomFilterTest{
 			boolean present = filter.contains(uuid);
 			if(present){
 				//false positive
-				Assertions.assertEquals(false, contained.contains(uuid));
+				Assertions.assertFalse(contained.contains(uuid));
 				fpp ++;
 			}
 		}
@@ -70,7 +70,7 @@ public class BloomFilterTest{
 			boolean present = filter.contains(uuid);
 			if(present){
 				// false positive
-				Assertions.assertEquals(false, contained.contains(uuid));
+				Assertions.assertFalse(contained.contains(uuid));
 				fpp ++;
 			}
 		}

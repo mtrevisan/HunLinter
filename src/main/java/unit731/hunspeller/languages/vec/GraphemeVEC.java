@@ -43,15 +43,15 @@ class GraphemeVEC{
 
 	private GraphemeVEC(){}
 
-	public static boolean isDiphtong(String group){
+	public static boolean isDiphtong(final String group){
 		return PatternHelper.find(group, DIPHTONG);
 	}
 
-	public static boolean isHyatus(String group){
+	public static boolean isHyatus(final String group){
 		return PatternHelper.find(group, HYATUS);
 	}
 
-	public static boolean isEterophonicSequence(String group){
+	public static boolean isEterophonicSequence(final String group){
 		return PatternHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}
 
@@ -85,7 +85,7 @@ class GraphemeVEC{
 		if(word.contains(GRAPHEME_J))
 			word = StringUtils.replace(word, GRAPHEME_J, PHONEME_JJH);
 		if(word.contains(GRAPHEME_I))
-			for(Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
+			for(final Pattern p : ETEROPHONIC_SEQUENCE_J_FALSE_POSITIVES)
 				word = PatternHelper.replaceAll(word, p, "$1" + PHONEME_I_UMLAUT + "$2");
 		return word;
 	}

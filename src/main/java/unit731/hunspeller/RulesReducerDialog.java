@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -26,24 +27,24 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.workers.RuleReducerWorker;
+import unit731.hunspeller.parsers.dictionary.workers.RulesReducerWorker;
 import unit731.hunspeller.services.ApplicationLogAppender;
 
 
-public class RuleReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
+public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RuleReducerDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
 
 	private static final long serialVersionUID = -5660512112885632106L;
 
 
 	private final Backbone backbone;
 
-	private RuleReducerWorker ruleReducerWorker;
+	private RulesReducerWorker rulesReducerWorker;
 
 
-	public RuleReducerDialog(Backbone backbone, Frame parent){
-		super(parent, "Rule reducer", true);
+	public RulesReducerDialog(Backbone backbone, Frame parent){
+		super(parent, "Rules reducer", true);
 
 		Objects.requireNonNull(backbone);
 		Objects.requireNonNull(parent);
@@ -54,6 +55,8 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 
 		init();
+
+		reload();
 
 		ApplicationLogAppender.addTextArea(reducedSetTextArea, Backbone.MARKER_RULE_REDUCER);
 	}
@@ -74,6 +77,7 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
       reducedSetTextArea = new javax.swing.JTextArea();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+      setMinimumSize(new java.awt.Dimension(547, 476));
 
       lblRule.setText("Rule:");
 
@@ -169,7 +173,10 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	private void init(){
 		KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+	}
 
+	public final void reload(){
+		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
 
 		AffixData affixData = backbone.getAffixData();
@@ -178,25 +185,37 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 			.map(affix -> (affix.isSuffix()? AffixTag.SUFFIX: AffixTag.PREFIX) + StringUtils.SPACE + affix.getEntries().get(0).getFlag())
 			.sorted()
 			.collect(Collectors.toList());
-		ruleComboBox.removeAllItems();
-		affixEntries.forEach(ruleComboBox::addItem);
+
+		javax.swing.SwingUtilities.invokeLater(() -> {
+			ruleComboBox.removeAllItems();
+			affixEntries.forEach(ruleComboBox::addItem);
+		});
 	}
 
    private void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
-//TODO refresh this list if the aff file changes
 		String flag = getSelectedFlag();
-		RuleEntry rule = backbone.getAffixData().getData(flag);
-		String ruleEntries = rule.getEntries().stream()
-			.map(AffixEntry::toString)
-			.collect(Collectors.joining(StringUtils.LF));
-		currentSetTextArea.setText(ruleEntries);
-		currentSetTextArea.setCaretPosition(0);
-		reducedSetTextArea.setText(null);
+		if(flag != null){
+			RuleEntry rule = backbone.getAffixData().getData(flag);
+			StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+			String header = sj.add(rule.getType().getTag().getCode())
+				.add(flag)
+				.add(Character.toString(rule.combinableChar()))
+				.add(Integer.toString(rule.getEntries().size()))
+				.toString();
+			String rules = rule.getEntries().stream()
+				.map(AffixEntry::toString)
+				.collect(Collectors.joining(StringUtils.LF));
+			currentSetTextArea.setText(header + StringUtils.LF + rules);
+			currentSetTextArea.setCaretPosition(0);
+			reducedSetTextArea.setText(null);
+		}
    }//GEN-LAST:event_ruleComboBoxActionPerformed
 
    private void reduceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
 		mainProgressBar.setValue(0);
 		reducedSetTextArea.setText(null);
+		ruleComboBox.setEnabled(false);
+		optimizeClosedGroupCheckBox.setEnabled(false);
 
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
@@ -207,21 +226,23 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		if(ruleReducerWorker != null && ruleReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-			ruleReducerWorker.pause();
+		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
+			rulesReducerWorker.pause();
 
 			Object[] options = {"Abort", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rule reducer task?", "Warning!",
+			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rules reducer task?", "Warning!",
 				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if(answer == JOptionPane.YES_OPTION){
-				ruleReducerWorker.cancel();
+				rulesReducerWorker.cancel();
+				ruleComboBox.setEnabled(true);
+				optimizeClosedGroupCheckBox.setEnabled(true);
 
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rule reducer aborted");
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rules reducer aborted");
 
-				ruleReducerWorker = null;
+				rulesReducerWorker = null;
 			}
 			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				ruleReducerWorker.resume();
+				rulesReducerWorker.resume();
 
 				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 			}
@@ -239,29 +260,36 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 		}
 		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
 			reducedSetTextArea.setCaretPosition(0);
+
+			ruleComboBox.setEnabled(true);
+			optimizeClosedGroupCheckBox.setEnabled(true);
 		}
 	}
 
 	private void reduceRules(){
-		if(ruleReducerWorker == null || ruleReducerWorker.isDone()){
+		if(rulesReducerWorker == null || rulesReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
 			try{
 				String flag = getSelectedFlag();
 				boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
-				ruleReducerWorker = new RuleReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
+				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, backbone.getAffixData(), backbone.getDicParser(),
 					backbone.getWordGenerator());
-				ruleReducerWorker.addPropertyChangeListener(this);
-				ruleReducerWorker.execute();
+				rulesReducerWorker.addPropertyChangeListener(this);
+				rulesReducerWorker.execute();
 			}
 			catch(Exception e){
+				ruleComboBox.setEnabled(true);
+				optimizeClosedGroupCheckBox.setEnabled(true);
+
 				LOGGER.info(Backbone.MARKER_RULE_REDUCER, e.getMessage());
 			}
 		}
 	}
 
 	private String getSelectedFlag(){
-		return ruleComboBox.getSelectedItem().toString().split(StringUtils.SPACE)[1];
+		Object item = ruleComboBox.getSelectedItem();
+		return (item != null? item.toString().split(StringUtils.SPACE)[1]: null);
 	}
 
 	private boolean getKeepLongestCommonAffix(){
@@ -269,11 +297,11 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(RuleReducerDialog.class.getName());
+		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
-		throw new NotSerializableException(RuleReducerDialog.class.getName());
+	private void readObject(ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(RulesReducerDialog.class.getName());
 	}
 
 
@@ -290,4 +318,5 @@ public class RuleReducerDialog extends JDialog implements ActionListener, Proper
    private javax.swing.JTextArea reducedSetTextArea;
    private javax.swing.JComboBox<String> ruleComboBox;
    // End of variables declaration//GEN-END:variables
+
 }

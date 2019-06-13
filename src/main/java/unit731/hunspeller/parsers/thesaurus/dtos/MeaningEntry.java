@@ -22,7 +22,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 
 	private MeaningEntry(){}
 
-	public MeaningEntry(String partOfSpeech, List<String> meanings){
+	public MeaningEntry(final String partOfSpeech, final List<String> meanings){
 		Objects.requireNonNull(partOfSpeech);
 		Objects.requireNonNull(meanings);
 
@@ -30,11 +30,11 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 		this.meanings = meanings;
 	}
 
-	public MeaningEntry(String partOfSpeechAndMeanings){
+	public MeaningEntry(final String partOfSpeechAndMeanings){
 		Objects.requireNonNull(partOfSpeechAndMeanings);
 
 		try{
-			String[] components = StringUtils.split(partOfSpeechAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
+			final String[] components = StringUtils.split(partOfSpeechAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 
 			partOfSpeech = StringUtils.strip(components[0]);
 			if(partOfSpeech.charAt(0) != '(' || partOfSpeech.charAt(partOfSpeech.length() - 1) != ')')
@@ -48,7 +48,7 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 			if(meanings.size() < 1)
 				throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): " + partOfSpeechAndMeanings);
 		}
-		catch(ArrayIndexOutOfBoundsException e){
+		catch(final ArrayIndexOutOfBoundsException e){
 			throw new IllegalArgumentException(e.getMessage() + " with input \"" + partOfSpeechAndMeanings + "\"");
 		}
 	}
@@ -66,20 +66,20 @@ public class MeaningEntry implements Comparable<MeaningEntry>{
 	}
 
 	@Override
-	public int compareTo(MeaningEntry other){
+	public int compareTo(final MeaningEntry other){
 		return new CompareToBuilder()
 			.append(partOfSpeech, other.partOfSpeech)
 			.toComparison();
 	}
 
 	@Override
-	public boolean equals(Object obj){
+	public boolean equals(final Object obj){
 		if(obj == this)
 			return true;
 		if(obj == null || obj.getClass() != getClass())
 			return false;
 
-		MeaningEntry rhs = (MeaningEntry)obj;
+		final MeaningEntry rhs = (MeaningEntry)obj;
 		return new EqualsBuilder()
 			.append(partOfSpeech, rhs.partOfSpeech)
 			.isEquals();

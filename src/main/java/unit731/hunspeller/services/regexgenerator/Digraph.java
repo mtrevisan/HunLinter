@@ -51,7 +51,7 @@ public final class Digraph<T>{
 	}
 
 	/**
-	 * Adds the directed edge <code>v→w</code> upone ε-transition to this digraph.
+	 * Adds the directed edge <code>v→w</code> upon ε-transition to this digraph.
 	 *
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
@@ -81,7 +81,7 @@ public final class Digraph<T>{
 	 * @throws IllegalArgumentException unless {@code 0 <= vertex < vertices}
 	 */
 	public Iterable<Pair<Integer, T>> adjacentVertices(int vertex){
-		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.<Pair<Integer, T>>emptyList());
+		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());
 	}
 
 	/**

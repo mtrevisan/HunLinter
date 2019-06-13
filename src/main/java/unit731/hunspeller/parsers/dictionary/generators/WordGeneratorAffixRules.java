@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
@@ -16,28 +17,28 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	WordGeneratorAffixRules(AffixData affixData){
+	WordGeneratorAffixRules(final AffixData affixData){
 		super(affixData);
 	}
 
-	List<Production> applySingleAffixRule(String line){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
-		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+	List<Production> applySingleAffixRule(final String line, final RuleEntry overriddenRule){
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
-		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData);
 
-		List<Production> productions = Collections.<Production>emptyList();
-		String circumfixFlag = affixData.getCircumfixFlag();
+		List<Production> productions = Collections.emptyList();
+		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(!dicEntry.hasContinuationFlag(circumfixFlag)){
-			String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+			final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 			if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-				return Collections.<Production>emptyList();
+				return Collections.emptyList();
 
 			//extract suffixed productions
 			boolean isCompound = false;
-			productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes());
+			productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
 			if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
 				LOGGER.debug("Suffix productions:");
 				productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
@@ -52,7 +53,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			enforceNeedAffixFlag(productions);
 
 			//convert using output table
-			for(Production production : productions)
+			for(final Production production : productions)
 				production.applyOutputConversionTable(affixData);
 
 			if(LOGGER.isTraceEnabled())
@@ -61,18 +62,22 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		return productions;
 	}
 
-	List<Production> applyAffixRules(String line){
-		FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
-		List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+	List<Production> applyAffixRules(final String line){
+		return applyAffixRules(line, null);
+	}
 
-		DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
+	List<Production> applyAffixRules(final String line, final RuleEntry overriddenRule){
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+
+		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData);
 
-		List<Production> productions = applyAffixRules(dicEntry, false);
+		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 
 		//convert using output table
-		for(Production production : productions)
+		for(final Production production : productions)
 			production.applyOutputConversionTable(affixData);
 
 		if(LOGGER.isTraceEnabled())

@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -63,7 +62,7 @@ public class ExternalSorter{
 	 */
 	private List<File> splitAndSortFiles(BufferedReader fbr, ExternalSorterOptions options, long blockSize) throws IOException{
 		List<File> files = new ArrayList<>();
-		try{
+		try(fbr){
 			List<String> headers = new ArrayList<>();
 			List<String> temporaryList = new ArrayList<>();
 			String line = StringUtils.EMPTY;
@@ -99,9 +98,6 @@ public class ExternalSorter{
 				temporaryList.clear();
 			}
 		}
-		finally{
-			fbr.close();
-		}
 		return files;
 	}
 
@@ -109,9 +105,9 @@ public class ExternalSorter{
 		if(options.isSortInParallel())
 			list = list.stream().parallel()
 				.sorted(options.getComparator())
-				.collect(Collectors.toCollection(ArrayList<String>::new));
+				.collect(Collectors.toCollection(ArrayList::new));
 		else
-			Collections.sort(list, options.getComparator());
+			list.sort(options.getComparator());
 		return list;
 	}
 
@@ -156,7 +152,6 @@ public class ExternalSorter{
 	 * @param sortedLines	Data to be sorted
 	 * @param options	Sorting options
 	 * @param out	The output stream
-	 * @return the file containing the sorted data
 	 * @throws IOException generic IO exception
 	 */
 	private void saveChunk(List<String> headers, List<String> sortedLines, ExternalSorterOptions options, OutputStream out) throws IOException{
@@ -232,26 +227,25 @@ public class ExternalSorter{
 	 *
 	 */
 	private int mergeSortedFiles(BufferedWriter writer, ExternalSorterOptions options, List<BinaryFileBuffer> buffers) throws IOException{
-		PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
+		final PriorityQueue<BinaryFileBuffer> queue = new PriorityQueue<>(11, (i, j) -> options.getComparator().compare(i.peek(), j.peek()));
 		buffers.stream()
 			.filter(Predicate.not(BinaryFileBuffer::empty))
 			.forEachOrdered(queue::add);
 		int rowCounter = 0;
-		try{
+		try(writer){
 			if(options.isRemoveDuplicates())
-				rowCounter = mergeSortRemoveDulicates(queue, writer, rowCounter);
+				rowCounter = mergeSortRemoveDuplicates(queue, writer, rowCounter);
 			else
 				rowCounter = mergeSort(queue, writer, rowCounter);
 		}
 		finally{
-			writer.close();
-			for(BinaryFileBuffer buffer : queue)
+			for(final BinaryFileBuffer buffer : queue)
 				buffer.close();
 		}
 		return rowCounter;
 	}
 
-	private int mergeSortRemoveDulicates(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
+	private int mergeSortRemoveDuplicates(PriorityQueue<BinaryFileBuffer> queue, BufferedWriter writer, int rowCounter) throws IOException{
 		String lastLine = null;
 		if(!queue.isEmpty()){
 			BinaryFileBuffer buffer = queue.poll();

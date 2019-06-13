@@ -15,17 +15,17 @@ public class CompoundRulesWorker extends WorkerDictionaryBase{
 	public static final String WORKER_NAME = "Compound rules extraction";
 
 
-	public CompoundRulesWorker(DictionaryParser dicParser, WordGenerator wordGenerator, BiConsumer<Production, Integer> productionReader,
-			Runnable completed){
+	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final BiConsumer<Production, Integer> productionReader, final Runnable completed){
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(productionReader);
 
-		BiConsumer<String, Integer> lineProcessor = (line, row) -> {
-			List<Production> productions = wordGenerator.applyAffixRules(line);
+		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
+			final List<Production> productions = wordGenerator.applyAffixRules(line);
 			for(Production production : productions)
 				productionReader.accept(production, row);
 		};
-		WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
+		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		createReadWorker(data, lineProcessor);
 	}

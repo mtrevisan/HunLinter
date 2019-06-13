@@ -79,7 +79,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				for(String line : lines)
 					meanings.add(new MeaningEntry(line));
 			}
-			catch(IllegalArgumentException e){}
+			catch(IllegalArgumentException ignored){}
 		}
 	}
 
@@ -87,7 +87,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		throw new NotSerializableException(ThesaurusTableModel.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(ThesaurusTableModel.class.getName());
 	}
 

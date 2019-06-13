@@ -1,7 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.vos;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,8 +41,8 @@ public class DictionaryStatistics implements Closeable{
 	private final Orthography orthography;
 
 
-	public DictionaryStatistics(String language, Charset charset){
-		BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
+	public DictionaryStatistics(final String language, final Charset charset){
+		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 		orthography = BaseBuilder.getOrthography(language);
 	}
@@ -106,25 +105,25 @@ public class DictionaryStatistics implements Closeable{
 		return orthography;
 	}
 
-	public void addData(String word){
+	public void addData(final String word){
 		addData(word, null);
 	}
 
-	public synchronized void addData(String word, Hyphenation hyphenation){
+	public synchronized void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !hyphenation.hasErrors()){
-			List<String> syllabes = hyphenation.getSyllabes();
+			final List<String> syllabes = hyphenation.getSyllabes();
 
-			List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
+			final List<Integer> stressIndexes = orthography.getStressIndexFromLast(syllabes);
 			if(!stressIndexes.isEmpty())
 				stressFromLastFrequencies.addValue(stressIndexes.get(stressIndexes.size() - 1));
 			syllabeLengthsFrequencies.addValue(syllabes.size());
-			StringBuffer sb = new StringBuffer();
-			for(String syllabe : syllabes){
+			final StringBuffer sb = new StringBuffer();
+			for(final String syllabe : syllabes){
 				sb.append(syllabe);
 				if(orthography.countGraphemes(syllabe) == syllabe.length())
 					syllabesFrequencies.addValue(syllabe);
 			}
-			String subword = sb.toString();
+			final String subword = sb.toString();
 			lengthsFrequencies.addValue(subword.length());
 			storeLongestWord(subword);
 			storeHyphenation(hyphenation);
@@ -137,16 +136,14 @@ public class DictionaryStatistics implements Closeable{
 		else{
 			lengthsFrequencies.addValue(word.length());
 			storeLongestWord(word);
-			if(word.length() < word.length())
-				compoundWords ++;
 			if(word.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
 			totalProductions ++;
 		}
 	}
 
-	private synchronized void storeLongestWord(String word){
-		int letterCount = orthography.countGraphemes(word);
+	private synchronized void storeLongestWord(final String word){
+		final int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
 			longestWordsByCharacters.add(word);
@@ -158,9 +155,9 @@ public class DictionaryStatistics implements Closeable{
 		bloomFilter.add(word);
 	}
 
-	private synchronized void storeHyphenation(Hyphenation hyphenation){
-		List<String> syllabes = hyphenation.getSyllabes();
-		int syllabeCount = syllabes.size();
+	private synchronized void storeHyphenation(final Hyphenation hyphenation){
+		final List<String> syllabes = hyphenation.getSyllabes();
+		final int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
 			longestWordsBySyllabes.add(hyphenation);
@@ -170,14 +167,14 @@ public class DictionaryStatistics implements Closeable{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
-	public synchronized List<String> getMostCommonSyllabes(int size){
+	public synchronized List<String> getMostCommonSyllabes(final int size){
 		return syllabesFrequencies.getMostCommonValues(size).stream()
 			.map(value -> value + " (" + DictionaryParser.PERCENT_FORMATTER_1.format(syllabesFrequencies.getPercentOf(value)) + ")")
 			.collect(Collectors.toList());
 	}
 
 	@Override
-	public void close() throws IOException{
+	public void close(){
 		bloomFilter.close();
 	}
 
@@ -195,8 +192,8 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 
-	public static List<String> extractRepresentatives(List<String> population, int limitPopulation){
-		List<String> result = new ArrayList<>(population);
+	public static List<String> extractRepresentatives(final List<String> population, final int limitPopulation){
+		final List<String> result = new ArrayList<>(population);
 		int minimumDistance = 4;
 		do{
 			removeClosestRepresentatives(result, limitPopulation, minimumDistance);
@@ -206,18 +203,18 @@ public class DictionaryStatistics implements Closeable{
 		return result;
 	}
 
-	private static void removeClosestRepresentatives(List<String> population, int limitPopulation, int minimumDistance){
+	private static void removeClosestRepresentatives(final List<String> population, int limitPopulation, final int minimumDistance){
 		int index = 0;
 		limitPopulation = Math.min(limitPopulation, population.size());
 		while(index < limitPopulation){
-			String elem = population.get(index);
+			final String elem = population.get(index);
 
 			int i = 0;
-			Iterator<String> itrRemoval = population.iterator();
+			final Iterator<String> itrRemoval = population.iterator();
 			while(itrRemoval.hasNext()){
-				String removal = itrRemoval.next();
+				final String removal = itrRemoval.next();
 				if(i ++ > index){
-					int distance = LEVENSHTEIN_DISTANCE.apply(elem, removal);
+					final int distance = LEVENSHTEIN_DISTANCE.apply(elem, removal);
 					if(distance < minimumDistance)
 						itrRemoval.remove();
 				}

@@ -18,8 +18,8 @@ import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 public class BaseBuilder{
 
-	public static final Comparator<String> COMPARATOR_LENGTH = (r1, r2) -> Integer.compare(r1.length(), r2.length());
-	public static final Comparator<String> COMPARATOR_DEFAULT = (r1, r2) -> r1.compareTo(r2);
+	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
+	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
 
 	private static class LanguageData{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
@@ -34,7 +34,7 @@ public class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.baseClass = DictionaryCorrectnessChecker.class;
 		LANGUAGE_DATA_DEFAULT.comparator = COMPARATOR_DEFAULT;
 		LANGUAGE_DATA_DEFAULT.dictionaryBaseData = DictionaryBaseData.getInstance();
-		LANGUAGE_DATA_DEFAULT.checker = (affixData, hyphenator) -> new DictionaryCorrectnessChecker(affixData, hyphenator);
+		LANGUAGE_DATA_DEFAULT.checker = DictionaryCorrectnessChecker::new;
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 	}
 	private static final Map<String, LanguageData> DATAS = new HashMap<>();
@@ -43,7 +43,7 @@ public class BaseBuilder{
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
 		langData.comparator = WordVEC.sorterComparator();
 		langData.dictionaryBaseData = DictionaryBaseDataVEC.getInstance();
-		langData.checker = (affixData, hyphenator) -> new DictionaryCorrectnessCheckerVEC(affixData, hyphenator);
+		langData.checker = DictionaryCorrectnessCheckerVEC::new;
 		langData.orthography = OrthographyVEC.getInstance();
 		DATAS.put(DictionaryCorrectnessCheckerVEC.LANGUAGE, langData);
 	}
@@ -51,33 +51,34 @@ public class BaseBuilder{
 
 	private BaseBuilder(){}
 
-	public static Comparator<String> getComparator(String language){
+	public static Comparator<String> getComparator(final String language){
 		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.comparator;
 	}
 
-	public static BloomFilterParameters getDictionaryBaseData(String language){
+	public static BloomFilterParameters getDictionaryBaseData(final String language){
 		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.dictionaryBaseData;
 	}
 
-	public static DictionaryCorrectnessChecker getCorrectnessChecker(AffixData affixData, HyphenatorInterface hyphenator) throws IOException{
-		DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
+	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData, final HyphenatorInterface hyphenator)
+			throws IOException{
+		final DictionaryCorrectnessChecker checker = DATAS.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
 			.checker.apply(affixData, hyphenator);
 		checker.loadRules();
 		return checker;
 	}
 
-	public static Orthography getOrthography(String language){
+	public static Orthography getOrthography(final String language){
 		return DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.orthography;
 	}
 
-	public static Properties getRulesProperties(String language) throws IOException{
-		Properties rulesProperties = new Properties();
-		Class<? extends DictionaryCorrectnessChecker> cl = DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
+	public static Properties getRulesProperties(final String language) throws IOException{
+		final Properties rulesProperties = new Properties();
+		final Class<? extends DictionaryCorrectnessChecker> cl = DATAS.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.baseClass;
-		try(InputStream is = cl.getResourceAsStream("rules.properties")){
+		try(final InputStream is = cl.getResourceAsStream("rules.properties")){
 			if(is != null)
 				rulesProperties.load(is);
 		}

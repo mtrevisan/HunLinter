@@ -70,7 +70,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			GUIUtils.addPopupMenu(copyingPopupMenu, compoundWordsOutputLabel, contractedWordsOutputLabel, lengthsModeOutputLabel, longestWordCharactersOutputLabel,
 				longestWordSyllabesOutputLabel, mostCommonSyllabesOutputLabel, syllabeLengthsModeOutputLabel, totalWordsOutputLabel, uniqueWordsOutputLabel);
 		}
-		catch(IOException e){}
+		catch(IOException ignored){}
 
 		addListenerOnClose();
 
@@ -309,8 +309,8 @@ public class DictionaryStatisticsDialog extends JDialog{
    }// </editor-fold>//GEN-END:initComponents
 
    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-		int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
-		if(fileChoosen == JFileChooser.APPROVE_OPTION){
+		int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);
 
 			try{
@@ -365,7 +365,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)uniqueWords / totalWords) + ")";
 		String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)contractedWords / uniqueWords) + ")";
-		String formattedLengthsMode = String.join(LIST_SEPARATOR, lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedLengthsMode = lengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
 		String formattedLongestWords = String.join(LIST_SEPARATOR, longestWords)
 			+ " (" + longestWordCharsCount + ")";
 
@@ -390,7 +390,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ " (" + DictionaryParser.PERCENT_FORMATTER_1.format((double)compoundWords / uniqueWords) + ")";
-		String formattedSyllabeLengthsMode = String.join(LIST_SEPARATOR, syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.toList()));
+		String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR));
 		String formattedMostCommonSyllabes = String.join(LIST_SEPARATOR, mostCommonSyllabes);
 		String formattedLongestWordSyllabes = String.join(LIST_SEPARATOR, longestWordSyllabes)
 			+ " (" + longestWordSyllabesCount + ")";
@@ -526,7 +526,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(DictionaryStatisticsDialog.class.getName());
 	}
 

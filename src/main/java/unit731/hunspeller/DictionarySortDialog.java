@@ -160,7 +160,7 @@ public class DictionarySortDialog extends JDialog{
 		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(DictionarySortDialog.class.getName());
 	}
 

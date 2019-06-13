@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -22,17 +21,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.collections.radixtree.AhoCorasickTree;
-import unit731.hunspeller.collections.radixtree.RadixTree;
-import unit731.hunspeller.collections.radixtree.sequencers.StringSequencer;
-import unit731.hunspeller.collections.radixtree.dtos.VisitElement;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
+import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
 import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
-import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorFactory;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
@@ -101,7 +96,7 @@ public class HyphenationParser{
 	public static final Pattern PATTERN_REDUCE = PatternHelper.pattern("/.+$");
 	private static final Pattern PATTERN_COMMENT = PatternHelper.pattern("^$|\\s*[%#].*$");
 
-	public static enum Level{NON_COMPOUND, COMPOUND}
+	public enum Level{NON_COMPOUND, COMPOUND}
 
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
@@ -110,22 +105,20 @@ public class HyphenationParser{
 			REDUCED_PATTERNS.put(level, new HashSet<>());
 	}
 
-	private final HyphenatorFactory.Type radixTreeType;
 	private final Comparator<String> comparator;
 	private final Orthography orthography;
 
 	private boolean secondLevelPresent;
 	public Pattern patternNoHyphen;
-	private final Map<Level, RadixTree<String, String>> patterns = new EnumMap<>(Level.class);
+	private final Map<Level, Map<String, String>> rules = new EnumMap<>(Level.class);
+	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private final HyphenationOptionsParser optParser;
 
 
-	public HyphenationParser(HyphenatorFactory.Type radixTreeType, String language){
-		Objects.requireNonNull(radixTreeType);
+	public HyphenationParser(String language){
 		Objects.requireNonNull(language);
 
-		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -133,19 +126,17 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		for(Level level : Level.values()){
-			patterns.put(level, creatTree());
+			rules.put(level, new HashMap<>());
 			customHyphenations.put(level, new HashMap<>());
 		}
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(HyphenatorFactory.Type radixTreeType, String language, Map<Level, RadixTree<String, String>> patterns,
+	HyphenationParser(String language, Map<Level, AhoCorasickTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
-		Objects.requireNonNull(radixTreeType);
 		Objects.requireNonNull(language);
 		Objects.requireNonNull(patterns);
 
-		this.radixTreeType = radixTreeType;
 		comparator = BaseBuilder.getComparator(language);
 		orthography = BaseBuilder.getOrthography(language);
 
@@ -153,25 +144,14 @@ public class HyphenationParser{
 		Objects.requireNonNull(orthography);
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
+		for(Level level : Level.values())
+			this.patterns.put(level, patterns.get(level));
+		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.emptyMap());
 		for(Level level : Level.values()){
-			RadixTree<String, String> p = patterns.getOrDefault(level, creatTree());
-			this.patterns.put(level, p);
-		}
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(Collections.<Level, Map<String, String>>emptyMap());
-		for(Level level : Level.values()){
-			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.<String, String>emptyMap());
+			Map<String, String> ch = customHyphenations.getOrDefault(level, Collections.emptyMap());
 			this.customHyphenations.put(level, ch);
 		}
 		this.optParser = (optParser != null? optParser: new HyphenationOptionsParser());
-	}
-
-	private RadixTree<String, String> creatTree(){
-		StringSequencer sequencer = new StringSequencer();
-		return (radixTreeType == HyphenatorFactory.Type.AHO_CORASICK? AhoCorasickTree.createTree(sequencer): RadixTree.createTree(sequencer));
-	}
-
-	public HyphenatorFactory.Type getRadixTreeType(){
-		return radixTreeType;
 	}
 
 	public Orthography getOrthography(){
@@ -186,7 +166,7 @@ public class HyphenationParser{
 		return patternNoHyphen;
 	}
 
-	public Map<Level, RadixTree<String, String>> getPatterns(){
+	public Map<Level, AhoCorasickTrie<String>> getPatterns(){
 		return patterns;
 	}
 
@@ -202,10 +182,9 @@ public class HyphenationParser{
 	 * Parse the hyphenation rules out from a .dic file.
 	 *
 	 * @param hypFile	The content of the hyphenation file
-	 * @throws IOException	If an I/O error occurs
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file
 	 */
-	public void parse(File hypFile) throws IOException, IllegalArgumentException{
+	public void parse(File hypFile) throws IllegalArgumentException{
 		try{
 			clearInternal();
 
@@ -253,7 +232,8 @@ public class HyphenationParser{
 								throw new IllegalArgumentException("Duplication found: '" + line + "'");
 							else
 								//insert current pattern into the radix tree (remove all numbers)
-								patterns.get(level).put(key, line);
+								rules.get(level)
+									.put(key, line);
 						}
 					}
 				}
@@ -271,10 +251,15 @@ public class HyphenationParser{
 					for(String noHyphen : retroCompatibilityNoHyphen){
 						line = ONE + noHyphen + ONE;
 						if(!isRuleDuplicated(noHyphen, line, level))
-							patterns.get(level).put(noHyphen, line);
+							rules.get(level)
+								.put(noHyphen, line);
 					}
 				}
 			}
+
+			//build tries
+			for(Level l : Level.values())
+				buildTrie(l, rules.get(l));
 //System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
 //103 352 B compact trie
 //106 800 B basic trie
@@ -303,7 +288,8 @@ public class HyphenationParser{
 
 	private boolean isRuleDuplicated(String key, String line, Level level){
 		boolean duplicatedRule = false;
-		String foundNodeValue = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
+		String foundNodeValue = rules.get(level)
+			.get(key);
 		if(foundNodeValue != null){
 			String clearedLine = PatternHelper.clear(line, PATTERN_REDUCE);
 			String clearedFoundNodeValue = PatternHelper.clear(foundNodeValue, PATTERN_REDUCE);
@@ -315,8 +301,8 @@ public class HyphenationParser{
 	/**
 	 * Removes comment lines and then cleans up blank lines and trailing whitespace.
 	 *
-	 * @param {String} data	The data from an affix file.
-	 * @return {String}		The cleaned-up data.
+	 * @param line	The line from an affix file
+	 * @return The cleaned-up line
 	 */
 	private static String removeComment(String line){
 		//remove comments
@@ -330,8 +316,6 @@ public class HyphenationParser{
 	}
 
 	private void clearInternal(){
-		patterns.values()
-			.forEach(RadixTree::clear);
 		customHyphenations.values()
 			.forEach(Map::clear);
 		optParser.clear();
@@ -348,11 +332,38 @@ public class HyphenationParser{
 		validateRule(rule, level);
 
 		String key = getKeyFromData(rule);
-		String newRule = patterns.get(level).get(key, RadixTree.PrefixType.PREFIXED_BY);
-		if(newRule == null)
-			patterns.get(level).put(key, rule);
+		Map<String, String> rulesByLevel = rules.get(level);
+		String oldRule = rulesByLevel.get(key);
+		if(oldRule == null){
+			rulesByLevel.put(key, rule);
 
-		return newRule;
+			buildTrie(level, rulesByLevel);
+		}
+
+		return oldRule;
+	}
+
+	/**
+	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 * 
+	 * @param rule	The rule to remove
+	 * @param level	Level to remove the rule from
+	 * @return <code>true</code> if the removal has completed successfully
+	 */
+	public boolean removeRule(String rule, Level level){
+		String key = getKeyFromData(rule);
+		Map<String, String> rulesByLevel = rules.get(level);
+		String oldRule = rulesByLevel.get(key);
+		if(oldRule != null)
+			buildTrie(level, rulesByLevel);
+		return (oldRule != null);
+	}
+
+	private void buildTrie(Level level, Map<String, String> rulesByLevel){
+		AhoCorasickTrie<String> trie = new AhoCorasickTrieBuilder<String>()
+			.caseInsensitive()
+			.build(rulesByLevel);
+		patterns.put(level, trie);
 	}
 
 	/**
@@ -455,25 +466,10 @@ public class HyphenationParser{
 	}
 
 	private void savePatternsByLevel(final BufferedWriter writer, Level level) throws IOException{
-		/** Extract (compound) data from the radix tree */
-		Map<Integer, List<String>> result = new HashMap<>();
-		Function<VisitElement<String, String>, Boolean> saveVisitor = elem -> {
-			String value = elem.getNode().getValue();
-			result.computeIfAbsent(value.length(), k -> new ArrayList<>())
-				.add(value);
-
-			return false;
-		};
-		patterns.get(level).visit(saveVisitor, RadixTree.PrefixType.PREFIXED_BY);
-
-		Collection<List<String>> values = result.values();
-		for(List<String> value : values){
-			//sort values
-			Collections.sort(value, comparator::compare);
-
-			for(String rule : value)
-				writeln(writer, rule);
-		}
+		List<String> patternsByLevel = new ArrayList<>(rules.get(level).values());
+		patternsByLevel.sort(comparator);
+		for(String pattern : patternsByLevel)
+			writeln(writer, pattern);
 
 		//write custom hyphenations
 		List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
@@ -496,7 +492,7 @@ public class HyphenationParser{
 	 */
 	public boolean hasRule(String rule, Level level){
 		String key = getKeyFromData(rule);
-		return (customHyphenations.get(level).containsKey(key) || patterns.get(level).containsKey(key, RadixTree.PrefixType.PREFIXED_BY));
+		return (customHyphenations.get(level).containsKey(key) || rules.get(level).get(key) != null);
 	}
 
 	public static String getKeyFromData(String rule){

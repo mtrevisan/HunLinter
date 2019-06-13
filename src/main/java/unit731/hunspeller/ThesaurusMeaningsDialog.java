@@ -148,7 +148,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
 	}
 
-	private void readObject(ObjectInputStream is) throws IOException, ClassNotFoundException{
+	private void readObject(ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(ThesaurusMeaningsDialog.class.getName());
 	}
 

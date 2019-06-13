@@ -15,7 +15,7 @@ public interface BitArray extends Closeable{
 	 * @param index the index of the bit in the array
 	 * @return <code>true</code> if the but is set, <code>false</code> otherwise
 	 */
-	boolean get(int index);
+	boolean get(final int index);
 
 	/**
 	 * Set the bit at index
@@ -24,14 +24,14 @@ public interface BitArray extends Closeable{
 	 * @return <code>true</code> if the bit was updated, <code>false</code> otherwise.
 	 *
 	 */
-	boolean set(int index);
+	boolean set(final int index);
 
 	/**
 	 * Clear a given bit at the index.
 	 *
 	 * @param index the index of the bit in the array
 	 */
-	void clear(int index);
+	void clear(final int index);
 
 	/**
 	 * Clear all bits in the array.

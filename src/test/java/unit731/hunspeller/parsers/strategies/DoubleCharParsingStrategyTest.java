@@ -7,20 +7,20 @@ import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
 
 
-public class DoubleCharParsingStrategyTest{
+class DoubleCharParsingStrategyTest{
 
 	private final FlagParsingStrategy strategy = ParsingStrategyFactory.createDoubleASCIIParsingStrategy();
 
 
 	@Test
-	public void ok(){
+	void ok(){
 		String[] flags = strategy.parseFlags("abcd");
 
 		Assertions.assertEquals(Arrays.asList("ab", "cd"), Arrays.asList(flags));
 	}
 
 	@Test
-	public void notOk(){
+	void notOk(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			strategy.parseFlags("abc");
 		});
@@ -28,21 +28,21 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void empty(){
+	void empty(){
 		String[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void nullFlags(){
+	void nullFlags(){
 		String[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
-	public void joinFlags(){
+	void joinFlags(){
 		String[] flags = new String[]{"ab", "cd"};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -50,7 +50,7 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithError(){
+	void joinFlagsWithError(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
@@ -59,7 +59,7 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithEmpty(){
+	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
@@ -68,7 +68,7 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void joinFlagsWithNull(){
+	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
 			String[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
@@ -77,7 +77,7 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void joinEmptyFlags(){
+	void joinEmptyFlags(){
 		String[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
@@ -85,7 +85,7 @@ public class DoubleCharParsingStrategyTest{
 	}
 
 	@Test
-	public void joinNullFlags(){
+	void joinNullFlags(){
 		String continuationFlags = strategy.joinFlags(null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());

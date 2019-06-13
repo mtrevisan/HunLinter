@@ -1,12 +1,12 @@
 package unit731.hunspeller.parsers.affix.strategies;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import unit731.hunspeller.services.PatternHelper;
+import unit731.hunspeller.services.SetHelper;
 
 
 /**
@@ -33,11 +33,11 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 	private NumericalParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(String flags){
+	public String[] parseFlags(final String flags){
 		if(StringUtils.isBlank(flags))
 			return null;
 
-		String[] singleFlags = extractFlags(flags);
+		final String[] singleFlags = extractFlags(flags);
 
 		checkForDuplication(singleFlags, flags);
 
@@ -46,59 +46,59 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private String[] extractFlags(String flags){
+	private String[] extractFlags(final String flags){
 		return StringUtils.split(flags, COMMA);
 	}
 
-	private void checkForDuplication(String[] flags, String originalFlags) throws IllegalArgumentException{
-		Set<String> unduplicatedFlags = new HashSet<>(Arrays.asList(flags));
-		if(unduplicatedFlags.size() < flags.length)
+	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+		if(notDuplicatedFlags.size() < flags.length)
 			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
 	}
 
 	@Override
-	public String joinFlags(String[] flags){
+	public String joinFlags(final String[] flags){
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		String originalFlags = Arrays.toString(flags);
+		final String originalFlags = Arrays.toString(flags);
 		checkValidity(flags, originalFlags);
 
 		return String.join(COMMA, flags);
 	}
 
-	private void checkValidity(String[] flags, String originalFlags) throws IllegalArgumentException{
-		for(String flag : flags)
+	private void checkValidity(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+		for(final String flag : flags)
 			checkValidity(flag, originalFlags);
 	}
 
-	private void checkValidity(String flag, String originalFlags) throws IllegalArgumentException{
+	private void checkValidity(final String flag, final String originalFlags) throws IllegalArgumentException{
 		try{
-			int numericalFlag = Integer.parseInt(flag);
+			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
 				throw new IllegalArgumentException("Flag must be in the range [1, " + MAX_NUMERICAL_FLAG + "]: " + flag + " from " + originalFlags);
 		}
-		catch(NumberFormatException e){
+		catch(final NumberFormatException e){
 			throw new IllegalArgumentException("Flag must be an integer number: " + flag + " from " + originalFlags);
 		}
 	}
 
 	@Override
-	public String[] extractCompoundRule(String compoundRule){
-		String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+	public String[] extractCompoundRule(final String compoundRule){
+		final String[] parts = PatternHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
 	}
 
-	private void checkCompoundValidity(String[] parts, String compoundRule) throws IllegalArgumentException{
-		for(String part : parts)
+	private void checkCompoundValidity(final String[] parts, final String compoundRule) throws IllegalArgumentException{
+		for(final String part : parts)
 			checkCompoundValidity(part, compoundRule);
 	}
 
-	private void checkCompoundValidity(String part, String compoundRule) throws IllegalArgumentException{
-		boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+	private void checkCompoundValidity(final String part, final String compoundRule) throws IllegalArgumentException{
+		final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
 		if(isNumber && !NumberUtils.isCreatable(part))
 			throw new IllegalArgumentException("Compound rule must be composed by numbers and the optional operators '*' and '?': "
 				+ compoundRule);

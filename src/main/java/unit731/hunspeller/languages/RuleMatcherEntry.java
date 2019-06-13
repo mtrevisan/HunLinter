@@ -11,14 +11,14 @@ public class RuleMatcherEntry{
 	private final String[] wrongFlags;
 
 
-	public RuleMatcherEntry(MessageFormat messagePattern, String masterFlag, String[] wrongFlags){
+	public RuleMatcherEntry(final MessageFormat messagePattern, final String masterFlag, final String[] wrongFlags){
 		this.messagePattern = messagePattern;
 		this.masterFlag = masterFlag;
 		this.wrongFlags = wrongFlags;
 	}
 
-	public void match(Production production) throws IllegalArgumentException{
-		for(String flag : wrongFlags)
+	public void match(final Production production) throws IllegalArgumentException{
+		for(final String flag : wrongFlags)
 			if(production.hasContinuationFlag(flag))
 				throw new IllegalArgumentException(messagePattern.format(new Object[]{masterFlag, flag}));
 	}

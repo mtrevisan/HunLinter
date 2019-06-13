@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 
@@ -34,7 +34,7 @@ public class HyphenationBreak{
 
 
 	public static HyphenationBreak getEmptyInstance(){
-		return new HyphenationBreak(Collections.<Integer, Pair<Integer, String>>emptyMap(), 0);
+		return new HyphenationBreak(Collections.emptyMap(), 0);
 	}
 
 	public HyphenationBreak(Map<Integer, Pair<Integer, String>> indexesAndRules, int size){
@@ -107,8 +107,8 @@ public class HyphenationBreak{
 				}
 				else{
 					//merge syllabe with previous
-					String removedSyllabe1 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
-					String removedSyllabe0 = (i >= 0? syllabes.remove(i): StringUtils.EMPTY);
+					String removedSyllabe1 = syllabes.remove(i);
+					String removedSyllabe0 = syllabes.remove(i);
 					if(syllabes.isEmpty())
 						syllabes.add(removedSyllabe1 + removedSyllabe0);
 					else

@@ -110,7 +110,7 @@ public class AffixParser{
 		PARSING_HANDLERS.put(AffixTag.FORBID_DUPLICATIONS_IN_COMPOUND, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_REPLACEMENT, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.FORBID_DIFFERENT_CASES_IN_COMPOUND, COPY_OVER);
-		PARSING_HANDLERS.put(AffixTag.FORBIT_TRIPLES_IN_COMPOUND, COPY_OVER);
+		PARSING_HANDLERS.put(AffixTag.FORBID_TRIPLES_IN_COMPOUND, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.SIMPLIFIED_TRIPLES_IN_COMPOUND, COPY_OVER);
 //		PARSING_HANDLERS.put(AffixTag.CHECK_COMPOUND_PATTERN, COPY_OVER);
 		PARSING_HANDLERS.put(AffixTag.FORCE_COMPOUND_UPPERCASE_FLAG, COPY_OVER);
@@ -134,7 +134,6 @@ public class AffixParser{
 	}
 
 
-	private Charset charset;
 	private final AffixData data = new AffixData();
 
 
@@ -145,12 +144,12 @@ public class AffixParser{
 	 * @throws IOException	If an I/O error occurs
 	 * @throws	IllegalArgumentException	If something is wrong while parsing the file (eg. missing rule)
 	 */
-	public void parse(File affFile) throws IOException, IllegalArgumentException{
+	public void parse(final File affFile) throws IOException, IllegalArgumentException{
 		data.clear();
 
 		boolean encodingRead = false;
-		charset = FileHelper.determineCharset(affFile.toPath());
-		try(LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
+		Charset charset = FileHelper.determineCharset(affFile.toPath());
+		try(final LineNumberReader br = FileHelper.createReader(affFile.toPath(), charset)){
 			String line;
 			while((line = br.readLine()) != null){
 				line = DictionaryParser.cleanLine(line);
@@ -162,21 +161,21 @@ public class AffixParser{
 				else
 					encodingRead = true;
 
-				ParsingContext context = new ParsingContext(line, br);
-				AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
-				Handler handler = lookupHandlerByRuleType(ruleType);
+				final ParsingContext context = new ParsingContext(line, br);
+				final AffixTag ruleType = AffixTag.createFromCode(context.getRuleType());
+				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
 						handler.parse(context, data.getFlagParsingStrategy(), data::addData, data::getData);
 					}
-					catch(RuntimeException e){
+					catch(final RuntimeException e){
 						throw new IllegalArgumentException(e.getMessage() + ", line " + br.getLineNumber());
 					}
 				}
 			}
 		}
 
-		postProccessData(affFile);
+		postProcessData(affFile);
 
 		data.close();
 
@@ -184,7 +183,7 @@ public class AffixParser{
 //7 490 848 B
 	}
 
-	private void postProccessData(File affFile){
+	private void postProcessData(final File affFile){
 		if(!data.containsData(AffixTag.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixTag.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
@@ -197,15 +196,15 @@ public class AffixParser{
 			data.addData(AffixTag.CHARACTER_SET, StandardCharsets.ISO_8859_1);
 		if(!data.containsData(AffixTag.LANGUAGE)){
 			//try to infer language from filename
-			String filename = FilenameUtils.removeExtension(affFile.getName());
+			final String filename = FilenameUtils.removeExtension(affFile.getName());
 			String[] languages = PatternHelper.extract(filename, PATTERN_ISO639_2);
 			if(languages.length == 0)
 				languages = PatternHelper.extract(filename, PATTERN_ISO639_1);
-			String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
+			final String language = (languages.length > 0? languages[0]: NO_LANGUAGE);
 			data.addData(AffixTag.LANGUAGE, language);
 		}
 		if(!data.containsData(AffixTag.WORD_BREAK_CHARACTERS)){
-			Set<String> wordBreakCharacters = new HashSet<>(3);
+			final Set<String> wordBreakCharacters = new HashSet<>(3);
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN);
 			wordBreakCharacters.add(START + HyphenationParser.MINUS_SIGN);
 			wordBreakCharacters.add(HyphenationParser.MINUS_SIGN + END);
@@ -213,13 +212,13 @@ public class AffixParser{
 		}
 		//swap tags:
 		if(data.isComplexPrefixes()){
-			String compoundBegin = data.getData(AffixTag.COMPOUND_BEGIN_FLAG);
-			String compoundEnd = data.getData(AffixTag.COMPOUND_END_FLAG);
+			final String compoundBegin = data.getData(AffixTag.COMPOUND_BEGIN_FLAG);
+			final String compoundEnd = data.getData(AffixTag.COMPOUND_END_FLAG);
 			data.addData(AffixTag.COMPOUND_BEGIN_FLAG, compoundEnd);
 			data.addData(AffixTag.COMPOUND_END_FLAG, compoundBegin);
 
-			RuleEntry prefixes = data.getData(AffixTag.PREFIX);
-			RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
+			final RuleEntry prefixes = data.getData(AffixTag.PREFIX);
+			final RuleEntry suffixes = data.getData(AffixTag.SUFFIX);
 			data.addData(AffixTag.PREFIX, suffixes);
 			data.addData(AffixTag.SUFFIX, prefixes);
 		}
@@ -229,7 +228,7 @@ public class AffixParser{
 //			data.addData(AffixTag.WORD_BREAK_CHARACTERS, "qwertzuiopasdfghjklyxcvbnmQWERTZUIOPASDFGHJKLYXCVBNM");
 	}
 
-	private Handler lookupHandlerByRuleType(AffixTag ruleType){
+	private Handler lookupHandlerByRuleType(final AffixTag ruleType){
 		return PARSING_HANDLERS.get(ruleType);
 	}
 

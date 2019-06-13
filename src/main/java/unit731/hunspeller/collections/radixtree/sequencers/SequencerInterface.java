@@ -42,6 +42,20 @@ public interface SequencerInterface<S>{
 	 * The subsequence begins at the specified {@code beginIndex} and extends to the end of the sequence.
 	 *
 	 * @param sequence	The sequence.
+	 * @param index	The index.
+	 * @return	The specified `character` at index `index`.
+	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
+	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
+	 */
+	default S characterAt(S sequence, int index){
+		return subSequence(sequence, index, index + 1);
+	}
+
+	/**
+	 * Returns a sequence that is a subsequence of this sequence.
+	 * The subsequence begins at the specified {@code beginIndex} and extends to the end of the sequence.
+	 *
+	 * @param sequence	The sequence.
 	 * @param beginIndex	The beginning index, inclusive.
 	 * @return	The specified substring.
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
@@ -65,6 +79,8 @@ public interface SequencerInterface<S>{
 	S subSequence(S sequence, int beginIndex, int endIndex);
 
 	S concat(S sequence, S other);
+
+	S reverse(S sequence);
 
 	String toString(S sequence);
 

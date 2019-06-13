@@ -20,7 +20,7 @@ public interface HashFunction{
 	 * @param bytes	The bytes to be hashed
 	 * @return the generated hash value
 	 */
-	long hash(byte[] bytes);
+	long hash(final byte[] bytes);
 
 	/**
 	 * Return the hash of the bytes as a long array.
@@ -28,6 +28,6 @@ public interface HashFunction{
 	 * @param bytes	The bytes to be hashed
 	 * @return the generated hash value
 	 */
-	long[] hashMultiple(byte[] bytes);
+	long[] hashMultiple(final byte[] bytes);
 
 }

@@ -78,7 +78,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 //			this.removedSynonyms = removedSynonyms;
 //		}
 
-		Memento(ThesaurusDictionary dictionary){
+		Memento(final ThesaurusDictionary dictionary){
 			this.dictionary = dictionary;
 		}
 
@@ -91,7 +91,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	private final CaretakerInterface<Memento> redoCaretaker = new ThesaurusCaretaker();
 
 
-	public ThesaurusParser(Undoable undoable){
+	public ThesaurusParser(final Undoable undoable){
 		this.undoable = undoable;
 	}
 
@@ -115,19 +115,19 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 * Parse the rows out from a .aid file.
 	 *
 	 * @param theFile	The content of the thesaurus file
-	 * @throws IOException	If an I/O error occurse
+	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(File theFile) throws IOException{
+	public void parse(final File theFile) throws IOException{
 		clearInternal();
 
-		Path path = theFile.toPath();
-		Charset charset = FileHelper.determineCharset(path);
-		try(LineNumberReader br = FileHelper.createReader(path, charset)){
+		final Path path = theFile.toPath();
+		final Charset charset = FileHelper.determineCharset(path);
+		try(final LineNumberReader br = FileHelper.createReader(path, charset)){
 			String line = extractLine(br);
 
 			//line should be a charset
 			try{ Charsets.toCharset(line); }
-			catch(UnsupportedCharsetException e){
+			catch(final UnsupportedCharsetException e){
 				throw new IllegalArgumentException("Thesaurus file malformed, the first line is not a charset");
 			}
 
@@ -142,7 +142,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
-		String line = br.readLine();
+		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Thesaurus file");
 
@@ -167,13 +167,13 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	 *												insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult insertMeanings(String synonymAndMeanings, Supplier<Boolean> duplicatesDiscriminator){
-		String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
+	public DuplicationResult insertMeanings(final String synonymAndMeanings, final Supplier<Boolean> duplicatesDiscriminator){
+		final String[] partOfSpeechAndMeanings = StringUtils.split(synonymAndMeanings, ThesaurusEntry.POS_AND_MEANS, 2);
 		if(partOfSpeechAndMeanings.length != 2)
 			throw new IllegalArgumentException("Wrong format: '" + synonymAndMeanings + "'");
 
 		String partOfSpeech = StringUtils.strip(partOfSpeechAndMeanings[0]);
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		if(!partOfSpeech.startsWith("("))
 			sb.append('(');
 		sb.append(partOfSpeech);
@@ -181,8 +181,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			sb.append(')');
 		partOfSpeech = sb.toString();
 
-		String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
-		List<String> meanings = Arrays.stream(means)
+		final String[] means = StringUtils.split(partOfSpeechAndMeanings[1], ThesaurusEntry.MEANS);
+		final List<String> meanings = Arrays.stream(means)
 			.filter(StringUtils::isNotBlank)
 			.map(String::trim)
 			.distinct()
@@ -190,17 +190,18 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		if(meanings.size() < 2)
 			throw new IllegalArgumentException("Not enough meanings are supplied (at least one should be present): '" + synonymAndMeanings + "'");
 
-		DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
+		final DuplicationResult duplicationResult = extractDuplicates(meanings, partOfSpeech, duplicatesDiscriminator);
 
 		if(duplicationResult.isForcedInsertion() || duplicationResult.getDuplicates().isEmpty()){
 			try{
+				//FIXME
 //				undoCaretaker.pushMemento(createMemento(partOfSpeech, meanings));
 				undoCaretaker.pushMemento(createMemento());
 
 				if(undoable != null)
 					undoable.onUndoChange(true);
 			}
-			catch(IOException e){
+			catch(final IOException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -211,18 +212,18 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	/** Find if there is a duplicate with the same part of speech */
-	private DuplicationResult extractDuplicates(List<String> means, String partOfSpeech, Supplier<Boolean> duplicatesDiscriminator)
-			throws IllegalArgumentException{
+	private DuplicationResult extractDuplicates(final List<String> means, final String partOfSpeech,
+			final Supplier<Boolean> duplicatesDiscriminator) throws IllegalArgumentException{
 		boolean forcedInsertion = false;
-		List<ThesaurusEntry> duplicates = new ArrayList<>();
+		final List<ThesaurusEntry> duplicates = new ArrayList<>();
 		try{
-			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
-			for(String meaning : means){
-				String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
-				for(ThesaurusEntry synonym : synonyms)
+			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+			for(final String meaning : means){
+				final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
+				for(final ThesaurusEntry synonym : synonyms)
 					if(synonym.getSynonym().equals(mean)){
-						List<MeaningEntry> meanings = synonym.getMeanings();
-						long countSamePartOfSpeech = meanings.stream()
+						final List<MeaningEntry> meanings = synonym.getMeanings();
+						final long countSamePartOfSpeech = meanings.stream()
 							.map(MeaningEntry::getPartOfSpeech)
 							.filter(pos -> pos.equals(partOfSpeech))
 							.map(m -> 1)
@@ -232,18 +233,18 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 					}
 			}
 		}
-		catch(IllegalArgumentException e){
+		catch(final IllegalArgumentException e){
 			if(!duplicatesDiscriminator.get())
 				throw e;
 
-			duplicates.clear();
 			forcedInsertion = true;
 		}
 		return new DuplicationResult(duplicates, forcedInsertion);
 	}
 
-	public void setMeanings(int index, List<MeaningEntry> meanings, String text){
+	public void setMeanings(final int index, final List<MeaningEntry> meanings, final String text){
 		try{
+			//FIXME
 //			undoCaretaker.pushMemento(createMemento(index, meanings, text));
 			undoCaretaker.pushMemento(createMemento());
 
@@ -252,21 +253,21 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			if(undoable != null)
 				undoable.onUndoChange(true);
 		}
-		catch(IOException e){
+		catch(final IOException e){
 			try{
 				undoCaretaker.popMemento();
 			}
-			catch(IOException ioe){
+			catch(final IOException ioe){
 				LOGGER.warn("Error while removing a memento", ioe);
 			}
 
 			LOGGER.warn("Error while storing a memento", e);
 		}
-		catch(Exception e){
+		catch(final Exception e){
 			try{
 				undoCaretaker.popMemento();
 			}
-			catch(IOException ioe){
+			catch(final IOException ioe){
 				LOGGER.warn("Error while removing a memento", ioe);
 			}
 
@@ -274,8 +275,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		}
 	}
 
-	public void deleteMeanings(int[] selectedRowIDs){
-		int count = selectedRowIDs.length;
+	public void deleteMeanings(final int[] selectedRowIDs){
+		final int count = selectedRowIDs.length;
 		if(count > 0){
 			try{
 //				undoCaretaker.pushMemento(createMemento(selectedRowIDs));
@@ -284,7 +285,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 				if(undoable != null)
 					undoable.onUndoChange(true);
 			}
-			catch(IOException e){
+			catch(final IOException e){
 				LOGGER.warn("Error while storing a memento", e);
 			}
 
@@ -308,15 +309,15 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return text;
 	}
 
-	public void save(File theIndexFile, File theDataFile) throws IOException{
+	public void save(final File theIndexFile, final File theDataFile) throws IOException{
 		//sort the synonyms
 		dictionary.sort();
 
 		//save index and data files
-		Charset charset = StandardCharsets.UTF_8;
+		final Charset charset = StandardCharsets.UTF_8;
 		try(
-				BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
+				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
+				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
 				){
 			//save charset
 			indexWriter.write(charset.name());
@@ -329,22 +330,22 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			dataWriter.write(StringUtils.LF);
 			//save data
 			int idx = charset.name().length() + 1;
-			List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
+			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 			for(ThesaurusEntry synonym : synonyms){
-				String syn = synonym.getSynonym();
+				final String syn = synonym.getSynonym();
 				indexWriter.write(syn);
 				indexWriter.write(ThesaurusEntry.PIPE);
 				indexWriter.write(Integer.toString(idx));
 				indexWriter.write(StringUtils.LF);
 
-				int meaningsCount = synonym.getMeanings().size();
+				final int meaningsCount = synonym.getMeanings().size();
 				dataWriter.write(syn);
 				dataWriter.write(ThesaurusEntry.PIPE);
 				dataWriter.write(Integer.toString(meaningsCount));
 				dataWriter.write(StringUtils.LF);
-				List<MeaningEntry> meanings = synonym.getMeanings();
+				final List<MeaningEntry> meanings = synonym.getMeanings();
 				int meaningsLength = 1;
-				for(MeaningEntry meaning : meanings){
+				for(final MeaningEntry meaning : meanings){
 					dataWriter.write(meaning.toString());
 					dataWriter.write(StringUtils.LF);
 
@@ -377,9 +378,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public boolean restorePreviousSnapshot() throws IOException{
 		boolean restored = false;
 		if(canUndo()){
+			//FIXME
 			redoCaretaker.pushMemento(createMemento());
 
-			Memento memento = undoCaretaker.popMemento();
+			final Memento memento = undoCaretaker.popMemento();
 			if(undoable != null){
 				undoable.onUndoChange(canUndo());
 				undoable.onRedoChange(true);
@@ -395,9 +397,10 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	public boolean restoreNextSnapshot() throws IOException{
 		boolean restored = false;
 		if(canRedo()){
+			//FIXME
 			undoCaretaker.pushMemento(createMemento());
 
-			Memento memento = redoCaretaker.popMemento();
+			final Memento memento = redoCaretaker.popMemento();
 			if(undoable != null){
 				undoable.onUndoChange(true);
 				undoable.onRedoChange(canRedo());
@@ -416,7 +419,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 	}
 
 	@Override
-	public void restoreMemento(Memento memento){
+	public void restoreMemento(final Memento memento){
 		dictionary.restore(memento.dictionary);
 	}
 

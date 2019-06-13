@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class BitArrayTest{
+class BitArrayTest{
 
 	private static final int MAX = 10_000;
 
 
 	@Test
-	public void java() throws IOException{
+	void java() throws IOException{
 		try(JavaBitArray bits = new JavaBitArray(MAX)){
 			for(int i = 0; i < MAX; i ++){
 				Assertions.assertFalse(bits.get(i));
@@ -25,7 +25,7 @@ public class BitArrayTest{
 	}
 
 	@Test
-	public void memoryMappedFile() throws IOException{
+	void memoryMappedFile() throws IOException{
 		File file = File.createTempFile("hunspeller-duplications-bitarray", ".bits");
 		file.deleteOnExit();
 		try(MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX)){

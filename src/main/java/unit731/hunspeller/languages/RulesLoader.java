@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.SetHelper;
 
 
 public class RulesLoader{
@@ -42,7 +43,7 @@ public class RulesLoader{
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>();
 
 
-	public RulesLoader(String language, FlagParsingStrategy strategy) throws IOException{
+	public RulesLoader(final String language, final FlagParsingStrategy strategy) throws IOException{
 		Objects.requireNonNull(language);
 
 		rulesProperties = BaseBuilder.getRulesProperties(language);
@@ -71,8 +72,8 @@ public class RulesLoader{
 
 			Iterator<String> rules = readPropertyAsIterator("notCombinableRules", '/');
 			while(rules.hasNext()){
-				String masterFlag = rules.next();
-				String[] wrongFlags = strategy.parseFlags(rules.next());
+				final String masterFlag = rules.next();
+				final String[] wrongFlags = strategy.parseFlags(rules.next());
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>())
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
@@ -80,13 +81,13 @@ public class RulesLoader{
 			String letter = null;
 			rules = readPropertyAsIterator("letterAndRulesNotCombinable", '/');
 			while(rules.hasNext()){
-				String elem = rules.next();
+				final String elem = rules.next();
 				if(elem.length() == 3 && elem.charAt(0) == '_' && elem.charAt(2) == '_')
 					letter = String.valueOf(elem.charAt(1));
 				else{
 					flags = strategy.parseFlags(elem);
-					String correctRule = flags[flags.length - 1];
-					String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+					final String correctRule = flags[flags.length - 1];
+					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
 					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>())
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)? WORD_WITH_LETTER_CANNOT_HAVE_USE: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
@@ -95,22 +96,22 @@ public class RulesLoader{
 		}
 	}
 
-	public final String readProperty(String key){
+	public final String readProperty(final String key){
 		return rulesProperties.getProperty(key, StringUtils.EMPTY);
 	}
 
-	public final Set<String> readPropertyAsSet(String key, char separator){
-		String line = readProperty(key);
-		return (StringUtils.isNotEmpty(line)? new HashSet<>(Arrays.asList(StringUtils.split(line, separator))): Collections.<String>emptySet());
+	public final Set<String> readPropertyAsSet(final String key, final char separator){
+		final String line = readProperty(key);
+		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.emptySet());
 	}
 
-	public final Iterator<String> readPropertyAsIterator(String key, char separator){
-		List<String> values = new ArrayList<>();
+	public final Iterator<String> readPropertyAsIterator(final String key, final char separator){
+		final List<String> values = new ArrayList<>();
 		@SuppressWarnings("unchecked")
-		Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
-		for(String k : keys)
+		final Set<String> keys = (Set<String>)(Collection<?>)rulesProperties.keySet();
+		for(final String k : keys)
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
-				String line = readProperty(k);
+				final String line = readProperty(k);
 				if(StringUtils.isNotEmpty(line))
 					values.addAll(Arrays.asList(StringUtils.split(line, separator)));
 			}
@@ -118,7 +119,7 @@ public class RulesLoader{
 	}
 
 
-	public Properties getRulesPorperties(){
+	public Properties getRulesProperties(){
 		return rulesProperties;
 	}
 
@@ -134,41 +135,41 @@ public class RulesLoader{
 		return wordCanHaveMultipleAccents;
 	}
 
-	public boolean containsDataField(String key){
+	public boolean containsDataField(final String key){
 		return dataFields.containsKey(key);
 	}
 
-	public Set<String> getDataField(String key){
+	public Set<String> getDataField(final String key){
 		return dataFields.get(key);
 	}
 
-	public boolean containsUnsyllabableWords(String word){
+	public boolean containsUnsyllabableWords(final String word){
 		return unsyllabableWords.contains(word);
 	}
 
-	public boolean containsMultipleAccentedWords(String word){
+	public boolean containsMultipleAccentedWords(final String word){
 		return multipleAccentedWords.contains(word);
 	}
 
-	public boolean containsHasToContainAccent(String word){
+	public boolean containsHasToContainAccent(final String word){
 		return hasToContainAccent.contains(word);
 	}
 
-	public boolean containsCannotContainAccent(String word){
+	public boolean containsCannotContainAccent(final String word){
 		return cannotContainAccent.contains(word);
 	}
 
-	public void letterToFlagIncompatibilityCheck(Production production) throws IllegalArgumentException{
-		for(Map.Entry<String, Set<LetterMatcherEntry>> check : letterAndRulesNotCombinable.entrySet())
+	public void letterToFlagIncompatibilityCheck(final Production production) throws IllegalArgumentException{
+		for(final Map.Entry<String, Set<LetterMatcherEntry>> check : letterAndRulesNotCombinable.entrySet())
 			if(StringUtils.containsAny(production.getWord(), check.getKey()))
-				for(LetterMatcherEntry entry : check.getValue())
+				for(final LetterMatcherEntry entry : check.getValue())
 					entry.match(production);
 	}
 
-	public void flagToFlagIncompatibilityCheck(Production production) throws IllegalArgumentException{
-		for(Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
+	public void flagToFlagIncompatibilityCheck(final Production production) throws IllegalArgumentException{
+		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
 			if(production.hasContinuationFlag(check.getKey()))
-				for(RuleMatcherEntry entry : check.getValue())
+				for(final RuleMatcherEntry entry : check.getValue())
 					entry.match(production);
 	}
 
