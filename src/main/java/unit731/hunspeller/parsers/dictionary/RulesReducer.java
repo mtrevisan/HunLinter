@@ -370,8 +370,9 @@ public class RulesReducer{
 					while(itr.hasNext()){
 						final Character chr = itr.next();
 
-						final LineEntry newEntryFromChildrenNotParent = LineEntry.createFromWithRules(parent, chr + parent.condition, childrenNotParent);
-						final LineEntry newEntryFromParent = LineEntry.createFrom(parent, chr + parent.condition);
+						final String cond = chr + parent.condition;
+						final LineEntry newEntryFromChildrenNotParent = LineEntry.createFromWithRules(parent, cond, childrenNotParent);
+						final LineEntry newEntryFromParent = LineEntry.createFrom(parent, cond);
 						if(newEntryFromChildrenNotParent.from.equals(newEntryFromParent.from)){
 							notPresentConditions.add(chr);
 
@@ -394,6 +395,7 @@ public class RulesReducer{
 								.collect(Collectors.toList());
 							for(final LineEntry alreadyPresentRule : alreadyPresentRules){
 								finalRules.remove(alreadyPresentRule);
+
 								notPresentConditions.addAll(parentGroup);
 							}
 
@@ -573,7 +575,7 @@ public class RulesReducer{
 	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = bush.stream()
-			.filter(child -> child.condition.endsWith(parent.condition) && child.condition.length() > parentConditionLength)
+			.filter(child -> child.condition.length() > parentConditionLength && child.condition.endsWith(parent.condition))
 			.collect(Collectors.toList());
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
@@ -604,8 +606,8 @@ public class RulesReducer{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",")
-					+ "] at index " + indexFromLast + " from last because of the presence of the word '" + word + "' that is too short");
+				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",") + "] at index " + indexFromLast
+					+ " from last because of the presence of the word '" + word + "' that is too short");
 
 			group.add(word.charAt(index));
 		}
@@ -615,10 +617,6 @@ public class RulesReducer{
 	private String makeGroup(final Set<Character> group){
 		final String merge = mergeSet(group);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
-	}
-
-	private String makeGroup(final Set<Character> group, final String suffix){
-		return makeGroup(group) + suffix;
 	}
 
 	private String makeNotGroup(final Set<Character> group){
@@ -660,8 +658,7 @@ public class RulesReducer{
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group, StringUtils.EMPTY)
-					+ StringUtils.join(commonPostCondition);
+				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group) + StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);
