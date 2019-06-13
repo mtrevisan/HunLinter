@@ -48,7 +48,6 @@ public class RulesReducer{
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
 	private static final String DOT = ".";
-	private static final String SLASH = "/";
 
 	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
