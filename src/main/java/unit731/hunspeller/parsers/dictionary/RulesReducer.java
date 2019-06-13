@@ -111,8 +111,7 @@ public class RulesReducer{
 					final int delta = longestConditionLength - rule.condition.length();
 					final String deltaAddition = from.substring(startIndex, startIndex + delta);
 					//add addition
-					for(final String addition : rule.addition)
-						compactedRule.addition.add(deltaAddition + addition);
+					rule.addition.forEach(addition -> compactedRule.addition.add(deltaAddition + addition));
 				}
 			}
 			compactedRules.add(compactedRule);
@@ -269,8 +268,7 @@ public class RulesReducer{
 					}
 				}
 
-				for(final LineEntry temporaryRule : temporaryRules)
-					insertRuleOrUpdateFrom(disjointedRules, temporaryRule);
+				temporaryRules.forEach(temporaryRule -> insertRuleOrUpdateFrom(disjointedRules, temporaryRule));
 				rule.addition.removeAll(additionsToBeRemoved);
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
@@ -464,8 +462,7 @@ public class RulesReducer{
 								final LineEntry child = itr2.next();
 								if(parent.from.containsAll(child.from)){
 									final Set<Character> childGroup = extractGroup(child.from, parentConditionLength + 1);
-									for(final Character chr : childGroup)
-										newBushes.add(LineEntry.createFrom(child, chr + child.condition));
+									childGroup.forEach(chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
 
 									itr2.remove();
 								}
@@ -706,8 +703,7 @@ public class RulesReducer{
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			for(final LineEntry entry : entries)
-				expandConditionToMaxLength(entry);
+			entries.forEach(this::expandConditionToMaxLength);
 
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);
@@ -782,11 +778,9 @@ public class RulesReducer{
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){
-		final int size = entries.size();
-		final List<String> rules = new ArrayList<>(size);
-		for(final LineEntry entry : entries)
-			rules.add(composeLine(type, flag, entry));
-		return rules;
+		return entries.stream()
+			.map(entry -> composeLine(type, flag, entry))
+			.collect(Collectors.toList());
 	}
 
 	private String composeHeader(final AffixEntry.Type type, final String flag, final char combinableChar, final int size){
@@ -806,11 +800,9 @@ public class RulesReducer{
 			morphologicalRules = addition.substring(idx);
 			addition = addition.substring(0, idx);
 		}
-		String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + partialLine.removal + StringUtils.SPACE
+		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + partialLine.removal + StringUtils.SPACE
 			+ addition + StringUtils.SPACE + (partialLine.condition.isEmpty()? DOT: partialLine.condition);
-		if(idx >= 0)
-			line += morphologicalRules;
-		return line;
+		return (idx >= 0? line + morphologicalRules: line);
 	}
 
 }
