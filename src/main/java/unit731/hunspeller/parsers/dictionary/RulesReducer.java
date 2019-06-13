@@ -376,8 +376,10 @@ public class RulesReducer{
 							.findFirst();
 						if(notRule.isPresent())
 							notRule.get().condition = parent.condition;
-						else
-							rules.add(LineEntry.createFrom(parent, makeGroup(notPresentConditions) + parent.condition));
+						else{
+							final LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(notPresentConditions) + parent.condition);
+							finalRules.add(newEntry);
+						}
 					}
 					groupsIntersection.stream()
 						.map(chr -> LineEntry.createFrom(parent, chr + parent.condition))
