@@ -222,7 +222,7 @@ public class AffixEntry{
 		//add morphological fields from the applied affix
 		mf.addAll((isSuffix()? mf.size(): 0), amf);
 
-		return mf.toArray(new String[mf.size()]);
+		return mf.toArray(new String[0]);
 	}
 
 	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){

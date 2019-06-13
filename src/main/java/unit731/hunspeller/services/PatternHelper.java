@@ -51,7 +51,7 @@ public class PatternHelper{
 				component = m.group(i ++);
 			result.add(component != null? component: m.group());
 		}
-		return result.toArray(new String[result.size()]);
+		return result.toArray(new String[0]);
 	}
 
 	public static boolean find(String text, Pattern pattern){

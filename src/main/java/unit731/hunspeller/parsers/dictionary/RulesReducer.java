@@ -32,7 +32,6 @@ import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.PatternHelper;
-import static unit731.hunspeller.services.PatternHelper.pattern;
 import unit731.hunspeller.services.SetHelper;
 
 

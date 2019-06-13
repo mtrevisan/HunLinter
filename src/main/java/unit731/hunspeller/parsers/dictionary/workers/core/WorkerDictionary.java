@@ -180,7 +180,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			lines.parallelStream()
 				.forEach(processor);
 		else
-			lines.stream()
+			lines
 				.forEach(processor);
 	}
 
