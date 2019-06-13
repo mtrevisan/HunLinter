@@ -169,8 +169,8 @@ public class RulesReducer{
 		final Map<String, LineEntry> map = new HashMap<>();
 		for(final LineEntry entry : plainRules)
 			for(final String addition : entry.addition){
-				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
 				final String key = entry.removal + TAB + addition + TAB + entry.condition;
+				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
 				final LineEntry rule = map.putIfAbsent(key, newEntry);
 				if(rule != null)
 					rule.from.addAll(entry.from);
@@ -706,22 +706,26 @@ public class RulesReducer{
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			for(final LineEntry entry : entries){
-				final String lcs = longestCommonAffix(entry.from, this::commonSuffix);
-				if(lcs != null){
-					final Set<Character> group = new HashSet<>();
-					try{
-						group.addAll(extractGroup(entry.from, lcs.length()));
-					}
-					catch(IllegalArgumentException ignored){}
-					final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
-					if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-						entry.condition = makeGroup(group) + lcs;
-				}
-			}
+			for(final LineEntry entry : entries)
+				expandConditionToMaxLength(entry);
+
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);
 		return sortedEntries;
+	}
+
+	private void expandConditionToMaxLength(final LineEntry entry){
+		final String lcs = longestCommonAffix(entry.from, this::commonSuffix);
+		if(lcs != null){
+			final Set<Character> group = new HashSet<>();
+			try{
+				group.addAll(extractGroup(entry.from, lcs.length()));
+			}
+			catch(IllegalArgumentException ignored){}
+			final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
+			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
+				entry.condition = makeGroup(group) + lcs;
+		}
 	}
 
 	private String longestCommonAffix(final Collection<String> texts, final BiFunction<String, String, String> commonAffix){
