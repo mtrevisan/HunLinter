@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +16,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;
@@ -23,8 +27,11 @@ public class LineEntry implements Serializable{
 
 	private static final long serialVersionUID = 8374397415767767436L;
 
+	public static final RegExpSequencer SEQUENCER_REGEXP = new RegExpSequencer();
+
 	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
+	private static final String DOT = ".";
 
 
 	final Set<String> from;
@@ -114,6 +121,42 @@ public class LineEntry implements Serializable{
 			group.add(word.charAt(index));
 		}
 		return group;
+	}
+
+	public void expandConditionToMaxLength(final LineEntry entry, final Comparator<String> comparator){
+		final String lcs = StringHelper.longestCommonSuffix(entry.from);
+		if(lcs != null){
+			final Set<Character> group = new HashSet<>();
+			try{
+				group.addAll(entry.extractGroup(lcs.length()));
+			}
+			catch(IllegalArgumentException ignored){}
+			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(entry.condition));
+			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
+				entry.condition = PatternHelper.makeGroup(group, comparator) + lcs;
+		}
+	}
+
+	public static String toHunspellHeader(final AffixEntry.Type type, final String flag, final char combinableChar, final int size){
+		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		return sj.add(type.getTag().getCode())
+			.add(flag)
+			.add(Character.toString(combinableChar))
+			.add(Integer.toString(size))
+			.toString();
+	}
+
+	public String toHunspellRule(final AffixEntry.Type type, final String flag){
+		String anAddition = anAddition();
+		String morphologicalRules = StringUtils.EMPTY;
+		final int idx = anAddition.indexOf(TAB);
+		if(idx >= 0){
+			morphologicalRules = anAddition.substring(idx);
+			anAddition = anAddition.substring(0, idx);
+		}
+		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + removal + StringUtils.SPACE
+			+ anAddition + StringUtils.SPACE + (condition.isEmpty()? DOT: condition);
+		return (idx >= 0? line + morphologicalRules: line);
 	}
 
 	@Override

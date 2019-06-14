@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,8 +42,6 @@ public class RulesReducer{
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
 	private static final String DOT = ".";
-
-	private static final RegExpSequencer SEQUENCER = new RegExpSequencer();
 
 
 	private final Comparator<LineEntry> shortestConditionComparator = Comparator.comparingInt(entry -> entry.condition.length());
@@ -184,7 +181,7 @@ public class RulesReducer{
 
 		final AffixEntry.Type type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, composeHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
+		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
 
@@ -583,8 +580,8 @@ public class RulesReducer{
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
 				final String[] aCondition = RegExpSequencer.splitSequence(anEntry.condition);
-				final String[] commonPreCondition = SEQUENCER.subSequence(aCondition, 0, 1);
-				final String[] commonPostCondition = SEQUENCER.subSequence(aCondition, 2);
+				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
+				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
@@ -626,59 +623,23 @@ public class RulesReducer{
 				return String.join(StringUtils.EMPTY, additions);
 			})
 			.collect(Collectors.toSet());
-		final String condition = SEQUENCER.toString(SEQUENCER.reverse(RegExpSequencer.splitSequence(entry.condition)));
+		final String condition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(entry.condition)));
 		return new LineEntry(removal, addition, condition, Collections.emptyList());
 	}
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			entries.forEach(this::expandConditionToMaxLength);
+			entries.forEach(LineEntry::expandConditionToMaxLength);
 
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);
 		return sortedEntries;
 	}
 
-	private void expandConditionToMaxLength(final LineEntry entry){
-		final String lcs = StringHelper.longestCommonSuffix(entry.from);
-		if(lcs != null){
-			final Set<Character> group = new HashSet<>();
-			try{
-				group.addAll(entry.extractGroup(lcs.length()));
-			}
-			catch(IllegalArgumentException ignored){}
-			final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
-			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-				entry.condition = PatternHelper.makeGroup(group, comparator) + lcs;
-		}
-	}
-
 	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){
 		return entries.stream()
-			.map(entry -> composeLine(type, flag, entry))
+			.map(entry -> entry.toHunspellRule(type, flag))
 			.collect(Collectors.toList());
-	}
-
-	private String composeHeader(final AffixEntry.Type type, final String flag, final char combinableChar, final int size){
-		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
-		return sj.add(type.getTag().getCode())
-			.add(flag)
-			.add(Character.toString(combinableChar))
-			.add(Integer.toString(size))
-			.toString();
-	}
-
-	private String composeLine(final AffixEntry.Type type, final String flag, final LineEntry rule){
-		String addition = rule.anAddition();
-		String morphologicalRules = StringUtils.EMPTY;
-		final int idx = addition.indexOf(TAB);
-		if(idx >= 0){
-			morphologicalRules = addition.substring(idx);
-			addition = addition.substring(0, idx);
-		}
-		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + rule.removal + StringUtils.SPACE
-			+ addition + StringUtils.SPACE + (rule.condition.isEmpty()? DOT: rule.condition);
-		return (idx >= 0? line + morphologicalRules: line);
 	}
 
 }
