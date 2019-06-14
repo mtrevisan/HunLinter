@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -33,6 +32,7 @@ import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class RulesReducer{
@@ -41,9 +41,6 @@ public class RulesReducer{
 
 	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
 
-	private static final String NOT_GROUP_START = "[^";
-	private static final String GROUP_START = "[";
-	private static final String GROUP_END = "]";
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
 	private static final String DOT = ".";
@@ -69,7 +66,7 @@ public class RulesReducer{
 		this.wordGenerator = wordGenerator;
 		comparator = BaseBuilder.getComparator(affixData.getLanguage());
 		lineEntryComparator = Comparator.comparingInt((LineEntry entry) -> RegExpSequencer.splitSequence(entry.condition).length)
-			.thenComparingInt(entry -> StringUtils.countMatches(entry.condition, GROUP_END))
+			.thenComparingInt(entry -> StringUtils.countMatches(entry.condition, PatternHelper.GROUP_END))
 			.thenComparingInt(entry -> entry.removal.length())
 			.thenComparing(entry -> StringUtils.reverse(entry.condition), comparator)
 			.thenComparing(entry -> entry.removal, comparator)
@@ -175,8 +172,8 @@ public class RulesReducer{
 					rule.from.addAll(entry.from);
 			}
 
-		return collect(map.values(),
-			entry -> entry.removal + TAB + entry.condition + TAB + mergeSet(entry.from),
+		return SetHelper.collect(map.values(),
+			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
 	}
 
@@ -218,8 +215,8 @@ public class RulesReducer{
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
-		return collect(rules,
-			entry -> entry.removal + TAB + mergeSet(entry.addition) + TAB + entry.condition,
+		return SetHelper.collect(rules,
+			entry -> entry.removal + TAB + PatternHelper.mergeSet(entry.addition, comparator) + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
@@ -241,8 +238,8 @@ public class RulesReducer{
 		for(final LineEntry rule : rules){
 			final List<LineEntry> temporaryRules = new ArrayList<>();
 
-			final Map<String, List<String>> lcss = bucket(rule.addition,
-				add -> longestCommonAffix(Arrays.asList(add, rule.removal), this::commonPrefix));
+			final Map<String, List<String>> lcss = SetHelper.bucket(rule.addition,
+				add -> StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal)));
 			if(lcss.size() > 1){
 				//order keys from longer to shorter
 				final List<String> keys = new ArrayList<>(lcss.keySet());
@@ -296,18 +293,7 @@ public class RulesReducer{
 		}
 	}
 
-	private <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
-		final Map<K, V> compaction = new HashMap<>();
-		for(final V entry : entries){
-			final K key = keyMapper.apply(entry);
-			final V rule = compaction.putIfAbsent(key, entry);
-			if(rule != null)
-				mergeFunction.accept(rule, entry);
-		}
-		return new ArrayList<>(compaction.values());
-	}
-
-	private List<LineEntry> disjoinConditions(List<LineEntry> rules){
+	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		//expand same conditions (if any); store surely disjoint rules
 		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules);
 
@@ -321,7 +307,7 @@ public class RulesReducer{
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by same condition
-		final Map<String, List<LineEntry>> conditionBucket = bucket(rules, rule -> rule.condition);
+		final Map<String, List<LineEntry>> conditionBucket = SetHelper.bucket(rules, rule -> rule.condition);
 
 		for(final Map.Entry<String, List<LineEntry>> entry : conditionBucket.entrySet()){
 			final List<LineEntry> sameCondition = entry.getValue();
@@ -359,7 +345,8 @@ public class RulesReducer{
 					if(!parentGroup.isEmpty()){
 						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parent.condition.length(), parentGroup, childrenGroup,
 							groupsIntersection);
-						final String preCondition = (chooseRatifyingOverNegated? makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
+							PatternHelper.makeNotGroup(childrenGroup, comparator));
 						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
 						finalRules.add(newRule);
 					}
@@ -381,7 +368,7 @@ public class RulesReducer{
 					}
 
 					if(!notPresentConditions.isEmpty()){
-						final String notCondition = makeNotGroup(notPresentConditions) + parent.condition;
+						final String notCondition = PatternHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
 						final Optional<LineEntry> notRule = finalRules.stream()
 							.filter(rule -> rule.condition.equals(notCondition))
 							.findFirst();
@@ -399,7 +386,8 @@ public class RulesReducer{
 								notPresentConditions.addAll(parentGroup);
 							}
 
-							final LineEntry newEntry = LineEntry.createFrom(parent, makeGroup(notPresentConditions) + parent.condition);
+							final LineEntry newEntry = LineEntry.createFrom(parent, PatternHelper.makeGroup(notPresentConditions, comparator)
+								+ parent.condition);
 							finalRules.add(newEntry);
 						}
 					}
@@ -451,7 +439,8 @@ public class RulesReducer{
 
 						//calculate new condition
 						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup);
-						final String preCondition = (chooseRatifyingOverNegated? makeGroup(parentGroup): makeNotGroup(childrenGroup));
+						final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
+							PatternHelper.makeNotGroup(childrenGroup, comparator));
 						LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
 
 						//keep only rules that matches some existent words
@@ -594,7 +583,7 @@ public class RulesReducer{
 	private Set<String> extractRuleSpine(final LineEntry rule){
 		final Set<String> parentBones = new HashSet<>();
 		for(final String add : rule.addition){
-			final int lcsLength = longestCommonAffix(Arrays.asList(add, rule.removal), this::commonPrefix)
+			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
 				.length();
 			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
 		}
@@ -614,37 +603,9 @@ public class RulesReducer{
 		return group;
 	}
 
-	private String makeGroup(final Set<Character> group){
-		final String merge = mergeSet(group);
-		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
-	}
-
-	private String makeNotGroup(final Set<Character> group){
-		final String merge = mergeSet(group);
-		return NOT_GROUP_START + merge + GROUP_END;
-	}
-
-	private <V> String mergeSet(final Set<V> set){
-		return set.stream()
-			.map(String::valueOf)
-			.sorted(comparator)
-			.collect(Collectors.joining());
-	}
-
-	private <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
-		final Map<K, List<V>> bucket = new HashMap<>();
-		for(final V entry : entries){
-			final K key = keyMapper.apply(entry);
-			if(key != null)
-				bucket.computeIfAbsent(key, k -> new ArrayList<>())
-					.add(entry);
-		}
-		return bucket;
-	}
-
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
-	private void mergeSimilarRules(List<LineEntry> entries){
-		final Map<String, List<LineEntry>> similarityBucket = bucket(entries, entry -> (entry.condition.contains(GROUP_END)?
+	private void mergeSimilarRules(final List<LineEntry> entries){
+		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries, entry -> (entry.condition.contains(PatternHelper.GROUP_END)?
 			entry.removal + TAB + entry.addition + TAB + RegExpSequencer.splitSequence(entry.condition)[0] + TAB
 				+ RegExpSequencer.splitSequence(entry.condition).length:
 			null));
@@ -658,7 +619,8 @@ public class RulesReducer{
 				final Set<Character> group = similarities.stream()
 					.map(entry -> RegExpSequencer.splitSequence(entry.condition)[1].charAt(0))
 					.collect(Collectors.toSet());
-				final String condition = StringUtils.join(commonPreCondition) + makeGroup(group) + StringUtils.join(commonPostCondition);
+				final String condition = StringUtils.join(commonPreCondition) + PatternHelper.makeGroup(group, comparator)
+					+ StringUtils.join(commonPostCondition);
 				entries.add(LineEntry.createFrom(anEntry, condition));
 
 				similarities.forEach(entries::remove);
@@ -671,7 +633,7 @@ public class RulesReducer{
 		Stream<LineEntry> stream = entries.stream()
 			.flatMap(rule -> rule.addition.stream()
 				.map(addition -> {
-					final int lcp = commonPrefix(rule.removal, addition).length();
+					final int lcp = StringHelper.longestCommonPrefix(Arrays.asList(rule.removal, addition)).length();
 					final String removal = rule.removal.substring(lcp);
 					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
 				}));
@@ -708,7 +670,7 @@ public class RulesReducer{
 	}
 
 	private void expandConditionToMaxLength(final LineEntry entry){
-		final String lcs = longestCommonAffix(entry.from, this::commonSuffix);
+		final String lcs = StringHelper.longestCommonSuffix(entry.from);
 		if(lcs != null){
 			final Set<Character> group = new HashSet<>();
 			try{
@@ -717,61 +679,8 @@ public class RulesReducer{
 			catch(IllegalArgumentException ignored){}
 			final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-				entry.condition = makeGroup(group) + lcs;
+				entry.condition = PatternHelper.makeGroup(group, comparator) + lcs;
 		}
-	}
-
-	private String longestCommonAffix(final Collection<String> texts, final BiFunction<String, String, String> commonAffix){
-		String lcs = null;
-		if(!texts.isEmpty()){
-			final Iterator<String> itr = texts.iterator();
-			lcs = itr.next();
-			while(!lcs.isEmpty() && itr.hasNext())
-				lcs = commonAffix.apply(lcs, itr.next());
-		}
-		return lcs;
-	}
-
-	/**
-	 * Returns the longest string {@code suffix} such that {@code a.toString().endsWith(suffix) &&
-	 * b.toString().endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
-	 * {@code b} have no common suffix, returns the empty string.
-	 */
-	private String commonSuffix(final String a, final String b){
-		int s = 0;
-		final int aLength = a.length();
-		final int bLength = b.length();
-		final int maxSuffixLength = Math.min(aLength, bLength);
-		while(s < maxSuffixLength && a.charAt(aLength - s - 1) == b.charAt(bLength - s - 1))
-			s ++;
-		if(validSurrogatePairAt(a, aLength - s - 1) || validSurrogatePairAt(b, bLength - s - 1))
-			s --;
-		return a.subSequence(aLength - s, aLength).toString();
-	}
-
-	/**
-	 * Returns the longest string {@code prefix} such that {@code a.toString().startsWith(prefix) &&
-	 * b.toString().startsWith(prefix)}, taking care not to split surrogate pairs. If {@code a} and
-	 * {@code b} have no common prefix, returns the empty string.
-	 */
-	private String commonPrefix(final String a, final String b){
-		int p = 0;
-		final int maxPrefixLength = Math.min(a.length(), b.length());
-		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
-			p ++;
-		if(validSurrogatePairAt(a, p - 1) || validSurrogatePairAt(b, p - 1))
-			p --;
-		return a.subSequence(0, p).toString();
-	}
-
-	/**
-	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
-	 * Out-of-range indexes return false.
-	 */
-	private boolean validSurrogatePairAt(final CharSequence string, final int index){
-		return (index >= 0 && index <= (string.length() - 2)
-			&& Character.isHighSurrogate(string.charAt(index))
-			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){

@@ -1,5 +1,8 @@
 package unit731.hunspeller.services;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -96,6 +99,67 @@ public class StringHelper{
 			currentRow = 1 - currentRow;
 		}
 		return Pair.of(lcsIndexA, lcsIndexB);
+	}
+
+	public static String longestCommonPrefix(final Collection<String> texts){
+		return longestCommonAffix(texts, StringHelper::commonPrefix);
+	}
+
+	public static String longestCommonSuffix(final Collection<String> texts){
+		return longestCommonAffix(texts, StringHelper::commonSuffix);
+	}
+
+	private static String longestCommonAffix(final Collection<String> texts, final BiFunction<String, String, String> commonAffix){
+		String lcs = null;
+		if(!texts.isEmpty()){
+			final Iterator<String> itr = texts.iterator();
+			lcs = itr.next();
+			while(!lcs.isEmpty() && itr.hasNext())
+				lcs = commonAffix.apply(lcs, itr.next());
+		}
+		return lcs;
+	}
+
+	/**
+	 * Returns the longest string {@code suffix} such that {@code a.toString().endsWith(suffix) &&
+	 * b.toString().endsWith(suffix)}, taking care not to split surrogate pairs. If {@code a} and
+	 * {@code b} have no common suffix, returns the empty string.
+	 */
+	private static String commonSuffix(final String a, final String b){
+		int s = 0;
+		final int aLength = a.length();
+		final int bLength = b.length();
+		final int maxSuffixLength = Math.min(aLength, bLength);
+		while(s < maxSuffixLength && a.charAt(aLength - s - 1) == b.charAt(bLength - s - 1))
+			s ++;
+		if(validSurrogatePairAt(a, aLength - s - 1) || validSurrogatePairAt(b, bLength - s - 1))
+			s --;
+		return a.subSequence(aLength - s, aLength).toString();
+	}
+
+	/**
+	 * Returns the longest string {@code prefix} such that {@code a.toString().startsWith(prefix) &&
+	 * b.toString().startsWith(prefix)}, taking care not to split surrogate pairs. If {@code a} and
+	 * {@code b} have no common prefix, returns the empty string.
+	 */
+	private static String commonPrefix(final String a, final String b){
+		int p = 0;
+		final int maxPrefixLength = Math.min(a.length(), b.length());
+		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
+			p ++;
+		if(validSurrogatePairAt(a, p - 1) || validSurrogatePairAt(b, p - 1))
+			p --;
+		return a.subSequence(0, p).toString();
+	}
+
+	/**
+	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
+	 * Out-of-range indexes return false.
+	 */
+	private static boolean validSurrogatePairAt(final CharSequence string, final int index){
+		return (index >= 0 && index <= (string.length() - 2)
+			&& Character.isHighSurrogate(string.charAt(index))
+			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
 }

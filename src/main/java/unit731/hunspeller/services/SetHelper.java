@@ -1,13 +1,19 @@
 package unit731.hunspeller.services;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -228,6 +234,28 @@ public class SetHelper{
 		union.removeAll(intersection);
 
 		return union;
+	}
+
+	public static <K, V> Map<K, List<V>> bucket(final Collection<V> entries, final Function<V, K> keyMapper){
+		final Map<K, List<V>> bucket = new HashMap<>();
+		for(final V entry : entries){
+			final K key = keyMapper.apply(entry);
+			if(key != null)
+				bucket.computeIfAbsent(key, k -> new ArrayList<>())
+					.add(entry);
+		}
+		return bucket;
+	}
+
+	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper, final BiConsumer<V, V> mergeFunction){
+		final Map<K, V> compaction = new HashMap<>();
+		for(final V entry : entries){
+			final K key = keyMapper.apply(entry);
+			final V rule = compaction.putIfAbsent(key, entry);
+			if(rule != null)
+				mergeFunction.accept(rule, entry);
+		}
+		return new ArrayList<>(compaction.values());
 	}
 
 }
