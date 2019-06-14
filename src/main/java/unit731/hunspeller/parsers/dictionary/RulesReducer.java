@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -284,7 +283,7 @@ public class RulesReducer{
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
 			expandedRules.stream()
-				.filter(expandedRule -> isContainedInto(expandedRule, rule))
+				.filter(expandedRule -> expandedRule.isContainedInto(rule))
 				.forEach(expandedRule -> {
 					rule.addition.removeAll(expandedRule.addition);
 					expandedRule.from.addAll(rule.from);
@@ -321,7 +320,7 @@ public class RulesReducer{
 					.collect(Collectors.toList());
 
 				final Map<LineEntry, Set<Character>> groups = children.stream()
-					.collect(Collectors.toMap(Function.identity(), child -> extractGroup(child.from, condition.length())));
+					.collect(Collectors.toMap(Function.identity(), child -> child.extractGroup(condition.length())));
 
 				rules.removeAll(sameCondition);
 
@@ -426,7 +425,7 @@ public class RulesReducer{
 					if(!bubbles.isEmpty()){
 						//extract ratifying group
 						final int parentConditionLength = parent.condition.length();
-						final Set<Character> parentGroup = extractGroup(parent.from, parentConditionLength);
+						final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 						//extract negated group
 						final Set<Character> childrenGroup = bubbles.stream()
@@ -452,7 +451,7 @@ public class RulesReducer{
 							while(itr2.hasNext()){
 								final LineEntry child = itr2.next();
 								if(parent.from.containsAll(child.from)){
-									final Set<Character> childGroup = extractGroup(child.from, parentConditionLength + 1);
+									final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
 									childGroup.forEach(chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
 
 									itr2.remove();
@@ -574,35 +573,6 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	private boolean isContainedInto(final LineEntry parent, final LineEntry child){
-		final Set<String> parentBones = extractRuleSpine(parent);
-		final Set<String> childBones = extractRuleSpine(child);
-		return childBones.containsAll(parentBones);
-	}
-
-	private Set<String> extractRuleSpine(final LineEntry rule){
-		final Set<String> parentBones = new HashSet<>();
-		for(final String add : rule.addition){
-			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
-				.length();
-			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
-		}
-		return parentBones;
-	}
-
-	private Set<Character> extractGroup(final Collection<String> words, final int indexFromLast){
-		final Set<Character> group = new HashSet<>();
-		for(final String word : words){
-			final int index = word.length() - indexFromLast - 1;
-			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",") + "] at index " + indexFromLast
-					+ " from last because of the presence of the word '" + word + "' that is too short");
-
-			group.add(word.charAt(index));
-		}
-		return group;
-	}
-
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(final List<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries, entry -> (entry.condition.contains(PatternHelper.GROUP_END)?
@@ -674,7 +644,7 @@ public class RulesReducer{
 		if(lcs != null){
 			final Set<Character> group = new HashSet<>();
 			try{
-				group.addAll(extractGroup(entry.from, lcs.length()));
+				group.addAll(entry.extractGroup(lcs.length()));
 			}
 			catch(IllegalArgumentException ignored){}
 			final int entryConditionLength = SEQUENCER.length(RegExpSequencer.splitSequence(entry.condition));
@@ -698,16 +668,16 @@ public class RulesReducer{
 			.toString();
 	}
 
-	private String composeLine(final AffixEntry.Type type, final String flag, final LineEntry partialLine){
-		String addition = partialLine.anAddition();
+	private String composeLine(final AffixEntry.Type type, final String flag, final LineEntry rule){
+		String addition = rule.anAddition();
 		String morphologicalRules = StringUtils.EMPTY;
 		final int idx = addition.indexOf(TAB);
 		if(idx >= 0){
 			morphologicalRules = addition.substring(idx);
 			addition = addition.substring(0, idx);
 		}
-		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + partialLine.removal + StringUtils.SPACE
-			+ addition + StringUtils.SPACE + (partialLine.condition.isEmpty()? DOT: partialLine.condition);
+		final String line = type.getTag().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + rule.removal + StringUtils.SPACE
+			+ addition + StringUtils.SPACE + (rule.condition.isEmpty()? DOT: rule.condition);
 		return (idx >= 0? line + morphologicalRules: line);
 	}
 

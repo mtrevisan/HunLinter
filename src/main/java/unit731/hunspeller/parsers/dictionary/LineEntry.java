@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -8,12 +9,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
+import unit731.hunspeller.services.StringHelper;
 
 
 public class LineEntry implements Serializable{
@@ -21,6 +24,7 @@ public class LineEntry implements Serializable{
 	private static final long serialVersionUID = 8374397415767767436L;
 
 	private static final String PATTERN_END_OF_WORD = "$";
+	private static final String TAB = "\t";
 
 
 	final Set<String> from;
@@ -81,6 +85,35 @@ public class LineEntry implements Serializable{
 
 	public String anAddition(){
 		return addition.iterator().next();
+	}
+
+	public boolean isContainedInto(final LineEntry rule){
+		final Set<String> parentBones = extractRuleSpine(this);
+		final Set<String> childBones = extractRuleSpine(rule);
+		return childBones.containsAll(parentBones);
+	}
+
+	private Set<String> extractRuleSpine(final LineEntry rule){
+		final Set<String> parentBones = new HashSet<>();
+		for(final String add : rule.addition){
+			final int lcsLength = StringHelper.longestCommonPrefix(Arrays.asList(add, rule.removal))
+				.length();
+			parentBones.add(rule.removal.substring(lcsLength) + TAB + add.substring(lcsLength));
+		}
+		return parentBones;
+	}
+
+	public Set<Character> extractGroup(final int indexFromLast){
+		final Set<Character> group = new HashSet<>();
+		for(final String word : from){
+			final int index = word.length() - indexFromLast - 1;
+			if(index < 0)
+				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(from, ",") + "] at index " + indexFromLast
+					+ " from last because of the presence of the word '" + word + "' that is too short");
+
+			group.add(word.charAt(index));
+		}
+		return group;
 	}
 
 	@Override
