@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -407,26 +408,29 @@ public class RulesReducer{
 		final int parentConditionLength = parentCondition.length();
 		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup,
 			groupsIntersection);
-		String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
-			PatternHelper.makeNotGroup(childrenGroup, comparator));
 		final Set<Character> overallLastGroup = overallLastGroups.get(parentConditionLength);
+		final Set<Character> baseGroup = (chooseRatifyingOverNegated? parentGroup: childrenGroup);
+		final BiFunction<Set<Character>, Comparator<String>, String> combineRatifying = (chooseRatifyingOverNegated? PatternHelper::makeGroup:
+			PatternHelper::makeNotGroup);
+		final BiFunction<Set<Character>, Comparator<String>, String> combineNegated = (chooseRatifyingOverNegated? PatternHelper::makeNotGroup:
+			PatternHelper::makeGroup);
+
+		String preCondition;
 		if(overallLastGroup != null){
 			final Set<Character> group = new HashSet<>(overallLastGroup);
-			if(chooseRatifyingOverNegated){
-				group.removeAll(parentGroup);
-				preCondition = (parentGroup.size() == overallLastGroup.size()?
-					(parentConditionLength == 0? StringUtils.EMPTY: DOT):
-					(parentGroup.size() <= group.size()? preCondition: PatternHelper.makeNotGroup(group, comparator)) + parentCondition);
-			}
-			else{
-				group.removeAll(childrenGroup);
-				preCondition = (childrenGroup.size() == overallLastGroup.size()?
-					(parentConditionLength == 0? StringUtils.EMPTY: DOT):
-					(childrenGroup.size() < group.size()? preCondition: PatternHelper.makeGroup(group, comparator)) + parentCondition);
-			}
+			group.removeAll(baseGroup);
+			if(baseGroup.size() == overallLastGroup.size())
+				preCondition = (parentConditionLength == 0? StringUtils.EMPTY: DOT)
+					+ parentCondition;
+			else
+				preCondition = (baseGroup.size() <= group.size()?
+					combineRatifying.apply(baseGroup, comparator):
+					combineNegated.apply(group, comparator))
+					+ parentCondition;
 		}
 		else
-			preCondition += parentCondition;
+			preCondition = combineRatifying.apply(baseGroup, comparator)
+				+ parentCondition;
 		return preCondition;
 	}
 
