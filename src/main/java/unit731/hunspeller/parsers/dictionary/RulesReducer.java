@@ -3,7 +3,6 @@ package unit731.hunspeller.parsers.dictionary;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +34,6 @@ import unit731.hunspeller.services.StringHelper;
 public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
-
-	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
 
 	private static final String TAB = "\t";
 	private static final String ZERO = "0";
@@ -605,7 +601,7 @@ public class RulesReducer{
 					return new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp), rule.condition, rule.from);
 				}));
 		if(type == AffixEntry.Type.PREFIX)
-			stream = stream.map(this::createReverseOf);
+			stream = stream.map(LineEntry::createReverse);
 		final List<LineEntry> restoredRules = stream
 			.collect(Collectors.toList());
 
@@ -614,22 +610,9 @@ public class RulesReducer{
 		return composeAffixRules(flag, type, sortedEntries);
 	}
 
-	private LineEntry createReverseOf(final LineEntry entry){
-		final String removal = StringUtils.reverse(entry.removal);
-		final Set<String> addition = entry.addition.stream()
-			.map(add -> {
-				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
-				additions[0] = StringUtils.reverse(additions[0]);
-				return String.join(StringUtils.EMPTY, additions);
-			})
-			.collect(Collectors.toSet());
-		final String condition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(entry.condition)));
-		return new LineEntry(removal, addition, condition, Collections.emptyList());
-	}
-
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final Collection<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			entries.forEach(LineEntry::expandConditionToMaxLength);
+			entries.forEach(entry -> entry.expandConditionToMaxLength(comparator));
 
 		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
 		sortedEntries.sort(lineEntryComparator);

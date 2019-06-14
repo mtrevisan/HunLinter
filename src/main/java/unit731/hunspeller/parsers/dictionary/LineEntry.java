@@ -27,6 +27,8 @@ public class LineEntry implements Serializable{
 
 	private static final long serialVersionUID = 8374397415767767436L;
 
+	private static final Pattern SPLITTER_ADDITION = PatternHelper.pattern("(?=[/\\t])");
+
 	public static final RegExpSequencer SEQUENCER_REGEXP = new RegExpSequencer();
 
 	private static final String PATTERN_END_OF_WORD = "$";
@@ -94,6 +96,19 @@ public class LineEntry implements Serializable{
 		return addition.iterator().next();
 	}
 
+	public LineEntry createReverse(){
+		final String reversedRemoval = StringUtils.reverse(removal);
+		final Set<String> reversedAddition = addition.stream()
+			.map(add -> {
+				final String[] additions = PatternHelper.split(add, SPLITTER_ADDITION);
+				additions[0] = StringUtils.reverse(additions[0]);
+				return String.join(StringUtils.EMPTY, additions);
+			})
+			.collect(Collectors.toSet());
+		final String reversedCondition = LineEntry.SEQUENCER_REGEXP.toString(LineEntry.SEQUENCER_REGEXP.reverse(RegExpSequencer.splitSequence(condition)));
+		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
+	}
+
 	public boolean isContainedInto(final LineEntry rule){
 		final Set<String> parentBones = extractRuleSpine(this);
 		final Set<String> childBones = extractRuleSpine(rule);
@@ -123,17 +138,17 @@ public class LineEntry implements Serializable{
 		return group;
 	}
 
-	public void expandConditionToMaxLength(final LineEntry entry, final Comparator<String> comparator){
-		final String lcs = StringHelper.longestCommonSuffix(entry.from);
+	public void expandConditionToMaxLength(final Comparator<String> comparator){
+		final String lcs = StringHelper.longestCommonSuffix(from);
 		if(lcs != null){
 			final Set<Character> group = new HashSet<>();
 			try{
-				group.addAll(entry.extractGroup(lcs.length()));
+				group.addAll(extractGroup(lcs.length()));
 			}
 			catch(IllegalArgumentException ignored){}
-			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(entry.condition));
+			final int entryConditionLength = SEQUENCER_REGEXP.length(RegExpSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
-				entry.condition = PatternHelper.makeGroup(group, comparator) + lcs;
+				condition = PatternHelper.makeGroup(group, comparator) + lcs;
 		}
 	}
 
