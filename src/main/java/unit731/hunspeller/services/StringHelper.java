@@ -162,4 +162,13 @@ public class StringHelper{
 			&& Character.isLowSurrogate(string.charAt(index + 1)));
 	}
 
+	public static int getLastCommonLetterIndex(final String word1, final String word2){
+		int lastCommonLetter;
+		final int minWordLength = Math.min(word1.length(), word2.length());
+		for(lastCommonLetter = 0; lastCommonLetter < minWordLength; lastCommonLetter ++)
+			if(word1.charAt(lastCommonLetter) != word2.charAt(lastCommonLetter))
+				break;
+		return lastCommonLetter;
+	}
+
 }

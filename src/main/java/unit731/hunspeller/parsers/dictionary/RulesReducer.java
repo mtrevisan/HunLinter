@@ -117,7 +117,7 @@ public class RulesReducer{
 			word = StringUtils.reverse(word);
 		}
 
-		final int lastCommonLetter = calculateLastCommonLetterIndex(word, producedWord);
+		final int lastCommonLetter = StringHelper.getLastCommonLetterIndex(word, producedWord);
 
 		final int wordLength = word.length();
 		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
@@ -127,15 +127,6 @@ public class RulesReducer{
 			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
-	}
-
-	private int calculateLastCommonLetterIndex(final String word1, final String word2){
-		int lastCommonLetter;
-		final int minWordLength = Math.min(word1.length(), word2.length());
-		for(lastCommonLetter = 0; lastCommonLetter < minWordLength; lastCommonLetter ++)
-			if(word1.charAt(lastCommonLetter) != word2.charAt(lastCommonLetter))
-				break;
-		return lastCommonLetter;
 	}
 
 	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
@@ -614,9 +605,9 @@ public class RulesReducer{
 		if(keepLongestCommonAffix)
 			entries.forEach(entry -> entry.expandConditionToMaxLength(comparator));
 
-		final List<LineEntry> sortedEntries = new ArrayList<>(entries);
-		sortedEntries.sort(lineEntryComparator);
-		return sortedEntries;
+		return entries.stream()
+			.sorted(lineEntryComparator)
+			.collect(Collectors.toList());
 	}
 
 	private List<String> composeAffixRules(final String flag, final AffixEntry.Type type, final List<LineEntry> entries){
