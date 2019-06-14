@@ -126,11 +126,15 @@ public class LineEntry implements Serializable{
 	}
 
 	public Set<Character> extractGroup(final int indexFromLast){
+		return extractGroup(indexFromLast, from);
+	}
+
+	public static Set<Character> extractGroup(final int indexFromLast, final Set<String> words){
 		final Set<Character> group = new HashSet<>();
-		for(final String word : from){
+		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(from, ",") + "] at index " + indexFromLast
+				throw new IllegalArgumentException("Cannot extract group from [" + StringUtils.join(words, ",") + "] at index " + indexFromLast
 					+ " from last because of the presence of the word '" + word + "' that is too short");
 
 			group.add(word.charAt(index));

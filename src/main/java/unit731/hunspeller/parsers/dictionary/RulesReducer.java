@@ -137,11 +137,27 @@ public class RulesReducer{
 		//reshuffle originating list to place the correct productions in the correct rule
 		compactedRules = makeAdditionsDisjoint(compactedRules);
 
-		compactedRules = disjoinConditions(compactedRules);
+		final Map<Integer, Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
+		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
 
 		mergeSimilarRules(compactedRules);
 
 		return compactedRules;
+	}
+
+	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
+		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
+		try{
+			final Set<String> overallFrom = plainRules.stream()
+				.flatMap(entry -> entry.from.stream())
+				.collect(Collectors.toSet());
+			for(int index = 0; ; index ++){
+				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
+				overallLastGroups.put(index, overallLastGroup);
+			}
+		}
+		catch(final IllegalArgumentException ignored){}
+		return overallLastGroups;
 	}
 
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
@@ -276,17 +292,17 @@ public class RulesReducer{
 		}
 	}
 
-	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
+	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
 		//expand same conditions (if any); store surely disjoint rules
-		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules);
+		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules, overallLastGroups);
 
 		//expand same ending conditions (if any); store surely disjoint rules
-		nonOverlappingRules.addAll(disjoinSameEndingConditions(rules));
+		nonOverlappingRules.addAll(disjoinSameEndingConditions(rules, overallLastGroups));
 
 		return nonOverlappingRules;
 	}
 
-	private List<LineEntry> disjoinSameConditions(final List<LineEntry> rules){
+	private List<LineEntry> disjoinSameConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by same condition
@@ -326,11 +342,8 @@ public class RulesReducer{
 					final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 					parentGroup.removeAll(groupsIntersection);
 					if(!parentGroup.isEmpty()){
-						final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parent.condition.length(), parentGroup, childrenGroup,
-							groupsIntersection);
-						final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
-							PatternHelper.makeNotGroup(childrenGroup, comparator));
-						final LineEntry newRule = LineEntry.createFrom(parent, preCondition + parent.condition);
+						final String newCondition = chooseCondition(parent.condition, parentGroup, childrenGroup, groupsIntersection, overallLastGroups);
+						final LineEntry newRule = LineEntry.createFrom(parent, newCondition);
 						finalRules.add(newRule);
 					}
 
@@ -352,8 +365,11 @@ public class RulesReducer{
 
 					if(!notPresentConditions.isEmpty()){
 						final String notCondition = PatternHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
+						final Set<Character> overallLastGroup = new HashSet<>(overallLastGroups.get(parent.condition.length()));
+						overallLastGroup.removeAll(notPresentConditions);
+						final String yesCondition = PatternHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 						final Optional<LineEntry> notRule = finalRules.stream()
-							.filter(rule -> rule.condition.equals(notCondition))
+							.filter(rule -> rule.condition.equals(notCondition) || rule.condition.equals(yesCondition))
 							.findFirst();
 						if(notRule.isPresent())
 							notRule.get().condition = parent.condition;
@@ -369,8 +385,10 @@ public class RulesReducer{
 								notPresentConditions.addAll(parentGroup);
 							}
 
-							final LineEntry newEntry = LineEntry.createFrom(parent, PatternHelper.makeGroup(notPresentConditions, comparator)
-								+ parent.condition);
+							final String newCondition = (notPresentConditions.size() < overallLastGroup.size()?
+								PatternHelper.makeGroup(notPresentConditions, comparator) + parent.condition:
+								PatternHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
+							final LineEntry newEntry = LineEntry.createFrom(parent, newCondition);
 							finalRules.add(newEntry);
 						}
 					}
@@ -384,7 +402,35 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules){
+	private String chooseCondition(final String parentCondition, final Set<Character> parentGroup, final Set<Character> childrenGroup,
+			final Set<Character> groupsIntersection, final Map<Integer, Set<Character>> overallLastGroups){
+		final int parentConditionLength = parentCondition.length();
+		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup,
+			groupsIntersection);
+		String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
+			PatternHelper.makeNotGroup(childrenGroup, comparator));
+		final Set<Character> overallLastGroup = overallLastGroups.get(parentConditionLength);
+		if(overallLastGroup != null){
+			final Set<Character> group = new HashSet<>(overallLastGroup);
+			if(chooseRatifyingOverNegated){
+				group.removeAll(parentGroup);
+				preCondition = (parentGroup.size() == overallLastGroup.size()?
+					(parentConditionLength == 0? StringUtils.EMPTY: DOT):
+					(parentGroup.size() <= group.size()? preCondition: PatternHelper.makeNotGroup(group, comparator)) + parentCondition);
+			}
+			else{
+				group.removeAll(childrenGroup);
+				preCondition = (childrenGroup.size() == overallLastGroup.size()?
+					(parentConditionLength == 0? StringUtils.EMPTY: DOT):
+					(childrenGroup.size() < group.size()? preCondition: PatternHelper.makeGroup(group, comparator)) + parentCondition);
+			}
+		}
+		else
+			preCondition += parentCondition;
+		return preCondition;
+	}
+
+	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by condition ending
@@ -477,7 +523,7 @@ public class RulesReducer{
 								newEntry = LineEntry.createFrom(parent, chr + parent.condition);
 								bush.add(newEntry);
 
-								finalRules.addAll(disjoinSameConditions(bush));
+								finalRules.addAll(disjoinSameConditions(bush, overallLastGroups));
 							}
 
 							bush.sort(shortestConditionComparator);
