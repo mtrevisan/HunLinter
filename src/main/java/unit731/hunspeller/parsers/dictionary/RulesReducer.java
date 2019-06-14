@@ -84,6 +84,25 @@ public class RulesReducer{
 		return compactProductions(filteredRules);
 	}
 
+	private LineEntry createAffixEntry(final Production production, String word, final AffixEntry.Type type){
+		String producedWord = production.getWord();
+		if(type == AffixEntry.Type.PREFIX){
+			producedWord = StringUtils.reverse(producedWord);
+			word = StringUtils.reverse(word);
+		}
+
+		final int lastCommonLetter = StringHelper.getLastCommonLetterIndex(word, producedWord);
+
+		final int wordLength = word.length();
+		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
+		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
+		if(lastAppliedRule != null)
+			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
+		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
+		return new LineEntry(removal, addition, condition, word);
+	}
+
 	private List<LineEntry> compactProductions(final List<LineEntry> rules){
 		final List<LineEntry> compactedRules = new ArrayList<>();
 		if(rules.size() > 1){
@@ -111,25 +130,6 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private LineEntry createAffixEntry(final Production production, String word, final AffixEntry.Type type){
-		String producedWord = production.getWord();
-		if(type == AffixEntry.Type.PREFIX){
-			producedWord = StringUtils.reverse(producedWord);
-			word = StringUtils.reverse(word);
-		}
-
-		final int lastCommonLetter = StringHelper.getLastCommonLetterIndex(word, producedWord);
-
-		final int wordLength = word.length();
-		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
-		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
-		if(lastAppliedRule != null)
-			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);
-		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
-		return new LineEntry(removal, addition, condition, word);
-	}
-
 	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
@@ -146,21 +146,6 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
-		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
-		try{
-			final Set<String> overallFrom = plainRules.stream()
-				.flatMap(entry -> entry.from.stream())
-				.collect(Collectors.toSet());
-			for(int index = 0; ; index ++){
-				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
-				overallLastGroups.put(index, overallLastGroup);
-			}
-		}
-		catch(final IllegalArgumentException ignored){}
-		return overallLastGroups;
-	}
-
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
 		for(final LineEntry entry : plainRules)
@@ -175,42 +160,6 @@ public class RulesReducer{
 		return SetHelper.collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
-	}
-
-	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules)
-			throws IllegalArgumentException{
-		final RuleEntry ruleToBeReduced = affixData.getData(flag);
-		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
-
-		final AffixEntry.Type type = ruleToBeReduced.getType();
-		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
-		return prettyPrintRules;
-	}
-
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules,
-			final List<String> originalLines) throws IllegalArgumentException{
-		final RuleEntry ruleToBeReduced = affixData.getData(flag);
-		if(ruleToBeReduced == null)
-			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
-
-		final List<AffixEntry> entries = reducedRules.stream()
-			.skip(1)
-			.map(line -> new AffixEntry(line, strategy, null, null))
-			.collect(Collectors.toList());
-		final AffixEntry.Type type = ruleToBeReduced.getType();
-		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combinableChar(), entries);
-		for(final String line : originalLines){
-			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
-			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
-
-			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
-			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
-			if(!filteredOriginalRules.equals(filteredRules))
-				throw new IllegalArgumentException("Something very bad occurs while producing from '" + line + "', expected "
-					+ filteredOriginalRules + ", obtained " + filteredRules);
-		}
 	}
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
@@ -291,6 +240,21 @@ public class RulesReducer{
 				});
 			expandedRules.add(rule);
 		}
+	}
+
+	private Map<Integer, Set<Character>> collectOverallLastGroups(List<LineEntry> plainRules){
+		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>();
+		try{
+			final Set<String> overallFrom = plainRules.stream()
+				.flatMap(entry -> entry.from.stream())
+				.collect(Collectors.toSet());
+			for(int index = 0; ; index ++){
+				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
+				overallLastGroups.put(index, overallLastGroup);
+			}
+		}
+		catch(final IllegalArgumentException ignored){}
+		return overallLastGroups;
 	}
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
@@ -434,6 +398,15 @@ public class RulesReducer{
 		return preCondition;
 	}
 
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
+			final Set<Character> childrenGroup, final Set<Character> intersectionGroup){
+		final int parentGroupSize = parentGroup.size();
+		final int childrenGroupSize = childrenGroup.size();
+		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
+			&& parentGroupSize <= childrenGroupSize && parentGroupSize != 0);
+		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
+	}
+
 	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
@@ -546,24 +519,6 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
-			final Set<Character> childrenGroup){
-		final int parentGroupSize = parentGroup.size();
-		final int childrenGroupSize = childrenGroup.size();
-		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1)
-			&& parentGroupSize != 0);
-		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
-	}
-
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
-			final Set<Character> childrenGroup, final Set<Character> intersectionGroup){
-		final int parentGroupSize = parentGroup.size();
-		final int childrenGroupSize = childrenGroup.size();
-		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
-			&& parentGroupSize <= childrenGroupSize && parentGroupSize != 0);
-		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
-	}
-
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
 		rules.sort(shortestConditionComparator);
 
@@ -607,6 +562,15 @@ public class RulesReducer{
 		return bubbles;
 	}
 
+	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
+			final Set<Character> childrenGroup){
+		final int parentGroupSize = parentGroup.size();
+		final int childrenGroupSize = childrenGroup.size();
+		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1)
+			&& parentGroupSize != 0);
+		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
+	}
+
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`) */
 	private void mergeSimilarRules(final List<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries, entry -> (entry.condition.contains(PatternHelper.GROUP_END)?
@@ -629,6 +593,18 @@ public class RulesReducer{
 
 				similarities.forEach(entries::remove);
 			}
+	}
+
+	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules)
+			throws IllegalArgumentException{
+		final RuleEntry ruleToBeReduced = affixData.getData(flag);
+		if(ruleToBeReduced == null)
+			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+
+		final AffixEntry.Type type = ruleToBeReduced.getType();
+		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
+		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
+		return prettyPrintRules;
 	}
 
 	private List<String> convertEntriesToRules(final String flag, final AffixEntry.Type type, final boolean keepLongestCommonAffix,
@@ -664,6 +640,30 @@ public class RulesReducer{
 		return entries.stream()
 			.map(entry -> entry.toHunspellRule(type, flag))
 			.collect(Collectors.toList());
+	}
+
+	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<LineEntry> originalRules,
+			final List<String> originalLines) throws IllegalArgumentException{
+		final RuleEntry ruleToBeReduced = affixData.getData(flag);
+		if(ruleToBeReduced == null)
+			throw new IllegalArgumentException("Non-existent rule " + flag + ", cannot reduce");
+
+		final List<AffixEntry> entries = reducedRules.stream()
+			.skip(1)
+			.map(line -> new AffixEntry(line, strategy, null, null))
+			.collect(Collectors.toList());
+		final AffixEntry.Type type = ruleToBeReduced.getType();
+		final RuleEntry overriddenRule = new RuleEntry((type == AffixEntry.Type.SUFFIX), ruleToBeReduced.combinableChar(), entries);
+		for(final String line : originalLines){
+			final List<Production> originalProductions = wordGenerator.applyAffixRules(line);
+			final List<Production> productions = wordGenerator.applyAffixRules(line, overriddenRule);
+
+			final List<LineEntry> filteredOriginalRules = collectProductionsByFlag(originalProductions, flag, type);
+			final List<LineEntry> filteredRules = collectProductionsByFlag(productions, flag, type);
+			if(!filteredOriginalRules.equals(filteredRules))
+				throw new IllegalArgumentException("Something very bad occurs while producing from '" + line + "', expected "
+					+ filteredOriginalRules + ", obtained " + filteredRules);
+		}
 	}
 
 }
