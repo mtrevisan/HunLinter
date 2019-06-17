@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
@@ -28,6 +30,9 @@ public class ThesaurusDictionary{
 	@JsonIgnore
 	private boolean modified;
 
+	//internal variable for fast inclusion test
+	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
+
 
 	public List<ThesaurusEntry> getSynonyms(){
 		return synonyms;
@@ -40,19 +45,22 @@ public class ThesaurusDictionary{
 	public boolean add(final String partOfSpeech, final List<String> meanings){
 		boolean result = false;
 		for(final String meaning : meanings){
-			final MeaningEntry entry = extractPartOfSpeechAndMeanings(partOfSpeech, meanings, meaning);
+			final MeaningEntry meaningEntry = extractPartOfSpeechAndMeanings(partOfSpeech, meanings, meaning);
 
 			final String mean = PatternHelper.replaceAll(meaning, PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 			final ThesaurusEntry foundSynonym = findByMeaning(mean);
 			if(foundSynonym != null)
 				//add to meanings if synonym does exists
 				foundSynonym.getMeanings()
-					.add(entry);
+					.add(meaningEntry);
 			else{
 				//add to list if synonym does not exists
 				final List<MeaningEntry> entries = new ArrayList<>();
-				entries.add(entry);
-				result = synonyms.add(new ThesaurusEntry(mean, entries));
+				entries.add(meaningEntry);
+				final ThesaurusEntry entry = new ThesaurusEntry(mean, entries);
+				result = synonyms.add(entry);
+				if(result)
+					dictionary.put(entry.getSynonym(), entry);
 			}
 		}
 
@@ -72,8 +80,11 @@ public class ThesaurusDictionary{
 
 	public boolean add(final ThesaurusEntry entry){
 		boolean result = false;
-		if(!synonyms.contains(entry)){
+		final String synonym = entry.getSynonym();
+		if(!dictionary.containsKey(synonym)){
 			result = synonyms.add(entry);
+			if(result)
+				dictionary.put(synonym, entry);
 
 			modified = true;
 		}
@@ -82,6 +93,7 @@ public class ThesaurusDictionary{
 
 	public ThesaurusEntry remove(final int index){
 		final ThesaurusEntry previousValue = synonyms.remove(index);
+		dictionary.remove(previousValue.getSynonym());
 
 		modified = true;
 
@@ -92,11 +104,16 @@ public class ThesaurusDictionary{
 		clear(true);
 
 		this.synonyms.addAll(dictionary.synonyms);
+
+		this.dictionary.clear();
+		dictionary.synonyms
+			.forEach(syn -> this.dictionary.put(syn.getSynonym(), syn));
 	}
 
 	public void clear(final boolean setModifiedFlag){
 		if(!synonyms.isEmpty()){
 			synonyms.clear();
+			dictionary.clear();
 
 			if(setModifiedFlag)
 				modified = true;
@@ -115,7 +132,7 @@ public class ThesaurusDictionary{
 		synonyms.sort(Comparator.naturalOrder());
 	}
 
-	public void setMeanings(final int index, final List<MeaningEntry> meanings,final  String text){
+	public void setMeanings(final int index, final List<MeaningEntry> meanings, final String text){
 		if(StringUtils.isNotBlank(text)){
 			meanings.clear();
 			final String[] lines = StringUtils.split(text, StringUtils.LF);
@@ -129,13 +146,7 @@ public class ThesaurusDictionary{
 	}
 
 	private ThesaurusEntry findByMeaning(final String meaning){
-		ThesaurusEntry foundSynonym = null;
-		for(final ThesaurusEntry synonym : synonyms)
-			if(synonym.getSynonym().equals(meaning)){
-				foundSynonym = synonym;
-				break;
-			}
-		return foundSynonym;
+		return dictionary.get(meaning);
 	}
 
 	public List<String> extractDuplicates(){
