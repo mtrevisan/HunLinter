@@ -24,7 +24,6 @@ public class ThesaurusDictionary{
 	public static final Pattern PATTERN_PART_OF_SPEECH = PatternHelper.pattern("\\s*\\([^)]+\\)");
 
 
-	@JsonProperty
 	private final List<ThesaurusEntry> synonyms = new ArrayList<>();
 
 	@JsonIgnore
@@ -34,8 +33,20 @@ public class ThesaurusDictionary{
 	private final Map<String, ThesaurusEntry> dictionary = new HashMap<>();
 
 
-	public List<ThesaurusEntry> getSynonyms(){
+	@JsonProperty
+	List<ThesaurusEntry> getSynonyms(){
 		return synonyms;
+	}
+
+	@JsonProperty
+	private void setSynonyms(final List<ThesaurusEntry> synonyms){
+		clear(true);
+
+		this.synonyms.addAll(synonyms);
+
+		this.dictionary.clear();
+		for(final ThesaurusEntry synonym : synonyms)
+			dictionary.put(synonym.getSynonym(), synonym);
 	}
 
 	public boolean isModified(){
@@ -58,9 +69,10 @@ public class ThesaurusDictionary{
 				final List<MeaningEntry> entries = new ArrayList<>();
 				entries.add(meaningEntry);
 				final ThesaurusEntry entry = new ThesaurusEntry(mean, entries);
-				result = synonyms.add(entry);
-				if(result)
-					dictionary.put(entry.getSynonym(), entry);
+				synonyms.add(entry);
+				dictionary.put(entry.getSynonym(), entry);
+
+				result = true;
 			}
 		}
 
@@ -82,10 +94,10 @@ public class ThesaurusDictionary{
 		boolean result = false;
 		final String synonym = entry.getSynonym();
 		if(!dictionary.containsKey(synonym)){
-			result = synonyms.add(entry);
-			if(result)
-				dictionary.put(synonym, entry);
+			synonyms.add(entry);
+			dictionary.put(synonym, entry);
 
+			result = true;
 			modified = true;
 		}
 		return result;
@@ -101,13 +113,7 @@ public class ThesaurusDictionary{
 	}
 
 	public void restore(final ThesaurusDictionary dictionary){
-		clear(true);
-
-		this.synonyms.addAll(dictionary.synonyms);
-
-		this.dictionary.clear();
-		dictionary.synonyms
-			.forEach(syn -> this.dictionary.put(syn.getSynonym(), syn));
+		setSynonyms(dictionary.synonyms);
 	}
 
 	public void clear(final boolean setModifiedFlag){
