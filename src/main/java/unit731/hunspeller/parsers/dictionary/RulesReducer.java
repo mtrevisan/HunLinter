@@ -149,17 +149,21 @@ public class RulesReducer{
 	private List<LineEntry> redistributeAdditions(final List<LineEntry> plainRules){
 		final Map<String, LineEntry> map = new HashMap<>();
 		for(final LineEntry entry : plainRules)
-			for(final String addition : entry.addition){
-				final String key = entry.removal + TAB + addition + TAB + entry.condition;
-				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
-				final LineEntry rule = map.putIfAbsent(key, newEntry);
-				if(rule != null)
-					rule.from.addAll(entry.from);
-			}
+			redistributeAddition(entry, map);
 
 		return SetHelper.collect(map.values(),
 			entry -> entry.removal + TAB + entry.condition + TAB + PatternHelper.mergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
+	}
+
+	private void redistributeAddition(final LineEntry entry, final Map<String, LineEntry> map){
+		for(final String addition : entry.addition){
+			final String key = entry.removal + TAB + addition + TAB + entry.condition;
+			final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
+			final LineEntry rule = map.putIfAbsent(key, newEntry);
+			if(rule != null)
+				rule.from.addAll(entry.from);
+		}
 	}
 
 	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
@@ -384,18 +388,15 @@ public class RulesReducer{
 			final Set<Character> group = new HashSet<>(overallLastGroup);
 			group.removeAll(baseGroup);
 			if(baseGroup.size() == overallLastGroup.size())
-				preCondition = (parentConditionLength == 0? StringUtils.EMPTY: DOT)
-					+ parentCondition;
+				preCondition = (parentConditionLength == 0? StringUtils.EMPTY: DOT);
 			else
 				preCondition = (baseGroup.size() <= group.size()?
 					combineRatifying.apply(baseGroup, comparator):
-					combineNegated.apply(group, comparator))
-					+ parentCondition;
+					combineNegated.apply(group, comparator));
 		}
 		else
-			preCondition = combineRatifying.apply(baseGroup, comparator)
-				+ parentCondition;
-		return preCondition;
+			preCondition = combineRatifying.apply(baseGroup, comparator);
+		return preCondition + parentCondition;
 	}
 
 	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Set<Character> parentGroup,
