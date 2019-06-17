@@ -45,6 +45,7 @@
 				</executions>
 				<configuration>
 					<additionalOptions>-html5</additionalOptions>
+					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 				</configuration>
 			</plugin>
 			<!-- Templating Maven Plugin -->
