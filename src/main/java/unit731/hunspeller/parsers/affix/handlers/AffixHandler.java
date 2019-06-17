@@ -51,11 +51,10 @@ public class AffixHandler implements Handler{
 		//List<AffixEntry> suffixEntries = new ArrayList<>();
 		final List<String> aliasesFlag = getData.apply(AffixTag.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = getData.apply(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
-		int i = 0;
 		String line;
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		try{
-			while(i < numEntries){
+			for(int i = 0; i < numEntries; i ++){
 				line = extractLine(br);
 
 				final AffixEntry entry = new AffixEntry(line, strategy, aliasesFlag, aliasesMorphologicalField);
@@ -76,8 +75,6 @@ public class AffixHandler implements Handler{
 //}
 //else
 //	prefixEntries.put(arr, lst);
-
-				i ++;
 			}
 		}
 		catch(final IllegalArgumentException e){

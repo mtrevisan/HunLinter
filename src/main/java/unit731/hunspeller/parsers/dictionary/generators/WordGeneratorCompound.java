@@ -201,7 +201,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				if(simplifyTriples)
 					nextCompound = nextCompound.substring(1);
 				//enforce not containment of a triple if CHECKCOMPOUNDTRIPLE is set
-				else if(forbidTriples){
+				else /*if(forbidTriples)*/{
 					sb.setLength(0);
 					break;
 				}
