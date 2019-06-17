@@ -3,6 +3,9 @@ package unit731.hunspeller.parsers.dictionary.vos;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -57,6 +60,26 @@ public class AffixCondition{
 		}
 
 		return match;
+	}
+
+	@Override
+	public boolean equals(final Object obj){
+		if(obj == this)
+			return true;
+		if(obj == null || obj.getClass() != getClass())
+			return false;
+
+		final AffixCondition rhs = (AffixCondition)obj;
+		return new EqualsBuilder()
+			.append(condition, rhs.condition)
+			.isEquals();
+	}
+
+	@Override
+	public int hashCode(){
+		return new HashCodeBuilder()
+			.append(condition)
+			.toHashCode();
 	}
 
 }

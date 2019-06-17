@@ -94,8 +94,8 @@ public class RulesReducer{
 		final int lastCommonLetter = StringHelper.getLastCommonLetterIndex(word, producedWord);
 
 		final int wordLength = word.length();
-		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): AffixEntry.ZERO);
-		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): AffixEntry.ZERO);
+		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): ZERO);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): ZERO);
 		final AffixEntry lastAppliedRule = production.getLastAppliedRule(type);
 		if(lastAppliedRule != null)
 			addition += lastAppliedRule.toStringWithMorphologicalFields(strategy);

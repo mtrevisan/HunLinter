@@ -204,11 +204,9 @@ public class AffixData{
 
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
 		//extract the list of applicable affixes...
-		final List<AffixEntry> applicableAffixes = new ArrayList<>();
-		for(final AffixEntry entry : entries)
-			if(entry.match(word))
-				applicableAffixes.add(entry);
-		return applicableAffixes;
+		return entries.stream()
+			.filter(entry -> entry.match(word))
+			.collect(Collectors.toList());
 	}
 
 	public String getNoSuggestFlag(){

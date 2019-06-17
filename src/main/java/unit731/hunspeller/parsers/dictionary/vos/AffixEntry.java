@@ -30,10 +30,9 @@ public class AffixEntry{
 	private static final String TAB = "\t";
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
-	private static final Pattern PATTERN_ENTRY = PatternHelper.pattern("\t.*$");
 
-	public static final String DOT = ".";
-	public static final String ZERO = "0";
+	private static final String DOT = ".";
+	private static final String ZERO = "0";
 
 
 	public enum Type{
@@ -287,14 +286,26 @@ public class AffixEntry{
 
 		final AffixEntry rhs = (AffixEntry)obj;
 		return new EqualsBuilder()
-			.append(entry, rhs.entry)
+			.append(type, rhs.type)
+			.append(flag, rhs.flag)
+			.append(continuationFlags, rhs.continuationFlags)
+			.append(condition, rhs.condition)
+			.append(removing, rhs.removing)
+			.append(appending, rhs.appending)
+			.append(morphologicalFields, rhs.morphologicalFields)
 			.isEquals();
 	}
 
 	@Override
 	public int hashCode(){
 		return new HashCodeBuilder()
-			.append(entry)
+			.append(type)
+			.append(flag)
+			.append(continuationFlags)
+			.append(condition)
+			.append(removing)
+			.append(appending)
+			.append(morphologicalFields)
 			.toHashCode();
 	}
 
