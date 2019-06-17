@@ -133,9 +133,8 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 man i/A man", strategy, null, null);
 
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			entry.applyRule("man", false);
-		});
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class,
+			() -> entry.applyRule("man", false));
 		Assertions.assertEquals("Cannot strip full words without the FULLSTRIP tag", exception.getMessage());
 }
 

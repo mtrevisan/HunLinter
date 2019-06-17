@@ -45,10 +45,6 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 					production.getRulesSequence()));
 			}
 
-			//remove rules that invalidate the onlyInCompound rule
-			if(isCompound)
-				enforceOnlyInCompound(productions);
-
 			//remove rules that invalidate the affix rule
 			enforceNeedAffixFlag(productions);
 

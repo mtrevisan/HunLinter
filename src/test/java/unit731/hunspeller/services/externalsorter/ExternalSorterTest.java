@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class ExternalSorterTest{
 
 	private final ExternalSorter sorter = new ExternalSorter();
-	private final Comparator<String>DEFAULT_COMPARATOR = (r1, r2) -> r1.compareTo(r2);
+	private final Comparator<String> DEFAULT_COMPARATOR = Comparator.naturalOrder();
 
 	private File inputFile;
 	private File outputFile;
@@ -75,7 +75,7 @@ class ExternalSorterTest{
 		sorter.sort(inputFile, options, outputFile);
 
 		Assertions.assertEquals(21, outputFile.length());
-		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
+		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", Files.readString(outputFile.toPath()));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ class ExternalSorterTest{
 		sorter.sort(inputFile, options, outputFile);
 
 		Assertions.assertEquals(27, outputFile.length());
-		Assertions.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", new String(Files.readAllBytes(outputFile.toPath()), StandardCharsets.UTF_8));
+		Assertions.assertEquals("g\r\na\r\na\r\nc\r\ne\r\ni\r\ni\r\nj\r\nk\r\n", Files.readString(outputFile.toPath()));
 	}
 
 }

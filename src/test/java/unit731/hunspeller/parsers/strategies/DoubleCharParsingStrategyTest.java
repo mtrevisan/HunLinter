@@ -21,9 +21,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void notOk(){
-		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-			strategy.parseFlags("abc");
-		});
+		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("abc"));
 		Assertions.assertEquals("Flag must be of length multiple of two: abc", exception.getMessage());
 	}
 

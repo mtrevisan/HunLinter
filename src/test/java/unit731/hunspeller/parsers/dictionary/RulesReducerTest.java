@@ -64,7 +64,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -134,7 +134,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -217,7 +217,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -307,7 +307,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -454,7 +454,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -585,7 +585,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -633,7 +633,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -693,7 +693,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -776,7 +776,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -858,7 +858,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -917,7 +917,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -973,7 +973,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1047,7 +1047,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1132,7 +1132,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1202,7 +1202,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1249,7 +1249,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1313,7 +1313,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1435,7 +1435,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1595,7 +1595,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1661,7 +1661,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1727,7 +1727,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1801,7 +1801,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1868,7 +1868,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1909,7 +1909,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1953,7 +1953,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
@@ -1996,7 +1996,7 @@ class RulesReducerTest{
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
-			.map(line -> wordGenerator.applyAffixRules(line))
+			.map(wordGenerator::applyAffixRules)
 			.flatMap(productions -> reducer.collectProductionsByFlag(productions, flag, affixType).stream())
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
