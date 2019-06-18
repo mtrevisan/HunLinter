@@ -1899,8 +1899,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryDuplicates(){
 		if(dicDuplicatesWorker == null || dicDuplicatesWorker.isDone()){
-			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
-			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);
@@ -1944,8 +1944,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractDictionaryWordlist(boolean plainWords){
 		if(dicWordlistWorker == null || dicWordlistWorker.isDone()){
-			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
-			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
@@ -1961,8 +1961,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private void extractMinimalPairs(){
 		if(dicMinimalPairsWorker == null || dicMinimalPairsWorker.isDone()){
-			int fileChoosen = saveTextFileFileChooser.showSaveDialog(this);
-			if(fileChoosen == JFileChooser.APPROVE_OPTION){
+			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
+			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
 
 				mainProgressBar.setValue(0);

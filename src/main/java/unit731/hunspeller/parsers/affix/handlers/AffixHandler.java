@@ -61,10 +61,11 @@ public class AffixHandler implements Handler{
 
 				checkValidity(entry, ruleType, ruleFlag);
 
-				final boolean inserted = entries.add(entry);
-				if(!inserted)
+				if(entries.contains(entry))
 					throw new IllegalArgumentException("duplicated line");
-	
+
+				final boolean inserted = entries.add(entry);
+
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
 //List<AffixEntry> lst = new ArrayList<>();

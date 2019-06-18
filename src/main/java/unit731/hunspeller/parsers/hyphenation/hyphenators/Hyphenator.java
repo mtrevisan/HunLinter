@@ -305,7 +305,7 @@ public class Hyphenator implements HyphenatorInterface{
 		final String reducedRule = removeNonStandardPart(rule);
 
 		//cycle the pattern's characters searching for numbers
-		//start from -1 since the innitial dot has to be skipped
+		//start from -1 since the initial dot has to be skipped
 		int j = -1;
 		for(final char chr : reducedRule.toCharArray()){
 			if(!Character.isDigit(chr))

@@ -174,7 +174,7 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> makeAdditionsDisjoint(final List<LineEntry> rules){
-		//tranform
+		//transform
 		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=...]
 		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=...]
 		//into
