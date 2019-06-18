@@ -167,8 +167,9 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			}
 			catch(final Exception e){
 				String errorMessage = ExceptionHelper.getMessage(e);
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
+				LOGGER.trace("{}, line {}: {}", errorMessage, rowLine.getKey(), rowLine.getValue());
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
+				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "{}, line {}: {}", e.getMessage(), rowLine.getKey(), rowLine.getValue());
 
 				if(!isPreventExceptionRelaunch())
 					throw e;
