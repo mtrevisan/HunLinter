@@ -102,10 +102,10 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		catch(final Exception t){
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");
-			else{
-				final String message = ExceptionHelper.getMessage(t);
-				LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", t.getClass().getSimpleName(), message);
-			}
+			else
+				LOGGER.error(Backbone.MARKER_APPLICATION, "{}", t.getMessage());
+			final String errorMessage = ExceptionHelper.getMessage(t);
+			LOGGER.trace("{}: {}", t.getClass().getSimpleName(), errorMessage);
 
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped opening project");
 
