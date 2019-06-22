@@ -638,7 +638,7 @@ class WordGeneratorAffixTest{
 
 
 	@Test
-	void circumfix() throws IOException{
+	void circumfix1() throws IOException{
 		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
 			"SET UTF-8",
 			"CIRCUMFIX X",
@@ -655,17 +655,42 @@ class WordGeneratorAffixTest{
 		String line = "nagy/C";
 		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
 
-		Assertions.assertEquals(6, words.size());
+		Assertions.assertEquals(4, words.size());
 		//base production
 		Assertions.assertEquals(createProduction("nagy", "C", "st:nagy"), words.get(0));
 		//suffix productions
 		Assertions.assertEquals(createProduction("nagyobb", null, "st:nagy"), words.get(1));
-		Assertions.assertEquals(createProduction("nagyobb", "AX", "st:nagy"), words.get(2));
-		Assertions.assertEquals(createProduction("nagyobb", "BX", "st:nagy"), words.get(3));
 		//prefix productions
 		//twofold productions
-		Assertions.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(4));
-		Assertions.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(5));
+		Assertions.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(2));
+		Assertions.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(3));
+	}
+
+	@Test
+	void circumfix2() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"CIRCUMFIX X",
+			"PFX A Y 1",
+			"PFX A 0 leg/X .",
+			"PFX B Y 1",
+			"PFX B 0 legesleg/X .",
+			"SFX C Y 3",
+			"SFX C 0 obb .",
+			"SFX C 0 obb/AX .",
+			"SFX C 0 obb/BX .");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "nagy/CX";
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+
+		Assertions.assertEquals(2, words.size());
+		//base production
+		//suffix productions
+		//prefix productions
+		//twofold productions
+		Assertions.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(0));
+		Assertions.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(1));
 	}
 
 

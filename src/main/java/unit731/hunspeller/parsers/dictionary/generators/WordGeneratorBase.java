@@ -66,10 +66,10 @@ class WordGeneratorBase{
 
 		checkTwofoldCorrectness(lastfoldProductions);
 
-		//remove rules that invalidate the circumfix rule
-		enforceCircumfix(lastfoldProductions);
-
 		final List<Production> productions = collectProductions(baseProduction, onefoldProductions, twofoldProductions, lastfoldProductions);
+
+		//remove rules that invalidate the circumfix rule
+		enforceCircumfix(productions);
 
 		//remove rules that invalidate the onlyInCompound rule
 		if(isCompound)
@@ -149,18 +149,19 @@ class WordGeneratorBase{
 		return productions;
 	}
 
-	private List<Production> enforceCircumfix(final List<Production> lastfoldProductions){
+	private List<Production> enforceCircumfix(final List<Production> productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			lastfoldProductions.removeIf(production -> affixWithCircumfix(production, circumfixFlag));
-		return lastfoldProductions;
+			productions.removeIf(production -> affixWithCircumfix(production, circumfixFlag));
+		return productions;
 	}
 
 	private boolean affixWithCircumfix(final Production production, final String circumfixFlag){
 		boolean affixWithCircumfix = false;
 		final List<AffixEntry> appliedRules = production.getAppliedRules();
-		final boolean rulesContainsCircumfixFlag = appliedRules.stream()
-			.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
+		final boolean rulesContainsCircumfixFlag = (appliedRules == null?
+			production.hasContinuationFlag(circumfixFlag):
+			appliedRules.stream().anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag)));
 		if(rulesContainsCircumfixFlag){
 			//check if at least one SFX and one PFX have the circumfix flag
 			final boolean suffixWithCircumfix = appliedRules.stream()
