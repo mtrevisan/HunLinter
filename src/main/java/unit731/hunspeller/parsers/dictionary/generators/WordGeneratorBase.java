@@ -242,8 +242,9 @@ class WordGeneratorBase{
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
 					final boolean entryContainsCircumfix = ArrayUtils.contains(postponedAffixes, circumfixFlag);
-					final boolean appliedRuleContainsCircumfix = appliedRules.stream()
-						.anyMatch(r -> (entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag));
+					final AffixEntry lastAppliedRule = appliedRules.get(appliedRules.size() - 1);
+					final boolean appliedRuleContainsCircumfix = (entry.isSuffix() ^ lastAppliedRule.isSuffix())
+						&& lastAppliedRule.hasContinuationFlag(circumfixFlag);
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
 				}
 

@@ -13,7 +13,7 @@ import unit731.hunspeller.services.RecentItems;
 
 
 /** A menu used to store and display recently used files. */
-public class RecentFileMenu extends JMenu{
+public class RecentFilesMenu extends JMenu{
 
 	private static final long serialVersionUID = 5949478291911784729L;
 
@@ -22,7 +22,7 @@ public class RecentFileMenu extends JMenu{
 	private final Consumer<String> onSelectFile;
 
 
-	public RecentFileMenu(RecentItems recentItems, Consumer<String> onSelectFile){
+	public RecentFilesMenu(RecentItems recentItems, Consumer<String> onSelectFile){
 		super();
 
 		Objects.requireNonNull(recentItems);
@@ -82,11 +82,11 @@ public class RecentFileMenu extends JMenu{
 	}
 
 	private void writeObject(ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(RecentFileMenu.class.getName());
+		throw new NotSerializableException(RecentFilesMenu.class.getName());
 	}
 
 	private void readObject(ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(RecentFileMenu.class.getName());
+		throw new NotSerializableException(RecentFilesMenu.class.getName());
 	}
 
 }

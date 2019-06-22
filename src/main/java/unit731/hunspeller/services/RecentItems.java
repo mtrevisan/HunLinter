@@ -58,7 +58,7 @@ public class RecentItems{
 	public void clear(){
 		items.clear();
 
-		observers.forEach(observer -> observer.onRecentItemChange(this));
+		update();
 	}
 
 	public String get(int index){

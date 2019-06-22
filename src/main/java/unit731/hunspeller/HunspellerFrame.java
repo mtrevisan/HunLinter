@@ -60,7 +60,7 @@ import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.gui.HunspellerTableModel;
 import unit731.hunspeller.gui.ProductionTableModel;
-import unit731.hunspeller.gui.RecentFileMenu;
+import unit731.hunspeller.gui.RecentFilesMenu;
 import unit731.hunspeller.gui.ThesaurusTableModel;
 import unit731.hunspeller.gui.ThesaurusTableRenderer;
 import unit731.hunspeller.languages.Orthography;
@@ -126,7 +126,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 	private final Backbone backbone;
 
-	private RecentFileMenu rfm;
+	private RecentFilesMenu recentFilesMenu;
 	private final Debouncer<HunspellerFrame> productionDebouncer = new Debouncer<>(this::calculateProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> compoundProductionDebouncer = new Debouncer<>(this::calculateCompoundProductions, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
@@ -151,8 +151,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		initComponents();
 
-		rfm.setEnabled(rfm.hasEntries());
-		filEmptyRecentFilesMenuItem.setEnabled(rfm.hasEntries());
+		recentFilesMenu.setEnabled(recentFilesMenu.hasEntries());
+		filEmptyRecentFilesMenuItem.setEnabled(recentFilesMenu.hasEntries());
 
 		try{
 			JPopupMenu copyingPopupMenu = GUIUtils.createCopyingPopupMenu(hypRulesOutputLabel.getHeight());
@@ -284,7 +284,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       setTitle("Hunspeller");
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/favicon.jpg")));
       setMinimumSize(new java.awt.Dimension(964, 534));
-      setPreferredSize(new java.awt.Dimension(964, 534));
 
       parsingResultTextArea.setEditable(false);
       parsingResultTextArea.setColumns(20);
@@ -839,10 +838,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
-      rfm = new RecentFileMenu(recentItems, this::loadFile);
-      rfm.setText("Recent files");
-      rfm.setMnemonic('R');
-      filMenu.add(rfm, 3);
+      recentFilesMenu = new RecentFilesMenu(recentItems, this::loadFile);
+      recentFilesMenu.setText("Recent files");
+      recentFilesMenu.setMnemonic('R');
+      filMenu.add(recentFilesMenu, 3);
 
       dicMenu.setMnemonic('D');
       dicMenu.setText("Dictionary tools");
@@ -1043,9 +1042,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		int fileSelected = openAffixFileFileChooser.showOpenDialog(this);
 		if(fileSelected == JFileChooser.APPROVE_OPTION){
-			rfm.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
+			recentFilesMenu.addEntry(openAffixFileFileChooser.getSelectedFile().getAbsolutePath());
 
-			rfm.setEnabled(true);
+			recentFilesMenu.setEnabled(true);
 			filEmptyRecentFilesMenuItem.setEnabled(true);
 
 			File affFile = openAffixFileFileChooser.getSelectedFile();
@@ -1419,9 +1418,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_hypCheckCorrectnessMenuItemActionPerformed
 
    private void filEmptyRecentFilesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentFilesMenuItemActionPerformed
-		rfm.clear();
+		recentFilesMenu.clear();
 
-		rfm.setEnabled(false);
+		recentFilesMenu.setEnabled(false);
 		filEmptyRecentFilesMenuItem.setEnabled(false);
 		filOpenAFFMenuItem.setEnabled(true);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed

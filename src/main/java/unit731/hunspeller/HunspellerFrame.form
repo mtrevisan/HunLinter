@@ -14,7 +14,7 @@
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;rfm = new RecentFileMenu(recentItems, this::loadFile);&#xa;rfm.setText(&quot;Recent files&quot;);&#xa;rfm.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(rfm, 3);"/>
+            <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="Preferences preferences = Preferences.userNodeForPackage(getClass());&#xa;RecentItems recentItems = new RecentItems(5, preferences);&#xa;recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);&#xa;recentFilesMenu.setText(&quot;Recent files&quot;);&#xa;recentFilesMenu.setMnemonic(&apos;R&apos;);&#xa;filMenu.add(recentFilesMenu, 3);"/>
           </AuxValues>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="filOpenAFFMenuItem">
@@ -271,9 +271,6 @@
       <Connection code="Toolkit.getDefaultToolkit().getImage(getClass().getResource(&quot;/favicon.jpg&quot;))" type="code"/>
     </Property>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[964, 534]"/>
-    </Property>
-    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[964, 534]"/>
     </Property>
   </Properties>
