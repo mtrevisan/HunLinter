@@ -99,6 +99,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
+			exception = null;
+
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for duplications extraction (pass 1/3)");
 
 			watch = TimeWatch.start();
@@ -123,6 +125,8 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(final Exception t){
+			exception = t;
+
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			else{

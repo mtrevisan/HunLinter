@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import unit731.hunspeller.DictionaryStatisticsDialog;
 import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
@@ -63,7 +64,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			dialog.setLocationRelativeTo(parent);
 			dialog.setVisible(true);
 		};
-		final Runnable cancelled = dicStatistics::close;
+		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);

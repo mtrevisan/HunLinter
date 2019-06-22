@@ -120,6 +120,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private void readProcess(final List<Pair<Integer, String>> lines){
 		try{
+			exception = null;
+
 			LOGGER.info(Backbone.MARKER_APPLICATION, workerData.workerName + " (pass 2/2)");
 			setProgress(0);
 
@@ -132,6 +134,8 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Successfully processed dictionary file (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception e){
+			exception = e;
+
 			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
 				LOGGER.warn("Thread interrupted");
 			else
@@ -247,7 +251,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		if(!isCancelled() && getCompleted() != null)
 			getCompleted().run();
 		else if(isCancelled() && getCancelled() != null)
-			getCancelled().run();
+			getCancelled().accept(exception);
 	}
 
 	public final void pause(){

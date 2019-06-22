@@ -1,6 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers.core;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 
 
@@ -9,7 +10,7 @@ public class WorkerData{
 	final String workerName;
 	final DictionaryParser dicParser;
 	Runnable completed;
-	Runnable cancelled;
+	Consumer<Exception> cancelled;
 
 	final boolean parallelProcessing;
 	final boolean preventExceptionRelaunch;
@@ -61,7 +62,7 @@ public class WorkerData{
 		this.completed = completed;
 	}
 
-	public void setCancelledCallback(final Runnable cancelled){
+	public void setCancelledCallback(final Consumer<Exception> cancelled){
 		Objects.requireNonNull(cancelled);
 
 		this.cancelled = cancelled;

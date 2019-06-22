@@ -3,6 +3,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -50,7 +51,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
 				falsePositiveCount);
 		};
-		final Runnable cancelled = dictionary::close;
+		final Consumer<Exception> cancelled = exception -> dictionary.close();
 		final WorkerData data = WorkerData.createParallel(WORKER_NAME, dicParser);
 		data.setCompletedCallback(completed);
 		data.setCancelledCallback(cancelled);

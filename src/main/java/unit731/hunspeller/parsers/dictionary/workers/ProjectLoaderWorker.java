@@ -1,9 +1,11 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.Backbone;
@@ -27,7 +29,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	private final AtomicBoolean paused = new AtomicBoolean(false);
 
 
-	public ProjectLoaderWorker(final String affixFilePath, final Backbone backbone, final Runnable completed, final Runnable cancelled){
+	public ProjectLoaderWorker(final String affixFilePath, final Backbone backbone, final Runnable completed, final Consumer<Exception> cancelled){
 		Objects.requireNonNull(affixFilePath);
 		Objects.requireNonNull(backbone);
 
@@ -42,6 +44,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
+			exception = null;
+
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening project");
 			setProgress(0);
 
@@ -100,6 +104,8 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception t){
+			exception = (t instanceof FileNotFoundException? new AFFFileNotFoundException(affixFilePath, t): t);
+
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");
 			else
@@ -120,7 +126,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 		if(!isCancelled() && getCompleted() != null)
 			getCompleted().run();
 		else if(isCancelled() && getCancelled() != null)
-			getCancelled().run();
+			getCancelled().accept(exception);
 	}
 
 	public final void pause(){

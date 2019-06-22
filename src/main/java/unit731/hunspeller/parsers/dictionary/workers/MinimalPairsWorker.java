@@ -70,13 +70,15 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 
 	@Override
 	protected Void doInBackground(){
-		LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
-
-		watch = TimeWatch.start();
-
-		setProgress(0);
-		final Charset charset = getCharset();
 		try{
+			exception = null;
+
+			LOGGER.info(Backbone.MARKER_APPLICATION, "Opening Dictionary file for minimal pairs extraction (pass 1/3)");
+
+			watch = TimeWatch.start();
+
+			setProgress(0);
+			final Charset charset = getCharset();
 			final File dicFile = dicParser.getDicFile();
 			try(
 					final LineNumberReader br = FileHelper.createReader(dicFile.toPath(), dicParser.getCharset());
@@ -229,6 +231,8 @@ public class MinimalPairsWorker extends WorkerBase<Void, Void>{
 			}
 		}
 		catch(final Exception t){
+			exception = t;
+
 			if(t instanceof ClosedChannelException)
 				LOGGER.info(Backbone.MARKER_APPLICATION, "Minimal pairs thread interrupted");
 			else{

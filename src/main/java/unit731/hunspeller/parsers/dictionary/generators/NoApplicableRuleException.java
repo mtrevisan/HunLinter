@@ -9,5 +9,5 @@ public class NoApplicableRuleException extends IllegalArgumentException{
 	public NoApplicableRuleException(String text){
 		super(text);
 	}
-	
+
 }

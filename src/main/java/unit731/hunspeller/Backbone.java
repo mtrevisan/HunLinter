@@ -185,7 +185,7 @@ public class Backbone implements FileChangeListener{
 			if(hunspellable != null)
 				hunspellable.clearAffixParser();
 
-			throw new FileNotFoundException("The file does not exists");
+			throw new FileNotFoundException("The file '" + affixFilePath + "' does not exists");
 		}
 
 		LOGGER.info(MARKER_APPLICATION, "Opening Affix file: {}", affFile.getName());

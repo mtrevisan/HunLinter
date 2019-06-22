@@ -17,6 +17,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -70,6 +71,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.dictionary.workers.AFFFileNotFoundException;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
@@ -1749,7 +1751,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-	private void loadFileCancelled(){
+	private void loadFileCancelled(Exception exc){
+		if(exc instanceof AFFFileNotFoundException)
+			//remove the file from the recent files menu
+			recentFilesMenu.removeEntry(((AFFFileNotFoundException)exc).getPath());
+
+
 		dicCheckCorrectnessMenuItem.setEnabled(false);
 		dicSortDictionaryMenuItem.setEnabled(false);
 		hypCheckCorrectnessMenuItem.setEnabled(false);
@@ -2039,8 +2046,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		clearDictionaryParser();
 
 
-		//update rule reduced dialog:
-		rulesReducerDialog.reload();
+		if(rulesReducerDialog != null)
+			//update rule reduced dialog
+			rulesReducerDialog.reload();
 	}
 
 	@Override

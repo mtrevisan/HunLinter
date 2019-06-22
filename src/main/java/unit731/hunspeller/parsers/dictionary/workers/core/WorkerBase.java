@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
 import unit731.hunspeller.services.TimeWatch;
@@ -15,6 +16,8 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 
 	protected BiConsumer<S, T> readLineProcessor;
 	protected BiConsumer<BufferedWriter, Pair<Integer, S>> writeLineProcessor;
+
+	protected Exception exception;
 
 	protected TimeWatch watch = TimeWatch.start();
 
@@ -35,7 +38,7 @@ public abstract class WorkerBase<S, T> extends SwingWorker<Void, Void>{
 		return workerData.completed;
 	}
 
-	protected Runnable getCancelled(){
+	protected Consumer<Exception> getCancelled(){
 		return workerData.cancelled;
 	}
 

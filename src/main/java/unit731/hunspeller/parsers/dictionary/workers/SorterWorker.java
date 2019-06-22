@@ -50,6 +50,8 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 	@Override
 	protected Void doInBackground(){
 		try{
+			exception = null;
+
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Sorting Dictionary file");
 			setProgress(0);
 
@@ -91,12 +93,16 @@ public class SorterWorker extends WorkerBase<Void, Void>{
 			setProgress(100);
 		}
 		catch(final ClosedChannelException e){
+			exception = e;
+
 			LOGGER.warn(Backbone.MARKER_APPLICATION, "Duplicates thread interrupted");
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
 
 			cancel(true);
 		}
 		catch(final Exception e){
+			exception = e;
+
 			String message = ExceptionHelper.getMessage(e);
 			LOGGER.error(Backbone.MARKER_APPLICATION, "{}: {}", e.getClass().getSimpleName(), message);
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Stopped reading Dictionary file");
