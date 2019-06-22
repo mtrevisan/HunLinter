@@ -505,7 +505,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel) theTable.getModel()));
+      theTable.setRowSorter(new TableRowSorter<ThesaurusTableModel>((ThesaurusTableModel)theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
@@ -1423,6 +1423,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		rfm.setEnabled(false);
 		filEmptyRecentFilesMenuItem.setEnabled(false);
+		filOpenAFFMenuItem.setEnabled(true);
    }//GEN-LAST:event_filEmptyRecentFilesMenuItemActionPerformed
 
    private void dicRulesReducerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicRulesReducerMenuItemActionPerformed
@@ -1648,6 +1649,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		backbone.startFileListener();
 
 		try{
+			filOpenAFFMenuItem.setEnabled(true);
 			dicCheckCorrectnessMenuItem.setEnabled(true);
 			dicSortDictionaryMenuItem.setEnabled(true);
 			hypCheckCorrectnessMenuItem.setEnabled(true);

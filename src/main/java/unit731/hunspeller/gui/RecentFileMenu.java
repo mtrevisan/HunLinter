@@ -51,6 +51,9 @@ public class RecentFileMenu extends JMenu{
 	}
 
 	public void clear(){
+		//clear the existing items
+		removeAll();
+
 		recentItems.clear();
 	}
 
