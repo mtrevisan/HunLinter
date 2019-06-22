@@ -662,8 +662,8 @@ class WordGeneratorAffixTest{
 		Assertions.assertEquals(createProduction("nagyobb", null, "st:nagy"), words.get(1));
 		//prefix productions
 		//twofold productions
-		Assertions.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(2));
-		Assertions.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(3));
+		Assertions.assertEquals(createProduction("legnagyobb", null, "st:nagy"), words.get(2));
+		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words.get(3));
 	}
 
 	@Test
@@ -689,8 +689,8 @@ class WordGeneratorAffixTest{
 		//suffix productions
 		//prefix productions
 		//twofold productions
-		Assertions.assertEquals(createProduction("legnagyobb", "X", "st:nagy"), words.get(0));
-		Assertions.assertEquals(createProduction("legeslegnagyobb", "X", "st:nagy"), words.get(1));
+		Assertions.assertEquals(createProduction("legnagyobb", null, "st:nagy"), words.get(0));
+		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words.get(1));
 	}
 
 

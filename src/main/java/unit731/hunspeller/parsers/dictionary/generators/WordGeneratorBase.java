@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,27 +153,8 @@ class WordGeneratorBase{
 	private List<Production> enforceCircumfix(final List<Production> productions){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null)
-			productions.removeIf(production -> affixWithCircumfix(production, circumfixFlag));
+			productions.removeIf(production -> production.hasContinuationFlag(circumfixFlag));
 		return productions;
-	}
-
-	private boolean affixWithCircumfix(final Production production, final String circumfixFlag){
-		boolean affixWithCircumfix = false;
-		final List<AffixEntry> appliedRules = production.getAppliedRules();
-		final boolean rulesContainsCircumfixFlag = (appliedRules == null?
-			production.hasContinuationFlag(circumfixFlag):
-			appliedRules.stream().anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag)));
-		if(rulesContainsCircumfixFlag){
-			//check if at least one SFX and one PFX have the circumfix flag
-			final boolean suffixWithCircumfix = appliedRules.stream()
-				.filter(AffixEntry::isSuffix)
-				.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
-			final boolean prefixWithCircumfix = appliedRules.stream()
-				.filter(Predicate.not(AffixEntry::isSuffix))
-				.anyMatch(rule -> rule.hasContinuationFlag(circumfixFlag));
-			affixWithCircumfix = (suffixWithCircumfix ^ prefixWithCircumfix);
-		}
-		return affixWithCircumfix;
 	}
 
 	protected void enforceNeedAffixFlag(final List<Production> productions){
@@ -208,10 +190,13 @@ class WordGeneratorBase{
 
 	private List<Production> applyAffixRules(final DictionaryEntry dicEntry, final List<String[]> allAffixes, final boolean isCompound,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final String[] appliedAffixes = allAffixes.get(0);
-		final String[] postponedAffixes = allAffixes.get(1);
-
+		final String circumfixFlag = affixData.getCircumfixFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+
+		final String[] appliedAffixes = allAffixes.get(0);
+		String[] postponedAffixes = allAffixes.get(1);
+		if(circumfixFlag != null && ArrayUtils.contains(allAffixes.get(2), circumfixFlag))
+			postponedAffixes = ArrayUtils.addAll(postponedAffixes, circumfixFlag);
 
 		final List<Production> productions = new ArrayList<>();
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
@@ -223,8 +208,10 @@ class WordGeneratorBase{
 		return productions;
 	}
 
-	private List<Production> applyAffixRule(final DictionaryEntry dicEntry, final String affix, final String[] postponedAffixes,
+	private List<Production> applyAffixRule(final DictionaryEntry dicEntry, final String affix, String[] postponedAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+		final List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
+
 		RuleEntry rule = affixData.getData(affix);
 		//override with the given rule
 		if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
@@ -233,7 +220,6 @@ class WordGeneratorBase{
 			if(affixData.isManagedByCompoundRule(affix))
 				return Collections.emptyList();
 
-			final List<AffixEntry> appliedRules = dicEntry.getAppliedRules();
 			final String parentFlag = (!appliedRules.isEmpty()? appliedRules.get(0).getFlag(): null);
 			throw new IllegalArgumentException("Non–existent rule " + affix + " found"
 				+ (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
@@ -242,6 +228,7 @@ class WordGeneratorBase{
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		final String permitCompoundFlag = affixData.getPermitCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		final String circumfixFlag = affixData.getCircumfixFlag();
 
 		final String word = dicEntry.getWord();
 		final List<AffixEntry> applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
@@ -251,9 +238,20 @@ class WordGeneratorBase{
 		final List<Production> productions = new ArrayList<>();
 		for(final AffixEntry entry : applicableAffixes)
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
+				//if entry has circumfix contraint and production has the same contraint then remove it from postponedAffixes
+				boolean removeCircumfixFlag = false;
+				if(circumfixFlag != null && appliedRules != null){
+					final boolean entryContainsCircumfix = ArrayUtils.contains(postponedAffixes, circumfixFlag);
+					final boolean appliedRuleContainsCircumfix = appliedRules.stream()
+						.anyMatch(r -> (entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag));
+					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));
+				}
+
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
 				final Production production = Production.createFromProduction(newWord, entry, dicEntry, postponedAffixes, rule.isCombinable());
+				if(removeCircumfixFlag)
+					production.removeContinuationFlag(circumfixFlag);
 				if(!production.hasContinuationFlag(forbiddenWordFlag))
 					productions.add(production);
 			}

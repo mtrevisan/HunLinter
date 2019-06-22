@@ -29,32 +29,28 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
 		dicEntry.applyInputConversionTable(affixData);
 
-		List<Production> productions = Collections.emptyList();
-		final String circumfixFlag = affixData.getCircumfixFlag();
-		if(!dicEntry.hasContinuationFlag(circumfixFlag)){
-			final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
-			if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-				return Collections.emptyList();
+		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
+			return Collections.emptyList();
 
-			//extract suffixed productions
-			boolean isCompound = false;
-			productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
-			if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
-				LOGGER.debug("Suffix productions:");
-				productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
-					production.getRulesSequence()));
-			}
-
-			//remove rules that invalidate the affix rule
-			enforceNeedAffixFlag(productions);
-
-			//convert using output table
-			for(final Production production : productions)
-				production.applyOutputConversionTable(affixData);
-
-			if(LOGGER.isTraceEnabled())
-				productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
+		//extract suffixed productions
+		boolean isCompound = false;
+		final List<Production> productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+		if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
+			LOGGER.debug("Suffix productions:");
+			productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
+				production.getRulesSequence()));
 		}
+
+		//remove rules that invalidate the affix rule
+		enforceNeedAffixFlag(productions);
+
+		//convert using output table
+		for(final Production production : productions)
+			production.applyOutputConversionTable(affixData);
+
+		if(LOGGER.isTraceEnabled())
+			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
 		return productions;
 	}
 
