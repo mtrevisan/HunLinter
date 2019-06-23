@@ -117,7 +117,7 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public void loadFile(String affixFilePath) throws FileNotFoundException, IOException{
+	public void loadFile(String affixFilePath) throws IOException{
 		clear();
 
 		openAffixFile(affixFilePath);
@@ -138,7 +138,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	/* NOTE: used for testing purposes */
-	public void loadFile(String affixFilePath, String dictionaryFilePath) throws FileNotFoundException, IOException{
+	public void loadFile(String affixFilePath, String dictionaryFilePath) throws IOException{
 		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();

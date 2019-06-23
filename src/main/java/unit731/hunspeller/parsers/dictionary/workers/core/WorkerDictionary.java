@@ -110,7 +110,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		return lines;
 	}
 
-	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+	private String extractLine(final LineNumberReader br) throws IOException{
 		String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
@@ -136,7 +136,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		catch(final Exception e){
 			exception = e;
 
-			if(e instanceof ClosedChannelException || e instanceof RuntimeInterruptedException)
+			if(e instanceof RuntimeInterruptedException)
 				LOGGER.warn("Thread interrupted");
 			else
 				LOGGER.error("{}", ExceptionHelper.getMessage(e));

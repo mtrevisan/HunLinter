@@ -274,7 +274,7 @@ public class HyphenationParser{
 		}
 	}
 
-	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+	private String extractLine(final LineNumberReader br) throws IOException{
 		String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Hyphenation file");

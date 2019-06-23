@@ -90,8 +90,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected List<Production> applyCompound(final List<List<List<Production>>> entries, final int limit) throws IllegalArgumentException,
-			NoApplicableRuleException{
+	protected List<Production> applyCompound(final List<List<List<Production>>> entries, final int limit) throws IllegalArgumentException{
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();

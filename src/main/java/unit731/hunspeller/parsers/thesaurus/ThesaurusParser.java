@@ -141,7 +141,7 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 //6 035 792 B
 	}
 
-	private String extractLine(final LineNumberReader br) throws IOException, EOFException{
+	private String extractLine(final LineNumberReader br) throws IOException{
 		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Thesaurus file");

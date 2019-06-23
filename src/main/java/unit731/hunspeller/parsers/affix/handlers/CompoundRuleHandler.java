@@ -55,7 +55,7 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
-	private void checkValidity(final ParsingContext context) throws IllegalArgumentException, NumberFormatException{
+	private void checkValidity(final ParsingContext context) throws IllegalArgumentException{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new IllegalArgumentException("Error reading line '" + context + "': The first parameter is not a number");
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -63,7 +63,7 @@ public class CompoundRuleHandler implements Handler{
 			throw new IllegalArgumentException("Error reading line '" + context + "': Bad number of entries, it must be a positive integer");
 	}
 
-	private String extractLine(final BufferedReader br) throws IOException, EOFException{
+	private String extractLine(final BufferedReader br) throws IOException{
 		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");

@@ -39,17 +39,16 @@ public class WordGenerator{
 	}
 
 	public List<Production> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit)
-			throws IllegalArgumentException, NoApplicableRuleException{
+			throws IllegalArgumentException{
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
 	public List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds)
-			throws IllegalArgumentException, NoApplicableRuleException{
+			throws IllegalArgumentException{
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 
-	public List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException,
-			NoApplicableRuleException{
+	public List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException{
 		return wordGeneratorCompoundBeginMiddleEnd.applyCompoundBeginMiddleEnd(inputCompounds, limit);
 	}
 

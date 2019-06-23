@@ -34,8 +34,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 			return Collections.emptyList();
 
 		//extract suffixed productions
-		boolean isCompound = false;
-		final List<Production> productions = getOnefoldProductions(dicEntry, isCompound, !affixData.isComplexPrefixes(), overriddenRule);
+		final List<Production> productions = getOnefoldProductions(dicEntry, false, !affixData.isComplexPrefixes(), overriddenRule);
 		if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
 			LOGGER.debug("Suffix productions:");
 			productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),

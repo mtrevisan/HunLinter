@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ZipManager{
 
-	public void zipDirectory(File dir, int compressionLevel, String zipFilename) throws FileNotFoundException, IOException{
+	public void zipDirectory(File dir, int compressionLevel, String zipFilename) throws IOException{
 		Files.deleteIfExists((new File(zipFilename)).toPath());
 
 		List<String> filesListInDir = extractFilesList(dir);
@@ -44,10 +44,10 @@ public class ZipManager{
 	}
 
 	private List<String> extractFilesList(File dir){
-		List<String> filesListInDir = new ArrayList<>();
+		final List<String> filesListInDir = new ArrayList<>();
 
-		File[] files = dir.listFiles();
-		for(File file : files){
+		final File[] files = dir.listFiles();
+		for(final File file : files){
 			if(file.isFile())
 				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
 			else
@@ -57,12 +57,11 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	public static void zipFile(File file, int compressionLevel, String zipFilename) throws FileNotFoundException, IOException{
+	public static void zipFile(File file, int compressionLevel, String zipFilename) throws IOException{
 		zipStream(new FileInputStream(file), file.getName(), compressionLevel, zipFilename);
 	}
 
-	public static void zipStream(InputStream entry, String entryName, int compressionLevel, String zipFilename) throws FileNotFoundException,
-			IOException{
+	public static void zipStream(InputStream entry, String entryName, int compressionLevel, String zipFilename) throws IOException{
 		//create ZipOutputStream to write to the zip file
 		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilename))){
 			zos.setLevel(compressionLevel);

@@ -62,7 +62,7 @@ public class WordBreakTableHandler implements Handler{
 		}
 	}
 
-	private String extractLine(final BufferedReader br) throws EOFException, IOException{
+	private String extractLine(final BufferedReader br) throws IOException{
 		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");

@@ -76,7 +76,7 @@ public class ConversionTable{
 		}
 	}
 
-	private String extractLine(final BufferedReader br) throws IOException, EOFException{
+	private String extractLine(final BufferedReader br) throws IOException{
 		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");

@@ -30,10 +30,7 @@ public class Production extends DictionaryEntry{
 			final FlagParsingStrategy strategy){
 		final String[] cfs = (strategy != null? strategy.parseFlags(continuationFlags): null);
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
-		final boolean combinable = true;
-		final List<AffixEntry> appliedRules = null;
-		return new Production(word, cfs, morphologicalFields, combinable,
-			appliedRules, compoundEntries);
+		return new Production(word, cfs, morphologicalFields, true, null, compoundEntries);
 	}
 
 	public static Production createFromProduction(final String word, final AffixEntry appliedEntry, final DictionaryEntry dicEntry,

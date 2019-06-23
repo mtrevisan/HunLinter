@@ -29,8 +29,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds) throws IllegalArgumentException,
-			NoApplicableRuleException{
+	List<Production> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds) throws IllegalArgumentException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");

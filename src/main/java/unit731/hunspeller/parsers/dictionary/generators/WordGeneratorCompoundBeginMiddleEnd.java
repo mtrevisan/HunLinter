@@ -28,8 +28,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	 * @return	The list of productions
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
-	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException,
-			NoApplicableRuleException{
+	List<Production> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit) throws IllegalArgumentException{
 		Objects.requireNonNull(inputCompounds);
 		if(limit <= 0)
 			throw new IllegalArgumentException("Limit cannot be non-positive");

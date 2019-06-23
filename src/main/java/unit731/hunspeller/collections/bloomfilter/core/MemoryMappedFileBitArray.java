@@ -35,7 +35,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	private MappedByteBuffer buffer;
 
 
-	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws FileNotFoundException, IOException{
+	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws IOException{
 		if(backingFile == null)
 			throw new IllegalArgumentException("Backing file cannot be empty/null");
 		if(backingFile.exists() && !backingFile.isFile())

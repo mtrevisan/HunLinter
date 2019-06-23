@@ -3,7 +3,7 @@ package unit731.hunspeller.parsers.dictionary.generators;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ class WordGeneratorBase{
 	 * @throws NoApplicableRuleException	If there is a rule that does not apply to the word
 	 */
 	protected List<Production> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule)
-			throws IllegalArgumentException, NoApplicableRuleException{
+			throws IllegalArgumentException{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();

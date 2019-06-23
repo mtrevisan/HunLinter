@@ -198,7 +198,7 @@ public class DuplicatesWorker extends WorkerBase<Void, Void>{
 		return duplicatesBloomFilter;
 	}
 
-	private String extractLine(final LineNumberReader br) throws EOFException, IOException{
+	private String extractLine(final LineNumberReader br) throws IOException{
 		final String line = br.readLine();
 		if(line == null)
 			throw new EOFException("Unexpected EOF while reading Dictionary file");
