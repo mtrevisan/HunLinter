@@ -693,42 +693,55 @@ class WordGeneratorAffixTest{
 		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words.get(1));
 	}
 
-//	@Test
-//	void circumfix3() throws IOException{
-//		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
-//			"SET UTF-8",
-//			"CIRCUMFIX X",
-//			"PFX a Y 4",
-//			"PFX a 0 a .",
-//			"PFX a 0 n .",
-//			"PFX a 0 t .",
-//			"PFX a 0 y .",
-//			"PFX c Y 5",
-//			"PFX c a g/X a[^y]",
-//			"PFX c a f/X a[^y]",
-//			"PFX c 0 t/X [^a]",
-//			"PFX c 0 lt/X [^a]",
-//			"PFX c 0 wlt/X [^a]",
-//			"PFX d Y 1",
-//			"PFX d 0 y/X .",
-//			"SFX b Y 1",
-//			"SFX b 0 i/cX .",
-//			"SFX e Y 2",
-//			"SFX e 0 un/cdX .",
-//			"SFX e 0 n/cdX .");
-//		loadData(affFile.getAbsolutePath());
-//
-//		String line = "bark/abe";
-//		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
-//
-//		Assertions.assertEquals(2, words.size());
-//		//base production
-//		//suffix productions
-//		//prefix productions
-//		//twofold productions
-//		Assertions.assertEquals(createProduction("legnagyobb", null, "st:nagy"), words.get(0));
-//		Assertions.assertEquals(createProduction("legeslegnagyobb", null, "st:nagy"), words.get(1));
-//	}
+	@Test
+	void circumfix3() throws IOException{
+		File affFile = FileHelper.getTemporaryUTF8File("xxx", ".aff",
+			"SET UTF-8",
+			"CIRCUMFIX X",
+			"PFX a Y 4",
+			"PFX a 0 a .",
+			"PFX a 0 n .",
+			"PFX a 0 t .",
+			"PFX a 0 y .",
+			"PFX c Y 5",
+			"PFX c a g/X a[^y]",
+			"PFX c a f/X a[^y]",
+			"PFX c 0 t/X [^a]",
+			"PFX c 0 lt/X [^a]",
+			"PFX c 0 wlt/X [^a]",
+			"PFX d Y 1",
+			"PFX d 0 y/X .",
+			"SFX b Y 1",
+			"SFX b 0 i/cX .",
+			"SFX e Y 2",
+			"SFX e 0 un/cdX .",
+			"SFX e 0 n/cdX .");
+		loadData(affFile.getAbsolutePath());
+
+		String line = "bark/abe";
+		List<Production> words = backbone.getWordGenerator().applyAffixRules(line);
+
+		Assertions.assertEquals(16, words.size());
+		//base production
+		Assertions.assertEquals(createProduction("bark", "abe", "st:bark"), words.get(0));
+		//suffix productions
+		//twofold productions
+		Assertions.assertEquals(createProduction("abark", "be", "st:bark"), words.get(1));
+		Assertions.assertEquals(createProduction("nbark", "be", "st:bark"), words.get(2));
+		Assertions.assertEquals(createProduction("tbark", "be", "st:bark"), words.get(3));
+		Assertions.assertEquals(createProduction("ybark", "be", "st:bark"), words.get(4));
+		Assertions.assertEquals(createProduction("tbarki", null, "st:bark"), words.get(5));
+		Assertions.assertEquals(createProduction("ltbarki", null, "st:bark"), words.get(6));
+		Assertions.assertEquals(createProduction("wltbarki", null, "st:bark"), words.get(7));
+		Assertions.assertEquals(createProduction("tbarkun", null, "st:bark"), words.get(8));
+		Assertions.assertEquals(createProduction("ltbarkun", null, "st:bark"), words.get(9));
+		Assertions.assertEquals(createProduction("wltbarkun", null, "st:bark"), words.get(10));
+		Assertions.assertEquals(createProduction("ybarkun", null, "st:bark"), words.get(11));
+		Assertions.assertEquals(createProduction("tbarkn", null, "st:bark"), words.get(12));
+		Assertions.assertEquals(createProduction("ltbarkn", null, "st:bark"), words.get(13));
+		Assertions.assertEquals(createProduction("wltbarkn", null, "st:bark"), words.get(14));
+		Assertions.assertEquals(createProduction("ybarkn", null, "st:bark"), words.get(15));
+	}
 
 
 	void morphologicalAnalisys() throws IOException{
