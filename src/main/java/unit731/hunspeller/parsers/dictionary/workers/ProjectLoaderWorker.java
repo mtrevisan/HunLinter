@@ -1,5 +1,6 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.channels.ClosedChannelException;
@@ -104,7 +105,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Project loaded successfully (in {})", watch.toStringMinuteSeconds());
 		}
 		catch(final Exception t){
-			exception = (t instanceof FileNotFoundException? new AFFFileNotFoundException(affixFilePath, t): t);
+			exception = (t instanceof FileNotFoundException? new ProjectFileNotFoundException(affixFilePath, t): t);
 
 			if(t instanceof ClosedChannelException)
 				LOGGER.warn(Backbone.MARKER_APPLICATION, "Project loader thread interrupted");

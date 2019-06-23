@@ -241,7 +241,7 @@ class WordGeneratorBase{
 				//if entry has circumfix contraint and production has the same contraint then remove it from postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null){
-					final boolean entryContainsCircumfix = ArrayUtils.contains(postponedAffixes, circumfixFlag);
+					final boolean entryContainsCircumfix = entry.hasContinuationFlag(circumfixFlag);
 					final boolean appliedRuleContainsCircumfix = appliedRules.stream()
 						.anyMatch(r -> (entry.isSuffix() ^ r.isSuffix()) && r.hasContinuationFlag(circumfixFlag));
 					removeCircumfixFlag = (entryContainsCircumfix && (entry.isSuffix() ^ appliedRuleContainsCircumfix));

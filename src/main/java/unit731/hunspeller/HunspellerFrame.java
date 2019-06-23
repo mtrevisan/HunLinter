@@ -71,7 +71,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.parsers.dictionary.workers.AFFFileNotFoundException;
+import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
@@ -1752,9 +1752,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void loadFileCancelled(Exception exc){
-		if(exc instanceof AFFFileNotFoundException)
+		if(exc instanceof ProjectFileNotFoundException)
 			//remove the file from the recent files menu
-			recentFilesMenu.removeEntry(((AFFFileNotFoundException)exc).getPath());
+			recentFilesMenu.removeEntry(((ProjectFileNotFoundException)exc).getPath());
 
 
 		dicCheckCorrectnessMenuItem.setEnabled(false);
