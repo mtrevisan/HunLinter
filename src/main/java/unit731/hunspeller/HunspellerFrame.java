@@ -1517,6 +1517,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		if(StringUtils.isNotBlank(inputText)){
 			try{
+//https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
+//https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.h
 //TODO
 				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(inputText);
 
