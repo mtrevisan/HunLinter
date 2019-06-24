@@ -120,6 +120,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
+	private String formerInputTextMunch;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private DictionarySortDialog dicSortDialog;
@@ -133,6 +134,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> theFilterDebouncer = new Debouncer<>(this::filterThesaurus, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypDebouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
 	private final Debouncer<HunspellerFrame> hypAddRuleDebouncer = new Debouncer<>(this::hyphenateAddRule, DEBOUNCER_INTERVAL);
+	private final Debouncer<HunspellerFrame> munchDebouncer = new Debouncer<>(this::calculateMunch, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
 	private DictionaryCorrectnessWorker dicCorrectnessWorker;
@@ -252,6 +254,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       hypAddRuleSyllabationOutputLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountLabel = new javax.swing.JLabel();
       hypAddRuleSyllabesCountOutputLabel = new javax.swing.JLabel();
+      mncLayeredPane = new javax.swing.JLayeredPane();
+      mncInputLabel = new javax.swing.JLabel();
+      mncInputTextField = new javax.swing.JTextField();
+      mncScrollPane = new javax.swing.JScrollPane();
+      mncTable = new javax.swing.JTable();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -482,7 +489,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addContainerGap())
       );
 
-      mainTabbedPane.addTab("Compound Rules", cmpLayeredPane);
+      mainTabbedPane.addTab("Compound rules", cmpLayeredPane);
 
       theMeaningsLabel.setLabelFor(theMeaningsTextField);
       theMeaningsLabel.setText("New synonym:");
@@ -505,7 +512,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel) theTable.getModel()));
+      theTable.setRowSorter(new TableRowSorter<ThesaurusTableModel>((ThesaurusTableModel)theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
@@ -783,6 +790,53 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
 
+      mncInputLabel.setLabelFor(dicInputTextField);
+      mncInputLabel.setText("Word:");
+
+      mncInputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+         public void keyReleased(java.awt.event.KeyEvent evt) {
+            mncInputTextFieldKeyReleased(evt);
+         }
+      });
+
+      mncTable.setModel(new ProductionTableModel());
+      mncTable.setShowHorizontalLines(false);
+      mncTable.setShowVerticalLines(false);
+      dicTable.setRowSelectionAllowed(true);
+      mncScrollPane.setViewportView(mncTable);
+
+      mncLayeredPane.setLayer(mncInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      mncLayeredPane.setLayer(mncInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      mncLayeredPane.setLayer(mncScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+      javax.swing.GroupLayout mncLayeredPaneLayout = new javax.swing.GroupLayout(mncLayeredPane);
+      mncLayeredPane.setLayout(mncLayeredPaneLayout);
+      mncLayeredPaneLayout.setHorizontalGroup(
+         mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(mncLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addGroup(mncLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(mncInputLabel)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(mncInputTextField))
+               .addComponent(mncScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE))
+            .addContainerGap())
+      );
+      mncLayeredPaneLayout.setVerticalGroup(
+         mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+         .addGroup(mncLayeredPaneLayout.createSequentialGroup()
+            .addContainerGap()
+            .addGroup(mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(mncInputLabel)
+               .addComponent(mncInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGap(18, 18, 18)
+            .addComponent(mncScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+            .addContainerGap())
+      );
+
+      mainTabbedPane.addTab("Munch word", mncLayeredPane);
+
       addWindowListener(new WindowAdapter(){
          @Override
          public void windowClosing(WindowEvent e){
@@ -839,7 +893,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainMenuBar.add(filMenu);
       Preferences preferences = Preferences.userNodeForPackage(getClass());
       RecentItems recentItems = new RecentItems(5, preferences);
-      recentFilesMenu = new RecentFilesMenu(recentItems, this::loadFile);
+      recentFilesMenu = new unit731.hunspeller.gui.RecentFilesMenu(recentItems, this::loadFile);
       recentFilesMenu.setText("Recent files");
       recentFilesMenu.setMnemonic('R');
       filMenu.add(recentFilesMenu, 3);
@@ -1172,10 +1226,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		extractMinimalPairs();
    }//GEN-LAST:event_dicExtractMinimalPairsMenuItemActionPerformed
 
-	private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_dicInputTextFieldKeyReleased
-		productionDebouncer.call(this);
-	}//GEN-LAST:event_dicInputTextFieldKeyReleased
-
 	private void cmpInputComboBoxKeyReleased(){
 		compoundProductionDebouncer.call(this);
 	}
@@ -1188,56 +1238,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		dialog.setLocationRelativeTo(this);
 		dialog.setVisible(true);
    }//GEN-LAST:event_theFindDuplicatesMenuItemActionPerformed
-
-	private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theAddButtonActionPerformed
-		try{
-			//try adding the meanings
-			String synonyms = theMeaningsTextField.getText();
-			Supplier<Boolean> duplicatesDiscriminator = () -> {
-				int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
-					"Please select one", JOptionPane.YES_NO_OPTION);
-				return (responseOption == JOptionPane.YES_OPTION);
-			};
-			DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
-			List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
-
-			if(duplicationResult.isForcedInsertion() || duplicates.isEmpty()){
-				//if everything's ok update the table and the sorter...
-				ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
-				dm.fireTableDataChanged();
-
-				formerFilterThesaurusText = null;
-				theMeaningsTextField.setText(null);
-				theMeaningsTextField.requestFocusInWindow();
-				@SuppressWarnings("unchecked")
-				TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
-				sorter.setRowFilter(null);
-
-				updateSynonymsCounter();
-
-				//... and save the files
-				backbone.storeThesaurusFiles();
-			}
-			else{
-				theMeaningsTextField.requestFocusInWindow();
-
-				String duplicatedWords = duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "));
-				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.WARNING_MESSAGE, null, null, null);
-			}
-		}
-		catch(IllegalArgumentException e){
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
-		}
-		catch(Exception t){
-			String message = ExceptionHelper.getMessage(t);
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
-		}
-	}//GEN-LAST:event_theAddButtonActionPerformed
-
-	private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
-		theFilterDebouncer.call(this);
-	}//GEN-LAST:event_theMeaningsTextFieldKeyReleased
 
 	private void filterThesaurus(HunspellerFrame frame){
 		String text = frame.theMeaningsTextField.getText();
@@ -1298,70 +1298,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		}
 	}
 
-   private void theUndoButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theUndoButtonActionPerformed
-		try{
-			if(backbone.restorePreviousThesaurusSnapshot()){
-				updateSynonyms();
-
-				updateSynonymsCounter();
-			}
-		}
-		catch(IOException e){
-			LOGGER.error("Something very bad happend while undoing changes to the thesaurus file", e);
-		}
-   }//GEN-LAST:event_theUndoButtonActionPerformed
-
-   private void theRedoButtonActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_theRedoButtonActionPerformed
-		try{
-			if(backbone.restoreNextThesaurusSnapshot()){
-				updateSynonyms();
-
-				updateSynonymsCounter();
-			}
-		}
-		catch(IOException e){
-			LOGGER.error("Something very bad happend while redoing changes to the thesaurus file", e);
-		}
-   }//GEN-LAST:event_theRedoButtonActionPerformed
-
-
-	private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt){//GEN-FIRST:event_hypWordTextFieldKeyReleased
-		hypDebouncer.call(this);
-	}//GEN-LAST:event_hypWordTextFieldKeyReleased
-
-   private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
-		hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
-
-   private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
-		String newRule = hypAddRuleTextField.getText();
-		HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
-		String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
-		if(foundRule == null){
-			try{
-				backbone.storeHyphenationFile();
-
-				if(hypWordTextField.getText() != null){
-					formerHyphenationText = null;
-					hyphenate(this);
-				}
-
-				hypAddRuleLevelComboBox.setEnabled(false);
-				hypAddRuleButton.setEnabled(false);
-				hypAddRuleTextField.setText(null);
-				hypAddRuleSyllabationOutputLabel.setText(null);
-				hypAddRuleSyllabesCountOutputLabel.setText(null);
-			}
-			catch(IOException e){
-				LOGGER.error("Something very bad happend while adding a rule to the hyphenation file", e);
-			}
-		}
-		else{
-			hypAddRuleTextField.requestFocusInWindow();
-
-			LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
-		}
-   }//GEN-LAST:event_hypAddRuleButtonActionPerformed
 
    private void dicStatisticsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicStatisticsMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1379,38 +1315,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			LOGGER.error(Backbone.MARKER_APPLICATION, ExceptionHelper.getMessage(e));
 		}
    }//GEN-LAST:event_dicWordCountMenuItemActionPerformed
-
-   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
-		String inputText = (String)cmpInputComboBox.getEditor().getItem();
-		int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
-		String inputCompounds = cmpInputTextArea.getText();
-
-		inputText = StringUtils.strip(inputText);
-		if(StringUtils.isNotBlank(inputText)){
-			try{
-				List<Production> words;
-				AffixData affixData = backbone.getAffixData();
-				if(affixData.getCompoundFlag().equals(inputText)){
-					int maxCompounds = affixData.getCompoundMaxWordCount();
-					words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
-				}
-				else
-					words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
-
-				CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
-				dm.setProductions(words);
-			}
-			catch(IllegalArgumentException e){
-				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
-			}
-		}
-		else
-			clearOutputTable(cmpTable);
-   }//GEN-LAST:event_limitComboBoxActionPerformed
-
-   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
-		extractCompoundRulesInputs();
-   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
    private void hypCheckCorrectnessMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypCheckCorrectnessMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
@@ -1439,15 +1343,197 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		extractDictionaryStatistics(true);
    }//GEN-LAST:event_hypStatisticsMenuItemActionPerformed
 
-   private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
-		hypAddRuleDebouncer.call(this);
-   }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
-
    private void dicExtractWordlistPlainTextMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		extractDictionaryWordlist(true);
    }//GEN-LAST:event_dicExtractWordlistPlainTextMenuItemActionPerformed
+
+   private void hypAddRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleButtonActionPerformed
+      String newRule = hypAddRuleTextField.getText();
+      HyphenationParser.Level level = HyphenationParser.Level.values()[hypAddRuleLevelComboBox.getSelectedIndex()];
+      String foundRule = backbone.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
+      if(foundRule == null){
+         try{
+            backbone.storeHyphenationFile();
+
+            if(hypWordTextField.getText() != null){
+               formerHyphenationText = null;
+               hyphenate(this);
+            }
+
+            hypAddRuleLevelComboBox.setEnabled(false);
+            hypAddRuleButton.setEnabled(false);
+            hypAddRuleTextField.setText(null);
+            hypAddRuleSyllabationOutputLabel.setText(null);
+            hypAddRuleSyllabesCountOutputLabel.setText(null);
+         }
+         catch(IOException e){
+            LOGGER.error("Something very bad happend while adding a rule to the hyphenation file", e);
+         }
+      }
+      else{
+         hypAddRuleTextField.requestFocusInWindow();
+
+         LOGGER.info(Backbone.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+      }
+   }//GEN-LAST:event_hypAddRuleButtonActionPerformed
+
+   private void hypAddRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypAddRuleLevelComboBoxActionPerformed
+      hypAddRuleDebouncer.call(this);
+   }//GEN-LAST:event_hypAddRuleLevelComboBoxActionPerformed
+
+   private void hypAddRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypAddRuleTextFieldKeyReleased
+      hypAddRuleDebouncer.call(this);
+   }//GEN-LAST:event_hypAddRuleTextFieldKeyReleased
+
+   private void hypWordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_hypWordTextFieldKeyReleased
+      hypDebouncer.call(this);
+   }//GEN-LAST:event_hypWordTextFieldKeyReleased
+
+   private void theRedoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theRedoButtonActionPerformed
+      try{
+         if(backbone.restoreNextThesaurusSnapshot()){
+            updateSynonyms();
+
+            updateSynonymsCounter();
+         }
+      }
+      catch(IOException e){
+         LOGGER.error("Something very bad happend while redoing changes to the thesaurus file", e);
+      }
+   }//GEN-LAST:event_theRedoButtonActionPerformed
+
+   private void theUndoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theUndoButtonActionPerformed
+      try{
+         if(backbone.restorePreviousThesaurusSnapshot()){
+            updateSynonyms();
+
+            updateSynonymsCounter();
+         }
+      }
+      catch(IOException e){
+         LOGGER.error("Something very bad happend while undoing changes to the thesaurus file", e);
+      }
+   }//GEN-LAST:event_theUndoButtonActionPerformed
+
+   private void theAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_theAddButtonActionPerformed
+      try{
+         //try adding the meanings
+         String synonyms = theMeaningsTextField.getText();
+         Supplier<Boolean> duplicatesDiscriminator = () -> {
+            int responseOption = JOptionPane.showConfirmDialog(this, "There is a duplicate with same part of speech.\nForce insertion?",
+               "Please select one", JOptionPane.YES_NO_OPTION);
+            return (responseOption == JOptionPane.YES_OPTION);
+         };
+         DuplicationResult duplicationResult = backbone.getTheParser().insertMeanings(synonyms, duplicatesDiscriminator);
+         List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+
+         if(duplicationResult.isForcedInsertion() || duplicates.isEmpty()){
+            //if everything's ok update the table and the sorter...
+            ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
+            dm.fireTableDataChanged();
+
+            formerFilterThesaurusText = null;
+            theMeaningsTextField.setText(null);
+            theMeaningsTextField.requestFocusInWindow();
+            @SuppressWarnings("unchecked")
+            TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)theTable.getRowSorter();
+            sorter.setRowFilter(null);
+
+            updateSynonymsCounter();
+
+            //... and save the files
+            backbone.storeThesaurusFiles();
+         }
+         else{
+            theMeaningsTextField.requestFocusInWindow();
+
+            String duplicatedWords = duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "));
+            JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
+               JOptionPane.WARNING_MESSAGE, null, null, null);
+         }
+      }
+      catch(IllegalArgumentException e){
+         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      }
+      catch(Exception t){
+         String message = ExceptionHelper.getMessage(t);
+         LOGGER.info(Backbone.MARKER_APPLICATION, "Insertion error: {}", message);
+      }
+   }//GEN-LAST:event_theAddButtonActionPerformed
+
+   private void theMeaningsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_theMeaningsTextFieldKeyReleased
+      theFilterDebouncer.call(this);
+   }//GEN-LAST:event_theMeaningsTextFieldKeyReleased
+
+   private void cmpLoadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmpLoadInputButtonActionPerformed
+      extractCompoundRulesInputs();
+   }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
+
+   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
+      String inputText = (String)cmpInputComboBox.getEditor().getItem();
+      int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
+      String inputCompounds = cmpInputTextArea.getText();
+
+      inputText = StringUtils.strip(inputText);
+      if(StringUtils.isNotBlank(inputText)){
+         try{
+            List<Production> words;
+            AffixData affixData = backbone.getAffixData();
+            if(affixData.getCompoundFlag().equals(inputText)){
+               int maxCompounds = affixData.getCompoundMaxWordCount();
+               words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
+            }
+            else
+            words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
+
+            CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
+            dm.setProductions(words);
+         }
+         catch(IllegalArgumentException e){
+            LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+         }
+      }
+      else
+      clearOutputTable(cmpTable);
+   }//GEN-LAST:event_limitComboBoxActionPerformed
+
+   private void dicInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_dicInputTextFieldKeyReleased
+		productionDebouncer.call(this);
+   }//GEN-LAST:event_dicInputTextFieldKeyReleased
+
+   private void mncInputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_mncInputTextFieldKeyReleased
+		munchDebouncer.call(this);
+   }//GEN-LAST:event_mncInputTextFieldKeyReleased
+
+	private void calculateMunch(HunspellerFrame frame){
+		String inputText = frame.mncInputTextField.getText();
+
+		inputText = StringUtils.strip(inputText);
+		if(formerInputTextMunch != null && formerInputTextMunch.equals(inputText))
+			return;
+		formerInputTextMunch = inputText;
+
+		if(StringUtils.isNotBlank(inputText)){
+			try{
+//TODO
+				List<Production> productions = frame.backbone.getWordGenerator().applyAffixRules(inputText);
+
+				ProductionTableModel dm = (ProductionTableModel)frame.mncTable.getModel();
+				dm.setProductions(productions);
+
+				//show first row
+				Rectangle cellRect = frame.mncTable.getCellRect(0, 0, true);
+				frame.mncTable.scrollRectToVisible(cellRect);
+			}
+			catch(IllegalArgumentException e){
+				LOGGER.info(Backbone.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+			}
+		}
+		else
+			frame.clearOutputTable(frame.mncTable);
+	}
 
 
 	@Override
@@ -2001,9 +2087,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		clearOutputTable(dicTable);
 		totalProductionsOutputLabel.setText(StringUtils.EMPTY);
 		clearOutputTable(cmpTable);
+		clearOutputTable(mncTable);
 
 		formerInputText = null;
+		formerInputTextMunch = null;
 		dicInputTextField.setText(null);
+		mncInputTextField.setText(null);
 	}
 
 	private void clearDictionaryCompoundFields(){
@@ -2156,6 +2245,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JMenuBar mainMenuBar;
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
+   private javax.swing.JLabel mncInputLabel;
+   private javax.swing.JTextField mncInputTextField;
+   private javax.swing.JLayeredPane mncLayeredPane;
+   private javax.swing.JScrollPane mncScrollPane;
+   private javax.swing.JTable mncTable;
    private javax.swing.JScrollPane parsingResultScrollPane;
    private javax.swing.JTextArea parsingResultTextArea;
    private javax.swing.JButton theAddButton;
