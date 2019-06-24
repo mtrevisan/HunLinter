@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -271,7 +273,7 @@ public class RulesReducer{
 		return nonOverlappingRules;
 	}
 
-	private List<LineEntry> disjoinSameConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
 		//bucket by same condition
@@ -288,7 +290,7 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private void disjoinSameConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
+	private void disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
 			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
 		//extract children
 		final List<LineEntry> children = rules.stream()
@@ -433,99 +435,106 @@ public class RulesReducer{
 	private List<LineEntry> disjoinSameEndingConditionsBush(final List<LineEntry> bush, final Map<Integer, Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>();
 
-		Iterator<LineEntry> itr = bush.iterator();
-		while(itr.hasNext()){
-			final LineEntry parent = itr.next();
-			
-			bush.remove(parent);
-			
-			final List<LineEntry> bubbles = extractBubbles(bush, parent);
+		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
+		queue.addAll(bush);
+		while(!queue.isEmpty()){
+			final LineEntry parent = queue.remove();
+
+			final List<LineEntry> bubbles = extractBubbles(queue, parent);
 			if(!bubbles.isEmpty()){
 				//extract ratifying group
 				final int parentConditionLength = parent.condition.length();
 				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
-				
+
 				//extract negated group
 				final Set<Character> childrenGroup = bubbles.stream()
 					.map(child -> child.condition.charAt(child.condition.length() - parentConditionLength - 1))
 					.collect(Collectors.toSet());
-				
+
 				//if intersection(parent-group, children-group) is empty
 				final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 				parentGroup.removeAll(groupsIntersection);
-				
+
 				//calculate new condition
 				final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup);
 				final String preCondition = (chooseRatifyingOverNegated? PatternHelper.makeGroup(parentGroup, comparator):
 					PatternHelper.makeNotGroup(childrenGroup, comparator));
 				LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
-				
+
 				//keep only rules that matches some existent words
 				if(newEntry.isProductive())
 					finalRules.add(newEntry);
 				else{
-					final List<LineEntry> newBushes = new ArrayList<>();
-					final Iterator<LineEntry> itr2 = bush.iterator();
-					while(itr2.hasNext()){
-						final LineEntry child = itr2.next();
-						if(parent.from.containsAll(child.from)){
-							final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
-							childGroup.forEach(chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
-							
-							itr2.remove();
-						}
-					}
-					if(!newBushes.isEmpty()){
-						bush.addAll(newBushes);
-						bush.add(parent);
-						bush.sort(shortestConditionComparator);
-						itr = bush.iterator();
-						
+					if(!growNewBush(queue, parent))
 						continue;
-					}
-					
+
 					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
 						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 				}
-				
-				final int maxConditionLength = bush.get(bush.size() - 1).condition.length();
+
+				final int maxConditionLength = queue.stream()
+					.mapToInt(e -> e.condition.length())
+					.max()
+					.orElse(0);
 				if(parentConditionLength + 1 >= maxConditionLength){
-					bush.removeAll(bubbles);
-					
+					queue.removeAll(bubbles);
+
 					finalRules.addAll(bubbles);
 				}
-				else if(bush.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
-					final List<LineEntry> bushes = new ArrayList<>(bush);
+				else if(queue.stream().allMatch(rule -> rule.condition.length() > parentConditionLength + 1)){
+					final List<LineEntry> bushes = new ArrayList<>(queue);
 					bushes.add(parent);
 					for(final Character chr : childrenGroup){
 						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
-						if(!bush.contains(newEntry))
-							bush.add(newEntry);
+						if(!queue.contains(newEntry))
+							queue.add(newEntry);
 					}
-					
-					bush.sort(shortestConditionComparator);
 				}
 				else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty()){
 					//expand intersection
 					for(final Character chr : groupsIntersection){
 						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
-						bush.add(newEntry);
-						
-						finalRules.addAll(disjoinSameConditions(bush, overallLastGroups));
+						queue.add(newEntry);
+
+						finalRules.addAll(disjoinSameConditions(queue, overallLastGroups));
 					}
-					
-					bush.sort(shortestConditionComparator);
 				}
-				
+
 				//continue until bubbles.condition length is reached
 			}
 			else
 				finalRules.add(parent);
-			
-			itr = bush.iterator();
 		}
 
 		return finalRules;
+	}
+
+	/**
+	 * @param queue	The queue to add the new rules to
+	 * @param parent	The parent rule
+	 * @return	<code>true</code> if a bush was created and added to the queue
+	 */
+	private boolean growNewBush(Queue<LineEntry> queue, LineEntry parent){
+		final int parentConditionLength = parent.condition.length();
+
+		final List<LineEntry> newBushes = new ArrayList<>();
+		final Iterator<LineEntry> itr = queue.iterator();
+		while(itr.hasNext()){
+			final LineEntry child = itr.next();
+
+			if(parent.from.containsAll(child.from)){
+				final Set<Character> childGroup = child.extractGroup(parentConditionLength + 1);
+				childGroup.forEach(chr -> newBushes.add(LineEntry.createFrom(child, chr + child.condition)));
+
+				itr.remove();
+			}
+		}
+		final boolean bushAdded = !newBushes.isEmpty();
+		if(bushAdded){
+			queue.addAll(newBushes);
+			queue.add(parent);
+		}
+		return bushAdded;
 	}
 
 	private List<List<LineEntry>> bucketByConditionEnding(final List<LineEntry> rules){
@@ -558,7 +567,7 @@ public class RulesReducer{
 		return children;
 	}
 
-	private List<LineEntry> extractBubbles(final List<LineEntry> bush, final LineEntry parent){
+	private List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = bush.stream()
 			.filter(child -> child.condition.length() > parentConditionLength && child.condition.endsWith(parent.condition))
