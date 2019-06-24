@@ -21,7 +21,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData);
 	}
 
-	List<Production> applySingleAffixRule(final String line, final RuleEntry overriddenRule){
+	List<Production> applyOnefoldAffixRule(final String line, final RuleEntry overriddenRule){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final List<String> aliasesFlag = affixData.getData(AffixTag.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);

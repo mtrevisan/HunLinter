@@ -5,8 +5,11 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.LineEntry;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
+import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,6 +39,35 @@ public class WordMuncher{
 
 		final List<Production> productions = new ArrayList<>();
 
+		if(affixData.isComplexPrefixes()){
+			//twofold prefixes and onefold suffixes at most
+			//TODO from the original word extract all the suffixes
+			//TODO from each prefix extract all the prefixes
+			//TODO from each suffix extract all the prefixes
+
+			//TODO from the original word extract all the prefixes
+			//TODO from each suffix extract all the prefixes
+			//TODO from each suffix extract all the suffixes
+
+			//TODO from the original word extract all the prefixes
+			//TODO from each suffix extract all the suffixes
+			//TODO from each suffix extract all the prefixes
+		}
+		else{
+			//twofold suffixes and onefold prefixes at most
+			//TODO from the original word extract all the prefixes
+			//TODO from each prefix extract all the suffixes
+			//TODO from each suffix extract all the suffixes
+
+			//TODO from the original word extract all the suffixes
+			//TODO from each suffix extract all the suffixes
+			//TODO from each suffix extract all the prefixes
+
+			//TODO from the original word extract all the suffixes
+			//TODO from each suffix extract all the prefixes
+			//TODO from each suffix extract all the suffixes
+		}
+
 //		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag,
 //			aliasesMorphologicalField);
 //
@@ -54,6 +86,16 @@ public class WordMuncher{
 		if(LOGGER.isTraceEnabled())
 			productions.forEach(production -> LOGGER.trace("Inferred word: {}", production));
 		return productions;
+	}
+
+	private List<Production> extractAllAffixes(final String word){
+		final List<Production> originatingRules = new ArrayList<>();
+		for(final AffixEntry affixEntry : entries){
+			final String originatingWord = affixEntry.undoRule(word);
+			final Production newProduction = Production.createFromProduction(originatingWord, affixEntry, null, null, false);
+			originatingRules.add(newProduction);
+		}
+		return originatingRules;
 	}
 
 }
