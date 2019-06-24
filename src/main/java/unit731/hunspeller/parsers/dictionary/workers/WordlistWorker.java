@@ -61,4 +61,9 @@ public class WordlistWorker extends WorkerDictionaryBase{
 		createWriteWorker(data, lineProcessor, outputFile);
 	}
 
+	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
 }

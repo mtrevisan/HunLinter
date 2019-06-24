@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit731.hunspeller.gui.GUIUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
@@ -226,29 +226,13 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 	@Override
 	public void actionPerformed(ActionEvent event){
-		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
-			rulesReducerWorker.pause();
-
-			Object[] options = {"Abort", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the rules reducer task?", "Warning!",
-				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if(answer == JOptionPane.YES_OPTION){
-				rulesReducerWorker.cancel();
-				ruleComboBox.setEnabled(true);
-				optimizeClosedGroupCheckBox.setEnabled(true);
-
-				LOGGER.info(Backbone.MARKER_RULE_REDUCER, "Rules reducer aborted");
-
-				rulesReducerWorker = null;
-			}
-			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-				rulesReducerWorker.resume();
-
-				setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-			}
-		}
-		else
-			dispose();
+		Runnable cancelTask = () -> {
+			ruleComboBox.setEnabled(true);
+			optimizeClosedGroupCheckBox.setEnabled(true);
+		};
+		Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		Runnable notRunningTask = this::dispose;
+		GUIUtils.askUserToAbort(rulesReducerWorker, this, cancelTask, resumeTask, notRunningTask);
 	}
 
 	@Override

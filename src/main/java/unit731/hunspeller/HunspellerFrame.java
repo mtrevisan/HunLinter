@@ -1069,8 +1069,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(backbone.getTheParser().isDictionaryModified()){
 			//there are unsaved synonyms, ask the user if he really want to quit
 			Object[] options ={"Quit", "Cancel"};
-			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?", "Warning!", JOptionPane.YES_NO_OPTION,
-				JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			int answer = JOptionPane.showOptionDialog(this, "There are unsaved synonyms in the thesaurus.\nWhat would you like to do?",
+				"Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if(answer == JOptionPane.YES_OPTION)
 				dispose();
 			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION)
@@ -1475,26 +1475,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
 			}
-			if(dicCorrectnessWorker != null && dicCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
-				dicCorrectnessWorker.pause();
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the dictionary correctness task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					dicCorrectnessWorker.cancel();
-
-					dicCheckCorrectnessMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary correctness check aborted");
-
-					dicCorrectnessWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					dicCorrectnessWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 //				dicDuplicatesWorker.pause();
 
@@ -1515,107 +1496,34 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 				}
 			}
-			if(dicWordCountWorker != null && dicWordCountWorker.getState() == SwingWorker.StateValue.STARTED){
-				dicWordCountWorker.pause();
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the word count extraction task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					dicWordCountWorker.cancel();
+			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-					dicWordCountMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Word count extraction aborted");
+			Runnable cancelTaskDuplicates = () -> dicCheckCorrectnessMenuItem.setEnabled(true);
+			GUIUtils.askUserToAbort(dicCorrectnessWorker, this, cancelTaskDuplicates, resumeTask, null);
 
-					dicWordCountWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					dicWordCountWorker.resume();
+			Runnable cancelTaskWordCount = () -> dicWordCountMenuItem.setEnabled(true);
+			GUIUtils.askUserToAbort(dicWordCountWorker, this, cancelTaskWordCount, resumeTask, null);
 
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(dicStatisticsWorker != null && dicStatisticsWorker.getState() == SwingWorker.StateValue.STARTED){
-				dicStatisticsWorker.pause();
+			Runnable cancelTaskStatistics = () -> {
+				dicStatisticsMenuItem.setEnabled(true);
+				hypStatisticsMenuItem.setEnabled(true);
+			};
+			GUIUtils.askUserToAbort(dicStatisticsWorker, this, cancelTaskStatistics, resumeTask, null);
 
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the statistics extraction task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					dicStatisticsWorker.cancel();
+			Runnable cancelTaskWordlist = () -> {
+				dicExtractWordlistMenuItem.setEnabled(true);
+				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+			};
+			GUIUtils.askUserToAbort(dicWordlistWorker, this, cancelTaskWordlist, resumeTask, null);
 
-					if(dicStatisticsWorker.isPerformHyphenationStatistics())
-						hypStatisticsMenuItem.setEnabled(true);
-					else
-						dicStatisticsMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Statistics extraction aborted");
+			Runnable cancelTaskRulesExtractor = () -> dicRulesReducerMenuItem.setEnabled(true);
+			GUIUtils.askUserToAbort(compoundRulesExtractorWorker, this, cancelTaskRulesExtractor, resumeTask, null);
 
-					dicStatisticsWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					dicStatisticsWorker.resume();
+			GUIUtils.askUserToAbort(compoundRulesExtractorWorker, this, () -> {}, resumeTask, null);
 
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(dicWordlistWorker != null && dicWordlistWorker.getState() == SwingWorker.StateValue.STARTED){
-				dicWordlistWorker.pause();
-
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the wordlist extraction task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					dicWordlistWorker.cancel();
-
-					dicExtractWordlistMenuItem.setEnabled(true);
-					dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Dictionary wordlist extraction aborted");
-
-					dicWordlistWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					dicWordlistWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(compoundRulesExtractorWorker != null && compoundRulesExtractorWorker.getState() == SwingWorker.StateValue.STARTED){
-				compoundRulesExtractorWorker.pause();
-
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the compound extraction task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					compoundRulesExtractorWorker.cancel();
-
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Compound extraction aborted");
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					compoundRulesExtractorWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
-			if(hypCorrectnessWorker != null && hypCorrectnessWorker.getState() == SwingWorker.StateValue.STARTED){
-				hypCorrectnessWorker.pause();
-
-				Object[] options = {"Abort", "Cancel"};
-				int answer = JOptionPane.showOptionDialog(this, "Do you really want to abort the hyphenation correctness task?", "Warning!",
-					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-				if(answer == JOptionPane.YES_OPTION){
-					hypCorrectnessWorker.cancel();
-
-					hypCheckCorrectnessMenuItem.setEnabled(true);
-					LOGGER.info(Backbone.MARKER_APPLICATION, "Hyphenation correctness check aborted");
-
-					hypCorrectnessWorker = null;
-				}
-				else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
-					hypCorrectnessWorker.resume();
-
-					setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-				}
-			}
+			Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
+			GUIUtils.askUserToAbort(hypCorrectnessWorker, this, cancelTaskCorrectness, resumeTask, null);
 		}
 	}
 

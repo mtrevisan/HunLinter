@@ -76,4 +76,9 @@ public class RulesReducerWorker extends WorkerDictionaryBase{
 		createReadWorker(data, lineProcessor);
 	}
 
+	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
 }

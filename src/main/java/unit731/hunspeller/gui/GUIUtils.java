@@ -11,21 +11,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import unit731.hunspeller.Backbone;
+import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import unit731.hunspeller.services.PatternHelper;
 
 
 public class GUIUtils{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(GUIUtils.class);
 
 	private static final Pattern PATTERN_HTML_CODE = PatternHelper.pattern("</?[^>]+>");
 
@@ -109,6 +110,34 @@ public class GUIUtils{
 				}
 			});
 		}
+	}
+
+	public static void askUserToAbort(WorkerDictionaryBase worker, Component parentComponent, Runnable cancelTask, Runnable resumeTask, Runnable notRunningTask){
+		if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
+			Objects.requireNonNull(parentComponent);
+			Objects.requireNonNull(cancelTask);
+			Objects.requireNonNull(resumeTask);
+
+			worker.pause();
+
+			Object[] options = {"Abort", "Cancel"};
+			int answer = JOptionPane.showOptionDialog(parentComponent, "Do you really want to abort the " + worker.getWorkerName() + " task?", "Warning!",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+			if(answer == JOptionPane.YES_OPTION){
+				worker.cancel();
+
+				cancelTask.run();
+
+				LOGGER.info(Backbone.MARKER_APPLICATION, worker.getWorkerName() + " aborted");
+			}
+			else if(answer == JOptionPane.NO_OPTION || answer == JOptionPane.CLOSED_OPTION){
+				worker.resume();
+
+				resumeTask.run();
+			}
+		}
+		else if(notRunningTask != null)
+			notRunningTask.run();
 	}
 
 }

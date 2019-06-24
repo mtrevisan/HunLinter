@@ -8,7 +8,7 @@ import javax.swing.SwingWorker;
 import org.apache.commons.lang3.tuple.Pair;
 
 
-public class WorkerDictionaryBase{
+public abstract class WorkerDictionaryBase{
 
 	private WorkerDictionary worker;
 
@@ -25,6 +25,8 @@ public class WorkerDictionaryBase{
 	public void addPropertyChangeListener(final PropertyChangeListener listener){
 		worker.addPropertyChangeListener(listener);
 	}
+
+	public abstract String getWorkerName();
 
 	public void execute(){
 		clear();

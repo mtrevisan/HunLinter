@@ -44,4 +44,9 @@ public class DictionaryCorrectnessWorker extends WorkerDictionaryBase{
 		return new IllegalArgumentException(sb.toString());
 	}
 
+	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
 }

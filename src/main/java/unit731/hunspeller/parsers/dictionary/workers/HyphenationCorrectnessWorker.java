@@ -60,4 +60,9 @@ public class HyphenationCorrectnessWorker extends WorkerDictionaryBase{
 		createReadWorker(data, lineProcessor);
 	}
 
+	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
 }

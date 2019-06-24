@@ -63,6 +63,11 @@ public class WordCountWorker extends WorkerDictionaryBase{
 	}
 
 	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
+	@Override
 	public void clear(){
 		totalProductions.set(0);
 		dictionary.clear();

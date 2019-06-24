@@ -2,6 +2,7 @@ package unit731.hunspeller.parsers.dictionary.workers;
 
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -30,7 +31,6 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Frame parent){
 		Objects.requireNonNull(affParser);
-		Objects.requireNonNull(hyphenator);
 		Objects.requireNonNull(wordGenerator);
 		Objects.requireNonNull(parent);
 
@@ -45,7 +45,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 			for(final Production production : productions){
 				//collect statistics
 				final String word = production.getWord();
-				final List<String> subwords = hyphenator.splitIntoCompounds(word);
+				final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): Collections.emptyList());
 				if(subwords.isEmpty())
 					dicStatistics.addData(word);
 				else
@@ -73,6 +73,11 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 	public boolean isPerformHyphenationStatistics(){
 		return (hyphenator != null);
+	}
+
+	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
 	}
 
 	@Override

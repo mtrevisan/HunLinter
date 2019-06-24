@@ -59,6 +59,11 @@ public class DictionaryInclusionTestWorker extends WorkerDictionaryBase{
 	}
 
 	@Override
+	public String getWorkerName(){
+		return WORKER_NAME;
+	}
+
+	@Override
 	public void clear(){
 		dictionary.clear();
 	}
