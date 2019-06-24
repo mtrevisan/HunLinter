@@ -1455,6 +1455,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(event.getSource() == theTable)
 			removeSelectedRowsFromThesaurus();
 		else{
+			//FIXME
 			if(prjLoaderWorker != null && prjLoaderWorker.getState() == SwingWorker.StateValue.STARTED){
 				prjLoaderWorker.pause();
 
@@ -1476,6 +1477,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				}
 			}
 
+			//FIXME
 			if(dicDuplicatesWorker != null && dicDuplicatesWorker.getState() == SwingWorker.StateValue.STARTED){
 //				dicDuplicatesWorker.pause();
 
