@@ -72,7 +72,7 @@ public class ProjectLoaderWorker extends WorkerBase<Void, Void>{
 			while(paused.get())
 				Thread.sleep(500l);
 
-			backbone.obtainCorrectnessChecker();
+			backbone.getCorrectnessChecker();
 
 			setProgress(50);
 
