@@ -43,7 +43,7 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 
 		final String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(singleFlags, flags);
+		checkForDuplication(singleFlags);
 
 		return singleFlags;
 	}
@@ -61,10 +61,10 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		return singleFlags;
 	}
 
-	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+	private void checkForDuplication(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if(notDuplicatedFlags.size() < originalFlags.length())
-			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
+		if(notDuplicatedFlags.size() < flags.length)
+			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
 	}
 
 	@Override
@@ -72,19 +72,18 @@ class CharsetParsingStrategy implements FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		final String originalFlags = Arrays.toString(flags);
-		checkValidity(flags, originalFlags);
+		checkValidity(flags);
 
 		return String.join(StringUtils.EMPTY, flags);
 	}
 
-	private void checkValidity(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+	private void checkValidity(final String[] flags) throws IllegalArgumentException{
 		for(final String flag : flags){
 			if(flag == null || flag.length() != 1)
 				throw new IllegalArgumentException("Each flag must be of length one");
 			if(!canEncode(flag))
 				throw new IllegalArgumentException("Each flag must be in " + charset.displayName() + " encoding: " + flag
-					+ (flags.length > 1? " in " + originalFlags: StringUtils.EMPTY));
+					+ (flags.length > 1? " in " + Arrays.toString(flags): StringUtils.EMPTY));
 		}
 	}
 

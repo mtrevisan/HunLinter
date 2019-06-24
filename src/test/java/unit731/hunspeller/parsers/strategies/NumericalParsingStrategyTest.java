@@ -22,13 +22,13 @@ class NumericalParsingStrategyTest{
 	@Test
 	void notOk1(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("ab"));
-		Assertions.assertEquals("Flag must be an integer number: ab from ab", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number: ab from [ab]", exception.getMessage());
 	}
 
 	@Test
 	void notOk2(){
 		Throwable exception = Assertions.assertThrows(IllegalArgumentException.class, () -> strategy.parseFlags("1.2"));
-		Assertions.assertEquals("Flag must be an integer number: 1.2 from 1.2", exception.getMessage());
+		Assertions.assertEquals("Flag must be an integer number: 1.2 from [1.2]", exception.getMessage());
 	}
 
 	@Test

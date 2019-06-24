@@ -39,9 +39,9 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 
 		final String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(singleFlags, flags);
+		checkForDuplication(singleFlags);
 
-		checkValidity(singleFlags, flags);
+		checkValidity(singleFlags);
 
 		return singleFlags;
 	}
@@ -50,10 +50,10 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		return StringUtils.split(flags, COMMA);
 	}
 
-	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+	private void checkForDuplication(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length)
-			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
+			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
 	}
 
 	@Override
@@ -61,13 +61,13 @@ class NumericalParsingStrategy implements FlagParsingStrategy{
 		if(flags == null || flags.length == 0)
 			return StringUtils.EMPTY;
 
-		final String originalFlags = Arrays.toString(flags);
-		checkValidity(flags, originalFlags);
+		checkValidity(flags);
 
 		return String.join(COMMA, flags);
 	}
 
-	private void checkValidity(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+	private void checkValidity(final String[] flags) throws IllegalArgumentException{
+		final String originalFlags = Arrays.toString(flags);
 		for(final String flag : flags)
 			checkValidity(flag, originalFlags);
 	}

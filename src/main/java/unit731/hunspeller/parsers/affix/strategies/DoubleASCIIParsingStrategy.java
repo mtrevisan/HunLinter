@@ -38,7 +38,7 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 
 		final String[] singleFlags = extractFlags(flags);
 
-		checkForDuplication(singleFlags, flags);
+		checkForDuplication(singleFlags);
 
 		return singleFlags;
 	}
@@ -52,10 +52,10 @@ class DoubleASCIIParsingStrategy implements FlagParsingStrategy{
 		return PatternHelper.split(flags, PATTERN);
 	}
 
-	private void checkForDuplication(final String[] flags, final String originalFlags) throws IllegalArgumentException{
+	private void checkForDuplication(final String[] flags) throws IllegalArgumentException{
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
-		if((notDuplicatedFlags.size() << 1) < originalFlags.length())
-			throw new IllegalArgumentException("Flags must not be duplicated: " + originalFlags);
+		if((notDuplicatedFlags.size() << 1) < flags.length)
+			throw new IllegalArgumentException("Flags must not be duplicated: " + Arrays.toString(flags));
 	}
 
 	@Override
