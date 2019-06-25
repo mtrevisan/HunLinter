@@ -51,6 +51,19 @@ originators.size();
 		if(affixData.isComplexPrefixes()){
 			//twofold prefixes and onefold suffixes at most
 			//TODO from the original word extract all the suffixes
+
+			//TODO from the original word extract all the prefixes
+
+			//TODO from the original word extract all the suffixes
+			//TODO from each prefix extract all the prefixes
+
+			//TODO from the original word extract all the prefixes
+			//TODO from each suffix extract all the prefixes
+
+			//TODO from the original word extract all the prefixes
+			//TODO from each suffix extract all the suffixes
+
+			//TODO from the original word extract all the suffixes
 			//TODO from each prefix extract all the prefixes
 			//TODO from each suffix extract all the prefixes
 
@@ -64,6 +77,19 @@ originators.size();
 		}
 		else{
 			//twofold suffixes and onefold prefixes at most
+			//TODO from the original word extract all the prefixes
+
+			//TODO from the original word extract all the suffixes
+
+			//TODO from the original word extract all the prefixes
+			//TODO from each prefix extract all the suffixes
+
+			//TODO from the original word extract all the suffixes
+			//TODO from each suffix extract all the suffixes
+
+			//TODO from the original word extract all the suffixes
+			//TODO from each suffix extract all the prefixes
+
 			//TODO from the original word extract all the prefixes
 			//TODO from each prefix extract all the suffixes
 			//TODO from each suffix extract all the suffixes
