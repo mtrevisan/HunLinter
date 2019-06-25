@@ -200,6 +200,14 @@ public class DictionaryEntry{
 		return distribution;
 	}
 
+	public boolean hasPartOfSpeech(){
+		if(morphologicalFields != null)
+			for(final String morphologicalField : morphologicalFields)
+				if(morphologicalField.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH))
+					return true;
+		return false;
+	}
+
 	public boolean hasPartOfSpeech(final String partOfSpeech){
 		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH + partOfSpeech);
 	}

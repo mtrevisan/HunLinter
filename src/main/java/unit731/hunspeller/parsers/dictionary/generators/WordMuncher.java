@@ -6,19 +6,17 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.SetHelper;
-import unit731.hunspeller.services.StringHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 //https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
@@ -40,12 +38,14 @@ public class WordMuncher{
 //		this.dicParser = dicParser;
 	}
 
-	public List<Production> inferAffixRules(final String word){
+	public List<Production> inferAffixRules(final String line){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
-		final List<Production> productions = new ArrayList<>();
-
-		final List<Production> originators = extractAllAffixes(word);
+		final String[] parts = StringUtils.split(line);
+		final String word = parts[0];
+		final String morphologicalField = (parts.length == 2 && parts[1].startsWith(MorphologicalTag.TAG_PART_OF_SPEECH)
+			&& !StringUtils.containsWhitespace(parts[1])? parts[1].substring(MorphologicalTag.TAG_PART_OF_SPEECH.length()): null);
+		final List<Production> originators = extractAllAffixes(word, morphologicalField);
 originators.size();
 
 		if(affixData.isComplexPrefixes()){
@@ -77,27 +77,12 @@ originators.size();
 			//TODO from each suffix extract all the suffixes
 		}
 
-//		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag,
-//			aliasesMorphologicalField);
-//
-//		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
-//		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
-//			return Collections.emptyList();
-//
-//		//extract suffixed productions
-//		final List<Production> productions = getOnefoldProductions(dicEntry, false, !affixData.isComplexPrefixes(), overriddenRule);
-//		if(LOGGER.isDebugEnabled() && !productions.isEmpty()){
-//			LOGGER.debug("Suffix productions:");
-//			productions.forEach(production -> LOGGER.debug("   {} from {}", production.toString(affixData.getFlagParsingStrategy()),
-//				production.getRulesSequence()));
-//		}
-
 		if(LOGGER.isTraceEnabled())
-			productions.forEach(production -> LOGGER.trace("Inferred word: {}", production));
-		return productions;
+			originators.forEach(production -> LOGGER.trace("Inferred word: {}", production));
+		return originators;
 	}
 
-	private List<Production> extractAllAffixes(final String word){
+	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
 		final List<Production> originatingRules = new ArrayList<>();
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, strategy);
@@ -107,8 +92,11 @@ originators.size();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
-					if(originatingWord != null)
-						originatingRulesFromEntry.add(Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable()));
+					if(originatingWord != null){
+						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable());
+						if(partOfSpeech == null || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
+							originatingRulesFromEntry.add(originatingRule);
+					}
 				}
 			if(originatingRulesFromEntry != null){
 				//originatingRulesFromEntry should not have productions from identical word

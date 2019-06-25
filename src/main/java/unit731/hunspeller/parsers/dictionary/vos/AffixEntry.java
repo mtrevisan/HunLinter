@@ -279,7 +279,7 @@ public class AffixEntry{
 
 	@Override
 	public String toString(){
-		return entry;
+		return StringUtils.replace(entry, TAB, StringUtils.SPACE);
 	}
 
 	@Override
