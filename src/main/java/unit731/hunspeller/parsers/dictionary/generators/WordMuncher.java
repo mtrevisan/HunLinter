@@ -10,9 +10,13 @@ import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.services.SetHelper;
+import unit731.hunspeller.services.StringHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -94,24 +98,25 @@ originators.size();
 	}
 
 	private List<Production> extractAllAffixes(final String word){
-		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final List<Production> originatingRules = new ArrayList<>();
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, strategy);
-		ruleLoop:
+		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
-			Production originatingRuleFromEntry = null;
+			final List<Production> originatingRulesFromEntry = new ArrayList<>();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(affixEntry.canInverseApplyTo(word)){
-					if(originatingRuleFromEntry != null)
-						continue ruleLoop;
-
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null)
-						originatingRuleFromEntry = Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable());
+						originatingRulesFromEntry.add(Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable()));
 				}
-			if(originatingRuleFromEntry != null)
-				originatingRules.add(originatingRuleFromEntry);
+			if(originatingRulesFromEntry != null){
+				//originatingRulesFromEntry should not have productions from identical word
+				final Map<String, List<Production>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, rule -> rule.getWord());
+				final boolean identicalOriginatingWord = wordBucket.values().stream().anyMatch(prods -> prods.size() > 1);
+				if(!identicalOriginatingWord)
+					originatingRules.addAll(originatingRulesFromEntry);
+			}
 		}
 		return originatingRules;
 	}

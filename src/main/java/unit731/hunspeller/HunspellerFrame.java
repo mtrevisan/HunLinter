@@ -1085,6 +1085,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mainTabbedPane.setEnabledAt(1, false);
       mainTabbedPane.setEnabledAt(2, false);
       mainTabbedPane.setEnabledAt(3, false);
+      mainTabbedPane.setEnabledAt(4, false);
       KeyStroke escapeKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
       mainTabbedPane.registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 
