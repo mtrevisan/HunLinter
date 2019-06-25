@@ -93,7 +93,7 @@ originators.size();
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
-						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable());
+						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, ruleEntry.isCombinable());
 						if(partOfSpeech == null || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
 							originatingRulesFromEntry.add(originatingRule);
 					}

@@ -67,7 +67,7 @@ public class AffixEntry{
 	private final Type type;
 	/** ID used to represent the affix */
 	private final String flag;
-	private final String[] continuationFlags;
+	final String[] continuationFlags;
 	/** condition that must be met before the affix can be applied */
 	private final AffixCondition condition;
 	/** string to strip */
@@ -76,7 +76,7 @@ public class AffixEntry{
 	/** string to append */
 	private final String appending;
 	private final int appendingLength;
-	private final String[] morphologicalFields;
+	final String[] morphologicalFields;
 
 	private final String entry;
 
