@@ -240,8 +240,12 @@ public class AffixEntry{
 		return (type == Type.SUFFIX);
 	}
 
-	public boolean match(final String word){
+	public boolean canApplyTo(final String word){
 		return condition.match(word, type);
+	}
+
+	public boolean canInverseApplyTo(final String word){
+		return (type == AffixEntry.Type.PREFIX? word.startsWith(appending): word.endsWith(appending));
 	}
 
 	public String applyRule(final String word, final boolean isFullstrip) throws IllegalArgumentException{
@@ -254,9 +258,10 @@ public class AffixEntry{
 	}
 
 	public String undoRule(final String word) throws IllegalArgumentException{
-		return (isSuffix()?
+		final String originatingWord = (isSuffix()?
 			word.substring(0, word.length() - appendingLength) + removing:
 			removing + word.substring(appendingLength));
+		return (canApplyTo(originatingWord)? originatingWord: null);
 	}
 
 	public String toStringWithMorphologicalFields(final FlagParsingStrategy strategy){

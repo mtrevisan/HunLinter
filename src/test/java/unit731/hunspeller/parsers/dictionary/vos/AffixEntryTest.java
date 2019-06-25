@@ -103,7 +103,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
-		boolean matches = entry.match("man");
+		boolean matches = entry.canApplyTo("man");
 
 		Assertions.assertTrue(matches);
 	}
@@ -113,7 +113,7 @@ class AffixEntryTest{
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		AffixEntry entry = new AffixEntry("SFX M0 0 i/A [^oaie]", strategy, null, null);
 
-		boolean matches = entry.match("mano");
+		boolean matches = entry.canApplyTo("mano");
 
 		Assertions.assertFalse(matches);
 	}

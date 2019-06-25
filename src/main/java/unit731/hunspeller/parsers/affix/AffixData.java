@@ -172,7 +172,7 @@ public class AffixData{
 		return containsData(AffixTag.SIMPLIFIED_TRIPLES_IN_COMPOUND);
 	}
 
-	public Set<String> getProductiveAffixes(){
+	public Set<String> getAffixes(){
 		//keeps only items with RuleEntry as value
 		final Set<String> affixes = new HashSet<>();
 		final Set<String> keys = data.keySet();
@@ -188,15 +188,14 @@ public class AffixData{
 		return getData(AffixTag.FLAG);
 	}
 
-	public boolean isAffixProductive(String word, final String affix){
-		word = applyInputConversionTable(word);
+	public boolean isAffixProductive(final String word, final String affix){
+		final String convertedWord = applyInputConversionTable(word);
 
 		boolean productive;
 		final RuleEntry rule = getData(affix);
-		if(rule != null){
-			final List<AffixEntry> applicableAffixes = extractListOfApplicableAffixes(word, rule.getEntries());
-			productive = !applicableAffixes.isEmpty();
-		}
+		if(rule != null)
+			productive = rule.getEntries().stream()
+				.anyMatch(entry -> entry.canApplyTo(convertedWord));
 		else
 			productive = isManagedByCompoundRule(affix);
 		return productive;
@@ -205,7 +204,7 @@ public class AffixData{
 	public static List<AffixEntry> extractListOfApplicableAffixes(final String word, final List<AffixEntry> entries){
 		//extract the list of applicable affixes...
 		return entries.stream()
-			.filter(entry -> entry.match(word))
+			.filter(entry -> entry.canApplyTo(word))
 			.collect(Collectors.toList());
 	}
 
@@ -306,7 +305,7 @@ public class AffixData{
 
 	public List<RuleEntry> getRuleEntries(){
 		return data.values().stream()
-			.filter(entry -> entry instanceof RuleEntry)
+			.filter(entry -> RuleEntry.class.isAssignableFrom(entry.getClass()))
 			.map(RuleEntry.class::cast)
 			.collect(Collectors.toList());
 	}

@@ -144,7 +144,7 @@ public class Backbone implements FileChangeListener{
 	}
 
 	/* NOTE: used for testing purposes */
-	void loadFile(String affixFilePath, String dictionaryFilePath) throws IOException{
+	public void loadFile(String affixFilePath, String dictionaryFilePath) throws IOException{
 		openAffixFile(affixFilePath);
 
 		File hypFile = getHyphenationFile();

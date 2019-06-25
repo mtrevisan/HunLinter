@@ -72,7 +72,7 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
-import unit731.hunspeller.parsers.dictionary.workers.DictionaryCorrectnessWorker;
+import unit731.hunspeller.parsers.dictionary.workers.CorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.DuplicatesWorker;
 import unit731.hunspeller.parsers.dictionary.workers.HyphenationCorrectnessWorker;
 import unit731.hunspeller.parsers.dictionary.workers.MinimalPairsWorker;
@@ -137,7 +137,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private final Debouncer<HunspellerFrame> munchDebouncer = new Debouncer<>(this::calculateMunch, DEBOUNCER_INTERVAL);
 
 	private ProjectLoaderWorker prjLoaderWorker;
-	private DictionaryCorrectnessWorker dicCorrectnessWorker;
+	private CorrectnessWorker dicCorrectnessWorker;
 	private DuplicatesWorker dicDuplicatesWorker;
 	private SorterWorker dicSorterWorker;
 	private WordCountWorker dicWordCountWorker;
@@ -175,7 +175,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 		saveTextFileFileChooser.setCurrentDirectory(currentDir);
 
-		enableComponentFromWorker.put(DictionaryCorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
+		enableComponentFromWorker.put(CorrectnessWorker.WORKER_NAME, () -> dicCheckCorrectnessMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(DuplicatesWorker.WORKER_NAME, () -> dicExtractDuplicatesMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(SorterWorker.WORKER_NAME, () -> dicSortDictionaryMenuItem.setEnabled(true));
 		enableComponentFromWorker.put(WordCountWorker.WORKER_NAME, () -> dicWordCountMenuItem.setEnabled(true));
@@ -1696,6 +1696,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			dicMenu.setEnabled(true);
 			int index = setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, true);
 			setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, !compoundRules.isEmpty());
+			setTabbedPaneEnable(mainTabbedPane, mncLayeredPane, true);
 			mainTabbedPane.setSelectedIndex(index);
 
 
@@ -1893,7 +1894,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			mainProgressBar.setValue(0);
 
-			dicCorrectnessWorker = new DictionaryCorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
+			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
 		}
@@ -2075,6 +2076,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 		setTabbedPaneEnable(mainTabbedPane, dicLayeredPane, false);
 		setTabbedPaneEnable(mainTabbedPane, cmpLayeredPane, false);
+		setTabbedPaneEnable(mainTabbedPane, mncLayeredPane, false);
 
 		//disable menu
 		dicMenu.setEnabled(false);

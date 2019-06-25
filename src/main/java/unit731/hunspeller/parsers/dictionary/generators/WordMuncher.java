@@ -1,18 +1,20 @@
 package unit731.hunspeller.parsers.dictionary.generators;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.LineEntry;
+import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 
-import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 
 //https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
@@ -23,21 +25,24 @@ public class WordMuncher{
 
 
 	private final AffixData affixData;
-	private final DictionaryParser dicParser;
+//	private final DictionaryParser dicParser;
 
 
 	public WordMuncher(final AffixData affixData, final DictionaryParser dicParser){
 		Objects.requireNonNull(affixData);
-		Objects.requireNonNull(dicParser);
+//		Objects.requireNonNull(dicParser);
 
 		this.affixData = affixData;
-		this.dicParser = dicParser;
+//		this.dicParser = dicParser;
 	}
 
-	public List<Production> inferAffixRules(final String line){
+	public List<Production> inferAffixRules(final String word){
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		final List<Production> productions = new ArrayList<>();
+
+		final List<Production> originators = extractAllAffixes(word);
+originators.size();
 
 		if(affixData.isComplexPrefixes()){
 			//twofold prefixes and onefold suffixes at most
@@ -89,11 +94,24 @@ public class WordMuncher{
 	}
 
 	private List<Production> extractAllAffixes(final String word){
+		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final List<Production> originatingRules = new ArrayList<>();
-		for(final AffixEntry affixEntry : entries){
-			final String originatingWord = affixEntry.undoRule(word);
-			final Production newProduction = Production.createFromProduction(originatingWord, affixEntry, null, null, false);
-			originatingRules.add(newProduction);
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, strategy);
+		ruleLoop:
+		for(final RuleEntry ruleEntry : ruleEntries){
+			Production originatingRuleFromEntry = null;
+			for(final AffixEntry affixEntry : ruleEntry.getEntries())
+				if(affixEntry.canInverseApplyTo(word)){
+					if(originatingRuleFromEntry != null)
+						continue ruleLoop;
+
+					final String originatingWord = affixEntry.undoRule(word);
+					if(originatingWord != null)
+						originatingRuleFromEntry = Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable());
+				}
+			if(originatingRuleFromEntry != null)
+				originatingRules.add(originatingRuleFromEntry);
 		}
 		return originatingRules;
 	}
