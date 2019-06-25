@@ -1069,6 +1069,11 @@
                               <Component id="mncInputTextField" max="32767" attributes="0"/>
                           </Group>
                           <Component id="mncScrollPane" alignment="1" pref="910" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="mncRuleTagsAidLabel" min="-2" pref="81" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="mncRuleTagsAidComboBox" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1082,8 +1087,13 @@
                           <Component id="mncInputLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="mncInputTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="mncScrollPane" pref="191" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="mncRuleTagsAidComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="mncRuleTagsAidLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="mncScrollPane" pref="175" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -1130,6 +1140,25 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JLabel" name="mncRuleTagsAidLabel">
+              <Properties>
+                <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                  <ComponentRef name="dicRuleTagsAidComboBox"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Rule tags aid:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="mncRuleTagsAidComboBox">
+              <Properties>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="0"/>
+                </Property>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_ruleTagsAidComboBox"/>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

@@ -264,6 +264,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mncInputTextField = new javax.swing.JTextField();
       mncScrollPane = new javax.swing.JScrollPane();
       mncTable = new javax.swing.JTable();
+      mncRuleTagsAidLabel = new javax.swing.JLabel();
+      mncRuleTagsAidComboBox = new javax.swing.JComboBox<>();
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenAFFMenuItem = new javax.swing.JMenuItem();
@@ -810,9 +812,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicTable.setRowSelectionAllowed(true);
       mncScrollPane.setViewportView(mncTable);
 
+      mncRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
+      mncRuleTagsAidLabel.setText("Rule tags aid:");
+
       mncLayeredPane.setLayer(mncInputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       mncLayeredPane.setLayer(mncInputTextField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       mncLayeredPane.setLayer(mncScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      mncLayeredPane.setLayer(mncRuleTagsAidLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
+      mncLayeredPane.setLayer(mncRuleTagsAidComboBox, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
       javax.swing.GroupLayout mncLayeredPaneLayout = new javax.swing.GroupLayout(mncLayeredPane);
       mncLayeredPane.setLayout(mncLayeredPaneLayout);
@@ -825,7 +832,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                   .addComponent(mncInputLabel)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                   .addComponent(mncInputTextField))
-               .addComponent(mncScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE))
+               .addComponent(mncScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 910, Short.MAX_VALUE)
+               .addGroup(mncLayeredPaneLayout.createSequentialGroup()
+                  .addComponent(mncRuleTagsAidLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                  .addComponent(mncRuleTagsAidComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addContainerGap())
       );
       mncLayeredPaneLayout.setVerticalGroup(
@@ -835,8 +846,12 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             .addGroup(mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                .addComponent(mncInputLabel)
                .addComponent(mncInputTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGap(18, 18, 18)
-            .addComponent(mncScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(mncLayeredPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+               .addComponent(mncRuleTagsAidComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+               .addComponent(mncRuleTagsAidLabel))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(mncScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
             .addContainerGap())
       );
 
@@ -1731,15 +1746,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			//aid file:
 			List<String> lines = backbone.getAidParser().getLines();
 			boolean aidLinesPresent = !lines.isEmpty();
-			dicRuleTagsAidComboBox.removeAllItems();
-			cmpRuleTagsAidComboBox.removeAllItems();
+			clearAidParser();
 			if(aidLinesPresent){
 				lines.forEach(dicRuleTagsAidComboBox::addItem);
 				lines.forEach(cmpRuleTagsAidComboBox::addItem);
+				lines.forEach(mncRuleTagsAidComboBox::addItem);
 			}
 			//enable combo-box only if an AID file exists
 			dicRuleTagsAidComboBox.setEnabled(aidLinesPresent);
 			cmpRuleTagsAidComboBox.setEnabled(aidLinesPresent);
+			mncRuleTagsAidComboBox.setEnabled(aidLinesPresent);
 
 
 			//thesaurus file:
@@ -1797,11 +1813,11 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 		//aid file:
-		dicRuleTagsAidComboBox.removeAllItems();
-		cmpRuleTagsAidComboBox.removeAllItems();
+		clearAidParser();
 		//enable combo-box only if an AID file exists
 		dicRuleTagsAidComboBox.setEnabled(false);
 		cmpRuleTagsAidComboBox.setEnabled(false);
+		mncRuleTagsAidComboBox.setEnabled(false);
 
 
 		//thesaurus file:
@@ -2135,6 +2151,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	public void clearAidParser(){
 		dicRuleTagsAidComboBox.removeAllItems();
 		cmpRuleTagsAidComboBox.removeAllItems();
+		mncRuleTagsAidComboBox.removeAllItems();
 	}
 
 	@Override
@@ -2272,6 +2289,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    private javax.swing.JLabel mncInputLabel;
    private javax.swing.JTextField mncInputTextField;
    private javax.swing.JLayeredPane mncLayeredPane;
+   private javax.swing.JComboBox<String> mncRuleTagsAidComboBox;
+   private javax.swing.JLabel mncRuleTagsAidLabel;
    private javax.swing.JScrollPane mncScrollPane;
    private javax.swing.JTable mncTable;
    private javax.swing.JScrollPane parsingResultScrollPane;
