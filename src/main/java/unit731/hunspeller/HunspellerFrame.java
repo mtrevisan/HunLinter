@@ -24,6 +24,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +51,7 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.DefaultCaret;
 import org.apache.commons.lang3.StringUtils;
@@ -69,6 +71,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
 import unit731.hunspeller.parsers.dictionary.workers.CompoundRulesWorker;
@@ -313,6 +316,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
       dicRuleTagsAidLabel.setText("Rule tags aid:");
 
+      dicTable.setAutoCreateRowSorter(true);
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
@@ -799,6 +803,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
+      mncTable.setAutoCreateRowSorter(true);
       mncTable.setModel(new ProductionTableModel());
       mncTable.setShowHorizontalLines(false);
       mncTable.setShowVerticalLines(false);
@@ -1644,6 +1649,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		backbone.registerFileListener();
 		backbone.startFileListener();
 
+		final Comparator<String> comparator = Comparator.comparingInt(String::length)
+			.thenComparing(BaseBuilder.getComparator(backbone.getAffixData().getLanguage()));
+		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
+			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(backbone.getAffixData().getLanguage()).compare(entry0.toString(), entry1.toString()));
+		addSorterToTable(dicTable, comparator, comparatorAffix);
+		addSorterToTable(mncTable, comparator, comparatorAffix);
+
 		try{
 			filOpenAFFMenuItem.setEnabled(true);
 			dicCheckCorrectnessMenuItem.setEnabled(true);
@@ -1745,6 +1757,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			LOGGER.error("A bad error occurred", e);
 		}
+	}
+
+	private void addSorterToTable(JTable table, Comparator<String> comparator, Comparator<AffixEntry> comparatorAffix){
+		final TableRowSorter<TableModel> dicSorter = new TableRowSorter<>(table.getModel());
+		dicSorter.setComparator(0, comparator);
+		dicSorter.setComparator(1, comparator);
+		dicSorter.setComparator(2, comparatorAffix);
+		dicSorter.setComparator(3, comparatorAffix);
+		dicSorter.setComparator(4, comparatorAffix);
+		table.setRowSorter(dicSorter);
 	}
 
 	private void loadFileCancelled(Exception exc){
