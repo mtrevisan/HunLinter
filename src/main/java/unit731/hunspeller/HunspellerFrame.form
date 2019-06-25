@@ -1135,7 +1135,7 @@
                     </Property>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="dicTable.setRowSelectionAllowed(true);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="mncTable.setRowSelectionAllowed(true);&#xd;&#xa;&#xd;&#xa;ActionListener listener = new ActionListener(){&#xd;&#xa;&#x9;public void actionPerformed(ActionEvent event){&#xd;&#xa;&#x9;&#x9;munchTableRowCopy();&#xd;&#xa;&#x9;}&#xd;&#xa;};&#xd;&#xa;final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false);&#xd;&#xa;mncTable.registerKeyboardAction(listener, &quot;Copy&quot;, stroke, JComponent.WHEN_FOCUSED);&#xd;&#xa;&#xd;&#xa;mncTable.removeColumn(mncTable.getColumnModel().getColumn(1));"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

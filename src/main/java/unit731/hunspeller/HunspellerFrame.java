@@ -7,6 +7,8 @@ import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -71,6 +73,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
@@ -120,6 +123,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 	private static final Pattern THESAURUS_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
+
+	private static final String SLASH = "/";
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -809,7 +814,17 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       mncTable.setModel(new ProductionTableModel());
       mncTable.setShowHorizontalLines(false);
       mncTable.setShowVerticalLines(false);
-      dicTable.setRowSelectionAllowed(true);
+      mncTable.setRowSelectionAllowed(true);
+
+      ActionListener listener = new ActionListener(){
+         public void actionPerformed(ActionEvent event){
+            munchTableRowCopy();
+         }
+      };
+      final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK, false);
+      mncTable.registerKeyboardAction(listener, "Copy", stroke, JComponent.WHEN_FOCUSED);
+
+      mncTable.removeColumn(mncTable.getColumnModel().getColumn(1));
       mncScrollPane.setViewportView(mncTable);
 
       mncRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
@@ -1166,9 +1181,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private void calculateProductions(HunspellerFrame frame){
-		String inputText = frame.dicInputTextField.getText();
+		String inputText = StringUtils.strip(frame.dicInputTextField.getText());
 
-		inputText = StringUtils.strip(inputText);
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
@@ -1197,11 +1211,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void calculateCompoundProductions(HunspellerFrame frame){
-		String inputText = (String)frame.cmpInputComboBox.getEditor().getItem();
+		String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
-		inputText = StringUtils.strip(inputText);
 		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
 			return;
 		formerCompoundInputText = inputText;
@@ -1493,11 +1506,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
-      String inputText = (String)cmpInputComboBox.getEditor().getItem();
+      String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
       int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
       String inputCompounds = cmpInputTextArea.getText();
 
-      inputText = StringUtils.strip(inputText);
       if(StringUtils.isNotBlank(inputText)){
          try{
             List<Production> words;
@@ -1529,9 +1541,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_mncInputTextFieldKeyReleased
 
 	private void calculateMunch(HunspellerFrame frame){
-		String inputText = frame.mncInputTextField.getText();
+		final String inputText = StringUtils.strip(frame.mncInputTextField.getText());
 
-		inputText = StringUtils.strip(inputText);
 		if(formerInputTextMunch != null && formerInputTextMunch.equals(inputText))
 			return;
 		formerInputTextMunch = inputText;
@@ -1555,6 +1566,35 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			frame.clearOutputTable(frame.mncTable);
 	}
 
+	private void munchTableRowCopy(){
+		final int col = mncTable.getSelectedColumn();
+		final int row = mncTable.getSelectedRow();
+		if(col != -1 && row != -1){
+			final String originator = mncTable.getValueAt(row, 0).toString();
+			final Object rule1 = mncTable.getValueAt(row, 1);
+			final Object rule2 = mncTable.getValueAt(row, 2);
+			final Object rule3 = mncTable.getValueAt(row, 3);
+
+			final FlagParsingStrategy strategy = backbone.getAffixData().getFlagParsingStrategy();
+			final List<String> aliasesFlag = backbone.getAffixData().getData(AffixTag.ALIASES_FLAG);
+			final List<String> aliasesMorphologicalField = backbone.getAffixData().getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
+			final AffixEntry entry1 = (rule1 != null? new AffixEntry(rule1.toString(), strategy, aliasesFlag, aliasesMorphologicalField): null);
+			final AffixEntry entry2 = (rule2 != null? new AffixEntry(rule2.toString(), strategy, aliasesFlag, aliasesMorphologicalField): null);
+			final AffixEntry entry3 = (rule3 != null? new AffixEntry(rule3.toString(), strategy, aliasesFlag, aliasesMorphologicalField): null);
+
+			//FIXME
+			final String data = originator + SLASH + entry1.getFlag();
+
+			setClipboardContents(data);
+		}
+	}
+
+	/** Place a String on the clipboard, and make this class the owner of the Clipboard's contents */
+	private void setClipboardContents(String data){
+		final StringSelection stringSelection = new StringSelection(data);
+		final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, stringSelection);
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent event){
