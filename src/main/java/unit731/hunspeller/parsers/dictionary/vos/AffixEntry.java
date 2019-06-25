@@ -153,8 +153,12 @@ public class AffixEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
+	public boolean hasContinuationFlags(){
+		return (continuationFlags != null);
+	}
+
 	public boolean hasContinuationFlag(final String flag){
-		return (continuationFlags != null && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
+		return (hasContinuationFlags() && flag != null && Arrays.binarySearch(continuationFlags, flag) >= 0);
 	}
 
 	public String[] combineContinuationFlags(final String[] otherContinuationFlags){

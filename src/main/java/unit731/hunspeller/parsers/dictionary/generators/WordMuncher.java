@@ -90,7 +90,7 @@ originators.size();
 		for(final RuleEntry ruleEntry : ruleEntries){
 			final List<Production> originatingRulesFromEntry = new ArrayList<>();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
-				if(affixEntry.canInverseApplyTo(word)){
+				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					if(originatingWord != null){
 						final Production originatingRule = Production.createFromProduction(originatingWord, affixEntry, nullDicEntry, null, ruleEntry.isCombinable());
