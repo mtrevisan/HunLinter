@@ -1,6 +1,8 @@
 package unit731.hunspeller;
 
 import java.awt.Component;
+
+import unit731.hunspeller.gui.AscendingDescendingUnsortedTableRowSorter;
 import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
@@ -316,7 +318,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       dicRuleTagsAidLabel.setLabelFor(dicRuleTagsAidComboBox);
       dicRuleTagsAidLabel.setText("Rule tags aid:");
 
-      dicTable.setAutoCreateRowSorter(true);
       dicTable.setModel(new ProductionTableModel());
       dicTable.setShowHorizontalLines(false);
       dicTable.setShowVerticalLines(false);
@@ -803,7 +804,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
          }
       });
 
-      mncTable.setAutoCreateRowSorter(true);
       mncTable.setModel(new ProductionTableModel());
       mncTable.setShowHorizontalLines(false);
       mncTable.setShowVerticalLines(false);
@@ -1760,7 +1760,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void addSorterToTable(JTable table, Comparator<String> comparator, Comparator<AffixEntry> comparatorAffix){
-		final TableRowSorter<TableModel> dicSorter = new TableRowSorter<>(table.getModel());
+		final AscendingDescendingUnsortedTableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
 		dicSorter.setComparator(2, comparatorAffix);
