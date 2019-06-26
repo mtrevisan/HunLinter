@@ -9,7 +9,6 @@ import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.services.SetHelper;
 
@@ -46,7 +45,6 @@ public class WordMuncher{
 		final String morphologicalField = (parts.length == 2 && parts[1].startsWith(MorphologicalTag.TAG_PART_OF_SPEECH)
 			&& !StringUtils.containsWhitespace(parts[1])? parts[1].substring(MorphologicalTag.TAG_PART_OF_SPEECH.length()): null);
 		final List<Production> originators = extractAllAffixes(word, morphologicalField);
-originators.size();
 
 		//TODO from the original word extract all the suffixes
 
@@ -107,7 +105,6 @@ originators.size();
 	private List<Production> extractAllAffixes(final String word, final String partOfSpeech){
 		final List<Production> originatingRules = new ArrayList<>();
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
-		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, strategy);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
 			final List<Production> originatingRulesFromEntry = new ArrayList<>();
