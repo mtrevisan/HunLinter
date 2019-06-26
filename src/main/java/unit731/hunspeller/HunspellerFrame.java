@@ -7,6 +7,8 @@ import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -71,6 +73,7 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
@@ -120,6 +123,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final int DEBOUNCER_INTERVAL = 600;
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 	private static final Pattern THESAURUS_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
+
+	private static final String SLASH = "/";
 
 	private String formerInputText;
 	private String formerCompoundInputText;
@@ -1097,9 +1102,8 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 
 	private void calculateProductions(HunspellerFrame frame){
-		String inputText = frame.dicInputTextField.getText();
+		String inputText = StringUtils.strip(frame.dicInputTextField.getText());
 
-		inputText = StringUtils.strip(inputText);
 		if(formerInputText != null && formerInputText.equals(inputText))
 			return;
 		formerInputText = inputText;
@@ -1128,11 +1132,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void calculateCompoundProductions(HunspellerFrame frame){
-		String inputText = (String)frame.cmpInputComboBox.getEditor().getItem();
+		String inputText = StringUtils.strip((String)frame.cmpInputComboBox.getEditor().getItem());
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
-		inputText = StringUtils.strip(inputText);
 		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
 			return;
 		formerCompoundInputText = inputText;
@@ -1424,11 +1427,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
    }//GEN-LAST:event_cmpLoadInputButtonActionPerformed
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
-      String inputText = (String)cmpInputComboBox.getEditor().getItem();
+      String inputText = StringUtils.strip((String)cmpInputComboBox.getEditor().getItem());
       int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
       String inputCompounds = cmpInputTextArea.getText();
 
-      inputText = StringUtils.strip(inputText);
       if(StringUtils.isNotBlank(inputText)){
          try{
             List<Production> words;
