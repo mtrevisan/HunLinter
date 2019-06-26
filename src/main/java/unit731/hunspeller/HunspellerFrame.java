@@ -1571,6 +1571,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		final Comparator<AffixEntry> comparatorAffix = Comparator.comparingInt((AffixEntry entry) -> entry.toString().length())
 			.thenComparing((entry0, entry1) -> BaseBuilder.getComparator(backbone.getAffixData().getLanguage()).compare(entry0.toString(), entry1.toString()));
 		addSorterToTable(dicTable, comparator, comparatorAffix);
+		addSorterToTable(theTable, comparator, null);
 
 		try{
 			filOpenAFFMenuItem.setEnabled(true);
@@ -1674,12 +1675,14 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	}
 
 	private void addSorterToTable(JTable table, Comparator<String> comparator, Comparator<AffixEntry> comparatorAffix){
-		final AscendingDescendingUnsortedTableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
+		final TableRowSorter<TableModel> dicSorter = new AscendingDescendingUnsortedTableRowSorter<>(table.getModel());
 		dicSorter.setComparator(0, comparator);
 		dicSorter.setComparator(1, comparator);
-		dicSorter.setComparator(2, comparatorAffix);
-		dicSorter.setComparator(3, comparatorAffix);
-		dicSorter.setComparator(4, comparatorAffix);
+		if(table.getColumnModel().getColumnCount() > 2){
+			dicSorter.setComparator(2, comparatorAffix);
+			dicSorter.setComparator(3, comparatorAffix);
+			dicSorter.setComparator(4, comparatorAffix);
+		}
 		table.setRowSorter(dicSorter);
 	}
 
