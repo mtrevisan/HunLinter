@@ -283,7 +283,7 @@ public class AffixEntry{
 
 	@Override
 	public String toString(){
-		return StringUtils.replace(entry, TAB, StringUtils.SPACE);
+		return entry;
 	}
 
 	@Override
