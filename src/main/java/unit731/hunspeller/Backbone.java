@@ -28,7 +28,6 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.aid.AidParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.generators.WordMuncher;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.Hyphenator;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
@@ -72,7 +71,6 @@ public class Backbone implements FileChangeListener{
 	private HyphenatorInterface hyphenator;
 	private DictionaryCorrectnessChecker checker;
 	private WordGenerator wordGenerator;
-	private WordMuncher wordMuncher;
 
 	private final Hunspellable hunspellable;
 	private final FileListenerManager flm;
@@ -119,10 +117,6 @@ public class Backbone implements FileChangeListener{
 		return wordGenerator;
 	}
 
-	public WordMuncher getWordMuncher(){
-		return wordMuncher;
-	}
-
 	public void loadFile(String affixFilePath) throws IOException{
 		clear();
 
@@ -166,7 +160,6 @@ public class Backbone implements FileChangeListener{
 		hyphenator = null;
 		checker = null;
 		wordGenerator = null;
-		wordMuncher = null;
 	}
 
 	public void registerFileListener(){
@@ -240,7 +233,6 @@ public class Backbone implements FileChangeListener{
 			dicParser.clear();
 
 		wordGenerator = new WordGenerator(affixData, dicParser);
-		wordMuncher = new WordMuncher(affixData, dicParser);
 	}
 
 	public void openAidFile(File aidFile) throws IOException{
