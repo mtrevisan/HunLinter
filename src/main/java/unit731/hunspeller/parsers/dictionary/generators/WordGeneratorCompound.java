@@ -48,8 +48,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	protected final DictionaryParser dicParser;
 	protected final WordGenerator wordGenerator;
 
-	protected DictionaryInclusionTestWorker dicInclusionTestWorker;
-	protected final Set<String> compoundAsReplacement = new HashSet<>();
+	private DictionaryInclusionTestWorker dicInclusionTestWorker;
+	private final Set<String> compoundAsReplacement = new HashSet<>();
 
 
 	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator){
@@ -283,10 +283,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		boolean exists = false;
 
 		for(final String cr : compoundAsReplacement)
-			if(word.contains(cr))
-				return true;
+			if(word.contains(cr)){
+				exists = true;
+				break;
+			}
 
-		if(word.length() >= 2){
+		if(!exists && word.length() >= 2){
 			final List<String> conversions = affixData.applyReplacementTable(word);
 			for(final String candidate : conversions)
 				if(dicInclusionTestWorker.isInDictionary(candidate)){
@@ -296,6 +298,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					break;
 				}
 		}
+
 		return exists;
 	}
 
