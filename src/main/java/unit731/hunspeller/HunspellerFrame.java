@@ -7,8 +7,6 @@ import unit731.hunspeller.interfaces.Hunspellable;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -73,7 +71,6 @@ import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
-import unit731.hunspeller.parsers.affix.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
@@ -1527,10 +1524,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			};
 			GUIUtils.askUserToAbort(dicWordlistWorker, this, cancelTaskWordlist, resumeTask, null);
 
-			Runnable cancelTaskRulesExtractor = () -> dicRulesReducerMenuItem.setEnabled(true);
+			Runnable cancelTaskRulesExtractor = () -> {
+				cmpInputComboBox.setEnabled(true);
+				limitComboBox.setEnabled(true);
+				cmpInputTextArea.setEnabled(true);
+				cmpLoadInputButton.setEnabled(true);
+			};
 			GUIUtils.askUserToAbort(compoundRulesExtractorWorker, this, cancelTaskRulesExtractor, resumeTask, null);
-
-			GUIUtils.askUserToAbort(compoundRulesExtractorWorker, this, () -> {}, resumeTask, null);
 
 			Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
 			GUIUtils.askUserToAbort(hypCorrectnessWorker, this, cancelTaskCorrectness, resumeTask, null);
@@ -1921,6 +1921,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private void extractCompoundRulesInputs(){
 		if(compoundRulesExtractorWorker == null || compoundRulesExtractorWorker.isDone()){
 			cmpInputComboBox.setEnabled(false);
+			limitComboBox.setEnabled(false);
 			cmpInputTextArea.setEnabled(false);
 			cmpLoadInputButton.setEnabled(false);
 

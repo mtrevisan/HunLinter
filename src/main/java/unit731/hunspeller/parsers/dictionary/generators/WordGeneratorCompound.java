@@ -335,8 +335,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	protected void loadDictionaryForInclusionTest(){
-		final boolean checkCompoundReplacement = affixData.isCheckCompoundReplacement();
-		if(checkCompoundReplacement && dicInclusionTestWorker == null){
+		if(dicInclusionTestWorker == null && affixData.isCheckCompoundReplacement()){
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
 
 			try{
