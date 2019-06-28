@@ -121,13 +121,10 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = PatternHelper.pattern("[.\\d=-]");
 	private static final Pattern THESAURUS_CLEAR_SEARCH = PatternHelper.pattern("\\s+\\([^)]+\\)");
 
-	private static final String SLASH = "/";
-
 	private String formerInputText;
 	private String formerCompoundInputText;
 	private String formerFilterThesaurusText;
 	private String formerHyphenationText;
-	private String formerInputTextMunch;
 	private final JFileChooser openAffixFileFileChooser;
 	private final JFileChooser saveTextFileFileChooser;
 	private DictionarySortDialog dicSortDialog;
@@ -2029,7 +2026,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		clearOutputTable(cmpTable);
 
 		formerInputText = null;
-		formerInputTextMunch = null;
 		dicInputTextField.setText(null);
 	}
 
