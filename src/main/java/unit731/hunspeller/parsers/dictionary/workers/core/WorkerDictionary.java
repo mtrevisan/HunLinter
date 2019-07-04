@@ -136,7 +136,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 		catch(final Exception e){
 			exception = e;
 
-			if(e.getCause() instanceof InterruptedException)
+			if(isInterruptedException(e))
 				LOGGER.warn("Thread interrupted");
 			else
 				LOGGER.error("{}", ExceptionHelper.getMessage(e), e);
@@ -146,6 +146,11 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 			cancel(true);
 		}
+	}
+
+	private boolean isInterruptedException(final Exception exc){
+		final Throwable t = (exc.getCause() != null? exc.getCause(): exc);
+		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException);
 	}
 
 	private void processLines(final List<Pair<Integer, String>> lines){
