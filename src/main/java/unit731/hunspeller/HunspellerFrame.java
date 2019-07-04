@@ -73,6 +73,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
+import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
 import unit731.hunspeller.parsers.dictionary.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.exceptions.ProjectFileNotFoundException;
@@ -1396,11 +1397,13 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
             backbone.storeThesaurusFiles();
          }
          else{
-            theMeaningsTextField.requestFocusInWindow();
+				theMeaningsTextField.requestFocusInWindow();
 
-            String duplicatedWords = duplicates.stream().map(ThesaurusEntry::getSynonym).collect(Collectors.joining(", "));
-            JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
-               JOptionPane.WARNING_MESSAGE, null, null, null);
+				String duplicatedWords = duplicates.stream()
+					.map(ThesaurusEntry::getSynonym)
+					.collect(Collectors.joining(", "));
+				JOptionPane.showOptionDialog(this, "Some duplicates are present, namely:\n   " + duplicatedWords + "\n\nSynonyms was NOT inserted!", "Warning!", JOptionPane.DEFAULT_OPTION,
+					JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
       catch(IllegalArgumentException e){
@@ -1427,14 +1430,16 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       if(StringUtils.isNotBlank(inputText)){
          try{
-            List<Production> words;
+         	//FIXME transfer into backbone
+            final List<Production> words;
+				final WordGenerator wordGenerator = backbone.getWordGenerator();
             AffixData affixData = backbone.getAffixData();
-            if(affixData.getCompoundFlag().equals(inputText)){
+				if(affixData.getCompoundFlag().equals(inputText)){
                int maxCompounds = affixData.getCompoundMaxWordCount();
-               words = backbone.getWordGenerator().applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
+               words = wordGenerator.applyCompoundFlag(StringUtils.split(inputCompounds, '\n'), limit, maxCompounds);
             }
             else
-            words = backbone.getWordGenerator().applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
+            	words = wordGenerator.applyCompoundRules(StringUtils.split(inputCompounds, '\n'), inputText, limit);
 
             CompoundTableModel dm = (CompoundTableModel)cmpTable.getModel();
             dm.setProductions(words);
@@ -1549,8 +1554,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(prjLoaderWorker == null || prjLoaderWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
-			mainProgressBar.setValue(0);
-
 			prjLoaderWorker = new ProjectLoaderWorker(filePath, backbone, this::loadFileCompleted, this::loadFileCancelled);
 			prjLoaderWorker.addPropertyChangeListener(this);
 			prjLoaderWorker.execute();
@@ -1609,7 +1612,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 						dicSortDialog.setVisible(false);
 
 						dicSortDictionaryMenuItem.setEnabled(false);
-						mainProgressBar.setValue(0);
 
 
 						dicSorterWorker = new SorterWorker(backbone, selectedRow);
@@ -1828,8 +1830,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(dicCorrectnessWorker == null || dicCorrectnessWorker.isDone()){
 			dicCheckCorrectnessMenuItem.setEnabled(false);
 
-			mainProgressBar.setValue(0);
-
 			dicCorrectnessWorker = new CorrectnessWorker(backbone.getDicParser(), backbone.getChecker(), backbone.getWordGenerator());
 			dicCorrectnessWorker.addPropertyChangeListener(this);
 			dicCorrectnessWorker.execute();
@@ -1841,8 +1841,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractDuplicatesMenuItem.setEnabled(false);
-
-				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicDuplicatesWorker = new DuplicatesWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(),
@@ -1857,8 +1855,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		if(dicWordCountWorker == null || dicWordCountWorker.isDone()){
 			dicWordCountMenuItem.setEnabled(false);
 
-			mainProgressBar.setValue(0);
-
 			dicWordCountWorker = new WordCountWorker(backbone.getAffParser().getAffixData().getLanguage(), backbone.getDicParser(), backbone.getWordGenerator());
 			dicWordCountWorker.addPropertyChangeListener(this);
 			dicWordCountWorker.execute();
@@ -1871,8 +1867,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				hypStatisticsMenuItem.setEnabled(false);
 			else
 				dicStatisticsMenuItem.setEnabled(false);
-
-			mainProgressBar.setValue(0);
 
 			dicStatisticsWorker = new StatisticsWorker(backbone.getAffParser(), backbone.getDicParser(), (performHyphenationStatistics? backbone.getHyphenator(): null),
 				backbone.getWordGenerator(), this);
@@ -1888,8 +1882,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				dicExtractWordlistMenuItem.setEnabled(false);
 				dicExtractWordlistPlainTextMenuItem.setEnabled(false);
 
-				mainProgressBar.setValue(0);
-
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicWordlistWorker = new WordlistWorker(backbone.getDicParser(), backbone.getWordGenerator(), plainWords, outputFile);
 				dicWordlistWorker.addPropertyChangeListener(this);
@@ -1903,8 +1895,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 			if(fileChosen == JFileChooser.APPROVE_OPTION){
 				dicExtractMinimalPairsMenuItem.setEnabled(false);
-
-				mainProgressBar.setValue(0);
 
 				File outputFile = saveTextFileFileChooser.getSelectedFile();
 				dicMinimalPairsWorker = new MinimalPairsWorker(backbone.getAffixData().getLanguage(), backbone.getDicParser(), backbone.getChecker(),
@@ -1923,7 +1913,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 			cmpLoadInputButton.setEnabled(false);
 
 			cmpInputTextArea.setText(null);
-			mainProgressBar.setValue(0);
 
 			AffixParser affParser = backbone.getAffParser();
 			AffixData affixData = affParser.getAffixData();
@@ -1956,8 +1945,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 				hypCorrectnessWorker.execute();
 
 				hypCheckCorrectnessMenuItem.setEnabled(false);
-				
-				mainProgressBar.setValue(0);
 			}
 			catch(IOException e){
 				LOGGER.warn("Cannot instantiate Hyphenation correctness worker", e);
@@ -1970,7 +1957,6 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 		ThesaurusTableModel dm = (ThesaurusTableModel)theTable.getModel();
 		dm.fireTableDataChanged();
 	}
-
 
 
 	@Override
