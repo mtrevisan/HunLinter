@@ -15,7 +15,8 @@ public class HyphenationBreak{
 
 	@FunctionalInterface
 	public interface NoHyphenationManageFunction{
-		int manage(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength, int syllabesCount);
+		int manage(Map<Integer, Pair<Integer, String>> indexesAndRules, List<String> syllabes, String nohyp, int wordLength,
+			int syllabesCount);
 	}
 
 	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = new HashMap<>();

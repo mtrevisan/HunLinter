@@ -1,5 +1,6 @@
 package unit731.hunspeller.interfaces;
 
+
 public interface Hunspellable{
 
 	void loadFileInternal(String filePath);
