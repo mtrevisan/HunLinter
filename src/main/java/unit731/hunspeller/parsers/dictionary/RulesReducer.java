@@ -108,28 +108,33 @@ public class RulesReducer{
 	private List<LineEntry> compactProductions(final List<LineEntry> rules){
 		final List<LineEntry> compactedRules = new ArrayList<>();
 		if(rules.size() > 1){
-			final String from = rules.get(0).from.iterator().next();
 			//retrieve rule with longest condition (all the other conditions must be this long)
 			final LineEntry compactedRule = rules.stream()
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
-			final int longestConditionLength = compactedRule.condition.length();
-			for(final LineEntry rule : rules){
-				//recover the missing characters for the current condition to become of length the maximum found earlier
-				final int startIndex = from.length() - longestConditionLength;
-				//if a condition is not long enough, keep it separate
-				if(startIndex >= 0){
-					final int delta = longestConditionLength - rule.condition.length();
-					final String deltaAddition = from.substring(startIndex, startIndex + delta);
-					//add addition
-					rule.addition.forEach(addition -> compactedRule.addition.add(deltaAddition + addition));
-				}
-			}
+			expandAddition(compactedRule, rules);
+
 			compactedRules.add(compactedRule);
 		}
 		else
 			compactedRules.addAll(rules);
 		return compactedRules;
+	}
+
+	private void expandAddition(final LineEntry compactedRule, final List<LineEntry> rules){
+		final String from = rules.get(0).from.iterator().next();
+		final int longestConditionLength = compactedRule.condition.length();
+		for(final LineEntry rule : rules){
+			//recover the missing characters for the current condition to become of length the maximum found earlier
+			final int startIndex = from.length() - longestConditionLength;
+			//if a condition is not long enough, keep it separate
+			if(startIndex >= 0){
+				final int delta = longestConditionLength - rule.condition.length();
+				final String deltaAddition = from.substring(startIndex, startIndex + delta);
+				//add addition
+				rule.addition.forEach(addition -> compactedRule.addition.add(deltaAddition + addition));
+			}
+		}
 	}
 
 	public List<LineEntry> reduceRules(List<LineEntry> plainRules){
