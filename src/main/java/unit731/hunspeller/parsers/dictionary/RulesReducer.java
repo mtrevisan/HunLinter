@@ -112,7 +112,7 @@ public class RulesReducer{
 			final LineEntry compactedRule = rules.stream()
 				.max(Comparator.comparingInt(rule -> rule.condition.length()))
 				.get();
-			expandAddition(compactedRule, rules);
+			expandAddition(rules, compactedRule);
 
 			compactedRules.add(compactedRule);
 		}
@@ -121,7 +121,7 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private void expandAddition(final LineEntry compactedRule, final List<LineEntry> rules){
+	private void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
 		final String from = rules.get(0).from.iterator().next();
 		final int longestConditionLength = compactedRule.condition.length();
 		for(final LineEntry rule : rules){
@@ -419,11 +419,10 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
-		final List<LineEntry> finalRules = new ArrayList<>();
-
 		//bucket by condition ending
 		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
+		final List<LineEntry> finalRules = new ArrayList<>();
 		//for each bush in the forest
 		for(final List<LineEntry> bush : forest){
 			//if there is only one rule, then it goes in the final set
