@@ -137,7 +137,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 			exception = e;
 
 			if(isInterruptedException(e))
-				LOGGER.warn("Thread interrupted");
+				LOGGER.info("Thread interrupted");
 			else
 				LOGGER.error("{}", ExceptionHelper.getMessage(e), e);
 
@@ -235,7 +235,7 @@ class WorkerDictionary extends WorkerBase<String, Integer>{
 
 	private void cancelWorker(final Exception e){
 		if(e instanceof ClosedChannelException)
-			LOGGER.warn("Thread interrupted");
+			LOGGER.info("Thread interrupted");
 		else if(e != null){
 			final String message = ExceptionHelper.getMessage(e);
 			LOGGER.error("{}: {}", e.getClass().getSimpleName(), message);

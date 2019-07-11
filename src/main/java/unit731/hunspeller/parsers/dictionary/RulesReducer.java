@@ -464,13 +464,11 @@ public class RulesReducer{
 				//keep only rules that matches some existent words
 				if(newEntry.isProductive())
 					finalRules.add(newEntry);
-				else{
-					if(!growNewBush(queue, parent))
-						continue;
-
+				else if(!growNewBush(queue, parent))
+					continue;
+				else
 					LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, String.join("|", newEntry.addition),
 						(newEntry.condition.isEmpty()? DOT: newEntry.condition));
-				}
 
 				final int maxConditionLength = queue.stream()
 					.mapToInt(e -> e.condition.length())
@@ -490,7 +488,7 @@ public class RulesReducer{
 							queue.add(newEntry);
 					}
 				}
-				else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty()){
+				else if(!groupsIntersection.isEmpty() && !parentGroup.isEmpty())
 					//expand intersection
 					for(final Character chr : groupsIntersection){
 						newEntry = LineEntry.createFrom(parent, chr + parent.condition);
@@ -498,7 +496,6 @@ public class RulesReducer{
 
 						finalRules.addAll(disjoinSameConditions(queue, overallLastGroups));
 					}
-				}
 
 				//continue until bubbles.condition length is reached
 			}
