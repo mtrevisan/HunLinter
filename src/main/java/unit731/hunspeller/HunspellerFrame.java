@@ -516,7 +516,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
       theTable.getColumnModel().getColumn(0).setMinWidth(200);
-      theTable.getColumnModel().getColumn(0).setMaxWidth(500);
+      theTable.getColumnModel().getColumn(0).setMaxWidth(ThesaurusTableModel.MAX_WIDTH);
 
       theTable.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 

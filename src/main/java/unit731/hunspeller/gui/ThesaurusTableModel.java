@@ -15,10 +15,12 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final long serialVersionUID = -2584004821296780108L;
 
+	public static final int MAX_WIDTH = 500;
+
 	private static final String[] COLUMN_NAMES = new String[]{"Synonym", "Meanings"};
 
-	private static final String TAG_START = "<html>";
-	private static final String TAG_END = "</html>";
+	private static final String TAG_START = "<html><body style='width:" + MAX_WIDTH + "px'>";
+	private static final String TAG_END = "</body></html>";
 	private static final String TAG_NEW_LINE = "<br>";
 
 
