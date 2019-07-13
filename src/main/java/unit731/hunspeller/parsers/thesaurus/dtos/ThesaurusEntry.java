@@ -1,10 +1,14 @@
 package unit731.hunspeller.parsers.thesaurus.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -59,12 +63,56 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		return synonym;
 	}
 
-	public List<MeaningEntry> getMeanings(){
-		return meanings;
+//	public List<MeaningEntry> getMeanings(){
+//		return meanings;
+//	}
+
+	public String joinMeanings(String separator){
+		return StringUtils.join(meanings, separator);
+
+	}
+	public void setMeanings(final String[] lines){
+		meanings.clear();
+		Arrays.stream(lines)
+			.map(MeaningEntry::new)
+			.forEachOrdered(meanings::add);
 	}
 
-	public void setMeanings(final List<MeaningEntry> meanings){
-		this.meanings = meanings;
+	public void addMeaning(MeaningEntry meaningEntry){
+		meanings.add(meaningEntry);
+	}
+
+	public int getMeaningsCount(){
+		return meanings.size();
+	}
+
+	public long countSamePartOfSpeech(String partOfSpeech){
+		return (long)meanings.stream()
+			.map(MeaningEntry::getPartOfSpeech)
+			.filter(pos -> pos.equals(partOfSpeech))
+			.map(m -> 1)
+			.reduce(0, (accumulator, m) -> accumulator + 1);
+	}
+
+	public void saveToIndex(BufferedWriter writer, int idx) throws IOException{
+		writer.write(synonym);
+		writer.write(ThesaurusEntry.PIPE);
+		writer.write(Integer.toString(idx));
+		writer.write(StringUtils.LF);
+	}
+
+	public int saveToData(BufferedWriter dataWriter, Charset charset) throws IOException{
+		final int meaningsCount = getMeaningsCount();
+		saveToIndex(dataWriter, meaningsCount);
+		int meaningsLength = 1;
+		for(final MeaningEntry meaning : meanings){
+			final String m = meaning.toString();
+			dataWriter.write(m);
+			dataWriter.write(StringUtils.LF);
+
+			meaningsLength += m.getBytes(charset).length;
+		}
+		return meaningsLength + StringUtils.LF.length() * meaningsCount;
 	}
 
 	@Override

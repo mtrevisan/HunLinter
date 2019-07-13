@@ -62,8 +62,7 @@ public class ThesaurusDictionary{
 			final ThesaurusEntry foundSynonym = findByMeaning(mean);
 			if(foundSynonym != null)
 				//add to meanings if synonym does exists
-				foundSynonym.getMeanings()
-					.add(meaningEntry);
+				foundSynonym.addMeaning(meaningEntry);
 			else{
 				//add to list if synonym does not exists
 				final List<MeaningEntry> entries = new ArrayList<>();
@@ -138,17 +137,13 @@ public class ThesaurusDictionary{
 		synonyms.sort(Comparator.naturalOrder());
 	}
 
-	public void setMeanings(final int index, final List<MeaningEntry> meanings, final String text){
+	public void setMeanings(final int index, final String text){
 		if(StringUtils.isNotBlank(text)){
-			meanings.clear();
 			final String[] lines = StringUtils.split(text, StringUtils.LF);
-			for(final String line : lines)
-				meanings.add(new MeaningEntry(line));
+			synonyms.get(index).setMeanings(lines);
+
+			modified = true;
 		}
-
-		synonyms.get(index).setMeanings(meanings);
-
-		modified = true;
 	}
 
 	private ThesaurusEntry findByMeaning(final String meaning){

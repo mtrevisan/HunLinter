@@ -6,14 +6,12 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javax.swing.JDialog;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
 
@@ -25,12 +23,10 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 
 	private final ThesaurusEntry synonym;
-	private final BiConsumer<List<MeaningEntry>, String> okButtonAction;
-
-	private final List<MeaningEntry> meanings;
+	private final Consumer<String> okButtonAction;
 
 
-	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, BiConsumer<List<MeaningEntry>, String> okButtonAction, Frame parent){
+	public ThesaurusMeaningsDialog(ThesaurusEntry synonym, Consumer<String> okButtonAction, Frame parent){
 		super(parent, "Change meanings for \"" + synonym.getSynonym() + "\"", true);
 
 		Objects.requireNonNull(parent);
@@ -42,8 +38,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
 
 		this.synonym = synonym;
 		this.okButtonAction = okButtonAction;
-		meanings = synonym.getMeanings();
-		String content = StringUtils.join(meanings, StringUtils.LF);
+		String content = synonym.joinMeanings(StringUtils.LF);
 		meaningsTextArea.setText(content);
 	}
 
@@ -131,7 +126,7 @@ public class ThesaurusMeaningsDialog extends JDialog{
    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
 		try{
 			String text = meaningsTextArea.getText();
-			okButtonAction.accept(meanings, text);
+			okButtonAction.accept(text);
 		}
 		catch(IllegalArgumentException e){
 			LOGGER.info(Backbone.MARKER_APPLICATION, "Error while changing the meanings for word \"{}\": {}", synonym.getSynonym(), e.getMessage());

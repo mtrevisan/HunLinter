@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
@@ -511,7 +512,7 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
       theTable.setModel(new ThesaurusTableModel());
       theTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_LAST_COLUMN);
-      theTable.setRowSorter(new TableRowSorter<ThesaurusTableModel>((ThesaurusTableModel)theTable.getModel()));
+      theTable.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)theTable.getModel()));
       theTable.setShowHorizontalLines(false);
       theTable.setShowVerticalLines(false);
       theTable.setRowSelectionAllowed(true);
@@ -528,9 +529,9 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
                int col = target.getSelectedColumn();
                if(col == 1){
                   int row = theTable.convertRowIndexToModel(target.getSelectedRow());
-                  BiConsumer<List<MeaningEntry>, String> okButtonAction = (meanings, text) -> {
+                  Consumer<String> okButtonAction = (text) -> {
                      try{
-                        backbone.getTheParser().setMeanings(row, meanings, text);
+                        backbone.getTheParser().setMeanings(row, text);
 
                         // ... and save the files
                         backbone.storeThesaurusFiles();

@@ -7,7 +7,6 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
 
 
@@ -47,13 +46,12 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			return null;
 
 		ThesaurusEntry thesaurus = synonyms.get(rowIndex);
-		List<MeaningEntry> meanings = thesaurus.getMeanings();
 		switch(columnIndex){
 			case 0:
 				return thesaurus.getSynonym();
 
 			case 1:
-				return TAG_START + StringUtils.join(meanings, TAG_NEW_LINE) + TAG_END;
+				return TAG_START + thesaurus.joinMeanings(TAG_NEW_LINE) + TAG_END;
 
 			default:
 				return null;
@@ -72,12 +70,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				String text = StringUtils.replace((String)value, TAG_START, StringUtils.EMPTY);
 				text = StringUtils.replace(text, TAG_END, StringUtils.EMPTY);
 
-				List<MeaningEntry> meanings = synonyms.get(rowIndex).getMeanings();
-				meanings.clear();
-
 				String[] lines = StringUtils.splitByWholeSeparator(text, TAG_NEW_LINE);
-				for(String line : lines)
-					meanings.add(new MeaningEntry(line));
+				synonyms.get(rowIndex)
+					.setMeanings(lines);
 			}
 			catch(IllegalArgumentException ignored){}
 		}

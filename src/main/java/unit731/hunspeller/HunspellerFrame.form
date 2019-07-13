@@ -771,7 +771,7 @@
                     </Property>
                     <Property name="autoResizeMode" type="int" value="3"/>
                     <Property name="rowSorter" type="javax.swing.RowSorter" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="new TableRowSorter&lt;ThesaurusTableModel&gt;((ThesaurusTableModel)theTable.getModel())" type="code"/>
+                      <Connection code="new TableRowSorter&lt;&gt;((ThesaurusTableModel)theTable.getModel())" type="code"/>
                     </Property>
                     <Property name="showHorizontalLines" type="boolean" value="false"/>
                     <Property name="showVerticalLines" type="boolean" value="false"/>

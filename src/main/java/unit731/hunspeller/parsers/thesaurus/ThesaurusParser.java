@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.interfaces.Undoable;
 import unit731.hunspeller.parsers.thesaurus.dtos.ThesaurusEntry;
-import unit731.hunspeller.parsers.thesaurus.dtos.MeaningEntry;
 import unit731.hunspeller.parsers.thesaurus.dtos.DuplicationResult;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.PatternHelper;
@@ -221,16 +220,8 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			for(final String meaning : means){
 				final String mean = PatternHelper.replaceAll(meaning, ThesaurusDictionary.PATTERN_PART_OF_SPEECH, StringUtils.EMPTY);
 				for(final ThesaurusEntry synonym : synonyms)
-					if(synonym.getSynonym().equals(mean)){
-						final List<MeaningEntry> meanings = synonym.getMeanings();
-						final long countSamePartOfSpeech = meanings.stream()
-							.map(MeaningEntry::getPartOfSpeech)
-							.filter(pos -> pos.equals(partOfSpeech))
-							.map(m -> 1)
-							.reduce(0, (accumulator, m) -> accumulator + 1);
-						if(countSamePartOfSpeech > 0l)
-							throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
-					}
+					if(synonym.getSynonym().equals(mean) && synonym.countSamePartOfSpeech(partOfSpeech) > 0l)
+						throw new IllegalArgumentException("Duplicate detected for '" + meaning + "'");
 			}
 		}
 		catch(final IllegalArgumentException e){
@@ -242,13 +233,13 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 		return new DuplicationResult(duplicates, forcedInsertion);
 	}
 
-	public void setMeanings(final int index, final List<MeaningEntry> meanings, final String text){
+	public void setMeanings(final int index, final String text){
 		try{
 			//FIXME
-//			undoCaretaker.pushMemento(createMemento(index, meanings, text));
+//			undoCaretaker.pushMemento(createMemento(index, text));
 			undoCaretaker.pushMemento(createMemento());
 
-			dictionary.setMeanings(index, meanings, text);
+			dictionary.setMeanings(index, text);
 
 			if(undoable != null)
 				undoable.onUndoChange(true);
@@ -330,29 +321,14 @@ public class ThesaurusParser implements OriginatorInterface<ThesaurusParser.Meme
 			dataWriter.write(StringUtils.LF);
 			//save data
 			int idx = charset.name().length() + 1;
+			final int doubleLineTerminatorLength = StringUtils.LF.length() * 2;
 			final List<ThesaurusEntry> synonyms = dictionary.getSynonyms();
 			for(ThesaurusEntry synonym : synonyms){
-				final String syn = synonym.getSynonym();
-				indexWriter.write(syn);
-				indexWriter.write(ThesaurusEntry.PIPE);
-				indexWriter.write(Integer.toString(idx));
-				indexWriter.write(StringUtils.LF);
+				synonym.saveToIndex(indexWriter, idx);
 
-				final int meaningsCount = synonym.getMeanings().size();
-				dataWriter.write(syn);
-				dataWriter.write(ThesaurusEntry.PIPE);
-				dataWriter.write(Integer.toString(meaningsCount));
-				dataWriter.write(StringUtils.LF);
-				final List<MeaningEntry> meanings = synonym.getMeanings();
-				int meaningsLength = 1;
-				for(final MeaningEntry meaning : meanings){
-					dataWriter.write(meaning.toString());
-					dataWriter.write(StringUtils.LF);
+				int meaningsLength = synonym.saveToData(dataWriter, charset);
 
-					meaningsLength += meaning.toString().getBytes(charset).length + 1;
-				}
-
-				idx += syn.getBytes(charset).length + meaningsLength + 2;
+				idx += synonym.getSynonym().getBytes(charset).length + meaningsLength + doubleLineTerminatorLength;
 			}
 
 			dictionary.resetModified();
