@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
 import unit731.hunspeller.services.FileHelper;
@@ -114,12 +113,10 @@ public class HyphenationParser{
 	private final HyphenationOptionsParser optParser;
 
 
-	public HyphenationParser(String language){
-		Objects.requireNonNull(language);
-
-		comparator = BaseBuilder.getComparator(language);
-
+	public HyphenationParser(final Comparator<String> comparator){
 		Objects.requireNonNull(comparator);
+
+		this.comparator = comparator;
 
 		for(Level level : Level.values()){
 			rules.put(level, new HashMap<>());
@@ -128,14 +125,12 @@ public class HyphenationParser{
 		optParser = new HyphenationOptionsParser();
 	}
 
-	HyphenationParser(String language, Map<Level, AhoCorasickTrie<String>> patterns,
-			Map<Level, Map<String, String>> customHyphenations, HyphenationOptionsParser optParser){
-		Objects.requireNonNull(language);
+	HyphenationParser(final Comparator<String> comparator, final Map<Level, AhoCorasickTrie<String>> patterns,
+			Map<Level, Map<String, String>> customHyphenations, final HyphenationOptionsParser optParser){
 		Objects.requireNonNull(patterns);
-
-		comparator = BaseBuilder.getComparator(language);
-
 		Objects.requireNonNull(comparator);
+
+		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(Level level : Level.values())

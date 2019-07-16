@@ -11,6 +11,7 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.Deflater;
@@ -199,7 +200,9 @@ public class Backbone implements FileChangeListener{
 		if(hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
-			hypParser = new HyphenationParser(affParser.getAffixData().getLanguage());
+			String language = affParser.getAffixData().getLanguage();
+			Comparator<String> comparator = BaseBuilder.getComparator(language);
+			hypParser = new HyphenationParser(comparator);
 			hypParser.parse(hypFile);
 
 			hyphenator = new Hyphenator(hypParser, HyphenationParser.BREAK_CHARACTER);

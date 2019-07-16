@@ -1,9 +1,11 @@
 package unit731.hunspeller.parsers.hyphenation;
 
+import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -33,7 +35,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 2");
 		optParser.parseLine("RIGHTHYPHENMIN 0");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
 	}
@@ -49,7 +52,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 0");
 		optParser.parseLine("RIGHTHYPHENMIN 2");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
 	}
@@ -65,7 +69,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 0");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "a", "bc");
 	}
@@ -81,7 +86,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 0");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "ab", "c");
 	}
@@ -97,7 +103,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("du", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("du");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "omaatje", "oma", "tje");
 	}
@@ -113,7 +120,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
 	}
@@ -129,7 +137,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
 	}
@@ -145,7 +154,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
 	}
@@ -162,7 +172,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
 	}
@@ -179,7 +190,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "kuko–fu", "ku", "ko–", "–fu");
 	}
@@ -195,7 +207,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("en");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "eighteen", "eight", "teen");
 	}
@@ -211,7 +224,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("de");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "schiffahrt", "schiff", "fahrt");
 	}
@@ -227,7 +241,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("de");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "Zucker", "Zuk", "ker");
 	}
@@ -243,7 +258,8 @@ class HyphenationParserTest{
 		custom1stLevel.put("abcd", "ab=cd");
 		custom.put(HyphenationParser.Level.NON_COMPOUND, custom1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, custom, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, custom, optParser);
 
 		check(parser, "abcd", "ab", "cd");
 	}
@@ -259,7 +275,8 @@ class HyphenationParserTest{
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("vec", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
 	}
@@ -277,7 +294,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("de", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("de");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "schiffen", "schif", "fen");
 		check(parser, "schiffahrt", "schiff", "fahrt");
@@ -295,7 +313,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("hu", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("hu");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "asszonnyal", "asz", "szony", "nyal");
 	}
@@ -310,7 +329,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("nl", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("nl");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "omaatje", "oma", "tje");
 	}
@@ -325,7 +345,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("nl", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("nl");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "omaatje", "oma", "tje");
 	}
@@ -339,7 +360,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("fr", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("fr");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "exéémple", "exá", "ample");
 		check(parser, "exéémplxééme", "exá", "amplxá", "ame");
@@ -362,7 +384,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "paral·lel", "paral", "lel");
 		check(parser, "omaatje", "oma", "tje");
@@ -393,7 +416,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 2");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 3");
-		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("en");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "motorcycle", "mo", "tor", "cy", "cle");
 	}
@@ -417,7 +441,8 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 3");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 4");
-		HyphenationParser parser = new HyphenationParser("en", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("en");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "motorcycle", "motor", "cycle");
 	}
@@ -438,7 +463,8 @@ class HyphenationParserTest{
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("hu", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("hu");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "főnökasszony", "fő", "nök", "asz", "szony");
 		check(parser, "asszonyfőnök", "asz", "szony", "fő", "nök");
@@ -464,7 +490,8 @@ class HyphenationParserTest{
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("no", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("no");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "kilowattime", "ki", "lo", "watt", "ti", "me");
 	}
@@ -488,7 +515,8 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "postea", "post", "e", "a");
 	}
@@ -511,7 +539,8 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "meaque", "me", "a", "que");
 	}
@@ -536,7 +565,8 @@ class HyphenationParserTest{
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
 		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK);
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "_foobara'foobarb-foo_barc\u2019foobard_", "_foobara'foobarb-foo", "_", "barc\u2019foobard_");
 	}
@@ -561,7 +591,8 @@ class HyphenationParserTest{
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
 		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.RIGHT_SINGLE_QUOTATION_MARK);
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "=foobara'foobarb-foo_barc\u2019foobard=", "=foobara'foobarb-foo", "_", "barc\u2019foobard=");
 	}
@@ -576,7 +607,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "maﬃa", "maf", "ﬁa");
 		check(parser, "maﬃaﬃa", "maf", "ﬁaf", "ﬁa");
@@ -591,7 +623,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+			Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "őőőőőőő", "őő", "ő", "ő", "ő", "őő");
 	}
@@ -618,7 +651,8 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.COMPOUND, patterns2ndLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		HyphenationParser parser = new HyphenationParser("xx", allPatterns, null, optParser);
+		Comparator<String> comparator = BaseBuilder.getComparator("xx");
+		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "paral·lel", "paral", "lel");
 		check(parser, "reëel", "re", "eel");
