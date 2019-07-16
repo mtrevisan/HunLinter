@@ -27,7 +27,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-		dicEntry.applyInputConversionTable(affixData);
+		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
@@ -63,7 +63,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixTag.ALIASES_MORPHOLOGICAL_FIELD);
 
 		final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLineWithAliases(line, strategy, aliasesFlag, aliasesMorphologicalField);
-		dicEntry.applyInputConversionTable(affixData);
+		dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 		final List<Production> productions = applyAffixRules(dicEntry, false, overriddenRule);
 

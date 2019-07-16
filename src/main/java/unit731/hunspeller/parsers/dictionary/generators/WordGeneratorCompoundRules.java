@@ -65,7 +65,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		Map<String, Set<DictionaryEntry>> compoundRules = new HashMap<>();
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
-			dicEntry.applyInputConversionTable(affixData);
+			dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 			final Map<String, Set<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);
 			compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);

@@ -63,7 +63,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		final List<DictionaryEntry> result = new ArrayList<>();
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, strategy);
-			dicEntry.applyInputConversionTable(affixData);
+			dicEntry.applyInputConversionTable(affixData::applyInputConversionTable);
 
 			//filter input set by minimum length and forbidden flag
 			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
