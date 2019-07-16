@@ -9,8 +9,8 @@ import java.util.Objects;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.PermutationsWithRepetitions;
 
 

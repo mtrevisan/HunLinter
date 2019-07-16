@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.SetHelper;
 

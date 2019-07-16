@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.dtos.ParsingContext;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.ParserHelper;
 
 

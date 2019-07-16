@@ -13,8 +13,8 @@ import unit731.hunspeller.parsers.dictionary.LineEntry;
 import unit731.hunspeller.parsers.dictionary.RulesReducer;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 

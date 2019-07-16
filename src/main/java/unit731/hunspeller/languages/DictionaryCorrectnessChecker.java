@@ -5,8 +5,8 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
-import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.vos.Production;
+import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 
 

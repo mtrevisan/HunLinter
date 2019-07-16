@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 

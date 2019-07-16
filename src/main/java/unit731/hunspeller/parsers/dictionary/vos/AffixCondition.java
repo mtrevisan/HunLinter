@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.PatternHelper;
 
 

@@ -17,7 +17,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import unit731.hunspeller.collections.radixtree.sequencers.RegExpSequencer;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 import unit731.hunspeller.services.PatternHelper;
 import unit731.hunspeller.services.SetHelper;
 import unit731.hunspeller.services.StringHelper;

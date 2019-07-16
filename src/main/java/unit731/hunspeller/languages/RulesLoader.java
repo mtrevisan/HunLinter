@@ -18,7 +18,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.SetHelper;
 
 

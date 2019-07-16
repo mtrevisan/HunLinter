@@ -6,10 +6,10 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.Backbone;
-import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.ConversionTable;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.FileHelper;
 
 

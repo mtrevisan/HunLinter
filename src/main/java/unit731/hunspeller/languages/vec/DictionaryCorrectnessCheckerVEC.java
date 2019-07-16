@@ -11,8 +11,8 @@ import unit731.hunspeller.languages.DictionaryCorrectnessChecker;
 import unit731.hunspeller.languages.RulesLoader;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
 import unit731.hunspeller.services.PatternHelper;
 

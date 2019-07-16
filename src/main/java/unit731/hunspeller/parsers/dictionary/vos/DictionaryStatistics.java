@@ -101,10 +101,6 @@ public class DictionaryStatistics implements Closeable{
 		return (totalProductions > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 	}
 
-	public Orthography getOrthography(){
-		return orthography;
-	}
-
 	public void addData(final String word){
 		addData(word, null);
 	}

@@ -22,6 +22,7 @@ import unit731.hunspeller.parsers.affix.handlers.CopyOverHandler;
 import unit731.hunspeller.parsers.affix.handlers.Handler;
 import unit731.hunspeller.parsers.affix.handlers.WordBreakTableHandler;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
+import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.HyphenationParser;
 import unit731.hunspeller.services.FileHelper;
 import unit731.hunspeller.services.ParserHelper;

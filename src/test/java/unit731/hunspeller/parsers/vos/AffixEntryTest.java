@@ -1,9 +1,10 @@
-package unit731.hunspeller.parsers.dictionary.vos;
+package unit731.hunspeller.parsers.vos;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.affix.strategies.ParsingStrategyFactory;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 
 
 class AffixEntryTest{

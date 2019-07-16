@@ -7,7 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import unit731.hunspeller.DictionarySortDialog;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.Production;
 
 
 public class CompoundTableModel extends AbstractTableModel implements HunspellerTableModel<Production>{

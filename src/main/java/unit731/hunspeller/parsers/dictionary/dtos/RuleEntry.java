@@ -2,7 +2,7 @@ package unit731.hunspeller.parsers.dictionary.dtos;
 
 import java.util.List;
 import java.util.Objects;
-import unit731.hunspeller.parsers.dictionary.vos.AffixEntry;
+import unit731.hunspeller.parsers.vos.AffixEntry;
 
 
 public class RuleEntry{

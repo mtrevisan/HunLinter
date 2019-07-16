@@ -1,10 +1,11 @@
-package unit731.hunspeller.parsers.dictionary.vos;
+package unit731.hunspeller.parsers.vos;
 
 import java.io.File;
 import java.io.IOException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unit731.hunspeller.parsers.affix.AffixParser;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.services.FileHelper;
 
 

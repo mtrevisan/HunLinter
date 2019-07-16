@@ -1,5 +1,7 @@
 package unit731.hunspeller.parsers.dictionary.workers;
 
+import unit731.hunspeller.languages.BaseBuilder;
+import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerDictionaryBase;
 import java.awt.Frame;
 import java.util.Collections;
@@ -14,7 +16,7 @@ import unit731.hunspeller.parsers.affix.AffixParser;
 import unit731.hunspeller.parsers.dictionary.DictionaryParser;
 import unit731.hunspeller.parsers.dictionary.generators.WordGenerator;
 import unit731.hunspeller.parsers.dictionary.vos.DictionaryStatistics;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.dictionary.workers.core.WorkerData;
 import unit731.hunspeller.parsers.hyphenation.dtos.Hyphenation;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
@@ -26,6 +28,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 
 	private final DictionaryStatistics dicStatistics;
 	private final HyphenatorInterface hyphenator;
+	private final Orthography orthography;
 
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
@@ -35,8 +38,10 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 		Objects.requireNonNull(parent);
 
 		final AffixData affixData = affParser.getAffixData();
-		dicStatistics = new DictionaryStatistics(affixData.getLanguage(), affixData.getCharset());
+		final String language = affixData.getLanguage();
+		dicStatistics = new DictionaryStatistics(language, affixData.getCharset());
 		this.hyphenator = hyphenator;
+		orthography = BaseBuilder.getOrthography(language);
 
 
 		final BiConsumer<String, Integer> lineProcessor = (line, row) -> {
@@ -50,7 +55,7 @@ public class StatisticsWorker extends WorkerDictionaryBase{
 					dicStatistics.addData(word);
 				else
 					for(final String subword : subwords){
-						final Hyphenation hyph = hyphenator.hyphenate(dicStatistics.getOrthography().markDefaultStress(subword));
+						final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
 						dicStatistics.addData(word, hyph);
 					}
 			}

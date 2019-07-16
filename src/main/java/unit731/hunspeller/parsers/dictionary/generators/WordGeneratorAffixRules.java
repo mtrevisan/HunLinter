@@ -5,11 +5,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
-import unit731.hunspeller.parsers.affix.AffixTag;
+import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
-import unit731.hunspeller.parsers.dictionary.vos.DictionaryEntry;
-import unit731.hunspeller.parsers.dictionary.vos.Production;
+import unit731.hunspeller.parsers.vos.DictionaryEntry;
+import unit731.hunspeller.parsers.vos.Production;
 
 
 class WordGeneratorAffixRules extends WordGeneratorBase{
