@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrie;
 import unit731.hunspeller.collections.ahocorasicktrie.AhoCorasickTrieBuilder;
-import unit731.hunspeller.languages.Orthography;
 import unit731.hunspeller.languages.BaseBuilder;
 import unit731.hunspeller.parsers.hyphenation.vos.HyphenationOptionsParser;
 import unit731.hunspeller.services.ExceptionHelper;
@@ -313,7 +312,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to add
 	 * @param level	Level to add the rule to
@@ -335,7 +334,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to remove
 	 * @param level	Level to remove the rule from
@@ -475,7 +474,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
+	 * NOTE: Calling the method {@link unit731.hunspeller.languages.Orthography#correctOrthography(String)} may be necessary
 	 * 
 	 * @param rule	The rule to be checked
 	 * @param level	The level to check the rule for
