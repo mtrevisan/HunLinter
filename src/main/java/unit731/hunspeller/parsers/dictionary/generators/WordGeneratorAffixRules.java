@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
+import unit731.hunspeller.parsers.vos.RuleEntry;
 import unit731.hunspeller.parsers.vos.DictionaryEntry;
 import unit731.hunspeller.parsers.vos.Production;
 
@@ -46,7 +46,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 		//convert using output table
 		for(final Production production : productions)
-			production.applyOutputConversionTable(affixData);
+			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
 			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));
@@ -69,7 +69,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 
 		//convert using output table
 		for(final Production production : productions)
-			production.applyOutputConversionTable(affixData);
+			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
 			productions.forEach(production -> LOGGER.trace("Produced word: {}", production));

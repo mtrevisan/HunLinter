@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.enums.MorphologicalTag;
 
@@ -188,8 +188,8 @@ public class Production extends DictionaryEntry{
 		return sj.toString();
 	}
 
-	public void applyOutputConversionTable(final AffixData affixData){
-		word = affixData.applyOutputConversionTable(word);
+	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){
+		word = outputConversionTable.apply(word);
 	}
 
 	@Override

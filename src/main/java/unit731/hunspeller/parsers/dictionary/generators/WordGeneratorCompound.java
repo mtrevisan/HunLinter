@@ -137,7 +137,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	private void applyOutputConversions(final Set<Production> productions, final String forceCompoundUppercaseFlag){
 		//convert using output table
 		for(final Production production : productions){
-			production.applyOutputConversionTable(affixData);
+			production.applyOutputConversionTable(affixData::applyOutputConversionTable);
 			production.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			production.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
