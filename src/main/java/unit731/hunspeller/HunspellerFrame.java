@@ -1508,34 +1508,46 @@ public class HunspellerFrame extends JFrame implements ActionListener, PropertyC
 
 			Runnable resumeTask = () -> setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-			Runnable cancelTaskDuplicates = () -> dicCheckCorrectnessMenuItem.setEnabled(true);
-			dicCorrectnessWorker.askUserToAbort(this, cancelTaskDuplicates, resumeTask, null);
+			if(dicCorrectnessWorker != null){
+				Runnable cancelTaskDuplicates = () -> dicCheckCorrectnessMenuItem.setEnabled(true);
+				dicCorrectnessWorker.askUserToAbort(this, cancelTaskDuplicates, resumeTask, null);
+			}
 
-			Runnable cancelTaskWordCount = () -> dicWordCountMenuItem.setEnabled(true);
-			dicWordCountWorker.askUserToAbort(this, cancelTaskWordCount, resumeTask, null);
+			if(dicWordCountWorker != null){
+				Runnable cancelTaskWordCount = () -> dicWordCountMenuItem.setEnabled(true);
+				dicWordCountWorker.askUserToAbort(this, cancelTaskWordCount, resumeTask, null);
+			}
 
-			Runnable cancelTaskStatistics = () -> {
-				dicStatisticsMenuItem.setEnabled(true);
-				hypStatisticsMenuItem.setEnabled(true);
-			};
-			dicStatisticsWorker.askUserToAbort(this, cancelTaskStatistics, resumeTask, null);
+			if(dicStatisticsWorker != null){
+				Runnable cancelTaskStatistics = () -> {
+					dicStatisticsMenuItem.setEnabled(true);
+					hypStatisticsMenuItem.setEnabled(true);
+				};
+				dicStatisticsWorker.askUserToAbort(this, cancelTaskStatistics, resumeTask, null);
+			}
 
-			Runnable cancelTaskWordlist = () -> {
-				dicExtractWordlistMenuItem.setEnabled(true);
-				dicExtractWordlistPlainTextMenuItem.setEnabled(true);
-			};
-			dicWordlistWorker.askUserToAbort(this, cancelTaskWordlist, resumeTask, null);
+			if(dicWordlistWorker != null){
+				Runnable cancelTaskWordlist = () -> {
+					dicExtractWordlistMenuItem.setEnabled(true);
+					dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+				};
+				dicWordlistWorker.askUserToAbort(this, cancelTaskWordlist, resumeTask, null);
+			}
 
-			Runnable cancelTaskRulesExtractor = () -> {
-				cmpInputComboBox.setEnabled(true);
-				limitComboBox.setEnabled(true);
-				cmpInputTextArea.setEnabled(true);
-				cmpLoadInputButton.setEnabled(true);
-			};
-			compoundRulesExtractorWorker.askUserToAbort(this, cancelTaskRulesExtractor, resumeTask, null);
+			if(compoundRulesExtractorWorker != null){
+				Runnable cancelTaskRulesExtractor = () -> {
+					cmpInputComboBox.setEnabled(true);
+					limitComboBox.setEnabled(true);
+					cmpInputTextArea.setEnabled(true);
+					cmpLoadInputButton.setEnabled(true);
+				};
+				compoundRulesExtractorWorker.askUserToAbort(this, cancelTaskRulesExtractor, resumeTask, null);
+			}
 
-			Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
-			hypCorrectnessWorker.askUserToAbort(this, cancelTaskCorrectness, resumeTask, null);
+			if(hypCorrectnessWorker != null){
+				Runnable cancelTaskCorrectness = () -> hypCheckCorrectnessMenuItem.setEnabled(true);
+				hypCorrectnessWorker.askUserToAbort(this, cancelTaskCorrectness, resumeTask, null);
+			}
 		}
 	}
 
