@@ -147,7 +147,6 @@ public enum AffixTag{
 //	CHECK_SHARPS("CHECKSHARPS");
 
 
-
 	private final String code;
 
 

@@ -22,7 +22,7 @@ import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.dictionary.dtos.RuleEntry;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
 import unit731.hunspeller.parsers.dictionary.dtos.Affixes;
-import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -98,7 +98,7 @@ public class DictionaryEntry{
 		boolean containsStem = false;
 		if(mfs != null)
 			for(final String mf : mfs)
-				if(mf.startsWith(MorphologicalTag.TAG_STEM)){
+				if(mf.startsWith(MorphologicalTag.TAG_STEM.getCode())){
 					containsStem = true;
 					break;
 				}
@@ -203,7 +203,7 @@ public class DictionaryEntry{
 	public boolean hasPartOfSpeech(){
 		if(morphologicalFields != null)
 			for(final String morphologicalField : morphologicalFields)
-				if(morphologicalField.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH))
+				if(morphologicalField.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()))
 					return true;
 		return false;
 	}

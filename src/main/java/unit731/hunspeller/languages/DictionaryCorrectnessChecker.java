@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
 import unit731.hunspeller.parsers.affix.AffixData;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.hyphenation.hyphenators.HyphenatorInterface;
@@ -64,7 +65,7 @@ public class DictionaryCorrectnessChecker{
 				throw new IllegalArgumentException(WORD_HAS_INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));
 
-			final String key = morphologicalField.substring(0, 3);
+			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField.substring(0, 3));
 			if(!rulesLoader.containsDataField(key))
 				throw new IllegalArgumentException(WORD_HAS_UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{production.getWord(),
 					morphologicalField}));

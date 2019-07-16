@@ -10,7 +10,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.AffixData;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 
 
 public class Production extends DictionaryEntry{
@@ -182,7 +182,7 @@ public class Production extends DictionaryEntry{
 	public String toStringWithPartOfSpeechFields(){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(word);
-		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH);
+		final List<String> fields = getMorphologicalFields(MorphologicalTag.TAG_PART_OF_SPEECH.getCode());
 		if(!fields.isEmpty())
 			sj.add(POS_OPEN_BRACKET + String.join(StringUtils.SPACE, fields) + POS_CLOSE_BRACKET);
 		return sj.toString();

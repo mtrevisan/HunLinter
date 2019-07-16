@@ -15,10 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
-import unit731.hunspeller.parsers.dictionary.vos.AffixCondition;
 import unit731.hunspeller.parsers.enums.AffixTag;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.services.PatternHelper;
 
 
@@ -190,12 +189,12 @@ public class AffixEntry{
 //		final boolean containsPartOfSpeech = amf.stream()
 //			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH));
 		final boolean containsTerminalSuffixes = amf.stream()
-			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX));
+			.anyMatch(field -> field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()));
 		//remove inflectional and terminal suffixes
 		mf = mf.stream()
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX))
-//			.filter(field -> !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH) || !containsPartOfSpeech)
-			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX) || !containsTerminalSuffixes)
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_INFLECTIONAL_SUFFIX.getCode()))
+//			.filter(field -> !field.startsWith(MorphologicalTag.TAG_PART_OF_SPEECH.getCode()) || !containsPartOfSpeech)
+			.filter(field -> !field.startsWith(MorphologicalTag.TAG_TERMINAL_SUFFIX.getCode()) || !containsTerminalSuffixes)
 			.collect(Collectors.toList());
 
 		//find stem

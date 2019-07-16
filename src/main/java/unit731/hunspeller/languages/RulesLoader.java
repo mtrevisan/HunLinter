@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,7 +18,7 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import unit731.hunspeller.parsers.affix.strategies.FlagParsingStrategy;
-import unit731.hunspeller.parsers.dictionary.dtos.MorphologicalTag;
+import unit731.hunspeller.parsers.enums.MorphologicalTag;
 import unit731.hunspeller.parsers.vos.Production;
 import unit731.hunspeller.services.SetHelper;
 
@@ -34,7 +35,7 @@ public class RulesLoader{
 	private final boolean morphologicalFieldsCheck;
 	private final boolean enableVerbSyllabationCheck;
 	private final boolean wordCanHaveMultipleAccents;
-	private final Map<String, Set<String>> dataFields = new HashMap<>();
+	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
 	private final Set<String> multipleAccentedWords;
 	private final Set<String> hasToContainAccent = new HashSet<>();
@@ -135,11 +136,11 @@ public class RulesLoader{
 		return wordCanHaveMultipleAccents;
 	}
 
-	public boolean containsDataField(final String key){
+	public boolean containsDataField(final MorphologicalTag key){
 		return dataFields.containsKey(key);
 	}
 
-	public Set<String> getDataField(final String key){
+	public Set<String> getDataField(final MorphologicalTag key){
 		return dataFields.get(key);
 	}
 
