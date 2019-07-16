@@ -41,4 +41,8 @@ public enum MorphologicalTag{
 		return code;
 	}
 
+	public String attachValue(final String value){
+		return code + value;
+	}
+
 }

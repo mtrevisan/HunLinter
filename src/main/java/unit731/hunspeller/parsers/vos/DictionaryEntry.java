@@ -63,7 +63,7 @@ public class DictionaryEntry{
 		final String[] continuationFlags = strategy.parseFlags(expandAliases(dicFlags, aliasesFlag));
 		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM + word}, mfs));
+		final String[] morphologicalFields = (containsStem(mfs)? mfs: ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_STEM.attachValue(word)}, mfs));
 		final boolean combinable = true;
 		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 	}
@@ -209,7 +209,7 @@ public class DictionaryEntry{
 	}
 
 	public boolean hasPartOfSpeech(final String partOfSpeech){
-		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH + partOfSpeech);
+		return hasMorphologicalField(MorphologicalTag.TAG_PART_OF_SPEECH.attachValue(partOfSpeech));
 	}
 
 	private boolean hasMorphologicalField(final String morphologicalField){

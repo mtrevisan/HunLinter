@@ -233,7 +233,7 @@ public class AffixEntry{
 		if(compoundEntries != null)
 			for(final DictionaryEntry compoundEntry : compoundEntries){
 				final String compound = compoundEntry.getWord();
-				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART + compound}, compoundEntry.morphologicalFields));
+				mf.add(ArrayUtils.addAll(new String[]{MorphologicalTag.TAG_PART.attachValue(compound)}, compoundEntry.morphologicalFields));
 			}
 		return mf.stream()
 			.flatMap(Arrays::stream)
